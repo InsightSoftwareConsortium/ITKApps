@@ -23,18 +23,18 @@ CannySegmentationLevelSetModule<TInputPixelType>
   m_ImportFilter                     = ImportFilterType::New();
   m_CastFilter                       = CastFilterType::New();
   m_FastMarchingImageFilter          = FastMarchingFilterType::New();
-//  m_CannySegmentationLevelSetFilter  = CannySegmentationLevelSetFilterType::New();
+  m_CannySegmentationLevelSetFilter  = CannySegmentationLevelSetFilterType::New();
   m_IntensityWindowingFilter         = IntensityWindowingFilterType::New();
   m_NodeContainer                    = NodeContainerType::New();
 
   m_PerformPostprocessing   = true;
 
   // Set up the pipeline
-//  m_CannySegmentationLevelSetFilter->SetInput(         m_FastMarchingImageFilter->GetOutput() );
+  m_CannySegmentationLevelSetFilter->SetInput(         m_FastMarchingImageFilter->GetOutput() );
   m_CastFilter->SetInput(                              m_ImportFilter->GetOutput() );
-//  m_CannySegmentationLevelSetFilter->SetFeatureImage(  m_CastFilter->GetOutput() );
+  m_CannySegmentationLevelSetFilter->SetFeatureImage(  m_CastFilter->GetOutput() );
 
-//  m_IntensityWindowingFilter->SetInput(    m_CannySegmentationLevelSetFilter->GetOutput() );
+  m_IntensityWindowingFilter->SetInput(    m_CannySegmentationLevelSetFilter->GetOutput() );
 
   m_IntensityWindowingFilter->SetOutputMinimum( 255 );
   m_IntensityWindowingFilter->SetOutputMaximum(   0 );
@@ -42,9 +42,9 @@ CannySegmentationLevelSetModule<TInputPixelType>
   m_FastMarchingImageFilter->SetSpeedConstant( 1.0 );
 
   // Allow progressive release of memory as the pipeline is executed
-//  m_CannySegmentationLevelSetFilter->ReleaseDataFlagOn();
+  m_CannySegmentationLevelSetFilter->ReleaseDataFlagOn();
 
-//  m_CannySegmentationLevelSetFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
+  m_CannySegmentationLevelSetFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
   m_FastMarchingImageFilter->AddObserver(              itk::ProgressEvent(), this->GetCommandObserver() );
   m_IntensityWindowingFilter->AddObserver(        itk::ProgressEvent(), this->GetCommandObserver() );
 
