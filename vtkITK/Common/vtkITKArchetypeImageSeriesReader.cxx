@@ -21,6 +21,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 
+#ifndef vtkFloatingPointType
+#define vtkFloatingPointType float
+#endif
+
 #include "itkExceptionObject.h"
 
 // turn itk exceptions into vtk errors
@@ -48,7 +52,7 @@
 #include "itkImportImageContainer.h"
 #include "itkImageRegion.h"
 
-vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkITKArchetypeImageSeriesReader);
 
 //----------------------------------------------------------------------------
