@@ -1,8 +1,8 @@
 INCLUDE_DIRECTORIES(
-  ${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer
-  ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
-  ${InsightApplications_SOURCE_DIR}/AnisotropicDiffusionFltkGui
-  ${InsightApplications_BINARY_DIR}/AnisotropicDiffusionFltkGui
+  ${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer     
+  ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer     
+  ${InsightApplications_SOURCE_DIR}/SegmentationEditorFltkGui/AnisotropicDiffusionFltkGui
+  ${InsightApplications_BINARY_DIR}/SegmentationEditorFltkGui/AnisotropicDiffusionFltkGui
 )
 
 SET(AnisotropicDiffusionFltkGui3D_SRCS
