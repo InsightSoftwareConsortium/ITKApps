@@ -325,8 +325,10 @@ LandmarkSliceViewer<TImagePixel>
   int    y;
   SizeType        size; 
   IndexType       modifiedIndex;
-  
-  size = cOverlayData->GetLargestPossibleRegion().GetSize();
+  RegionType region ;
+
+  region = cOverlayData->GetLargestPossibleRegion();
+  size = region.GetSize();
   OverlayPixelType o_color ;
   for ( unsigned int i = 0 ; i < 4 ; i++ )
     {
@@ -337,21 +339,14 @@ LandmarkSliceViewer<TImagePixel>
     {
     x = landmark.GetIndex()[0]+i;
     
-    if( x < 0 ) 
-      {
-      x = 0;
-      }
-    
-    if( x >= static_cast<int>(size[0]) )
-      {
-      x = size[0];
-      }
-
     modifiedIndex[0] = x;
     modifiedIndex[1] = (landmark.GetIndex())[1] ;
     modifiedIndex[2] = (landmark.GetIndex())[2];
 
-    cOverlayData->SetPixel(modifiedIndex, o_color);
+    if (region.IsInside(modifiedIndex))
+      {
+      cOverlayData->SetPixel(modifiedIndex, o_color);
+      }
     }
 
   for( int i=-5; i<6; i++ )
@@ -359,21 +354,14 @@ LandmarkSliceViewer<TImagePixel>
 
     y = (landmark.GetIndex())[1] + i;
 
-    if( y < 0 ) 
-      {
-      y = 0;
-      }
-
-    if( y >= static_cast<int>(size[1]) )
-      {
-      y = size[1];
-      }
-
     modifiedIndex[0] = (landmark.GetIndex())[0];
     modifiedIndex[1] = y;
     modifiedIndex[2] = (landmark.GetIndex())[2];
 
-    cOverlayData->SetPixel(modifiedIndex, o_color);
+    if (region.IsInside(modifiedIndex))
+      {
+      cOverlayData->SetPixel(modifiedIndex, o_color);
+      }
     }
 }
 
