@@ -389,6 +389,8 @@ SET(MY_BINARY_DIR ${InsightApplications_BINARY_DIR}/SNAP)
 
 # Include directories
 INCLUDE_DIRECTORIES(
+  ${ITK_SOURCE_DIR}/Utilities/zlib
+  ${ITK_DIR}/Utilities/zlib
   ${MY_SOURCE_DIR}/Common
   ${MY_SOURCE_DIR}/Logic
   ${MY_SOURCE_DIR}/Logic/Common
