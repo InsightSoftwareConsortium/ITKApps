@@ -33,7 +33,7 @@ public:
   static vtkWSLookupTableManager *New();
 
   vtkTypeMacro(vtkWSLookupTableManager,vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) {}
+  void PrintSelf(ostream&, vtkIndent) {}
   
   // Description:
   // Fills the table with a random color for each label.
