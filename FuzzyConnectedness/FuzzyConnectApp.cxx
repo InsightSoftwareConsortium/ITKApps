@@ -225,7 +225,7 @@ FuzzyConnectApp
 {
 
   m_Filter->SetInput( m_InputImage );
-  m_Filter->SetObjectsSeed( m_Seed );
+  m_Filter->SetObjectSeed( m_Seed );
 
   // set up a 5 x 5 neighborhood around seed
   IndexType startIndex;
