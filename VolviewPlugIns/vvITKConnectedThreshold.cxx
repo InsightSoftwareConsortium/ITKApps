@@ -25,12 +25,9 @@ class ConnectedThresholdRunner
 
       if( info->NumberOfMarkers < 1 )
         {
-        info->SetProperty( info, VVP_ERROR, "Please select a seed point using the 3D Markers in the Annotation menu" ); 
+        info->SetProperty( info, VVP_ERROR, "Please select seed points using the 3D Markers in the Annotation menu" ); 
         return;
         }
-
-      itk::Index<Dimension> seed;
-      VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, 0, seed );
 
       VolView::PlugIn::FilterModuleDoubleOutput< FilterType > module;
       module.SetPluginInfo( info );
@@ -39,7 +36,15 @@ class ConnectedThresholdRunner
       module.GetFilter()->SetUpper( static_cast<InputPixelType>( upper  ) );
       module.GetFilter()->SetLower( static_cast<InputPixelType>( lower ) );
       module.GetFilter()->SetReplaceValue( replaceValue );
-      module.GetFilter()->SetSeed( seed );
+
+      itk::Index<Dimension> seed;
+      const unsigned int numberOfSeeds = info->NumberOfMarkers;
+      for( unsigned int i=0; i<numberOfSeeds; i++)
+        {
+        VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, i, seed );
+        module.GetFilter()->AddSeed( seed );
+        }
+
       module.SetProduceDoubleOutput( compositeOutput          );
       // Execute the filter
       module.ProcessData( pds  );
@@ -193,7 +198,7 @@ void VV_PLUGIN_EXPORT vvITKConnectedThresholdInit(vtkVVPluginInfo *info)
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
                                     "Connected Threshold Segmentation");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,
-    "This filter applies an region growing algorithm for segmentation. The criterion for including new pixels in the region is defined by an intensity range whose bound are provided by the user. These bounds are described as the lower and upper thresholds.");
+    "This filter applies an region growing algorithm for segmentation. The criterion for including new pixels in the region is defined by an intensity range whose bound are provided by the user. These bounds are described as the lower and upper thresholds. The region is grown starting from a set of seed points that the user should provide in the form of 3D markers.");
   info->SetProperty(info, VVP_SUPPORTS_IN_PLACE_PROCESSING, "0");
   info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "0");
   info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "4");
