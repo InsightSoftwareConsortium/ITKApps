@@ -28,6 +28,7 @@ class ImageRegistrationApp : public Object
     itkTypeMacro(ImageRegistrationApp, Object);
   
     typedef TImage                        ImageType;
+    typedef typename ImageType::Pointer   ImagePointer;
     typedef typename TImage::PixelType    ImagePixelType ;
     typedef typename TImage::RegionType   RegionType ;
     typedef typename TImage::OffsetType   OffsetType ;
@@ -102,10 +103,10 @@ class ImageRegistrationApp : public Object
     itkSetMacro(MovingImageRegion, RegionType) ;
     itkGetConstMacro(MovingImageRegion, RegionType) ;
   
-    typename ImageType::Pointer GetLandmarkRegisteredMovingImage();
-    typename ImageType::Pointer GetRigidRegisteredMovingImage();
-    typename ImageType::Pointer GetAffineRegisteredMovingImage();
-    typename ImageType::Pointer GetFinalRegisteredMovingImage();
+    ImagePointer GetLandmarkRegisteredMovingImage();
+    ImagePointer GetRigidRegisteredMovingImage();
+    ImagePointer GetAffineRegisteredMovingImage();
+    ImagePointer GetFinalRegisteredMovingImage();
   
   protected:
     ImageRegistrationApp() ;
@@ -147,7 +148,7 @@ class ImageRegistrationApp : public Object
     AffineScalesType    m_AffineScales ;
     bool                m_AffineRegValid;
   
-    typename ImageType::Pointer  m_ResampleUsingTransform(
+    ImagePointer        m_ResampleUsingTransform(
                                         AffineTransformType * transform,
                                         ImageType * input,
                                         ImageType * output);

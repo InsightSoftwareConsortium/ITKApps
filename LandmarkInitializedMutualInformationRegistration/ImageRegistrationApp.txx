@@ -332,7 +332,7 @@ ImageRegistrationApp< TImage >
   }
 
 template< class TImage >
-typename ImageRegistrationApp< TImage >::ImageType::Pointer
+ImageRegistrationApp< TImage >::ImagePointer
 ImageRegistrationApp< TImage >
 ::GetLandmarkRegisteredMovingImage()
   {
@@ -341,7 +341,7 @@ ImageRegistrationApp< TImage >
   }
 
 template< class TImage >
-typename ImageRegistrationApp< TImage >::ImageType::Pointer
+typename ImageRegistrationApp< TImage >::ImagePointer
 ImageRegistrationApp< TImage >
 ::GetRigidRegisteredMovingImage()
   {
@@ -350,7 +350,7 @@ ImageRegistrationApp< TImage >
   }
 
 template< class TImage >
-typename ImageRegistrationApp< TImage >::ImageType::Pointer
+typename ImageRegistrationApp< TImage >::ImagePointer
 ImageRegistrationApp< TImage >
 ::GetAffineRegisteredMovingImage()
   {
@@ -359,7 +359,7 @@ ImageRegistrationApp< TImage >
   }
 
 template< class TImage >
-typename ImageRegistrationApp< TImage >::ImageType::Pointer
+typename ImageRegistrationApp< TImage >::ImagePointer
 ImageRegistrationApp< TImage >
 ::GetFinalRegisteredMovingImage()
   {
@@ -394,7 +394,7 @@ ImageRegistrationApp< TImage >
   }
 
 template< class TImage >
-typename ImageRegistrationApp< TImage >::ImageType::Pointer
+typename ImageRegistrationApp< TImage >::ImagePointer
 ImageRegistrationApp< TImage >
 ::m_ResampleUsingTransform(AffineTransformType * transform,
                            ImageType * input, ImageType * output)
