@@ -1,5 +1,5 @@
 /* This module encapsulates the full preprocessing required for
-   applying the FastMarching image filter for segmenting the 
+   applying the GeodesicActiveContours image filter for segmenting a 
    volume.  It requires seed points and the original image as inputs. */
 
 
