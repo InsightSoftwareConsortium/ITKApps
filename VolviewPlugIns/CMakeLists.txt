@@ -56,6 +56,7 @@ SET (PLUGINS
   vvITKIsolatedConnected
   vvITKIsotropicFourthOrderLevelSet
   vvITKMedian
+  vvITKLandmarkWarping
   vvITKSigmoid
   vvITKShapeDetectionModule
   vvITKSurfaceSpline
