@@ -93,6 +93,9 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     info->SetProperty( info, VVP_ERROR, except.what() ); 
     return -1;
   }
+
+  info->UpdateProgress( info, 1.0, "Shape Detection Done !");
+
   return 0;
 }
 
@@ -133,13 +136,13 @@ static int UpdateGUI(void *inf)
 
   info->SetGUIProperty(info, 5, VVP_GUI_LABEL, "Maximum RMS Error.");
   info->SetGUIProperty(info, 5, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 5, VVP_GUI_DEFAULT, "6.0");
+  info->SetGUIProperty(info, 5, VVP_GUI_DEFAULT, "0.06");
   info->SetGUIProperty(info, 5, VVP_GUI_HELP, "Threshold of the RMS change between one iteration and the previous one. This is a convergence criteria, the process will stop when the RMS change is lower than the value set here");
-  info->SetGUIProperty(info, 5, VVP_GUI_HINTS , "0.1 50.0 0.1");
+  info->SetGUIProperty(info, 5, VVP_GUI_HINTS , "0.01 0.5 0.01");
 
   info->SetGUIProperty(info, 6, VVP_GUI_LABEL, "Maximum iterations.");
   info->SetGUIProperty(info, 6, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 6, VVP_GUI_DEFAULT, "10.0");
+  info->SetGUIProperty(info, 6, VVP_GUI_DEFAULT, "100.0");
   info->SetGUIProperty(info, 6, VVP_GUI_HELP, "The maximum number of iteration to apply the time step in the partial differental equation.");
   info->SetGUIProperty(info, 6, VVP_GUI_HINTS , "1.0 500.0 1.0");
 
