@@ -553,23 +553,40 @@ Window3D
 
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-  this->SetupModelView();
+  // Compute the center of rotation  
+  Vector3ui crosshair = m_GlobalState->GetCrosshairsPosition();
+  for (int i=0; i<3; i++) 
+    m_CenterOfRotation[i] = m_Spacing[i] * crosshair[i];
 
-  //SetupModelView calls glPushMatrix
+  // Set up the model view matrix
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();  
+  glLoadIdentity();
+
+  // Update the screen geometry
+  glTranslatef( m_Trackball.GetPanX(), m_Trackball.GetPanY(), 0.0 );
+  glMultMatrixf( m_Trackball.GetRot() );
+  glTranslatef( -m_CenterOfRotation[0], -m_CenterOfRotation[1], -m_CenterOfRotation[2] );
+
+  // Scale by the voxel spacing
   glPushMatrix();
   glScalef( m_Spacing[X], m_Spacing[Y], m_Spacing[Z] );
 
+  // Draw things in pixel coords
   DrawCrosshairs();
   DrawSamples();
-  DrawCutPlane();
-  glMatrixMode(GL_MODELVIEW);
+  
+  // Undo scaling by voxel spacing
   glPopMatrix();
+
+  // Draw the cut plane
+  DrawCutPlane();
 
   // The mesh is already in isotropic coords (needed for marching cubes)
   m_Mesh.Display();
 
-  glMatrixMode(GL_MODELVIEW);
-  glPopMatrix();  // from SetupModelView()
+  // Restore the matrix state
+  glPopMatrix(); 
 
   // Draw any overlays there may be
   if(m_ScalpelMode->GetStarted() && m_ScalpelMode->GetInside())
@@ -625,15 +642,13 @@ Window3D
       
       }
     
-    glPopAttrib();
-
     glPopMatrix();
+    
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
-    }
-
-  
-
+    
+    glPopAttrib();
+  }
 
   glFlush();
   CheckErrors();
@@ -838,17 +853,6 @@ void
 Window3D
 ::SetupModelView()
 {
-  // Set m_Center of rotation
-  Vector3ui crosshair = m_GlobalState->GetCrosshairsPosition();
-  for (int i=0; i<3; i++) m_CenterOfRotation[i] = m_Spacing[i] * crosshair[i];
-
-  glMatrixMode( GL_MODELVIEW );
-  glPushMatrix();
-  glLoadIdentity();
-
-  glTranslatef( m_Trackball.GetPanX(), m_Trackball.GetPanY(), 0.0 );
-  glMultMatrixf( m_Trackball.GetRot() );
-  glTranslatef( -m_CenterOfRotation[0], -m_CenterOfRotation[1], -m_CenterOfRotation[2] );
 }
 
 void 
@@ -871,12 +875,26 @@ Window3D
 // Get a copy of the viewport/m_Modelview/projection matrices OpenGL uses
 void Window3D::ComputeMatricies( int *vport, double *mview, double *proj )
 {
-  this->SetupModelView();
+  // Compute the center of rotation  
+  Vector3ui crosshair = m_GlobalState->GetCrosshairsPosition();
+  for (int i=0; i<3; i++) 
+    m_CenterOfRotation[i] = m_Spacing[i] * crosshair[i];
+
+  // Set up the model view matrix
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();  
+  glLoadIdentity();
+
+  // Update the screen geometry
+  glTranslatef( m_Trackball.GetPanX(), m_Trackball.GetPanY(), 0.0 );
+  glMultMatrixf( m_Trackball.GetRot() );
+  glTranslatef( -m_CenterOfRotation[0], -m_CenterOfRotation[1], -m_CenterOfRotation[2] );
   glScalef( m_Spacing[X], m_Spacing[Y], m_Spacing[Z] );
 
   glGetIntegerv( GL_VIEWPORT, vport );
   glGetDoublev( GL_MODELVIEW_MATRIX, mview );
   glGetDoublev( GL_PROJECTION_MATRIX, proj );
+
   glPopMatrix();
 }
 
@@ -1216,7 +1234,6 @@ void Window3D::DrawSamples()
   m_Driver->GetCurrentImageData()->GetColorLabel(index).GetRGBVector(rgb);
 
   glColor3ubv(rgb);
-  glMatrixMode( GL_MODELVIEW );
   for (SampleListIterator it=m_Samples.begin();it!=m_Samples.end();it++)
     {
     glPushMatrix(); 
@@ -1243,52 +1260,6 @@ void Window3D
 {
   if (m_Plane.valid != 1) return;
 
-  // Compute the dimensions of the square representing the plane
-
-
-
-/*
-
-
-  // Spit out a vertex with given x, y coords (assumes m_Plane.coords[Z] != 0)
-  #define Z_VERTEX(x,y) Vector3d( (x), (y), \
-        ( 1.0 - (m_Plane.coords[X]*(x)) - (m_Plane.coords[Y]*(y)) ) / m_Plane.coords[Z] )
-
-  // Spit out a vertex with given x, z coords (assumes m_Plane.coords[Y] != 0)
-  #define Y_VERTEX(x,z) Vector3d( (x), \
-        ( 1.0 - (m_Plane.coords[X]*(x)) - (m_Plane.coords[Z]*(z)) ) / m_Plane.coords[Y],\
-        (z) )
-
-  // Compute the corners of the plane
-  Vector3d corner[4];  
-  if (m_Plane.coords[Z]==0)
-    {   
-    // plane is parallel to Z axis
-    if (m_Plane.coords[Y]==0)
-      {   
-      // plane is parallel to Y axis (also)
-      corner[0] = Vector3d(1.0/m_Plane.coords[X],        0.0,        0.0);
-      corner[1] = Vector3d(1.0/m_Plane.coords[X],        0.0, m_VolumeSize[Z]);
-      corner[2] = Vector3d(1.0/m_Plane.coords[X], m_VolumeSize[Y], m_VolumeSize[Z]);
-      corner[3] = Vector3d(1.0/m_Plane.coords[X], m_VolumeSize[Y],        0.0);
-      } 
-    else
-      {
-      corner[0] = Y_VERTEX(       0.0,        0.0);
-      corner[1] = Y_VERTEX(       0.0, m_VolumeSize[Z]);
-      corner[2] = Y_VERTEX(m_VolumeSize[X], m_VolumeSize[Z]);
-      corner[3] = Y_VERTEX(m_VolumeSize[X],        0.0);
-      }
-    } 
-  else
-    {        
-    // Standard case, generic plane
-    corner[0] = Z_VERTEX(       0.0,        0.0);
-    corner[1] = Z_VERTEX(       0.0, m_VolumeSize[Y]);
-    corner[2] = Z_VERTEX(m_VolumeSize[X], m_VolumeSize[Y]);
-    corner[3] = Z_VERTEX(m_VolumeSize[X],        0.0);
-    }
-*/
   Vector3d corner[4];  
   corner[0] = m_Plane.xDisplayCorner[0];
   corner[1] = m_Plane.xDisplayCorner[1];
@@ -1298,11 +1269,6 @@ void Window3D
   // Save the settings
   glPushAttrib(GL_LINE_BIT | GL_COLOR_BUFFER_BIT | GL_LIGHTING_BIT);
 
-  // Make sure we're operating in world coordinates
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-  glScaled(1.0 / m_Spacing[X], 1.0 / m_Spacing[Y], 1.0 / m_Spacing[Z] );
-  
   // Draw the plane using lines
   glEnable(GL_LINE_SMOOTH);
   glEnable(GL_LINE_STIPPLE);
@@ -1342,12 +1308,14 @@ void Window3D
     glPopMatrix();
     }
 
-  glPopMatrix();
   glPopAttrib();
 };
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.10  2003/10/14 13:44:27  pauly
+ *FIX: Fixed warnings on gcc-3.3
+ *
  *Revision 1.9  2003/10/10 15:04:21  pauly
  *ENH: Cut plane improvements (paint-over-visible and paint-over-one)
  *
