@@ -36,7 +36,7 @@ class AntiAliasRunner
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Reducing aliasing effects...");
       // Set the parameters on it
-      module.GetFilter()->SetMaximumIterations(     maxNumberOfIterations );
+      module.GetFilter()->SetNumbeOfIterations(     maxNumberOfIterations );
       module.GetFilter()->SetMaximumRMSError(       maximumRMSError    );
       module.SetOutputMinimum(  0  );
       module.SetOutputMaximum( 255 );

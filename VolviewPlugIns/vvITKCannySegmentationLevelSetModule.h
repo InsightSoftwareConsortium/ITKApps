@@ -84,7 +84,7 @@ public:
     void SetPropagationScaling( float value );
     void SetAdvectionScaling( float value );
     void SetMaximumRMSError( float value );
-    void SetMaximumIterations( unsigned int iterations );
+    void SetNumberOfIterations( unsigned int iterations );
 
     void SetThreshold( float value );
     void SetVariance( float value );

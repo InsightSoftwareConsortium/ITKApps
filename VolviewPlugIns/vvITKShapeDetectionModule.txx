@@ -185,9 +185,9 @@ ShapeDetectionModule<TInputPixelType>
 template <class TInputPixelType >
 void 
 ShapeDetectionModule<TInputPixelType>
-::SetMaximumIterations( unsigned int value )
+::SetNumberOfIterations( unsigned int value )
 {
-  m_ShapeDetectionFilter->SetMaximumIterations( value );
+  m_ShapeDetectionFilter->SetNumberOfIterations( value );
 }
 
 

@@ -188,9 +188,9 @@ GeodesicActiveContourModule<TInputPixelType>
 template <class TInputPixelType >
 void 
 GeodesicActiveContourModule<TInputPixelType>
-::SetMaximumIterations( unsigned int value )
+::SetNumberOfIterations( unsigned int value )
 {
-  m_GeodesicActiveContourFilter->SetMaximumIterations( value );
+  m_GeodesicActiveContourFilter->SetNumberOfIterations( value );
 }
 
 

@@ -47,7 +47,7 @@ class CannySegmentationLevelSetModuleRunner
       module.SetPropagationScaling( propagationScaling );
       module.SetAdvectionScaling( advectionScaling );
       module.SetMaximumRMSError( maximumRMSError );
-      module.SetMaximumIterations( maximumNumberOfIterations );
+      module.SetNumberOfIterations( maximumNumberOfIterations );
       for(unsigned int i=0; i< numberOfSeeds; i++)
         {
         VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, i, seedPosition );

@@ -134,7 +134,7 @@ public:
     filter->SetPropagationScaling( propagationScaling );
     filter->SetAdvectionScaling( advectionScaling );
     filter->SetMaximumRMSError( maximumRMSError );
-    filter->SetMaximumIterations( maximumNumberOfIterations );
+    filter->SetNumberOfIterations( maximumNumberOfIterations );
 
     m_SmoothingFilter->SetSigma( gaussianSigma );
 

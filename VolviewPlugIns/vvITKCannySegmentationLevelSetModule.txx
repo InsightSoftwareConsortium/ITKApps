@@ -198,9 +198,9 @@ CannySegmentationLevelSetModule<TInputPixelType>
 template <class TInputPixelType >
 void 
 CannySegmentationLevelSetModule<TInputPixelType>
-::SetMaximumIterations( unsigned int value )
+::SetNumberOfIterations( unsigned int value )
 {
-  m_CannySegmentationLevelSetFilter->SetMaximumIterations( value );
+  m_CannySegmentationLevelSetFilter->SetNumberOfIterations( value );
 }
 
 /*
