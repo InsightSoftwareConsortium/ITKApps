@@ -86,7 +86,7 @@ void vtkFlImageViewer::flush(void)
 void vtkFlImageViewer::draw(void){
   //UpdateSize( this->w(), this->h() );
         SetWindowId( (void*)fl_xid( this ) );
-#if !defined(WIN32)
+#if !defined(WIN32) && !defined(__APPLE__)
         SetDisplayId( fl_display );
 #endif
   Render();
