@@ -285,7 +285,6 @@ SET(MY_GRAPHICS_LIBS
   vtkGraphics
   vtkHybrid
   vtkImaging
-  vtkPatented
   vtkRendering
   ${FLTK_LIBRARIES} 
   ${OPENGL_glu_LIBRARY}
