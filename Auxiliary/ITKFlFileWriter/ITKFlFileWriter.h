@@ -23,7 +23,7 @@ protected:
   static void cb_okButton(Fl_Return_Button *o, void *d);
 };
 
- Fl_Menu_Item  menu_guiITKPixelType[] = {
+static Fl_Menu_Item  menu_guiITKPixelType[] = {
    {"char", 0,  0, 0, 0, 0, 0, 11, 56},
    {"unsigned char", 0,  0, 0, 0, 0, 0, 11, 56},
    {"short", 0,  0, 0, 0, 0, 0, 11, 56},
