@@ -99,6 +99,11 @@ public:
 
     void SetSigma( float value );
 
+    void SetStiffness( float value );
+    void SetExternalForceWeight( float value );
+    void SetTimeStep( float value );
+    void SetNumberOfIterations( unsigned int value );
+
     void ProcessData( const vtkVVProcessDataStruct * pds );
     void PostProcessData( const vtkVVProcessDataStruct * pds );
 

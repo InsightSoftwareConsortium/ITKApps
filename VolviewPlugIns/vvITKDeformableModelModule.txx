@@ -5,6 +5,7 @@
 #define _itkVVDeformableModelModule_txx
 
 #include "vvITKDeformableModelModule.h"
+#include "itkCovariantVector.h"
 
 namespace VolView 
 {
@@ -28,7 +29,9 @@ DeformableModelModule<TInputPixelType>
     // Set up the pipeline
     m_GradientMagnitudeFilter->SetInput(  m_ImportFilter->GetOutput()             );
     m_GradientFilter->SetInput(           m_GradientMagnitudeFilter->GetOutput()  );
+
     m_DeformableModelFilter->SetInput(    m_MeshSource->GetOutput()               );
+    m_DeformableModelFilter->SetGradient( m_GradientFilter->GetOutput()           );
 
     // Allow progressive release of memory as the pipeline is executed
     m_GradientMagnitudeFilter->ReleaseDataFlagOn();
@@ -95,6 +98,60 @@ DeformableModelModule<TInputPixelType>
 
 
 
+/*
+ *  Set the Stiffness of the deformable model.
+ */
+template <class TInputPixelType >
+void 
+DeformableModelModule<TInputPixelType>
+::SetStiffness( float value )
+{
+  itk::CovariantVector<double, 2>   stiffnessVector;
+  stiffnessVector[0] = value;
+  stiffnessVector[1] = value;
+  m_DeformableModelFilter->SetStiffness( stiffnessVector );
+}
+
+
+/*
+ *  Set time Step
+ */
+template <class TInputPixelType >
+void 
+DeformableModelModule<TInputPixelType>
+::SetTimeStep( float value )
+{
+  m_DeformableModelFilter->SetTimeStep( value );
+}
+
+
+
+/*
+ *  Set the factor for weighting external forces.
+ */
+template <class TInputPixelType >
+void 
+DeformableModelModule<TInputPixelType>
+::SetExternalForceWeight( float value )
+{
+  m_DeformableModelFilter->SetGradientMagnitude( value );
+}
+
+
+
+/*
+ *  Set the number of iterations 
+ */
+template <class TInputPixelType >
+void 
+DeformableModelModule<TInputPixelType>
+::SetNumberOfIterations( unsigned int value )
+{
+  m_DeformableModelFilter->SetStepThreshold( value );
+}
+
+
+
 
 /*
  *  Performs the actual filtering on the data 
@@ -153,7 +210,8 @@ DeformableModelModule<TInputPixelType>
 
   // Execute the filters and progressively remove temporary memory
   m_MeshSource->Update();
- // m_GradientMagnitudeFilter->Update();
+  m_GradientMagnitudeFilter->Update();
+  m_GradientFilter->Update();
  // m_DeformableModelFilter->Update();
 
   this->PostProcessData( pds );
@@ -179,8 +237,8 @@ DeformableModelModule<TInputPixelType>
 
   // Temporarily use the sphere output, just to debug the convertion from ITK mesh
   // to Plugin mesh.
-  //typename MeshType::ConstPointer mesh = m_DeformableModelFilter->GetOutput();
-  typename MeshType::Pointer mesh = m_MeshSource->GetOutput();
+  typedef typename MeshType::Pointer  MeshPointer;
+  MeshPointer mesh = m_DeformableModelFilter->GetOutput();
 
   // now put the results into the data structure
   const unsigned int numberOfPoints = mesh->GetNumberOfPoints();
