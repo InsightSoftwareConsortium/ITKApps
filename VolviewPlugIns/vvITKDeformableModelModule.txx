@@ -161,12 +161,6 @@ DeformableModelModule<TInputPixelType>
                                     totalNumberOfPixels,
                                     importFilterWillDeleteTheInputBuffer );
 
-  ofs << "Just before start Updating() " << std::endl;
-
-  m_DeformableModelFilter->Print( ofs );
-
-  ofs << std::endl << std::endl;
-
   // Execute the filters and progressively remove temporary memory
   m_MeshSource->Update();
   m_GradientMagnitudeFilter->Update();
