@@ -2,12 +2,11 @@
 #include "guiMainImplementation.h"
 #include "ImageRegistrationApp.h"
 #include <time.h>
+#include <string>
 
 int usage()
   {
-  std::cout 
-    << "limir [options] fixedImage movingImage" 
-    << std::endl;
+  std::cout << "miRegTool [options] fixedImage movingImage" << std::endl;
   std::cout << "Options:" << std::endl;
   std::cout << "  -I <method#> : Registration initialization" << std::endl;
   std::cout << "        0 - NONE" << std::endl;
@@ -15,6 +14,8 @@ int usage()
   std::cout << "        2 - Centers of Mass [default]" << std::endl;
   std::cout << "        3 - Moments" << std::endl;
   std::cout << "        4 - Landmarks" << std::endl;
+  std::cout << "        5 <#_Of_Tfms> <tfm1> [<tfm2> ...] - Load transform" 
+            << std::endl;
   std::cout << "  -R <method#>: Registration Method" << std::endl;
   std::cout << "        0 - NONE" << std::endl;
   std::cout << "        1 - Rigid [default]" << std::endl;
@@ -25,6 +26,10 @@ int usage()
   std::cout << "        1 - Gradient" << std::endl;
   std::cout << "        2 - Regular step gradient" << std::endl;
   std::cout << "        3 - Conjugate gradient" << std::endl;
+  std::cout << "  -I <iterations> : number of iterations for the optimizer"
+            << std::endl;
+  std::cout << "  -S <# of samples> : number of samples for MI computation"
+            << std::endl;
   std::cout << "  -L <fixedLandmarksfile> <movingLandmarksfile>" << std::endl;
   std::cout << "  -T <filename> : save registration transform" << std::endl;
   std::cout << "  -W <filename> : save registered moving image" << std::endl;
@@ -40,12 +45,18 @@ int main(int argc, char **argv)
       return usage();
       }
 
+    unsigned long iterations = 1000;
+    unsigned long samples = 1000;
+
     int initializationMethod = 2;
     int registrationMethod = 1;
     int optimizationMethod = 0;
 
     char fixedImageFilename[255];
     char movingImageFilename[255];
+
+    int  loadedTransformNumber = 0;
+    std::string loadedTransformFilename[255];
 
     char outputImageFilename[255];
     outputImageFilename[0] = '\0';
@@ -66,6 +77,14 @@ int main(int argc, char **argv)
         case 'I':
           argNum++;
           initializationMethod = (int)atof(argv[argNum++]);
+          if(initializationMethod == 5)
+            {
+            loadedTransformNumber = (int)atof(argv[argNum++]);
+            for(unsigned int i=0; i<loadedTransformNumber; i++)
+              {
+              loadedTransformFilename[i] = argv[argNum++];
+              }
+            }
           break;
         case 'R':
           argNum++;
@@ -109,6 +128,7 @@ int main(int argc, char **argv)
     typedef itk::SpatialObjectReader<>      LandmarkReaderType;
     typedef LandmarkReaderType::GroupType   GroupType;
     typedef itk::SpatialObjectWriter<>      GroupWriterType;
+    typedef itk::SpatialObjectReader<>      GroupReaderType;
     typedef itk::AffineTransform<double, 3> TransformType;
 
     ImageType::Pointer fixedImage;
@@ -226,6 +246,33 @@ int main(int argc, char **argv)
                                       movingLandmarks.GetPointer());
           }
         break;
+      case 5:
+        typedef ImageRegistrationAppType::LoadedRegTransformType LoadedTType;
+        for(unsigned int i=0; i<loadedTransformNumber; i++)
+          {
+          GroupReaderType::Pointer transformReader = GroupReaderType::New();
+          transformReader->SetFileName(loadedTransformFilename[i].c_str());
+          transformReader->Update();
+          GroupType::Pointer group = transformReader->GetGroup();
+          GroupType::TransformType::Pointer transform;
+          transform = group->GetObjectToParentTransform();
+          LoadedTType::Pointer loadedTransform = LoadedTType::New();
+          loadedTransform->SetCenter(transform->GetCenterOfRotationComponent());
+          loadedTransform->SetMatrix(transform->GetMatrix());
+          loadedTransform->SetOffset(transform->GetOffset());
+          if(i == 0)
+            {
+            imageRegistrationApp->SetLoadedTransform(
+                                   *(group->GetObjectToParentTransform()));
+            }
+          else
+            {
+            imageRegistrationApp->CompositeLoadedTransform(
+                                     *(group->GetObjectToParentTransform()));
+            }
+          }
+        imageRegistrationApp->RegisterUsingLoadedTransform();
+        break;
       }
     clock_t timeInitEnd = clock();
 
@@ -279,10 +326,12 @@ int main(int argc, char **argv)
       GroupType::Pointer group = GroupType::New();
       itk::SpatialObject<3>::TransformType::Pointer transform =
           itk::SpatialObject<3>::TransformType::New();
+      transform->SetCenter(imageRegistrationApp
+                            ->GetFinalTransform()->GetCenter());
       transform->SetMatrix(imageRegistrationApp
-                            ->GetRigidAffineTransform()->GetMatrix());
+                            ->GetFinalTransform()->GetMatrix());
       transform->SetOffset(imageRegistrationApp
-                            ->GetRigidAffineTransform()->GetOffset());
+                            ->GetFinalTransform()->GetOffset());
       group->SetObjectToParentTransform( transform.GetPointer() );
       transformWriter->SetInput( group );
       transformWriter->Update();

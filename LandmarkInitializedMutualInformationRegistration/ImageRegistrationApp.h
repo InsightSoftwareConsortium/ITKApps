@@ -60,6 +60,8 @@ class ImageRegistrationApp : public Object
     typedef LandmarkRegistratorType::ScalesType       LandmarkScalesType;
     typedef LandmarkRegistratorType::TransformType    LandmarkRegTransformType;
   
+    typedef AffineTransform<double, 3>                LoadedRegTransformType;
+
     typedef RigidRegistrator< TImage >                    RigidRegistratorType;
     typedef typename RigidRegistratorType::ParametersType RigidParametersType;
     typedef typename RigidRegistratorType::ScalesType     RigidScalesType;
@@ -90,6 +92,10 @@ class ImageRegistrationApp : public Object
 
     void RegisterUsingMoments();
 
+    void SetLoadedTransform(const LoadedRegTransformType & tfm);
+    void CompositeLoadedTransform(const LoadedRegTransformType & tfm);
+    void RegisterUsingLoadedTransform();
+
     void RegisterUsingLandmarks(LandmarkSetType* fixedImageLandmarks,
                                 LandmarkSetType* movingImageLandmarks) ;
   
@@ -106,6 +112,7 @@ class ImageRegistrationApp : public Object
     itkGetObjectMacro(MassRegTransform, MassRegTransformType) ;
     itkGetObjectMacro(MomentRegTransform, MomentRegTransformType) ;
     itkGetObjectMacro(LandmarkRegTransform, LandmarkRegTransformType) ;
+    itkGetObjectMacro(LoadedRegTransform, LoadedRegTransformType) ;
     itkGetObjectMacro(RigidRegTransform, RigidRegTransformType) ;
     itkGetObjectMacro(AffineRegTransform, AffineRegTransformType) ;
     itkGetObjectMacro(LandmarkAffineTransform, AffineTransformType) ;
@@ -148,6 +155,7 @@ class ImageRegistrationApp : public Object
     ImagePointer GetMassRegisteredMovingImage();
     ImagePointer GetMomentRegisteredMovingImage();
     ImagePointer GetLandmarkRegisteredMovingImage();
+    ImagePointer GetLoadedRegisteredMovingImage();
     ImagePointer GetRigidRegisteredMovingImage();
     ImagePointer GetAffineRegisteredMovingImage();
     ImagePointer GetFinalRegisteredMovingImage();
@@ -164,7 +172,7 @@ class ImageRegistrationApp : public Object
     void PrintError(ExceptionObject &e) ;
   
   private:
-    typedef enum { NONE, CENTER, MASS, MOMENT, LANDMARK, RIGID, AFFINE }
+    typedef enum { NONE, CENTER, MASS, MOMENT, LANDMARK, LOADED, RIGID, AFFINE }
                  PriorRegistrationMethodType;
 
     typedef enum { ONEPLUSONE,
@@ -183,6 +191,8 @@ class ImageRegistrationApp : public Object
     typename AffineTransformType::Pointer        m_MomentAffineTransform ;
     typename LandmarkRegTransformType::Pointer   m_LandmarkRegTransform ;
     typename AffineTransformType::Pointer        m_LandmarkAffineTransform ;
+    typename LoadedRegTransformType::Pointer     m_LoadedRegTransform ;
+    typename AffineTransformType::Pointer        m_LoadedAffineTransform ;
     typename RigidRegTransformType::Pointer      m_RigidRegTransform ;
     typename AffineTransformType::Pointer        m_RigidAffineTransform ;
     typename AffineRegTransformType::Pointer     m_AffineRegTransform ;
@@ -209,6 +219,8 @@ class ImageRegistrationApp : public Object
     unsigned int        m_LandmarkNumberOfIterations ;
     LandmarkScalesType  m_LandmarkScales ;
     bool                m_LandmarkRegValid;
+
+    bool                m_LoadedRegValid;
   
     unsigned int        m_RigidNumberOfIterations ;
     double              m_RigidFixedImageStandardDeviation ;

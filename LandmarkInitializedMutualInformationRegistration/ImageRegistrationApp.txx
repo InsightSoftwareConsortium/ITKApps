@@ -50,6 +50,12 @@ ImageRegistrationApp< TImage >
   m_LandmarkAffineTransform->SetIdentity() ;
   m_LandmarkRegValid = false;
   
+  m_LoadedRegTransform = LoadedRegTransformType::New();
+  m_LoadedRegTransform->SetIdentity();
+  m_LoadedAffineTransform = AffineTransformType::New();
+  m_LoadedAffineTransform->SetIdentity();
+  m_LoadedRegValid = false;
+
   m_RigidNumberOfIterations = 2000 ;
   m_RigidNumberOfSpatialSamples = 20000 ;
   m_RigidScales.set_size(6);
@@ -93,7 +99,7 @@ ImageRegistrationApp< TImage >
   m_MovingImage = NULL;
 
   m_PriorRegistrationMethod = NONE;
-  m_OptimizerMethod = GRADIENT;
+  m_OptimizerMethod = ONEPLUSONE;
   }
 
 template< class TImage >
@@ -111,10 +117,11 @@ ImageRegistrationApp< TImage >
   m_MassRegValid = false;
   m_MomentRegValid = false;
   m_LandmarkRegValid = false;
+  m_LoadedRegValid = false;
   m_RigidRegValid = false;
   m_AffineRegValid = false;
   m_PriorRegistrationMethod = NONE;
-  m_OptimizerMethod = GRADIENT;
+  m_OptimizerMethod = ONEPLUSONE;
   }
 
 template< class TImage >
@@ -126,10 +133,11 @@ ImageRegistrationApp< TImage >
   m_MassRegValid = false;
   m_MomentRegValid = false;
   m_LandmarkRegValid = false;
+  m_LoadedRegValid = false;
   m_RigidRegValid = false;
   m_AffineRegValid = false;
   m_PriorRegistrationMethod = NONE;
-  m_OptimizerMethod = GRADIENT;
+  m_OptimizerMethod = ONEPLUSONE;
   }
 
 
@@ -203,6 +211,22 @@ ImageRegistrationApp< TImage >
         p[4] = lmkParams[4];
         p[5] = lmkParams[5];
         center = m_LandmarkRegTransform->GetCenter();
+        }
+      break;
+      }
+    case LOADED:
+      {
+      if(m_LoadedRegValid)
+        {
+        itk::Versor<double> v;
+        v.Set(m_LoadedRegTransform->GetMatrix());
+        p[0] = v.GetX();
+        p[1] = v.GetY();
+        p[2] = v.GetZ();
+        p[3] = m_LoadedRegTransform->GetTranslation()[0];
+        p[4] = m_LoadedRegTransform->GetTranslation()[1];
+        p[5] = m_LoadedRegTransform->GetTranslation()[2];
+        center = m_LoadedRegTransform->GetCenter();
         }
       break;
       }
@@ -291,9 +315,10 @@ ImageRegistrationApp< TImage >
   m_FinalTransform = m_NoneAffineTransform;
   m_PriorRegistrationMethod = NONE;
 
-  std::cout << "DEBUG: None: FINAL affine transform: "
-            << std::endl
-            << m_FinalTransform->GetParameters() << std::endl << std::endl;
+  std::cout << "DEBUG: None: FINAL affine transform: " << std::endl
+            << m_FinalTransform->GetParameters() << std::endl
+            << "   Offset = " << m_FinalTransform->GetOffset() << std::endl
+            << "   Center = " << m_FinalTransform->GetCenter() << std::endl;
   }
 
 template< class TImage >
@@ -331,9 +356,10 @@ ImageRegistrationApp< TImage >
   m_FinalTransform = m_CenterAffineTransform;
   m_PriorRegistrationMethod = CENTER;
 
-  std::cout << "DEBUG: Center: FINAL affine transform: "
-            << std::endl
-            << m_FinalTransform->GetParameters() << std::endl << std::endl;
+  std::cout << "DEBUG: Center: FINAL affine transform: " << std::endl
+            << m_FinalTransform->GetParameters() << std::endl
+            << "   Offset = " << m_FinalTransform->GetOffset() << std::endl
+            << "   Center = " << m_FinalTransform->GetCenter() << std::endl;
   }
 
 template< class TImage >
@@ -371,9 +397,10 @@ ImageRegistrationApp< TImage >
   m_FinalTransform = m_MassAffineTransform;
   m_PriorRegistrationMethod = MASS;
 
-  std::cout << "DEBUG: Mass: FINAL affine transform: "
-            << std::endl
-            << m_FinalTransform->GetParameters() << std::endl << std::endl;
+  std::cout << "DEBUG: Mass: FINAL affine transform: " << std::endl
+            << m_FinalTransform->GetParameters() << std::endl
+            << "   Offset = " << m_FinalTransform->GetOffset() << std::endl
+            << "   Center = " << m_FinalTransform->GetCenter() << std::endl;
   }
 
 template< class TImage >
@@ -412,9 +439,10 @@ ImageRegistrationApp< TImage >
   m_FinalTransform = m_MomentAffineTransform;
   m_PriorRegistrationMethod = MOMENT;
 
-  std::cout << "DEBUG: Moment: FINAL affine transform: "
-            << std::endl
-            << m_FinalTransform->GetParameters() << std::endl;
+  std::cout << "DEBUG: Moment: FINAL affine transform: " << std::endl
+            << m_FinalTransform->GetParameters() << std::endl
+            << "   Offset = " << m_FinalTransform->GetOffset() << std::endl
+            << "   Center = " << m_FinalTransform->GetCenter() << std::endl;
   }
 
 
@@ -458,11 +486,64 @@ ImageRegistrationApp< TImage >
   m_FinalTransform = m_LandmarkAffineTransform;
   m_PriorRegistrationMethod = LANDMARK;
 
-  std::cout << "DEBUG: Landmark: FINAL affine transform: "
-            << std::endl
-            << m_FinalTransform->GetParameters() << std::endl;
+  std::cout << "DEBUG: Landmark: FINAL affine transform: " << std::endl
+            << m_FinalTransform->GetParameters() << std::endl
+            << "   Offset = " << m_FinalTransform->GetOffset() << std::endl
+            << "   Center = " << m_FinalTransform->GetCenter() << std::endl;
   }
 
+template< class TImage >
+void
+ImageRegistrationApp< TImage >
+::SetLoadedTransform(const LoadedRegTransformType & tfm)
+  {
+  m_LoadedRegTransform->SetIdentity();
+  m_LoadedRegTransform->SetCenter(tfm.GetCenter());
+  m_LoadedRegTransform->SetMatrix(tfm.GetMatrix());
+  m_LoadedRegTransform->SetOffset(tfm.GetOffset());
+
+  m_LoadedAffineTransform->SetIdentity();
+  m_LoadedAffineTransform->SetCenter(tfm.GetCenter());
+  m_LoadedAffineTransform->SetMatrix(tfm.GetMatrix());
+  m_LoadedAffineTransform->SetOffset(tfm.GetOffset());
+
+  m_LoadedRegValid = true;
+  }
+
+template< class TImage >
+void
+ImageRegistrationApp< TImage >
+::CompositeLoadedTransform(const LoadedRegTransformType & tfm)
+  {
+  m_LoadedRegTransform->SetIdentity();
+  m_LoadedRegTransform->SetCenter(tfm.GetCenter());
+  m_LoadedRegTransform->SetMatrix(tfm.GetMatrix());
+  m_LoadedRegTransform->SetOffset(tfm.GetOffset());
+
+  m_LoadedAffineTransform->Compose(m_LoadedRegTransform, false);
+
+  m_LoadedRegTransform->SetIdentity();
+  m_LoadedRegTransform->SetCenter(m_LoadedAffineTransform->GetCenter());
+  m_LoadedRegTransform->SetMatrix(m_LoadedAffineTransform->GetMatrix());
+  m_LoadedRegTransform->SetOffset(m_LoadedAffineTransform->GetOffset());
+
+  m_LoadedRegValid = true;
+  }
+
+template< class TImage >
+void
+ImageRegistrationApp< TImage >
+::RegisterUsingLoadedTransform()
+  {
+  m_LoadedRegValid = true;
+  m_FinalTransform = m_LoadedAffineTransform;
+  m_PriorRegistrationMethod = LOADED;
+
+  std::cout << "DEBUG: Loaded: FINAL affine transform: " << std::endl
+            << m_FinalTransform->GetParameters() << std::endl
+            << "   Offset = " << m_FinalTransform->GetOffset() << std::endl
+            << "   Center = " << m_FinalTransform->GetCenter() << std::endl;
+  }
 
 template< class TImage >
 void
@@ -533,9 +614,10 @@ ImageRegistrationApp< TImage >
   m_FinalTransform = m_RigidAffineTransform;
   m_PriorRegistrationMethod = RIGID;
 
-  std::cout << "DEBUG: Rigid: FINAL affine transform: "  
-            << std::endl
-            << m_FinalTransform->GetParameters() << std::endl  << std::endl;
+  std::cout << "DEBUG: Rigid: FINAL affine transform: "  << std::endl
+            << m_FinalTransform->GetParameters() << std::endl
+            << "   Offset = " << m_FinalTransform->GetOffset() << std::endl
+            << "   Center = " << m_FinalTransform->GetCenter() << std::endl;
   }
 
 
@@ -611,9 +693,10 @@ ImageRegistrationApp< TImage >
   m_FinalTransform = m_AffineAffineTransform;
   m_PriorRegistrationMethod = AFFINE;
 
-  std::cout << "DEBUG: Affine: FINAL affine transform: "  
-            << std::endl
-            << m_FinalTransform->GetParameters() << std::endl  << std::endl;
+  std::cout << "DEBUG: Affine: FINAL affine transform: "  << std::endl
+            << m_FinalTransform->GetParameters() << std::endl
+            << "   Offset = " << m_FinalTransform->GetOffset() << std::endl
+            << "   Center = " << m_FinalTransform->GetCenter() << std::endl;
   }
 
 template< class TImage >
@@ -658,6 +741,15 @@ ImageRegistrationApp< TImage >
 ::GetLandmarkRegisteredMovingImage()
   {
   return m_ResampleUsingTransform(this->GetLandmarkAffineTransform(),
+                                  m_MovingImage, m_FixedImage);
+  }
+
+template< class TImage >
+typename ImageRegistrationApp< TImage >::ImagePointer
+ImageRegistrationApp< TImage >
+::GetLoadedRegisteredMovingImage()
+  {
+  return m_ResampleUsingTransform(this->GetLoadedAffineTransform(),
                                   m_MovingImage, m_FixedImage);
   }
 

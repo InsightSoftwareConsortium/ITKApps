@@ -1142,18 +1142,22 @@ guiMainImplementation
 
   if( filename )
     {
-    typedef itk::SpatialObjectWriter< > WriterType;
-    typedef itk::GroupSpatialObject< > GroupType;
+    typedef itk::SpatialObjectWriter< >         WriterType;
+    typedef itk::GroupSpatialObject< >          GroupType;
     typedef itk::FixedCenterOfRotationAffineTransform< double, 3 > 
-      TransformType;
+                                                TransformType;
 
     WriterType::Pointer writer = WriterType::New();
     writer->SetFileName(filename);
       
     GroupType::Pointer grp = GroupType::New();
     TransformType::Pointer transform = TransformType::New();
-    transform->SetParameters( m_ImageRegistrationApp->GetFinalTransform()
-                                                    ->GetParameters() );
+    transform->SetCenter( m_ImageRegistrationApp->GetFinalTransform()
+                                                ->GetCenter() );
+    transform->SetMatrix( m_ImageRegistrationApp->GetFinalTransform()
+                                                ->GetMatrix() );
+    transform->SetOffset( m_ImageRegistrationApp->GetFinalTransform()
+                                                ->GetOffset() );
     grp->SetObjectToParentTransform( transform.GetPointer() );
     writer->SetInput( grp );
     writer->Update();

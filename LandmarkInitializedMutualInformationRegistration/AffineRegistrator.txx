@@ -15,7 +15,7 @@ AffineRegistrator< TImage >
 
   this->SetInterpolator(InterpolatorType::New());
   
-  m_OptimizerMethod = GRADIENT;
+  m_OptimizerMethod = ONEPLUSONE;
   m_OptimizerNumberOfIterations = 100 ;
   m_OptimizerScales.set_size(15) ; 
   m_OptimizerScales[0] = 200; // rotations
