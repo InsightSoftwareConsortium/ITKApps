@@ -231,7 +231,7 @@ CannySegmentationLevelSetModule<TInputPixelType>
  *  from the CannySegmentationLevelSet filter.
  */
 template <class TInputPixelType >
-const CannySegmentationLevelSetModule<TInputPixelType>::RealImageType *
+const typename CannySegmentationLevelSetModule<TInputPixelType>::RealImageType *
 CannySegmentationLevelSetModule<TInputPixelType>
 ::GetLevelSet()
 {
@@ -323,7 +323,7 @@ CannySegmentationLevelSetModule<TInputPixelType>
   typedef itk::MinimumMaximumImageCalculator< 
                                   RealImageType > CalculatorType;
  
-  CalculatorType::Pointer calculator = CalculatorType::New();
+  typename CalculatorType::Pointer calculator = CalculatorType::New();
   calculator->SetImage( m_CannySegmentationLevelSetFilter->GetOutput() );
   calculator->Compute();
 
