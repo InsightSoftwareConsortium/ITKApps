@@ -58,6 +58,7 @@ SET (PLUGINS
   vvITKIsotropicFourthOrderLevelSet
   vvITKLandmarkWarping
   vvITKMask
+  vvITKMaskNegated
   vvITKMedian
   vvITKRescaleIntensityTo8Bits
   vvITKScalarImageKMeansClassifier
