@@ -55,7 +55,11 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       }
     case VTK_UNSIGNED_SHORT:
       {
-      // ... when ready, copy/paste from U-Char implementation.
+      typedef  unsigned short                             PixelType;
+      typedef VolView::PlugIn::FastMarchingModule< 
+                                            PixelType >   ModuleType;
+      ModuleType  module;
+
       module.SetPluginInfo( info );
       module.SetStoppingValue( stoppingValue );
       module.SetSigma( sigma );
@@ -112,7 +116,7 @@ static int UpdateGUI(void *inf)
 
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, "0");
   
-  info->OutputVolumeScalarType = VTK_UNSIGNED_SHORT;
+  info->OutputVolumeScalarType = VTK_UNSIGNED_CHAR;
   info->OutputVolumeNumberOfComponents = 1;
 
   memcpy(info->OutputVolumeDimensions,info->InputVolumeDimensions,
