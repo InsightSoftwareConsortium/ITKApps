@@ -114,8 +114,8 @@ class VTK_EXPORT vtkITKPDEDeformableRegistrationFilter : public vtkITKImageToIma
 protected:
   //BTX
   typedef itk::Image<float, 3> RegistrationImageType;
-  typedef itk::VTKImageImport<RegistrationImageType,vtkFloatingPointType> FixedImageImportType;
-  typedef itk::VTKImageImport<RegistrationImageType,vtkFloatingPointType> MovingImageImportType;
+  typedef itk::VTKImageImport<RegistrationImageType> FixedImageImportType;
+  typedef itk::VTKImageImport<RegistrationImageType> MovingImageImportType;
   
   typedef itk::Vector<float,3> OutputImagePixelType;
   typedef itk::Image<OutputImagePixelType, 3> OutputImageType;
@@ -175,7 +175,7 @@ private:
   
 };
 
-vtkCxxRevisionMacro(vtkITKPDEDeformableRegistrationFilter, "$Revision: 1.5 $");
+vtkCxxRevisionMacro(vtkITKPDEDeformableRegistrationFilter, "$Revision: 1.5.2.1 $");
 vtkStandardNewMacro(vtkITKPDEDeformableRegistrationFilter);
 
 #endif

@@ -58,7 +58,7 @@
 #define vtkFloatingPointType float
 #endif
 
-vtkCxxRevisionMacro(vtkITKMutualInformationTransform, "$Revision: 1.12 $");
+vtkCxxRevisionMacro(vtkITKMutualInformationTransform, "$Revision: 1.12.2.1 $");
 vtkStandardNewMacro(vtkITKMutualInformationTransform);
 
 //----------------------------------------------------------------------------
@@ -136,7 +136,7 @@ static void vtkITKMutualInformationExecute(vtkITKMutualInformationTransform *sel
   vtkImageExport *movingVtkExporter = vtkImageExport::New();
     movingVtkExporter->SetInput(source);
 
-  typedef itk::VTKImageImport<OutputType,vtkFloatingPointType> ImageImportType;
+  typedef itk::VTKImageImport<OutputType> ImageImportType;
 
   typename ImageImportType::Pointer movingItkImporter = ImageImportType::New();
   ConnectPipelines(movingVtkExporter, movingItkImporter);

@@ -51,8 +51,8 @@ protected:
   typedef itk::Image<OutputImagePixelType, 3> OutputImageType;
 
   typedef itk::Image<float, 3> JoinImageType;
-  typedef itk::VTKImageImport<JoinImageType,vtkFloatingPointType> ImageImportType;
-  typedef itk::VTKImageExport<JoinImageType,vtkFloatingPointType> ImageExportType;
+  typedef itk::VTKImageImport<JoinImageType> ImageImportType;
+  typedef itk::VTKImageExport<JoinImageType> ImageExportType;
   ImageImportType::Pointer itkImporter;
   ImageExportType::Pointer itkExporter;
   ImageImportType::Pointer itkImporter1;
