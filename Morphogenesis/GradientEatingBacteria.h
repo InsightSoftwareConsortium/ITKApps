@@ -42,6 +42,8 @@ public:
   virtual void ReceptorsReading(void);
   virtual void Mitosis( void );
 
+  virtual void ComputeGeneNetwork(void);
+
   static  Cell * CreateEgg(void);
 
   static const char * GetSpeciesName(void) 
