@@ -67,6 +67,20 @@ public:
 
   int GetIntOption(std::string tag, int default_value, bool required) ;
   
+  int GetMultiUCharOption(std::string tag, 
+                          std::vector< unsigned char >* args,
+                          bool required);
+
+  unsigned char GetUCharOption(std::string tag, unsigned char default_value, 
+                               bool required) ;
+
+  int GetMultiUIntOption(std::string tag, 
+                          std::vector< unsigned int >* args,
+                          bool required);
+
+  unsigned int GetUIntOption(std::string tag, unsigned int default_value, 
+                               bool required) ;
+
   int GetStringOption(std::string tag, std::string* ret, bool required);
   
   int GetMultiStringOption(std::string tag, std::vector< std::string >* ret,

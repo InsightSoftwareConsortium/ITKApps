@@ -200,6 +200,58 @@ int OptionList::GetMultiIntOption(std::string tag,
   return arg_no ;
 }
 
+int OptionList::GetMultiUIntOption(std::string tag, 
+                                  std::vector<unsigned int>* args, 
+                                  bool required)
+{
+  args->clear() ;
+  
+  StringVector temp_args ;
+  int arg_no = this->GetOption(tag, &temp_args) ;
+  
+  if (required && arg_no == 0)
+    throw RequiredOptionMissing(tag) ;
+  
+  if (arg_no == 0)
+    return -1 ;
+  
+  if (temp_args[0] == "-")
+    return -2 ;
+  
+  for (int i = 0 ; i < arg_no ; i++)
+    {
+      args->push_back( (unsigned int) atoi(temp_args[i].c_str()) ) ;
+    }
+  
+  return arg_no ;
+}
+
+int OptionList::GetMultiUCharOption(std::string tag, 
+                                    std::vector<unsigned char>* args, 
+                                    bool required)
+{
+  args->clear() ;
+  
+  StringVector temp_args ;
+  int arg_no = this->GetOption(tag, &temp_args) ;
+  
+  if (required && arg_no == 0)
+    throw RequiredOptionMissing(tag) ;
+  
+  if (arg_no == 0)
+    return -1 ;
+  
+  if (temp_args[0] == "-")
+    return -2 ;
+  
+  for (int i = 0 ; i < arg_no ; i++)
+    {
+      args->push_back( (unsigned char) atoi(temp_args[i].c_str()) ) ;
+    }
+  
+  return arg_no ;
+}
+
 int OptionList::GetIntOption(std::string tag, int default_value, bool required)
 {
   StringVector args ;
@@ -212,6 +264,36 @@ int OptionList::GetIntOption(std::string tag, int default_value, bool required)
     return default_value ;
   
   return atoi(args[0].c_str()) ;
+}
+
+unsigned int OptionList::GetUIntOption(std::string tag, 
+                                       unsigned int default_value, 
+                                       bool required)
+{
+  StringVector args ;
+  int arg_no = this->GetOption(tag, &args) ;
+  
+  if (required && arg_no == 0)
+    throw RequiredOptionMissing(tag) ;
+  
+  if (arg_no == 0)
+    return default_value ;
+  
+  return (unsigned int) atoi(args[0].c_str()) ;
+}
+
+unsigned char OptionList::GetUCharOption(std::string tag, unsigned char default_value, bool required)
+{
+  StringVector args ;
+  int arg_no = this->GetOption(tag, &args) ;
+  
+  if (required && arg_no == 0)
+    throw RequiredOptionMissing(tag) ;
+  
+  if (arg_no == 0)
+    return default_value ;
+  
+  return (unsigned char) atoi(args[0].c_str()) ;
 }
 
 int OptionList::GetStringOption(std::string tag, 
