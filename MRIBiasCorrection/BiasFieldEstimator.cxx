@@ -152,13 +152,13 @@ int main(int argc, char* argv[])
   std::string inputMaskFileName = "" ;
   bool useLog = true;
   int degree = 3;
-  itk::Array<double> coefficientVector ;
   itk::Array<double> classMeans ;
   itk::Array<double> classSigmas ;
   int volumeMaximumIteration = 20; 
   double initialRadius = 1.02;
   double grow  = 1.05;
   double shrink = pow(grow, -0.25);
+  std::vector<double> coefficients ;
 
   try
     {
@@ -170,13 +170,7 @@ int main(int argc, char* argv[])
       useLog = options.GetBooleanOption("use-log", true, true) ;
       degree = options.GetIntOption("degree", 3, false) ;
       
-      std::vector<double> coefficients ;
       options.GetMultiDoubleOption("coefficients", &coefficients, false) ;
-
-      int length = coefficients.size() ;
-      coefficientVector.resize(length) ;
-      for (int i = 0 ; i < length ; i++)
-        coefficientVector[i] = coefficients[i] ;
 
       // get energyfunction options
       options.GetMultiDoubleOption("class-mean", &classMeans, true) ;
@@ -226,7 +220,7 @@ int main(int argc, char* argv[])
     }
   
   filter->IsBiasFieldMultiplicative(useLog) ;
-  filter->SetInitialBiasFieldCoefficients(coefficientVector) ;
+  filter->SetInitialBiasFieldCoefficients(coefficients) ;
   // sets tissue classes' statistics for creating the energy function
   filter->SetTissueClassStatistics(classMeans, classSigmas) ;
   // setting standard optimizer parameters 
