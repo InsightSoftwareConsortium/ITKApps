@@ -1,19 +1,17 @@
-
-# Uncomment the following lines to compile this using CMake
-#   if you move this outside of the Insight directory structure
-### HERE:  Modified this line to give an appropriate name
 PROJECT(ITKRegistrationLib)
 
-# 
-# Find ITK
-#
-#FIND_PATH( ITK_BINARY_DIR itkConfigure.h )
+IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
-# Load in the values from ITK if found
-#IF ( ITK_BINARY_DIR )
-#  LOAD_CACHE(${ITK_BINARY_DIR})
-#  INCLUDE (${ITK_SOURCE_DIR}/itkCMakeOptions.cmake)
-#ENDIF (ITK_BINARY_DIR )
+  FIND_PACKAGE(ITK)
+  IF(ITK_FOUND)
+    INCLUDE(${ITK_USE_FILE})
+  ELSE(ITK_FOUND)
+    MESSAGE(FATAL_ERROR
+            "Cannot build InsightApplications without ITK.  Please set ITK_DIR.")
+  ENDIF(ITK_FOUND)
+
+ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
+
 
 #INCLUDE_REGULAR_EXPRESSION(".*")
 
