@@ -37,85 +37,88 @@ void
 SNAPAppearanceSettings
 ::InitializeDefaultSettings()
 {
+  // An element pointer for setting properties
+  Element *elt;
+  
   // Crosshairs
-  Element &elt = m_DefaultElementSettings[CROSSHAIRS];
-  elt.NormalColor = Vector3d(0.3, 0.3, 1.0);
-  elt.ActiveColor = Vector3d(0.0, 0.0, 0.0);
-  elt.LineThickness = 1.0;
-  elt.DashSpacing = 1.0;
-  elt.FontSize = 0;
-  elt.Visible = true;
-  elt.AlphaBlending = false;
+  elt = &m_DefaultElementSettings[CROSSHAIRS];
+  elt->NormalColor = Vector3d(0.3, 0.3, 1.0);
+  elt->ActiveColor = Vector3d(0.0, 0.0, 0.0);
+  elt->LineThickness = 1.0;
+  elt->DashSpacing = 1.0;
+  elt->FontSize = 0;
+  elt->Visible = true;
+  elt->AlphaBlending = false;
 
   // Markers
-  elt = m_DefaultElementSettings[MARKERS];
-  elt.NormalColor = Vector3d(1.0, 0.75, 0.0);
-  elt.ActiveColor = Vector3d(0.0, 0.0, 0.0);
-  elt.LineThickness = 0.0;
-  elt.DashSpacing = 0.0;
-  elt.FontSize = 16;
-  elt.Visible = true;
-  elt.AlphaBlending = false;
+  elt = &m_DefaultElementSettings[MARKERS];
+  elt->NormalColor = Vector3d(1.0, 0.75, 0.0);
+  elt->ActiveColor = Vector3d(0.0, 0.0, 0.0);
+  elt->LineThickness = 0.0;
+  elt->DashSpacing = 0.0;
+  elt->FontSize = 16;
+  elt->Visible = true;
+  elt->AlphaBlending = false;
 
   // ROI
-  elt = m_DefaultElementSettings[ROI_BOX];
-  elt.NormalColor = Vector3d(1.0, 0.0, 0.2);
-  elt.ActiveColor = Vector3d(1.0, 1.0, 0.2);
-  elt.LineThickness = 1.0;
-  elt.DashSpacing = 3.0;
-  elt.FontSize = 0;
-  elt.Visible = true;
-  elt.AlphaBlending = false;
+  elt = &m_DefaultElementSettings[ROI_BOX];
+  elt->NormalColor = Vector3d(1.0, 0.0, 0.2);
+  elt->ActiveColor = Vector3d(1.0, 1.0, 0.2);
+  elt->LineThickness = 1.0;
+  elt->DashSpacing = 3.0;
+  elt->FontSize = 0;
+  elt->Visible = true;
+  elt->AlphaBlending = false;
 
   // Slice background
-  elt = m_DefaultElementSettings[BACKGROUND_3D];
-  elt.NormalColor = Vector3d(0.0, 0.0, 0.0);
-  elt.ActiveColor = Vector3d(0.0, 0.0, 0.0);
-  elt.LineThickness = 0.0;
-  elt.DashSpacing = 0.0;
-  elt.FontSize = 0;
-  elt.Visible = true;
-  elt.AlphaBlending = false;
+  elt = &m_DefaultElementSettings[BACKGROUND_3D];
+  elt->NormalColor = Vector3d(0.0, 0.0, 0.0);
+  elt->ActiveColor = Vector3d(0.0, 0.0, 0.0);
+  elt->LineThickness = 0.0;
+  elt->DashSpacing = 0.0;
+  elt->FontSize = 0;
+  elt->Visible = true;
+  elt->AlphaBlending = false;
 
   // 3D Window background
-  elt = m_DefaultElementSettings[BACKGROUND_3D];
-  elt.NormalColor = Vector3d(0.0, 0.0, 0.0);
-  elt.ActiveColor = Vector3d(0.0, 0.0, 0.0);
-  elt.LineThickness = 0.0;
-  elt.DashSpacing = 0.0;
-  elt.FontSize = 0;
-  elt.Visible = true;
-  elt.AlphaBlending = false;
+  elt = &m_DefaultElementSettings[BACKGROUND_3D];
+  elt->NormalColor = Vector3d(0.0, 0.0, 0.0);
+  elt->ActiveColor = Vector3d(0.0, 0.0, 0.0);
+  elt->LineThickness = 0.0;
+  elt->DashSpacing = 0.0;
+  elt->FontSize = 0;
+  elt->Visible = true;
+  elt->AlphaBlending = false;
 
   // Zoom thumbail
-  elt = m_DefaultElementSettings[ZOOM_THUMBNAIL];
-  elt.NormalColor = Vector3d(1.0, 1.0, 0.0);
-  elt.ActiveColor = Vector3d(1.0, 1.0, 1.0);
-  elt.LineThickness = 1.0;
-  elt.DashSpacing = 0.0;
-  elt.FontSize = 0;
-  elt.Visible = true;
-  elt.AlphaBlending = false;
+  elt = &m_DefaultElementSettings[ZOOM_THUMBNAIL];
+  elt->NormalColor = Vector3d(1.0, 1.0, 0.0);
+  elt->ActiveColor = Vector3d(1.0, 1.0, 1.0);
+  elt->LineThickness = 1.0;
+  elt->DashSpacing = 0.0;
+  elt->FontSize = 0;
+  elt->Visible = true;
+  elt->AlphaBlending = false;
 
   // 3D crosshairs
-  elt = m_DefaultElementSettings[CROSSHAIRS_3D];
-  elt.NormalColor = Vector3d(0.3, 0.3, 1.0);
-  elt.ActiveColor = Vector3d(0.0, 0.0, 0.0);
-  elt.LineThickness = 1.0;
-  elt.DashSpacing = 1.0;
-  elt.FontSize = 0;
-  elt.Visible = true;
-  elt.AlphaBlending = true;
+  elt = &m_DefaultElementSettings[CROSSHAIRS_3D];
+  elt->NormalColor = Vector3d(0.3, 0.3, 1.0);
+  elt->ActiveColor = Vector3d(0.0, 0.0, 0.0);
+  elt->LineThickness = 1.0;
+  elt->DashSpacing = 1.0;
+  elt->FontSize = 0;
+  elt->Visible = true;
+  elt->AlphaBlending = true;
 
   // Thumbnail crosshairs
-  elt = m_DefaultElementSettings[CROSSHAIRS_THUMB];
-  elt.NormalColor = Vector3d(0.3, 0.3, 1.0);
-  elt.ActiveColor = Vector3d(0.0, 0.0, 0.0);
-  elt.LineThickness = 1.0;
-  elt.DashSpacing = 1.0;
-  elt.FontSize = 0;
-  elt.Visible = true;
-  elt.AlphaBlending = false;
+  elt = &m_DefaultElementSettings[CROSSHAIRS_THUMB];
+  elt->NormalColor = Vector3d(0.3, 0.3, 1.0);
+  elt->ActiveColor = Vector3d(0.0, 0.0, 0.0);
+  elt->LineThickness = 1.0;
+  elt->DashSpacing = 1.0;
+  elt->FontSize = 0;
+  elt->Visible = true;
+  elt->AlphaBlending = false;
 }
 
 const char *
