@@ -72,7 +72,7 @@ public:
    */
   enum RAWImagePixelType
     {
-    BYTE, SHORT, INT, FLOAT
+    IW_UBYTE, IW_BYTE, IW_USHORT, IW_SHORT, IW_UINT, IW_INT, IW_FLOAT
     };
 
   // Destructor
@@ -103,8 +103,8 @@ public:
    * a call to ReleaseImageIO for memory efficiency.
    */
   virtual bool LoadFromRAWFile(const char *file,
-                               unsigned int dimX, unsigned int dimY, 
-                               unsigned int dimZ,unsigned int header, 
+                               const Vector3ui &size,const Vector3d &spacing,
+                               unsigned int header, 
                                RAWImagePixelType pixelType,bool isBigEndian,
                                itk::Command *progressCommand = NULL) = 0;
 

@@ -24,7 +24,9 @@ using std::numeric_limits;
 using std::map;
 
 template <class TPixel>
-void ImageIOWizardLogic<TPixel>::GoBack(Fl_Group *current) {
+void ImageIOWizardLogic<TPixel>
+::GoBack(Fl_Group *current) 
+{
   // The link to the last page
   Fl_Group *last = NULL;
 
@@ -40,15 +42,20 @@ void ImageIOWizardLogic<TPixel>::GoBack(Fl_Group *current) {
   else
     assert(0 == "Next page not valid at this position in the wizard");
 
-  if (!last->active()) {
+  if (!last->active())
+    {
     GoBack(last);
-  } else {
+    } 
+  else
+    {
     m_WizInput->value(last);
-  }
+    }
 }
 
 template <class TPixel>
-void ImageIOWizardLogic<TPixel>::GoForward(Fl_Group *current) {
+void ImageIOWizardLogic<TPixel>
+::GoForward(Fl_Group *current) 
+{
   // The link to the next page
   Fl_Group *next = NULL;
 
@@ -66,26 +73,32 @@ void ImageIOWizardLogic<TPixel>::GoForward(Fl_Group *current) {
     assert(0 == "Next page not valid at this position in the wizard");
 
   // Check if the page is active 
-  if (!next->active()) {
+  if (!next->active())
+    {
     GoForward(next);
-  } else {
+    } else
+    {
     m_WizInput->value(next);
-  }           
+    }           
 }
 
 template <class TPixel>
-const char *ImageIOWizardLogic<TPixel>::GetFilePatterns() {
+const char *ImageIOWizardLogic<TPixel>
+::GetFilePatterns() 
+{
   static const char *pattern = 
-      "All Image Files (*.{gipl,mha,mhd,img,raw})\t"
+      "All Image Files (*.{gipl,mha,mhd,img,raw*})\t"
       "GIPL Files (*.{gipl,gipl.gz})\t"
       "MetaImage Files (*.{mha,mhd})\t"
       "Analyze Files (*.{img,img.gz})\t"
-      "RAW Files (*.{raw,raw.gz})";
+      "RAW Files (*.{raw*})";
   return pattern;
 }
 
 template <class TPixel>
-void ImageIOWizardLogic<TPixel>::OnFilePageBrowse() {
+void ImageIOWizardLogic<TPixel>
+::OnFilePageBrowse() 
+{
   // Get the path and pattern for reading in the file 
   const char *pattern = GetFilePatterns();
   const char *path = m_InFilePageBrowser->value();
@@ -93,39 +106,49 @@ void ImageIOWizardLogic<TPixel>::OnFilePageBrowse() {
 
   // Bring up th choice dialog
   const char *fname = fl_file_chooser("Please select an image file",pattern,path);
-  if (fname) {
+  if (fname)
+    {
     m_InFilePageBrowser->value(fname);
     OnFilePageFileInputChange();
-  }
+    }
 }
 
 template <class TPixel>
-void ImageIOWizardLogic<TPixel>::OnFilePageFileInputChange() {
+void ImageIOWizardLogic<TPixel>
+::OnFilePageFileInputChange() 
+{
   // Check the length of the input
   const char *text = m_InFilePageBrowser->value();
-  if (text != NULL && strlen(text) > 0) {
+  if (text != NULL && strlen(text) > 0)
+    {
     m_BtnFilePageNext->activate();
 
     // Check the file extension and update the RAW checkbox
     // if the extension contains .raw
     m_ChkFilePageRAW->activate();
-    if (strstr(text,".raw") || strstr(text,".RAW") || strstr(text,".Raw")) {
+    
+    if (strstr(text,".raw") || strstr(text,".RAW") || strstr(text,".Raw"))
+      {
       m_ChkFilePageRAW->value(1);
-    } else {
+      } 
+    else
+      {
       m_ChkFilePageRAW->value(0);
-    }
+      }
     OnFilePageRAWCheck();
-  } else {
+    } 
+  else
+    {
     m_BtnFilePageNext->deactivate();
     m_ChkFilePageRAW->value(0);
     m_ChkFilePageRAW->deactivate();
     OnFilePageRAWCheck();
-  }          
+    }          
 }
 
 template <class TPixel>
-void ImageIOWizardLogic<TPixel>::OnFilePageRAWCheck() {
-
+void ImageIOWizardLogic<TPixel>::OnFilePageRAWCheck()
+{
   // When the check box changes value, the status of 
   // the header page is tied to it
   if (m_ChkFilePageRAW->value())
@@ -135,42 +158,47 @@ void ImageIOWizardLogic<TPixel>::OnFilePageRAWCheck() {
 }
 
 template <class TPixel>
-void ImageIOWizardLogic<TPixel>::OnFilePageNext() {
-
+void ImageIOWizardLogic<TPixel>
+::OnFilePageNext() 
+{
   // Check if a file has been specified
   const char *fname = m_InFilePageBrowser->value();
   assert(fname && strlen(fname) > 0);
 
   // See if the user wants to treat the file as RAW
-  if (m_ChkFilePageRAW->value() > 0) {
+  if (m_ChkFilePageRAW->value() > 0)
+    {
     GoForward();
-  }
+    }
 
-  else {
+  else
+    {
 
     // Try to read the file without generating an error
-    try {
-      // Read in the file
-      fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
-      m_Image->LoadFromFile(fname);
-      fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+    fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+    bool success= m_Image->LoadFromFile(fname);
+    fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
 
+    if (success)
+      {
       // Update the UI to the image
       DoImageLoadCommon();
 
       // Go forward
       GoForward();
-
-    } catch (itk::ExceptionObject &exc) {
-      // TODO: Show an error message to the user
-      cout << exc << endl;
+      } 
+    else
+      {
+      fl_alert("Error. Image could not be read!");
+      }
     }
-  }
 }
 
 template <class TPixel>
-void ImageIOWizardLogic<TPixel>::OnCancel() {
-
+void 
+ImageIOWizardLogic<TPixel>
+::OnCancel() 
+{
   // Clear the data stored in the image
   m_Image->Reset();
   m_Image = NULL;
@@ -183,38 +211,53 @@ void ImageIOWizardLogic<TPixel>::OnCancel() {
 }
 
 template <class TPixel>
-void ImageIOWizardLogic<TPixel>::OnHeaderPageNext() {
-
+void 
+ImageIOWizardLogic<TPixel>
+::OnHeaderPageNext() 
+{
   // Make sure we're not here by mistake
   assert(m_ChkFilePageRAW->value() == 1);
 
-  try {
-    // Get the byte type
-    typename ImageWrapper<TPixel>::RAWImagePixelType ptype = 
-        (typename ImageWrapper<TPixel>::RAWImagePixelType)
-    (ImageWrapper<TPixel>::BYTE + (int)m_InHeaderPageVoxelType->value());
+  // Get the byte type
+  typedef typename ImageWrapper<TPixel>::RAWImagePixelType RAWPixelType;  
+  RAWPixelType ptype = 
+    static_cast<RAWPixelType>(ImageWrapper<TPixel>::IW_UBYTE + 
+                              (int)m_InHeaderPageVoxelType->value());
 
-    // Load the image with supplied information
-    fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
-    m_Image->LoadFromRAWFile(
-                            m_InFilePageBrowser->value(),
-                            (unsigned int)m_BtnHeaderPageDimX->value(),
-                            (unsigned int)m_BtnHeaderPageDimY->value(),
-                            (unsigned int)m_BtnHeaderPageDimZ->value(),
-                            (unsigned int)m_InHeaderPageHeaderSize->value(),
-                            ptype,m_InHeaderPageByteAlign->value() == 0);
-    fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+  // Create the vector for the image size
+  Vector3ui size((unsigned int) m_InHeaderPageDimX->value(),
+                 (unsigned int) m_InHeaderPageDimY->value(),
+                 (unsigned int) m_InHeaderPageDimZ->value());
 
+  // Create the vector for the image spacing
+  Vector3d spacing(m_InHeaderPageSpacingX->value(),
+                   m_InHeaderPageSpacingY->value(),
+                   m_InHeaderPageSpacingZ->value());
+
+  // Load the image with supplied information
+  fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+  
+  bool success = 
+    m_Image->LoadFromRAWFile(m_InFilePageBrowser->value(),
+                             size,spacing,
+                             (unsigned int) m_InHeaderPageHeaderSize->value(),
+                             ptype,
+                             m_InHeaderPageByteAlign->value() == 0);
+
+  fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+
+  if(success) 
+    {
     // Update the UI to the image
     DoImageLoadCommon();
 
     // Go forward
     GoForward();
-
-  } catch (itk::ExceptionObject &exc) {
-    // TODO: Show an error message to the user
-    cout << exc << endl;
-  }
+    }
+  else
+    {
+    fl_alert("Error. Image could not be read!");
+    }
 }
 
 template <class TPixel>
@@ -232,9 +275,12 @@ ImageIOWizardLogic<TPixel>
 ::OnHeaderPageInputChange() 
 {
   // Header input has changed
-  if (m_BtnHeaderPageDimX->value() > 0 &&
-      m_BtnHeaderPageDimY->value() > 0 &&
-      m_BtnHeaderPageDimZ->value() > 0)
+  if (m_InHeaderPageDimX->value() >= 1 &&
+      m_InHeaderPageDimY->value() >= 1 &&
+      m_InHeaderPageDimZ->value() >= 1 &&
+      m_InHeaderPageSpacingX->value() > 0 &&
+      m_InHeaderPageSpacingY->value() > 0 &&
+      m_InHeaderPageSpacingZ->value() > 0)
     {
     m_BtnHeaderPageNext->activate();
     }
@@ -245,13 +291,16 @@ ImageIOWizardLogic<TPixel>
 }
 
 template <class TPixel>
-void ImageIOWizardLogic<TPixel>::OnHeaderPageBack() 
+void 
+ImageIOWizardLogic<TPixel>
+::OnHeaderPageBack() 
 {
   GoBack();
 }
 
 template <class TPixel>
-void ImageIOWizardLogic<TPixel>
+void 
+ImageIOWizardLogic<TPixel>
 ::UpdateSummaryPage()
 {
   const char *boTypes[] = 
@@ -280,10 +329,19 @@ void ImageIOWizardLogic<TPixel>
     m_OutSummarySpacingZ->value(ioBase->GetSpacing(2));
 
     // Dump out the file type info
-    // fileTypes[(unsigned int)(ioBase->GetFileType() - ioBase->ASCII)]);
-    m_OutSummaryPixelType->value(
-      ioBase->ReturnTypeAsString(ioBase->GetComponentType()).c_str());
-
+    
+    // TODO: This is a workaround on an itk bug with RawImageIO
+    if(ioBase->GetComponentType() != itk::ImageIOBase::UNKNOWN)
+      {
+      // There actually is a type in the IO object
+      m_OutSummaryPixelType->value(
+        ioBase->ReturnTypeAsString(ioBase->GetComponentType()).c_str());
+      }
+    else
+      {
+      m_OutSummaryPixelType->value(m_InHeaderPageVoxelType->text());
+      }
+    
     m_OutSummaryByteOrder->value(
        boTypes[(unsigned int)(ioBase->GetByteOrder() - ioBase->BigEndian)]);
 
@@ -313,7 +371,8 @@ void ImageIOWizardLogic<TPixel>
 }
 
 template <class TPixel>
-void ImageIOWizardLogic<TPixel>
+void 
+ImageIOWizardLogic<TPixel>
 ::OnOrientationPageNext() 
 {
   
@@ -481,7 +540,10 @@ ImageIOWizardLogic<TPixel>::~ImageIOWizardLogic() {
 }
 
 template <class TPixel>
-bool ImageIOWizardLogic<TPixel>::DisplayInputWizard(WrapperType *target) {
+bool 
+ImageIOWizardLogic<TPixel>
+::DisplayInputWizard(WrapperType *target) 
+{
   m_Image = target;
   m_ImageLoaded = false;
 
@@ -515,12 +577,16 @@ bool ImageIOWizardLogic<TPixel>::DisplayInputWizard(WrapperType *target) {
 }
 
 template <class TPixel>
-void ImageIOWizardLogic<TPixel>::OnSummaryPageBack() {
+void 
+ImageIOWizardLogic<TPixel>
+::OnSummaryPageBack() 
+{
   GoBack();
 }
 
 template <class TPixel>
-void ImageIOWizardLogic<TPixel>::ApplyRAI() 
+void ImageIOWizardLogic<TPixel>
+::ApplyRAI() 
 {
   // Get the RAI code
   char rai[3];

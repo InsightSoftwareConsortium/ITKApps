@@ -58,7 +58,7 @@ class ImageIOWizard {open : ImageIOWizardBase
         }
         Fl_Group m_PageHeader {
           label {Header Info} open
-          xywh {0 0 470 330} box PLASTIC_DOWN_BOX labelfont 2 labelsize 10 hide deactivate
+          xywh {0 0 470 330} box PLASTIC_DOWN_BOX labelfont 2 labelsize 10 deactivate
         } {
           Fl_Group {} {
             label {Supply missing header information:} open
@@ -86,64 +86,76 @@ class ImageIOWizard {open : ImageIOWizardBase
           }
           Fl_Group {} {
             label {Image dimensions:} open
-            xywh {30 105 400 45} labelsize 12 align 21
+            xywh {30 100 405 35} labelsize 12 align 20
           } {
-            Fl_Value_Input m_BtnHeaderPageDimX {
+            Fl_Value_Input m_InHeaderPageDimX {
               label {X:}
               callback {this->OnHeaderPageInputChange();}
-              xywh {170 120 70 25} labelsize 12 textsize 12
+              xywh {185 105 70 25} labelsize 12 textsize 12
             }
-            Fl_Value_Input m_BtnHeaderPageDimY {
+            Fl_Value_Input m_InHeaderPageDimY {
               label {Y:}
               callback {this->OnHeaderPageInputChange();}
-              xywh {260 120 70 25} labelsize 12 textsize 12
+              xywh {275 105 70 25} labelsize 12 textsize 12
             }
-            Fl_Value_Input m_BtnHeaderPageDimZ {
+            Fl_Value_Input m_InHeaderPageDimZ {
               label {Z:}
               callback {this->OnHeaderPageInputChange();}
-              xywh {350 120 70 25} labelsize 12 textsize 12
+              xywh {365 105 70 25} labelsize 12 textsize 12
             }
           }
           Fl_Group {} {
-            label {Voxel data type:} open
-            xywh {30 155 360 35} labelsize 12 align 20
+            label {Voxel representation:} open
+            xywh {30 180 360 35} labelsize 12 align 20
           } {
             Fl_Choice m_InHeaderPageVoxelType {
               callback {this->OnHeaderPageInputChange();} open
-              xywh {170 160 150 25} down_box BORDER_BOX labelsize 12 align 20 textsize 12
+              xywh {185 185 195 25} down_box BORDER_BOX labelsize 12 align 20 textsize 12
             } {
               menuitem {} {
-                label byte
+                label {8 bit, unsigned}
                 xywh {5 5 100 20} labelsize 12
               }
               menuitem {} {
-                label {short, 2 bytes}
+                label {8 bit, signed}
                 xywh {15 15 100 20} labelsize 12
               }
               menuitem {} {
-                label {int, 4 bytes}
+                label {16 bit, unsigned}
                 xywh {25 25 100 20} labelsize 12
               }
               menuitem {} {
-                label {float, 4 bytes}
+                label {16 bit, signed}
                 xywh {35 35 100 20} labelsize 12
+              }
+              menuitem {} {
+                label {32 bit, unsigned}
+                xywh {45 45 100 20} labelsize 12
+              }
+              menuitem {} {
+                label {32 bit, signed}
+                xywh {55 55 100 20} labelsize 12
+              }
+              menuitem {} {
+                label {32 bit, floating point}
+                xywh {65 65 100 20} labelsize 12
               }
             }
           }
           Fl_Group {} {
             label {Byte alignment:} open
-            xywh {30 195 360 35} labelsize 12 align 20
+            xywh {30 220 360 35} labelsize 12 align 20
           } {
             Fl_Choice m_InHeaderPageByteAlign {
               callback {this->OnHeaderPageInputChange();} open
-              xywh {170 200 150 25} down_box BORDER_BOX labelsize 12 align 20 textsize 12
+              xywh {185 225 195 25} down_box BORDER_BOX labelsize 12 align 20 textsize 12
             } {
               menuitem {} {
-                label {big endian (unix, mac)}
+                label {Big Endian (UNIX, Mac)}
                 xywh {15 15 100 20} labelsize 12
               }
               menuitem {} {
-                label {little endian (intel)}
+                label {Little Endian (Intel, AMD)}
                 xywh {25 25 100 20} labelsize 12
               }
             }
@@ -155,12 +167,32 @@ class ImageIOWizard {open : ImageIOWizardBase
             Fl_Value_Input m_InHeaderPageHeaderSize {
               label bytes
               callback {this->OnHeaderPageInputChange();}
-              xywh {170 65 70 25} labelsize 12 align 8 textsize 12
+              xywh {185 65 70 25} labelsize 12 align 8 textsize 12
+            }
+          }
+          Fl_Group {} {
+            label {Voxel spacing:} open
+            xywh {30 140 405 35} labelsize 12 align 20
+          } {
+            Fl_Value_Input m_InHeaderPageSpacingX {
+              label {X:}
+              callback {this->OnHeaderPageInputChange();}
+              tooltip {Spacing between voxels in each dimension} xywh {185 145 70 25} labelsize 12 maximum 100 step 0.01 value 1 textsize 12
+            }
+            Fl_Value_Input m_InHeaderPageSpacingY {
+              label {Y:}
+              callback {this->OnHeaderPageInputChange();}
+              tooltip {Spacing between voxels in each dimension} xywh {275 145 70 25} labelsize 12 maximum 100 step 0.01 value 1 textsize 12
+            }
+            Fl_Value_Input m_InHeaderPageSpacingZ {
+              label {Z:}
+              callback {this->OnHeaderPageInputChange();} selected
+              tooltip {Spacing between voxels in each dimension} xywh {365 145 70 25} labelsize 12 maximum 100 step 0.01 value 1 textsize 12
             }
           }
         }
         Fl_Group m_PageOrientation {
-          label {Image Orientation} open
+          label {Image Orientation}
           xywh {0 0 470 330} box PLASTIC_DOWN_BOX labelfont 2 labelsize 10 hide
         } {
           Fl_Group {} {
@@ -327,8 +359,8 @@ class ImageIOWizard {open : ImageIOWizardBase
           } {}
         }
         Fl_Group m_PageSummary {
-          label Summary open selected
-          xywh {0 0 470 330} box PLASTIC_DOWN_BOX labelfont 2 labelsize 10
+          label Summary open
+          xywh {0 0 470 330} box PLASTIC_DOWN_BOX labelfont 2 labelsize 10 hide
         } {
           Fl_Group {} {
             label {Image Summary:} open

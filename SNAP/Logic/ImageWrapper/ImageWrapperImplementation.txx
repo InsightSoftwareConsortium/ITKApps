@@ -52,7 +52,7 @@ ImageWrapperImplementation<TPixel>
   m_Initialized = false;
 
   // Create slicer objects
-  for(unsigned int i=0;i<3;i++)
+  for (unsigned int i=0;i<3;i++)
     {
     m_Slicer[i] = SlicerType::New();
     m_Slicer[i]->SetSliceAxis(i);
@@ -66,7 +66,7 @@ ImageWrapperImplementation<TPixel>
   CommonInitialization();
 
   // If the source contains an image, make a copy of that image
-  if(copy.IsInitialized() && copy.GetImage()) 
+  if (copy.IsInitialized() && copy.GetImage())
     {
     m_Image = copy.DeepCopyRegion(copy.GetImage()->GetLargestPossibleRegion());
     HandleImagePointerUpdate();
@@ -83,43 +83,125 @@ CreateRawImageIO(unsigned int header)
   return io2;
 }
 
+
+/** 
+ * \class AbstraceRawImageIOInstantiator
+ * \brief A utility class for creating generic type RAWImageIO objects
+ */
+class AbstraceRawImageIOInstantiator
+  {
+public:
+  virtual void SetHeaderSize(unsigned int size) = 0;
+  virtual itk::ImageIOBase *GetIOBase() const = 0;
+  virtual ~AbstraceRawImageIOInstantiator() {};
+  };
+
+/** 
+ * \class RawImageIOInstantiator
+ * \brief A utility class for creating generic type RAWImageIO objects
+ */
+template <class TPixel> 
+class RawImageIOInstantiator : public AbstraceRawImageIOInstantiator
+  {
+public:
+  typedef itk::RawImageIO<TPixel,3> RawIOType;
+  typedef typename RawIOType::Pointer RawIOPointer;
+
+  RawImageIOInstantiator() 
+  {
+    m_RawIO = RawIOType::New();
+  }
+
+  void SetHeaderSize(unsigned int size)
+  {
+    m_RawIO->SetHeaderSize(size);
+  }
+
+  itk::ImageIOBase *GetIOBase() const
+  {
+    return m_RawIO;
+  }
+
+private:
+  RawIOPointer m_RawIO;
+  };
+
 template <class TPixel> 
 bool 
 ImageWrapperImplementation<TPixel>
-::LoadFromRAWFile(const char *fname, unsigned int dimX, 
-                  unsigned int dimY, unsigned int dimZ,
-                  unsigned int header, RAWImagePixelType pixelType, 
-                  bool isBigEndian, itk::Command *progressCommand) 
+::LoadFromRAWFile(const char *fname, 
+                  const Vector3ui &size,
+                  const Vector3d &spacing,
+                  unsigned int header, 
+                  RAWImagePixelType pixelType, 
+                  bool isBigEndian, 
+                  itk::Command *progressCommand) 
 {
-  typename itk::ImageIOBase::Pointer io;
+  AbstraceRawImageIOInstantiator *ioWrapper;
 
-  switch(pixelType) {
-  case BYTE : 
-    io = CreateRawImageIO<unsigned char>(header);
-    break;
+  switch (pixelType)
+    {
+    case IW_UBYTE: 
+      ioWrapper = new RawImageIOInstantiator<unsigned char>; 
+      break;
 
-  case SHORT : 
-    io = CreateRawImageIO<unsigned short>(header);
-    break;
+    case IW_BYTE: 
+      ioWrapper = new RawImageIOInstantiator<char>; 
+      break;
 
-  case INT : 
-    io = CreateRawImageIO<int>(header);
-    break;
+    case IW_USHORT: 
+      ioWrapper = new RawImageIOInstantiator<unsigned short>; 
+      break;
 
-  case FLOAT : 
-    io = CreateRawImageIO<float>(header);
-    break;
-  }
+    case IW_SHORT: 
+      ioWrapper = new RawImageIOInstantiator<short>; 
+      break;
 
-  io->SetDimensions(0,dimX);
-  io->SetDimensions(1,dimY);
-  io->SetDimensions(2,dimZ);
-  if(isBigEndian)
+    case IW_UINT: 
+      ioWrapper = new RawImageIOInstantiator<unsigned int>; 
+      break;
+
+    case IW_INT:
+      ioWrapper = new RawImageIOInstantiator<int>; 
+      break;
+
+    case IW_FLOAT: 
+      ioWrapper = new RawImageIOInstantiator<float>; 
+      break;
+
+    default: 
+      ioWrapper = NULL;
+    }
+
+  // The type must be recognized
+  assert(ioWrapper);
+
+  // Set the RAW IO header size
+  ioWrapper->SetHeaderSize(header);
+
+  // Get the actual IO base
+  itk::ImageIOBase *io = ioWrapper->GetIOBase();
+
+  // Set the dimensions, etc
+  for(unsigned int i=0;i<3;i++)
+    {
+    io->SetDimensions(i,size(i));
+    io->SetSpacing(i,spacing(i));
+    }
+  
+  if (isBigEndian)
     io->SetByteOrderToBigEndian();
   else
     io->SetByteOrderToLittleEndian();
 
-  return DoLoad(fname,io,progressCommand);
+  // Tru to load the image
+  bool rc = DoLoad(fname,io,progressCommand);
+
+  // Delete the IO wrapper
+  delete ioWrapper;
+
+  // Return a code
+  return rc;
 }
 
 template <class TPixel> 
@@ -134,7 +216,7 @@ ImageWrapperImplementation<TPixel>
 template <class TPixel> 
 bool 
 ImageWrapperImplementation<TPixel>
-::DoLoad(const char *fname,itk::ImageIOBase::Pointer ioBase,itk::Command *progressCommand) 
+::DoLoad(const char *fname,itk::ImageIOBase *ioBase,itk::Command *progressCommand) 
 {
   typedef itk::ImageFileReader<ImageType> ReaderType;
 
@@ -168,8 +250,7 @@ ImageWrapperImplementation<TPixel>
 
     // Check if the image actually loaded
     // verbose << "Loaded Image Rgn : " << tmpImage->GetLargestPossibleRegion() << endl;
-    } 
-  catch (itk::ExceptionObject &exc)
+    } catch (itk::ExceptionObject &exc)
     {
     cerr << "Error reading input image" << endl;
     cerr << exc << endl;
@@ -209,7 +290,7 @@ ImageWrapperImplementation<TPixel>
 ::HandleImagePointerUpdate() 
 {
   // Update the slicing pipeline
-  for(unsigned int i=0;i<3;i++)
+  for (unsigned int i=0;i<3;i++)
     m_Slicer[i]->SetInput(m_Image);
 
   // Update the max-min pipeline once we have one setup
@@ -298,8 +379,8 @@ void
 ImageWrapperImplementation<TPixel>
 ::Reset() 
 {
-  if(m_Initialized)
-    m_Image->ReleaseData();   
+  if (m_Initialized)
+    m_Image->ReleaseData();
   m_Initialized = false;
 }
 
@@ -389,14 +470,15 @@ ImageWrapperImplementation<TPixel>
 
   // Check if the image has been updated since the last time that
   // the min/max has been computed
-  if(m_Image->GetMTime() > m_MinMaxCalc->GetMTime()) {
+  if (m_Image->GetMTime() > m_MinMaxCalc->GetMTime())
+    {
     m_MinMaxCalc->Compute();
     m_MinMaxCalc->Modified();
     m_ImageScaleFactor = 1.0 / (m_MinMaxCalc->GetMaximum() - m_MinMaxCalc->GetMinimum());
 
     verbose << "Computing intensity range:" << endl;
     verbose << "   " << m_MinMaxCalc->GetMinimum() << " to " << m_MinMaxCalc->GetMaximum() << endl;
-  }    
+    }
 }
 
 template <class TPixel> 

@@ -86,8 +86,9 @@ public:
   virtual void InitializeToSize(unsigned int x, unsigned int y, unsigned int z);
   virtual void InitializeToImage(itk::ImageBase<3> *source);
   bool LoadFromFile(const char *fname,itk::Command *progressCommand = NULL);
+  
   bool LoadFromRAWFile(const char *file,
-                       unsigned int dimX, unsigned int dimY, unsigned int dimZ,
+                       const Vector3ui &size,const Vector3d &spacing,
                        unsigned int header, RAWImagePixelType pixelType,
                        bool isBigEndian,itk::Command *progressCommand);
   void Reset();
@@ -194,7 +195,7 @@ protected:
   /**
    * A method to actually load the image from disk
    */
-  bool DoLoad(const char *fname, itk::ImageIOBase::Pointer io, itk::Command *progressCommand);
+  bool DoLoad(const char *fname, itk::ImageIOBase *io, itk::Command *progressCommand);
 
   /**
    * Compute the intensity range of the image if it's out of date.  
