@@ -19,6 +19,7 @@
 #include "IRISException.h"
 #include "LabelImageWrapper.h"
 #include "GreyImageWrapper.h"
+#include "GlobalState.h"
 #include "ColorLabel.h"
 #include "ImageCoordinateGeometry.h"
 
@@ -71,7 +72,7 @@ public:
    * on the side of that plane
    */
   void RelabelSegmentationWithCutPlane(
-    const Vector3d &normal, double intercept, LabelType newlabel);
+    const Vector3d &normal, double intercept, GlobalState *state);
 
   /**
    * Compute the intersection of the segmentation with a ray
@@ -139,6 +140,23 @@ public:
    * Set voxel in segmentation image
    */
   void SetSegmentationVoxel(const Vector3ui &index, LabelType value);
+
+  /** 
+   * This method is used to selectively override labels in a target 
+   * segmentation image with the current drawing color.  It uses the 
+   * current coverage mode to determine whether to override the pixel 
+   * or to keep it */
+  LabelType DrawOverFunction(GlobalState *state, LabelType victim)
+  {
+  // If mode is paint over all, the victim is overridden
+  return (
+    ((state->GetCoverageMode() == PAINT_OVER_ALL) ||
+         (state->GetCoverageMode() == PAINT_OVER_COLORS && 
+          m_ColorLabels[victim].IsVisible()) ||
+         (state->GetCoverageMode() == PAINT_OVER_ONE &&
+          state->GetOverWriteColorLabel() == victim)) ? 
+    state->GetDrawingColorLabel() : victim);
+  }
 
   /**
    * Check validity of greyscale image

@@ -524,7 +524,7 @@ Window3D
   if (1 == m_Plane.valid )
     {   
     m_Driver->GetCurrentImageData()->RelabelSegmentationWithCutPlane(
-      m_Plane.vNormal, m_Plane.dIntercept, colorid);
+      m_Plane.vNormal, m_Plane.dIntercept, m_GlobalState);
     m_Plane.valid = -1;
     }
 }
@@ -1348,6 +1348,9 @@ void Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.8  2003/10/10 14:25:55  pauly
+ *FIX: Ensured that code compiles on gcc 3-3
+ *
  *Revision 1.7  2003/10/09 22:45:15  pauly
  *EMH: Improvements in 3D functionality and snake parameter preview
  *

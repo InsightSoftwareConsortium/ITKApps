@@ -179,20 +179,20 @@ IRISImageData
 void 
 IRISImageData
 ::RelabelSegmentationWithCutPlane(const Vector3d &normal, double intercept,
-                                  LabelType newlabel) 
+                                  GlobalState *state) 
 {
   typedef ImageRegionIteratorWithIndex<LabelImageType> IteratorType;
   IteratorType it(m_LabelWrapper->GetImage(),this->GetImageRegion());
 
   // Compute a label mapping table based on the color labels
   LabelType table[MAX_COLOR_LABELS];
-  for(unsigned int i=0;i<MAX_COLOR_LABELS;i++)
-    {
-    if(m_ColorLabels[i].IsValid() && m_ColorLabels[i].IsVisible())
-      table[i] = newlabel;
-    else
-      table[i] = i;
-    }
+  
+  // The clear label does not get painted over, no matter what
+  table[0] = 0;
+
+  // The other labels get painted over, depending on current settings
+  for(unsigned int i=1;i<MAX_COLOR_LABELS;i++)
+    table[i] = this->DrawOverFunction(state,i);
 
   // Adjust the intercept by 0.5 for voxel offset
   intercept -= 0.5 * (normal[0] + normal[1] + normal[2]);

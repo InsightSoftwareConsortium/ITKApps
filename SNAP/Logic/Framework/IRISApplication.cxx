@@ -285,11 +285,6 @@ IRISApplication
   SourceIteratorType itSource(source,source->GetLargestPossibleRegion());
   TargetIteratorType itTarget(target,roi);
 
-  // We need this information for merging the images 
-  LabelType clrDrawing = m_GlobalState->GetDrawingColorLabel();
-  LabelType clrOverwrite = m_GlobalState->GetOverWriteColorLabel();
-  CoverageModeType mode = m_GlobalState->GetCoverageMode();
-
   // Figure out which color draws and which color is clear
   unsigned int iClear = m_GlobalState->GetPolygonInvert() ? 1 : 0;
 
@@ -297,20 +292,15 @@ IRISApplication
   // possible combination of two input intensities (note that snap image only
   // has two possible intensities
   LabelType mergeTable[2][MAX_COLOR_LABELS];
-  for(unsigned i=0;i<MAX_COLOR_LABELS;i++)
+  for(unsigned int i=0;i<MAX_COLOR_LABELS;i++)
     {
     // Whe the SNAP image is clear, IRIS passes through to the output
     // except for the IRIS voxels of the drawing color, which get cleared out
-    mergeTable[iClear][i] = (i!=clrDrawing) ? i : 0;
+    mergeTable[iClear][i] = (i!=m_GlobalState->GetDrawingColorLabel()) ? i : 0;
 
     // Assign the output intensity based on the current drawing mode
-    if ((mode == PAINT_OVER_ALL ||
-        (mode == PAINT_OVER_ONE && i == clrOverwrite) ||
-        (mode == PAINT_OVER_COLORS &&
-         m_IRISImageData->GetColorLabel(i).IsVisible())))
-      {
-      mergeTable[1-iClear][i] = clrDrawing;
-      }
+    mergeTable[1-iClear][i] = 
+      m_IRISImageData->DrawOverFunction(m_GlobalState, (LabelType) i);
     }
 
   // Go through both iterators, copy the new over the old
