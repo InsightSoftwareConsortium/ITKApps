@@ -22,7 +22,6 @@
 // Forward reference to itk classes
 namespace itk {
   template <class TPixel,unsigned int VDimension> class Image;
-  template <class TInputImage> class VTKImageExport;
 }
 
 // Forward reference to our own VTK pipeline
