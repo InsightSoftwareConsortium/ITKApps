@@ -58,6 +58,7 @@ public:
     void SetLowestBorderValue( float value );
     void SetLowestBasinValue(  float value );
     void SetDistanceFromSeeds( float value );
+    void SetSigma( float value );
 
     void SetCurvatureScaling(  float value );
     void SetPropagationScaling( float value );

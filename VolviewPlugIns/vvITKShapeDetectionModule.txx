@@ -5,6 +5,7 @@
 #define _itkVVShapeDetectionModule_txx
 
 #include "vvITKShapeDetectionModule.h"
+#include <fstream>
 
 namespace VolView 
 {
@@ -29,8 +30,8 @@ ShapeDetectionModule<TInputPixelType>
   m_ShapeDetectionFilter->SetFeatureImage( m_FastMarchingModule.GetSpeedImage()   );
   m_IntensityWindowingFilter->SetInput(    m_ShapeDetectionFilter->GetOutput() );
 
-  m_IntensityWindowingFilter->SetOutputMinimum(   0 );
-  m_IntensityWindowingFilter->SetOutputMaximum( 255 );
+  m_IntensityWindowingFilter->SetOutputMinimum( 255 );
+  m_IntensityWindowingFilter->SetOutputMaximum(   0 );
 
   // Allow progressive release of memory as the pipeline is executed
   m_ShapeDetectionFilter->ReleaseDataFlagOn();
@@ -111,6 +112,21 @@ ShapeDetectionModule<TInputPixelType>
 {
   m_FastMarchingModule.SetLowestBorderValue( value );
 }
+
+
+
+/*
+ *  Set the sigma value of the Gaussian to be used
+ *  by the gradient magnitude filter.
+ */
+template <class TInputPixelType >
+void 
+ShapeDetectionModule<TInputPixelType>
+::SetSigma( float value )
+{
+  m_FastMarchingModule.SetSigma( value );
+}
+
 
 
 
@@ -229,8 +245,27 @@ ShapeDetectionModule<TInputPixelType>
   const typename RealImageType::PixelType minimum = calculator->GetMinimum(); 
   const typename RealImageType::PixelType maximum = calculator->GetMaximum(); 
   
-  m_IntensityWindowingFilter->SetWindowMaximum( maximum );
-  m_IntensityWindowingFilter->SetWindowMinimum( minimum );
+  if( minimum < 0.0 && maximum > 0.0 )
+    {
+    if( -minimum > maximum )
+      {
+      m_IntensityWindowingFilter->SetWindowMaximum(  maximum );
+      m_IntensityWindowingFilter->SetWindowMinimum( -maximum );
+      }
+    else
+      {
+      m_IntensityWindowingFilter->SetWindowMaximum( -minimum );
+      m_IntensityWindowingFilter->SetWindowMinimum(  minimum );
+      }
+    }
+  else
+    {
+    std::ofstream ofs("Azucar.txt");
+    ofs << "Minimum < 0 && Maximum > 0 assertion failed";
+    ofs << "Minimum = " << minimum << std::endl;
+    ofs << "Maximum = " << maximum << std::endl;
+    ofs.close(); 
+    }
 
   m_IntensityWindowingFilter->Update();
 
