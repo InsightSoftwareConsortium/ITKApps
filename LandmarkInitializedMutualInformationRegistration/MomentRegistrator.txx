@@ -76,7 +76,7 @@ MomentRegistrator< TImage >
       offset = fixedCenterPoint - movingCenterPoint;
 
       newTransform->SetCenter(movingCenterPoint);
-      newTransform->SetTranslation(offset);
+      newTransform->SetOffset(offset);
       }
     else 
       {
@@ -113,7 +113,7 @@ MomentRegistrator< TImage >
       if(m_NumberOfMoments == 1) // Centers of mass
         {
         newTransform->SetCenter(movingImageCenterOfMass);
-        newTransform->SetTranslation(offset);
+        newTransform->SetOffset(offset);
         }
       else  // m_NumberOfMoments == 2 // Principle axes
         {

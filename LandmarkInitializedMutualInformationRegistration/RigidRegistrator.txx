@@ -15,7 +15,7 @@ RigidRegistrator< TImage >
 
   this->SetInterpolator(InterpolatorType::New());
 
-  m_OptimizerMethod = ONEPLUSONE;
+  m_OptimizerMethod = ONEPLUSONEPLUSGRADIENT;
   m_OptimizerNumberOfIterations = 100 ;
   m_OptimizerScales.set_size(6) ; 
   m_OptimizerScales[0] = 200; // rotations
@@ -27,6 +27,8 @@ RigidRegistrator< TImage >
 
   this->SetMetric(MetricType::New());
   m_MetricNumberOfSpatialSamples = 20000 ;
+
+  m_SecondaryOptimizer = 0;
   }
 
 template< class TImage >
@@ -54,17 +56,9 @@ RigidRegistrator< TImage >
 template< class TImage >
 void
 RigidRegistrator< TImage >
-::SetOptimizerToRegularGradient() 
+::SetOptimizerToOnePlusOnePlusGradient() 
   {
-  m_OptimizerMethod = REGULARGRADIENT;
-  }
-
-template< class TImage >
-void
-RigidRegistrator< TImage >
-::SetOptimizerToConjugateGradient() 
-  {
-  m_OptimizerMethod = CONJUGATEGRADIENT;
+  m_OptimizerMethod = ONEPLUSONEPLUSGRADIENT;
   }
 
 template< class TImage >
@@ -84,45 +78,47 @@ RigidRegistrator< TImage >
       OnePlusOneOptimizerType::Pointer opt = OnePlusOneOptimizerType::New();
       opt->SetNormalVariateGenerator( OptimizerNormalGeneratorType::New() );
       opt->SetMaximumIteration( m_OptimizerNumberOfIterations);
-      opt->SetEpsilon(0.0000000000001);
+      opt->SetEpsilon(1e-10);
       opt->Initialize(1.01); // Initial search radius
       opt->SetScales( m_OptimizerScales );
       this->SetOptimizer(opt);
+      this->SetSecondaryOptimizer(0);
       break;
       }
     case GRADIENT:
       {
       GradientOptimizerType::Pointer opt = GradientOptimizerType::New();
       opt->SetMaximize(false);
-      opt->SetLearningRate(0.001);
-      opt->SetNumberOfIterations(m_OptimizerNumberOfIterations);
+      opt->SetStepLength(5);
+      opt->SetStepTolerance(1e-10);
+      opt->SetMaximumIteration(m_OptimizerNumberOfIterations);
       opt->SetScales( m_OptimizerScales );
       this->SetOptimizer(opt);
+      this->SetSecondaryOptimizer(0);
       break;
       }
-    case REGULARGRADIENT:
+    case ONEPLUSONEPLUSGRADIENT:
       {
-      RegularGradientOptimizerType::Pointer opt;
-      opt = RegularGradientOptimizerType::New();
+      OnePlusOneOptimizerType::Pointer initOpt = OnePlusOneOptimizerType::New();
+      initOpt->SetNormalVariateGenerator( OptimizerNormalGeneratorType::New() );
+      initOpt->SetMaximumIteration( m_OptimizerNumberOfIterations);
+      initOpt->SetEpsilon(1e-10);
+      initOpt->Initialize(1.01); // Initial search radius
+      initOpt->SetScales( m_OptimizerScales );
+
+      GradientOptimizerType::Pointer opt = GradientOptimizerType::New();
       opt->SetMaximize(false);
-      //opt->SetLearningRate(0.001);
-      opt->SetNumberOfIterations(m_OptimizerNumberOfIterations);
+      opt->SetStepLength(0.25);
+      opt->SetStepTolerance(1e-10);
+      opt->SetMaximumIteration(4);
       opt->SetScales( m_OptimizerScales );
-      this->SetOptimizer(opt);
-      break;
-      }
-    case CONJUGATEGRADIENT:
-      {
-      ConjugateGradientOptimizerType::Pointer opt;
-      opt = ConjugateGradientOptimizerType::New();
-      //opt->SetLearningRate(0.001);
-      //opt->SetNumberOfIterations(m_OptimizerNumberOfIterations);
-      opt->SetScales( m_OptimizerScales );
-      this->SetOptimizer(opt);
+
+      this->SetOptimizer(initOpt);
+      this->SetSecondaryOptimizer(opt);
+
       break;
       }
     }
-
 
   try
     {
@@ -151,6 +147,31 @@ RigidRegistrator< TImage >
     {
     this->PrintUncaughtError() ;
     }
+
+  if(m_SecondaryOptimizer)
+    {
+    m_SecondaryOptimizer->SetCostFunction(this->GetMetric());
+    m_SecondaryOptimizer->SetInitialPosition(this->GetLastTransformParameters());
+    try
+      {
+      m_SecondaryOptimizer->StartOptimization();
+      }
+    catch(ExceptionObject &e)
+      {
+      this->SetLastTransformParameters( 
+                     m_SecondaryOptimizer->GetCurrentPosition() );
+      this->GetTypedTransform()->SetParameters( 
+                     this->GetLastTransformParameters() );
+
+      this->PrintError(e) ;
+      }
+
+    this->SetLastTransformParameters( 
+                   m_SecondaryOptimizer->GetCurrentPosition() );
+    this->GetTypedTransform()->SetParameters( 
+                   this->GetLastTransformParameters() );
+    }
+
   }
 
 template< class TImage >

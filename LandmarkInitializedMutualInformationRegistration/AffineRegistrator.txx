@@ -15,24 +15,24 @@ AffineRegistrator< TImage >
 
   this->SetInterpolator(InterpolatorType::New());
   
-  m_OptimizerMethod = ONEPLUSONE;
-  m_OptimizerNumberOfIterations = 100 ;
+  m_OptimizerMethod = ONEPLUSONEPLUSGRADIENT;
+  m_OptimizerNumberOfIterations = 1000 ;
   m_OptimizerScales.set_size(15) ; 
-  m_OptimizerScales[0] = 200; // rotations
-  m_OptimizerScales[1] = 200;
-  m_OptimizerScales[2] = 200;
+  m_OptimizerScales[0] = 100; // rotations
+  m_OptimizerScales[1] = 100;
+  m_OptimizerScales[2] = 100;
   m_OptimizerScales[3] = 1;  // offset
   m_OptimizerScales[4] = 1;
   m_OptimizerScales[5] = 1;
-  m_OptimizerScales[6] = 300;  // scale
-  m_OptimizerScales[7] = 300;
-  m_OptimizerScales[8] = 300;
-  m_OptimizerScales[9] = 400; // skew
-  m_OptimizerScales[10] = 400;
-  m_OptimizerScales[11] = 400;
-  m_OptimizerScales[12] = 400;
-  m_OptimizerScales[13] = 400;
-  m_OptimizerScales[14] = 400;
+  m_OptimizerScales[6] = 100;  // scale
+  m_OptimizerScales[7] = 100;
+  m_OptimizerScales[8] = 100;
+  m_OptimizerScales[9] = 200; // skew
+  m_OptimizerScales[10] = 200;
+  m_OptimizerScales[11] = 200;
+  m_OptimizerScales[12] = 200;
+  m_OptimizerScales[13] = 200;
+  m_OptimizerScales[14] = 200;
   
   this->SetMetric(MetricType::New());
   m_MetricNumberOfSpatialSamples = 40000 ;
@@ -63,17 +63,9 @@ AffineRegistrator< TImage >
 template< class TImage >
 void
 AffineRegistrator< TImage >
-::SetOptimizerToRegularGradient() 
+::SetOptimizerToOnePlusOnePlusGradient() 
   {
-  m_OptimizerMethod = REGULARGRADIENT;
-  }
-
-template< class TImage >
-void
-AffineRegistrator< TImage >
-::SetOptimizerToConjugateGradient() 
-  {
-  m_OptimizerMethod = CONJUGATEGRADIENT;
+  m_OptimizerMethod = ONEPLUSONEPLUSGRADIENT;
   }
 
 template< class TImage >
@@ -93,7 +85,7 @@ AffineRegistrator< TImage >
       OnePlusOneOptimizerType::Pointer opt = OnePlusOneOptimizerType::New();
       opt->SetNormalVariateGenerator( OptimizerNormalGeneratorType::New() );
       opt->SetMaximumIteration( m_OptimizerNumberOfIterations);
-      opt->SetEpsilon(0.0000000000001);
+      opt->SetEpsilon(1e-10);
       opt->Initialize(1.01); // Initial search radius
       opt->SetScales( m_OptimizerScales );
       this->SetOptimizer(opt);
@@ -103,31 +95,32 @@ AffineRegistrator< TImage >
       {
       GradientOptimizerType::Pointer opt = GradientOptimizerType::New();
       opt->SetMaximize(false);
-      opt->SetLearningRate(0.001);
-      opt->SetNumberOfIterations(m_OptimizerNumberOfIterations);
+      opt->SetStepLength(5);
+      opt->SetStepTolerance(1e-10);
+      opt->SetMaximumIteration(m_OptimizerNumberOfIterations);
       opt->SetScales( m_OptimizerScales );
       this->SetOptimizer(opt);
       break;
       }
-    case REGULARGRADIENT:
+    case ONEPLUSONEPLUSGRADIENT:
       {
-      RegularGradientOptimizerType::Pointer opt;
-      opt = RegularGradientOptimizerType::New();
+      OnePlusOneOptimizerType::Pointer initOpt = OnePlusOneOptimizerType::New();
+      initOpt->SetNormalVariateGenerator( OptimizerNormalGeneratorType::New() );
+      initOpt->SetMaximumIteration( m_OptimizerNumberOfIterations);
+      initOpt->SetEpsilon(1e-10);
+      initOpt->Initialize(1.01); // Initial search radius
+      initOpt->SetScales( m_OptimizerScales );
+
+      GradientOptimizerType::Pointer opt = GradientOptimizerType::New();
       opt->SetMaximize(false);
-      //opt->SetLearningRate(0.001);
-      opt->SetNumberOfIterations(m_OptimizerNumberOfIterations);
+      opt->SetStepLength(0.25);
+      opt->SetStepTolerance(1e-10);
+      opt->SetMaximumIteration(4);
       opt->SetScales( m_OptimizerScales );
-      this->SetOptimizer(opt);
-      break;
-      }
-    case CONJUGATEGRADIENT:
-      {
-      ConjugateGradientOptimizerType::Pointer opt;
-      opt = ConjugateGradientOptimizerType::New();
-      //opt->SetLearningRate(0.001);
-      //opt->SetNumberOfIterations(m_OptimizerNumberOfIterations);
-      opt->SetScales( m_OptimizerScales );
-      this->SetOptimizer(opt);
+
+      this->SetOptimizer(initOpt);
+      this->SetSecondaryOptimizer(opt);
+
       break;
       }
     }
@@ -159,6 +152,31 @@ AffineRegistrator< TImage >
   catch(...)
     {
     this->PrintUncaughtError() ;
+    }
+
+  if(m_SecondaryOptimizer)
+    {
+    m_SecondaryOptimizer->SetCostFunction(this->GetTypedMetric());
+    m_SecondaryOptimizer->SetInitialPosition(this->GetLastTransformParameters());
+    try
+      {
+      m_SecondaryOptimizer->StartOptimization();
+      }
+    catch(ExceptionObject &e)
+      {
+      this->SetLastTransformParameters( 
+                     m_SecondaryOptimizer->GetCurrentPosition() );
+      this->GetTypedTransform()->SetParameters( 
+                     this->GetLastTransformParameters() );
+
+      this->PrintError(e) ;
+      }
+
+    this->SetLastTransformParameters( 
+                   m_SecondaryOptimizer->GetCurrentPosition() );
+    this->GetTypedTransform()->SetParameters( 
+                   this->GetLastTransformParameters() );
+
     }
   }
 

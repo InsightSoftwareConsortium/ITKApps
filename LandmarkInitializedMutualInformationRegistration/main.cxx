@@ -22,13 +22,13 @@ int usage()
   std::cout << "        2 - Affine" << std::endl;
   std::cout << "        3 - Rigid + Affine" << std::endl;
   std::cout << "  -O <method#>" << std::endl;
-  std::cout << "        0 - One plus one evolutionary [default]" << std::endl;
-  std::cout << "        1 - Gradient" << std::endl;
-  std::cout << "        2 - Regular step gradient" << std::endl;
-  std::cout << "        3 - Conjugate gradient" << std::endl;
-  std::cout << "  -I <iterations> : number of iterations for the optimizer"
+  std::cout << "        0 - One plus one evolutionary" << std::endl;
+  std::cout << "        1 - Powell line search" << std::endl;
+  std::cout << "        2 - One plus One + Powell line search [default]" 
             << std::endl;
-  std::cout << "  -S <# of samples> : number of samples for MI computation"
+  std::cout << "  -i <iterations> : # of iterations for optimizer [1000]"
+            << std::endl;
+  std::cout << "  -s <# of samples> : # of samples for MI computation [20000]"
             << std::endl;
   std::cout << "  -L <fixedLandmarksfile> <movingLandmarksfile>" << std::endl;
   std::cout << "  -T <filename> : save registration transform" << std::endl;
@@ -45,9 +45,12 @@ int main(int argc, char **argv)
       return usage();
       }
 
+    unsigned long iterations = 1000;
+    unsigned long samples = 20000;
+
     int initializationMethod = 2;
     int registrationMethod = 1;
-    int optimizationMethod = 0;
+    int optimizationMethod = 2;
 
     char fixedImageFilename[255];
     char movingImageFilename[255];
@@ -86,6 +89,14 @@ int main(int argc, char **argv)
         case 'R':
           argNum++;
           registrationMethod = (int)atof(argv[argNum++]);
+          break;
+        case 'i':
+          argNum++;
+          iterations = (int)atof(argv[argNum++]);
+          break;
+        case 's':
+          argNum++;
+          samples = (int)atof(argv[argNum++]);
           break;
         case 'L':
           argNum++;
@@ -139,12 +150,11 @@ int main(int argc, char **argv)
       }
     catch(...)
       {
-      std::cout << "ERROR: exception caught while loading fixed image."
+      std::cerr << "ERROR: exception caught while loading fixed image."
                 << std::endl;
       return 1;
       }
     fixedImage = fixedReader->GetOutput();
-    std::cout << "Read fixed image: " << fixedImageFilename << std::endl;
 
     ImageReaderType::Pointer movingReader = ImageReaderType::New();
     movingReader = ImageReaderType::New();
@@ -155,12 +165,11 @@ int main(int argc, char **argv)
       }
     catch(...)
       {
-      std::cout << "ERROR: exception caught while loading moving image."
+      std::cerr << "ERROR: exception caught while loading moving image."
                 << std::endl;
       return 1;
       }
     movingImage = movingReader->GetOutput();
-    std::cout << "Read moving image: " << movingImageFilename << std::endl;
 
     LandmarkType::Pointer fixedLandmarks;
     LandmarkType::Pointer movingLandmarks;
@@ -174,8 +183,6 @@ int main(int argc, char **argv)
       GroupType::ChildrenListType * children = group->GetChildren();
       fixedLandmarks = dynamic_cast< LandmarkType * >
                                       ((*(children->begin())).GetPointer());
-      std::cout << "Read fixed landmarks: " 
-                << fixedLandmarksFilename << std::endl;
 
       LandmarkReaderType::Pointer movingLandmarkReader =
                                   LandmarkReaderType::New();
@@ -185,8 +192,6 @@ int main(int argc, char **argv)
       children = group->GetChildren();
       movingLandmarks = dynamic_cast< LandmarkType * >
                                       ((*(children->begin())).GetPointer());
-      std::cout << "Read moving landmarks: " 
-                << movingLandmarksFilename << std::endl;
       }
 
     // Register
@@ -197,11 +202,16 @@ int main(int argc, char **argv)
     imageRegistrationApp->SetMovingImageRegion( 
          movingImage->GetLargestPossibleRegion() );
 
+    imageRegistrationApp->SetRigidNumberOfIterations(iterations);
+    imageRegistrationApp->SetAffineNumberOfIterations(iterations);
+    imageRegistrationApp->SetRigidNumberOfSpatialSamples(samples);
+    imageRegistrationApp->SetAffineNumberOfSpatialSamples(samples);
+
 
     switch(optimizationMethod)
       {
       default:
-        std::cout << "Error: Optimization method unknown!" << std::endl;
+        std::cerr << "Error: Optimization method unknown!" << std::endl;
         break;
       case 0:
         imageRegistrationApp->SetOptimizerToOnePlusOne();
@@ -210,10 +220,7 @@ int main(int argc, char **argv)
         imageRegistrationApp->SetOptimizerToGradient();
         break;
       case 2:
-        imageRegistrationApp->SetOptimizerToRegularGradient();
-        break;
-      case 3:
-        imageRegistrationApp->SetOptimizerToConjugateGradient();
+        imageRegistrationApp->SetOptimizerToOnePlusOnePlusGradient();
         break;
       }
 
@@ -221,7 +228,7 @@ int main(int argc, char **argv)
     switch(initializationMethod)
       {
       default:
-        std::cout << "Error: Initialization method unknown!" << std::endl;
+        std::cerr << "Error: Initialization method unknown!" << std::endl;
         break;
       case 0:
         imageRegistrationApp->RegisterUsingNone();
@@ -273,32 +280,47 @@ int main(int argc, char **argv)
       }
     clock_t timeInitEnd = clock();
 
+    double finalMetricValue = 0;
     switch(registrationMethod)
       {
       default:
-        std::cout << "Error: Image registration method unknown!" << std::endl;
+        std::cerr << "Error: Image registration method unknown!" << std::endl;
         break;
       case 0:
         break;
       case 1:
         imageRegistrationApp->RegisterUsingRigid();
+        finalMetricValue = imageRegistrationApp->GetRigidMetricValue();
         break;
       case 2:
         imageRegistrationApp->RegisterUsingAffine();
+        finalMetricValue = imageRegistrationApp->GetAffineMetricValue();
         break;
       case 3:
         imageRegistrationApp->RegisterUsingRigid();
         imageRegistrationApp->RegisterUsingAffine();
+        finalMetricValue = imageRegistrationApp->GetAffineMetricValue();
         break;
       }
     clock_t timeRegEnd = clock();
 
-    std::cout << "Time for initialization = " 
-              << timeInitEnd - timeStart << std::endl;
-    std::cout << "Time for registration = " 
-              << timeRegEnd - timeInitEnd << std::endl;
-    std::cout << "Time total = " 
-              << timeRegEnd - timeStart << std::endl;
+    TransformType::MatrixType m = imageRegistrationApp->
+                                             GetFinalTransform()->GetMatrix();
+    TransformType::OffsetType o = imageRegistrationApp->
+                                             GetFinalTransform()->GetOffset();
+    for(int i=0; i<3; i++)
+      {
+      for(int j=0; j<3; j++)
+        {
+        std::cout << m[j][i] << " ";
+        }
+      }
+    for(int i=0; i<3; i++)
+      {
+      std::cout << o[i] << " ";
+      }
+    std::cout << timeRegEnd - timeInitEnd << " ";
+    std::cout << finalMetricValue << std::endl;
     
     if(strlen(outputImageFilename)>1)
       {
@@ -312,7 +334,7 @@ int main(int argc, char **argv)
         }
       catch( itk::ExceptionObject &e )
         {
-        std::cout << e << std::endl;
+        std::cerr << e << std::endl;
         }
       }
 

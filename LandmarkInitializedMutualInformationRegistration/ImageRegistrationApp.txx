@@ -70,6 +70,7 @@ ImageRegistrationApp< TImage >
   m_RigidAffineTransform = AffineTransformType::New() ;
   m_RigidAffineTransform->SetIdentity() ;
   m_RigidRegValid = false;
+  m_RigidMetricValue = 0;
 
   m_AffineNumberOfIterations = 2000 ;
   m_AffineNumberOfSpatialSamples = 40000 ;
@@ -94,12 +95,13 @@ ImageRegistrationApp< TImage >
   m_AffineAffineTransform = AffineTransformType::New();
   m_AffineAffineTransform->SetIdentity();
   m_AffineRegValid = false;
+  m_AffineMetricValue = 0;
 
   m_FixedImage = NULL;
   m_MovingImage = NULL;
 
   m_PriorRegistrationMethod = NONE;
-  m_OptimizerMethod = ONEPLUSONE;
+  m_OptimizerMethod = ONEPLUSONEPLUSGRADIENT;
   }
 
 template< class TImage >
@@ -121,7 +123,7 @@ ImageRegistrationApp< TImage >
   m_RigidRegValid = false;
   m_AffineRegValid = false;
   m_PriorRegistrationMethod = NONE;
-  m_OptimizerMethod = ONEPLUSONE;
+  m_OptimizerMethod = ONEPLUSONEPLUSGRADIENT;
   }
 
 template< class TImage >
@@ -137,7 +139,7 @@ ImageRegistrationApp< TImage >
   m_RigidRegValid = false;
   m_AffineRegValid = false;
   m_PriorRegistrationMethod = NONE;
-  m_OptimizerMethod = ONEPLUSONE;
+  m_OptimizerMethod = ONEPLUSONEPLUSGRADIENT;
   }
 
 
@@ -246,6 +248,22 @@ ImageRegistrationApp< TImage >
         }
       break;
       }
+    case AFFINE:
+      {
+      if(m_AffineRegValid)
+        {
+        AffineParametersType affineParams;
+        affineParams = m_AffineRegTransform->GetParameters();
+        p[0] = affineParams[0];
+        p[1] = affineParams[1];
+        p[2] = affineParams[2];
+        p[3] = affineParams[3];
+        p[4] = affineParams[4];
+        p[5] = affineParams[5];
+        center = m_AffineRegTransform->GetCenter();
+        }
+      break;
+      }
     }
   }
 
@@ -268,17 +286,9 @@ ImageRegistrationApp< TImage >
 template< class TImage >
 void
 ImageRegistrationApp< TImage >
-::SetOptimizerToRegularGradient()
+::SetOptimizerToOnePlusOnePlusGradient()
   {
-  m_OptimizerMethod = REGULARGRADIENT;
-  }
-
-template< class TImage >
-void
-ImageRegistrationApp< TImage >
-::SetOptimizerToConjugateGradient()
-  {
-  m_OptimizerMethod = CONJUGATEGRADIENT;
+  m_OptimizerMethod = ONEPLUSONEPLUSGRADIENT;
   }
 
 template< class TImage >
@@ -315,10 +325,10 @@ ImageRegistrationApp< TImage >
   m_FinalTransform = m_NoneAffineTransform;
   m_PriorRegistrationMethod = NONE;
 
-  std::cout << "DEBUG: None: FINAL affine transform: " << std::endl
-            << m_FinalTransform->GetParameters() << std::endl
-            << "   Offset = " << m_FinalTransform->GetOffset() << std::endl
-            << "   Center = " << m_FinalTransform->GetCenter() << std::endl;
+  //std::cout << "DEBUG: None: FINAL affine transform: " << std::endl
+            //<< m_FinalTransform->GetParameters() << std::endl
+            //<< "   Offset = " << m_FinalTransform->GetOffset() << std::endl
+            //<< "   Center = " << m_FinalTransform->GetCenter() << std::endl;
   }
 
 template< class TImage >
@@ -356,10 +366,10 @@ ImageRegistrationApp< TImage >
   m_FinalTransform = m_CenterAffineTransform;
   m_PriorRegistrationMethod = CENTER;
 
-  std::cout << "DEBUG: Center: FINAL affine transform: " << std::endl
-            << m_FinalTransform->GetParameters() << std::endl
-            << "   Offset = " << m_FinalTransform->GetOffset() << std::endl
-            << "   Center = " << m_FinalTransform->GetCenter() << std::endl;
+  //std::cout << "DEBUG: Center: FINAL affine transform: " << std::endl
+            //<< m_FinalTransform->GetParameters() << std::endl
+            //<< "   Offset = " << m_FinalTransform->GetOffset() << std::endl
+            //<< "   Center = " << m_FinalTransform->GetCenter() << std::endl;
   }
 
 template< class TImage >
@@ -397,10 +407,10 @@ ImageRegistrationApp< TImage >
   m_FinalTransform = m_MassAffineTransform;
   m_PriorRegistrationMethod = MASS;
 
-  std::cout << "DEBUG: Mass: FINAL affine transform: " << std::endl
-            << m_FinalTransform->GetParameters() << std::endl
-            << "   Offset = " << m_FinalTransform->GetOffset() << std::endl
-            << "   Center = " << m_FinalTransform->GetCenter() << std::endl;
+  //std::cout << "DEBUG: Mass: FINAL affine transform: " << std::endl
+            //<< m_FinalTransform->GetParameters() << std::endl
+            //<< "   Offset = " << m_FinalTransform->GetOffset() << std::endl
+            //<< "   Center = " << m_FinalTransform->GetCenter() << std::endl;
   }
 
 template< class TImage >
@@ -439,10 +449,10 @@ ImageRegistrationApp< TImage >
   m_FinalTransform = m_MomentAffineTransform;
   m_PriorRegistrationMethod = MOMENT;
 
-  std::cout << "DEBUG: Moment: FINAL affine transform: " << std::endl
-            << m_FinalTransform->GetParameters() << std::endl
-            << "   Offset = " << m_FinalTransform->GetOffset() << std::endl
-            << "   Center = " << m_FinalTransform->GetCenter() << std::endl;
+  //std::cout << "DEBUG: Moment: FINAL affine transform: " << std::endl
+            //<< m_FinalTransform->GetParameters() << std::endl
+            //<< "   Offset = " << m_FinalTransform->GetOffset() << std::endl
+            //<< "   Center = " << m_FinalTransform->GetCenter() << std::endl;
   }
 
 
@@ -486,10 +496,10 @@ ImageRegistrationApp< TImage >
   m_FinalTransform = m_LandmarkAffineTransform;
   m_PriorRegistrationMethod = LANDMARK;
 
-  std::cout << "DEBUG: Landmark: FINAL affine transform: " << std::endl
-            << m_FinalTransform->GetParameters() << std::endl
-            << "   Offset = " << m_FinalTransform->GetOffset() << std::endl
-            << "   Center = " << m_FinalTransform->GetCenter() << std::endl;
+  //std::cout << "DEBUG: Landmark: FINAL affine transform: " << std::endl
+            //<< m_FinalTransform->GetParameters() << std::endl
+            //<< "   Offset = " << m_FinalTransform->GetOffset() << std::endl
+            //<< "   Center = " << m_FinalTransform->GetCenter() << std::endl;
   }
 
 template< class TImage >
@@ -539,10 +549,10 @@ ImageRegistrationApp< TImage >
   m_FinalTransform = m_LoadedAffineTransform;
   m_PriorRegistrationMethod = LOADED;
 
-  std::cout << "DEBUG: Loaded: FINAL affine transform: " << std::endl
-            << m_FinalTransform->GetParameters() << std::endl
-            << "   Offset = " << m_FinalTransform->GetOffset() << std::endl
-            << "   Center = " << m_FinalTransform->GetCenter() << std::endl;
+  //std::cout << "DEBUG: Loaded: FINAL affine transform: " << std::endl
+            //<< m_FinalTransform->GetParameters() << std::endl
+            //<< "   Offset = " << m_FinalTransform->GetOffset() << std::endl
+            //<< "   Center = " << m_FinalTransform->GetCenter() << std::endl;
   }
 
 template< class TImage >
@@ -570,14 +580,9 @@ ImageRegistrationApp< TImage >
       registrator->SetOptimizerToGradient();
       break;
       }
-    case REGULARGRADIENT:
+    case ONEPLUSONEPLUSGRADIENT:
       {
-      registrator->SetOptimizerToRegularGradient();
-      break;
-      }
-    case CONJUGATEGRADIENT:
-      {
-      registrator->SetOptimizerToConjugateGradient();
+      registrator->SetOptimizerToOnePlusOnePlusGradient();
       break;
       }
     }
@@ -588,9 +593,9 @@ ImageRegistrationApp< TImage >
   registrator->GetTypedTransform()->SetCenter(center);
   registrator->SetInitialTransformParameters(params);
 
-  std::cout << "DEBUG: Rigid: INITIAL versor transform: "
-            << std::endl
-            << registrator->GetInitialTransformParameters() << std::endl ;
+  //std::cout << "DEBUG: Rigid: INITIAL versor transform: "
+            //<< std::endl
+            //<< registrator->GetInitialTransformParameters() << std::endl ;
 
   try
     {   
@@ -607,6 +612,8 @@ ImageRegistrationApp< TImage >
 
   m_RigidRegValid = true;
   m_RigidRegTransform  = registrator->GetTypedTransform();
+  m_RigidMetricValue = registrator->GetTypedMetric()->GetValue(
+                                      m_RigidRegTransform->GetParameters());
   m_RigidAffineTransform->SetIdentity();
   m_RigidAffineTransform->SetCenter(m_RigidRegTransform->GetCenter());
   m_RigidAffineTransform->SetMatrix( m_RigidRegTransform->GetRotationMatrix());
@@ -614,10 +621,10 @@ ImageRegistrationApp< TImage >
   m_FinalTransform = m_RigidAffineTransform;
   m_PriorRegistrationMethod = RIGID;
 
-  std::cout << "DEBUG: Rigid: FINAL affine transform: "  << std::endl
-            << m_FinalTransform->GetParameters() << std::endl
-            << "   Offset = " << m_FinalTransform->GetOffset() << std::endl
-            << "   Center = " << m_FinalTransform->GetCenter() << std::endl;
+  //std::cout << "DEBUG: Rigid: FINAL affine transform: "  << std::endl
+            //<< m_FinalTransform->GetParameters() << std::endl
+            //<< "   Offset = " << m_FinalTransform->GetOffset() << std::endl
+            //<< "   Center = " << m_FinalTransform->GetCenter() << std::endl;
   }
 
 
@@ -647,14 +654,9 @@ ImageRegistrationApp< TImage >
       registrator->SetOptimizerToGradient();
       break;
       }
-    case REGULARGRADIENT:
+    case ONEPLUSONEPLUSGRADIENT:
       {
-      registrator->SetOptimizerToRegularGradient();
-      break;
-      }
-    case CONJUGATEGRADIENT:
-      {
-      registrator->SetOptimizerToConjugateGradient();
+      registrator->SetOptimizerToOnePlusOnePlusGradient();
       break;
       }
     }
@@ -668,9 +670,9 @@ ImageRegistrationApp< TImage >
   registrator->GetTypedTransform()->SetCenter(center);
   registrator->SetInitialTransformParameters(params);
 
-  std::cout << "DEBUG: Affine: INITIAL versor/offset/scale/skew transform: "
-            << std::endl 
-            << registrator->GetInitialTransformParameters() << std::endl ;
+  //std::cout << "DEBUG: Affine: INITIAL versor/offset/scale/skew transform: "
+            //<< std::endl 
+            //<< registrator->GetInitialTransformParameters() << std::endl ;
 
   try
     {   
@@ -686,6 +688,8 @@ ImageRegistrationApp< TImage >
     }
 
   m_AffineRegTransform = registrator->GetTypedTransform() ;
+  m_AffineMetricValue = registrator->GetTypedMetric()->GetValue(
+                                      m_AffineRegTransform->GetParameters());
   m_AffineAffineTransform->SetIdentity();
   m_AffineAffineTransform->SetCenter(m_AffineRegTransform->GetCenter());
   m_AffineAffineTransform->SetMatrix(m_AffineRegTransform->GetMatrix());
@@ -693,10 +697,10 @@ ImageRegistrationApp< TImage >
   m_FinalTransform = m_AffineAffineTransform;
   m_PriorRegistrationMethod = AFFINE;
 
-  std::cout << "DEBUG: Affine: FINAL affine transform: "  << std::endl
-            << m_FinalTransform->GetParameters() << std::endl
-            << "   Offset = " << m_FinalTransform->GetOffset() << std::endl
-            << "   Center = " << m_FinalTransform->GetCenter() << std::endl;
+  //std::cout << "DEBUG: Affine: FINAL affine transform: "  << std::endl
+            //<< m_FinalTransform->GetParameters() << std::endl
+            //<< "   Offset = " << m_FinalTransform->GetOffset() << std::endl
+            //<< "   Center = " << m_FinalTransform->GetCenter() << std::endl;
   }
 
 template< class TImage >

@@ -80,9 +80,7 @@ class ImageRegistrationApp : public Object
 
     void SetOptimizerToGradient();
 
-    void SetOptimizerToRegularGradient();
-
-    void SetOptimizerToConjugateGradient();
+    void SetOptimizerToOnePlusOnePlusGradient();
 
     void RegisterUsingNone();
 
@@ -159,6 +157,9 @@ class ImageRegistrationApp : public Object
     ImagePointer GetRigidRegisteredMovingImage();
     ImagePointer GetAffineRegisteredMovingImage();
     ImagePointer GetFinalRegisteredMovingImage();
+
+    itkGetMacro(RigidMetricValue, double);
+    itkGetMacro(AffineMetricValue, double);
   
   protected:
     ImageRegistrationApp() ;
@@ -177,8 +178,7 @@ class ImageRegistrationApp : public Object
 
     typedef enum { ONEPLUSONE,
                    GRADIENT,
-                   REGULARGRADIENT,
-                   CONJUGATEGRADIENT
+                   ONEPLUSONEPLUSGRADIENT
                  } OptimizerMethodType;
 
     typename NoneRegTransformType::Pointer       m_NoneRegTransform ;
@@ -199,6 +199,9 @@ class ImageRegistrationApp : public Object
     typename AffineTransformType::Pointer        m_AffineAffineTransform ;
     typename AffineTransformType::Pointer        m_FinalTransform;
   
+    double m_RigidMetricValue;
+    double m_AffineMetricValue;
+
     TImage*             m_FixedImage ;
     TImage*             m_MovingImage ;
     

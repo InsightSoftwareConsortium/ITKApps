@@ -9,9 +9,7 @@
 
 #include "itkOnePlusOneEvolutionaryOptimizer.h"
 #include "itkNormalVariateGenerator.h"
-#include "itkGradientDescentOptimizer.h"
-#include "itkConjugateGradientOptimizer.h"
-#include "itkRegularStepGradientDescentOptimizer.h"
+#include "itkPowellOptimizer.h"
 
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkStatisticsImageFilter.h"
@@ -39,13 +37,11 @@ class RigidRegistrator : public ImageRegistrationMethod < TImage, TImage >
     /** preprocessing related typedefs */
     typedef VersorRigid3DTransform<double>      TransformType ;
 
-    typedef enum { ONEPLUSONE, GRADIENT, REGULARGRADIENT, CONJUGATEGRADIENT }
+    typedef enum { ONEPLUSONE, GRADIENT, ONEPLUSONEPLUSGRADIENT }
                                                 OptimizerMethodType;
 
     typedef OnePlusOneEvolutionaryOptimizer     OnePlusOneOptimizerType ;
-    typedef GradientDescentOptimizer            GradientOptimizerType ;
-    typedef RegularStepGradientDescentOptimizer RegularGradientOptimizerType;
-    typedef ConjugateGradientOptimizer          ConjugateGradientOptimizerType;
+    typedef PowellOptimizer                     GradientOptimizerType ;
     typedef Statistics::NormalVariateGenerator  OptimizerNormalGeneratorType;
     typedef TransformType::ParametersType       ParametersType ;
     typedef TransformType::ParametersType       ScalesType ;
@@ -63,8 +59,7 @@ class RigidRegistrator : public ImageRegistrationMethod < TImage, TImage >
 
     void SetOptimizerToOnePlusOne();
     void SetOptimizerToGradient();
-    void SetOptimizerToRegularGradient();
-    void SetOptimizerToConjugateGradient();
+    void SetOptimizerToOnePlusOnePlusGradient();
 
     itkSetMacro(OptimizerNumberOfIterations, unsigned int) ;
     itkGetConstMacro(OptimizerNumberOfIterations, unsigned int) ;
@@ -90,13 +85,18 @@ class RigidRegistrator : public ImageRegistrationMethod < TImage, TImage >
 
     void PrintError(ExceptionObject &e) ;
 
+    itkSetObjectMacro(SecondaryOptimizer, OptimizerType);
+    itkGetObjectMacro(SecondaryOptimizer, OptimizerType);
+
 
   private:
     OptimizerMethodType     m_OptimizerMethod;
     unsigned int            m_OptimizerNumberOfIterations;
     ScalesType              m_OptimizerScales;
 
-    unsigned int  m_MetricNumberOfSpatialSamples;
+    unsigned int            m_MetricNumberOfSpatialSamples;
+
+    OptimizerType::Pointer  m_SecondaryOptimizer;
 
 
 
