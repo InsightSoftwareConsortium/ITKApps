@@ -70,7 +70,7 @@ int main(int argc, char **argv)
         }
 
   std::cout << "Loading File: " << fName << std::endl;
-  typedef itk::Image< itk::RGBPixel<float>, 3 > ImageType;
+  typedef itk::Image< itk::RGBPixel<unsigned char>, 3 > ImageType;
   typedef itk::ImageFileReader< ImageType > VolumeReaderType;
   VolumeReaderType::Pointer reader = VolumeReaderType::New();
 
