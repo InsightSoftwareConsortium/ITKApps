@@ -91,6 +91,7 @@ public:
 
     for(unsigned int component=0; component < numberOfComponents; component++ )
       {
+
       this->ImportPixelBuffer( component, pds );
 
        // Execute the filter
@@ -138,7 +139,7 @@ public:
       outData += numberOfComponents;
       }
 
-  } // end of ProcessData
+  } // end of CopyOutputData
 
 
 
