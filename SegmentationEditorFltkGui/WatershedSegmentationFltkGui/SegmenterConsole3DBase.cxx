@@ -31,9 +31,12 @@ SegmenterConsole3DBase
   m_ImageFileNameAvailable = false;
 
   m_Reader     = VolumeReaderType::New();
+
+  m_Flip = FlipType::New();
+  m_Flip->SetInput(m_Reader->GetOutput());
   
   m_FilterGrad = GradientMagnitudeFilterType::New();
-  m_FilterGrad->SetInput( m_Reader->GetOutput() );
+  m_FilterGrad->SetInput( m_Flip->GetOutput() );
 
   m_FilterGauss = DiscreteGaussianImageFilterType::New();
   m_FilterGauss->SetVariance( 0.0 );
@@ -122,34 +125,44 @@ SegmenterConsole3DBase
  *  Save Segmented Image
  *
  ***********************************/
-void
-SegmenterConsole3DBase 
-::SaveSegmentedImage( const char * filename )
-{
-  if( !filename )
-  {
-    return;
-  }
+// void
+// SegmenterConsole3DBase 
+// ::SaveSegmentedImage( const char * filename )
+// {
+//   if( !filename )
+//   {
+//     return;
+//   }
 
-  m_FilterW->SetSegmentationFileName( filename );
+//   m_FilterW->SetSegmentationFileName( filename );
 
-}
+// }
 
 /************************************
  *
  *  Save Tree
  *
  ***********************************/
-void
-SegmenterConsole3DBase 
-::SaveTree( const char * filename )
-{
-  if( !filename )
-  {
-    return;
-  }
+// void
+// SegmenterConsole3DBase 
+// ::SaveTree( const char * filename )
+// {
+//   if( !filename )
+//   {
+//     return;
+//   }
 
-  m_FilterW->SetTreeFileName( filename );
+//   m_FilterW->SetTreeFileName( filename );
+// }
+
+/************************************
+ *
+ * SaveSegmentedData
+ *
+ ************************************/
+void SegmenterConsole3DBase::SaveSegmentedData()
+{
+
 }
 
 

@@ -8,11 +8,11 @@ class SegmenterConsole3DGUI {open : {public SegmenterConsole3DBase}
   } {
     Fl_Window consoleWindow {
       label {Segmenter 3D} open
-      xywh {358 217 793 192} color 215 resizable
+      xywh {351 469 790 185} color 215 resizable
       code0 {\#include <SegmenterConsole3DBase.h>}
       code1 {\#include <fltkLightButton.h>} visible
     } {
-      Fl_Group controlsGroup {open
+      Fl_Group controlsGroup {open selected
         xywh {0 1 880 362} color 29 deactivate
       } {
         Fl_Light_Button inputButton {
@@ -30,7 +30,7 @@ class SegmenterConsole3DGUI {open : {public SegmenterConsole3DBase}
         Fl_Light_Button SegmentButton {
           label {Show Watershed Segmentation Image}
           callback {ShowSegmentedImage();}
-          xywh {425 20 355 24} selection_color 121 align 16
+          xywh {425 20 280 24} selection_color 121 align 16
           class {fltk::LightButton}
         }
         Fl_Box {} {
@@ -52,22 +52,32 @@ class SegmenterConsole3DGUI {open : {public SegmenterConsole3DBase}
           xywh {222 43 168 57} box UP_FRAME color 110 labeltype NO_LABEL
         } {}
         Fl_Group {} {open
-          xywh {425 44 355 91} box UP_FRAME color 2
+          xywh {425 19 350 81} box UP_FRAME color 2
         } {
           Fl_Button {} {
-            label {Image Filename@>}
-            callback {SaveSegmentedImage();}
-            xywh {448 95 147 25}
+            label {Save@>}
+            callback {SaveSegmentedData();}
+            xywh {705 19 70 25}
           }
-          Fl_Button {} {
-            label {Tree Filename@>}
-            callback {SaveTree();}
-            xywh {627 95 125 25}
-          }
+        }
+        Fl_Round_Button flipX {
+          label {Flip X Axis}
+          callback {Flip(0);}
+          xywh {23 116 90 20} down_box ROUND_DOWN_BOX
+        }
+        Fl_Round_Button flipY {
+          label {Flip Y Axis}
+          callback {Flip(1);}
+          xywh {132 116 90 20} down_box ROUND_DOWN_BOX
+        }
+        Fl_Round_Button flipZ {
+          label {Flip Z Axis}
+          callback {Flip(3);}
+          xywh {241 116 90 20} down_box ROUND_DOWN_BOX
         }
       }
       Fl_Output statusTextOutput {
-        xywh {10 155 575 25}
+        xywh {8 149 575 25}
       }
       Fl_Light_Button loadButton {
         label {Load Source File}
@@ -78,7 +88,7 @@ class SegmenterConsole3DGUI {open : {public SegmenterConsole3DBase}
       Fl_Button {} {
         label Quit
         callback {Quit();}
-        xywh {700 150 80 35}
+        xywh {698 112 80 35}
       }
       Fl_Value_Input SmoothingVariance {
         label {Smoothing Variance}
@@ -97,19 +107,19 @@ class SegmenterConsole3DGUI {open : {public SegmenterConsole3DBase}
       Fl_Value_Input Threshold {
         label {Lower Threshold}
         callback {SetThreshold( o->value() );}
-        xywh {719 58 50 25} align 132 step 0.001 value 0.01
+        xywh {711 57 50 25} align 132 step 0.001 value 0.01
       }
       Fl_Button {} {
         label {Show Help}
         callback {helpWin->show();}
-        xywh {605 150 80 35}
+        xywh {603 112 80 35}
       }
     }
     Fl_Window helpWin {
       label Help open
       xywh {499 497 525 365} labeltype NORMAL_LABEL resizable visible
     } {
-      Fl_Output instructTextOutput {selected
+      Fl_Output instructTextOutput {
         xywh {10 10 520 295} type Multiline labeltype NO_LABEL resizable
       }
       Fl_Button {} {
@@ -130,5 +140,7 @@ class SegmenterConsole3DGUI {open : {public SegmenterConsole3DBase}
   Function {ShowGradientImage( void )} {return_type {virtual void}
   } {}
   Function {ShowSegmentedImage( void )} {return_type {virtual void}
+  } {}
+  Function {Flip( int )} {return_type {virtual void}
   } {}
 } 

@@ -27,6 +27,8 @@
 #include <itkDiscreteGaussianImageFilter.h>
 
 #include <itkWatershedFilterAndWriter.h>
+#include <itkFlipImageFilter.h>
+
 
 
 class SegmenterConsole3DBase 
@@ -47,6 +49,8 @@ public:
 
   typedef   itk::ImageFileReader< 
                             InputImageType >  VolumeReaderType;
+
+  typedef   itk::FlipImageFilter<InputImageType> FlipType;
 
   typedef   itk::GradientMagnitudeImageFilter<
                             InputImageType,
@@ -77,14 +81,13 @@ public:
   virtual void SetThreshold( double );
   virtual void SetTreeFileName( const char * );
   virtual void SetSegmentedFileName( const char * );
-  virtual void SaveSegmentedImage(void) = 0;
-  virtual void SaveSegmentedImage(const char * filename);
-  virtual void SaveTree(void) = 0;
-  virtual void SaveTree(const char * filename);
+  virtual void SaveSegmentedData( void );
 
 protected:
 
   VolumeReaderType::Pointer                                      m_Reader;
+
+  FlipType::Pointer                                              m_Flip;
 
   GradientMagnitudeFilterType::Pointer                           m_FilterGrad;
 

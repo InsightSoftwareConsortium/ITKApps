@@ -62,7 +62,6 @@ WatershedFilterAndWriter<TInputImageType>
 
   if((this->m_SegmentationFileName == "") ||
   (this->m_TreeFileName == "")) {
-    std::cerr << "Please verify the tree and image file names are set\n";
     return;
   }
  

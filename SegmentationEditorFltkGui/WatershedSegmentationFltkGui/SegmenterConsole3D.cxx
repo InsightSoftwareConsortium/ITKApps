@@ -19,6 +19,7 @@
 #include <SegmenterConsole3D.h>
 #include <FL/fl_file_chooser.H>
 #include <stdio.h>
+#include <fstream>
 
 
 /************************************
@@ -54,6 +55,9 @@ SegmenterConsole3D
 
   m_Reader->AddObserver( itk::ModifiedEvent(), GradientButton->GetRedrawCommand());
 
+  axes[0] = false;
+  axes[1] = false;
+  axes[2] = false;
 
   this->ShowStatus("Let's start by loading an image...");
 
@@ -269,9 +273,11 @@ SegmenterConsole3D
     return;
   }
 
-  m_Reader->Update();
-  m_InputViewer->SetImage( m_Reader->GetOutput() ); 
+  m_Flip->Update();
+  m_InputViewer->SetImage( m_Flip->GetOutput() ); 
   m_InputViewer->Show();
+
+  this->ShowStatus("Input Image");
 }
 
 
@@ -289,6 +295,8 @@ SegmenterConsole3D
   m_FilterGauss->Update();
   m_ViewerGrad->SetImage( m_FilterGauss->GetOutput() );  
   m_ViewerGrad->Show();
+
+  this->ShowStatus("Gradient Image");
 
 }
 
@@ -310,6 +318,8 @@ SegmenterConsole3D
 
   m_SegmentViewer->SetImage( m_Colormapper->GetOutput() );
   m_SegmentViewer->Show();
+
+  this->ShowStatus("Segmented Image");
   
 }
 
@@ -319,61 +329,124 @@ SegmenterConsole3D
  *  Save Segmented Image
  *
  ***********************************/
-void
-SegmenterConsole3D
-::SaveSegmentedImage( void )
-{
+// void
+// SegmenterConsole3D
+// ::SaveSegmentedImage( void )
+// {
 
-  const char * filename = fl_file_chooser("Image filename","*.raw","");
-  if( !filename )
-  {
-    return;
-  }
+//   const char * filename = fl_file_chooser("Image filename","*.raw","");
+//   if( !filename )
+//   {
+//     return;
+//   }
 
-  this->ShowStatus("Saving image file...");
+//   this->ShowStatus("Saving image file...");
   
-  try 
-  {
-    SegmenterConsole3DBase::SaveSegmentedImage( filename );
-  }
-  catch( ... ) 
-  {
-    this->ShowStatus("Problems writing file format");
-    return;
-  }
+//   try 
+//   {
+//     SegmenterConsole3DBase::SaveSegmentedImage( filename );
+//   }
+//   catch( ... ) 
+//   {
+//     this->ShowStatus("Problems writing file format");
+//     return;
+//   }
 
-  this->ShowStatus("File Saved");
+//   this->ShowStatus("File Saved");
 
-}
+// }
 
 /************************************
  *
  *  Save Tree
  *
  ***********************************/
-void
-SegmenterConsole3D
-::SaveTree( void )
-{
+// void
+// SegmenterConsole3D
+// ::SaveTree( void )
+// {
 
-  const char * filename = fl_file_chooser("Tree filename","*.tree","");
-  if( !filename )
-  {
-    return;
-  }
+//   const char * filename = fl_file_chooser("Tree filename","*.tree","");
+//   if( !filename )
+//   {
+//     return;
+//   }
 
-  this->ShowStatus("Saving tree file...");
+//   this->ShowStatus("Saving tree file...");
   
-  try 
-  {
-    SegmenterConsole3DBase::SaveTree( filename );
+//   try 
+//   {
+//     SegmenterConsole3DBase::SaveTree( filename );
+//   }
+//   catch( ... ) 
+//   {
+//     this->ShowStatus("Problems writing file format");
+//     return;
+//   }
+
+//   this->ShowStatus("File Saved");
+
+// }
+
+/***********************************
+ *
+ * SaveSegmentedData
+ *
+ ***********************************/
+void SegmenterConsole3D::SaveSegmentedData()
+{
+ const char * filename = fl_file_chooser("Segmented Data","*.ws","");
+   if( !filename )
+   {
+     return;
+   }
+   this->ShowStatus("Saving .ws, .raw, and .tree files...");
+   std::string header = filename;
+
+   int length = header.length();
+
+   std::string raw_data = header.substr(0,length-3);
+   raw_data += ".raw";
+   std::string tree_data = header.substr(0,length-3);
+   tree_data += ".tree";
+   int x, y, z;
+   x = (m_FilterW->GetOutput()->GetLargestPossibleRegion()).GetSize()[0];
+   y = (m_FilterW->GetOutput()->GetLargestPossibleRegion()).GetSize()[1];
+   z = (m_FilterW->GetOutput()->GetLargestPossibleRegion()).GetSize()[2];
+
+
+   // write out filename.ws header
+   std::ofstream out;
+   out.open( header.c_str() );
+   out << raw_data << " " << tree_data << " " << x << " " << y << " " << z << std::endl;
+
+   out.close();
+
+   // write out raw data
+   m_FilterW->SetSegmentationFileName( raw_data.c_str() );
+
+   // write out tree
+   m_FilterW->SetTreeFileName( tree_data.c_str() );
+
+   m_FilterW->Update();
+
+   this->ShowStatus("Files Saved");
+}
+
+/**********************************
+ *
+ * Flip
+ *
+ **********************************/
+void SegmenterConsole3D::Flip(int a)
+{
+  if(axes[a]) {
+    axes[a] = false;
   }
-  catch( ... ) 
-  {
-    this->ShowStatus("Problems writing file format");
-    return;
+  else {
+    axes[a] = true;
   }
 
-  this->ShowStatus("File Saved");
-
+  m_Flip->SetFlipAxes(axes);
+  ShowInputImage();
 }

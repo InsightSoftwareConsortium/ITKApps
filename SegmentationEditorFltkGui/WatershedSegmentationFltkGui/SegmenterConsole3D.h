@@ -44,7 +44,6 @@ public:
   typedef itk::UnaryFunctorImageFilter<LabeledImageType,
     RGBImageType, ColorMapFunctorType> ColorMapFilterType;
 
-  typedef itk::ImageFileWriter<RGBImageType> RGBImageWriterType;
 
 public:
   SegmenterConsole3D();
@@ -57,8 +56,8 @@ public:
   virtual void ShowInputImage(void);
   virtual void ShowGradientImage(void);
   virtual void ShowSegmentedImage(void);
-  virtual void SaveSegmentedImage(void);
-  virtual void SaveTree(void);
+  virtual void SaveSegmentedData(void);
+  virtual void Flip(int);
 
 private:
   InputImageViewerType*      m_InputViewer;
@@ -68,6 +67,8 @@ private:
   RGBImageViewerType*        m_SegmentViewer;
 
   ColorMapFilterType::Pointer m_Colormapper;
+
+  bool axes[3];
 
 };
 
