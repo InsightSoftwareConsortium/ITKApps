@@ -21,6 +21,10 @@
 #include "vtkImageExport.h"
 #include "vtkImageData.h"
 
+#ifndef vtkFloatingPointType
+#define vtkFloatingPointType float
+#endif
+
 namespace itk
 {
   
@@ -55,7 +59,7 @@ public:
   /** Some typedefs. */
   typedef TOutputImage OutputImageType;
   typedef typename    OutputImageType::ConstPointer    OutputImagePointer;
-  typedef VTKImageImport< OutputImageType >            ImporterFilterType; 
+  typedef VTKImageImport< OutputImageType, vtkFloatingPointType >   ImporterFilterType; 
   typedef typename ImporterFilterType::Pointer         ImporterFilterPointer;
  
   /** Get the output in the form of a vtkImage. 
