@@ -21,6 +21,8 @@
 #include "itkVTKImageImport.h"
 #include "itkCurvatureFlowImageFilter.h"
 #include "itkCastImageFilter.h"
+#include "itkRGBPixel.h"
+#include "itkImageFileReader.h"
 
 #include "vtkImageImport.h"
 #include "vtkImageExport.h"
@@ -131,7 +133,7 @@ int main()
   // VTK to ITK pipeline connection.
   //------------------------------------------------------------------------
   
-  typedef itk::Image<unsigned short, 2> ImageType; //AZUCAR
+  typedef itk::Image<unsigned short, 2> ImageType; 
   typedef itk::VTKImageImport<ImageType> ImageImportType;
   ImageImportType::Pointer itkImporter = ImageImportType::New();
   ConnectPipelines(vtkExporter, itkImporter);
@@ -241,5 +243,72 @@ int main()
   std::cerr << "Exception catched !! " << e << std::endl;
   }
 
+
+  // Now attempt instantiation for a color image
+  try
+    {
+    typedef itk::RGBPixel< unsigned char > PixelType;
+    typedef itk::Image< PixelType, 2 > ImageType;
+    
+    typedef itk::ImageFileReader< ImageType > ReaderType;
+
+    ReaderType::Pointer reader  = ReaderType::New();
+    reader->SetFileName("ellipses2.png");
+    reader->Update();
+
+    typedef itk::VTKImageExport< ImageType > ExportFilterType;
+    ExportFilterType::Pointer itkExporter = ExportFilterType::New();
+
+    itkExporter->SetInput( reader->GetOutput() );
+
+    // Create the vtkImageImport and connect it to the
+    // itk::VTKImageExport instance.
+    vtkImageImport* vtkImporter = vtkImageImport::New();  
+    ConnectPipelines(itkExporter, vtkImporter);
+    
+    //------------------------------------------------------------------------
+    // VTK pipeline.
+    //------------------------------------------------------------------------
+    
+    // Create a vtkImageShiftScale to convert the floating point image
+    // to an unsigned char image.  Connect it to the vtkImageImport
+    // instance.
+    vtkImageShiftScale* shifter = vtkImageShiftScale::New();
+    shifter->SetInput(vtkImporter->GetOutput());
+    shifter->SetScale(256);
+    shifter->SetOutputScalarTypeToUnsignedChar();
+
+
+    // Create a vtkImageActor to help render the image.  Connect it to
+    // the vtkImageShiftScale instance.
+    vtkImageActor* actor = vtkImageActor::New();
+    actor->SetInput(shifter->GetOutput());
+    
+    // Create a renderer, render window, and render window interactor to
+    // display the results.
+    vtkRenderer* renderer = vtkRenderer::New();
+    vtkRenderWindow* renWin = vtkRenderWindow::New();
+    vtkRenderWindowInteractor* iren = vtkRenderWindowInteractor::New();
+    
+    renWin->SetSize(500, 500);
+    renWin->AddRenderer(renderer);
+    iren->SetRenderWindow(renWin);
+    
+    // Add the vtkImageActor to the renderer for display.
+    renderer->AddActor(actor);
+    renderer->SetBackground(0.4392, 0.5020, 0.5647);
+
+    // Bring up the render window and begin interaction.
+    renWin->Render();
+    iren->Start();
+
+    }
+  catch( itk::ExceptionObject & e )
+    {
+    std::cerr << "Exception catched !! " << e << std::endl;
+    }
+
+
+  
   return 0;
 }
