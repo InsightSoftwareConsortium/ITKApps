@@ -133,6 +133,13 @@ bool  LiverTumorSegmentationBase::DoSegmentation( SegmentationModuleType sType )
         m_ThresholdLevelSetModule.Execute();
         m_SegmentedVolume = m_ThresholdLevelSetModule.GetOutput(); 
         break;
+        
+      case WATERSHED:
+        
+      case GEODESIC_ACTIVE_CONTOUR:
+
+      default:
+        fl_message("The selected segmentation method is not fully implemented");
      }
      
      //**************** For debugging ( R E M O V E       L A T E R  )
