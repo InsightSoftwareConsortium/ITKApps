@@ -22,6 +22,7 @@ ImageRegistrationApp< TImage >
   m_LandmarkRegTransform->SetIdentity() ;
   m_LandmarkAffineTransform = AffineTransformType::New() ;
   m_LandmarkAffineTransform->SetIdentity() ;
+  m_LandmarkRegValid = false;
   
   m_RigidNumberOfIterations = 500 ;
   m_RigidFixedImageStandardDeviation = 0.4 ;
@@ -66,12 +67,33 @@ ImageRegistrationApp< TImage >
   m_AffineRegTransform->SetIdentity();
   m_AffineAffineTransform = AffineTransformType::New();
   m_AffineAffineTransform->SetIdentity();
+
+  m_FixedImage = NULL;
+  m_MovingImage = NULL;
   }
 
 template< class TImage >
 ImageRegistrationApp< TImage >
 ::~ImageRegistrationApp()
   {
+  }
+
+template< class TImage >
+void
+ImageRegistrationApp< TImage >
+::SetFixedImage(TImage * image)
+  {
+  m_FixedImage = image;
+  m_LandmarkRegValid = false;
+  }
+
+template< class TImage >
+void
+ImageRegistrationApp< TImage >
+::SetMovingImage(TImage * image)
+  {
+  m_MovingImage = image;
+  m_LandmarkRegValid = false;
   }
 
 template< class TImage >
@@ -101,6 +123,7 @@ ImageRegistrationApp< TImage >
       this->PrintUncaughtError() ;
     }
   
+  m_LandmarkRegValid = true;
   m_LandmarkRegTransform = registrator->GetTransform() ;
   m_LandmarkAffineTransform->SetIdentity();
   m_LandmarkAffineTransform->SetMatrix(
@@ -108,9 +131,11 @@ ImageRegistrationApp< TImage >
   m_LandmarkAffineTransform->SetOffset(m_LandmarkRegTransform->GetOffset());
   m_FinalTransform = m_LandmarkAffineTransform;
 
-  std::cout << "DEBUG: Landmark registration FINAL centered versor transform: "  << std::endl
+  std::cout << "DEBUG: Landmark registration FINAL centered versor transform: "
+            << std::endl
             << m_LandmarkRegTransform->GetParameters() << std::endl ;
-  std::cout << "DEBUG: Landmark registration FINAL affine transform: "  << std::endl
+  std::cout << "DEBUG: Landmark registration FINAL affine transform: "
+            << std::endl
             << m_FinalTransform->GetParameters() << std::endl  << std::endl;
   }
 
@@ -136,10 +161,44 @@ ImageRegistrationApp< TImage >
   registrator->SetMetricNumberOfSpatialSamples
                ( m_RigidNumberOfSpatialSamples );
 
-  registrator->SetInitialTransformParameters 
-               ( m_LandmarkRegTransform->GetParameters() );
+  if(m_LandmarkRegValid)
+    {
+    registrator->SetInitialTransformParameters 
+                 ( m_LandmarkRegTransform->GetParameters() );
+    }
+   else
+    {
+    TImage::SizeType size;
+    TImage::IndexType fixedCenterIndex;
+    itk::Point<double, 3> fixedCenterPoint;
+    size = m_FixedImage->GetLargestPossibleRegion().GetSize();
+    fixedCenterIndex[0] = size[0]/2;
+    fixedCenterIndex[1] = size[1]/2;
+    fixedCenterIndex[2] = size[2]/2;
+    m_FixedImage->TransformIndexToPhysicalPoint(fixedCenterIndex,
+                                                fixedCenterPoint);
+    TImage::IndexType movingCenterIndex;
+    itk::Point<double, 3> movingCenterPoint;
+    size = m_MovingImage->GetLargestPossibleRegion().GetSize();
+    movingCenterIndex[0] = size[0]/2;
+    movingCenterIndex[1] = size[1]/2;
+    movingCenterIndex[2] = size[2]/2;
+    m_MovingImage->TransformIndexToPhysicalPoint(movingCenterIndex,
+                                                movingCenterPoint);
+    RigidParametersType params;
+    params.resize(9);
+    params.Fill(0);
+    params[3] = movingCenterPoint[0];
+    params[4] = movingCenterPoint[1];
+    params[5] = movingCenterPoint[2];
+    params[6] = fixedCenterPoint[0] - movingCenterPoint[0];
+    params[7] = fixedCenterPoint[1] - movingCenterPoint[1];
+    params[8] = fixedCenterPoint[2] - movingCenterPoint[2];
+    registrator->SetInitialTransformParameters ( params );
+    }
 
-  std::cout << "DEBUG: rigid registration INITIAL centered versor transform: "  << std::endl
+  std::cout << "DEBUG: rigid registration INITIAL centered versor transform: "
+            << std::endl
             << registrator->GetInitialTransformParameters() << std::endl ;
 
   try
@@ -160,9 +219,11 @@ ImageRegistrationApp< TImage >
   m_RigidAffineTransform->SetOffset(m_RigidRegTransform->GetOffset());
   m_FinalTransform = m_RigidAffineTransform;
 
-  std::cout << "DEBUG: Rigid registration FINAL centered versor transform: " << std::endl 
+  std::cout << "DEBUG: Rigid registration FINAL centered versor transform: " 
+            << std::endl 
             << m_RigidRegTransform->GetParameters() << std::endl ;
-  std::cout << "DEBUG: Rigid registration FINAL affine transform: "  << std::endl
+  std::cout << "DEBUG: Rigid registration FINAL affine transform: "  
+            << std::endl
             << m_FinalTransform->GetParameters() << std::endl  << std::endl;
   }
 
@@ -188,14 +249,50 @@ ImageRegistrationApp< TImage >
   registrator->SetMetricNumberOfSpatialSamples
                ( m_AffineNumberOfSpatialSamples );
 
-  m_AffineRegTransform->SetIdentity();
-  m_AffineRegTransform->SetMatrix( m_LandmarkRegTransform->GetRotationMatrix());
-  m_AffineRegTransform->SetTranslation(m_LandmarkRegTransform->GetTranslation());
-  m_AffineRegTransform->SetCenter(m_LandmarkRegTransform->GetCenter());
-  registrator->SetInitialTransformParameters 
-               ( m_AffineRegTransform->GetParameters() );
+  if(m_LandmarkRegValid)
+    {
+    m_AffineRegTransform->SetIdentity();
+    m_AffineRegTransform->SetMatrix( 
+                          m_LandmarkRegTransform->GetRotationMatrix());
+    m_AffineRegTransform->SetTranslation(
+                          m_LandmarkRegTransform->GetTranslation());
+    m_AffineRegTransform->SetCenter(
+                          m_LandmarkRegTransform->GetCenter());
+    registrator->SetInitialTransformParameters 
+                 ( m_AffineRegTransform->GetParameters() );
+    }
+  else
+    {
+    TImage::SizeType size;
+    TImage::IndexType fixedCenterIndex;
+    itk::Point<double, 3> fixedCenterPoint;
+    size = m_FixedImage->GetLargestPossibleRegion().GetSize();
+    fixedCenterIndex[0] = size[0]/2;
+    fixedCenterIndex[1] = size[1]/2;
+    fixedCenterIndex[2] = size[2]/2;
+    m_FixedImage->TransformIndexToPhysicalPoint(fixedCenterIndex,
+                                                fixedCenterPoint);
+    TImage::IndexType movingCenterIndex;
+    itk::Point<double, 3> movingCenterPoint;
+    size = m_MovingImage->GetLargestPossibleRegion().GetSize();
+    movingCenterIndex[0] = size[0]/2;
+    movingCenterIndex[1] = size[1]/2;
+    movingCenterIndex[2] = size[2]/2;
+    m_MovingImage->TransformIndexToPhysicalPoint(movingCenterIndex,
+                                                movingCenterPoint);
+    m_AffineRegTransform->SetIdentity();
+    AffineParametersType params = m_AffineRegTransform->GetParameters();
+    params[9] = movingCenterPoint[0];
+    params[10] = movingCenterPoint[1];
+    params[11] = movingCenterPoint[2];
+    params[12] = fixedCenterPoint[0] - movingCenterPoint[0];
+    params[13] = fixedCenterPoint[1] - movingCenterPoint[1];
+    params[14] = fixedCenterPoint[2] - movingCenterPoint[2];
+    registrator->SetInitialTransformParameters ( params );
+    }
 
-  std::cout << "DEBUG: affine registration INITIAL centered versor transform: " << std::endl 
+  std::cout << "DEBUG: affine registration INITIAL centered versor transform: "
+            << std::endl 
             << registrator->GetInitialTransformParameters() << std::endl ;
 
   try

@@ -67,9 +67,16 @@ AffineRegistrator< TImage >
 template< class TImage >
 void
 AffineRegistrator< TImage >
-::Initialize()
+::Initialize() throw(ExceptionObject)
   {
-  Superclass::Initialize();
+  try
+    {
+    Superclass::Initialize();
+    }
+  catch(ExceptionObject e)
+    {
+    throw(e);
+    }
 
   // Base class handles
   // m_Interpolator->SetInputImage(m_MovingImage) ;
@@ -82,9 +89,9 @@ AffineRegistrator< TImage >
   this->GetMetric()->SetNumberOfSpatialSamples( m_MetricNumberOfSpatialSamples );
   
   typedef itk::StatisticsImageFilter< TImage > StatsFilterType;
-  StatsFilterType::Pointer statsFilter = StatsFilterType::New();
+  typename StatsFilterType::Pointer statsFilter = StatsFilterType::New();
   typedef itk::RegionOfInterestImageFilter<TImage, TImage> ROIFilterType;
-  ROIFilterType::Pointer roiFilter = ROIFilterType::New();
+  typename ROIFilterType::Pointer roiFilter = ROIFilterType::New();
   if(this->GetMovingImageRegionDefined())
     {
     roiFilter->SetInput(this->GetMovingImage());

@@ -84,7 +84,7 @@ class RigidRegistrator : public itk::ImageRegistrationMethod < TImage, TImage >
     RigidRegistrator() ;
     virtual ~RigidRegistrator() ;
 
-    virtual void Initialize();
+    virtual void Initialize() throw(ExceptionObject);
 
     void PrintUncaughtError() ;
 

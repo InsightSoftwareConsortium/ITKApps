@@ -84,7 +84,7 @@ class AffineRegistrator : public itk::ImageRegistrationMethod < TImage, TImage >
     AffineRegistrator() ;
     virtual ~AffineRegistrator() ;
 
-    virtual void Initialize();
+    virtual void Initialize() throw(ExceptionObject);
 
     void PrintUncaughtError() ;
 

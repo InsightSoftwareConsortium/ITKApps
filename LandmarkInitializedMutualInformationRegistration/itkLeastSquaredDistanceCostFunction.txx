@@ -1,4 +1,4 @@
-#include "itkLeastSquareDistanceCostFunction.h"
+#include "itkLeastSquaredDistanceCostFunction.h"
 
 namespace itk
 {
@@ -10,8 +10,8 @@ namespace itk
    */
 
   template< class TTransform >
-  LeastSquareDistanceCostFunction<TTransform>
-  ::LeastSquareDistanceCostFunction()
+  LeastSquaredDistanceCostFunction<TTransform>
+  ::LeastSquaredDistanceCostFunction()
   {
     m_Valid = 0;
     m_Transform = TransformType::New();
@@ -26,8 +26,8 @@ namespace itk
    */
 
   template< class TTransform >
-  LeastSquareDistanceCostFunction<TTransform>
-  ::~LeastSquareDistanceCostFunction()
+  LeastSquaredDistanceCostFunction<TTransform>
+  ::~LeastSquaredDistanceCostFunction()
   {
 
   }
@@ -42,13 +42,13 @@ namespace itk
 
   template< class TTransform >
   void
-  LeastSquareDistanceCostFunction<TTransform>
+  LeastSquaredDistanceCostFunction<TTransform>
   ::SetFixedPointSet( PointSetPointer fixedPointSet )
   {
     if( fixedPointSet->Size() == 0 )
       {
       itk::ExceptionObject e("itkLeastSqaureDistanceCostFunction.txx",50);
-      e.SetLocation("itk::LeastSquareDistanceCostFunction::SetFixedPointSet()");
+      e.SetLocation("itk::LeastSquaredDistanceCostFunction::SetFixedPointSet()");
       e.SetDescription("the point set passed as argument is of size 0...");
       throw(e);
       }
@@ -72,7 +72,7 @@ namespace itk
 
   template< class TTransform >
   void
-  LeastSquareDistanceCostFunction<TTransform>
+  LeastSquaredDistanceCostFunction<TTransform>
   ::PrintSelf( std::ostream &os, Indent indent ) const
   {
     unsigned int fixedPointSetSize = m_FixedPointSet->Size();
@@ -113,13 +113,13 @@ namespace itk
 
   template< class TTransform >
   void
-  LeastSquareDistanceCostFunction<TTransform>
+  LeastSquaredDistanceCostFunction<TTransform>
   ::SetMovingPointSet( PointSetPointer movingPointSet )
   {
     if( movingPointSet->Size() == 0 )
       {
-      itk::ExceptionObject e("itkLeastSquareDistanceCostFunction.txx",121);
-      e.SetLocation("itk::LeastSquareDistanceCostFunction::SetMovingPointSet()");
+      itk::ExceptionObject e("itkLeastSquaredDistanceCostFunction.txx",121);
+      e.SetLocation("itk::LeastSquaredDistanceCostFunction::SetMovingPointSet()");
       e.SetDescription("the point set passed as argument is of size 0...");
       throw(e);
       }
@@ -145,12 +145,14 @@ namespace itk
 
   template< class TTransform >
   double
-  LeastSquareDistanceCostFunction<TTransform>
+  LeastSquaredDistanceCostFunction<TTransform>
   ::GetValue( const ParametersType &parameters ) const
   {
     if( m_Valid )
       {
-      double   squareEuclideanDistance = 0.0;
+      double   maxPointSquaredDistance = 0;
+      double   pointSquaredDistance = 0;
+      double   squaredEuclideanDistance = 0.0;
       PointType     transformedPoint;
       unsigned int  pointSetSize = m_FixedPointSet->Size();
 
@@ -160,22 +162,26 @@ namespace itk
         {
         transformedPoint = m_Transform->TransformPoint(
                                               m_MovingPointSet->ElementAt(i));
+        pointSquaredDistance = 0;
         for( unsigned int j=0; j<3; j++)
           {
           double tf = (m_FixedPointSet->ElementAt(i)[j] -
                                       transformedPoint[j]);
-          squareEuclideanDistance += tf * tf;
+          pointSquaredDistance += tf * tf;
           }
-        //std::cout << "f[" << i << "] = " << m_FixedPointSet->ElementAt(i) << std::endl;
-        //std::cout << "m = " << transformedPoint << std::endl;
+        if(pointSquaredDistance > maxPointSquaredDistance)
+          {
+          maxPointSquaredDistance = pointSquaredDistance;
+          }
+        squaredEuclideanDistance += pointSquaredDistance;
         }
-      //std::cout << std::endl;
-      return squareEuclideanDistance;
+      squaredEuclideanDistance -= 0.5 * maxPointSquaredDistance;
+      return squaredEuclideanDistance;
       }
     else
       {
-      itk::ExceptionObject e("itkLeastSquareDistanceCostFunction.txx",169);
-      e.SetLocation("itk::LeastSquareDistanceCostFunction::GetValue()");
+      itk::ExceptionObject e("itkLeastSquaredDistanceCostFunction.txx",169);
+      e.SetLocation("itk::LeastSquaredDistanceCostFunction::GetValue()");
       e.SetDescription("Point sets do not have the same number of elements");
       throw(e);
       }
@@ -191,7 +197,7 @@ namespace itk
 
   template< class TTransform >
   void
-  LeastSquareDistanceCostFunction<TTransform>
+  LeastSquaredDistanceCostFunction<TTransform>
   ::GetDerivative( const ParametersType &, DerivativeType & ) const
   {
     // not implemented yet
@@ -205,7 +211,7 @@ namespace itk
 
   template< class TTransform >
   unsigned int 
-  LeastSquareDistanceCostFunction<TTransform>
+  LeastSquaredDistanceCostFunction<TTransform>
   ::GetNumberOfParameters(void) const
   {
     return m_Transform->GetNumberOfParameters();

@@ -1,7 +1,7 @@
 #ifndef __LandmarkRegistrator_h
 #define __LandmarkRegistrator_h
 
-#include "itkLeastSquareDistanceCostFunction.h"
+#include "itkLeastSquaredDistanceCostFunction.h"
 #include "itkResampleImageFilter.h"
 #include "itkOnePlusOneEvolutionaryOptimizer.h"
 #include "itkNormalVariateGenerator.h"
@@ -20,7 +20,7 @@ class LandmarkRegistrator : public itk::Object
     typedef itk::SmartPointer<const Self>                 ConstPointer;
 
     typedef itk::VersorRigid3DTransform< double >         TransformType;
-    typedef itk::LeastSquareDistanceCostFunction<
+    typedef itk::LeastSquaredDistanceCostFunction<
                                       TransformType >     MetricType;
 
     typedef MetricType::PointType                         LandmarkType ;

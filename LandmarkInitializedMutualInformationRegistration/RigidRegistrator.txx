@@ -31,7 +31,7 @@ RigidRegistrator< TImage >
   m_OptimizerScales[8] = 10;
   this->GetOptimizer()->SetNormalVariateGenerator(OptimizerNormalGeneratorType::New());
 
-  MetricType::Pointer newMetric = MetricType::New();
+  typename MetricType::Pointer newMetric = MetricType::New();
   this->SetMetric(newMetric);
   m_MetricNumberOfSpatialSamples = 50 ;
   m_MetricMovingImageStandardDeviation = 0.4;
@@ -62,9 +62,16 @@ RigidRegistrator< TImage >
 template< class TImage >
 void
 RigidRegistrator< TImage >
-::Initialize()
+::Initialize() throw (ExceptionObject)
   {
-  Superclass::Initialize();
+  try
+    {
+    Superclass::Initialize();
+    }
+  catch(ExceptionObject e)
+    {
+    throw(e);
+    }
   
   std::cout << "RigidRegistrator: Initialize" << std::endl;
 
@@ -79,9 +86,9 @@ RigidRegistrator< TImage >
   this->GetMetric()->SetNumberOfSpatialSamples( m_MetricNumberOfSpatialSamples );
   
   typedef itk::StatisticsImageFilter< TImage > StatsFilterType;
-  StatsFilterType::Pointer statsFilter = StatsFilterType::New();
+  typename StatsFilterType::Pointer statsFilter = StatsFilterType::New();
   typedef itk::RegionOfInterestImageFilter<TImage, TImage> ROIFilterType;
-  ROIFilterType::Pointer roiFilter = ROIFilterType::New();
+  typename ROIFilterType::Pointer roiFilter = ROIFilterType::New();
   if(this->GetMovingImageRegionDefined())
     {
     roiFilter->SetInput(this->GetMovingImage());

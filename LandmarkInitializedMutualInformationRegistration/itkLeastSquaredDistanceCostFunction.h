@@ -1,5 +1,5 @@
-#ifndef _itkLeastSquareDistanceCostFunction__h
-#define _itkLeastSquareDistanceCostFunction__h
+#ifndef _itkLeastSquaredDistanceCostFunction__h
+#define _itkLeastSquaredDistanceCostFunction__h
 
 #include <itkSingleValuedCostFunction.h>
 #include <itkPoint.h>
@@ -17,13 +17,13 @@ namespace itk
  */
 
   template< class TTransform = itk::VersorRigid3DTransform<double> >
-  class LeastSquareDistanceCostFunction
+  class LeastSquaredDistanceCostFunction
   : public SingleValuedCostFunction
   {
 
   public:
 
-    typedef LeastSquareDistanceCostFunction       Self;
+    typedef LeastSquaredDistanceCostFunction       Self;
     typedef SingleValuedCostFunction              Superclass;
     typedef SmartPointer<Self>                    Pointer;
     typedef SmartPointer< const Self >            ConstPointer;
@@ -39,7 +39,7 @@ namespace itk
 
     itkNewMacro(Self);
 
-    itkTypeMacro(LeastSquareDistanceCostFunction,SingleValuedCostFunction);
+    itkTypeMacro(LeastSquaredDistanceCostFunction,SingleValuedCostFunction);
   
     void SetFixedPointSet( PointSetPointer fixedPointSet );
 
@@ -47,7 +47,8 @@ namespace itk
 
     double GetValue( const ParametersType &parameters ) const;
 
-    void GetDerivative( const ParametersType &parameters, DerivativeType &derivative ) const;
+    void GetDerivative( const ParametersType &parameters,
+                        DerivativeType &derivative ) const;
 
     unsigned int GetNumberOfParameters(void) const;
 
@@ -59,15 +60,15 @@ namespace itk
     PointSetPointer     m_FixedPointSet;
     PointSetPointer     m_MovingPointSet;
 
-    LeastSquareDistanceCostFunction();
+    LeastSquaredDistanceCostFunction();
 
-    virtual ~LeastSquareDistanceCostFunction();
+    virtual ~LeastSquaredDistanceCostFunction();
 
     virtual void PrintSelf( std::ostream &os, Indent indent ) const;
 
   private:
 
-   LeastSquareDistanceCostFunction(const Self&);  //purposely not implemented
+   LeastSquaredDistanceCostFunction(const Self&);  //purposely not implemented
    void operator=(const Self&);                   //purposely not implemented
 
   };
@@ -75,8 +76,8 @@ namespace itk
 } //end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-  #include "itkLeastSquareDistanceCostFunction.txx"
+  #include "itkLeastSquaredDistanceCostFunction.txx"
 #endif
 
-#endif //_itkLeastSquareDistanceCostFunction__h
+#endif //_itkLeastSquaredDistanceCostFunction__h
 

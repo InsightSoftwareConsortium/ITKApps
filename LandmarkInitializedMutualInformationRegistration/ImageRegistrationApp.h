@@ -66,11 +66,9 @@ public:
 
   void RegisterUsingAffineMethod() ;
 
-  void SetFixedImage(TImage* image)
-  { m_FixedImage = image ; }
+  void SetFixedImage(TImage* image);
   
-  void SetMovingImage(TImage* image)
-  { m_MovingImage = image ; }
+  void SetMovingImage(TImage* image);
 
   itkGetObjectMacro(LandmarkRegTransform, LandmarkRegTransformType) ;
   itkGetObjectMacro(RigidRegTransform, RigidRegTransformType) ;
@@ -135,6 +133,7 @@ private:
 
   unsigned int        m_LandmarkNumberOfIterations ;
   LandmarkScalesType  m_LandmarkScales ;
+  bool                m_LandmarkRegValid;
 
   unsigned int        m_RigidNumberOfIterations ;
   double              m_RigidFixedImageStandardDeviation ;
