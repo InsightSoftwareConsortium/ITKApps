@@ -24,7 +24,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       typedef  itk::Image< PixelType, Dimension >   ImageType; 
       typedef  itk::GradientMagnitudeRecursiveGaussianImageFilter< ImageType,  ImageType >   FilterType;
       VolView::PlugIn::FilterModule< FilterType > module;
-      module.SetPlugInfo( info );
+      module.SetPluginInfo( info );
       module.SetUpdateMessage("Computing the gradient magnitude...");
       // Set the parameters on it
       module.GetFilter()->SetSigma( sigma ); 
@@ -39,7 +39,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       typedef  itk::Image< PixelType, Dimension >   ImageType; 
       typedef  itk::GradientMagnitudeRecursiveGaussianImageFilter< ImageType,  ImageType >   FilterType;
       VolView::PlugIn::FilterModule< FilterType > module;
-      module.SetPlugInfo( info );
+      module.SetPluginInfo( info );
       module.SetUpdateMessage("Computing the gradient magnitude...");
       // Set the parameters on it
       module.GetFilter()->SetSigma( sigma ); 
