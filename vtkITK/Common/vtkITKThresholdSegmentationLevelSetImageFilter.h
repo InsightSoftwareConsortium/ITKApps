@@ -118,8 +118,8 @@ class VTK_EXPORT vtkITKThresholdSegmentationLevelSetImageFilter : public vtkITKI
 protected:
   //BTX
   typedef itk::ThresholdSegmentationLevelSetImageFilter<Superclass::InputImageType,Superclass::InputImageType> ImageFilterType;
-  typedef itk::VTKImageImport<InputImageType,vtkFloatingPointType> FeatureImageImportType;
-  typedef itk::VTKImageExport<InputImageType,vtkFloatingPointType> SpeedImageExportType;
+  typedef itk::VTKImageImport<InputImageType> FeatureImageImportType;
+  typedef itk::VTKImageExport<InputImageType> SpeedImageExportType;
   
   vtkITKThresholdSegmentationLevelSetImageFilter() : Superclass ( ImageFilterType::New() )
   {
@@ -149,7 +149,7 @@ private:
   
 };
 
-vtkCxxRevisionMacro(vtkITKThresholdSegmentationLevelSetImageFilter, "$Revision: 1.6 $");
+vtkCxxRevisionMacro(vtkITKThresholdSegmentationLevelSetImageFilter, "$Revision: 1.7 $");
 vtkStandardNewMacro(vtkITKThresholdSegmentationLevelSetImageFilter);
 
 #endif

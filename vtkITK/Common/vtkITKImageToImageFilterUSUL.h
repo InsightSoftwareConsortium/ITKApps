@@ -32,8 +32,8 @@ protected:
   typedef itk::Image<unsigned short, 3> InputImageType;
   typedef itk::Image<unsigned long, 3> OutputImageType;
 
-  typedef itk::VTKImageImport<InputImageType,vtkFloatingPointType> ImageImportType;
-  typedef itk::VTKImageExport<OutputImageType,vtkFloatingPointType> ImageExportType;
+  typedef itk::VTKImageImport<InputImageType> ImageImportType;
+  typedef itk::VTKImageExport<OutputImageType> ImageExportType;
   ImageImportType::Pointer itkImporter;
   ImageExportType::Pointer itkExporter;
 

@@ -40,10 +40,6 @@
 #include "vnl/vnl_math.h"
 #include "OptionList.h"
 
-#ifndef vtkFloatingPointType
-#define vtkFloatingPointType float
-#endif
-
 void print_usage();
 
 int main(int argc, char **argv)
@@ -140,7 +136,7 @@ int main(int argc, char **argv)
   vtkImageExport *movingVtkExporter = vtkImageExport::New();
     movingVtkExporter->SetInput(movingReader->GetOutput());
 
-  typedef itk::VTKImageImport<InputType,vtkFloatingPointType> ImageImportType;
+  typedef itk::VTKImageImport<InputType> ImageImportType;
   ImageImportType::Pointer movingItkImporter = ImageImportType::New();
 
   ConnectPipelines(movingVtkExporter, movingItkImporter);
@@ -372,7 +368,7 @@ int main(int argc, char **argv)
 
 void print_usage()
 {
-  std::cerr << "RegisterAD $Revision: 1.7 $  $Date: 2004-02-10 22:27:05 $"  << std::endl;
+  std::cerr << "RegisterAD $Revision: 1.8 $  $Date: 2004-02-19 03:49:52 $"  << std::endl;
 
   std::cerr <<  " usage: RegisterAD" << std::endl;
   std::cerr <<  "    --study1Prefix prefix" << std::endl;
