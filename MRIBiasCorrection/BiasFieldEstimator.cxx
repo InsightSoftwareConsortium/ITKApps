@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "metaITKUtils.h"
 #include "imageutils.h"
 
+typedef itk::MRIBiasFieldCorrectionFilter<ImageType, ImageType, MaskType> Corrector ;
+
 void print_usage()
 {
   print_line("MRIBiasCorrection 1.0 (21.June.2001)");
@@ -84,10 +86,7 @@ void print_usage()
 }
 
 
-
-typedef itk::MRIBiasFieldCorrectionFilter<ImageType, ImageType, MaskType> Corrector ;
-
-void printResult(Corrector::Pointer filter, OptionList& options)
+void printResult(Corrector* filter, OptionList& options)
 {
   options.DumpOption("input") ;
   options.DumpOption("input-mask") ;
@@ -236,7 +235,7 @@ int main(int argc, char* argv[])
   std::cout << "Estimating the bias field..." << std::endl ;
   filter->Update() ;
 
-  printResult(filter, options) ;
+  printResult(filter.GetPointer(), options) ;
 
   return 0 ;
 }
