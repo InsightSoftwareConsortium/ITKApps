@@ -1,4 +1,4 @@
-/* perform smoothing using an anisotropic diffusion filter */
+/* perform smoothing on the iso-surface of a volume by using Level Sets */
 
 #include "vvITKFilterModuleWithRescaling.h"
 
