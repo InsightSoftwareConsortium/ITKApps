@@ -1,0 +1,573 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0103 
+header_name {.h} 
+code_name {.cxx}
+class guiMain {open
+} {
+  Function {guiMain()} {open selected
+  } {
+    Fl_Window tkWindow {
+      label {3D Registration Tool ====> downloadable on http://caddlab.rad.unc.edu <=====}
+      xywh {106 285 1060 735} box PLASTIC_UP_BOX color 159 resizable
+      code0 {itk::ImageRegion< 3 > tempRegion ;} visible
+    } {
+      Fl_Group tkMainGroup {open
+        xywh {0 25 1050 710} resizable
+      } {
+        Fl_Value_Slider tkSliceValuator {
+          callback {UpdateSliceNumber();}
+          xywh {430 47 16 603} type {Vert Fill} box PLASTIC_DOWN_BOX color 247 selection_color 247 labelsize 8 step 1
+        }
+        Fl_Button tkResetButton {
+          label Reset
+          callback {Reset();}
+          xywh {910 655 135 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 1 selection_color 247 labelfont 2 labelsize 10
+        }
+        Fl_Choice tkDisplayMovingImageChoice {
+          label {Currently Displayed Moving Image:}
+          callback {SetDisplayMovingImage();} open
+          xywh {794 26 249 15} box PLASTIC_UP_BOX down_box BORDER_BOX color 255 selection_color 255 labelsize 10 when 1 textsize 10
+        } {
+          menuitem tkUnregisteredView {
+            label {Unregistered Images}
+            callback {SelectImageSet(0) ;}
+            xywh {5 5 100 20} labelsize 10
+          }
+          menuitem tkLandmarkRegisteredView {
+            label {Landmark Registered Images}
+            callback {SelectImageSet(1) ;}
+            xywh {15 15 100 20} labelsize 10 deactivate
+          }
+          menuitem tkRegisteredView {
+            label {Registered Images}
+            callback {SelectImageSet(2) ;}
+            xywh {25 25 100 20} labelsize 10 deactivate
+          }
+        }
+        Fl_Group {} {
+          label {Developed by Computer Aided Diagnosis and Display Laboratories  ( http://caddlab.rad.unc.edu ), Oct. 2002}
+          xywh {530 700 520 15} labelsize 10 align 25
+        } {}
+        Fl_Button {} {
+          label Quit
+          callback {Quit();}
+          xywh {910 675 135 15} box PLASTIC_UP_BOX color 1 labelfont 2 labelsize 10
+        }
+        Fl_Button tkRegisterButton {
+          label Register
+          callback {//PreRegister();
+Register();}
+          xywh {740 655 155 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 63 selection_color 63 labelsize 10
+        }
+        Fl_Choice tkRegistrationMethodChoice {
+          label {Registration Method:} open
+          xywh {640 656 90 19} box PLASTIC_UP_BOX down_box BORDER_BOX color 255 selection_color 255 labelsize 10 align 36 when 1 textsize 10
+        } {
+          menuitem tkRigidMethod {
+            label Rigid
+            xywh {15 15 100 34} labelsize 10
+          }
+          menuitem tkAffineMethod {
+            label Affine
+            xywh {15 15 100 34} labelsize 10
+          }
+          menuitem tkDeformable {
+            label Deformable
+            xywh {15 15 100 34} labelsize 10 hide deactivate
+          }
+        }
+        Fl_Box tkResultImageViewer {
+          label label
+          xywh {448 51 600 601} box FLAT_BOX color 42 deactivate resizable
+          code0 {\#include <GLColorSliceView.h>}
+          class {GLColorSliceView< float, unsigned char >}
+        }
+        Fl_Group tkSubGroup {open
+          xywh {5 46 420 609}
+        } {
+          Fl_Box tkFixedImageViewer {
+            label label
+            xywh {149 69 275 275} box FLAT_BOX color 42 deactivate
+            code0 {\#include <LandmarkSliceViewer.h>}
+            class {LandmarkSliceViewer< short >}
+          }
+          Fl_Button tkSelectFixedImageButton {
+            label {Select Reference Image...}
+            callback {SelectFixedImage();}
+            xywh {9 49 131 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 selection_color 247 labelsize 10
+          }
+          Fl_Button tkSelectMovingImageButton {
+            label {Select Compared Image...}
+            callback {SelectMovingImage();}
+            xywh {9 356 131 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 selection_color 247 labelsize 10
+          }
+          Fl_Output tkMovingImageFile {
+            xywh {149 356 275 15} box PLASTIC_DOWN_BOX color 247 labeltype NO_LABEL labelsize 10 textsize 9
+          }
+          Fl_Output tkFixedImageFile {
+            xywh {149 49 275 15} box PLASTIC_DOWN_BOX color 247 labeltype NO_LABEL labelsize 10 textsize 9
+          }
+          Fl_Group tkFixedImageLandmarkGroup {open
+            xywh {10 90 130 145} deactivate
+          } {
+            Fl_Button tkClearFixedImageLandmarksButton {
+              label {clear landmarks}
+              callback {ClearLandmarks(o->parent());}
+              xywh {10 180 130 15} box PLASTIC_UP_BOX color 247 labelsize 9
+            }
+            Fl_Button {} {
+              label {Go to...}
+              callback {JumpToLandmark(0,0);}
+              xywh {95 99 45 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 10
+            }
+            Fl_Button {} {
+              label {Go to...}
+              callback {JumpToLandmark(0,1);}
+              xywh {95 117 45 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 10
+            }
+            Fl_Button {} {
+              label {Go to...}
+              callback {JumpToLandmark(0,2);}
+              xywh {95 135 45 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 10
+            }
+            Fl_Button {} {
+              label {Go to...}
+              callback {JumpToLandmark(0,3);}
+              xywh {95 153 45 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 10
+            }
+            Fl_Button {} {
+              label {load landmarks...}
+              callback {LoadLandmarks(0);}
+              xywh {10 200 130 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9
+            }
+            Fl_Button {} {
+              label {save landmarks...}
+              callback {SaveLandmarks(0);}
+              xywh {10 220 130 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9
+            }
+            Fl_Round_Button tkFixedImageLandmark1Button {
+              label {Landmark 1}
+              callback {UpdateLandmark(o->parent(), 0);}
+              tooltip {Landmark 1: mucosa point most opposite to the cervex} xywh {20 99 75 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 4
+            }
+            Fl_Round_Button tkFixedImageLandmark2Button {
+              label {Landmark 2}
+              callback {UpdateLandmark(o->parent(), 1);}
+              tooltip {Landmark 2: Extreme left point of the mucosa} xywh {20 118 75 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 1
+            }
+            Fl_Round_Button tkFixedImageLandmark3Button {
+              label {Landmark 3}
+              callback {UpdateLandmark(o->parent(), 2);}
+              tooltip {Landmark 3: mucosa point closest to the cervex} xywh {20 136 75 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 63
+            }
+            Fl_Round_Button tkFixedImageLandmark4Button {
+              label {Landmark 4}
+              callback {UpdateLandmark(o->parent(), 3);}
+              tooltip {Landmark 4: extreme right point of the mucosa} xywh {20 153 75 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 3
+            }
+          }
+          Fl_Group tkMovingImageLandmarkGroup {open
+            xywh {15 395 130 145} deactivate
+          } {
+            Fl_Button tkClearMovingImageLandmarksButton {
+              label {clear landmarks}
+              callback {ClearLandmarks(o->parent()) ;}
+              xywh {15 485 130 15} box PLASTIC_UP_BOX color 247 labelsize 9
+            }
+            Fl_Button {} {
+              label {Go to...}
+              callback {JumpToLandmark(1,0);}
+              xywh {100 405 45 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 10
+            }
+            Fl_Button {} {
+              label {Go to...}
+              callback {JumpToLandmark(1,1);}
+              xywh {100 422 45 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 10
+            }
+            Fl_Button {} {
+              label {Go to...}
+              callback {JumpToLandmark(1,2);}
+              xywh {100 440 45 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 10
+            }
+            Fl_Button {} {
+              label {Go to...}
+              callback {JumpToLandmark(1,3);}
+              xywh {100 458 45 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 10
+            }
+            Fl_Button {} {
+              label {load landmarks...}
+              callback {LoadLandmarks(1);}
+              xywh {15 505 130 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9
+            }
+            Fl_Button {} {
+              label {save landmarks...}
+              callback {SaveLandmarks(1);}
+              xywh {15 525 130 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9
+            }
+            Fl_Round_Button tkMovingImageLandmark1Button {
+              label {Landmark 1}
+              callback {UpdateLandmark(o->parent(), 0);}
+              tooltip {Landmark 1: mucosa point most opposite to the cervex} xywh {25 406 75 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 4
+            }
+            Fl_Round_Button tkMovingImageLandmark2Button {
+              label {Landmark 2}
+              callback {UpdateLandmark(o->parent(), 1);}
+              tooltip {Landmark 2: Extreme left point of the mucosa} xywh {25 424 75 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 1
+            }
+            Fl_Round_Button tkMovingImageLandmark3Button {
+              label {Landmark 3}
+              callback {UpdateLandmark(o->parent(), 2);}
+              tooltip {Landmark 3: mucosa point closest to the cervex} xywh {25 442 75 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 63
+            }
+            Fl_Round_Button tkMovingImageLandmark4Button {
+              label {Landmark 4}
+              callback {UpdateLandmark(o->parent(), 3);}
+              tooltip {Landmark 4: extreme right point of the mucosa} xywh {25 460 74 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 3
+            }
+          }
+          Fl_Box tkMovingImageViewer {
+            label label
+            xywh {150 375 275 275} box FLAT_BOX color 42 deactivate
+            class {LandmarkSliceViewer< short >}
+          }
+        }
+        Fl_Group tkViewAxisGroup {
+          label {View axis:} open
+          xywh {220 25 210 20} labelsize 10 align 4
+        } {
+          Fl_Round_Button tkViewAxisX {
+            label X
+            user_data 0
+            callback {SetViewAxis(0) ;}
+            xywh {260 25 25 20} type Radio down_box ROUND_DOWN_BOX labelsize 10
+          }
+          Fl_Round_Button tkViewAxisY {
+            label Y
+            user_data 1
+            callback {SetViewAxis(1) ;}
+            xywh {305 25 25 20} type Radio down_box ROUND_DOWN_BOX labelsize 10
+          }
+          Fl_Round_Button tkViewAxisZ {
+            label Z
+            user_data 2
+            callback {SetViewAxis(2) ;}
+            xywh {345 25 25 20} type Radio down_box ROUND_DOWN_BOX labelsize 10
+          }
+        }
+        Fl_Output tkStatusDisplay {
+          label Status
+          xywh {80 690 415 20} labelsize 10 textsize 10
+        }
+      }
+      Fl_Menu_Bar {} {open
+        xywh {1 0 1060 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 selection_color 247 labelsize 9 textsize 9
+      } {
+        submenu {} {
+          label File open
+          xywh {0 0 100 20} labelsize 10
+        } {
+          menuitem {} {
+            label {Save landmark registered moving image...}
+            callback {SaveLandmarkRegisteredImage();}
+            xywh {0 0 100 20} labelsize 10
+          }
+          menuitem {} {
+            label {Save registered final moving image...}
+            callback {SaveFinalRegisteredImage();}
+            xywh {20 20 100 20} labelsize 10
+          }
+          menuitem {} {
+            label {Save transform...}
+            callback {SaveTransform();}
+            xywh {15 15 100 20} labelsize 10
+          }
+          menuitem {} {
+            label Quit
+            callback {Quit();}
+            xywh {5 5 100 20} labelsize 10
+          }
+        }
+        submenu {} {
+          label Options open
+          xywh {0 0 100 20} labelsize 10
+        } {
+          menuitem {} {
+            label {Advanced Registration Options}
+            callback {ShowAdvancedOptions();}
+            xywh {0 0 100 20} labelsize 10
+          }
+          menuitem {} {
+            label {Save options...}
+            callback {SaveOptions() ;}
+            xywh {0 0 100 20} labelsize 10
+          }
+          menuitem {} {
+            label {Load options...}
+            callback {LoadOptions() ;}
+            xywh {0 0 100 20} labelsize 10
+          }
+        }
+        menuitem {} {
+          label Help
+          callback {ShowHelp("Help/Index.html");}
+          xywh {0 0 100 20} labelsize 10
+        }
+      }
+    }
+    Fl_Window tkAdvancedOptionsWindow {
+      label {Advanced Options...}
+      xywh {667 205 405 520} box PLASTIC_UP_BOX color 159 labelsize 10 resizable visible
+    } {
+      Fl_Tabs {} {open
+        xywh {15 15 375 455} labelsize 12
+      } {
+        Fl_Group {} {
+          label {Rigid Registration Options} open
+          xywh {15 40 375 430} labelsize 12 align 2 hide
+        } {
+          Fl_Button {} {
+            label {Help...}
+            callback {ShowHelp("Help/RegistrationParametersHelp.html");}
+            xywh {285 410 85 20} box PLASTIC_UP_BOX color 88 labelsize 12
+          }
+          Fl_Box {} {
+            label {Rotation Scales}
+            xywh {35 140 155 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
+          }
+          Fl_Value_Input tkRigidRotationScaleX {
+            label {X:}
+            xywh {110 145 65 25} labelsize 12 maximum 1e+009 value 1
+          }
+          Fl_Value_Input tkRigidRotationScaleY {
+            label {Y:}
+            xywh {110 175 65 25} labelsize 12 maximum 1e+009 value 1
+          }
+          Fl_Value_Input tkRigidRotationScaleZ {
+            label {Z:}
+            xywh {110 205 65 25} labelsize 12 maximum 1e+009 value 1
+          }
+          Fl_Box {} {
+            label {Translation Scales}
+            xywh {210 140 160 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
+          }
+          Fl_Value_Input tkRigidTranslationScaleX {
+            label {X:}
+            xywh {290 145 65 25} labelsize 12 maximum 1e+009 value 100
+          }
+          Fl_Value_Input tkRigidTranslationScaleY {
+            label {Y:}
+            xywh {290 175 65 25} labelsize 12 maximum 1e+009 value 100
+          }
+          Fl_Value_Input tkRigidTranslationScaleZ {
+            label {Z:}
+            xywh {290 205 65 25} labelsize 12 maximum 1e+009 value 100
+          }
+          Fl_Value_Input tkRigidNumberOfIterations {
+            label {Number of Iterations:}
+            xywh {305 255 65 25} labeltype EMBOSSED_LABEL labelsize 12 value 200
+          }
+          Fl_Value_Input tkRigidLearningRate {
+            label {Learning Rate:}
+            xywh {305 285 65 25} labeltype EMBOSSED_LABEL labelsize 12 minimum 1e-010 value 0.0001
+          }
+          Fl_Box {} {
+            xywh {35 65 335 55} box THIN_DOWN_FRAME labelsize 12
+          }
+          Fl_Check_Button tkRigidUseRegion {
+            label {Register using region determined by landmarks}
+            xywh {40 77 225 33} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelsize 12 align 148
+          }
+          Fl_Button {} {
+            label {options...}
+            callback {ShowRegionOptions();}
+            xywh {290 80 70 25} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 12
+          }
+          Fl_Value_Input tkRigidFixedImageStdDev {
+            label {Fixed Image Standard Deviation:}
+            xywh {305 315 65 25} labeltype EMBOSSED_LABEL labelsize 12 value 0.4
+          }
+          Fl_Value_Input tkRigidMovingImageStdDev {
+            label {Moving Image Standard Deviation:}
+            xywh {305 345 65 25} labeltype EMBOSSED_LABEL labelsize 12 value 0.4
+          }
+          Fl_Value_Input tkRigidNumberOfSpatialSamples {
+            label {Number of Spatial Samples}
+            xywh {305 375 65 25} labeltype EMBOSSED_LABEL labelsize 12 maximum 10000 value 50
+          }
+        }
+        Fl_Group {} {
+          label {Affine Registration Options} open
+          xywh {15 40 375 430} labelsize 12
+        } {
+          Fl_Box {} {
+            label {Matrix Scales}
+            xywh {30 65 345 125} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
+          }
+          Fl_Value_Input tkAffineMatrixScale0 {
+            xywh {115 95 65 25} labelsize 12 maximum 1e+009 value 1
+          }
+          Fl_Value_Input tkAffineMatrixScale1 {
+            xywh {185 95 65 25} labelsize 12 maximum 1e+009 value 1
+          }
+          Fl_Value_Input tkAffineMatrixScale2 {
+            xywh {255 95 65 25} labelsize 12 maximum 1e+009 value 1
+          }
+          Fl_Box {} {
+            label 1
+            xywh {130 70 35 25}
+          }
+          Fl_Box {} {
+            label 2
+            xywh {200 70 35 25}
+          }
+          Fl_Box {} {
+            label 3
+            xywh {270 70 35 25}
+          }
+          Fl_Box {} {
+            label 1
+            xywh {85 95 30 25}
+          }
+          Fl_Box {} {
+            label 2
+            xywh {85 125 30 25}
+          }
+          Fl_Box {} {
+            label 3
+            xywh {85 160 30 25}
+          }
+          Fl_Value_Input tkAffineMatrixScale3 {
+            xywh {115 125 65 25} labelsize 12 maximum 1e+009 value 1
+          }
+          Fl_Value_Input tkAffineMatrixScale4 {
+            xywh {185 125 65 25} labelsize 12 maximum 1e+009 value 1
+          }
+          Fl_Value_Input tkAffineMatrixScale5 {
+            xywh {255 125 65 25} labelsize 12 maximum 1e+009 value 1
+          }
+          Fl_Value_Input tkAffineMatrixScale6 {
+            xywh {115 160 65 25} labelsize 12 maximum 1e+009 value 1
+          }
+          Fl_Value_Input tkAffineMatrixScale7 {
+            xywh {185 160 65 25} labelsize 12 maximum 1e+009 value 1
+          }
+          Fl_Value_Input tkAffineMatrixScale8 {
+            xywh {255 160 65 25} labelsize 12 maximum 1e+009 value 1
+          }
+          Fl_Box {} {
+            label {Translation Scales}
+            xywh {30 210 345 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
+          }
+          Fl_Value_Input tkAffineTranslationScaleX {
+            label {X:}
+            xywh {185 215 65 25} labelsize 12 maximum 1e+009 value 0.0001
+          }
+          Fl_Value_Input tkAffineTranslationScaleY {
+            label {Y:}
+            xywh {185 245 65 25} labelsize 12 maximum 1e+009 value 0.0001
+          }
+          Fl_Value_Input tkAffineTranslationScaleZ {
+            label {Z:}
+            xywh {185 275 65 25} labelsize 12 maximum 1e+009 value 0.0001
+          }
+          Fl_Value_Input tkAffineNumberOfIterations {
+            label {Number of Iterations:}
+            xywh {310 315 65 25} labeltype EMBOSSED_LABEL labelsize 12 maximum 10000 value 200
+          }
+          Fl_Value_Input tkAffineLearningRate {
+            label {Learning Rate:}
+            xywh {310 345 65 25} labeltype EMBOSSED_LABEL labelsize 12 value 0.0001
+          }
+          Fl_Value_Input tkAffineFixedImageStdDev {
+            label {Fixed Image Standard Deviation:}
+            xywh {310 375 65 25} labeltype EMBOSSED_LABEL labelsize 12 value 0.4
+          }
+          Fl_Value_Input tkAffineMovingImageStdDev {
+            label {Moving Image Standard Deviation:}
+            xywh {310 405 65 25} labeltype EMBOSSED_LABEL labelsize 12 value 0.4
+          }
+          Fl_Value_Input tkAffineNumberOfSpatialSamples {
+            label {Number of Spatial Samples:}
+            xywh {310 435 65 25} labeltype EMBOSSED_LABEL labelsize 12 maximum 10000 value 50
+          }
+        }
+      }
+      Fl_Button tkApplyAdvancedOptionsButton {
+        label OK
+        callback {ApplyAdvancedOptions();}
+        xywh {70 485 125 25} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 63 labelsize 12
+      }
+      Fl_Button tkCloseAdvancedOptionsButton {
+        label Cancel
+        callback {tkAdvancedOptionsWindow->hide();}
+        xywh {220 485 125 25} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 88 labelsize 12
+      }
+    }
+    Fl_Window tkHelpWindow {open
+      xywh {-32000 -32000 409 630} box PLASTIC_UP_BOX color 159 hide
+    } {
+      Fl_Help_View tkHelpView {
+        xywh {10 10 390 585} labelsize 10
+      }
+      Fl_Button {} {
+        label Close
+        callback {tkHelpWindow->hide();}
+        xywh {280 605 120 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 88 labelsize 10
+      }
+    }
+  }
+  Function {SelectFixedImage()} {open return_type {virtual void}
+  } {}
+  Function {SelectMovingImage()} {open return_type {virtual void}
+  } {}
+  Function {UpdateSliceNumber()} {return_type {virtual void}
+  } {}
+  Function {Register()} {open return_type {virtual void}
+  } {}
+  Function {SetDisplayMovingImage()} {open return_type {virtual void}
+  } {}
+  Function {UpdateLandmark(Fl_Group* parent, unsigned int index )} {open return_type {virtual void}
+  } {}
+  Function {Quit()} {open return_type {virtual void}
+  } {}
+  Function {ClearLandmarks(Fl_Group* parent)} {open return_type {virtual void}
+  } {}
+  Function {SaveLandmarks( bool moving )} {open return_type {virtual void}
+  } {}
+  Function {LoadLandmarks( bool moving )} {open return_type {virtual void}
+  } {}
+  Function {SaveFinalRegisteredImage()} {open return_type {virtual void}
+  } {}
+  Function {SaveLandmarkRegisteredImage()} {open return_type {virtual void}
+  } {}
+  Function {ApplyAdvancedOptions()} {open return_type {virtual void}
+  } {}
+  Function {ShowAdvancedOptions()} {open return_type {virtual void}
+  } {}
+  Function {JumpToLandmark( bool moving, unsigned int index )} {open return_type {virtual void}
+  } {}
+  Function {SaveStudy()} {open return_type {virtual void}
+  } {}
+  Function {LoadStudy( const char * filename )} {open return_type {virtual void}
+  } {}
+  Function {ShowRegionOptions()} {open return_type {virtual void}
+  } {}
+  Function {ApplyRegionOptions()} {open return_type {virtual void}
+  } {}
+  Function {UpdateRegionOptions()} {open return_type {virtual void}
+  } {}
+  Function {ShowHelp( const char * file )} {open return_type {virtual void}
+  } {}
+  Function {Reset()} {open return_type {virtual void}
+  } {}
+  Function {SelectImageSet(unsigned int)} {open return_type {virtual void}
+  } {}
+  Function {SaveTransform()} {open return_type {virtual void}
+  } {}
+  Function {SaveOptions()} {open return_type {virtual void}
+  } {}
+  Function {LoadOptions()} {open return_type {virtual void}
+  } {}
+  Function {SetViewAxis(unsigned int axis)} {open return_type {virtual void}
+  } {}
+} 
