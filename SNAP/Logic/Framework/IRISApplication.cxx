@@ -451,7 +451,7 @@ void IRISApplication
 
     // Create a stream to parse that string
     IRISIStringStream iss(line);
-    iss.exceptions(ios_base::eofbit | ios_base::badbit | ios_base::failbit);
+    iss.exceptions(ios_base::badbit | ios_base::failbit);
 
     try 
       {
