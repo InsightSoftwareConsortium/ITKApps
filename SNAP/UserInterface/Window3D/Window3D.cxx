@@ -751,6 +751,7 @@ Window3D
     case WIN3D_PAN:    
       m_Trackball.TrackPan(x,y,w(),h(),2*m_ViewHalf[X],2*m_ViewHalf[Y]);
       break;
+    default: break;
     }
 
   redraw();
@@ -768,6 +769,7 @@ Window3D
       m_Trackball.StopZoom(); 
       this->SetupProjection();
       break;
+    default: break;
     }
   m_Mode = WIN3D_NONE;
 }
@@ -1346,6 +1348,9 @@ void Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.7  2003/10/09 22:45:15  pauly
+ *EMH: Improvements in 3D functionality and snake parameter preview
+ *
  *Revision 1.6  2003/10/02 20:57:46  pauly
  *FIX: Made sure that the previous check-in compiles on Linux
  *

@@ -110,7 +110,7 @@ protected:
           {
           // Generate an iteration event, since some work has happened up to
           // this point
-          m_PauseCommand->Execute(this,IterationEvent());
+          m_PauseCommand->Execute(this,itk::IterationEvent());
 
           // Clear the flag
           firstTimeInLoop = false;
@@ -118,7 +118,7 @@ protected:
         else
           {
           // Generate a dummy event, since no more changes occurred
-          m_PauseCommand->Execute(this,NoEvent());
+          m_PauseCommand->Execute(this,itk::NoEvent());
           }
         
       else 

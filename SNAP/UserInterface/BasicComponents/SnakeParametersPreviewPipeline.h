@@ -175,7 +175,7 @@ private:
 
   // A method to scan-convert a polygon
   void ScanConvertSpline(Fl_Gl_Window *context);  
-#endif SNAKE_PREVIEW_ADVANCED
+#endif // SNAKE_PREVIEW_ADVANCED
 
 };
 

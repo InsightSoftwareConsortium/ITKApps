@@ -373,7 +373,7 @@ SnakeParametersPreviewPipeline
     {  
     // Save the points
     m_ControlPoints = points;
-    for(int i=0;i<m_ControlPoints.size();i++)
+    for(unsigned int i=0;i<m_ControlPoints.size();i++)
       m_ControlPoints[i] *= 0.25;
 
     // Set the flags
@@ -527,7 +527,7 @@ SnakeParametersPreviewPipeline
     
     // The starting index
     // int si = ((int)(t * uMax)) - 1;
-    int sidx = floor(s - 1);
+    int sidx = (int) floor(s - 1);
     double u = s - sidx;
 
     // Compute the position and derivatives of the b-spline

@@ -135,7 +135,7 @@ IRISMeshPipeline
   m_NormalsFilter->SetInput(m_DecimateFilter->GetOutput());
   m_NormalsFilter->SplittingOff();
   m_NormalsFilter->ConsistencyOff();
-  m_NormalsFilter->AutoOrientNormalsOff();
+  //m_NormalsFilter->AutoOrientNormalsOff();
   //m_NormalsFilter->ReleaseDataFlagOn();
 
   // Create and configure a filter for polygon smoothing
