@@ -28,5 +28,5 @@ FLTK_WRAP_UI(LandmarkInitializedMutualInformationRegistration guiMain.fl)
 ITK_DISABLE_FLTK_GENERATED_WARNINGS(guiMain.fl)
 
 TARGET_LINK_LIBRARIES (LandmarkInitializedMutualInformationRegistration
-                       ITKIO ITKMetaIO ITKBasicFilters ITKStatistics ITKFltkImageViewer ${OPENGL_LIBRARY})
+                       ITKIO ITKMetaIO ITKBasicFilters ITKStatistics ITKFltkImageViewer)
 

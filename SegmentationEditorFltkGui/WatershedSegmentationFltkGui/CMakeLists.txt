@@ -45,15 +45,7 @@ ITKIO
 ITKNumerics
 ITKFltkImageViewer
 ${FTLK_LIBRARY}
-${OPENGL_LIBRARY}
-${OPENGL_glu_LIBRARY}
 )
-
-IF(WIN32)
-  LINK_LIBRARIES(
-  wsock32
-  )
-ENDIF(WIN32)
 
 ADD_EXECUTABLE(WatershedSegmentationFltkGui3D ${WatershedSegmentationFltkGui3D_SRCS})
 

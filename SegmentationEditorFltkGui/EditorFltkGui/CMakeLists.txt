@@ -74,16 +74,8 @@ vtkIO
 vtkRendering
 ITKVtkFltk
 ITKFltkImageViewer
-${FLTK_LIBRARY}
-${OPENGL_LIBRARY}
-${OPENGL_glu_LIBRARY}
 )
 
-IF(WIN32)
-  LINK_LIBRARIES(
-  wsock32
-  )
-ENDIF(WIN32)
 
 ADD_EXECUTABLE(EditorFltkGui ${EditorFltkGui_SRCS})
 
