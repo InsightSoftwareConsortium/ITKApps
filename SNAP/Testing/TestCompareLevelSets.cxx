@@ -85,7 +85,7 @@ public:
 
   /** Set/Get the number of iterations that the filter will run. */
   itkSetMacro(NumberOfIterations, unsigned int);
-  itkGetMacro(NumberOfIterations, unsigned int);
+  itkGetConstReferenceMacro(NumberOfIterations, unsigned int);
 
 protected:
   LevelSetExtensionFilter() 

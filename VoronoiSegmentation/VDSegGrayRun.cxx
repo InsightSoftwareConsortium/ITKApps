@@ -103,6 +103,7 @@ Load( const char * )
       }
     }
   }
+  return 0;
 }
 
 void
