@@ -44,11 +44,8 @@ public:
   typedef TInputImage1        Input1ImageType;
   typedef TInputImage2        Input2ImageType;
 
-  typedef typename FilterType::OutputImageType    OutputImageType;
-
   typedef typename Input1ImageType::PixelType     Input1PixelType;
   typedef typename Input2ImageType::PixelType     Input2PixelType;
-  typedef typename OutputImageType::PixelType     OutputPixelType;
 
   itkStaticConstMacro( Dimension, unsigned int, 
          itk::GetImageDimension< Input1ImageType >::ImageDimension );
