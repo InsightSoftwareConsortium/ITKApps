@@ -1,23 +1,19 @@
-/* Id
+/*=========================================================================
 
-// ******************************************************************
-// VISPack. Copyright (c) 1994-2000 Ross Whitaker rtw@utk.edu       *
-// For conditions of distribution and use, see the file LICENSE.txt *
-// accompanying this distribution.                                  *
-// ******************************************************************
+  Program:   Insight Segmentation & Registration Toolkit
+  Module:    param.y
+  Language:  C++
+  Date:      $Date$
+  Version:   $Revision$
 
+  Copyright (c) 2002 Insight Consortium. All rights reserved.
+  See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
 
-   Josh Cates 03/07/00 jecates@utk.edu
-   University of Tennessee, Knoxville
-   University of Utah
+     This software is distributed WITHOUT ANY WARRANTY; without even 
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     PURPOSE.  See the above copyright notices for more information.
 
-   This file defines a grammer for the parameter file parser. It serves as an
-   input file for the Bison utility, which will generate a function yyparse().
-
-   A successful call to yyparse() will generate a parse tree with a
-   Parameter_File object at its root.
-   
-*/
+=========================================================================*/
 %{
 
 extern "C" {
@@ -56,7 +52,7 @@ void reset_yyvalues()
 /**
  * Function required by the bison utility
  */
-void yyerror (const char *errstring)
+void yyerror (const char *)
 {
   syntax_error_count++;
   std::cerr << "yyparse(): Line " << line_no

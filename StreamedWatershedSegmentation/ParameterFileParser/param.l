@@ -1,19 +1,19 @@
-/* Id
+/*=========================================================================
 
-// ******************************************************************
-// VISPack. Copyright (c) 1994-2000 Ross Whitaker rtw@utk.edu       *
-// For conditions of distribution and use, see the file LICENSE.txt *
-// accompanying this distribution.                                  *
-// ******************************************************************
+  Program:   Insight Segmentation & Registration Toolkit
+  Module:    param.l
+  Language:  C++
+  Date:      $Date$
+  Version:   $Revision$
 
+  Copyright (c) 2002 Insight Consortium. All rights reserved.
+  See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
 
-   Josh Cates 12/00/00 jecates@utk.edu
-   University of Tennessee, Knoxville
+     This software is distributed WITHOUT ANY WARRANTY; without even 
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     PURPOSE.  See the above copyright notices for more information.
 
-   This file defines a flex scanner for parameter file language tokens.
-
-   */
-
+=========================================================================*/
 %{
 
 #include <iostream>
