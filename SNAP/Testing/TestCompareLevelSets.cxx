@@ -16,6 +16,7 @@
 //  by hand 
 #if defined(__BORLANDC__)
 #include <SNAPBorlandDummyTypes.h>
+#include <time.h>
 #endif
 
 #include "TestCompareLevelSets.h"
