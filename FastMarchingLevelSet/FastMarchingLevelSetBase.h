@@ -65,6 +65,9 @@ public:
   /** Filter for reading the input image */
   typedef   itk::ImageFileReader< InputImageType >       ImageReaderType;
 
+  /** Filter for writing the output image */
+  typedef   itk::ImageFileWriter< ThresholdedImageType > ImageWriterType;
+
   /** Cast filter needed because FastMarchingLevelSetImageFilter 
       expects double images */
   typedef   itk::CastImageFilter< 
@@ -108,6 +111,9 @@ public:
   virtual void LoadInputImage()=0;
   virtual void LoadInputImage(const char * filename);
 
+  virtual void SaveOutputImage()=0;
+  virtual void SaveOutputImage(const char * filename);
+
   virtual void ShowStatus(const char * text)=0;
 
   virtual void ComputeGradientMagnitude();
@@ -129,6 +135,8 @@ protected:
 protected:
 
   ImageReaderType::Pointer                    m_ImageReader;
+
+  ImageWriterType::Pointer                    m_ImageWriter;
 
   bool                                        m_InputImageIsLoaded;
 

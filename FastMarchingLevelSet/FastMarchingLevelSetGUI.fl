@@ -4,10 +4,11 @@ header_name {.h}
 code_name {.cxx}
 class FastMarchingLevelSetGUI {open : {public FastMarchingLevelSetBase}
 } {
-  Function {FastMarchingLevelSetGUI()} {} {
+  Function {FastMarchingLevelSetGUI()} {open
+  } {
     Fl_Window consoleWindow {
       label {Fast Marching Segmentation Level Set} open
-      xywh {259 69 830 280}
+      xywh {189 372 830 280}
       code0 {\#include <FastMarchingLevelSetBase.h>}
       code1 {\#include <fltkLightButton.h>} visible
     } {
@@ -15,7 +16,7 @@ class FastMarchingLevelSetGUI {open : {public FastMarchingLevelSetBase}
         xywh {0 0 820 210}
       } {
         Fl_Box {} {
-          xywh {679 36 61 10} box UP_BOX color 4
+          xywh {679 39 61 10} box UP_BOX color 4
         }
         Fl_Box {} {
           xywh {230 80 10 70} box UP_BOX color 4
@@ -27,16 +28,19 @@ class FastMarchingLevelSetGUI {open : {public FastMarchingLevelSetBase}
           xywh {200 78 80 11} box UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {679 76 61 10} box UP_BOX color 4
+          xywh {679 79 61 10} box UP_BOX color 4
         }
         Fl_Box {} {
           xywh {505 80 10 70} box UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {680 116 61 10} box UP_BOX color 4
+          xywh {680 119 61 10} box UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {679 36 10 90} box UP_BOX color 4
+          xywh {650 82 10 100} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {679 39 10 90} box UP_BOX color 4
         }
         Fl_Box {} {
           xywh {470 79 80 11} box UP_BOX color 4
@@ -57,7 +61,7 @@ class FastMarchingLevelSetGUI {open : {public FastMarchingLevelSetBase}
           xywh {415 90 10 95} box UP_BOX color 21
         }
       }
-      Fl_Group controlsGroup {
+      Fl_Group controlsGroup {open
         xywh {5 5 815 215} deactivate
       } {
         Fl_Light_Button inputImageButton {
@@ -74,13 +78,13 @@ class FastMarchingLevelSetGUI {open : {public FastMarchingLevelSetBase}
         Fl_Light_Button thresholdedImageButton {
           label Display
           callback {this->ShowThresholdedImage();}
-          xywh {714 66 90 31} type Normal value 1 selection_color 1 labelsize 12 align 148
+          xywh {714 68 90 31} type Normal value 1 selection_color 1 labelsize 12 align 148
           class {fltk::LightButton}
         }
         Fl_Light_Button thresholdedImageVTKButton {
           label {VTK Render}
           callback {ShowThresholdedImageWithVTK();}
-          xywh {714 107 90 30} type Normal value 1 selection_color 1 labelsize 12 align 148
+          xywh {714 109 90 30} type Normal value 1 selection_color 1 labelsize 12 align 148
           class {fltk::LightButton}
         }
         Fl_Button {} {
@@ -90,7 +94,7 @@ class FastMarchingLevelSetGUI {open : {public FastMarchingLevelSetBase}
         }
         Fl_Button {} {
           label Threshold
-          callback {m_ThresholdFilter->Update();}
+          callback {m_ThresholdFilter->UpdateLargestPossibleRegion();}
           xywh {525 66 117 34} box ROUND_UP_BOX labelsize 12 align 128
         }
         Fl_Value_Input upperThresholdValueInput {
@@ -139,7 +143,7 @@ class FastMarchingLevelSetGUI {open : {public FastMarchingLevelSetBase}
         Fl_Light_Button segmentedImageButton {
           label Overlay
           callback {this->ShowSegmentedImage();}
-          xywh {715 26 90 31} type Normal value 1 selection_color 1 labelsize 12 align 148
+          xywh {715 28 90 31} type Normal value 1 selection_color 1 labelsize 12 align 148
           class {fltk::LightButton}
         }
         Fl_Value_Input betaValueInput {
@@ -154,8 +158,13 @@ class FastMarchingLevelSetGUI {open : {public FastMarchingLevelSetBase}
         }
         Fl_Value_Input stoppingValueInput {
           label Stopping
-          callback {this->SetStoppingValue( o->value()  );} selected
+          callback {this->SetStoppingValue( o->value()  );}
           xywh {435 40 55 25} labelsize 12 maximum 50000 step 1 value 50 textsize 12
+        }
+        Fl_Button {} {
+          label Save
+          callback {this->SaveOutputImage();} selected
+          xywh {626 173 60 35} box ROUND_UP_BOX labelsize 12 align 128
         }
       }
       Fl_Slider progressSlider {
@@ -169,7 +178,7 @@ class FastMarchingLevelSetGUI {open : {public FastMarchingLevelSetBase}
       Fl_Button {} {
         label Quit
         callback {this->Quit();}
-        xywh {665 155 90 35} box ROUND_UP_BOX labelsize 12 align 128
+        xywh {715 170 90 35} box ROUND_UP_BOX labelsize 12 align 128
       }
       Fl_Button {} {
         label Load
@@ -192,7 +201,7 @@ class FastMarchingLevelSetGUI {open : {public FastMarchingLevelSetBase}
   } {}
   Function {ShowThresholdedImage( void )} {return_type {virtual void}
   } {}
-  Function {UpdateExtract()} {open return_type {virtual void}
+  Function {UpdateExtract()} {return_type {virtual void}
   } {}
   Function {ShowThresholdedImageWithVTK( void )} {return_type {virtual void}
   } {}
@@ -203,5 +212,7 @@ class FastMarchingLevelSetGUI {open : {public FastMarchingLevelSetBase}
   Function {ShowEdgePotentialImage( void )} {return_type {virtual void}
   } {}
   Function {ShowSegmentedImage( void )} {return_type {virtual void}
+  } {}
+  Function {SaveOutputImage( void )} {return_type {virtual void}
   } {}
 } 

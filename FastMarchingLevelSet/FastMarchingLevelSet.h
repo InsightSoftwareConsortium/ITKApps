@@ -76,6 +76,8 @@ public:
 
   virtual void LoadInputImage();
 
+  virtual void SaveOutputImage();
+
   virtual void ShowConsole();
 
   virtual void ShowStatus(const char * text);

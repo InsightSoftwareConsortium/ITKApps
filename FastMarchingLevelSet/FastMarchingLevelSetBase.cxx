@@ -29,6 +29,7 @@ FastMarchingLevelSetBase
 {
 
   m_ImageReader                  = ImageReaderType::New();
+  m_ImageWriter                  = ImageWriterType::New();
 
   m_CastImageFilter = CastImageFilterType::New();
   m_CastImageFilter->SetInput( m_ImageReader->GetOutput() );
@@ -64,6 +65,8 @@ FastMarchingLevelSetBase
   m_ThresholdFilter->SetInput( m_FastMarchingWindowingFilter->GetOutput() );
   m_ThresholdFilter->SetInsideValue(   1 );
   m_ThresholdFilter->SetOutsideValue(  0 );
+
+  m_ImageWriter->SetInput( m_ThresholdFilter->GetOutput() );
 
   m_TrialPoints = NodeContainer::New();
   m_FastMarchingFilter->SetTrialPoints( m_TrialPoints );
@@ -113,6 +116,27 @@ FastMarchingLevelSetBase
 
 }
 
+
+
+ 
+/************************************
+ *
+ *  Save Output Image
+ *
+ ***********************************/
+void
+FastMarchingLevelSetBase 
+::SaveOutputImage( const char * filename )
+{
+  if( !filename )
+  {
+    return;
+  }
+
+  m_ImageWriter->SetFileName( filename );
+  m_ImageWriter->Update();
+  
+}
 
 
   
@@ -168,7 +192,7 @@ FastMarchingLevelSetBase
 ::ComputeGradientMagnitude( void )
 {
   this->ShowStatus("Computing Gradient Image");
-  m_DerivativeFilter->Update();
+  m_DerivativeFilter->UpdateLargestPossibleRegion();
 }
 
 
@@ -185,7 +209,7 @@ FastMarchingLevelSetBase
 {
   this->ComputeGradientMagnitude();
   this->ShowStatus("Computing Edge Potential Image");
-  m_SigmoidFilter->Update();
+  m_SigmoidFilter->UpdateLargestPossibleRegion();
 }
 
 
@@ -221,7 +245,7 @@ FastMarchingLevelSetBase
     {
     this->ComputeGradientMagnitude();
     this->ShowStatus("Computing Fast Marching Filter");
-    m_FastMarchingWindowingFilter->Update();
+    m_FastMarchingWindowingFilter->UpdateLargestPossibleRegion();
     }
   catch( itk::ExceptionObject & exp )
     {

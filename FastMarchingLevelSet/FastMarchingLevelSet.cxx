@@ -192,6 +192,44 @@ FastMarchingLevelSet
 
 
  
+
+ 
+/************************************
+ *
+ *  Save Output Image
+ *
+ ***********************************/
+void
+FastMarchingLevelSet
+::SaveOutputImage( void )
+{
+
+  const char * filename = fl_file_chooser("Output Image filename","*.*","");
+  if( !filename )
+  {
+    return;
+  }
+
+  this->ShowStatus("Saving output image file...");
+  
+  try 
+    {
+    FastMarchingLevelSetBase::SaveOutputImage( filename );
+    }
+  catch( ... ) 
+    {
+    this->ShowStatus("Problems writing output file");
+    return;
+    }
+
+  this->ShowStatus("Output Image Saved");
+
+}
+
+
+
+
+
 /************************************
  *
  *  Show Status
@@ -240,7 +278,7 @@ FastMarchingLevelSet
     return;
     }
 
-  m_CastImageFilter->Update();
+  m_CastImageFilter->UpdateLargestPossibleRegion();
   m_InputImageViewer.SetImage( m_CastImageFilter->GetOutput() );  
   m_InputImageViewer.SetOverlay( m_SeedImage );
   m_InputImageViewer.Show();
@@ -330,7 +368,7 @@ void
 FastMarchingLevelSet
 ::ShowThresholdedImage( void )
 {
-  m_ThresholdFilter->Update();
+  m_ThresholdFilter->UpdateLargestPossibleRegion();
   m_ThresholdedImageViewer.SetImage( m_ThresholdFilter->GetOutput() );  
   m_ThresholdedImageViewer.SetOverlay( m_SeedImage );
   m_ThresholdedImageViewer.Show();
@@ -351,7 +389,7 @@ void
 FastMarchingLevelSet
 ::ShowSegmentedImage( void )
 {
-  m_ThresholdFilter->Update();
+  m_ThresholdFilter->UpdateLargestPossibleRegion();
   m_SegmentationImageViewer.SetImage( m_CastImageFilter->GetOutput() );  
   m_SegmentationImageViewer.SetOverlay( m_ThresholdFilter->GetOutput() );
   m_SegmentationImageViewer.Show();
