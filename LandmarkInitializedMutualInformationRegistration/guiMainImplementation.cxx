@@ -850,7 +850,7 @@ guiMainImplementation
 
   // set landmark advance option values
   ImageRegistrationAppType::RigidScalesType landmarkScales;
-  landmarkScales.resize(9);
+  landmarkScales.set_size(9);
   landmarkScales[0] = tkLandmarkRotationScale->value();
   landmarkScales[1] = tkLandmarkRotationScale->value();
   landmarkScales[2] = tkLandmarkRotationScale->value();
@@ -866,7 +866,7 @@ guiMainImplementation
 
   // set rigid advance option values
   ImageRegistrationAppType::RigidScalesType rigidScales;
-  rigidScales.resize(9);
+  rigidScales.set_size(9);
   rigidScales[0] = tkRigidRotationScale->value();
   rigidScales[1] = tkRigidRotationScale->value();
   rigidScales[2] = tkRigidRotationScale->value();
@@ -889,7 +889,7 @@ guiMainImplementation
 
   // set affine advance option values
   ImageRegistrationAppType::AffineScalesType affineScales;
-  affineScales.resize(18);
+  affineScales.set_size(18);
   affineScales[0] = tkAffineRotationScale->value();
   affineScales[1] = tkAffineRotationScale->value();
   affineScales[2] = tkAffineRotationScale->value();

@@ -279,7 +279,7 @@ int main(int argc, char **argv)
     registration->GetLastTransformParameters();
 
   vnl_quaternion<double> quat(solution[0],solution[1],solution[2],solution[3]);
-  vnl_matrix_fixed<double,3,3> mat = quat.rotation_matrix();
+  vnl_matrix_fixed<double,3,3> mat = quat.rotation_matrix_transpose();
   
   // Convert the vnl matrix to a vtk mtrix
   double result[16];
@@ -368,7 +368,7 @@ int main(int argc, char **argv)
 
 void print_usage()
 {
-  std::cerr << "RegisterAD $Revision: 1.4 $  $Date: 2003-04-08 11:16:38 $"  << std::endl;
+  std::cerr << "RegisterAD $Revision: 1.5 $  $Date: 2003-12-16 17:58:20 $"  << std::endl;
 
   std::cerr <<  " usage: RegisterAD" << std::endl;
   std::cerr <<  "    --study1Prefix prefix" << std::endl;

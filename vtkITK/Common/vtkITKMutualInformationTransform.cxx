@@ -54,7 +54,7 @@
 #include "itkNumericTraits.h"
 #include "vnl/vnl_math.h"
 
-vtkCxxRevisionMacro(vtkITKMutualInformationTransform, "$Revision: 1.9 $");
+vtkCxxRevisionMacro(vtkITKMutualInformationTransform, "$Revision: 1.10 $");
 vtkStandardNewMacro(vtkITKMutualInformationTransform);
 
 //----------------------------------------------------------------------------
@@ -224,7 +224,7 @@ static void vtkITKMutualInformationExecute(vtkITKMutualInformationTransform *sel
     registration->GetLastTransformParameters();
 
   vnl_quaternion<double> quat(solution[0],solution[1],solution[2],solution[3]);
-  vnl_matrix_fixed<double,3,3> mat = quat.rotation_matrix();
+  vnl_matrix_fixed<double,3,3> mat = quat.rotation_matrix_transpose();
   
   // Convert the vnl matrix to a vtk mtrix
   matrix->Element[0][0] = mat(0,0);

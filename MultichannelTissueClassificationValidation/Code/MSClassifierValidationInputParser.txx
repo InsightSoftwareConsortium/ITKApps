@@ -54,18 +54,17 @@ MSClassifierValidationInputParser<TVectorInputImage,TMaskImage>
   // Initialize the containers for means/covariance/number of samples 
   //-------------------------------------------------------------------
 
-  m_ClassMeans.resize( m_NumberOfClasses, m_NumberOfChannels );
+  m_ClassMeans.set_size( m_NumberOfClasses, m_NumberOfChannels );
   m_ClassMeans.fill( 0 );
-
   m_ClassCovariances.resize( m_NumberOfClasses );
 
   for(unsigned int i = 0; i < m_NumberOfClasses; i++ )
     {
-    m_ClassCovariances[i].resize( m_NumberOfChannels, m_NumberOfChannels );
+    m_ClassCovariances[i].set_size( m_NumberOfChannels, m_NumberOfChannels );
     m_ClassCovariances[i].set_identity( );
     }
 
-  m_ClassNumberOfSamples.resize( m_NumberOfClasses, m_NumberOfChannels );
+  m_ClassNumberOfSamples.set_size( m_NumberOfClasses, m_NumberOfChannels );
   m_ClassNumberOfSamples.fill( 0 );
   
 }
@@ -240,7 +239,7 @@ MSClassifierValidationInputParser<TVectorInputImage,TMaskImage>
     //-------------------------------------------------------------------
     // set the means container
     {
-    m_ClassMeans.resize( m_NumberOfClasses, m_NumberOfChannels );
+    m_ClassMeans.set_size( m_NumberOfClasses, m_NumberOfChannels );
     m_ClassMeans.fill( 0 );
     }
 
@@ -249,7 +248,7 @@ MSClassifierValidationInputParser<TVectorInputImage,TMaskImage>
     m_ClassCovariances.resize( m_NumberOfClasses );
     for(unsigned int i = 0; i < m_NumberOfClasses; i++ )
       {
-      m_ClassCovariances[i].resize( m_NumberOfChannels, m_NumberOfChannels );
+      m_ClassCovariances[i].set_size( m_NumberOfChannels, m_NumberOfChannels );
       m_ClassCovariances[i].fill( 0 );
       }
 
@@ -257,7 +256,7 @@ MSClassifierValidationInputParser<TVectorInputImage,TMaskImage>
 
     // set the class number of samples container
     {
-    m_ClassNumberOfSamples.resize( m_NumberOfClasses, 1 );
+    m_ClassNumberOfSamples.set_size( m_NumberOfClasses, 1 );
     m_ClassNumberOfSamples.fill( 0 );    
     }
 

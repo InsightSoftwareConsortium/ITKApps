@@ -17,7 +17,7 @@ AffineRegistrator< TImage >
   
   this->SetOptimizer(OptimizerType::New());
   m_OptimizerNumberOfIterations = 100 ;
-  m_OptimizerScales.resize(18) ; 
+  m_OptimizerScales.set_size(18) ; 
   m_OptimizerScales[0] = 200; // rotations
   m_OptimizerScales[1] = 200;
   m_OptimizerScales[2] = 200;

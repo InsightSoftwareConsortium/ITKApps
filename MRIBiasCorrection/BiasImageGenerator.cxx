@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
       std::vector<double> coefficients ;
       options.GetMultiDoubleOption("coefficients", &coefficients, true) ;
       int length = coefficients.size() ;
-      coefficientVector.resize(length) ;
+      coefficientVector.set_size(length) ;
       for (int i = 0 ; i < length ; i++)
         coefficientVector[i] = coefficients[i] ;
       degree = options.GetIntOption("degree", 3, true) ;

@@ -376,9 +376,9 @@ int main(int ac, char** av)
     FieldType::SizeType origin, size;
     FieldType::RegionType region;
     vnl_vector<double> imagesize, meshorigin, meshsize;
-    imagesize.resize(2);
-    meshorigin.resize(2);
-    meshsize.resize(2);
+    imagesize.set_size(2);
+    meshorigin.set_size(2);
+    meshsize.set_size(2);
 
     for (int j=0; j<2; j++) {
       disp[j] = 0.;
@@ -438,9 +438,9 @@ for (unsigned int n=0; n < (*ee)->GetNumberOfNodes(); n++) {
       vnl_vector<double> gloPt, locPt, solVec;
       Element::ConstPointer elem;
 
-      gloPt.resize(2);
-      locPt.resize(2);
-      solVec.resize(2);
+      gloPt.set_size(2);
+      locPt.set_size(2);
+      solVec.set_size(2);
 
       fieldIter.GoToBegin();
       for (; !fieldIter.IsAtEnd(); ++fieldIter) {

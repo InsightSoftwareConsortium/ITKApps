@@ -7,7 +7,7 @@ template< class TImage >
 ImageRegistrationApp< TImage >
 ::ImageRegistrationApp()
   {
-  m_LandmarkScales.resize(9) ; 
+  m_LandmarkScales.set_size(9) ; 
   m_LandmarkScales[0] = 200;
   m_LandmarkScales[1] = 200;
   m_LandmarkScales[2] = 200;
@@ -26,7 +26,7 @@ ImageRegistrationApp< TImage >
   
   m_RigidNumberOfIterations = 2000 ;
   m_RigidNumberOfSpatialSamples = 20000 ;
-  m_RigidScales.resize(9);
+  m_RigidScales.set_size(9);
   m_RigidScales[0] = 200;
   m_RigidScales[1] = 200;
   m_RigidScales[2] = 200;
@@ -44,7 +44,7 @@ ImageRegistrationApp< TImage >
 
   m_AffineNumberOfIterations = 2000 ;
   m_AffineNumberOfSpatialSamples = 40000 ;
-  m_AffineScales.resize(18) ;
+  m_AffineScales.set_size(18) ;
   m_AffineScales[0] = 200; // rotations
   m_AffineScales[1] = 200;
   m_AffineScales[2] = 200;
@@ -184,7 +184,7 @@ ImageRegistrationApp< TImage >
     m_MovingImage->TransformIndexToPhysicalPoint(movingCenterIndex,
                                                 movingCenterPoint);
     RigidParametersType params;
-    params.resize(9);
+    params.set_size(9);
     params.Fill(0);
     params[3] = movingCenterPoint[0];
     params[4] = movingCenterPoint[1];

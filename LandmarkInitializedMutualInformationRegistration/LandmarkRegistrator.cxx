@@ -17,7 +17,7 @@ LandmarkRegistrator::LandmarkRegistrator()
 
   m_OptimizerNumberOfIterations = 5000;
 
-  m_OptimizerScales.resize(9);
+  m_OptimizerScales.set_size(9);
   m_OptimizerScales[0] = 200; // rotation
   m_OptimizerScales[1] = 200;
   m_OptimizerScales[2] = 200;
@@ -49,10 +49,10 @@ LandmarkRegistrator
     }
 
   ParametersType fixedCenter;
-  fixedCenter.resize(3);
+  fixedCenter.set_size(3);
   fixedCenter.Fill(0);
   ParametersType movingCenter;
-  movingCenter.resize(3);
+  movingCenter.set_size(3);
   movingCenter.Fill(0);
   for( unsigned int i=0; i<m_MovingLandmarkSet->Size(); i++)
     {
