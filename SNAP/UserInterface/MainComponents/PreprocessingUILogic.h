@@ -18,17 +18,13 @@
 #include "PreprocessingUI.h"
 #include "IRISTypes.h"
 #include "itkSmartPointer.h"
+#include "EdgePreprocessingImageFilter.h"
+#include "SmoothBinaryThresholdImageFilter.h"
 
 // Forward references to application classes
 class GlobalState;
 class IRISApplication;
 class UserInterfaceLogic;
-
-template<typename TInputImage,typename TOutputImage> 
-  class SmoothBinaryThresholdImageFilter;
-
-template<typename TInputImage,typename TOutputImage> 
-  class EdgePreprocessingImageFilter;
 
 // ITK forward references
 namespace itk {

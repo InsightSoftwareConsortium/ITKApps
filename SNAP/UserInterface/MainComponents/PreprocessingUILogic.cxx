@@ -15,10 +15,8 @@
 #include "PreprocessingUILogic.h"
 
 #include "GlobalState.h"
-#include "EdgePreprocessingImageFilter.h"
 #include "IRISApplication.h"
 #include "IRISImageData.h"
-#include "SmoothBinaryThresholdImageFilter.h"
 #include "SNAPImageData.h"
 #include "ThresholdSettings.h"
 #include "UserInterfaceLogic.h"
