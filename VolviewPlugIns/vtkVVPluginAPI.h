@@ -286,9 +286,9 @@ gets passed into the ProcessData function.
 #define vvPluginSetGUIScaleRange(id) \
   { \
   char _tmp[1000]; \
-  double min = info->InputVolumeScalarTypeRange[0]; \
-  double max = info->InputVolumeScalarTypeRange[1]; \
-  double stepSize = 1.0; \
+  double _min = info->InputVolumeScalarTypeRange[0]; \
+  double _max = info->InputVolumeScalarTypeRange[1]; \
+  double _stepSize = 1.0; \
   /* for some large types let us be reasonable */ \
   if (info->InputVolumeScalarType == VTK_FLOAT || \
       info->InputVolumeScalarType == VTK_INT || \
@@ -300,17 +300,17 @@ gets passed into the ProcessData function.
     /* for non double we can safely do some additional calculations */ \
     if (info->InputVolumeScalarType != VTK_DOUBLE) \
       { \
-      min = 2.0*info->InputVolumeScalarRange[0] - \
+      _min = 2.0*info->InputVolumeScalarRange[0] - \
             info->InputVolumeScalarRange[1]; \
-      max = 2.0*info->InputVolumeScalarRange[1] - \
+      _max = 2.0*info->InputVolumeScalarRange[1] - \
             info->InputVolumeScalarRange[0]; \
-      if (min < info->InputVolumeScalarTypeRange[0]) \
+      if (_min < info->InputVolumeScalarTypeRange[0]) \
         { \
-        min = info->InputVolumeScalarTypeRange[0]; \
+        _min = info->InputVolumeScalarTypeRange[0]; \
         } \
-      if (max > info->InputVolumeScalarTypeRange[1]) \
+      if (_max > info->InputVolumeScalarTypeRange[1]) \
         { \
-        max = info->InputVolumeScalarTypeRange[1]; \
+        _max = info->InputVolumeScalarTypeRange[1]; \
         } \
       } \
     /* for integer types include zero in the range */ \
@@ -319,18 +319,18 @@ gets passed into the ProcessData function.
         info->InputVolumeScalarType == VTK_LONG || \
         info->InputVolumeScalarType == VTK_UNSIGNED_LONG) \
       { \
-      if (min > 0 ) \
+      if (_min > 0 ) \
         { \
-        min = 0; \
+        _min = 0; \
         } \
-      if (max < 0 ) \
+      if (_max < 0 ) \
         { \
-        max = 0; \
+        _max = 0; \
         } \
       } \
-    stepSize = max*0.005 - min*0.005; \
+    _stepSize = _max*0.005 - _min*0.005; \
     } \
-  sprintf(_tmp,"%g %g %g", min, max, stepSize); \
+  sprintf(_tmp,"%g %g %g", _min, _max, _stepSize); \
   info->SetGUIProperty(info, id, VVP_GUI_HINTS , _tmp); \
   }
   
