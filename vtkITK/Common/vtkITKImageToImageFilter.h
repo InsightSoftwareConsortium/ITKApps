@@ -40,18 +40,35 @@
 class VTK_EXPORT vtkITKImageToImageFilter : public vtkImageToImageFilter
 {
 public:
-  static vtkITKImageToImageFilter *New()
-   {
-     return new vtkITKImageToImageFilter;
-   };
-  
   vtkTypeMacro(vtkITKImageToImageFilter,vtkImageToImageFilter);
 
+  // Description:
+  // vtkITK filters typically cast their input to pixel type
+  // consistent with the particular instantiation of the ITK filter.
+  // If we know the types are going to be consistent, we can save
+  // memory by skipping the cast. Default is to cast.
+  vtkBooleanMacro(CastInput, int);
+  vtkSetMacro(CastInput, int);
+  vtkGetMacro(CastInput, int);
+
+  // Description:
+  // vtkITK filters can be told to release their bulk output data
+  // during a pipeline update.  Setting the
+  // ReleaseDataBeforeUpdateFlag can minimize peak memory utilization
+  // during a pipeline update.
+  virtual void SetReleaseDataBeforeUpdateFlag(int i) {};
+  virtual int GetReleaseDataBeforeUpdateFlag() {return 0;};
+  vtkBooleanMacro(ReleaseDataBeforeUpdateFlag, int);
+  
+  // Description:
+  // PrintSelf routine for the portion of the pipeline that is
+  // constructed in this class.
   void PrintSelf(ostream& os, vtkIndent indent)
   {
     Superclass::PrintSelf ( os, indent );
     this->vtkExporter->PrintSelf ( os, indent );
     this->vtkImporter->PrintSelf ( os, indent );
+    os << indent << "CastInput: " << (this->CastInput ? "On" : "Off") << std::endl;
   };
   
   // Description:
@@ -131,10 +148,34 @@ public:
     this->vtkCast->SetInput(Input);
   };
 
+  // Description:
+  // Turn on/off flag to control whether this object's data is released
+  // after being used by a source.
+  virtual void SetReleaseDataFlag(int f)
+    {
+      this->vtkCast->SetReleaseDataFlag(f);
+    }
+
   // Description: Override vtkSource's Update so that we can access
   // this class's GetOutput(). vtkSource's GetOutput is not virtual.
   void Update()
     {
+      // Wire the internal pipeline according to how the user selected
+      // CastInput.
+      if (this->CastInput)
+        {
+        // set the pipeline to do an internal cast to a pixeltype
+        // consistent with the ITK instantiation
+        this->vtkExporter->SetInput( this->vtkCast->GetOutput() );
+        }
+      else
+        {
+        // skip the cast operation
+        this->vtkExporter->SetInput( this->vtkCast->GetInput() );
+        }
+      
+      
+      // Force the internal pipeline to update.
       if (this->GetOutput(0))
         {
         this->GetOutput(0)->Update();
@@ -144,6 +185,33 @@ public:
           }
         }
     }
+
+  // Description: Override vtkSource's UpdateWholeExtent so that we can access
+  // this class's GetOutput(). vtkSource's GetOutput is not virtual.
+  void UpdateWholeExtent()
+    {
+      // Wire the internal pipeline according to how the user selected
+      // CastInput.
+      if (this->CastInput)
+        {
+        // set the pipeline to do an internal cast to a pixeltype
+        // consistent with the ITK instantiation
+        this->vtkExporter->SetInput( this->vtkCast->GetOutput() );
+        }
+      else
+        {
+        // skip the cast operation
+        this->vtkExporter->SetInput( this->vtkCast->GetInput() );
+        }
+      
+      
+      // Force the internal pipeline to update.
+      if (this->GetOutput(0))
+        {
+        this->GetOutput(0)->GetSource()->UpdateWholeExtent();
+        }
+    }
+
   //BTX
   void HandleProgressEvent ()
   {
@@ -186,6 +254,8 @@ public:
     this->m_StartEventCommand->SetCallbackFunction ( this, &vtkITKImageToImageFilter::HandleStartEvent );
     this->m_EndEventCommand = MemberCommand::New();
     this->m_EndEventCommand->SetCallbackFunction ( this, &vtkITKImageToImageFilter::HandleEndEvent );
+    // default is to cast the input pixel type
+    this->CastInput = 1;
   };
   ~vtkITKImageToImageFilter()
   {
@@ -221,6 +291,8 @@ public:
   vtkImageImport* vtkImporter;
   vtkImageExport* vtkExporter;  
   //ETX
+
+  int CastInput;
   
 private:
   vtkITKImageToImageFilter(const vtkITKImageToImageFilter&);  // Not implemented.

@@ -14,18 +14,23 @@ vtkITKImageToImageFilter2DFF.h
 vtkITKImageToImageFilterFF.h
 vtkITKImageToImageFilterFUL.h
 vtkITKImageToImageFilterULUL.h
+vtkITKImageToImageFilterSUL.h
 vtkITKImageToImageFilterUSUL.h
 vtkITKImageToImageFilterUSUS.h
+vtkITKImageToImageFilterSS.h
 vtkITKIsolatedConnectedImageFilter.cxx
 vtkITKLaplacianSegmentationLevelSetImageFilter.h
 vtkITKMutualInformationTransform.cxx
 vtkITKNeighborhoodConnectedImageFilter.h
 vtkITKNormalizeImageFilter.cxx
 vtkITKPDEDeformableRegistrationFilter.h
-vtkITKSmoothingRecursiveGaussianImageFilter.h
+vtkITKSmoothingRecursiveGaussianImageFilterSS.h
+vtkITKGradientMagnitudeRecursiveGaussianImageFilterSS.h
 vtkITKThresholdSegmentationLevelSetImageFilter.h
 vtkITKTobogganImageFilter.h
 vtkITKWatershedImageFilter.cxx
+vtkITKWatershedImageFilterSUL.h
+vtkITKRelabelComponentImageFilter.h
 )
 
 SET_SOURCE_FILES_PROPERTIES ( 
@@ -34,8 +39,10 @@ vtkITKImageToImageFilter2DFF.h
 vtkITKImageToImageFilterFF.h
 vtkITKImageToImageFilterFUL.h
 vtkITKImageToImageFilterULUL.h
+vtkITKImageToImageFilterSUL.h
 vtkITKImageToImageFilterUSUL.h
 vtkITKImageToImageFilterUSUS.h
+vtkITKImageToImageFilterSS.h
 ABSTRACT
 )
 
@@ -63,3 +70,4 @@ ENDIF(BORLAND)
 
 TARGET_LINK_LIBRARIES(vtkVTKITKCommon vtkImaging
                       ITKIO ITKNumerics ITKBasicFilters)
+
