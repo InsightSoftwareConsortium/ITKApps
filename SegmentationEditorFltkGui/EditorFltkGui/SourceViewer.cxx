@@ -82,12 +82,6 @@ int SourceViewer::handle( int event ) {
 
     switch( event ) 
     {
-      case FL_FOCUS:
-
-      case FL_UNFOCUS:
-
-      case FL_KEYBOARD:   // keypress
-      
       case FL_PUSH: 
         if(button == 1) {
           PaintPixels(x, y);
@@ -111,6 +105,13 @@ int SourceViewer::handle( int event ) {
         else if(button == 3) {
           UnpaintPixels(x, y);
         }
+
+      case FL_FOCUS:
+
+      case FL_UNFOCUS:
+
+      case FL_KEYBOARD:   // keypress
+      
       case FL_MOVE:
 
       case FL_RELEASE:    // mouse up
@@ -148,7 +149,6 @@ void SourceViewer::SetBinaryViewer(BinaryViewer* v) {
 }
 //---------------------------------------------------------------------------
 void SourceViewer::PaintPixels(int x, int y) {
-
   float magX = resampler->GetAxisMagnificationFactor(0);
   float magY = resampler->GetAxisMagnificationFactor(1);
 

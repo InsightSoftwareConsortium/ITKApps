@@ -9,7 +9,7 @@ class EditorConsoleGUI {open : {public EditorConsoleBase}
   Function {CreateGUI()} {open
   } {
     Fl_Window consoleWindow {
-      label {Segmentation Editor} open selected
+      label {Segmentation Editor} open
       xywh {18 452 1203 444} color 215 resizable
       code0 {\#include <EditorConsoleBase.h>}
       code1 {\#include <fltkLightButton.h>} visible
@@ -322,22 +322,22 @@ class EditorConsoleGUI {open : {public EditorConsoleBase}
       }
       Fl_Group paint {
         label {Paint Value:} open
-        xywh {1026 160 170 29} labelfont 1 align 5
+        xywh {1026 160 174 29} labelfont 1 align 5
       } {
         Fl_Round_Button paint1 {
           label Red
-          callback {ChangePaintValue(1);}
-          xywh {1026 160 35 28} type Radio down_box ROUND_DOWN_BOX value 1
+          callback {ChangePaintValue(1);} selected
+          xywh {1026 160 49 28} type Radio down_box ROUND_DOWN_BOX value 1
         }
         Fl_Round_Button paint2 {
           label Green
           callback {ChangePaintValue(2);}
-          xywh {1080 160 38 29} type Radio down_box ROUND_DOWN_BOX
+          xywh {1080 160 65 29} type Radio down_box ROUND_DOWN_BOX
         }
         Fl_Round_Button paint3 {
           label Blue
           callback {ChangePaintValue(3);}
-          xywh {1147 160 40 29} type Radio down_box ROUND_DOWN_BOX
+          xywh {1147 160 53 29} type Radio down_box ROUND_DOWN_BOX
         }
       }
       Fl_Group render {
@@ -376,13 +376,13 @@ class EditorConsoleGUI {open : {public EditorConsoleBase}
       }
       Fl_Button {} {
         label {Save Binary}
+        callback {WriteBinaryVolume();}
         xywh {564 408 100 30}
-	callback {WriteBinaryVolume();}
       }
       Fl_Button {} {
         label {Load Binary}
+        callback {ReadBinaryVolume();}
         xywh {679 408 100 30}
-	callback {ReadBinaryVolume();}
       }
     }
     Fl_Window segmentedConsole {

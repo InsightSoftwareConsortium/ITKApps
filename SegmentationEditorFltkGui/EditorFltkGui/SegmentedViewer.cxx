@@ -83,10 +83,6 @@ int SegmentedViewer::handle( int event ) {
 
     switch( event ) 
     {
-      case FL_FOCUS:
-        break;
-      case FL_UNFOCUS:
-        break;
       case FL_PUSH: 
         if( (Fl::get_key(FL_Shift_L)) || (Fl::get_key(FL_Shift_R)) ) {
           if(button == 1) {
@@ -98,6 +94,10 @@ int SegmentedViewer::handle( int event ) {
             SelectRegion(x,y);
           }
         }
+        break;
+      case FL_FOCUS:
+        break;
+      case FL_UNFOCUS:
         break;
       case FL_DRAG:
         break;
