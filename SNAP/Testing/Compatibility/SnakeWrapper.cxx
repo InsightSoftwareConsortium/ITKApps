@@ -535,8 +535,7 @@ int snake3D::run(int num_steps)
             vnl_math_sqr( vnl_math_min(ubz, 0.0f) ) + vnl_math_sqr( vnl_math_max(ufz, 0.0f) );
             }
 
-          float c_term = convergence * g_c[i] * sqrt(gradFB);
-
+          float c_term = static_cast<float>(convergence * g_c[i] * sqrt(gradFB));
 
 
           float smooth_term = c_smooth * (uxx + uyy + uzz);
@@ -1284,6 +1283,10 @@ int edt3ddan(const unsigned char *input,int six,int siy,int siz,unsigned char me
 
 /*
  *Log: SnakeWrapper.cxx
+ *Revision 1.2  2003/08/27 14:03:22  pauly
+ *FIX: Made sure that -Wall option in gcc generates 0 warnings.
+ *FIX: Removed 'comment within comment' problem in the cvs log.
+ *
  *Revision 1.1  2003/07/12 04:50:42  pauly
  *Initial checkin of SNAP testing code to the InsightApplications tree
  *
