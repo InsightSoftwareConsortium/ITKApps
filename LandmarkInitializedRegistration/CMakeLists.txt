@@ -12,6 +12,7 @@ INCLUDE_DIRECTORIES(
   ${ITK_SOURCE_DIR}/Code/Numerics/vxl
   ${ITK_SOURCE_DIR}/Code/Numerics/Statistics
   ${ITK_SOURCE_DIR}/Utilities/MetaIO
+  ${ITK_SOURCE_DIR}/Utilities/MetaIO/SaptialObject
   ${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer
   ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
   ${InsightApplications_SOURCE_DIR}/LandmarkInitializedRegistration
