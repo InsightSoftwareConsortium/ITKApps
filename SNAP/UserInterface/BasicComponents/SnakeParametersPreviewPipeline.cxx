@@ -14,7 +14,7 @@
 =========================================================================*/
 #include "SnakeParametersPreviewPipeline.h"
 
-#include "FL/Fl_Gl_Window.h"
+#include "FL/Fl_Gl_Window.H"
 #include "SNAPOpenGL.h"
 
 #include "LevelSetExtensionFilter.h"

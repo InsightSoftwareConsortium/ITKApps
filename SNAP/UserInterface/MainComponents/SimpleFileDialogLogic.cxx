@@ -14,7 +14,7 @@
 =========================================================================*/
 #include "SimpleFileDialogLogic.h"
 #include "itkCommand.h"
-#include "FL/Fl_File_Chooser.h"
+#include "FL/Fl_File_Chooser.H"
 
 #include <algorithm>
 

@@ -22,7 +22,7 @@
 #include "ImageRayIntersectionFinder.h"
 #include "SNAPAppearanceSettings.h"
 
-#include <FL/glut.h>
+#include <FL/glut.H>
 
 #include <vxl_version.h>
 #if VXL_VERSION_DATE_FULL > 20040406
@@ -1421,6 +1421,9 @@ Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.23  2004/09/21 16:13:35  jjomier
+ *FIX: Linux, gcc3.3 fixes
+ *
  *Revision 1.22  2004/09/21 15:50:51  jjomier
  *FIX: vector_multiply_mixed requires template parameters otherwise MSVC cannot deduce them
  *

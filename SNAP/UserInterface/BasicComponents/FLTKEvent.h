@@ -15,8 +15,8 @@
 #ifndef __FLTKEvent_h_
 #define __FLTKEvent_h_
 
-#include <FL/Fl.h>
-#include <FL/Enumerations.h>
+#include <FL/Fl.H>
+#include <FL/Enumerations.H>
 
 #include "SNAPCommonUI.h"
 

@@ -15,7 +15,7 @@
 #ifndef __ImageIOWizardLogic_txx_
 #define __ImageIOWizardLogic_txx_
 
-#include "FL/fl_file_chooser.h"
+#include "FL/Fl_File_Chooser.H"
 #include "FL/Fl_Text_Buffer.H"
 #include <limits>
 #include <stdio.h>

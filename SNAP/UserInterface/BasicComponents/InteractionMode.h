@@ -15,7 +15,7 @@
 #ifndef __InteractionMode_h_
 #define __InteractionMode_h_
 
-#include <FL/Fl.h>
+#include <FL/Fl.H>
 
 #include "SNAPCommonUI.h"
 #include "FLTKEvent.h"

@@ -26,7 +26,7 @@
 #include <vector>
 
 #include "ImageIOWizard.h"
-#include "FL/fl_draw.h"
+#include "FL/fl_draw.H"
 #include "itkSmartPointer.h"
 #include "ImageCoordinateGeometry.h"
 #include <string>
