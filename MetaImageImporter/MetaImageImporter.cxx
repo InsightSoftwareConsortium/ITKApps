@@ -19,7 +19,7 @@
 #include <string>
 #include <list>
 
-int main(int argc, char **argv)
+int main(int, char **)
   {
   std::cout << "Importing your data into the MetaImage format"
     << std::endl
@@ -278,7 +278,7 @@ int main(int argc, char **argv)
         << "It must be less than or equal to nDims (" << nDims << ") Enter 2 for typical image slice data."
         <<std::endl
         << "  -=> ";
-        unsigned int fileImageDim;
+        int fileImageDim;
       std::cin >>fileImageDim;
       std::cout << std::endl;
       if ( (fileImageDim < 0 ) || (fileImageDim > nDims) )
@@ -288,7 +288,7 @@ int main(int argc, char **argv)
 
       fp << fileImageDim
         << std::endl;
-      unsigned int totalFiles = 1;
+      int totalFiles = 1;
       for (i = nDims; i > fileImageDim; i--)
         {
           totalFiles *= dimSize[i-1];
