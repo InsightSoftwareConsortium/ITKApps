@@ -72,7 +72,7 @@ void reset_yyvalues()
 /**
  * Function required by the bison utility
  */
-void yyerror (const char *errstring)
+void yyerror (const char *)
 {
   syntax_error_count++;
   std::cerr << "yyparse(): Line " << line_no
