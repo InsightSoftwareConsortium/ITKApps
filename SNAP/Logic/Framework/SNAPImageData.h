@@ -15,6 +15,7 @@
 #ifndef __SNAPImageData_h_
 #define __SNAPImageData_h_
 
+#include <itkImage.h>
 #include "IRISImageData.h"
 #include "SnakeParameters.h"
 #include "SpeedImageWrapper.h"
