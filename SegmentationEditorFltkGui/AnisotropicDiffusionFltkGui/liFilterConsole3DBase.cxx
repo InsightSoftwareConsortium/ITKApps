@@ -215,6 +215,18 @@ liFilterConsole3DBase
 
 /************************************
  *
+ *  Set Time Step For Gradient
+ *
+ ***********************************/
+void
+liFilterConsole3DBase 
+::SetTimeStepForGradient( double value )
+{
+  m_FilterG->SetTimeStep( value );
+}
+
+/************************************
+ *
  *  Set Iterations For Curvature
  *
  ***********************************/
@@ -238,7 +250,15 @@ liFilterConsole3DBase
 }
 
 
-
-
-
+/************************************
+ *
+ *  Set Time Step For Curvature
+ *
+ ***********************************/
+void
+liFilterConsole3DBase 
+::SetTimeStepForCurvature( double value )
+{
+  m_FilterC->SetTimeStep( value );
+}
 
