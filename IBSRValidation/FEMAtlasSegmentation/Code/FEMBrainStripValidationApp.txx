@@ -19,6 +19,7 @@
 #define _FEMBrainStripValidationApp_txx
 
 #include "FEMBrainStripValidationApp.h"
+#include "itkImageFileWriter.h"
 
 namespace itk
 {

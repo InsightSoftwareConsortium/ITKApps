@@ -20,6 +20,7 @@
 #include "FEMRegistrator.h"
 
 #include "itkCommand.h"
+#include "itkImageFileWriter.h"
 
 
 namespace itk
