@@ -13,6 +13,7 @@
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "Registry.h"
+#include "IRISVectorTypes.h"
 
 #include <cstring>
 #include <cstdio>
@@ -365,7 +366,7 @@ Registry
 }
 
 Registry
-::Registry() 
+::Registry()
 {
   m_AddIfNotFound = false;
 }

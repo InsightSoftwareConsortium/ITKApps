@@ -8,8 +8,8 @@
   Copyright (c) 2003 Insight Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #ifndef __Registry_h_
@@ -30,14 +30,14 @@
 
 #include "SNAPCommon.h"
 
-template <class T> 
+template <class T>
 inline T GetValueWithDefault(const std::string &source, bool isNull, T defaultValue)
 {
   // Initialize with the default value
   T returnValue = defaultValue;
 
   // Default value is returned if the entry is Null
-  if(isNull) 
+  if(isNull)
     return returnValue;
 
   // Try to access the value using c++ formatting
@@ -48,16 +48,16 @@ inline T GetValueWithDefault(const std::string &source, bool isNull, T defaultVa
   return returnValue;
 }
 
-template <> 
+template <>
 inline const char *GetValueWithDefault<const char *>(const std::string &source, bool isNull, const char *defaultValue)
 {
-  if(isNull) 
+  if(isNull)
     return defaultValue;
   else
     return source.c_str();
 }
 
-/** A class used to associate a set of strings with an ENUM so that the 
+/** A class used to associate a set of strings with an ENUM so that the
  * enum can be exported to the registry in a consistent fashion */
 template <class TEnum>
 class RegistryEnumMap
@@ -84,7 +84,7 @@ public:
 
   /** Initializing constructor: sets the object to a value */
   RegistryValue(const std::string &value);
-  
+
   /** Is the value present in the Registry? */
   bool IsNull() const { return m_Null; }
 
@@ -92,38 +92,59 @@ public:
   const std::string &GetInternalString() const { return m_String; }
 
   /**
-   * An operator that allows us to access a value using different 
+   * An operator that allows us to access a value using different
    * formats
    */
-  bool operator[](bool defaultValue) { 
+  bool operator[](bool defaultValue) {
     return GetValueWithDefault(m_String,m_Null,defaultValue);
   }
 
-  int operator[](int defaultValue) { 
+  int operator[](int defaultValue) {
     return GetValueWithDefault(m_String,m_Null,defaultValue);
   }
 
-  unsigned int operator[](unsigned int defaultValue) { 
+  unsigned int operator[](unsigned int defaultValue) {
     return GetValueWithDefault(m_String,m_Null,defaultValue);
   }
 
-  double operator[](double defaultValue) { 
-    return GetValueWithDefault(m_String,m_Null,defaultValue);
-  }
-  
-  const char *operator[](const char *defaultValue) { 
+  double operator[](double defaultValue) {
     return GetValueWithDefault(m_String,m_Null,defaultValue);
   }
 
-  std::string operator[](const std::string &defaultValue) { 
+  const char *operator[](const char *defaultValue) {
+    return GetValueWithDefault(m_String,m_Null,defaultValue);
+  }
+
+  std::string operator[](const std::string &defaultValue) {
     if(IsNull())
       return defaultValue;
-    else 
+    else
       return m_String;
   }
 
+  Vector3i operator[](const Vector3i &defaultValue)
+  {
+    return GetValueWithDefault(m_String,m_Null,defaultValue);
+  }
+
+  Vector2i operator[](const Vector2i &defaultValue)
+  {
+    return GetValueWithDefault(m_String,m_Null,defaultValue);
+  }
+
+  Vector3d operator[](const Vector3d &defaultValue)
+  {
+    return GetValueWithDefault(m_String,m_Null,defaultValue);
+  }
+
+  Vector2d operator[](const Vector2d &defaultValue)
+  {
+    return GetValueWithDefault(m_String,m_Null,defaultValue);
+  }
+
+
   template <class T, int VSize> iris_vector_fixed<T,VSize>
-    operator[](const iris_vector_fixed<T,VSize> &defaultValue) 
+    operator[](const iris_vector_fixed<T,VSize> &defaultValue)
   {
     return GetValueWithDefault(m_String,m_Null,defaultValue);
   }
@@ -160,7 +181,7 @@ public:
     else return rem.m_StringToEnumMap[m_String];
   }
 
-private:  
+private:
   std::string m_String;
   bool m_Null;
 };
@@ -172,7 +193,7 @@ private:
  * \class Registry
  * \brief A tree of key-value pair maps
  */
-class Registry 
+class Registry
 {
 public:
   // String definition
@@ -192,7 +213,7 @@ public:
 
   /** Get a reference to a value in this registry, which can then be queried */
   RegistryValue &operator[](const StringType &key) { return Entry(key); }
-  
+
   /** Get a reference to a folder inside this registry, creating it if necessary */
   RegistryValue &Entry(const StringType &key);
 
@@ -214,7 +235,7 @@ public:
   /** Empty the contents of the registry */
   void Clear();
 
-  /** Get a list of all keys that have values contained in this registry 
+  /** Get a list of all keys that have values contained in this registry
    * and all subfolders (recursive operation).  Prefix is used internally,
    * but can be specified to prepend a string to all keys */
   void CollectKeys(StringListType &keyList,const StringType &keyPrefix="");
@@ -226,7 +247,7 @@ public:
    * header, each line of which must start with the '#" character  */
   void WriteToFile(const char *pathname, const char *header = NULL);
 
-  /** Read this Registry from a file */  
+  /** Read this Registry from a file */
   void ReadFromFile(const char *pathname);
 
   /** Experimental */
@@ -259,16 +280,16 @@ public:
   {
     // Try reading the element count
     unsigned int size = Entry("ArraySize")[(unsigned int) 0];
-  
+
     // Initialize the result array
     std::vector<T> result(size,defaultElement);
-  
+
     // Read element
-    for(unsigned int i=0;i < size;i++) 
+    for(unsigned int i=0;i < size;i++)
       {
       result[i] = Entry(Key("Element[%d]",i))[defaultElement];
       }
-  
+
     // Return the array
     return result;
   }
@@ -278,7 +299,7 @@ public:
   public:
     IOException(const char *text) : StringType(text) {}
   };
-  
+
   /** A syntax error exception */
   class SyntaxException : public StringType {
   public:
@@ -293,15 +314,15 @@ private:
   // Commonly used hashtable iterators
   typedef FolderMapType::const_iterator FolderIterator;
   typedef EntryMapType::iterator EntryIterator;
-  
+
   /** A hash table for the subfolders */
   FolderMapType m_FolderMap;
 
   /** A hash table for the registry values */
   EntryMapType m_EntryMap;
 
-  /** 
-   * A flag as to whether keys and folders that are read and not found 
+  /**
+   * A flag as to whether keys and folders that are read and not found
    * should be created and populated with default values.
    */
   bool m_AddIfNotFound;

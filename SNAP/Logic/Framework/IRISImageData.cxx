@@ -89,7 +89,7 @@ IRISImageData
     }
   
   // Compute the size of a voxel, in mm^3
-  const double *spacing = m_GreyWrapper->GetImage()->GetSpacing().GetDataPointer();
+  const double *spacing = m_GreyWrapper->GetImage()->GetSpacing();//.GetDataPointer();
   double volVoxel = spacing[0] * spacing[1] * spacing[2];
 
   // Open the selected file for writing
@@ -383,7 +383,7 @@ Vector3f
 IRISImageData
 ::GetVoxelScaleFactor() 
 {
-  const double *spacing = this->m_GreyWrapper->GetImage()->GetSpacing().GetDataPointer();
+  const double *spacing = this->m_GreyWrapper->GetImage()->GetSpacing();//.GetDataPointer();
   Vector3f rtn;
   rtn[0]=(float)spacing[0];
   rtn[1]=(float)spacing[1];

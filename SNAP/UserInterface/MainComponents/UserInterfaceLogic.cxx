@@ -230,7 +230,7 @@ UserInterfaceLogic
 
   // The voxel size for the resampled region
   Vector3d voxelSizeSrc(
-    m_Driver->GetCurrentImageData()->GetGrey()->GetImage()->GetSpacing().GetDataPointer());
+    m_Driver->GetCurrentImageData()->GetGrey()->GetImage()->GetSpacing());//.GetDataPointer());
 
   // Check if the user wants to resample the image
   if(m_ChkResampleRegion->value())
@@ -3016,6 +3016,9 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.16  2003/12/10 02:21:14  lorensen
+ *ENH: Spacing is now a FixedArray.
+ *
  *Revision 1.15  2003/12/07 21:19:32  pauly
  *ENH: SNAP can now resample the segmentation ROI, facilitating
  *multires segmentation and segmentation of anisotropic images
