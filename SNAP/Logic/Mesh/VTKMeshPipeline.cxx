@@ -344,7 +344,7 @@ VTKMeshPipeline
   // Shift all the points in the output mesh
   for(vtkIdType i = 0; i < outMesh->GetNumberOfPoints(); i++)
     {
-    double *x = outMesh->GetPoint(i);
+    vtkFloatingPointType *x = outMesh->GetPoint(i);
     x[0] += xRealOrigin[0];
     x[1] += xRealOrigin[1];
     x[2] += xRealOrigin[2];
