@@ -11,10 +11,9 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 
   const unsigned int Dimension = 3;
 
-  const float lower         = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
-  const float upper         = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
+  const float upper         = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
+  const float lower         = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
   const int   replaceValue  = atoi( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ) );
-  const unsigned int initialRadius      = atoi( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ) );
 
    if( info->NumberOfMarkers < 1 )
     {
