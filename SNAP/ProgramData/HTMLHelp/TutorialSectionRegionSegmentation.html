@@ -190,6 +190,20 @@
     <td>When you are satisfied with the feature image, press <strong>Okay</strong> to compute the feature image at all voxels and close the intensity region filter window. </td>
   </tr>
 </table>
+<br>
+<table width="80%"  border="1" align="center" cellpadding="4" cellspacing="0">
+  <tr>
+    <td width="36" valign="top"><img src="Artwork/ttIconTip.gif" width="36" height="36"></td>
+    <td><p>SnAP lets you save and load feature images. Just use the appropriate menu items in the <strong>File</strong> menu. You can also load feature images by pressing the <strong>Load from File... </strong>button in the segmentation pipeline wizard.</p></td>
+  </tr>
+</table>
+<br>
+<table width="80%"  border="1" align="center" cellpadding="4" cellspacing="0">
+  <tr>
+    <td width="36" valign="top"><img src="Artwork/ttIconExpert.gif" width="36" height="36"></td>
+    <td><p>Voxels in feature images are saved as floating point numbers, so some applications may not be able to load the saved images. You can not save feature images in GIPL format because if does not support floating point voxels. The Meta format is recommended. </p></td>
+  </tr>
+</table>
 <p>We are now almost done with the first step of the Segmentation Pipeline Wizard.</p>
 <table width="80%"  border="1" align="center" cellpadding="4" cellspacing="0">
   <tr>
@@ -300,7 +314,7 @@
       <p>Press the <strong>Rewind</strong> button if you want to restart.</p></td>
   </tr>
 </table>
-<p>To see the segmentation result in 3D, you can press the <strong>Update </strong> button underneath the 3D window, or you can select the <strong>Update Continuously </strong>checkbox.</p>
+<p>To see the segmentation result in 3D, you can press the <strong>Update Mesh </strong> button underneath the 3D window, or you can select the <strong>Update Continuously </strong>checkbox.</p>
 <table width="80%"  border="1" align="center" cellpadding="4" cellspacing="0">
   <tr>
     <td width="36" valign="top"><img src="Artwork/ttIconAttention.gif" width="36" height="36"></td>
@@ -310,20 +324,122 @@
 <p>The result of the segmentation should look something like this. </p>
 <p align="center"><img src="Artwork/ttRegionResult.gif" width="266" height="223"></p>
 <hr>
-<h3>Step X. Some Tips.</h3>
+<h3>Step 6. Finalize the Segmentation </h3>
+<p>The final step in the automatic segmentation process is to return to the SNAP manual segmentation mode, incorporating the segmentation results with other structures that have been previously segmented.</p>
 <table width="80%"  border="1" align="center" cellpadding="4" cellspacing="0">
   <tr>
-    <td width="36" valign="top"><img src="Artwork/ttIconTip.gif" width="36" height="36"></td>
-    <td><p>SnAP lets you save and load feature images. Just use the appropriate menu items in the <strong>File</strong> menu. You can also load feature images by pressing the <strong>Load from File... </strong>button in the segmentation pipeline wizard.</p></td>
+    <td width="36" valign="top"><img src="Artwork/ttIconAction.gif" width="36" height="36"></td>
+    <td><p>Press the <strong>Finish</strong> button in the Segmentation Pipeline Wizard</p>
+    </td>
+  </tr>
+</table>
+<p>The Segmentation Pipeline Wizard will disappear, and the layout of the SNAP control panel will return to normal. </p>
+<table width="80%"  border="1" align="center" cellpadding="4" cellspacing="0">
+  <tr>
+    <td width="36" valign="top"><img src="Artwork/ttIconAction.gif" width="36" height="36"></td>
+    <td><p><strong>[Optional]</strong> Save your segmentation as described in <a href="TutorialSectionManualSegmentation.html#Save">Section 4</a>. </p></td>
+  </tr>
+</table>
+<br>
+<hr>
+<h3>Step 7. Use the 3D  Tools to Edit the Segmentation Results </h3>
+<p>In this step we will postprocess the results of the segmentation using 3D tools. </p>
+<table width="80%"  border="1" align="center" cellpadding="4" cellspacing="0">
+  <tr>
+    <td width="36" valign="top"><img src="Artwork/ttIconAction.gif" width="36" height="36"></td>
+    <td><p>Press the <strong>Update Mesh </strong> button below the 3D window to render the results </p></td>
+  </tr>
+</table>
+<br>
+<p align="left">Now, let us examine the different tools available in the <strong>3D Toolbox</strong>, which is shown below.</p>
+<p align="center"><img src="Artwork/ttRegion3DTools.gif" width="142" height="121"></p>
+<p align="left">The toolbox contains four tools. Top to bottom, left to right, they are </p>
+<ul>
+  <li><strong>3D Trackball Tool</strong>: Used to rotate, zoom, and pan in the 3D window.</li>
+  <li><strong>3D Crosshair Tool:</strong> Used to set the crosshair location by clicking on anatomical structures shown in the 3D window</li>
+  <li><strong>3D Scalpel Tool:</strong> Used to repaint or erase parts of the anatomical structures shown in the 3D window</li>
+  <li><strong>3D Spray Paint Tool</strong>: Used to add anatomical landmarks to the surface of anatomical structures shown in the 3D window</li>
+</ul>
+<p>Let's begin by examining the 3D trackball tool:</p>
+<table width="80%"  border="1" align="center" cellpadding="4" cellspacing="0">
+  <tr>
+    <td width="36" valign="top"><img src="Artwork/ttIconAction.gif" width="36" height="36"></td>
+    <td><p>Select the <strong>3D Trackball Tool</strong></p>
+      <p>Press and hold the <strong>left mouse button </strong>and move the mouse to rotate the 3D view.</p>
+      <p>Press and hold the <strong>right mouse button </strong>and move the mouse up or down to zoom in and out in the 3D view</p>
+      <p>Press and hold the <strong>middle mouse button</strong> and move the mouse to pan in the 3D view. </p></td>
+  </tr>
+</table>
+<p>Now try the 3D crosshair tool: </p>
+<table width="80%"  border="1" align="center" cellpadding="4" cellspacing="0">
+  <tr>
+    <td width="36" valign="top"><img src="Artwork/ttIconAction.gif" width="36" height="36"></td>
+    <td><p>Select the <strong>3D Crosshair Tool</strong></p>
+        <p>Position the mouse over any point on the caudates  and click the <strong>left mouse button</strong>. The crosshair position will move to the selected point and the slices shown in the slice windows will be changed.</p>
+    </td>
+  </tr>
+</table>
+<p>Now, something more complex. We will use the 3D scalpel tool to assign different labels to the left and right caudate nuclei. </p>
+<table width="80%"  border="1" align="center" cellpadding="4" cellspacing="0">
+  <tr>
+    <td width="36" valign="top"><img src="Artwork/ttIconAction.gif" width="36" height="36"></td>
+    <td><p>Use the <strong>Edit Labels </strong>button to add two new labels called 'left caudate' and 'right caudate' with different colors (for information on editing labels, see <a href="TutorialSectionManualSegmentation.html#EditLabel">Section 3</a>). </p></td>
   </tr>
 </table>
 <br>
 <table width="80%"  border="1" align="center" cellpadding="4" cellspacing="0">
   <tr>
-    <td width="36" valign="top"><img src="Artwork/ttIconExpert.gif" width="36" height="36"></td>
-    <td><p>Voxels in feature images are saved as floating point numbers, so some applications may not be able to load the saved images. You can not save feature images in GIPL format because if does not support floating point voxels. The Meta format is recommended. </p></td>
+    <td width="36" valign="top"><img src="Artwork/ttIconAction.gif" width="36" height="36"></td>
+    <td><p>Select 'right caudate' as the current drawing label, and select 'caudates' (the label used for automatic segmentation) as the label to draw over, as shown below. </p></td>
   </tr>
 </table>
-<p>&nbsp; </p>
+<p align="center"><img src="Artwork/ttRegionScalpelLabels.gif" width="142" height="209"></p>
+<p>The 3D scalpel tool works by partitioning the space into two regions separated by a plane. The segmentation labels on one side of the plane are replaced by the current drawing label, as long as they agree with the current setting of the draw over label. In order to use the scalpel tool, we need to first rotate the 3D view such that a line can be drawn between the two caudates.</p>
+<table width="80%"  border="1" align="center" cellpadding="4" cellspacing="0">
+  <tr>
+    <td width="36" valign="top"><img src="Artwork/ttIconAction.gif" width="36" height="36"></td>
+    <td><p>Use the <strong>3D Trackball</strong> tool to rotate the 3D view in such a way that the caudates can be separated by an imaginary line, as shown below. </p></td>
+  </tr>
+</table>
+<p align="center"><img src="Artwork/ttRegion3DImaginaryLine.gif" width="217" height="212"></p>
+<p align="left">Now, we will use the 3D scalpel tool to actually draw a line in place of the imaginary line </p>
+<table width="80%"  border="1" align="center" cellpadding="4" cellspacing="0">
+  <tr>
+    <td width="36" valign="top"><img src="Artwork/ttIconAction.gif" width="36" height="36"></td>
+    <td><p>Select the <strong>3D Scalpel Tool</strong></p>
+      <p>Click the <strong>left mouse button</strong> at one end of the imaginary line separating the caudates</p>
+      <p>Move the mouse around the 3D window. You will see a white line indicating where the 'cut' will be made, and an arrow indicating which half of the space will be relabeled.</p>
+      <p>Click the <strong>left mouse button</strong> again at the other end of the imaginary line  </p></td>
+  </tr>
+</table>
+<p align="left">The result of this operation should look like this:</p>
+<p align="center"><img src="Artwork/ttRegion3DScalpelLine.gif" width="218" height="213"> </p>
+<table width="80%"  border="1" align="center" cellpadding="4" cellspacing="0">
+  <tr>
+    <td width="36" valign="top"><img src="Artwork/ttIconTip.gif" width="36" height="36"></td>
+    <td><p>If you are not satisfied with the 'cut', press the <strong>Reset View</strong> button and try again.</p></td>
+  </tr>
+</table>
+<br>
+<table width="80%"  border="1" align="center" cellpadding="4" cellspacing="0">
+  <tr>
+    <td width="36" valign="top"><img src="Artwork/ttIconAction.gif" width="36" height="36"></td>
+    <td><p>Otherwise, press the <strong>Accept</strong> button to repaint one of the caudates with the active drawing label and press the <strong>Update Mesh</strong> to see the result in 3D. </p>
+    </td>
+  </tr>
+</table>
+<p align="center"><img src="Artwork/ttRegion3DScalpelResult.gif" width="218" height="213"></p>
+<p align="left">The 3D scalpel is a very powerful tool for editing segmentation results. Using the clear label as the active drawing label, you can erase parts of the segmentation that have leaked outside of the caudates. </p>
+<hr>
+<h3>Step 8. [Optional] Segment the Ventricles</h3>
+<table width="80%"  border="1" align="center" cellpadding="4" cellspacing="0">
+  <tr>
+    <td width="36" valign="top"><img src="Artwork/ttIconAction.gif" width="36" height="36"></td>
+    <td><p>Use the procedure outlined in the steps above to segment the ventricles in the image. You will need to use the <strong>Above</strong> threshold direction setting when creating the feature image. </p></td>
+  </tr>
+</table>
+<p align="center"><img src="Artwork/ttRegionFunctionForVentricles.gif" width="243" height="229"></p>
+<p align="left">The result should look like this</p>
+<p align="center"><img src="Artwork/ttRegionVentricleResult.gif" width="218" height="213"> </p>
 </body>
 </html>

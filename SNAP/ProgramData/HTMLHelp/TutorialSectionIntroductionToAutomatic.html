@@ -32,6 +32,7 @@
   <li>What form will the initial snake take?</li>
 </ol>
 <p>In the following three subsections, we will address these three questions correspondingly.</p>
+<hr>
 <h3>Step 2. Feature Images</h3>
 <p>As mentioned above, some of the velocities that drive snake evolution depend on the image intensities. In SNAP, this dependency is represented by the so-called <em>feature image </em>. The feature image is computed by applying a particular function uniformly to the entire image. Image dependent velocities are proportional to the value of the feature image.</p>
 <table width="80%"  border="1" align="center" cellpadding="4" cellspacing="0">
@@ -96,6 +97,7 @@
   </tr>
 </table>
 <p>Note that in this image we show the interior of the snake, rather than its boundary, as was shown in an earlier illustration. This is how the snake is actually visualized in SNAP. </p>
+<hr>
 <h3><a name="Velocity"></a>Step 3. Types of Velocities for Snake Evolution </h3>
 <p>In this subsection we will discuss in more detail the different types of velocities for image propagation. There are three types of velocities that can be applied in SNAP to drive snake evolution.</p>
 <ol>
@@ -110,6 +112,7 @@
 <p>This velocity is used to control the shape of the evolving snake, and it can sometimes prevent the snake from <em>leaking</em> into adjacent structures. The curvature velocity acts inwards and is approximately proportional to the curvature of the snake at the point. Sharp corners in the snake's boundary have high curvature, while points where the snake is straight have low curvature. The effect of curvature velocity is to slow down the snake evolution at places of high curvature, effectively smoothing out the sharp corners that may otherwise be formed. </p>
 <h4>Advection Velocity</h4>
 <p>The advection velocity is the most difficult of the three velocities to visualize, but it is very important because it can have a dramatic effect on the quality of the segmentation. The advection velocity is used only in conjunstion with the edge feature image; it is not used with the region competition feature image. In qualitative terms, it causes the snake to slow down or stop as it approaches edges in the greyscale image. More precisely, the velocity is defined by the dot product of the unit vector perpendicular to the snake and the gradient vector of the feature image. That means that when the snake is parallel to an image edges and close to it, the advection force acting inwards on the snake is greatest. The illustration below shows the gradient vectors of the feature image and the corresponding advection velocities.</p>
+<hr>
 <h3><a name="Init"></a>Step 4. Snake Initialization</h3>
 <p>As mentioned, the snake can be initialized very roughtly, using a circular bubble. More than one bubble can be used to initialize the snake. As the snake evolves, its disconnected components may merge together, as illustrated by the sequence of images below.</p>
 <table width="10%"  border="0" align="center" cellpadding="5" cellspacing="0">
@@ -128,6 +131,8 @@
       <p>When using the region competition feature image, the initialization may lie outside of the structure of interest, since the snake propagates both inward and outward. </p></td>
   </tr>
 </table>
+<p>&nbsp;</p>
+<hr>
 <h3>Step 5. Summary</h3>
 <p>One does not need to fully understand the mathematical theory behind snake evolution in order to use it in SNAP. Basically, a snake is a closed curve or collection of closed curves in 2D, and a closed surface or collection of closed surfaces in 3D. Snake evolvution is described by the sum of different types of velocities that act on each point of the snake in the direction perpendicular to the snake. Some of these velocities are image dependant, while others depend on the shape of the snake. The image dependant velocities are defined in terms of the feature image, to which they are proportional. SNAP can create two types of feature images, one based on edges in the input image, the other based on regions of uniform intensity. SNAP supports three types of velocities: the image dependent propagation velocity, the shape dependent curvature velocity and the image dependent advection velocity. </p>
 <p>In order to perform an automatic segmentation in SNAP, the user needs to (1) choose the type, edge or region, of the feature image to be used, (2) select the parameters used to compute the feature image, (3), initialize the snake using spherical bubbles, and (4) choose the relative weights of the different types of velocities that drive snake evolution. The following two sections of the tutorial describe how these tasks are performed through the SNAP user interface. </p>

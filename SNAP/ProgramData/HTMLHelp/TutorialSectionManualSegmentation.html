@@ -12,7 +12,8 @@
  This section requires approximately 10 minutes to complete.</p>
  <h3>Step 1. About Segmentation and Segmentation Labels</h3>
  <p>To segment an anatomical structure in SNAP means to assign a label to each voxel in the structure. A label is a number between 0 and 255. Associated with each label is a name and a set of display settings, such as the color used to display the label. For example, we can associate the name 'cuadate' and the color red with the label 3. When you first load a grey image into SNAP, the special label 0 is assigned to each voxel in the image. This label is associated with the name 'Clear' and means that a pixel has not been segmented yet.</p>
- <h3>Step 2. Create a Few Labels</h3>
+ <hr>
+ <h3><a name="EditLabel"></a>Step 2. Create a Few Labels</h3>
  <p>When you first load SNAP, it creates a default set of six labels, with names 'Label 1' through 'Label 6'. Before starting segmentation, we will edit these labels, assigning them meaningful names and colors.</p>
  <p>The SNAP control panel contains a sub-panel that is used to interact with segmentation labels. It is shown below.</p>
  <p align="center"><img src="Artwork/ttManualSegmentLabelSubPanel.gif" width="144" height="207"></p>
@@ -44,6 +45,8 @@
      <p><strong>Visibility:</strong> A label can be hidden from display, either in the 3D window or in all windows. Like transparency, this can be used to hide obstructing structures. Additionally, you can tell SNAP to apply manual and automatic segmentation to only to voxels with labels that are not hidden. Thus, by hiding a label, it is possible to prevent various segmentation operations from affecting it. </p>     </td>
    </tr>
  </table>
+ <br>
+ <hr>
  <h3>Step 3. Load Labels from a File</h3>
  <p>If you have downloaded an image archive, as recommended in <a href="TutorialSectionLoadingImages.html#Download">Section 2, Step 1</a>, then you can load a set of segmentation labels from a file. </p>
  <table width="80%"  border="1" align="center" cellpadding="4" cellspacing="0">
@@ -63,6 +66,8 @@
      </td>
    </tr>
  </table>
+ <br>
+ <hr>
  <h3>Step 4. Segment the Caudate Nucleus</h3>
  <p>In the step, we will manually segment the caudate nucleus. This step assumes that you are working with the image <strong>MRIcrop-orig.gipl</strong>, as recommended in <a href="TutorialSectionLoadingImages.html#Download">Section 2, Step 1</a>.</p>
  <table width="80%"  border="1" align="center" cellpadding="4" cellspacing="0">
@@ -164,7 +169,8 @@
  </table>
  <p align="center"><img src="Artwork/ttManualSegmentResult.gif" width="266" height="223"></p>
  <p align="left">You can learn a lot more about interacting with the 3D window in a later section. </p>
- <h3 align="left">Step 5. [Optional] Save your work</h3>
+ <hr>
+ <h3 align="left"><a name="Save"></a>Step 5. [Optional] Save your work</h3>
  <p align="left">SNAP saves segmentation results as images. Each voxel in this image contains a number between 0 and 255, which indicates the segmentation label assigned to the voxel. Segmentation images can be saved in a variety of image formats and can be read by other programs.</p>
  <table width="80%"  border="1" align="center" cellpadding="4" cellspacing="0">
    <tr>
