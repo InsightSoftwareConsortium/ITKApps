@@ -97,6 +97,69 @@ public:
   ProcessData( const vtkVVProcessDataStruct * pds )
   {
 
+    const unsigned int numberOfComponents = this->GetPluginInfo()->InputVolumeNumberOfComponents;
+
+    for(unsigned int component=0; component < numberOfComponents; component++ )
+      {
+
+
+      this->ImportPixelBuffer( component, pds );
+
+      m_CastFilter->SetInput( m_ImportFilter->GetOutput() );
+
+      // Execute the filter
+      try
+        {
+        m_Filter->Update();
+        }
+      catch( itk::ProcessAborted &  )
+        {
+        return;
+        }
+
+      this->CopyOutputData( component, pds );
+
+      }
+
+  } // end of ProcessData
+
+
+
+  /**  Copy the output data into the volview data structure */
+  virtual void 
+  CopyOutputData( unsigned int component, const vtkVVProcessDataStruct * pds )
+  {
+
+    // Copy the data (with casting) to the output buffer provided by the PlugIn API
+    typename OutputImageType::ConstPointer outputImage =
+                                               m_Filter->GetOutput();
+
+    const unsigned int numberOfComponents = this->GetPluginInfo()->InputVolumeNumberOfComponents;
+
+    typedef itk::ImageRegionConstIterator< OutputImageType >  OutputIteratorType;
+
+    OutputIteratorType ot( outputImage, outputImage->GetBufferedRegion() );
+
+    FinalPixelType * outData = static_cast< FinalPixelType * >( pds->outData );
+
+    outData += component;  // move to the start of the selected component;
+
+    ot.GoToBegin(); 
+    while( !ot.IsAtEnd() )
+      {
+      *outData = static_cast< FinalPixelType >( ot.Get() );
+      ++ot;
+      outData += numberOfComponents;
+      }
+
+  } // end of CopyOutputData
+
+
+
+  virtual void 
+  ImportPixelBuffer( unsigned int component, const vtkVVProcessDataStruct * pds )
+  {
+
     SizeType   size;
     IndexType  start;
 
@@ -125,59 +188,48 @@ public:
 
     const unsigned int totalNumberOfPixels = region.GetNumberOfPixels();
 
-    const bool         importFilterWillDeleteTheInputBuffer = false;
+
+
+    const unsigned int numberOfComponents = this->GetPluginInfo()->InputVolumeNumberOfComponents;
 
     const unsigned int numberOfPixelsPerSlice = size[0] * size[1];
 
-    InputPixelType *   dataBlockStart = 
-                          static_cast< InputPixelType * >( pds->inData )  
-                        + numberOfPixelsPerSlice * pds->StartSlice;
-
-    m_ImportFilter->SetImportPointer( dataBlockStart, 
-                                      totalNumberOfPixels,
-                                      importFilterWillDeleteTheInputBuffer );
-
-    m_CastFilter->SetInput( m_ImportFilter->GetOutput() );
-
-    // Execute the filter
-    try
+    if( numberOfComponents == 1 )
       {
-      m_Filter->Update();
+      const bool         importFilterWillDeleteTheInputBuffer = false;
+
+      InputPixelType *   dataBlockStart = 
+                            static_cast< InputPixelType * >( pds->inData )  
+                          + numberOfPixelsPerSlice * pds->StartSlice;
+
+      m_ImportFilter->SetImportPointer( dataBlockStart, 
+                                        totalNumberOfPixels,
+                                        importFilterWillDeleteTheInputBuffer );
       }
-    catch( itk::ProcessAborted &  )
+    else 
       {
-      return;
-      }
+      const bool         importFilterWillDeleteTheInputBuffer = true;
+      
+      InputPixelType *   extractedComponent = new InputPixelType[ totalNumberOfPixels ];
 
+      InputPixelType *   dataBlockStart = 
+                            static_cast< InputPixelType * >( pds->inData )  
+                          + numberOfPixelsPerSlice * pds->StartSlice
+                          + component;
 
-    // Copy the data (with casting) to the output buffer provided by the Plug In API
-    typename OutputImageType::ConstPointer outputImage =
-                                               m_Filter->GetOutput();
+      InputPixelType *   inputData = dataBlockStart;
 
-    typedef itk::ImageRegionConstIterator< OutputImageType >  OutputIteratorType;
-
-    OutputIteratorType ot( outputImage, outputImage->GetBufferedRegion() );
-
-    FinalPixelType * outData = (FinalPixelType *)(pds->outData);
-
-    ot.GoToBegin(); 
-    while( !ot.IsAtEnd() )
-      {
-      // NOTE: some combination of ClampMacro and 
-      // NumericTraits should be used here. 
-      // The code below is ok only for unsigned types in the FinalPixelType...
-      InternalPixelType value = ot.Get();
-      if( value < itk::NumericTraits<InternalPixelType>::Zero ) 
+      for(unsigned int i=0; i<totalNumberOfPixels; i++, inputData += numberOfComponents )
         {
-        value = itk::NumericTraits<InternalPixelType>::Zero;
+        extractedComponent[i] =  *inputData;
         }
-      *outData = static_cast< FinalPixelType >( value );
-      ++ot;
-      ++outData;
+
+      m_ImportFilter->SetImportPointer( extractedComponent, 
+                                        totalNumberOfPixels,
+                                        importFilterWillDeleteTheInputBuffer );
       }
 
-  } // end of ProcessData
-
+  } // end of ImportPixelBuffer
 
 private:
     typename ImportFilterType::Pointer    m_ImportFilter;
