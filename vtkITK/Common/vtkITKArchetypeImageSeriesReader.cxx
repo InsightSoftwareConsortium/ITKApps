@@ -51,8 +51,11 @@
 #include "itkImageFileReader.h"
 #include "itkImportImageContainer.h"
 #include "itkImageRegion.h"
+#include "itkDICOMSeriesFileNames.h"
+#include "itkDICOMImageIO2.h"
+#include <itksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.3 $");
 vtkStandardNewMacro(vtkITKArchetypeImageSeriesReader);
 
 //----------------------------------------------------------------------------
@@ -64,6 +67,7 @@ vtkITKArchetypeImageSeriesReader::vtkITKArchetypeImageSeriesReader()
   this->FileNameSliceSpacing = 1;
   this->FileNameSliceCount = 0;
 
+  this->OutputScalarType = VTK_FLOAT;
   for (int i = 0; i < 3; i++)
     {
     this->DefaultDataSpacing[i] = 1.0;
@@ -98,6 +102,9 @@ void vtkITKArchetypeImageSeriesReader::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "FileNameSliceCount: " 
      << this->FileNameSliceCount << "\n";
 
+  os << indent << "OutputScalarType: "
+     << vtkImageScalarTypeNameMacro(this->OutputScalarType)
+     << std::endl;
   os << indent << "DefaultDataSpacing: (" << this->DefaultDataSpacing[0];
   for (idx = 1; idx < 3; ++idx)
     {
@@ -120,13 +127,55 @@ void vtkITKArchetypeImageSeriesReader::PrintSelf(ostream& os, vtkIndent indent)
 void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
 {
   vtkImageData *output = this->GetOutput();
+  std::vector<std::string> candidateFiles;
   int extent[6];  
 
-  // Generate filenames from the Archetype
-  itk::ArchetypeSeriesFileNames::Pointer fit = itk::ArchetypeSeriesFileNames::New();
-  fit->SetArchetype (this->Archetype);
-
-  std::vector<std::string> candidateFiles = fit->GetFileNames();
+  // Test whether the input file is a DICOM file
+  itk::DICOMImageIO2::Pointer dicomIO = itk::DICOMImageIO2::New();
+  bool isDicomFile = dicomIO->CanReadFile(this->Archetype);
+  if (isDicomFile)
+    {
+    typedef itk::DICOMSeriesFileNames DICOMNameGeneratorType;
+    DICOMNameGeneratorType::Pointer inputImageFileGenerator = DICOMNameGeneratorType::New();  
+    std::string fileNameName = itksys::SystemTools::GetFilenameName( this->Archetype );
+    std::string fileNamePath = itksys::SystemTools::GetFilenamePath( this->Archetype );
+    if (fileNamePath == "")
+      {
+      fileNamePath = ".";
+      }
+    inputImageFileGenerator->SetDirectory( fileNamePath );
+    std::vector <std::string> seriesUIDs = inputImageFileGenerator->GetSeriesUIDs();
+    inputImageFileGenerator->SetFileNameSortingOrderToSortBySliceLocation();
+    int archetypeSeries = -1;
+    for (int s = 0; s < seriesUIDs.size(); s++)
+      {
+      candidateFiles = inputImageFileGenerator->GetFileNames( seriesUIDs[s] );
+      for (int f = 0; f < candidateFiles.size(); f++)
+        {
+        if (candidateFiles[f] == (fileNamePath + "/" + fileNameName))
+          {
+          archetypeSeries = s;
+          break;
+          }
+        }
+      }
+    if (archetypeSeries != -1)
+      {
+      candidateFiles = inputImageFileGenerator->GetFileNames(seriesUIDs[archetypeSeries]);      
+      }
+    else
+      {
+      candidateFiles.resize(0);
+      candidateFiles.push_back(this->Archetype);
+      }
+    }
+  else
+    {  
+    // Generate filenames from the Archetype
+    itk::ArchetypeSeriesFileNames::Pointer fit = itk::ArchetypeSeriesFileNames::New();
+    fit->SetArchetype (this->Archetype);
+    candidateFiles = fit->GetFileNames();
+    }
 
   // Reduce the selection of filenames
   int maximumCount;
