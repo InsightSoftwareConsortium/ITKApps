@@ -70,14 +70,22 @@ public:
     m_ImportFilter       = ImportFilterType::New();
     m_CastFilter         = CastFilterType::New();
     m_Filter             = FilterType::New();
+
     m_CastFilter->ReleaseDataFlagOn();
     m_Filter->ReleaseDataFlagOn();
+
+    m_Filter->SetInput( m_CastFilter->GetOutput() );
+
+    // Set the Observer for updating progress in the GUI
+    m_Filter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
+
+
     }
 
 
 
   /**  Destructor */
-  ~FilterModuleWithCasting() 
+  virtual ~FilterModuleWithCasting() 
     {
     }
 
@@ -89,7 +97,7 @@ public:
 
 
   /**  ProcessData performs the actual filtering on the data */
-  void 
+  virtual void 
   ProcessData( const vtkVVProcessDataStruct * pds )
   {
 
@@ -136,10 +144,6 @@ public:
                                       importFilterWillDeleteTheInputBuffer );
 
     m_CastFilter->SetInput( m_ImportFilter->GetOutput() );
-    m_Filter->SetInput( m_CastFilter->GetOutput() );
-
-    // Set the Observer for updating progress in the GUI
-    m_Filter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
 
     // Execute the filter
     try

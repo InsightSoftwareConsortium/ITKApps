@@ -55,12 +55,17 @@ public:
     m_ImportFilter       = ImportFilterType::New();
     m_Filter             = FilterType::New();
     m_Filter->ReleaseDataFlagOn();
+ 
+    m_Filter->SetInput( m_ImportFilter->GetOutput() );
+
+    // Set the Observer for updating progress in the GUI
+    m_Filter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
     }
 
 
 
   /**  Destructor */
-  ~FilterModule() 
+  virtual ~FilterModule() 
     {
     }
 
@@ -72,7 +77,7 @@ public:
 
 
   /**  ProcessData performs the actual filtering on the data */
-  void 
+  virtual void 
   ProcessData( const vtkVVProcessDataStruct * pds )
   {
 
@@ -116,12 +121,7 @@ public:
                                       totalNumberOfPixels,
                                       importFilterWillDeleteTheInputBuffer );
 
-    m_Filter->SetInput( m_ImportFilter->GetOutput() );
-
-    // Set the Observer for updating progress in the GUI
-    m_Filter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
-
-    // Execute the filter
+     // Execute the filter
     try
       {
       m_Filter->Update();
