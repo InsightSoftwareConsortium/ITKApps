@@ -60,7 +60,9 @@ vtkFlRenderWindowInteractor::~vtkFlRenderWindowInteractor()
     // its parent, so we have to do that explicitly at destruction
     // (and remember, NEVER delete() an instance of this class)
     if (parent())
+      {
       ((Fl_Group*)parent())->remove(*(Fl_Gl_Window*)this);
+      }
 }
 //---------------------------------------------------------------------------
 vtkFlRenderWindowInteractor * vtkFlRenderWindowInteractor::New()
@@ -230,7 +232,13 @@ void vtkFlRenderWindowInteractor::draw(void){
     {
     // make sure the vtk part knows where and how large we are
     UpdateSize( this->w(), this->h() );
-    
+
+    // make sure the GL context exists and is current:
+    // after a hide() and show() sequence e.g. there is no context yet
+    // and the Render() will fail due to an invalid context.
+    // see Fl_Gl_Window::show()
+    make_current();
+
     RenderWindow->SetWindowId( (void *)fl_xid( this ) );
 #if !defined(WIN32) && !defined(__APPLE__)
     RenderWindow->SetDisplayId( fl_display );
