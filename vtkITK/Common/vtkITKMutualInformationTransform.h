@@ -31,7 +31,12 @@
 // vtkLinearTransform
 
 #include "vtkLinearTransform.h"
+
+#include "itkImageRegion.h"
+
 class vtkImageData;
+
+typedef itk::ImageRegion<3> ImageRegionType;
 
 class VTK_EXPORT vtkITKMutualInformationTransform : public vtkLinearTransform
 {
@@ -61,6 +66,12 @@ public:
   vtkGetMacro(SourceStandardDeviation, double);
   vtkSetMacro(TargetStandardDeviation, double);
   vtkGetMacro(TargetStandardDeviation, double);
+  
+  // Description:
+  // Set/Get the region over which the metric will be computed
+  void SetFixedImageRegion(int xMin, int xMax, int yMin, int yMax, int zMin, int zMax);
+  ImageRegionType GetFixedImageRegion() 
+    { return FixedImageRegion; }
 
   // Description:
   // Set the number of iterations
@@ -120,6 +131,8 @@ protected:
   int NumberOfIterations;
   int NumberOfSamples;
   
+  ImageRegionType FixedImageRegion;
+
 private:
   vtkITKMutualInformationTransform(const vtkITKMutualInformationTransform&);  // Not implemented.
   void operator=(const vtkITKMutualInformationTransform&);  // Not implemented.
