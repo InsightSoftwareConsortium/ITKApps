@@ -60,7 +60,7 @@ public:
   typedef   itk::Image< VectorType, 2 >           VectorImageType;
   typedef   itk::Image< CovariantVectorType, 2 >  CovariantVectorImageType;
 
-  typedef   ImageType::IndexType                  MeshPointDataType;
+  typedef   itk::Point<float,2>                   MeshPointDataType;
 
   typedef   itk::Mesh< MeshPointDataType, 3 >     MeshType;
 
