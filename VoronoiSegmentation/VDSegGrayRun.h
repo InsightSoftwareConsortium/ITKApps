@@ -51,14 +51,14 @@ protected:
   void Save(const char *outputFileName);
 
 
-  unsigned int m_Cols;
-  unsigned int m_Rows;
-  unsigned int m_Pages;
+  int m_Cols;
+  int m_Rows;
+  int m_Pages;
   float m_Mean;
   float m_STD;
   float m_MeanRatio;
   float m_STDRatio;
-  unsigned int m_SampleRegion;
+  int m_SampleRegion;
 
   char m_Datatype;
   unsigned int m_Offset;

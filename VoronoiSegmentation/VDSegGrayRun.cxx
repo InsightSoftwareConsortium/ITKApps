@@ -61,7 +61,7 @@ VDSegGrayRun::LoadImage()
 
 int
 VDSegGrayRun::
-Load( const char * filename )
+Load( const char * )
 {
   Fl_Window window(200,280);
   Fl_Int_Input inputcols(80, 10, 100, 25, "Columns:");
@@ -218,11 +218,11 @@ void
 VDSegGrayRun::
 ComputeStats(void)
 {
-  unsigned int numPoints=m_Viewer->numClickedPointsStored();
-  unsigned int i,j,k,l;  
+  int numPoints=m_Viewer->numClickedPointsStored();
+  int i,j,k,l;  
   int x,y,z,ex,bx,ey,by,ez,bz;
-  unsigned int halfr=m_SampleRegion/2;
-  unsigned int totalp=0;
+  int halfr=m_SampleRegion/2;
+  int totalp=0;
   float totalv=0;
   float totalvv=0;
   float currp=0;
@@ -283,7 +283,7 @@ void
 VDSegGrayRun::
 GenerateDataPrior()
 {
-  unsigned int i;
+  int i;
   BinImage2D::Pointer prior=BinImage2D::New();
   prior->SetLargestPossibleRegion(m_ImageRegion2D);
   prior->SetBufferedRegion(m_ImageRegion2D);
@@ -341,7 +341,7 @@ void
 VDSegGrayRun::
 GenerateDataStandard()
 {
-  unsigned int i;
+  int i;
   itk::ImageRegionIteratorWithIndex<FloatImage> iit(m_DataImage, m_ImageRegion);
   itk::ImageRegionIteratorWithIndex<FloatImage> oit(m_ViewResultImage, m_ImageRegion);
   itk::ImageRegionIteratorWithIndex<FloatImage2D> iit2(m_WorkingImage, m_ImageRegion2D);
