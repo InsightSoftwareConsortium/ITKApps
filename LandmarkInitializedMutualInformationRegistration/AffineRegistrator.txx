@@ -11,13 +11,14 @@ AffineRegistrator< TImage >
 :ImageRegistrationMethod<TImage, TImage>()
   {
   this->SetTransform(TransformType::New());
-  this->GetTransform()->SetIdentity();
-  this->SetInitialTransformParameters(this->GetTransform()->GetParameters());
+  this->GetTypedTransform()->SetIdentity();
+  this->SetInitialTransformParameters(
+                  this->GetTypedTransform()->GetParameters());
 
   this->SetInterpolator(InterpolatorType::New());
   
   this->SetOptimizer(OptimizerType::New());
-  this->GetOptimizer()->MaximizeOn();
+  this->GetTypedOptimizer()->MaximizeOn();
   m_OptimizerNumberOfIterations = 1000 ;
   m_OptimizerScales.resize(15) ; 
   m_OptimizerScales[0] = 500; // rotations
@@ -35,7 +36,8 @@ AffineRegistrator< TImage >
   m_OptimizerScales[12] = 10;
   m_OptimizerScales[13] = 10;
   m_OptimizerScales[14] = 10;
-  this->GetOptimizer()->SetNormalVariateGenerator(OptimizerNormalGeneratorType::New());
+  this->GetTypedOptimizer()->SetNormalVariateGenerator(
+                             OptimizerNormalGeneratorType::New());
   
   this->SetMetric(MetricType::New());
   m_MetricNumberOfSpatialSamples = 50 ;
@@ -81,12 +83,13 @@ AffineRegistrator< TImage >
   // Base class handles
   // m_Interpolator->SetInputImage(m_MovingImage) ;
 
-  this->GetOptimizer()->SetScales( m_OptimizerScales );
-  this->GetOptimizer()->SetMaximumIteration(m_OptimizerNumberOfIterations);
-  this->GetOptimizer()->Initialize(4.0, 1.1, 0.9); // Initial search radius
-  this->GetOptimizer()->SetEpsilon(0.00000001);
+  this->GetTypedOptimizer()->SetScales( m_OptimizerScales );
+  this->GetTypedOptimizer()->SetMaximumIteration(m_OptimizerNumberOfIterations);
+  this->GetTypedOptimizer()->Initialize(4.0, 1.1, 0.9); // Initial search radius
+  this->GetTypedOptimizer()->SetEpsilon(0.00000001);
 
-  this->GetMetric()->SetNumberOfSpatialSamples( m_MetricNumberOfSpatialSamples );
+  this->GetTypedMetric()->SetNumberOfSpatialSamples( 
+                          m_MetricNumberOfSpatialSamples );
   
   typedef itk::StatisticsImageFilter< TImage > StatsFilterType;
   typename StatsFilterType::Pointer statsFilter = StatsFilterType::New();
@@ -105,7 +108,7 @@ AffineRegistrator< TImage >
   statsFilter->Update();
   double stdDev;
   stdDev = m_MetricMovingImageStandardDeviation * statsFilter->GetSigma();
-  this->GetMetric()->SetMovingImageStandardDeviation( stdDev );
+  this->GetTypedMetric()->SetMovingImageStandardDeviation( stdDev );
 
   if(this->GetFixedImageRegionDefined())
     {
@@ -119,7 +122,7 @@ AffineRegistrator< TImage >
     }
   statsFilter->Update();
   stdDev = m_MetricFixedImageStandardDeviation * statsFilter->GetSigma();
-  this->GetMetric()->SetFixedImageStandardDeviation( stdDev );
+  this->GetTypedMetric()->SetFixedImageStandardDeviation( stdDev );
   }
 
 template< class TImage >

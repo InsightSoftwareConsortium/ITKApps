@@ -37,13 +37,19 @@ class LandmarkRegistrator : public itk::Object
 
     //
     itkSetObjectMacro(Metric,MetricType);
-    itkGetConstObjectMacro(Metric,MetricType);
+    MetricType * GetTypedMetric(void)
+      {
+      return m_Metric;
+      }
 
     itkSetMacro(InitialTransformParameters,ParametersType);
     itkGetConstMacro(InitialTransformParameters,ParametersType);
 
     itkSetObjectMacro(Transform,TransformType);
-    itkGetObjectMacro(Transform,TransformType);
+    TransformType * GetTypedTransform(void)
+      {
+      return m_Transform;
+      }
 
     itkSetMacro(OptimizerScales,ScalesType);
     itkGetMacro(OptimizerScales,ScalesType);

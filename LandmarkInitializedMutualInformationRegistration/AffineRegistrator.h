@@ -47,12 +47,12 @@ class AffineRegistrator : public itk::ImageRegistrationMethod < TImage, TImage >
 
     void StartRegistration() ;
 
-    TransformType * GetTransform(void)
+    TransformType * GetTypedTransform(void)
       {
       return static_cast<TransformType *>(Superclass::GetTransform());
       }
 
-    OptimizerType * GetOptimizer(void)
+    OptimizerType * GetTypedOptimizer(void)
       {
       return static_cast<OptimizerType *>(Superclass::GetOptimizer());
       }
@@ -62,7 +62,7 @@ class AffineRegistrator : public itk::ImageRegistrationMethod < TImage, TImage >
     itkSetMacro(OptimizerScales, ScalesType) ;
     itkGetConstMacro(OptimizerScales, ScalesType) ;
 
-    MetricType * GetMetric(void)
+    MetricType * GetTypedMetric(void)
       {
       return static_cast<MetricType *>(Superclass::GetMetric());
       }

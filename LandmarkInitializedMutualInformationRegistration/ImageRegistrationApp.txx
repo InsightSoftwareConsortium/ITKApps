@@ -124,7 +124,7 @@ ImageRegistrationApp< TImage >
     }
   
   m_LandmarkRegValid = true;
-  m_LandmarkRegTransform = registrator->GetTransform() ;
+  m_LandmarkRegTransform = registrator->GetTypedTransform() ;
   m_LandmarkAffineTransform->SetIdentity();
   m_LandmarkAffineTransform->SetMatrix(
                                    m_LandmarkRegTransform->GetRotationMatrix());
@@ -172,17 +172,17 @@ ImageRegistrationApp< TImage >
     typename TImage::IndexType fixedCenterIndex;
     itk::Point<double, 3> fixedCenterPoint;
     size = m_FixedImage->GetLargestPossibleRegion().GetSize();
-    fixedCenterIndex[0] = size[0]/2;
-    fixedCenterIndex[1] = size[1]/2;
-    fixedCenterIndex[2] = size[2]/2;
+    fixedCenterIndex[0] = size[0]/2+m_FixedImage->GetOrigin()[0];
+    fixedCenterIndex[1] = size[1]/2+m_FixedImage->GetOrigin()[1];
+    fixedCenterIndex[2] = size[2]/2+m_FixedImage->GetOrigin()[2];
     m_FixedImage->TransformIndexToPhysicalPoint(fixedCenterIndex,
                                                 fixedCenterPoint);
     typename TImage::IndexType movingCenterIndex;
     itk::Point<double, 3> movingCenterPoint;
     size = m_MovingImage->GetLargestPossibleRegion().GetSize();
-    movingCenterIndex[0] = size[0]/2;
-    movingCenterIndex[1] = size[1]/2;
-    movingCenterIndex[2] = size[2]/2;
+    movingCenterIndex[0] = size[0]/2+m_MovingImage->GetOrigin()[0];
+    movingCenterIndex[1] = size[1]/2+m_MovingImage->GetOrigin()[1];
+    movingCenterIndex[2] = size[2]/2+m_MovingImage->GetOrigin()[2];
     m_MovingImage->TransformIndexToPhysicalPoint(movingCenterIndex,
                                                 movingCenterPoint);
     RigidParametersType params;
@@ -214,7 +214,7 @@ ImageRegistrationApp< TImage >
       this->PrintUncaughtError() ;
     }
 
-  m_RigidRegTransform = registrator->GetTransform();
+  m_RigidRegTransform = registrator->GetTypedTransform();
   m_RigidAffineTransform->SetMatrix( m_RigidRegTransform->GetRotationMatrix());
   m_RigidAffineTransform->SetOffset(m_RigidRegTransform->GetOffset());
   m_FinalTransform = m_RigidAffineTransform;
@@ -308,7 +308,7 @@ ImageRegistrationApp< TImage >
       this->PrintUncaughtError() ;
     }
 
-  m_AffineRegTransform = registrator->GetTransform() ;
+  m_AffineRegTransform = registrator->GetTypedTransform() ;
   m_AffineRegTransform->ComputeOffset();
   m_AffineAffineTransform->SetMatrix( m_AffineRegTransform->GetMatrix());
   m_AffineAffineTransform->SetOffset(m_AffineRegTransform->GetOffset());
