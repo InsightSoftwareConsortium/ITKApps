@@ -40,6 +40,7 @@ public:
   virtual void ShowCurvatureImage(void);
   virtual void SaveGradientImage(void);  
   virtual void SaveCurvatureImage(void);
+  virtual void Flip(int);
 
 private:
   InputImageViewerType::Pointer      m_InputViewer;

@@ -8,11 +8,11 @@ class liFilterConsole3DGUI {open : {public liFilterConsole3DBase}
   } {
     Fl_Window consoleWindow {
       label {Anisotropic Diffusion 3D} open
-      xywh {357 123 585 285} color 215
+      xywh {384 220 586 287} color 215
       code0 {\#include <liFilterConsole3DBase.h>}
       code1 {\#include <fltkLightButton.h>} visible
     } {
-      Fl_Group controlsGroup {
+      Fl_Group controlsGroup {open selected
         xywh {0 1 582 304} deactivate
       } {
         Fl_Light_Button inputButton {
@@ -58,6 +58,21 @@ class liFilterConsole3DGUI {open : {public liFilterConsole3DBase}
         Fl_Box {} {
           label label
           xywh {199 125 20 10} box THIN_UP_BOX color 12 labeltype NO_LABEL
+        }
+        Fl_Round_Button flipX {
+          label {Flip X Axis}
+          callback {Flip(0);}
+          xywh {47 120 94 20} down_box ROUND_DOWN_BOX
+        }
+        Fl_Round_Button flipY {
+          label {Flip Y Axis}
+          callback {Flip(1);}
+          xywh {47 141 92 20} down_box ROUND_DOWN_BOX
+        }
+        Fl_Round_Button flipZ {
+          label {Flip Z Axis}
+          callback {Flip(2);}
+          xywh {47 161 90 20} down_box ROUND_DOWN_BOX
         }
       }
       Fl_Slider progressSlider {

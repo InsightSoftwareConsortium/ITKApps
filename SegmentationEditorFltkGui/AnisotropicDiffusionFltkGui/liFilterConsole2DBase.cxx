@@ -32,18 +32,23 @@ liFilterConsole2DBase
   m_ImageFileNameAvailable = false;
 
   m_Reader = VolumeReaderType::New();
+
+  m_Flip = FlipType::New();
+  axes[0] = false;
+  axes[1] = false;
+  m_Flip->SetInput(m_Reader->GetOutput());
   
   m_FilterG = GradientAnisotropicDiffusionFilterType::New();
   m_FilterG->SetNumberOfIterations( 10 );
   m_FilterG->SetTimeStep( 0.25 );
   m_FilterG->SetConductanceParameter( 1.0 );
-  m_FilterG->SetInput( m_Reader->GetOutput() );
+  m_FilterG->SetInput( m_Flip->GetOutput() );
 
   m_FilterC = CurvatureAnisotropicDiffusionFilterType::New();
   m_FilterC->SetNumberOfIterations( 10 );
   m_FilterC->SetTimeStep( 0.12 );
   m_FilterC->SetConductanceParameter( 1.0 );
-  m_FilterC->SetInput( m_Reader->GetOutput() );
+  m_FilterC->SetInput( m_Flip->GetOutput() );
 
   m_Rescaler  = RescaleIntensityImageFilterType::New();
   m_Rescaler->SetOutputMinimum( 0 );
@@ -252,6 +257,15 @@ liFilterConsole2DBase
   m_FilterC->SetConductanceParameter( value );
 }
 
+
+/***********************************
+ *
+ * Flip
+ *
+ ************************************/
+void liFilterConsole2DBase::Flip(int a) {
+
+}
 
 /************************************
  *

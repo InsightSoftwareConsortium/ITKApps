@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0100 
+version 1.0102 
 header_name {.h} 
 code_name {.cxx}
 class liFilterConsole2DGUI {open : {public liFilterConsole2DBase}
@@ -8,12 +8,12 @@ class liFilterConsole2DGUI {open : {public liFilterConsole2DBase}
   } {
     Fl_Window consoleWindow {
       label {Anisotropic Diffusion 2D} open
-      xywh {312 23 585 300} color 215
+      xywh {312 50 585 300} color 215
       code0 {\#include <liFilterConsole2DBase.h>}
       code1 {\#include <fltkLightButton.h>} visible
     } {
-      Fl_Group controlsGroup {open
-        xywh {0 -4 585 304} color 29 deactivate
+      Fl_Group controlsGroup {open selected
+        xywh {0 1 585 304} color 29 deactivate
       } {
         Fl_Light_Button inputButton {
           label {Show Input Image}
@@ -58,6 +58,16 @@ class liFilterConsole2DGUI {open : {public liFilterConsole2DBase}
           label label
           xywh {203 120 18 10} box THIN_UP_BOX color 12 labeltype NO_LABEL
         }
+        Fl_Round_Button flipX {
+          label {Flip X Axis}
+          callback {Flip(0);}
+          xywh {50 128 100 20} down_box ROUND_DOWN_BOX
+        }
+        Fl_Round_Button flipY {
+          label {Flip Y Axis}
+          callback {Flip(1);}
+          xywh {50 148 100 20} down_box ROUND_DOWN_BOX
+        }
       }
       Fl_Slider progressSlider {
         xywh {5 200 575 15} type {Horz Fill} selection_color 5
@@ -100,7 +110,7 @@ class liFilterConsole2DGUI {open : {public liFilterConsole2DBase}
       }
       Fl_Box {} {
         label label
-        xywh {203 25 18 10} box THIN_UP_BOX color 12 labeltype NO_LABEL
+        xywh {204 20 18 10} box THIN_UP_BOX color 12 labeltype NO_LABEL
       }
       Fl_Button {} {
         label {Show Help}
@@ -114,7 +124,7 @@ class liFilterConsole2DGUI {open : {public liFilterConsole2DBase}
       }
       Fl_Value_Input TimeStepCurvature {
         label {Time Step}
-        callback {SetTimeStepForCurvature( o->value() );} selected
+        callback {SetTimeStepForCurvature( o->value() );}
         xywh {449 169 50 25} align 1 minimum 0.001 maximum 0.125 step 0.001 value 0.1
       }
     }

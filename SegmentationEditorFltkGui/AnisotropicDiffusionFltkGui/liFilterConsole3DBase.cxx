@@ -32,12 +32,19 @@ liFilterConsole3DBase
   m_ImageFileNameAvailable = false;
 
   m_Reader     = VolumeReaderType::New();
+
+  m_Flip = FlipType::New();
+  m_Flip->SetInput(m_Reader->GetOutput());
+  axes[0] = false;
+  axes[1] = false;
+  axes[2] = false;
+  m_Flip->SetFlipAxes(axes);
   
   m_FilterG = GradientAnisotropicDiffusionFilterType::New();
   m_FilterG->SetNumberOfIterations( 10 );
   m_FilterG->SetTimeStep( 0.125 );
   m_FilterG->SetConductanceParameter( 1.0 );
-  m_FilterG->SetInput( m_Reader->GetOutput() );
+  m_FilterG->SetInput( m_Flip->GetOutput() );
 
   m_FilterC = CurvatureAnisotropicDiffusionFilterType::New();
   m_FilterC->SetNumberOfIterations( 10 );
@@ -249,6 +256,14 @@ liFilterConsole3DBase
   m_FilterC->SetConductanceParameter( value );
 }
 
+/***********************************
+ *
+ * Flip
+ *
+ ***********************************/
+void liFilterConsole3DBase::Flip(int a) {
+  
+}
 
 /************************************
  *

@@ -212,9 +212,9 @@ liFilterConsole2D
     return;
   }
 
-  m_Reader->Update();
+  m_Flip->Update();
 
-  m_InputViewer->SetImage( m_Reader->GetOutput() ); 
+  m_InputViewer->SetImage( m_Flip->GetOutput() ); 
   m_InputViewer->Show();
 }
 
@@ -314,3 +314,20 @@ liFilterConsole2D
 }
 
 
+/***********************************
+ *
+ * Flip
+ *
+ ************************************/
+void liFilterConsole2D::Flip(int a) {
+    if(axes[a]) {
+    axes[a] = false;
+  }
+  else {
+    axes[a] = true;
+  }
+
+  m_Flip->SetFlipAxes(axes);
+
+  ShowInputImage();
+}

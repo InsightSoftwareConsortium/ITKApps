@@ -222,15 +222,14 @@ void
 liFilterConsole3D
 ::ShowInputImage( void )
 {
-
   if( ! (m_ImageFileNameAvailable) ) 
   {
     this->ShowStatus("Please provide a image filename first");
     return;
   }
 
-  m_Reader->Update();
-  m_InputViewer->SetImage( m_Reader->GetOutput() ); 
+  m_Flip->Update();
+  m_InputViewer->SetImage( m_Flip->GetOutput() ); 
   m_InputViewer->Show();
 }
 
@@ -331,4 +330,21 @@ liFilterConsole3D
 
 }
 
+/***********************************
+ *
+ * Flip
+ *
+ ***********************************/
+void liFilterConsole3D::Flip(int a) {
+  if(axes[a]) {
+    axes[a] = false;
+  }
+  else {
+    axes[a] = true;
+  }
+
+  m_Flip->SetFlipAxes(axes);
+
+  ShowInputImage();
+}
 

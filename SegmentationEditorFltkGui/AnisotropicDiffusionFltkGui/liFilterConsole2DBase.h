@@ -26,6 +26,8 @@
 
 #include <itkRescaleIntensityImageFilter.h>
 
+#include <itkFlipImageFilter.h>
+
 class liFilterConsole2DBase 
 {
 
@@ -47,6 +49,8 @@ public:
 
   typedef   itk::ImageFileWriter< 
                             WriteImageType >  VolumeWriterType;
+
+  typedef   itk::FlipImageFilter<InputImageType>  FlipType;
 
 
   typedef itk::GradientAnisotropicDiffusionImageFilter<
@@ -83,10 +87,15 @@ public:
   virtual void SaveGradientImage(const char * filename);
   virtual void SaveCurvatureImage(void) = 0;
   virtual void SaveCurvatureImage(const char * filename);
+  virtual void Flip(int);
 
 protected:
 
   VolumeReaderType::Pointer                                  m_Reader;
+
+  FlipType::Pointer                                          m_Flip;
+  
+  bool axes[2];
 
   GradientAnisotropicDiffusionFilterType::Pointer            m_FilterG;
 
