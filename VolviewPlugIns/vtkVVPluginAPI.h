@@ -266,8 +266,9 @@ gets passed into the ProcessData function.
 /* this macro should be called first inside every Init function to make sure
  * the plugin version matches the volview version */
 #define vvPluginVersionCheck() \
-  if (info->magic1 != VV_PLUGIN_API_VERSION) { return; } \
-  else {info->magic1 = 0; }
+  if (info->magic1 >= VV_PLUGIN_API_VERSION) { \
+    info->magic1 = VV_PLUGIN_API_VERSION; } \
+  else {info->magic1 = 0; return; }
 
 /* these macros are provided to help people write plugins. The biggest
  * difficulty is handling the different data types that volview handles. The
