@@ -102,8 +102,6 @@ protected:
   int FileNameSliceSpacing;
   int FileNameSliceCount;
   
-  void *Ptr;
-
 //BTX
   std::vector<std::string> FileNames;
 //ETX
