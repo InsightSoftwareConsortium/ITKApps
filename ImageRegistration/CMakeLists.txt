@@ -27,4 +27,4 @@ ITKFltkImageViewer
 ADD_GUI_EXECUTABLE(ImageRegistration "${ImageRegistration_SRCS}")
 
 FLTK_WRAP_UI( ImageRegistration ${ImageRegistration_GUI_SRCS} )
-
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${ImageRegistration_GUI_SRCS}")

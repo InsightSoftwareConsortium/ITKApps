@@ -27,4 +27,4 @@ FuzzySegGrayUI.fl
 ADD_GUI_EXECUTABLE(SimpleFuzzyConnectedness   "${Project_SRCS}")
 
 FLTK_WRAP_UI(SimpleFuzzyConnectedness ${Project_FLTK_SRCS})
-
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${Project_FLTK_SRCS}")

@@ -25,4 +25,5 @@ SET(Morphogenesis_SRCS
 ADD_GUI_EXECUTABLE(Morphogenesis "${Morphogenesis_SRCS}")
 
 FLTK_WRAP_UI(Morphogenesis BacterialColonyGUI.fl CellsViewerGUI.fl)
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("BacterialColonyGUI.fl;CellsViewerGUI.fl")
 TARGET_LINK_LIBRARIES(Morphogenesis ITKFltkImageViewer ITKBasicFilters ITKIO)

@@ -28,4 +28,4 @@ VDSegGrayUI.fl
 ADD_GUI_EXECUTABLE(VoronoiSegmentation   "${Project_SRCS}")
 
 FLTK_WRAP_UI(VoronoiSegmentation ${Project_FLTK_SRCS})
-
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${Project_FLTK_SRCS}")

@@ -72,6 +72,18 @@ IF(USE_FLTK)
   ENDIF(FLTK_FOUND)
 ENDIF(USE_FLTK)
 
+# The fluid-generated fltk sources have many warnings.  This macro
+# will disable warnings for the generated files on some compilers.
+MACRO(ITK_DISABLE_FLTK_GENERATED_WARNINGS files)
+  IF(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 1.6)
+    IF(CMAKE_COMPILER_IS_GNUCXX)
+      FOREACH(f ${files})
+        STRING(REGEX REPLACE "\\.fl$" ".cxx" SRC "${f}")
+        SET_SOURCE_FILES_PROPERTIES(${SRC} PROPERTIES COMPILE_FLAGS -w)
+      ENDFOREACH(f)
+    ENDIF(CMAKE_COMPILER_IS_GNUCXX)
+  ENDIF(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 1.6)
+ENDMACRO(ITK_DISABLE_FLTK_GENERATED_WARNINGS)
 
 # Macro for adding resources to GUI application on the Mac
 #

@@ -187,6 +187,9 @@ ADD_GUI_EXECUTABLE(SNAPTests "${TESTING_SRCS}")
 FLTK_WRAP_UI(SNAP ${COMMON_FLUIDS})
 FLTK_WRAP_UI(SNAPTests ${COMMON_FLUIDS} ${TESTING_FLUIDS})
 
+SET(ALL_FLUIDS ${COMMON_FLUIDS} ${TESTING_FLUIDS})
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${ALL_FLUIDS}")
+
 #############################################
 # LIBRARIES AND EXTERNAL CODE               #
 #############################################

@@ -11,6 +11,7 @@ ADD_LIBRARY(Curves2DExtractorLib ceExtractorConsole.cxx
 # Take the list of GUI files, generate .cxx and .h from them and add
 # them to the build process of the target
 FLTK_WRAP_UI(Curves2DExtractorLib ceExtractorConsoleGUI.fl)
+ITK_DISABLE_FLTK_GENERATED_WARNINGS(ceExtractorConsoleGUI.fl)
 
 TARGET_LINK_LIBRARIES(Curves2DExtractorLib
                       ITKBasicFilters ITKIO ITKFltkImageViewer)

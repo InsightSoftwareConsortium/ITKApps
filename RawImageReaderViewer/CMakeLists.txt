@@ -25,3 +25,4 @@ itkRawImageReaderViewerGUI.fl
 ADD_GUI_EXECUTABLE(RawImageReaderViewer   "${RawImageReaderViewer_SRCS}")
 
 FLTK_WRAP_UI(RawImageReaderViewer   ${RawImageReaderViewer_GUI_SRCS})
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${RawImageReaderViewer_GUI_SRCS}")

@@ -26,3 +26,4 @@ SET(ImageColorViewer_GUI_SRCS
   )
 
 FLTK_WRAP_UI( ImageColorViewer ${ImageColorViewer_GUI_SRCS} )
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${ImageColorViewer_GUI_SRCS}")

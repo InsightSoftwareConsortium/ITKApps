@@ -25,6 +25,7 @@ ADD_EXECUTABLE(LandmarkInitializedMutualInformationRegistration
 )
 
 FLTK_WRAP_UI(LandmarkInitializedMutualInformationRegistration guiMain.fld)
+ITK_DISABLE_FLTK_GENERATED_WARNINGS(guiMain.fld)
 
 TARGET_LINK_LIBRARIES (LandmarkInitializedMutualInformationRegistration
                        ITKIO ITKMetaIO ITKBasicFilters ITKStatistics ITKFltkImageViewer ${OPENGL_LIBRARY})
