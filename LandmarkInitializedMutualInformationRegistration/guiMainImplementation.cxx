@@ -1327,7 +1327,7 @@ guiMainImplementation
     m_App->GetLandmarkScales();
   for ( unsigned int i = 0 ; i < landmarkScales.Size() ; ++i )
     {
-    std::ostringstream temp ;
+    itk::OStringStream temp ;
     temp <<  "LandmarkScales_" << i ;
     landmarkScales[i] = options[temp.str()] ;
     }
@@ -1338,7 +1338,7 @@ guiMainImplementation
   RegistrationAppType::RigidScalesType rigidScales = m_App->GetRigidScales();
   for ( unsigned int i = 0 ; i < rigidScales.Size() ; ++i )
     {
-    std::ostringstream temp ;
+    itk::OStringStream temp ;
     temp <<  "RigidScales_" << i ;
     rigidScales[i] = options[temp.str()] ;
     }
@@ -1359,7 +1359,7 @@ guiMainImplementation
     m_App->GetAffineScales() ;
   for ( unsigned int i = 0 ; i < affineScales.Size() ; ++i )
     {
-    std::ostringstream temp ;
+    itk::OStringStream temp ;
     temp << "AffineScales_" << i ;
     affineScales[i] = options[temp.str()] ;
     }

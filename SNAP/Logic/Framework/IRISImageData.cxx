@@ -636,7 +636,7 @@ IRISImageData
     m_ColorLabels[i].SetVisible(true);
     m_ColorLabels[i].SetDoMesh(true);
 
-    std::stringstream sout;
+    itk::OStringStream sout;
     sout << "Label" << i;
     m_ColorLabels[i].SetLabel(sout.str().c_str());
     }

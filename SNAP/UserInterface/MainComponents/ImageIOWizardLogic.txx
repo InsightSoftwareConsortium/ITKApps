@@ -346,7 +346,7 @@ ImageIOWizardLogic<TPixel>
        boTypes[(unsigned int)(ioBase->GetByteOrder() - ioBase->BigEndian)]);
 
     // Create a string stream for the dictionary
-    std::stringstream sout;    
+    itk::OStringStream sout;    
 
     // Dump out the image data to the browser
     m_Image->GetImage()->GetMetaDataDictionary().Print(sout);
