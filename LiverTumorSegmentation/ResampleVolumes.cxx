@@ -150,9 +150,9 @@ int main( int argc, char * argv[] )
   InputImageType::SizeType   inputSize = inputImage->GetLargestPossibleRegion().GetSize();
   InputImageType::SizeType   size;
 
-  size[0] =   inputSize[0]       * inputSpacing[0] / isoSpacing;
-  size[1] =   inputSize[1]       * inputSpacing[1] / isoSpacing;
-  size[2] = ( inputSize[2] - 1 ) * inputSpacing[2] / isoSpacing;
+  size[0] =  (long unsigned int) (inputSize[0]       * inputSpacing[0] / isoSpacing);
+  size[1] =  (long unsigned int) (inputSize[1]       * inputSpacing[1] / isoSpacing);
+  size[2] = (long unsigned int)  (( inputSize[2] - 1 ) * inputSpacing[2] / isoSpacing);
 
   resampler->SetSize( size );
 
