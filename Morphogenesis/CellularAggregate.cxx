@@ -853,17 +853,25 @@ CellularAggregate
   SubstrateType::IndexType index;
   typedef SubstrateType::IndexType::IndexValueType IndexValueType;
 
-  SubstrateType::SizeType  substratSize = 
+  SubstrateType::SizeType  substrateSize = 
                     substrate->GetBufferedRegion().GetSize();
 
+  const double * spacing = substrate->GetSpacing();
+
+  PointType centeredPosition;
   for(unsigned int i=0; i<Cell::Dimension; i++)
     {
-    index[i] = static_cast< IndexValueType > (
-                    substratSize[i] / 2.0 + cellPosition[i] );
+    centeredPosition[i] = cellPosition[i] + spacing[i] * substrateSize[i] / 2.0;
     }
 
-  SubstrateValueType  value     = substrate->GetPixel( index );
-  
+  substrate->TransformPhysicalPointToIndex( centeredPosition, index );
+
+  SubstrateValueType  value = 0;
+  if( substrate->GetBufferedRegion().IsInside( index ) )
+    {
+    value     = substrate->GetPixel( index );
+    }
+
   return value;
 }
 
