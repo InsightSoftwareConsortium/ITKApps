@@ -112,7 +112,8 @@ int main(int argc, char * argv [] )
   try
     {
     typedef unsigned char PixelType;
-    typedef itk::Image< PixelType, 2 > ImageType;
+    const unsigned int Dimension = 2;
+    typedef itk::Image< PixelType, Dimension > ImageType;
     
     typedef itk::ImageFileReader< ImageType > ReaderType;
 
