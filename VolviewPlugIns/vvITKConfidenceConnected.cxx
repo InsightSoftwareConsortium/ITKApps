@@ -108,19 +108,22 @@ static int UpdateGUI(void *inf)
   info->SetGUIProperty(info, 4, VVP_GUI_TYPE, VVP_GUI_SCALE);
   info->SetGUIProperty(info, 4, VVP_GUI_DEFAULT, "0");
   info->SetGUIProperty(info, 4, VVP_GUI_HELP, "X coordinate of the seed point. The seed should be placed in the middle of the region to be segmented.");
-  info->SetGUIProperty(info, 4, VVP_GUI_HINTS , "1 1000.0 1.0");
+  info->SetGUIProperty(info, 4, VVP_GUI_HINTS , 
+            VolView::PlugIn::FilterModuleBase::GetInputVolumeDimension( info, 0 ) );
 
   info->SetGUIProperty(info, 5, VVP_GUI_LABEL, "Y coordinate of the seed");
   info->SetGUIProperty(info, 5, VVP_GUI_TYPE, VVP_GUI_SCALE);
   info->SetGUIProperty(info, 5, VVP_GUI_DEFAULT, "0");
   info->SetGUIProperty(info, 5, VVP_GUI_HELP, "Y coordinate of the seed point. The seed should be placed in the middle of the region to be segmented.");
-  info->SetGUIProperty(info, 5, VVP_GUI_HINTS , "1 1000.0 1.0");
+  info->SetGUIProperty(info, 5, VVP_GUI_HINTS , 
+            VolView::PlugIn::FilterModuleBase::GetInputVolumeDimension( info, 1 ) );
 
   info->SetGUIProperty(info, 6, VVP_GUI_LABEL, "Z coordinate of the seed");
   info->SetGUIProperty(info, 6, VVP_GUI_TYPE, VVP_GUI_SCALE);
   info->SetGUIProperty(info, 6, VVP_GUI_DEFAULT, "0");
   info->SetGUIProperty(info, 6, VVP_GUI_HELP, "Z coordinate of the seed point. The seed should be placed in the middle of the region to be segmented.");
-  info->SetGUIProperty(info, 6, VVP_GUI_HINTS , "1 1000.0 1.0");
+  info->SetGUIProperty(info, 6, VVP_GUI_HINTS , 
+            VolView::PlugIn::FilterModuleBase::GetInputVolumeDimension( info, 2 ) );
 
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, "0");
   
