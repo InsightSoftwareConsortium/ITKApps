@@ -106,7 +106,7 @@ static int UpdateGUI(void *inf)
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, "0");
   
  
-  info->OutputVolumeScalarType = info->InputVolumeScalarType;
+  info->OutputVolumeScalarType = VTK_UNSIGNED_CHAR;
   info->OutputVolumeNumberOfComponents = 1;
   memcpy(info->OutputVolumeDimensions,info->InputVolumeDimensions,
          3*sizeof(int));
