@@ -89,6 +89,7 @@ VVP_REQUIRES_SECOND_INPUT
 
 =========================================================================*/
 
+#define VV_PLUGIN_API_VERSION 1
   
 /* These types are returned by GetDataType to indicate pixel type. */
 #ifndef VTK_VOID  
@@ -247,8 +248,14 @@ gets passed into the ProcessData function.
 }
 #endif
 
+/* this macro should be called first inside every Init function to make sure
+ * the plugin version matches the volview version */
+#define vvPluginVersionCheck() \
+  if (info->magic1 != VV_PLUGIN_API_VERSION) { return; } \
+  else {info->magic1 = 0; }
+
 /* these macros are provided to help people write plugins. The biggest
- * diffuicukty is handling the different data types that volview handles. The
+ * difficulty is handling the different data types that volview handles. The
  * following template can be used to invoke a templated C++ function based on
  * the actual data type. See vvThreshold.cxx for an example of this
  * approach. */
