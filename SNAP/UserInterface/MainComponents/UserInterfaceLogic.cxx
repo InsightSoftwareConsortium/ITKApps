@@ -390,7 +390,7 @@ UserInterfaceLogic
   // Set bubble radius range according to volume dimensions (world dimensions)
   Vector3ui size = m_Driver->GetCurrentImageData()->GetVolumeExtents();
   Vector3d voxdims = m_Driver->GetSNAPImageData()->GetImageSpacing();
-  double mindim = vector_multiply_mixed(voxdims, size).min_value();
+  double mindim = vector_multiply_mixed<double,unsigned int,3>(voxdims, size).min_value();
 
   m_InBubbleRadius->value(1);
   if ((int)(mindim/2) < 1)
@@ -2873,6 +2873,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.29  2004/09/14 14:11:10  pauly
+ *ENH: Added an activation manager to main UI class, improved snake code, various UI fixes and additions
+ *
  *Revision 1.28  2004/09/08 12:09:45  pauly
  *ENH: Adapting SNAP to work with stop-n-go function in finite diff. framewk
  *

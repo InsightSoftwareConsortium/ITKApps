@@ -460,7 +460,7 @@ Window3D
     m_Origin = to_float(m_Driver->GetCurrentImageData()->GetImageOrigin());
 
     // Volume size
-    m_VolumeSize = vector_multiply_mixed(m_Spacing, m_ImageSize);
+    m_VolumeSize = vector_multiply_mixed<float,unsigned int,3>(m_Spacing, m_ImageSize);
     } 
   else
     {
@@ -558,7 +558,7 @@ Window3D
 
   // Compute the center of rotation  
   m_CenterOfRotation = m_Origin + 
-    vector_multiply_mixed(m_Spacing, m_GlobalState->GetCrosshairsPosition());
+    vector_multiply_mixed<float,unsigned int,3>(m_Spacing, m_GlobalState->GetCrosshairsPosition());
 
   // Set up the projection matrix
   SetupProjection();
@@ -881,7 +881,7 @@ void Window3D::ComputeMatricies( GLint *vport, double *mview, double *proj )
 {
   // Compute the center of rotation
   m_CenterOfRotation = m_Origin + 
-    vector_multiply_mixed(m_Spacing, m_GlobalState->GetCrosshairsPosition());
+    vector_multiply_mixed<float,unsigned int,3>(m_Spacing, m_GlobalState->GetCrosshairsPosition());
 
   // Set up the model view matrix
   glMatrixMode(GL_MODELVIEW);
@@ -971,10 +971,10 @@ Window3D
   // plane.
 
   // Compute the points on the plane in world space
-  Vector3d x1World = vector_multiply_add_mixed(x1, m_Spacing, m_Origin);
-  Vector3d x2World = vector_multiply_add_mixed(x2, m_Spacing, m_Origin);
-  Vector3d p1World = vector_multiply_add_mixed(p1, m_Spacing, m_Origin);
-  Vector3d p2World = vector_multiply_add_mixed(p2, m_Spacing, m_Origin);
+  Vector3d x1World = vector_multiply_add_mixed<double,float,float,3>(x1, m_Spacing, m_Origin);
+  Vector3d x2World = vector_multiply_add_mixed<double,float,float,3>(x2, m_Spacing, m_Origin);
+  Vector3d p1World = vector_multiply_add_mixed<double,float,float,3>(p1, m_Spacing, m_Origin);
+  Vector3d p2World = vector_multiply_add_mixed<double,float,float,3>(p2, m_Spacing, m_Origin);
   
   // Compute the normal in world coordinates
   Vector3d nWorld = - itk_cross_3d((vnl_vector<double>) (x2World - x1World),
@@ -1419,6 +1419,9 @@ Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.21  2004/09/14 14:11:11  pauly
+ *ENH: Added an activation manager to main UI class, improved snake code, various UI fixes and additions
+ *
  *Revision 1.20  2004/08/26 18:29:20  pauly
  *ENH: New user interface for configuring the UI options
  *
