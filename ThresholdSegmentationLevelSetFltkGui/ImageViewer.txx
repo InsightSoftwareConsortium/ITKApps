@@ -177,10 +177,10 @@ ImageViewer<ImagePixelType,OverlayPixelType>
   double iwMin  = ((int)(glSliceView->iwMin()*pow(10, -b)))/pow(10,-b);
   double iwMax  = ((int)(glSliceView->iwMax()*pow(10, -b)))/pow(10,-b);
   double iwStep = (iwMax-iwMin)/100.0;
-  sliceNumberSlider->range( 0.0f, glSliceView->numSlices() );
+  //sliceNumberSlider->range( 0.0f, glSliceView->numSlices() );
   intensityWindowingMinSlider->range(iwMin-iwStep,iwMax+iwStep);
   intensityWindowingMaxSlider->range(iwMin-iwStep,iwMax+iwStep);
-  sliceNumberSlider->value((float)glSliceView->sliceNum());
+  //sliceNumberSlider->value((float)glSliceView->sliceNum());
   intensityWindowingMinSlider->step(iwStep);
   intensityWindowingMaxSlider->step(iwStep);
   intensityWindowingMinSlider->value(iwMin);
@@ -198,8 +198,8 @@ void
 ImageViewer<ImagePixelType,OverlayPixelType>
 ::SelectSlice(unsigned int num)
 {
-  sliceNumberSlider->value(num);
-  glSliceView->sliceNum((int)sliceNumberSlider->value());
+  //sliceNumberSlider->value(num);
+  //glSliceView->sliceNum((int)sliceNumberSlider->value());
   glSliceView->update();
 }
 

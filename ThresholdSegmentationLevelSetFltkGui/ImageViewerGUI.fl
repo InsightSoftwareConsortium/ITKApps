@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0100 
+version 1.0102 
 header_name {.h} 
 code_name {.cxx}
 class ImageViewerGUI {open
@@ -10,7 +10,7 @@ class ImageViewerGUI {open
   Function {CreateGUI()} {open
   } {
     Fl_Window iviewWindow {
-      xywh {855 29 295 400} labelsize 10 resizable visible
+      xywh {393 541 260 405} labelsize 10 resizable visible
     } {
       Fl_Group glWindowGroup {
         xywh {0 25 260 320}
@@ -71,19 +71,25 @@ class ImageViewerGUI {open
             xywh {10 10 100 20}
           }
         }
-      }
-      Fl_Value_Slider sliceNumberSlider {
-        label Slice
-        callback {SelectSlice((unsigned int)o->value());}
-        xywh {270 25 20 250} type {Vert Knob} labelsize 10 align 1 step 1 textsize 9
+        submenu {} {
+          label Viewer
+          xywh {10 10 100 20}
+          code0 {AddFilterMenuOptions();}
+        } {
+          menuitem {} {
+            label Options
+            callback {imageInfo->show();}
+            xywh {10 10 100 20}
+          }
+        }
       }
       Fl_Value_Slider intensityWindowingMinSlider {
         callback {SetIntensityWindowingMin(o->value());}
-        xywh {0 360 300 20} type {Horz Fill} selection_color 32 labeltype NO_LABEL labelsize 9 step 1 value 1 textsize 9
+        xywh {0 360 260 20} type {Horz Fill} selection_color 32 labeltype NO_LABEL labelsize 9 step 1 value 1 textsize 9
       }
       Fl_Value_Slider intensityWindowingMaxSlider {
         callback {SetIntensityWindowingMax(o->value());}
-        xywh {0 380 300 20} type {Horz Fill} color 55 selection_color 47 labeltype NO_LABEL labelsize 9 step 1 value 1 textsize 9
+        xywh {0 380 260 20} type {Horz Fill} color 55 selection_color 47 labeltype NO_LABEL labelsize 9 step 1 value 1 textsize 9
       }
       Fl_Button {} {
         label {Zoom In}
@@ -128,7 +134,7 @@ class ImageViewerGUI {open
     }
     Fl_Window clickedPointsWindow {
       label {Clicked Points}
-      xywh {548 29 290 405} visible
+      xywh {548 51 290 405} visible
     } {
       Fl_Browser clickedPointsBrowser {
         xywh {10 15 270 345} textfont 4
@@ -151,7 +157,7 @@ class ImageViewerGUI {open
     }
     Fl_Window overlayOpacityControlWindow {
       label {Overlay Opacity} open
-      xywh {502 506 400 100} visible
+      xywh {834 513 400 100} visible
     } {
       Fl_Button {} {
         label Close
@@ -162,6 +168,31 @@ class ImageViewerGUI {open
         label Opacity
         callback {SetOverlayOpacity( o->value() );}
         xywh {25 29 360 25} type {Horz Fill} color 29 selection_color 21 align 1 value 0.5
+      }
+    }
+    Fl_Window imageInfo {
+      label {Image Info} open
+      xywh {116 689 180 110} labeltype NORMAL_LABEL visible
+    } {
+      Fl_Button {} {
+        label Close
+        callback {imageInfo->hide();}
+        xywh {63 83 45 25}
+      }
+      Fl_Check_Button {} {
+        label {View Image Values}
+        callback {ViewValue(o->value()); Update();} selected
+        xywh {11 5 25 25} down_box DOWN_BOX when 1 value 1
+      }
+      Fl_Check_Button {} {
+        label {View Image Information}
+        xywh {11 29 25 25} down_box DOWN_BOX when 1 
+        callback {ViewDetails(o->value()); Update();} selected
+      }
+      Fl_Check_Button {} {
+        label {View Crosshairs}
+        xywh {11 52 25 25} down_box DOWN_BOX  when 1 value 1
+        callback {ViewCrosshairs(o->value()); Update();} selected
       }
     }
   }
@@ -211,10 +242,16 @@ class ImageViewerGUI {open
   } {}
   Function {ClearClickedPoints(void)} {return_type {virtual void}
   } {}
-  Function {ShowOverlayOpacityControl(void)} {selected return_type {virtual void}
+  Function {ShowOverlayOpacityControl(void)} {return_type {virtual void}
   } {}
   Function {SetOverlayOpacity(float)} {return_type {virtual void}
   } {}
   Function {UpdateClickedPoints()} {return_type {virtual void}
+  } {}
+  Function {ViewDetails(bool)} {return_type {virtual void}
+  } {}
+  Function {ViewValue(bool)} {return_type {virtual void}
+  } {}
+  Function {ViewCrosshairs(bool)} {return_type {virtual void}
   } {}
 } 

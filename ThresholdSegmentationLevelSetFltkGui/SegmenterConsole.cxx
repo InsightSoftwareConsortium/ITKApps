@@ -34,6 +34,7 @@
 SegmenterConsole
 ::SegmenterConsole()
 {
+  // initialize viewers
   m_InputViewer = new InputImageViewerType;
   m_InputViewer->SetLabel("Input Image");
   m_InputViewer->ClickSelectCallBack( ClickSelectCallback, (void *)this );
@@ -41,11 +42,13 @@ SegmenterConsole
 
   m_SeedViewer = new SeedViewerType;
   m_SeedViewer->SetLabel("Seed Image");
+  m_SeedViewer->ViewDetails(false);
 
   m_SpeedViewer = new SpeedViewerType;
   m_SpeedViewer->SetLabel("Speed Image");
   m_SpeedViewer->ViewDetails(false);
 
+  // initialize gui
   diffusionIterations->value(0);
   diffusionConductance->value(1.0);
   diffusionTimeStep->value(0.125);
@@ -56,29 +59,40 @@ SegmenterConsole
   seedY->value(116);
   distance->value(5);
 
+  // these should match the initializations for m_thresholdSegmentation
+  // in SegmenterConsoleBase.cxx
   curvature->value(1.0);
+  propagation->value(1.0);
+  edge->value(1.0);
   maxIterations->value(100);
   RMSError->value(0.02);
-  negativeFeatures->value(1);
+  reverseExpansionDir->value(0);
+  threshIterations->value(0);
+  threshConductance->value(0.5);
+  threshTimeStep->value(0.100);
 
-  guessRadius = 2;
-  m_filterCase = 1;
-  m_drawCase = 1;
+  updateIterations->minimum(1);
+  updateIterations->maximum(500);
+  updateIterations->step(1);
+  updateIterations->value(1);
 
-  width = 1;
-  height = 1;
-  min = 0.0;
-  max = 0.0;
-
-  //ChangeMinThresh(0.0);
-  //ChangeMaxThresh(0.0);
   minThresh->value(0.0);
   minThresh2->value(0.0);
   maxThresh->value(0.0);
   maxThresh2->value(0.0);
-  
+
+  // initialize misc data members
   prevMinThresh = 0.0;
   prevMaxThresh = 0.0;
+  guessRadius = 2;
+  m_filterCase = 1;
+  m_drawCase = 1;
+  min = 0.0;
+  max = 0.0;  
+  loadingSession = false;
+  inputFilename = "";
+  seedFilename = "";
+
 
   // set up the segmentation observer
   typedef itk::SimpleMemberCommand< SegmenterConsole > SimpleCommandType;
@@ -91,19 +105,11 @@ SegmenterConsole
 
   ShowInputButton->Observe( m_InputCaster.GetPointer() );
   DiffuseButton->Observe( m_Curvature.GetPointer() );
-  SpeedButton->Observe( m_BinaryThresh.GetPointer() );
   ViewSeedButton->Observe( m_SeedCaster.GetPointer() );
   SegmentButton->Observe( m_thresholdSegmentation.GetPointer() );
 
-  updateIterations->minimum(1);
-  updateIterations->maximum(500);
-  updateIterations->step(1);
-  updateIterations->value(1);
 
-  loadingSession = false;
-  inputFilename = "";
-  seedFilename = "";
-
+  // help text
   helpText->value("ThresholdSegmentationLevelSetFltkGui\n-----------------------------------------------------------\nThis application allows you to do segmentation using the\nThresholdSegmentationLevelSetImageFilter on a 2D\nimage.\n\nTo begin, load in a 2D image (preferably in the Meta Image\nformat) by clicking the \"Load Input Image\" button.\n");
 }
 
@@ -127,7 +133,8 @@ void
 SegmenterConsole
 ::Load( void )
 {
-  m_Reader = VolumeReaderType::New();
+  // create a new reader every time in case they are reading in a new image
+  m_Reader = ReaderType::New();
   if(loadingSession) {
     try 
     {
@@ -154,9 +161,13 @@ SegmenterConsole
     }
   }
   
+  // activate the other gui options
   ShowInputButton->activate();
-  this->InitializeGuessImage();
 
+  this->InitializeGuessImages();
+
+  // calculate the min max and set the thresholds to be 
+  // close to the min+max / 2
   m_minMax->SetImage(m_Reader->GetOutput());
   try {
     m_minMax->Compute();
@@ -180,19 +191,25 @@ SegmenterConsole
   maxThresh->minimum(min);
   maxThresh->maximum(max);
 
-  width = m_Reader->GetOutput()->GetLargestPossibleRegion().GetSize()[0];
-  height = m_Reader->GetOutput()->GetLargestPossibleRegion().GetSize()[1];
-
+  ShowInputImage();
 }
 
 /***********************************
  *
- * InitializeGuessImage
+ * InitializeGuessImages
  *
  **********************************/
-void SegmenterConsole::InitializeGuessImage()
+void SegmenterConsole::InitializeGuessImages()
 {
- 
+  // Initialize images used
+
+  // m_thresh is a 3D image buffer which stores
+  // the threshold points as an overlay to the
+  // viewer
+
+  // m_image is a 3D image buffer which stores
+  // the guess of the user to be the overlay
+  // in the viewer
   m_start1[0] = 0;
   m_start1[1] = 0;
   m_start1[2] = 0;
@@ -209,10 +226,15 @@ void SegmenterConsole::InitializeGuessImage()
   m_image->Allocate();
   m_thresh->Allocate();
 
+  // fill both buffers with 0's (black in itkColorTable.h)
   WriteImageType3D::PixelType  initialValue1 = 0;
   m_image->FillBuffer( initialValue1 );
 
   m_thresh->FillBuffer( initialValue1 );
+
+  // m_guessImage is a 2D image that is modifed
+  // when the user draws a guess image and can be
+  // passed to the threshold filter for input
 
   m_start2[0] = 0;
   m_start2[1] = 0;
@@ -225,6 +247,7 @@ void SegmenterConsole::InitializeGuessImage()
   m_guessImage->SetRegions( m_region2 );
   m_guessImage->Allocate();
 
+  // initialize buffer
   WriteImageType::PixelType  initialValue2 = 255;
   m_guessImage->FillBuffer( initialValue2 );
 
@@ -311,21 +334,14 @@ SegmenterConsole::ShowInputImage(void)
 void
 SegmenterConsole::SmoothImage()
 {
-  m_Curvature->SetInput(m_Reader->GetOutput());
   m_Curvature->SetNumberOfIterations((unsigned int)diffusionIterations->value());
   m_Curvature->SetConductanceParameter(diffusionConductance->value());
   m_Curvature->SetTimeStep(diffusionTimeStep->value());
-
-  try {
-    m_Curvature->Update();
-  }
-  catch( itk::ExceptionObject & excep )
-  {
-    std::cerr << "Exception caught !" << std::endl;
-    std::cerr << excep << std::endl;
-  }  
+  m_Curvature->SetInput(m_Reader->GetOutput());
 
   m_InputCaster->SetInput(m_Curvature->GetOutput());
+  // this update must be in here in order to get the
+  // curvature to update with changes in params
   try 
   {
     m_InputCaster->Update();
@@ -335,6 +351,7 @@ SegmenterConsole::SmoothImage()
     return;
   }
 
+  // calculate the min and max to set threshold boundaries
   m_minMax->SetImage(m_Curvature->GetOutput());
   try {
     m_minMax->Compute();
@@ -352,6 +369,8 @@ SegmenterConsole::SmoothImage()
 
   maxThresh->minimum(min);
   maxThresh->maximum(max);
+
+  // show curvature image
   m_InputViewer->SetImage(m_InputCaster->GetOutput());
   m_InputViewer->SetOverlay( m_image );
   m_InputViewer->Show();
@@ -372,10 +391,16 @@ SegmenterConsole::ShowSpeedImage()
     m_thresholdSegmentation->SetUpperThreshold( maxThresh2->value() );
     m_thresholdSegmentation->SetLowerThreshold( minThresh2->value() );
     m_thresholdSegmentation->SetCurvatureScaling( curvature->value() );
+    m_thresholdSegmentation->SetPropagationScaling( propagation->value() );
+    m_thresholdSegmentation->SetEdgeWeight( edge->value() );
     m_thresholdSegmentation->SetMaximumRMSError( RMSError->value() );
     m_thresholdSegmentation->SetMaximumIterations( 0 );
+
+    m_thresholdSegmentation->SetSmoothingIterations( threshIterations->value() );
+    m_thresholdSegmentation->SetSmoothingConductance( threshConductance->value() );
+    m_thresholdSegmentation->SetSmoothingTimeStep( threshTimeStep->value() );
     
-    m_thresholdSegmentation->SetInput(m_Curvature->GetOutput() );
+    m_thresholdSegmentation->SetInput(m_Curvature->GetOutput() ); 
     m_thresholdSegmentation->SetIsoSurfaceValue(0.0);
     
     try {
@@ -398,22 +423,13 @@ SegmenterConsole::ShowSpeedImage()
     float a_max = m_minMax->GetMaximum();
     float a_min = m_minMax->GetMinimum();
     
-    m_BinaryThresh->SetInput(const_cast<InputImageType *>(m_thresholdSegmentation->GetSpeedImage()));
-    m_BinaryThresh->SetOutsideValue(6);
-    m_BinaryThresh->SetInsideValue(1);
-    m_BinaryThresh->SetUpperThreshold(a_max);
-    m_BinaryThresh->SetLowerThreshold(0.0);
+    m_speedThresh->SetInput(const_cast<InputImageType *>(m_thresholdSegmentation->GetSpeedImage()));
+    m_speedThresh->SetOutsideValue(6);
+    m_speedThresh->SetInsideValue(1);
+    m_speedThresh->SetUpperThreshold(a_max);
+    m_speedThresh->SetLowerThreshold(0.0);
     
-    try {
-      m_BinaryThresh->Update();
-    }
-    catch( itk::ExceptionObject & excep )
-    {
-      std::cerr << "Exception caught !" << std::endl;
-      std::cerr << excep << std::endl;
-    }
-    
-    m_SpeedCaster->SetInput(m_BinaryThresh->GetOutput());
+    m_SpeedCaster->SetInput(m_speedThresh->GetOutput());
     
     try {
       m_SpeedCaster->Update();
@@ -423,7 +439,8 @@ SegmenterConsole::ShowSpeedImage()
       std::cerr << "Exception caught !" << std::endl;
       std::cerr << excep << std::endl;
     }
-    
+
+    // update speed image
     m_SpeedViewer->SetImage(m_InputCaster->GetOutput());
     m_SpeedViewer->SetOverlay(m_SpeedCaster->GetOutput());
     m_SpeedViewer->SetOverlayOpacity(0.5);
@@ -446,19 +463,31 @@ SegmenterConsole::ShowSegmentedImage(void)
   m_thresholdSegmentation->SetUpperThreshold( maxThresh2->value() );
   m_thresholdSegmentation->SetLowerThreshold( minThresh2->value() );
   m_thresholdSegmentation->SetCurvatureScaling( curvature->value() );
+  m_thresholdSegmentation->SetPropagationScaling( propagation->value() );
+  m_thresholdSegmentation->SetEdgeWeight( edge->value() );
   m_thresholdSegmentation->SetMaximumRMSError( RMSError->value() );
   m_thresholdSegmentation->SetMaximumIterations( (unsigned int)maxIterations->value() );
-  if(negativeFeatures->value()) {
-    m_thresholdSegmentation->SetUseNegativeFeaturesOn();
+  
+  m_thresholdSegmentation->SetSmoothingIterations( threshIterations->value() );
+  m_thresholdSegmentation->SetSmoothingConductance( threshConductance->value() );
+  m_thresholdSegmentation->SetSmoothingTimeStep( threshTimeStep->value() );
+  
+  if(reverseExpansionDir->value()) {
+    m_thresholdSegmentation->ReverseExpansionDirectionOn();
   }
   else {
-    m_thresholdSegmentation->SetUseNegativeFeaturesOff();
+    m_thresholdSegmentation->ReverseExpansionDirectionOff();
   }
 
   m_thresholder->SetInput(m_thresholdSegmentation->GetOutput());
+  m_thresholder->SetOutsideValue(0);
+  m_thresholder->SetInsideValue(1);
+  m_thresholder->SetUpperThreshold(0.5);
+  m_thresholder->SetLowerThreshold(-0.5);
+
   m_SegmentedCaster->SetInput(m_thresholder->GetOutput());
   
-  m_thresholdSegmentation->SetInput(m_Reader->GetOutput() );
+  m_thresholdSegmentation->SetInput(m_Curvature->GetOutput() ); 
   m_thresholdSegmentation->SetIsoSurfaceValue(0.0);
   m_thresholdSegmentation->SetMaximumIterations(0);
   try {
@@ -480,7 +509,7 @@ SegmenterConsole::ShowSegmentedImage(void)
       return;
       break;
     }
-    m_thresholdSegmentation->SetInput(m_SeedReader->GetOutput() );
+    m_thresholdSegmentation->SetInput(m_SeedReader->GetOutput() ); // LEAVE
     m_thresholdSegmentation->SetIsoSurfaceValue(isosurface->value());
     try {
       m_thresholdSegmentation->Update();
@@ -540,10 +569,13 @@ SegmenterConsole::ShowSegmentedImage(void)
     std::cerr << excep << std::endl;
   }
 
+  // update segmented image when done
   m_InputViewer->SetOverlay(m_SegmentedCaster->GetOutput());
   m_InputViewer->SetOverlayOpacity(1.0);
   m_InputViewer->Update();
   Fl::check();
+
+  // activate segmented saving options
   save->activate();
   binarySave->activate();
 }
@@ -561,13 +593,13 @@ SegmenterConsole::SwitchCase(int c)
   // uncheck option to be in threshold drawing mode
 
   m_filterCase = c;
-  if(m_filterCase == 1) {
+  if(m_filterCase == 1) { // loading seed image
     Case1Group->activate();
     Case2Group->deactivate();
     Case3Group->deactivate();
     m_thresholdSegmentation->Modified();
   }
-  else if(m_filterCase == 2) {
+  else if(m_filterCase == 2) { // specifying coords for FastMarching
     Case2Group->activate();
     Case1Group->deactivate();
     Case3Group->deactivate();
@@ -576,7 +608,7 @@ SegmenterConsole::SwitchCase(int c)
     ToggleThresholdGuess();
     m_drawCase = 2;
   }
-  else if(m_filterCase == 3) {
+  else if(m_filterCase == 3) { // draw initial guess
     Case3Group->activate();
     Case1Group->deactivate();
     Case2Group->deactivate();
@@ -596,7 +628,7 @@ SegmenterConsole::SwitchCase(int c)
 void 
 SegmenterConsole::LoadSeedImage()
 {
-  m_SeedReader = VolumeReaderType::New();
+  m_SeedReader = ReaderType::New();
 
   if(loadingSession) {
     m_SeedReader->SetFileName(seedFilename.c_str());
@@ -610,6 +642,8 @@ SegmenterConsole::LoadSeedImage()
     m_SeedReader->SetFileName(filename);
   }
 
+  // this update must be here, otherwise the
+  // isosurface value doesn't get calculated
   try {
     m_SeedReader->Update();
   }
@@ -619,21 +653,22 @@ SegmenterConsole::LoadSeedImage()
     std::cerr << excep << std::endl;
   }
 
-
-  m_minMaxSeed->SetImage(m_SeedReader->GetOutput());
+  // calculate the min and max to determine a good isosurface
+  m_minMax->SetImage(m_SeedReader->GetOutput());
   try {
-    m_minMaxSeed->Compute();
+    m_minMax->Compute();
   }
   catch( itk::ExceptionObject & excep )
   {
     std::cerr << "Exception caught !" << std::endl;
     std::cerr << excep << std::endl;
   }  
-  float m_min = m_minMaxSeed->GetMinimum();
-  float m_max = m_minMaxSeed->GetMaximum();
+  float m_min = m_minMax->GetMinimum();
+  float m_max = m_minMax->GetMaximum();
 
   isosurface->value((m_min+m_max)/2.0);
 
+  ShowSeedImage();
 }
 
 /**********************************
@@ -654,6 +689,7 @@ SegmenterConsole::ShowSeedImage()
     std::cerr << excep << std::endl;
   }
 
+  // view the seed image
   m_SeedViewer->SetImage( m_SeedCaster->GetOutput());
   m_SeedViewer->Show();
 }
@@ -669,7 +705,7 @@ void SegmenterConsole::GetClickPoints(float x, float y)
   WriteImageType::IndexType pixelIndex2;
 
   switch(m_drawCase) {
-  case 1:
+  case 1: // drawing thresholds
     m_InputViewer->SetOverlay( m_thresh );
     m_InputViewer->SetOverlayOpacity(0.3);
   
@@ -684,12 +720,12 @@ void SegmenterConsole::GetClickPoints(float x, float y)
     }
     m_InputViewer->Update();
     break;
-  case 2:
+  case 2: // setting x and y seed points
     seedX->value(x);
     seedY->value(y);
     m_thresholdSegmentation->Modified();
     break;
-  case 3:
+  case 3: // drawing initial segmentation guess
     m_InputViewer->SetOverlay( m_image );
     m_InputViewer->SetOverlayOpacity(0.3);
 
@@ -741,7 +777,8 @@ void SegmenterConsole::ChangePaintRadius(float r)
  **********************************/
 void SegmenterConsole::ClearGuess()
 {
-  WriteImageType::PixelType  initialValue2;
+  WriteImageType::PixelType  initialValue2; 
+
   // clear guessImage
   initialValue2 = 255;
   m_guessImage->FillBuffer( initialValue2 );
@@ -790,23 +827,16 @@ void SegmenterConsole::UpdateViewerAfterIteration()
     m_thresholder->SetInput(tmp);
     m_SegmentedCaster->SetInput(m_thresholder->GetOutput());
 
-     try {
-       m_thresholder->Update();
-     }
-     catch( itk::ExceptionObject & excep )
-     {
-       std::cerr << "Exception caught !" << std::endl;
-       std::cerr << excep << std::endl;
-     }
-     try {
-       m_SegmentedCaster->Update();
-     }
-     catch( itk::ExceptionObject & excep )
-     {
-       std::cerr << "Exception caught !" << std::endl;
-       std::cerr << excep << std::endl;
-     }
+    try {
+      m_SegmentedCaster->Update();
+    }
+    catch( itk::ExceptionObject & excep )
+    {
+      std::cerr << "Exception caught !" << std::endl;
+      std::cerr << excep << std::endl;
+    }
 
+    // update the viewer with the current segmentation
     m_InputViewer->SetOverlay(m_SegmentedCaster->GetOutput());
     m_InputViewer->SetOverlayOpacity(1.0);
     m_InputViewer->Update();
@@ -862,9 +892,16 @@ void SegmenterConsole::CalculateThresholds()
       }
     }
 
-  ChangeMinThresh(area_min);
-  ChangeMaxThresh(area_max);
-
+  // the order matters because if the minimum is changed first
+  // and is set to higher than the max, the user will get an error
+  if(maxThresh2->value() <= area_min) {
+    ChangeMaxThresh(area_max);
+    ChangeMinThresh(area_min);
+  }
+  else {
+    ChangeMinThresh(area_min);
+    ChangeMaxThresh(area_max);
+  }
   ClearThresh();
 }
 
@@ -881,11 +918,11 @@ void SegmenterConsole::SaveSegmented()
     return;
   }
 
-  m_writer->SetFileName(filename);
-  m_writer->SetInput(m_thresholdSegmentation->GetOutput());
+  m_segmentWriter->SetFileName(filename);
+  m_segmentWriter->SetInput(m_thresholdSegmentation->GetOutput());
 
   try {
-    m_writer->Update();
+    m_segmentWriter->Update();
   }
   catch( itk::ExceptionObject & excep )
   {
@@ -921,26 +958,17 @@ void SegmenterConsole::SaveBinaryMask()
   float a_max = m_minMax->GetMaximum();
   float a_min = m_minMax->GetMinimum();
   
-  m_BinaryThresh2->SetInput(m_thresholdSegmentation->GetOutput());
-  m_BinaryThresh2->SetOutsideValue(1);
-  m_BinaryThresh2->SetInsideValue(0);
-  m_BinaryThresh2->SetUpperThreshold(0.0);
-  m_BinaryThresh2->SetLowerThreshold(a_min);
+  m_maskThresh->SetInput(m_thresholdSegmentation->GetOutput());
+  m_maskThresh->SetOutsideValue(1);
+  m_maskThresh->SetInsideValue(0);
+  m_maskThresh->SetUpperThreshold(0.0);
+  m_maskThresh->SetLowerThreshold(a_min);
+  
+  m_maskWriter->SetFileName(filename);
+  m_maskWriter->SetInput(m_maskThresh->GetOutput());
   
   try {
-    m_BinaryThresh2->Update();
-  }
-  catch( itk::ExceptionObject & excep )
-  {
-    std::cerr << "Exception caught !" << std::endl;
-    std::cerr << excep << std::endl;
-  }
-  
-  m_writer2->SetFileName(filename);
-  m_writer2->SetInput(m_BinaryThresh2->GetOutput());
-  
-  try {
-    m_writer2->Update();
+    m_maskWriter->Update();
   }
   catch( itk::ExceptionObject & excep )
   {
@@ -1007,6 +1035,7 @@ void SegmenterConsole::ChangeMaxThresh(float val)
  *****************************/
 void SegmenterConsole::SetThresholdFilterToModified()
 {
+  // this is mainly used when parameters are changed
   m_thresholdSegmentation->Modified();
 }
 
@@ -1040,10 +1069,10 @@ void SegmenterConsole::SaveSession()
   }
 
   if(strcmp(m_SeedReader->GetFileName(), "") == 0) {
-    out << "BLANK ";
+    out << "\nBLANK\n";
   }
   else {
-    out << m_SeedReader->GetFileName() << " ";
+    out << "\n" << m_SeedReader->GetFileName() << "\n";
   }
   out << isosurface->value() << " ";
 
@@ -1056,10 +1085,16 @@ void SegmenterConsole::SaveSession()
   out << minThresh2->value() << " ";
   out << maxThresh2->value() << " ";
   out << curvature->value() << " ";
+  out << propagation->value() << " ";
+  out << edge->value() << " ";
   out << maxIterations->value() << " ";
   out << RMSError->value() << " ";
   
-  if(negativeFeatures->value()) {
+  out << threshIterations->value() << " ";
+  out << threshConductance->value() << " ";
+  out << threshTimeStep->value() << " ";
+  
+  if(reverseExpansionDir->value()) {
     out << 1 << " ";
   }
   else {
@@ -1093,6 +1128,8 @@ void SegmenterConsole::LoadSession()
   char buffer2[256];
   int intVal;
   float floatVal;
+  float min_thresh;
+  float max_thresh;
 
   in.getline(buffer2, 256); // input image filename
   inputFilename = buffer2;
@@ -1105,9 +1142,11 @@ void SegmenterConsole::LoadSession()
   diffusionConductance->value(floatVal);
   in >> floatVal;
   diffusionTimeStep->value(floatVal);
+
   SmoothImage();
 
   in >> intVal; // segmentation case
+  m_filterCase = intVal;
   SwitchCase( intVal );
   if(intVal == 1) {
     radio1->value(1);
@@ -1128,12 +1167,16 @@ void SegmenterConsole::LoadSession()
   in >> intVal; // drawing threshold mode
   calcThresh->value(intVal);
   ToggleThresholdGuess();
-  
-  in >> buffer; // seedreader
-  //  if(m_case == 1 && buffer != "BLANK") {
-  //   seedFilename = buffer;
-  //  LoadSeedImage();
-  //}
+
+  in.getline(buffer2, 256); // return
+  in.getline(buffer2, 256); // seedreader
+
+
+  if(m_filterCase == 1 && strcmp(buffer2,"BLANK")!= 0) {
+    seedFilename = buffer2;
+    LoadSeedImage();
+  }
+
   in >> floatVal;
   isosurface->value(floatVal);
 
@@ -1147,24 +1190,50 @@ void SegmenterConsole::LoadSession()
   in >> intVal; //paint radius
   paintRadius->value( intVal );
   
-  in >> floatVal; // segmentation parameters
-  ChangeMinThresh( floatVal );
-  in >> floatVal;
-  ChangeMaxThresh( floatVal );
+  in >> min_thresh; // segmentation parameters
+  in >> max_thresh;
+
+  minThresh->value(min_thresh);
+  minThresh2->value(min_thresh);
+  prevMinThresh = min_thresh;
+
+  maxThresh->value(max_thresh);
+  maxThresh2->value(max_thresh);
+  prevMaxThresh = max_thresh;
+
   in >> floatVal;
   curvature->value(floatVal);
+
+  in >> floatVal;
+  propagation->value(floatVal);
+
+  in >> floatVal;
+  edge->value(floatVal);
+
   in >> intVal;
   maxIterations->value(intVal);
   in >> floatVal;
   RMSError->value(floatVal);
+
+  in >> floatVal;
+  threshIterations->value((int)floatVal);
+
+  in >> floatVal;
+  threshConductance->value(floatVal);
+
+  in >> floatVal;
+  threshTimeStep->value(floatVal);
+
   in >> intVal;
   if(intVal == 1) {
-    negativeFeatures->value(1);
+    reverseExpansionDir->value(1);
   }
   else {
-    negativeFeatures->value(0);
+    reverseExpansionDir->value(0);
   }
   
+  ShowSpeedImage();
+
   in >> intVal; // update iteration value
   updateIterations->value(intVal);
   

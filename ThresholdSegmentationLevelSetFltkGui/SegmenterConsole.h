@@ -41,7 +41,7 @@ public:
   virtual void Load(void);
   virtual void Quit(void);
   virtual void ShowInputImage(void);
-  virtual void InitializeGuessImage(void);
+  virtual void InitializeGuessImages(void);
   virtual void SmoothImage();
   virtual void ShowSpeedImage();
   virtual void ShowSegmentedImage(void);
@@ -74,8 +74,6 @@ private:
   int m_filterCase;
   int m_drawCase;
 
-  int width;
-  int height;
   float min;
   float max;
   float prevMinThresh;

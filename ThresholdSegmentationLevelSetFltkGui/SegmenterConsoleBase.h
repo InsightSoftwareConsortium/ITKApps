@@ -22,38 +22,38 @@
 #include <itkImageFileWriter.h>
 
 #include <itkThresholdSegmentationLevelSetImageFilter.h>
-#include "itkFastMarchingImageFilter.h"
-#include "itkZeroCrossingImageFilter.h"
 
-#include "itkCurvatureAnisotropicDiffusionImageFilter.h"
+#include <itkFastMarchingImageFilter.h>
 
-#include "itkCastImageFilter.h"
+#include <itkCurvatureAnisotropicDiffusionImageFilter.h>
 
-#include "itkBinaryThresholdImageFilter.h"
+#include <itkCastImageFilter.h>
 
-#include "itkMinimumMaximumImageCalculator.h"
+#include <itkBinaryThresholdImageFilter.h>
+
+#include <itkMinimumMaximumImageCalculator.h>
 
 
 class SegmenterConsoleBase 
 {
 
 public:
-  typedef   float                             InputPixelType;
-  typedef   float                             OutputPixelType;
-  typedef   unsigned char                     WritePixelType;
+  typedef   float                              InputPixelType;
+  typedef   float                              OutputPixelType;
+  typedef   unsigned char                      WritePixelType;
 
-  typedef   float                             ComputationType;
+  typedef   float                              ComputationType;
 
-  typedef   itk::Image< InputPixelType, 2 >   InputImageType;
-  typedef   itk::Image< OutputPixelType, 2 >  OutputImageType;
-  typedef   itk::Image< WritePixelType, 2 >   WriteImageType;
+  typedef   itk::Image< InputPixelType, 2 >    InputImageType;
+  typedef   itk::Image< OutputPixelType, 2 >   OutputImageType;
+  typedef   itk::Image< WritePixelType, 2 >    WriteImageType;
 
-  typedef   itk::Image< InputPixelType, 3 >   InputImageType3D;
-  typedef   itk::Image< OutputPixelType, 3 >  OutputImageType3D;
-  typedef   itk::Image< WritePixelType, 3 >   WriteImageType3D;
+  typedef   itk::Image< InputPixelType, 3 >    InputImageType3D;
+  typedef   itk::Image< OutputPixelType, 3 >   OutputImageType3D;
+  typedef   itk::Image< WritePixelType, 3 >    WriteImageType3D;
 
   typedef   itk::ImageFileReader< 
-                            InputImageType >  VolumeReaderType;
+                            InputImageType >   ReaderType;
 
   typedef   itk::CastImageFilter<
                             InputImageType, 
@@ -63,17 +63,19 @@ public:
                             WriteImageType, 
                             WriteImageType3D > SegmentedCasterType;
 
+
+
   typedef   itk::CurvatureAnisotropicDiffusionImageFilter<
                             InputImageType,
-                            InputImageType  > CurvatureDiffusionType;
-
-  typedef   itk::ZeroCrossingImageFilter<
-                            InputImageType,
-                            WriteImageType > ThresholdingFilterType;
+                            InputImageType  >  CurvatureDiffusionType;
 
   typedef   itk::FastMarchingImageFilter<
                             InputImageType,
-                            InputImageType > FastMarchingFilterType;
+                            InputImageType >   FastMarchingFilterType;
+
+  typedef   itk::BinaryThresholdImageFilter<
+                            InputImageType,
+                            WriteImageType >   BinaryThresholdType;
   
   typedef   itk::ThresholdSegmentationLevelSetImageFilter<
                             InputImageType, 
@@ -85,14 +87,7 @@ public:
   typedef   itk::ImageFileWriter<WriteImageType>  BinaryWriterType;
   
   
-  typedef   itk::BinaryThresholdImageFilter<
-                            InputImageType,
-                            WriteImageType >  BinaryThresholdType;
 
-  typedef   itk::BinaryThresholdImageFilter<
-                            InputImageType,
-                            WriteImageType >  BinaryThresholdType2;
-  
   typedef   FastMarchingFilterType::NodeContainer  NodeContainer;
   typedef   FastMarchingFilterType::NodeType       NodeType;
 
@@ -106,31 +101,32 @@ public:
   virtual void Load(const char * filename);
 
 protected:
-
-  VolumeReaderType::Pointer                                      m_Reader;
+  
+  ReaderType::Pointer                                            m_Reader;
+  CurvatureDiffusionType::Pointer                                m_Curvature;
   InputCasterType::Pointer                                       m_InputCaster;
 
-  CurvatureDiffusionType::Pointer                                m_Curvature;
-
-  ThresholdingFilterType::Pointer                                m_thresholder;
+  BinaryThresholdType::Pointer                                   m_thresholder;
   FastMarchingFilterType::Pointer                                m_fastMarching;
+
   ThresholdSegmentationLevelSetImageFilterType::Pointer          m_thresholdSegmentation;
+
   WriteCasterType::Pointer                                       m_writerCaster;
-  SegmentWriterType::Pointer                                     m_writer;
-  BinaryWriterType::Pointer                                      m_writer2;
+  SegmentWriterType::Pointer                                     m_segmentWriter;
+  BinaryWriterType::Pointer                                      m_maskWriter;
+
+  ReaderType::Pointer                                            m_SeedReader;
+  InputCasterType::Pointer                                       m_SeedCaster;
   NodeContainer::Pointer                                         m_seeds;
   InputImageType::IndexType                                      m_seedPosition;
   NodeType                                                       m_node;
 
-  VolumeReaderType::Pointer                                      m_SeedReader;
-
-  InputCasterType::Pointer                                       m_SeedCaster;
-
   SegmentedCasterType::Pointer                                   m_SegmentedCaster;
 
-  BinaryThresholdType::Pointer                                   m_BinaryThresh;
-  BinaryThresholdType2::Pointer                                   m_BinaryThresh2;
+  BinaryThresholdType::Pointer                                   m_speedThresh;
   SegmentedCasterType::Pointer                                   m_SpeedCaster;
+
+  BinaryThresholdType::Pointer                                   m_maskThresh;
 
   WriteImageType3D::Pointer                                      m_image;
   WriteImageType3D::Pointer                                      m_thresh;
@@ -144,8 +140,9 @@ protected:
   InputImageType::SizeType                                       m_size2;
   InputImageType::RegionType                                     m_region2;
 
+  // this is used in multiple places to calculate min and max
+  // so each time the input is set
   CalculatorType::Pointer                                        m_minMax;
-  CalculatorType::Pointer                                        m_minMaxSeed;
 };
 
 
