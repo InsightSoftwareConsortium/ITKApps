@@ -25,8 +25,6 @@
 namespace itk
 {
 
-typedef itk::fem::Element3DC0LinearHexahedronMembrane   ElementType;
-
 
 
 template <typename TFixedImage, typename TMovingImage, typename TFieldValue>
@@ -60,8 +58,8 @@ FEMRegistrator<TFixedImage,TMovingImage,TFieldValue>
   if (!m_Registration.ReadConfigFile(  (m_Registration.GetConfigFileName()).c_str())) { return ; }
  
    // Setup the registrator
-  m_Registration.SetReferenceImage(  m_MovingImage);
-  m_Registration.SetTargetImage( m_FixedImage );
+  m_Registration.SetMovingImage(  m_MovingImage);
+  m_Registration.SetFixedImage( m_FixedImage );
 
   // Choose the material properties
   itk::fem::MaterialLinearElasticity::Pointer m;
@@ -94,20 +92,65 @@ FEMRegistrator<TFixedImage,TMovingImage,TFieldValue>
     }
 
   m_DeformedImage=m_Registration.GetWarpedImage();
-  m_DeformationField=m_Registration.GetDeformationField();
+
 
   typedef itk::CastImageFilter<MovingImageType,LabelImageType> CasterType1;
   typedef itk::CastImageFilter<LabelImageType,MovingImageType> CasterType2;
   typename CasterType1::Pointer Rcaster1 = CasterType1::New();
   typename CasterType2::Pointer Rcaster2 = CasterType2::New();
 
+ 
+
+  typedef MinimumMaximumImageFilter<MovingImageType> MinMaxFilterType;
+  typename MinMaxFilterType::Pointer minMaxFilter = MinMaxFilterType::New();
+  minMaxFilter->SetInput( m_DeformedImage );
+  minMaxFilter->Update();
+  float min = minMaxFilter->GetMinimum();
+  double shift = -1.0 * static_cast<double>( min );
+  double scale = static_cast<double>( minMaxFilter->GetMaximum() );
+  scale += shift;
+  scale = 255.0 / scale;
+  typedef ShiftScaleImageFilter<MovingImageType, MovingImageType> FilterType;
+  typename FilterType::Pointer filter = FilterType::New();
+  filter->SetInput( m_DeformedImage );
+  filter->SetShift( shift );
+  filter->SetScale( scale );
+  filter->Update();
+  m_DeformedImage = filter->GetOutput();
+
+// for testing the full field 
   Rcaster2->SetInput(m_AtlasLabelImage); Rcaster2->Update();
   m_Registration.WarpImage(Rcaster2->GetOutput());
+  m_DeformedImage=m_Registration.GetWarpedImage();
+  
 
-  Rcaster1->SetInput(m_Registration.GetWarpedImage()); Rcaster1->Update();
-
+  Rcaster1->SetInput(m_DeformedImage); Rcaster1->Update();
   m_WarpedAtlasLabelImage=Rcaster1->GetOutput();
   
+  std::string fn1;
+  {
+  typename ImageFileWriter<LabelImageType>::Pointer writer;
+  writer = itk::ImageFileWriter<LabelImageType>::New();
+  fn1="warpedimage.hdr";
+  writer->SetFileName(fn1.c_str());
+  writer->SetInput( m_WarpedAtlasLabelImage ); 
+  writer->Write();
+ }
+ {
+  typedef Image<float,ImageDimension> RealImageType;
+  typename ImageFileWriter<RealImageType>::Pointer writer2;
+  writer2 = itk::ImageFileWriter<RealImageType>::New();
+  fn1="jac2.hdr";
+  writer2->SetFileName(fn1.c_str());
+  writer2->SetInput( m_Registration.GetJacobianImage() ); 
+  writer2->Write();
+ }
+      // now write the components of the images
+      fn1="warp";
+      m_Registration.SetDisplacementsFile(fn1.c_str());
+      for (unsigned int i=0; i<ImageDimension;i++)
+        m_Registration.WriteDisplacementField(i);
+
   delete e1;
 }
 
