@@ -27,7 +27,10 @@ WatershedModule<TInputPixelType>
 
 
     // Set up the pipeline
-    m_GradientMagnitudeFilter->SetInput(  m_ImportFilter->GetOutput()             );
+    m_GradientMagnitudeFilter->SetInput(  m_ImportFilter->GetOutput() );
+    m_GradientMagnitudeFilter->SetNormalizeAcrossScale( true );
+
+    m_WatershedFilter->SetInput( m_GradientMagnitudeFilter->GetOutput() );
 
     // Allow progressive release of memory as the pipeline is executed
     m_GradientMagnitudeFilter->ReleaseDataFlagOn();
