@@ -78,6 +78,8 @@ public:
 
     // Set the Observer for updating progress in the GUI
     m_Filter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
+    m_Filter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
+    m_Filter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
     }
 
 
@@ -109,8 +111,10 @@ public:
   virtual void 
   ProcessData( const vtkVVProcessDataStruct * pds )
   {
-  vtkVVPluginInfo *info = this->GetPluginInfo();
 
+    vtkVVPluginInfo *info = this->GetPluginInfo();
+
+    this->InitializeProgressValue();
     // Methods must be called by derived classes at the 
     // beginning of their corresponding ProcessData().
 
