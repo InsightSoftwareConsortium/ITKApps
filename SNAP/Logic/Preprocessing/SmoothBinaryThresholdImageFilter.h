@@ -46,7 +46,7 @@ public:
 
     // Compute the largest scaling for U-L such that the function is greater
     // than 1-eps
-    float eps = pow(10,-settings.GetSmoothness());
+    float eps = pow((float)10,-(float)settings.GetSmoothness());
     float maxScaling = (m_UpperThreshold - m_LowerThreshold) / log((2-eps)/eps);
 
     // Set the factor by which the input is multiplied
