@@ -21,12 +21,6 @@ ${ITK_SOURCE_DIR}/Code/BasicFilters
 ${EllipsoidInteriorExteriorSpatialFunction_SOURCE_DIR}
 )
 
-LINK_DIRECTORIES(
-${ITK_BINARY_DIR}/Code/Common
-${ITK_BINARY_DIR}/Code/IO
-${ITK_BINARY_DIR}/Code/BasicFilters
-)
-
 SET(ELLIPSOID_SPATIAL_FUNCTION_SRCS
 itkEllipsoidInteriorExteriorSpatialFunctionExample.cxx
 )
