@@ -29,7 +29,7 @@ public:
   static vtkWSBoundingBoxManager *New();
 
   vtkTypeMacro(vtkWSBoundingBoxManager,vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) {}
+  void PrintSelf(ostream&, vtkIndent) {}
 
   vtkSetObjectMacro(LabeledImage, vtkImageData);
   vtkGetObjectMacro(LabeledImage, vtkImageData);
