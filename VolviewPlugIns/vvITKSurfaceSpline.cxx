@@ -17,14 +17,16 @@ class SurfaceSplineRunner
     SurfaceSplineRunner() {}
     void Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
     {
-      const unsigned int pointsAlongRows  = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
-      const unsigned int pointsAlongCols  = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
+      const unsigned int pointsAlongRows  = atoi( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
+      const unsigned int pointsAlongCols  = atoi( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
+      const double       stiffness        = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ));
 
       ModuleType  module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Computing Surface Spline...");
       module.SetNumberOfPointsAlongRows( pointsAlongRows );
       module.SetNumberOfPointsAlongColumns( pointsAlongCols );
+      module.SetStiffness( stiffness );
       // Execute the filter
       module.ProcessData( pds  );
     }
@@ -136,6 +138,13 @@ static int UpdateGUI( void *inf )
   info->SetGUIProperty(info, 1, VVP_GUI_HELP, "Number of points to along the columns of the spline surface. This is used to define the resolution of the grid that resamples the spline.");
   info->SetGUIProperty(info, 1, VVP_GUI_HINTS , "3 200 1");
 
+  info->SetGUIProperty(info, 2, VVP_GUI_LABEL, "Stiffness");
+  info->SetGUIProperty(info, 2, VVP_GUI_TYPE, VVP_GUI_SCALE);
+  info->SetGUIProperty(info, 2, VVP_GUI_DEFAULT, "0.0");
+  info->SetGUIProperty(info, 2, VVP_GUI_HELP, "Stiffness allows to modify the spline for doing interpolation or approximation. A value of zero will result in the standard interpolating spline. A non-zero stiffness allows the spline to approximate rather thatn interpolate the landmarks.");
+  info->SetGUIProperty(info, 2, VVP_GUI_HINTS , "0.0 0.1 0.001");
+
+
   return 1;
 }
 
@@ -159,7 +168,7 @@ void VV_PLUGIN_EXPORT vvITKSurfaceSplineInit(vtkVVPluginInfo *info)
 
   info->SetProperty(info, VVP_SUPPORTS_IN_PLACE_PROCESSING, "0");
   info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "0");
-  info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "2");
+  info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "3");
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP,           "0");
   info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "0");
   info->SetProperty(info, VVP_PRODUCES_MESH_ONLY,           "1");

@@ -72,6 +72,10 @@ public:
 
   //  Set the number of points along the columns
   void SetNumberOfPointsAlongColumns( unsigned int );
+
+  //  Set the stiffness that allow to range from 
+  //  interpolation to approximation
+  void SetStiffness( double );
      
 
 public:

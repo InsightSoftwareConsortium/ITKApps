@@ -142,6 +142,21 @@ SurfaceSpline<TInputPixelType>
 }
 
 
+/*
+ *  Set the stiffness value that allows to make the surface move from
+ *  interpolation (passing through the landmarks) to approximation (not
+ *  touching the landmarks).
+ */
+template <class TInputPixelType >
+void 
+SurfaceSpline<TInputPixelType>
+::SetStiffness( double stiffness )
+{
+   m_Spline->SetStiffness( stiffness );
+}
+
+
+
 
 /*
  *  Performs the actual filtering on the data 
