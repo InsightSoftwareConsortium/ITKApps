@@ -46,7 +46,7 @@ public:
   void Unset(int x, int y, int z)
     { *( (unsigned char *)( GetScalarPointer(x, y, z) )) = 0;}
   bool   Get(int x, int y, int z)
-    { return (bool) (*( (unsigned char *)( GetScalarPointer(x, y, z) ))); }
+    { return (*( (unsigned char *)( GetScalarPointer(x, y, z) )) != 0); }
 
   int WriteToDisk(const char *fn);
   int ReadFromDisk(const char *fn);
