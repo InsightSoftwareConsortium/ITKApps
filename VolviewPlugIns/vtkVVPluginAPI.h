@@ -247,4 +247,51 @@ gets passed into the ProcessData function.
 }
 #endif
 
+/* these macros are provided to help people write plugins. The biggest
+ * diffuicukty is handling the different data types that volview handles. The
+ * following template can be used to invoke a templated C++ function based on
+ * the actual data type. See vvThreshold.cxx for an example of this
+ * approach. */
+#define vtkTemplateMacro3(func, arg1, arg2, arg3) \
+      case VTK_DOUBLE: \
+        { typedef double VTK_TT; \
+        func(arg1, arg2, arg3); } \
+        break; \
+      case VTK_FLOAT: \
+        { typedef float VTK_TT; \
+        func(arg1, arg2, arg3); } \
+        break; \
+      case VTK_LONG: \
+        { typedef long VTK_TT; \
+        func(arg1, arg2, arg3); } \
+        break; \
+      case VTK_UNSIGNED_LONG: \
+        { typedef unsigned long VTK_TT; \
+        func(arg1, arg2, arg3); } \
+        break; \
+      case VTK_INT: \
+        { typedef int VTK_TT; \
+        func(arg1, arg2, arg3); } \
+        break; \
+      case VTK_UNSIGNED_INT: \
+        { typedef unsigned int VTK_TT; \
+        func(arg1, arg2, arg3); } \
+        break; \
+      case VTK_SHORT: \
+        { typedef short VTK_TT; \
+        func(arg1, arg2, arg3); } \
+        break; \
+      case VTK_UNSIGNED_SHORT: \
+        { typedef unsigned short VTK_TT; \
+        func(arg1, arg2, arg3); } \
+        break; \
+      case VTK_CHAR: \
+        { typedef char VTK_TT; \
+        func(arg1, arg2, arg3); } \
+        break; \
+      case VTK_UNSIGNED_CHAR: \
+        { typedef unsigned char VTK_TT; \
+        func(arg1, arg2, arg3); } \
+        break
+
 #endif
