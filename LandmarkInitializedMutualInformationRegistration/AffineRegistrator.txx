@@ -37,7 +37,7 @@ AffineRegistrator< TImage >
   this->SetMetric(MetricType::New());
   m_MetricNumberOfSpatialSamples = 40000 ;
 
-  m_Observer = NULL;
+  m_Observer = 0;
   }
 
 template< class TImage >
@@ -91,7 +91,7 @@ AffineRegistrator< TImage >
       opt->Initialize(1.01); // Initial search radius
       opt->SetScales( m_OptimizerScales );
       this->SetOptimizer(opt);
-      if(m_Observer != NULL)
+      if(m_Observer)
         {
         opt->AddObserver(itk::IterationEvent(), m_Observer);
         }
@@ -106,7 +106,7 @@ AffineRegistrator< TImage >
       opt->SetMaximumIteration(m_OptimizerNumberOfIterations);
       opt->SetScales( m_OptimizerScales );
       this->SetOptimizer(opt);
-      if(m_Observer != NULL)
+      if(m_Observer)
         {
         opt->AddObserver(itk::IterationEvent(), m_Observer);
         }
@@ -130,7 +130,7 @@ AffineRegistrator< TImage >
 
       this->SetOptimizer(initOpt);
       this->SetSecondaryOptimizer(opt);
-      if(m_Observer != NULL)
+      if(m_Observer)
         {
         initOpt->AddObserver(itk::IterationEvent(), m_Observer);
         opt->AddObserver(itk::IterationEvent(), m_Observer);

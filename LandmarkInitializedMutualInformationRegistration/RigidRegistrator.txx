@@ -29,6 +29,8 @@ RigidRegistrator< TImage >
   m_MetricNumberOfSpatialSamples = 20000 ;
 
   m_SecondaryOptimizer = 0;
+
+  m_Observer = 0;
   }
 
 template< class TImage >
@@ -83,7 +85,7 @@ RigidRegistrator< TImage >
       opt->SetScales( m_OptimizerScales );
       this->SetOptimizer(opt);
       this->SetSecondaryOptimizer(0);
-      if(m_Observer != NULL)
+      if(m_Observer)
         {
         opt->AddObserver(itk::IterationEvent(), m_Observer);
         }
@@ -99,7 +101,7 @@ RigidRegistrator< TImage >
       opt->SetScales( m_OptimizerScales );
       this->SetOptimizer(opt);
       this->SetSecondaryOptimizer(0);
-      if(m_Observer != NULL)
+      if(m_Observer)
         {
         opt->AddObserver(itk::IterationEvent(), m_Observer);
         }
@@ -123,7 +125,7 @@ RigidRegistrator< TImage >
 
       this->SetOptimizer(initOpt);
       this->SetSecondaryOptimizer(opt);
-      if(m_Observer != NULL)
+      if(m_Observer)
         {
         initOpt->AddObserver(itk::IterationEvent(), m_Observer);
         opt->AddObserver(itk::IterationEvent(), m_Observer);
