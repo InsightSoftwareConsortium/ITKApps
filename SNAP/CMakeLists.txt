@@ -414,31 +414,51 @@ INCLUDE_DIRECTORIES(
   ${OPENGL_INCLUDE_PATH}
 )
 
-# Link libraries
-SET(MY_GRAPHICS_LIBS
-  ${FLTK_LIBRARIES} 
+# ----------------------------------------------------------------
+# Define Libraries 
+# ----------------------------------------------------------------
+
+# ITK Libraries
+SET(SNAP_ITK_LIBS
+  ITKIO
+)
+
+# Core VTK libraries
+SET(SNAP_VTK_CORE_LIBS
   vtkCommon
   vtkFiltering
   vtkGraphics
   vtkImaging
+  vtkIO
   vtkRendering
-  ${OPENGL_glu_LIBRARY}
-  ${OPENGL_LIBRARIES}
 )
 
-SET(MY_ITK_LIBS
-  ITKIO
-)
-
+# VTK Libraries with possible inclusion of patented code
 IF(VTK_USE_PATENTED)
-  TARGET_LINK_LIBRARIES(SNAP ${MY_ITK_LIBS} vtkPatented ${MY_GRAPHICS_LIBS} )
-  TARGET_LINK_LIBRARIES(SNAPTests ${MY_ITK_LIBS} vtkPatented  ${MY_GRAPHICS_LIBS} )
-  TARGET_LINK_LIBRARIES(SNAPTutorialTest ${MY_ITK_LIBS} vtkPatented  ${MY_GRAPHICS_LIBS} )
+  SET(SNAP_VTK_LIBS vtkPatented ${SNAP_VTK_CORE_LIBS})
 ELSE(VTK_USE_PATENTED)
-  TARGET_LINK_LIBRARIES(SNAP ${MY_ITK_LIBS} ${MY_GRAPHICS_LIBS} )
-  TARGET_LINK_LIBRARIES(SNAPTests ${MY_ITK_LIBS} ${MY_GRAPHICS_LIBS} )
-  TARGET_LINK_LIBRARIES(SNAPTutorialTest ${MY_ITK_LIBS} vtkIO ${MY_GRAPHICS_LIBS} )
+  SET(SNAP_VTK_LIBS ${SNAP_VTK_CORE_LIBS})
 ENDIF(VTK_USE_PATENTED)
+
+# FLTK Related libraries
+SET(SNAP_FLTK_LIBS
+  ${FLTK_LIBRARIES}
+)
+
+# System libraries
+SET(SNAP_SYSTEM_LIBS
+  ${OPENGL_LIBRARIES}
+  ${OPENGL_glu_LIBRARY}
+)
+
+# Assign libraries to targets
+TARGET_LINK_LIBRARIES(SNAP             ${SNAP_ITK_LIBS} ${SNAP_VTK_LIBS} ${SNAP_FLTK_LIBS} ${SNAP_SYSTEM_LIBS})
+TARGET_LINK_LIBRARIES(SNAPTests        ${SNAP_ITK_LIBS} ${SNAP_VTK_LIBS} ${SNAP_FLTK_LIBS} ${SNAP_SYSTEM_LIBS})
+TARGET_LINK_LIBRARIES(SNAPTutorialTest ${SNAP_ITK_LIBS} ${SNAP_VTK_LIBS} ${SNAP_FLTK_LIBS} ${SNAP_SYSTEM_LIBS})
+
+# ----------------------------------------------------------------
+# Miscelaneous tasks (not related to link and compilation)
+# ----------------------------------------------------------------
 
 # Copy documentation from the source tree to the build tree
 FOREACH(DATAFILE ${PROGRAM_DATA_FILES})
