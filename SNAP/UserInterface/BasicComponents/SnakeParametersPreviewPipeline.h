@@ -32,7 +32,6 @@ class LevelSetPreviewPipeline2D;
 namespace itk {
   template<class TInputImage, class TOutputImage> 
     class SparseFieldLevelSetImageFilter;
-  template<class TInputImage> class VTKImageExport;
 };
 
 /** 

@@ -62,7 +62,7 @@ int main(int, char **)
       {
       for(i=0; i< inputDimSize[0]; i++)
         {
-        inputImageData[cnt] = cnt/100000.0;
+        inputImageData[cnt] = cnt/100000.0f;
         cnt++;
         }
       }

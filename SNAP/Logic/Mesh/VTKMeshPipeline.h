@@ -35,6 +35,10 @@
 #include <vtkSmoothPolyDataFilter.h>
 #include <vtkStripper.h>
 
+#ifndef vtkFloatingPointType
+#define vtkFloatingPointType float
+#endif
+
 // Optional selection of patented or non-patented algorithms
 #ifdef USE_VTK_PATENTED
   #include <vtkImageMarchingCubes.h>
@@ -76,7 +80,7 @@ public:
 private:
   
   // VTK-ITK Connection typedefs
-  typedef itk::VTKImageExport<ImageType> VTKExportType;
+  typedef itk::VTKImageExport<ImageType,vtkFloatingPointType> VTKExportType;
   typedef itk::SmartPointer<VTKExportType> VTKExportPointer;
   
   // Current set of mesh options

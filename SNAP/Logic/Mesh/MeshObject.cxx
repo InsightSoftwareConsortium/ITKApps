@@ -200,8 +200,13 @@ MeshObject
       ntris += npts-2;
       glBegin( GL_TRIANGLE_STRIP );
       for (vtkIdType j = 0; j < npts; j++) {
+#ifndef vtkFloatingPointType
         glNormal3fv( norms->GetTuple( pts[j] ) ); // Specify normal.
         glVertex3fv( verts->GetPoint ( pts[j] ) );  // Specify vertex.
+#else
+        glNormal3dv( norms->GetTuple( pts[j] ) ); // Specify normal.
+        glVertex3dv( verts->GetPoint ( pts[j] ) );  // Specify vertex.
+#endif
       }
       glEnd();
     }
@@ -315,6 +320,9 @@ MeshObject
 
 /*
  *Log: MeshObject.cxx
+ *Revision 1.8  2003/10/09 22:45:13  pauly
+ *EMH: Improvements in 3D functionality and snake parameter preview
+ *
  *Revision 1.7  2003/10/02 14:54:53  pauly
  *ENH: Development during the September code freeze
  *
