@@ -131,7 +131,7 @@ LandmarkSliceViewer<TImagePixel>
 ::IsLandmarkAvailable(unsigned int id)
   {
   if ( id < m_LandmarkPointList->size() &&
-       m_LandmarkPointList->at(id).GetID() == id)
+       m_LandmarkPointList->at(id).GetID() == (int)(id))
     {
     return true;
     }
@@ -156,7 +156,7 @@ void
 LandmarkSliceViewer<TImagePixel>
 ::SetLandmark(unsigned int id, LandmarkPointType & landmark)
   {
-  if(id != landmark.GetID())
+  if((int)(id) != landmark.GetID())
     {
     std::cout << "Warning: reseting landmark id to match" << std::endl;
     landmark.SetID(id);
@@ -195,7 +195,7 @@ LandmarkSliceViewer<TImagePixel>
   {
   if( id < m_LandmarkPointList->size() )
     {
-    if( m_LandmarkPointList->at(id).GetID() == id )
+    if( m_LandmarkPointList->at(id).GetID() == (int)(id) )
       {
       LandmarkPointType::ColorType color;
       color.SetRed(0);
