@@ -7,6 +7,8 @@
 #include "vvITKWatershedModule.h"
 #include <set>
 
+#include <fstream>
+
 
 namespace VolView 
 {
