@@ -51,9 +51,9 @@ static int UpdateGUI(void *inf)
 
   info->SetGUIProperty(info, 0, VVP_GUI_LABEL, "Zero Set value.");
   info->SetGUIProperty(info, 0, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 0, VVP_GUI_DEFAULT, "5.0");
+  info->SetGUIProperty(info, 0, VVP_GUI_DEFAULT, VolView::PlugIn::FilterModuleBase::GetInputVolumeScalarMidValue( info ) );
   info->SetGUIProperty(info, 0, VVP_GUI_HELP, "An initial level will be created using the seed points. The zero set will be placed at a certain distance from the seed points. The value set in this scale is the distance to be used");
-  info->SetGUIProperty(info, 0, VVP_GUI_HINTS , "1.0 100.0 1.0");
+  info->SetGUIProperty(info, 0, VVP_GUI_HINTS , VolView::PlugIn::FilterModuleBase::GetInputVolumeScalarRange( info ) );
 
   info->SetGUIProperty(info, 1, VVP_GUI_LABEL, "Sigma for gradient magnitude.");
   info->SetGUIProperty(info, 1, VVP_GUI_TYPE, VVP_GUI_SCALE);
