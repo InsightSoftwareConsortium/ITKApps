@@ -1,0 +1,48 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0104 
+header_name {.h} 
+code_name {.cxx}
+class DicomImageReaderGUI {open : {public ISIS::DicomImageReaderBase}
+} {
+  Function {DicomImageReaderGUI()} {open
+  } {
+    Fl_Window seriesBrowserWindow {
+      label {DICOM Series selection} open
+      xywh {533 289 417 371} type Double
+      code0 {\#include "DicomImageReaderBase.h"} visible
+    } {
+      Fl_Button {} {
+        label Cancel
+        callback {this->HideSeriesBrowser();}
+        xywh {265 323 85 30}
+      }
+      Fl_Button {} {
+        label Ok
+        callback {this->HideSeriesBrowser();
+this->ReadVolume();} selected
+        xywh {55 323 85 30}
+      }
+      Fl_Browser seriesBrowser {
+        xywh {12 16 395 290} type Hold
+      }
+    }
+  }
+  Function {~DicomImageReaderGUI()} {return_type virtual
+  } {}
+  Function {ShowSeriesBrowser()} {return_type {virtual void}
+  } {
+    code {seriesBrowserWindow->show();} {}
+  }
+  Function {HideSeriesBrowser()} {open return_type {virtual void}
+  } {
+    code {seriesBrowserWindow->hide();
+while (seriesBrowserWindow->visible())
+{
+	Fl::wait();
+	printf("waited\\n");
+}
+Fl::check();} {}
+  }
+  Function {ReadVolume()} {return_type {virtual void}
+  } {}
+} 

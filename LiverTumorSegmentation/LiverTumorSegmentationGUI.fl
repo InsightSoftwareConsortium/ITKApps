@@ -1,0 +1,357 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0104 
+header_name {.h} 
+code_name {.cxx}
+decl {\#include <FL/Fl_File_Chooser.H>} {public
+} 
+
+decl {\#include <FL/Fl_Help_Dialog.H>} {public
+} 
+
+class LiverTumorSegmentationGUI {open : {public LiverTumorSegmentationBase}
+} {
+  Function {LiverTumorSegmentationGUI()} {open
+  } {
+    Fl_Window m_MainWindow {
+      label {Liver Tumor Segmentation, ISIS Center, Georgetown University, Washington DC.} open
+      xywh {459 110 633 672} type Double color 148 resizable
+      code0 {\#include "LiverTumorSegmentationBase.h"} visible
+    } {
+      Fl_Box axialView {
+        xywh {124 21 251 300} box PLASTIC_UP_FRAME color 56 selection_color 32 align 2
+        code0 {\#include "vtkFlRenderWindowInteractor.h"}
+        class vtkFlRenderWindowInteractor
+      }
+      Fl_Value_Slider axialViewSlider {
+        callback {this->SelectAxialSlice( static_cast<int>( o->value() ));}
+        xywh {125 323 250 10} type Horizontal color 25 labelcolor 32 maximum 100 step 1
+      }
+      Fl_Box coronalView {
+        xywh {378 21 250 300} box PLASTIC_UP_FRAME align 2
+        code0 {\#include "vtkFlRenderWindowInteractor.h"}
+        class vtkFlRenderWindowInteractor
+      }
+      Fl_Value_Slider coronalViewSlider {
+        callback {this->SelectCoronalSlice( static_cast<int>( o->value() ) );}
+        xywh {378 323 250 10} type Horizontal color 25 maximum 100 step 1
+      }
+      Fl_Box saggitalView {
+        xywh {125 335 250 300} box PLASTIC_UP_FRAME align 2
+        code0 {\#include "vtkFlRenderWindowInteractor.h"}
+        class vtkFlRenderWindowInteractor
+      }
+      Fl_Value_Slider saggitalViewSlider {
+        callback {this->SelectSaggitalSlice( static_cast<int>( o->value() ) );}
+        xywh {126 637 250 10} type Horizontal color 25 maximum 100 step 1
+      }
+      Fl_Menu_Bar {} {
+        xywh {0 0 641 20}
+      } {
+        submenu {} {
+          label File open
+          xywh {0 0 100 20}
+        } {
+          menuitem {} {
+            label {Load File}
+            callback {this->Load();}
+            xywh {0 0 100 20}
+          }
+          menuitem {} {
+            label {Load DICOM }
+            callback {this->LoadDICOM();}
+            xywh {0 0 100 20}
+          }
+          menuitem {} {
+            label {Load Segmented Volume}
+            callback {this->LoadSegmentedVolume();}
+            xywh {0 0 100 20}
+          }
+          menuitem {} {
+            label {Write Segmented Volume}
+            callback {char *fname = fl_file_chooser("Save File As?", "*.gipl", "");
+if (fname != NULL) 
+{
+    this->WriteSegmentedVolume( fname );
+}}
+            xywh {5 5 100 20}
+          }
+          menuitem {} {
+            label {Write Binary Segmented Volume}
+            callback {char *fname = fl_file_chooser("Save File As?", "*.gipl", "");
+if (fname != NULL) 
+{
+    this->WriteBinarySegmentedVolume( fname );
+}}
+            xywh {15 15 100 20}
+          }
+          menuitem {} {
+            label Quit
+            callback {this->Quit();}
+            xywh {20 20 100 20}
+          }
+        }
+        submenu {} {
+          label Settings open
+          xywh {0 0 100 20}
+        } {
+          menuitem {} {
+            label {Segmentation Parameters}
+            callback {this->OnSegmentationParameters();}
+            xywh {0 0 100 20}
+          }
+          menuitem {} {
+            label {Shift and Scale}
+            callback {sprintf(m_MessageString, "%4.3f", this->GetImageShift());
+m_Shift->value( m_MessageString );
+sprintf(m_MessageString, "%4.3f", this->GetImageScale());
+m_Scale->value( m_MessageString );
+m_ShiftAndScaleParameterWindow->show();}
+            xywh {0 0 100 20}
+          }
+        }
+        submenu {} {
+          label Help open
+          xywh {20 20 100 20}
+        } {
+          menuitem {} {
+            label {How to use?}
+            callback {Fl_Help_Dialog  *help;    // Help dialog
+help = new Fl_Help_Dialog;
+help->load("how_to_use.html");
+help->show();}
+            xywh {0 0 100 20}
+          }
+          menuitem {} {
+            label About
+            callback {m_AboutWindow->show();}
+            xywh {0 0 100 20}
+          }
+        }
+      }
+      Fl_Box m_MessageBar {
+        xywh {0 651 630 20} box THIN_DOWN_BOX align 20
+      }
+      Fl_Slider m_ProgressSlider {
+        xywh {1 651 630 20} type {Horz Fill} selection_color 66 when 2 deactivate
+        code0 {\#include <fltkProgressBar.h>}
+        class {fltk::ProgressBar}
+      }
+      Fl_Button {} {
+        label {Load Image}
+        callback {this->Load();}
+        xywh {5 35 115 30} box PLASTIC_UP_BOX color 67 labelfont 1
+      }
+      Fl_Button {} {
+        label Segmentation
+        callback {this->OnSegmentation();}
+        xywh {5 77 115 30} box PLASTIC_UP_BOX color 67 labelfont 1
+      }
+      Fl_Button {} {
+        label Quit
+        callback {this->Quit();}
+        xywh {5 120 115 30} box PLASTIC_UP_BOX color 67 labelfont 1
+      }
+      Fl_Group {} {
+        label {Seed Point}
+        xywh {5 565 115 82} box PLASTIC_UP_BOX color 146 labelfont 1 labelcolor 32 align 5
+      } {
+        Fl_Input m_SeedX {
+          label X
+          callback {this->SetSeedPoint(atof(m_SeedX->value()),atof(m_SeedY->value()),atof(m_SeedZ->value()) );}
+          xywh {38 570 60 25} labelcolor 80
+        }
+        Fl_Input m_SeedY {
+          label Y
+          callback {this->SetSeedPoint(atof(m_SeedX->value()),atof(m_SeedY->value()),atof(m_SeedZ->value()) );}
+          xywh {38 596 60 25} labelcolor 80
+        }
+        Fl_Input m_SeedZ {
+          label Z
+          callback {this->SetSeedPoint(atof(m_SeedX->value()),atof(m_SeedY->value()),atof(m_SeedZ->value()) );}
+          xywh {38 621 60 25} labelcolor 80
+        }
+      }
+      Fl_Box volumeView {selected
+        xywh {380 335 250 300} box PLASTIC_UP_FRAME align 2
+        code0 {\#include "vtkFlRenderWindowInteractor.h"}
+        class vtkFlRenderWindowInteractor
+      }
+      Fl_Roller m_SegmentedVolumeOpacityControl {
+        label {Blend Control}
+        callback {OnOpacityControl( m_SegmentedVolumeOpacityControl->value());}
+        xywh {5 517 115 26} type Horizontal color 17 selection_color 147 labelfont 1 align 5 when 4 step 0.01 value 0.5 hotspot
+      }
+    }
+    Fl_Window m_SegmentationParametersWindow {
+      label {Segmentation Parameters}
+      xywh {991 160 285 525} type Double color 140 labelfont 3 visible
+    } {
+      Fl_Input m_Parameter001 {
+        xywh {196 98 75 26} labelfont 1
+      }
+      Fl_Input m_Parameter002 {
+        xywh {196 134 75 26} labelfont 1
+      }
+      Fl_Return_Button {} {
+        label Ok
+        callback {this->OnSegmentationParametersOk( m_Module->value() );}
+        xywh {123 488 45 25} labelfont 1
+      }
+      Fl_Button {} {
+        label Cancel
+        callback {m_SegmentationParametersWindow->hide();}
+        xywh {182 488 53 25} labelfont 1
+      }
+      Fl_Input m_Parameter003 {
+        xywh {196 170 75 26} labelfont 1
+      }
+      Fl_Input m_Parameter004 {
+        xywh {196 206 75 26} labelfont 1
+      }
+      Fl_Input m_Parameter005 {
+        xywh {196 242 75 26} labelfont 1
+      }
+      Fl_Input m_Parameter006 {
+        xywh {196 278 75 26} labelfont 1
+      }
+      Fl_Input m_Parameter007 {
+        xywh {196 314 75 26} labelfont 1
+      }
+      Fl_Group {} {
+        label {Pre-Processing Parameters}
+        xywh {6 361 274 116} box PLASTIC_UP_BOX color 178 labelfont 3 align 5
+      } {
+        Fl_Input m_Parameter101 {
+          xywh {196 370 75 26} labelfont 1
+        }
+        Fl_Input m_Parameter102 {
+          xywh {196 406 75 26} labelfont 1
+        }
+        Fl_Input m_Parameter103 {
+          xywh {196 442 75 26} labelfont 1
+        }
+      }
+      Fl_Browser m_Module {
+        label Module
+        callback {this->OnSegmentationModuleSelection(m_Module->value())}
+        xywh {60 10 220 75} type Hold labelfont 1 align 4 when 3
+      }
+    }
+    Fl_Window m_ShiftAndScaleParameterWindow {
+      label {Shift and Scale Parameters}
+      xywh {983 482 293 165} type Double hide
+    } {
+      Fl_Input m_Shift {
+        label {Shift  }
+        xywh {155 25 75 25} labelfont 1
+      }
+      Fl_Input m_Scale {
+        label {Scale  }
+        xywh {155 60 75 25} labelfont 1
+      }
+      Fl_Return_Button {} {
+        label Ok
+        callback {this->SetImageShift( atof(m_Shift->value()) );
+this->SetImageScale( atof(m_Scale->value()) );
+m_ShiftAndScaleParameterWindow->hide();}
+        xywh {176 115 45 25} labelfont 1
+      }
+      Fl_Button {} {
+        label Cancel
+        callback {m_ShiftAndScaleParameterWindow->hide();}
+        xywh {235 115 53 25} labelfont 1
+      }
+    }
+    Fl_Window m_AboutWindow {
+      label {About }
+      callback {m_AboutWindow->hide();}
+      xywh {-32000 -32000 268 161} type Double hide
+    } {
+      Fl_Button {} {
+        label Dismiss
+        callback {m_AboutWindow->hide();}
+        xywh {205 135 60 25}
+      }
+      Fl_Clock {} {
+        xywh {5 5 95 100}
+      }
+      Fl_Text_Display m_TextDisplay {
+        xywh {105 5 160 110}
+      }
+    }
+    code {m_TextBuffer.append("Tumor Segmentation\\nISIS Center\\nGeorgetown University");
+m_TextDisplay->buffer(m_TextBuffer);} {}
+  }
+  Function {~LiverTumorSegmentationGUI()} {return_type virtual
+  } {}
+  Function {Quit()} {return_type {virtual void}
+  } {}
+  Function {Load()} {return_type {virtual void}
+  } {}
+  Function {Show()} {return_type {virtual void}
+  } {
+    code {m_MainWindow->show();
+m_SegmentationParametersWindow->hide();
+m_ShiftAndScaleParameterWindow->hide();
+m_AboutWindow->hide();} {}
+  }
+  Function {Hide()} {return_type {virtual void}
+  } {
+    code {m_MainWindow->hide();
+m_SegmentationParametersWindow->hide();
+m_ShiftAndScaleParameterWindow->hide();
+m_AboutWindow->hide();} {}
+  }
+  Function {SelectAxialSlice( int )} {open return_type {virtual void}
+  } {}
+  Function {SelectCoronalSlice( int )} {open return_type {virtual void}
+  } {}
+  Function {SelectSaggitalSlice( int )} {open return_type {virtual void}
+  } {}
+  Function {LoadDICOM()} {open return_type {virtual void}
+  } {}
+  Function {OnSegmentation()} {return_type {virtual void}
+  } {}
+  Function {GetImageScale(void)} {return_type {virtual double}
+  } {
+    code {return 1.0f;} {}
+  }
+  Function {SetImageScale( double val)} {return_type {virtual void}
+  } {}
+  Function {GetImageShift(void)} {return_type {virtual double}
+  } {
+    code {return 1.0f;} {}
+  }
+  Function {SetImageShift( double val)} {return_type {virtual void}
+  } {}
+  decl {Fl_Text_Buffer m_TextBuffer;} {}
+  Function {GetOverlayedVolumeOpacity()} {return_type {virtual float}
+  } {
+    code {return 0.0f;} {}
+  }
+  Function {SetOverlayedVolumeOpacity( const double val )} {return_type {virtual bool}
+  } {
+    code {return false;} {}
+  }
+  Function {LoadSegmentedVolume( void )} {open return_type {virtual void}
+  } {}
+  Function {OnDebugButton()} {open return_type {virtual void}
+  } {}
+  Function {OnSegmentationParameters(void)} {open return_type {virtual void}
+  } {}
+  Function {OnSegmentationParametersOk( int module )} {open return_type {virtual void}
+  } {}
+  Function {OnSegmentationModuleSelection(int module)} {open return_type {virtual void}
+  } {}
+  Function {OnOpacityControl( float opacity )} {open return_type {virtual void}
+  } {}
+  Function {SetSegmentedVolumeOpacityControlOn( double val )} {return_type {virtual void}
+  } {
+    code {m_SegmentedVolumeOpacityControl->value( val );
+m_SegmentedVolumeOpacityControl->show();} {}
+  }
+  Function {SetSegmentedVolumeOpacityControlOff( void )} {return_type {virtual void}
+  } {
+    code {m_SegmentedVolumeOpacityControl->hide();} {}
+  }
+} 
