@@ -85,62 +85,59 @@ int main(int argc, char **argv)
   return 0;
 }
 
-/*Log: Main.cxx
-/*Revision 1.1  2003/07/11 23:33:57  pauly
-/**** empty log message ***
-/*
-/*Revision 1.8  2003/07/11 21:41:38  pauly
-/*Preparation for ITK checkin
-/*
-/*Revision 1.7  2003/07/01 16:53:59  pauly
-/**** empty log message ***
-/*
-/*Revision 1.6  2003/06/23 23:59:32  pauly
-/*Command line argument parsing
-/*
-/*Revision 1.5  2003/06/14 22:42:06  pauly
-/*Several changes.  Started working on implementing the level set function
-/*in ITK.
-/*
-/*Revision 1.4  2003/05/05 12:30:18  pauly
-/**** empty log message ***
-/*
-/*Revision 1.3  2003/04/18 17:32:18  pauly
-/**** empty log message ***
-/*
-/*Revision 1.2  2003/04/16 05:04:17  pauly
-/*Incorporated intensity modification into the snap pipeline
-/*New IRISApplication
-/*Random goodies
-/*
-/*Revision 1.1  2003/03/07 19:29:47  pauly
-/*Initial checkin
-/*
-/*Revision 1.1.1.1  2002/12/10 01:35:36  pauly
-/*Started the project repository
-/*
-/*
-/*Revision 1.8  2002/04/01 22:27:57  moon
-/*Took out global snake3D.  It's now part of SnakeVoxDataClass
-/*
-/*Revision 1.7  2002/03/26 19:20:13  moon
-/*Changed full_data back to VoxDataClass, from SnakeVoxDataClass.  roi_data
-/*is a SnakeVoxDataClass now.
-/*
-/*Revision 1.6  2002/03/23 02:16:37  scheuerm
-/*Added subclass of VoxData called SnakeVoxData which includes
-/*a preprocessed image. Doesn't do much yet but it's a start.
-/*
-/*Revision 1.5  2002/03/19 19:35:06  moon
-/*added snakewrapper to makefile so it gets compiled. started putting in callback,
-/*etc. for snake vcr buttons.  added snake object to IrisGlobals, instantiated in Main
-/*
-/*Revision 1.4  2002/03/08 13:54:47  moon
-/*trying to add log tags
-/**/
-/* 
-template <class T> 
-T vnl_numeric_limits<T>::min() {
-    return std::numeric_limits<T>::min();
-}
-*/
+/*Log: SNAPMain.cxx
+ *Revision 1.1  2003/07/12 04:46:50  pauly
+ *Initial checkin of the SNAP application into the InsightApplications tree.
+ *
+ *Revision 1.1  2003/07/11 23:33:57  pauly
+ **** empty log message ***
+ *
+ *Revision 1.8  2003/07/11 21:41:38  pauly
+ *Preparation for ITK checkin
+ *
+ *Revision 1.7  2003/07/01 16:53:59  pauly
+ **** empty log message ***
+ *
+ *Revision 1.6  2003/06/23 23:59:32  pauly
+ *Command line argument parsing
+ *
+ *Revision 1.5  2003/06/14 22:42:06  pauly
+ *Several changes.  Started working on implementing the level set function
+ *in ITK.
+ *
+ *Revision 1.4  2003/05/05 12:30:18  pauly
+ **** empty log message ***
+ *
+ *Revision 1.3  2003/04/18 17:32:18  pauly
+ **** empty log message ***
+ *
+ *Revision 1.2  2003/04/16 05:04:17  pauly
+ *Incorporated intensity modification into the snap pipeline
+ *New IRISApplication
+ *Random goodies
+ *
+ *Revision 1.1  2003/03/07 19:29:47  pauly
+ *Initial checkin
+ *
+ *Revision 1.1.1.1  2002/12/10 01:35:36  pauly
+ *Started the project repository
+ *
+ *
+ *Revision 1.8  2002/04/01 22:27:57  moon
+ *Took out global snake3D.  It's now part of SnakeVoxDataClass
+ *
+ *Revision 1.7  2002/03/26 19:20:13  moon
+ *Changed full_data back to VoxDataClass, from SnakeVoxDataClass.  roi_data
+ *is a SnakeVoxDataClass now.
+ *
+ *Revision 1.6  2002/03/23 02:16:37  scheuerm
+ *Added subclass of VoxData called SnakeVoxData which includes
+ *a preprocessed image. Doesn't do much yet but it's a start.
+ *
+ *Revision 1.5  2002/03/19 19:35:06  moon
+ *added snakewrapper to makefile so it gets compiled. started putting in callback,
+ *etc. for snake vcr buttons.  added snake object to IrisGlobals, instantiated in Main
+ *
+ *Revision 1.4  2002/03/08 13:54:47  moon
+ *trying to add log tags
+ **/

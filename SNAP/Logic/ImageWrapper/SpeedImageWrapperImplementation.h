@@ -41,12 +41,62 @@ class SpeedImageWrapperImplementation
 public:
 
   // Inherit type definitions from parent
+  typedef SpeedImageWrapper::ImageType ImageType;
   typedef SpeedImageWrapper::DisplaySliceType DisplaySliceType;
   typedef SpeedImageWrapper::DisplaySlicePointer DisplaySlicePointer;
   typedef SpeedImageWrapper::OverlayPixelType OverlayPixelType; 
   typedef SpeedImageWrapper::OverlaySliceType OverlaySliceType;
   typedef SpeedImageWrapper::OverlaySlicePointer OverlaySlicePointer;
 
+  /**
+   * Set the preview source for the slices.  This means that the slices
+   * will be generated not from the internal image but from external 
+   * images (outputs of some preprocessing filters)
+   */
+  void SetSliceSourceForPreview(unsigned int slice,ImageType *source)
+  {
+    m_PreviewSource[slice] = source;
+    m_Slicer[slice]->SetInput(source);    
+  }
+
+  /** 
+   * Unset the preview sources for all slices.  The slices will be now
+   * generated from the internal image 
+   */
+  void RemoveSliceSourcesForPreview()
+  {
+    for(unsigned int i=0;i<3;i++)
+      {
+      m_PreviewSource[i] = NULL;
+      m_Slicer[i]->SetInput(m_Image);
+      }
+  }
+
+  /** Get a 'preview' voxel, i.e., a voxel from the previewing slices.  For
+   * the results to be valid, the voxel has to be on one of the previewing
+   * slices, and this method is intended for getting the voxel at the
+   * cross-hairs position */
+  float GetPreviewVoxel(const Vector3i &point) const
+  {
+    // Better be in preview mode
+    assert(m_PreviewSource[0] && m_PreviewSource[1] && m_PreviewSource[2]);
+
+    // Create an index
+    itk::Index<3> index;
+    index[0] = point[0];
+    index[1] = point[1];
+    index[2] = point[2];
+
+    // Make sure the slice is current
+    m_Slicer[0]->Update();
+
+    // Make sure the voxel is in the computed region
+    assert(m_Slicer[0]->GetInput()->GetBufferedRegion().IsInside(index));
+
+    // Return the pixel
+    return m_Slicer[0]->GetInput()->GetPixel(index);    
+  }
+  
   /**
    * Indicate that this image is a In/Out speed image that has a 
    * range of -1 to +1.  
@@ -117,6 +167,11 @@ public:
   /** Destructor */
   ~SpeedImageWrapperImplementation();
 
+protected:
+  /** We override this method in order to maintain the preview sources 
+   * when the image gets changed */
+  void HandleImagePointerUpdate();
+
 private:
   /**
    * A very simple functor used to map intensities
@@ -173,6 +228,9 @@ private:
 
   /** The currently used overlay functor */
   OverlayFunctor m_OverlayFunctor;
+
+  /** Preview sources */
+  ImagePointer m_PreviewSource[3];
 };
 
 #endif // __SpeedImageWrapperImplementation_h_

@@ -18,6 +18,7 @@ SET(COMMON_CXX
   Logic/Framework/SNAPImageData.cxx
   Logic/ImageWrapper/GreyImageWrapperImplementation.cxx
   Logic/ImageWrapper/LabelImageWrapperImplementation.cxx
+  Logic/ImageWrapper/LevelSetImageWrapperImplementation.cxx
   Logic/ImageWrapper/SpeedImageWrapperImplementation.cxx
   Logic/LevelSet/SnakeParameters.cxx
   Logic/LevelSet/SNAPLevelSetDriver.cxx
@@ -73,6 +74,8 @@ SET(COMMON_HEADERS
   Common/IRISVectorTypes.txx
   Logic/Common/ColorLabel.h
   Logic/Common/ImageCoordinateTransform.h
+  Logic/Common/ImageRayIntersectionFinder.h
+  Logic/Common/ImageRayIntersectionFinder.txx
   Logic/Framework/GlobalState.h
   Logic/Framework/IRISApplication.h
   Logic/Framework/IRISImageData.h
@@ -84,9 +87,13 @@ SET(COMMON_HEADERS
   Logic/ImageWrapper/ImageWrapperImplementation.txx
   Logic/ImageWrapper/LabelImageWrapper.h
   Logic/ImageWrapper/LabelImageWrapperImplementation.h
+  Logic/ImageWrapper/LevelSetImageWrapper.h
+  Logic/ImageWrapper/LevelSetImageWrapperImplementation.h
   Logic/ImageWrapper/SpeedImageWrapper.h
   Logic/ImageWrapper/SpeedImageWrapperImplementation.h
   Logic/LevelSet/SnakeParameters.h
+  Logic/LevelSet/SNAPAdvectionFieldImageFilter.h
+  Logic/LevelSet/SNAPAdvectionFieldImageFilter.txx
   Logic/LevelSet/SNAPLevelSetDriver.h
   Logic/LevelSet/SNAPLevelSetFunction.h
   Logic/LevelSet/SNAPLevelSetFunction.txx

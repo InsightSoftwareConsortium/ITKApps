@@ -24,7 +24,7 @@
 #include "UserInterfaceLogic.h"
 
 #include "itkImage.h"
-#include "itkEventObject.h"
+#include "itkEventObject.h" 
 
 using namespace itk;
 
@@ -35,7 +35,6 @@ PreprocessingUILogic
   m_ParentUI = parent;
   m_Driver = parent->GetDriver();
   m_GlobalState = parent->GetDriver()->GetGlobalState();
-  m_ShowProgress = false;
 }
 
 void 
@@ -61,31 +60,15 @@ PreprocessingUILogic
     m_ParentUI->m_WinMain->x() + 200,
     m_ParentUI->m_WinMain->y() + 480);
 
-  // Initialize the filter used for the preprocessing
-  m_EdgeFilter = EdgeFilterType::New();
-  m_EdgeFilter->SetInput(
-    m_Driver->GetSNAPImageData()->GetGrey()->GetImage());
-
-  // Set up the progress bar to update when the filter updated
-  typedef SimpleMemberCommand<PreprocessingUILogic> CommandType;
-  CommandType::Pointer callback = CommandType::New();
-  callback->SetCallbackFunction(this,&PreprocessingUILogic::OnEdgeProgress);
-
-  // Add an event listener to the edge filter
-  m_EdgeFilter->AddObserver(ProgressEvent(),callback);
-
   // Get a handle to the snap image data
   SNAPImageData *snapData = m_Driver->GetSNAPImageData();
 
   // Initialize the speed image if necessary
   if(!snapData->IsSpeedLoaded())
     snapData->InitializeSpeed();
-
+    
   // Set the intensity mapping mode for the speed image
   snapData->GetSpeed()->SetModeToEdgeSnake();
-
-  // Pipe the filter into the speed image
-  snapData->GetSpeed()->SetImage(m_EdgeFilter->GetOutput());
 
   // Apply the automatic preview preference
   m_InEdgePreview->value(
@@ -93,13 +76,13 @@ PreprocessingUILogic
 
   OnEdgePreviewChange();
 
-  // Compute the plot to be displayed
-  UpdateEdgePlot();
-
   // Set up the plot range, etc
   FunctionPlot2DSettings &plotSettings = 
     m_BoxEdgeFunctionPlot->GetPlotter().GetSettings();
   plotSettings.SetPlotRangeMin(Vector2f(0.0f));
+
+  // Compute the plot to be displayed
+  UpdateEdgePlot();
 
   // Show the window
   m_WinEdge->show();
@@ -167,28 +150,12 @@ PreprocessingUILogic
   // Get a handle to the snap image data
   SNAPImageData *snapData = m_Driver->GetSNAPImageData();
 
-  // Initialize the filter used for the preprocessing
-  m_InOutFilter = InOutFilterType::New();
-  m_InOutFilter->SetThresholdSettings(settings);
-  m_InOutFilter->SetInput(snapData->GetGrey()->GetImage());
-
-  // Set up the progress bar to update when the filter updated
-  typedef SimpleMemberCommand<PreprocessingUILogic> CommandType;
-  CommandType::Pointer callback = CommandType::New();
-  callback->SetCallbackFunction(this,&PreprocessingUILogic::OnThresholdProgress);
-
-  // Add an event listener to the edge filter
-  m_InOutFilter->AddObserver(ProgressEvent(),callback);
-
   // Initialize the speed image if necessary
   if(!snapData->IsSpeedLoaded())
     snapData->InitializeSpeed();
 
   // Set the speed image to In/Out mode
   snapData->GetSpeed()->SetModeToInsideOutsideSnake();
-
-  // Pipe the filter into the speed image
-  snapData->GetSpeed()->SetImage(m_InOutFilter->GetOutput());
 
   // Apply the automatic preview preference
   m_InThresholdPreview->value(
@@ -203,14 +170,14 @@ PreprocessingUILogic
   m_InThresholdOverlay->value(0);
   OnThresholdOverlayChange();
 
-  // Compute the plot to be displayed
-  UpdateThresholdPlot();
-
   // Set up the plot range, etc
   FunctionPlot2DSettings &plotSettings = 
     m_BoxThresholdFunctionPlot->GetPlotter().GetSettings();
   plotSettings.SetPlotRangeMin(Vector2f(iMin,-1.0f));
   plotSettings.SetPlotRangeMax(Vector2f(iMax,1.0f));
+
+  // Compute the plot to be displayed
+  UpdateThresholdPlot();
 
   // Show the window
   m_WinInOut->show();
@@ -286,17 +253,20 @@ PreprocessingUILogic
   // Store the settings globally
   m_GlobalState->SetEdgePreprocessingSettings(settings);
 
-  // Apply the settings to the filter if in preview mode
-  if(m_GlobalState->GetShowPreprocessedEdgePreview())
-    {
-    m_EdgeFilter->SetEdgePreprocessingSettings(settings);
-    }
-
   // Update the plotter
   UpdateEdgePlot();
+  
+  // Update display if in preview mode
+  if(m_GlobalState->GetShowPreprocessedEdgePreview())
+    {
+    // Apply the settings to the preview filters
+    m_EdgePreviewFilter[0]->SetEdgePreprocessingSettings(settings);
+    m_EdgePreviewFilter[1]->SetEdgePreprocessingSettings(settings);
+    m_EdgePreviewFilter[2]->SetEdgePreprocessingSettings(settings);
 
-  // Repaint the slice windows
-  m_ParentUI->RedrawWindows();
+    // Repaint the slice windows
+    m_ParentUI->RedrawWindows();
+    }
 }
 
 void 
@@ -314,17 +284,19 @@ PreprocessingUILogic
   // Store the settings globally
   m_GlobalState->SetThresholdSettings(settings);
 
+  // Compute the plot to be displayed
+  UpdateThresholdPlot();
+  
   // Apply the settings to the filter but only if we are in preview mode
   if(m_GlobalState->GetShowPreprocessedInOutPreview())
     {    
-    m_InOutFilter->SetThresholdSettings(settings);
+    m_InOutPreviewFilter[0]->SetThresholdSettings(settings);
+    m_InOutPreviewFilter[1]->SetThresholdSettings(settings);
+    m_InOutPreviewFilter[2]->SetThresholdSettings(settings);
 
     // Repaint the slice windows
     m_ParentUI->RedrawWindows();
     }  
-
-  // Compute the plot to be displayed
-  UpdateThresholdPlot();
 }
 
 void 
@@ -338,6 +310,48 @@ PreprocessingUILogic
 
   // Entering preview mode means that we can draw the speed image
   m_GlobalState->SetShowSpeed(preview);
+
+  if(preview)
+    {
+    // Initialize each preview filter
+    for(unsigned int i=0;i<3;i++)
+      {
+      // Make sure the preview filter is deallocated
+      assert(!m_EdgePreviewFilter[i]);
+  
+      // Create the filter
+      m_EdgePreviewFilter[i] = EdgeFilterType::New();
+
+      // Give it an input
+      m_EdgePreviewFilter[i]->SetInput(
+        m_Driver->GetSNAPImageData()->GetGrey()->GetImage());
+  
+      // Pass the current settings to the filter
+      m_EdgePreviewFilter[i]->SetEdgePreprocessingSettings(
+        m_GlobalState->GetEdgePreprocessingSettings());
+  
+      // Tell the speed wrapper who it's previewer is
+      m_Driver->GetSNAPImageData()->GetSpeed()->SetSliceSourceForPreview(
+        i,m_EdgePreviewFilter[i]->GetOutput());
+
+      // The speed preview is now valid
+      m_GlobalState->SetSpeedPreviewValid(true);
+      }
+    }
+  else
+    {
+    // Clear the preview filters
+    m_EdgePreviewFilter[0] = NULL;
+    m_EdgePreviewFilter[1] = NULL;
+    m_EdgePreviewFilter[2] = NULL;
+
+    // Revert to the old speed image
+    // TODO: We're reverting to the last APPLY.  The user may get confused.
+    m_Driver->GetSNAPImageData()->GetSpeed()->RemoveSliceSourcesForPreview();
+
+    // The speed preview is now invalid
+    m_GlobalState->SetSpeedPreviewValid(false);
+    }
 
   // Repaint the slice windows
   m_ParentUI->RedrawWindows();
@@ -354,6 +368,48 @@ PreprocessingUILogic
 
   // Entering preview mode means that we can draw the speed image
   m_GlobalState->SetShowSpeed(preview);
+
+  if(preview)
+    {
+    // Initialize each preview filter
+    for(unsigned int i=0;i<3;i++)
+      {
+      // Make sure the preview filter is deallocated
+      assert(!m_InOutPreviewFilter[i]);
+  
+      // Create the filter
+      m_InOutPreviewFilter[i] = InOutFilterType::New();
+
+      // Give it an input
+      m_InOutPreviewFilter[i]->SetInput(
+        m_Driver->GetSNAPImageData()->GetGrey()->GetImage());
+  
+      // Pass the current settings to the filter
+      m_InOutPreviewFilter[i]->SetThresholdSettings(
+        m_GlobalState->GetThresholdSettings());
+  
+      // Tell the speed wrapper who it's previewer is
+      m_Driver->GetSNAPImageData()->GetSpeed()->SetSliceSourceForPreview(
+        i,m_InOutPreviewFilter[i]->GetOutput());
+
+      // The speed preview is now valid
+      m_GlobalState->SetSpeedPreviewValid(true);
+      }
+    }
+  else
+    {
+    // Clear the preview filters
+    m_InOutPreviewFilter[0] = NULL;
+    m_InOutPreviewFilter[1] = NULL;
+    m_InOutPreviewFilter[2] = NULL;
+
+    // Revert to the old speed image
+    // TODO: We're reverting to the last APPLY.  The user may get confused.
+    m_Driver->GetSNAPImageData()->GetSpeed()->RemoveSliceSourcesForPreview();
+
+    // The speed preview is now invalid
+    m_GlobalState->SetSpeedPreviewValid(false);
+    }
 
   // Repaint the slice windows
   m_ParentUI->RedrawWindows();
@@ -385,21 +441,40 @@ void
 PreprocessingUILogic
 ::OnEdgeApply()
 {
-  // Get a handle to the speed image wrapper
+  // Make sure that the speed image exists
+  if(!m_Driver->GetSNAPImageData()->IsSpeedLoaded())
+    m_Driver->GetSNAPImageData()->InitializeSpeed();
+    
+  // Keep a handle to the speed image wrapper
   SpeedImageWrapper *speed = m_Driver->GetSNAPImageData()->GetSpeed();
 
-  // Pass the settings object to the filter (redundant in preview mode)
-  m_EdgeFilter->SetEdgePreprocessingSettings(
+  // Create an edge filter for whole-image preprocessing
+  m_EdgeFilterWhole = EdgeFilterType::New();
+  
+  // Pass the settings to the filter
+  m_EdgeFilterWhole->SetEdgePreprocessingSettings(
     m_GlobalState->GetEdgePreprocessingSettings());
 
-  // Enable progress bar 
-  m_ShowProgress = true;
+  // Set the filter's input
+  m_EdgeFilterWhole->SetInput(
+    m_Driver->GetSNAPImageData()->GetGrey()->GetImage());
 
-  // Update the filter using the largest possible region
-  m_EdgeFilter->UpdateLargestPossibleRegion();
+  // Attach the filter to the progress bar
+  CommandPointer callback = CommandType::New();
+  callback->SetCallbackFunction(this,&PreprocessingUILogic::OnEdgeProgress);
+  m_EdgeFilterWhole->AddObserver(ProgressEvent(),callback);
 
-  // Disable progress bar 
-  m_ShowProgress = false;
+  // Run the filter
+  m_EdgeFilterWhole->UpdateLargestPossibleRegion();
+  
+  // Pass the output of the filter to the speed wrapper
+  speed->SetImage(m_EdgeFilterWhole->GetOutput());
+  
+  // Dismantle this pipeline
+  speed->GetImage()->DisconnectPipeline();
+
+  // Clean up the filter
+  m_EdgeFilterWhole = NULL;
 
   // The preprocessing image is valid
   m_GlobalState->SetSpeedValid(true);
@@ -423,21 +498,42 @@ void
 PreprocessingUILogic
 ::OnThresholdApply()
 {
-  // Get a handle to the speed image wrapper
+  // Make sure that the speed image exists
+  if(!m_Driver->GetSNAPImageData()->IsSpeedLoaded())
+    m_Driver->GetSNAPImageData()->InitializeSpeed();
+    
+  // Keep a handle to the speed image wrapper
   SpeedImageWrapper *speed = m_Driver->GetSNAPImageData()->GetSpeed();
 
-  // Pass the current settings to the filter (redundant in preview mode)
-  m_InOutFilter->SetThresholdSettings(m_GlobalState->GetThresholdSettings());
+  // Create an edge filter for whole-image preprocessing
+  m_InOutFilterWhole = InOutFilterType::New();
+  
+  // Pass the settings to the filter
+  m_InOutFilterWhole->SetThresholdSettings(
+    m_GlobalState->GetThresholdSettings());
 
-  // Enable progress bar 
-  m_ShowProgress = true;
+  // Set the filter's input
+  m_InOutFilterWhole->SetInput(
+    m_Driver->GetSNAPImageData()->GetGrey()->GetImage());
 
-  // Update the filter using the largest possible region
-  m_InOutFilter->UpdateLargestPossibleRegion();
+  // Attach the filter to the progress bar
+  CommandPointer callback = CommandType::New();
+  callback->SetCallbackFunction(this,
+                                &PreprocessingUILogic::OnThresholdProgress);
+  m_InOutFilterWhole->AddObserver(ProgressEvent(),callback);
 
-  // Disable progress bar 
-  m_ShowProgress = false;
+  // Run the filter
+  m_InOutFilterWhole->UpdateLargestPossibleRegion();
+  
+  // Pass the output of the filter to the speed wrapper
+  speed->SetImage(m_InOutFilterWhole->GetOutput());
+  
+  // Dismantle this pipeline
+  speed->GetImage()->DisconnectPipeline();
 
+  // Clean up the filter
+  m_InOutFilterWhole = NULL;
+  
   // The preprocessing image is valid
   m_GlobalState->SetSpeedValid(true);
 
@@ -489,37 +585,40 @@ PreprocessingUILogic
 
 void 
 PreprocessingUILogic
-::DisconnectSpeedWrapper()
+::OnCloseCommon()
 {
-  // Take a handle to the speed image
-  SpeedImageWrapper::ImagePointer image = 
-    m_Driver->GetSNAPImageData()->GetSpeed()->GetImage();
+  // Revert to the old speed image
+  // TODO: We're reverting to the last APPLY.  The user may get confused.
+  m_Driver->GetSNAPImageData()->GetSpeed()->RemoveSliceSourcesForPreview();
 
-  // Disconnnect the speed image from the pipeline
-  image->DisconnectPipeline();
-
-  // Make sure that the image has the correct requested region
-  image->SetRequestedRegionToLargestPossibleRegion();
+  // The speed preview is now invalid
+  m_GlobalState->SetSpeedPreviewValid(false);
+  
+  // Make sure that if the speed is not valid, then it is not visible
+  if(!m_GlobalState->GetSpeedValid())
+    {
+    m_GlobalState->SetShowSpeed(false);
+    m_ParentUI->RedrawWindows();
+    }
+    
+  // Notify that we have been closed
+  m_ParentUI->OnPreprocessClose();
 }
 
 void 
 PreprocessingUILogic
 ::OnEdgeClose()
 {
-  // Make sure we are no longer looking in grey/speed overlay mode
-  m_GlobalState->SetSpeedViewZero(false);
-
-  // Detach the speed wrapper from the filter
-  DisconnectSpeedWrapper();
-
-  // Destroy the filter
-  m_EdgeFilter = NULL;
+  // If in preview mode, disconnect and destroy the preview filters
+  m_EdgePreviewFilter[0] = NULL;
+  m_EdgePreviewFilter[1] = NULL;
+  m_EdgePreviewFilter[2] = NULL;
 
   // Close the window
   m_WinEdge->hide();
 
-  // Notify that we have been closed
-  m_ParentUI->OnPreprocessClose();
+  // Common closing tasks
+  OnCloseCommon();
 }
 
 void 
@@ -529,17 +628,16 @@ PreprocessingUILogic
   // Make sure we are no longer looking in grey/speed overlay mode
   m_GlobalState->SetSpeedViewZero(false);
 
-  // Detach the speed wrapper from the filter
-  DisconnectSpeedWrapper();
-
-  // Destroy the filter
-  m_InOutFilter = NULL;
+  // If in preview mode, disconnect and destroy the preview filters
+  m_InOutPreviewFilter[0] = NULL;
+  m_InOutPreviewFilter[1] = NULL;
+  m_InOutPreviewFilter[2] = NULL;
 
   // Close the window
   m_WinInOut->hide();
-
-  // Notify that we have been closed
-  m_ParentUI->OnPreprocessClose();
+  
+  // Common closing tasks
+  OnCloseCommon();
 }
 
 void 
@@ -624,29 +722,21 @@ void
 PreprocessingUILogic
 ::OnEdgeProgress()
 {
-  // What is the progress of the filter
-  float progress = m_EdgeFilter->GetProgress();
+  // Display the filter's progress
+  m_OutEdgeProgress->value(m_EdgeFilterWhole->GetProgress());
 
-  // Only update the bar if we are not in preview mode
-  if(m_ShowProgress)
-    {
-    m_OutEdgeProgress->value(progress);
-    Fl::check();
-    }
+  // Let the UI refresh
+  Fl::check();
 }
 
 void 
 PreprocessingUILogic
 ::OnThresholdProgress()
 {
-  // What is the progress of the filter
-  float progress = m_InOutFilter->GetProgress();
+  // Display the filter's progress
+  m_OutThresholdProgress->value(m_InOutFilterWhole->GetProgress());
 
-  // Only update the bar if we are not in preview mode
-  if(m_ShowProgress)
-    {
-    m_OutThresholdProgress->value(progress);
-    Fl::check();
-    }
+  // Let the UI refresh
+  Fl::check();
 }
 

@@ -18,6 +18,7 @@
 #include "IRISImageData.h"
 #include "IRISSliceWindow.h"
 #include "UserInterfaceLogic.h"
+#include "IRISVectorTypesToITKConversion.h"
 
 #include <cassert>
 #include <cmath>
@@ -129,13 +130,18 @@ int RegionInteractionMode
 void RegionInteractionMode
 ::GetSystemROICorners(Vector2f corner[2])
 {
-  // Get the region of interest in image coorinates
-  Vector3i ul = m_GlobalState->GetROICorner(0);
-  Vector3i lr = m_GlobalState->GetROICorner(1);
+  // Get the region of interest in image coordinates  
+  GlobalState::RegionType roi = m_GlobalState->GetSegmentationROI();
+
+  // Get the lower-valued corner
+  Vector3l ul(roi.GetIndex().GetIndex());
+  
+  // Get the higher valued corner
+  Vector3ul sz(roi.GetSize().GetSize());
 
   // Remap to slice coordinates
   corner[0] = m_Parent->MapImageToSlice(to_float(ul));
-  corner[1] = m_Parent->MapImageToSlice(to_float(lr));
+  corner[1] = m_Parent->MapImageToSlice(to_float(ul+to_long(sz)));
 }
 
 void RegionInteractionMode
@@ -203,22 +209,23 @@ void RegionInteractionMode
     }
 
   // Update the region of interest in the system
-  for (unsigned int i=0;i<2;i++)
-    {
-    // Convert the corners to integers
-    Vector3f xImage = m_Parent->MapSliceToImage(corner[i]);
-    Vector3i xVoxel = to_int(xImage);
+  Vector3i xImageLower = to_int(m_Parent->MapSliceToImage(corner[0]));
+  Vector3i xImageUpper = to_int(m_Parent->MapSliceToImage(corner[1]));
 
-    // Get the system's current ROI corner
-    Vector3i xSystem = m_GlobalState->GetROICorner(i);
+  // Create a region based on the corners
+  GlobalState::RegionType roiCorner(
+    to_itkIndex(xImageLower),to_itkSize(xImageUpper-xImageLower));
 
-    // The slice z-direction coordinate in xVoxel is equal to the slice
-    // number and thus we use the xSystem's value
-    xVoxel(m_Parent->m_Id) = xSystem(m_Parent->m_Id);
+  // Get the system's region of interest
+  GlobalState::RegionType roiSystem = m_GlobalState->GetSegmentationROI();
 
-    // Update the system's ROI corner
-    m_GlobalState->SetROICorner(i,xVoxel);
-    }  
+  // The slice z-direction index and size in the ROI should retain the system's
+  // previous value because we are only manipulating the slice in 2D
+  roiCorner.SetIndex(m_Parent->m_Id,roiSystem.GetIndex(m_Parent->m_Id));
+  roiCorner.SetSize(m_Parent->m_Id,roiSystem.GetSize(m_Parent->m_Id));
+
+  // Update the system's ROI
+  m_GlobalState->SetSegmentationROI(roiCorner);
 
   // Cause a system redraw
   m_ParentUI->RedrawWindows();
@@ -278,8 +285,8 @@ RegionInteractionMode
   // Check that the current slice is actually within the bounding box
   int slice = m_Parent->m_SliceIndex;
   int dim = m_Parent->m_Id;
-  int bbMin = m_GlobalState->GetROICorner(0)(dim);
-  int bbMax = m_GlobalState->GetROICorner(1)(dim);
+  int bbMin = m_GlobalState->GetSegmentationROI().GetIndex(dim);
+  int bbMax = bbMin + m_GlobalState->GetSegmentationROI().GetSize(dim);
 
   // And if so, return without painting anything
   if(bbMin > slice || bbMax < slice)

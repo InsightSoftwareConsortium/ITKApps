@@ -176,48 +176,51 @@ public:
 
 #endif // __IrisTypes_h_
 /*Log: IRISTypes.h
-/*Revision 1.10  2003/07/12 01:34:17  pauly
-/*More final changes before ITK checkin
-/*
-/*Revision 1.9  2003/07/11 23:31:04  pauly
-/**** empty log message ***
-/*
-/*Revision 1.7  2003/06/08 16:11:42  pauly
-/*User interface changes
-/*Automatic mesh updating in SNAP mode
-/*
-/*Revision 1.6  2003/05/12 02:51:05  pauly
-/*Got code to compile on UNIX
-/*
-/*Revision 1.5  2003/05/05 12:30:18  pauly
-/**** empty log message ***
-/*
-/*Revision 1.4  2003/04/23 20:36:23  pauly
-/**** empty log message ***
-/*
-/*Revision 1.3  2003/04/23 06:05:17  pauly
-/**** empty log message ***
-/*
-/*Revision 1.2  2003/04/18 00:25:37  pauly
-/**** empty log message ***
-/*
-/*Revision 1.1  2003/03/07 19:29:47  pauly
-/*Initial checkin
-/*
-/*Revision 1.1.1.1  2002/12/10 01:35:36  pauly
-/*Started the project repository
-/*
-/*
-/*Revision 1.6  2002/04/27 17:47:44  bobkov
-/*Commented Bubble class
-/*
-/*Revision 1.5  2002/04/11 23:04:17  bobkov
-/*commented the Bubble class
-/*cvs: ----------------------------------------------------------------------
-/*
-/*Revision 1.4  2002/03/21 15:20:49  moon
-/**** empty log message ***
-/*
-/*Revision 1.3  2002/03/08 14:06:20  moon
-/*Added Header and Log tags to all files
-/**/
+ *Revision 1.1  2003/07/12 04:53:17  pauly
+ *Initial checkin of SNAP application to the InsightApplications tree
+ *
+ *Revision 1.10  2003/07/12 01:34:17  pauly
+ *More final changes before ITK checkin
+ *
+ *Revision 1.9  2003/07/11 23:31:04  pauly
+ **** empty log message ***
+ *
+ *Revision 1.7  2003/06/08 16:11:42  pauly
+ *User interface changes
+ *Automatic mesh updating in SNAP mode
+ *
+ *Revision 1.6  2003/05/12 02:51:05  pauly
+ *Got code to compile on UNIX
+ *
+ *Revision 1.5  2003/05/05 12:30:18  pauly
+ **** empty log message ***
+ *
+ *Revision 1.4  2003/04/23 20:36:23  pauly
+ **** empty log message ***
+ *
+ *Revision 1.3  2003/04/23 06:05:17  pauly
+ **** empty log message ***
+ *
+ *Revision 1.2  2003/04/18 00:25:37  pauly
+ **** empty log message ***
+ *
+ *Revision 1.1  2003/03/07 19:29:47  pauly
+ *Initial checkin
+ *
+ *Revision 1.1.1.1  2002/12/10 01:35:36  pauly
+ *Started the project repository
+ *
+ *
+ *Revision 1.6  2002/04/27 17:47:44  bobkov
+ *Commented Bubble class
+ *
+ *Revision 1.5  2002/04/11 23:04:17  bobkov
+ *commented the Bubble class
+ *cvs: ----------------------------------------------------------------------
+ *
+ *Revision 1.4  2002/03/21 15:20:49  moon
+ **** empty log message ***
+ *
+ *Revision 1.3  2002/03/08 14:06:20  moon
+ *Added Header and Log tags to all files
+ **/

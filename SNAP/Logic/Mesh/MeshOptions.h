@@ -112,26 +112,29 @@ private:
 
 #endif // __MeshOptions_h_
 /*Log: MeshOptions.h
-/*Revision 1.5  2003/07/12 01:34:18  pauly
-/*More final changes before ITK checkin
-/*
-/*Revision 1.4  2003/07/11 23:29:17  pauly
-/**** empty log message ***
-/*
-/*Revision 1.3  2003/07/11 21:25:12  pauly
-/*Code cleanup for ITK checkin
-/*
-/*Revision 1.2  2003/06/08 16:11:42  pauly
-/*User interface changes
-/*Automatic mesh updating in SNAP mode
-/*
-/*Revision 1.1  2003/03/07 19:29:47  pauly
-/*Initial checkin
-/*
-/*Revision 1.1.1.1  2002/12/10 01:35:36  pauly
-/*Started the project repository
-/*
-/*
-/*Revision 1.2  2002/03/08 14:06:30  moon
-/*Added Header and Log tags to all files
-/**/
+ *Revision 1.1  2003/07/12 04:52:25  pauly
+ *Initial checkin of SNAP application  to the InsightApplications tree
+ *
+ *Revision 1.5  2003/07/12 01:34:18  pauly
+ *More final changes before ITK checkin
+ *
+ *Revision 1.4  2003/07/11 23:29:17  pauly
+ **** empty log message ***
+ *
+ *Revision 1.3  2003/07/11 21:25:12  pauly
+ *Code cleanup for ITK checkin
+ *
+ *Revision 1.2  2003/06/08 16:11:42  pauly
+ *User interface changes
+ *Automatic mesh updating in SNAP mode
+ *
+ *Revision 1.1  2003/03/07 19:29:47  pauly
+ *Initial checkin
+ *
+ *Revision 1.1.1.1  2002/12/10 01:35:36  pauly
+ *Started the project repository
+ *
+ *
+ *Revision 1.2  2002/03/08 14:06:30  moon
+ *Added Header and Log tags to all files
+ **/

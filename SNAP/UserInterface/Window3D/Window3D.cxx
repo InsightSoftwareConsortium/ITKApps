@@ -14,10 +14,12 @@
 =========================================================================*/
 #include "Window3D.h"
 #include "IRISImageData.h"
+#include "SNAPImageData.h"
 #include "UserInterfaceLogic.h"
 #include "GlobalState.h"
 #include <iostream>
 #include "IRISApplication.h"
+#include "ImageRayIntersectionFinder.h"
 
 //#ifdef WIN32
 //#  include <glut.h>
@@ -31,6 +33,39 @@
                 
 static Vector3d ray;
 static Vector3d pt;
+   
+/** These classes are used internally for ray intersection testing */
+
+class LabelImageHitTester 
+{
+public:
+  LabelImageHitTester(const IRISImageData *irisData = NULL)
+  {
+    m_IRISData = irisData;
+  }
+
+  int operator()(LabelType label) const
+  {
+    assert(m_IRISData);
+    const ColorLabel &cl = m_IRISData->GetColorLabel(label);
+    return cl.IsValid() && cl.IsVisible() ? 1 : 0;
+  }
+
+private:
+  const IRISImageData *m_IRISData;
+};
+
+class SnakeImageHitTester 
+{
+public:
+  int operator()(float levelSetValue) const
+  {
+    return levelSetValue <= 0 ? 1 : 0;
+  }
+};
+
+
+
 
 Window3D
 ::Window3D( int x, int y, int w, int h, const char *l )
@@ -144,7 +179,7 @@ void
 Window3D
 ::ResetView()
 {
-  verbose << "Window 3D Reset View" << endl;
+  // verbose << "Window 3D Reset View" << endl;
 
   make_current(); // update GL state
 
@@ -187,7 +222,7 @@ void
 Window3D
 ::UpdateMesh()
 {
-  verbose << "Window 3D Update m_Mesh" << endl;
+  // verbose << "Window 3D Update m_Mesh" << endl;
 
   make_current(); // update GL state
   m_Mesh.GenerateMesh();
@@ -318,6 +353,7 @@ Window3D
         case FL_DRAG: MousePointPressFunc(button); return 1;
         }
       break;
+    case ROI_MODE:
     case POLYGON_DRAWING_MODE:
       break;
     default:
@@ -407,7 +443,7 @@ Window3D
     {
     case FL_LEFT_MOUSE:
 
-      if (this->IntersectSegData(Fl::event_x(), Fl::event_y(), &hit))
+      if (this->IntersectSegData(Fl::event_x(), Fl::event_y(), hit))
         {
 
         // TODO: Unify this!
@@ -451,7 +487,7 @@ Window3D
   switch (button)
     {
     case FL_LEFT_MOUSE:
-      if (this->IntersectSegData(Fl::event_x(), Fl::event_y(), &hit))
+      if (this->IntersectSegData(Fl::event_x(), Fl::event_y(), hit))
         {
         AddSample( hit );
         m_ParentUI->Activate3DAccept(true);
@@ -564,14 +600,18 @@ void Window3D::ComputeRay( int x, int y, double *mvmatrix, double *projmatrix,
                       mvmatrix, projmatrix, viewport,
                       &(v[0]), &(v[1]), &(v[2]) );
   if ( val == GL_FALSE ) cerr << "gluUnProject #1 FAILED!!!!!" << endl;
+  
   val = gluUnProject( (GLdouble) x, (GLdouble) y, 1.0,
                       mvmatrix, projmatrix, viewport,
                       &(r[0]), &(r[1]), &(r[2]) );
   if ( val == GL_FALSE ) cerr << "gluUnProject #2 FAILED!!!!!" << endl;
+
   r[0] = r[0] - v[0];
   r[1] = r[1] - v[1];
   r[2] = r[2] - v[2];
 }
+
+
 
 //------------------------------------------------------------------------
 // IntersectSegData(int mouse_x, int mouse_y, Vector3i *hit)
@@ -580,7 +620,7 @@ void Window3D::ComputeRay( int x, int y, double *mvmatrix, double *projmatrix,
 // The output Vector3i hit is in image coords.
 //
 //------------------------------------------------------------------------
-int Window3D::IntersectSegData(int mouse_x, int mouse_y, Vector3i *hit)
+int Window3D::IntersectSegData(int mouse_x, int mouse_y, Vector3i &hit)
 {
   double mvmatrix[16];
   double projmatrix[16];
@@ -591,12 +631,45 @@ int Window3D::IntersectSegData(int mouse_x, int mouse_y, Vector3i *hit)
   int x = mouse_x;
   int y = viewport[3] - mouse_y - 1;
   ComputeRay( x, y, mvmatrix, projmatrix, viewport, pt, ray );
-  // ray now has the proj ray, pt is the pt in image space
-  switch (m_Driver->GetCurrentImageData()->GetRayIntersectionWithSegmentation( pt, ray, *hit ))
+
+  // The result 
+  int result = 0;
+  
+  // Depending on the situation, we may intersect with a snake image or a
+  // segmentation image
+  // TODO: Need both conditions?
+  if(m_GlobalState->GetSnakeActive() && 
+     m_Driver->GetSNAPImageData()->IsSnakeInitialized())
     {
-    case 1: return 1; break;
-    case -1: cerr << "RAY WAS INVALID!" << endl; break;
-    default: cerr << "No hit found" << endl;
+    typedef ImageRayIntersectionFinder<
+      float,SnakeImageHitTester> RayCasterType;
+
+    RayCasterType caster;
+
+    result = 
+      caster.FindIntersection(
+        m_Driver->GetSNAPImageData()->GetLevelSetImage(),
+        pt,ray,hit);
+    }
+  else
+    {
+    typedef ImageRayIntersectionFinder<
+      LabelType,LabelImageHitTester> RayCasterType;
+
+    RayCasterType caster;
+    caster.SetHitTester(LabelImageHitTester(m_Driver->GetCurrentImageData()));
+    result = 
+      caster.FindIntersection(
+        m_Driver->GetCurrentImageData()->GetSegmentation()->GetImage(),
+        pt,ray,hit);
+    }
+  
+  // ray now has the proj ray, pt is the pt in image space
+  switch (result)
+    {
+    case 1: return 1;
+    case -1: /*cerr << "RAY WAS INVALID!" << endl;*/ break;
+    /* default: cerr << "No hit found" << endl;*/
     }
   return 0;
 }
@@ -784,6 +857,7 @@ void Window3D::DrawSamples()
     gluSphere(quad,1.0,4,4);
     gluDeleteQuadric(quad);
     // glutSolidSphere( 1.0, 4, 4 );
+
     glPopMatrix();
     }
 }
@@ -854,79 +928,82 @@ void Window3D::DrawCutPlane() {
 };
 
 /*Log: Window3D.cxx
-/*Revision 1.2  2003/07/12 01:34:18  pauly
-/*More final changes before ITK checkin
-/*
-/*Revision 1.1  2003/07/11 23:25:33  pauly
-/**** empty log message ***
-/*
-/*Revision 1.9  2003/06/08 23:27:56  pauly
-/*Changed variable names using combination of ctags, egrep, and perl.
-/*
-/*Revision 1.8  2003/06/04 04:52:17  pauly
-/*More UI fixes for the demo
-/*
-/*Revision 1.7  2003/05/08 21:59:05  pauly
-/*SNAP is almost working
-/*
-/*Revision 1.6  2003/05/07 19:14:46  pauly
-/*More progress on getting old segmentation working in the new SNAP.  Almost there, region of interest and bubbles are working.
-/*
-/*Revision 1.5  2003/04/29 14:01:42  pauly
-/*Charlotte Trip
-/*
-/*Revision 1.4  2003/04/23 06:05:18  pauly
-/**** empty log message ***
-/*
-/*Revision 1.3  2003/04/18 17:32:18  pauly
-/**** empty log message ***
-/*
-/*Revision 1.2  2003/04/16 05:04:17  pauly
-/*Incorporated intensity modification into the snap pipeline
-/*New IRISApplication
-/*Random goodies
-/*
-/*Revision 1.1  2003/03/07 19:29:48  pauly
-/*Initial checkin
-/*
-/*Revision 1.2  2002/12/16 16:40:19  pauly
-/**** empty log message ***
-/*
-/*Revision 1.1.1.1  2002/12/10 01:35:36  pauly
-/*Started the project repository
-/*
-/*
-/*Revision 1.10  2002/06/04 20:26:23  seanho
-/*new rotation code from iris
-/*
-/*Revision 1.9  2002/04/27 18:31:05  moon
-/*Finished commenting
-/*
-/*Revision 1.8  2002/04/24 17:15:13  bobkov
-/*made no changes
-/*
-/*Revision 1.7  2002/04/23 22:00:39  moon
-/*Just put in a couple glMatrixMode(GL_MODELVIEW) in a few places I thought it should
-/*be just to be cautious.  I don't think it changed anything.
-/*
-/*Revision 1.6  2002/04/22 21:56:21  moon
-/*Put in code to get crosshairs m_Mode working in 3D window.  Just checks global
-/*flag in the mouseclick method to see if we're in snake m_Mode, so that the
-/*right windows get redrawn.
-/*
-/*Revision 1.5  2002/04/13 16:22:40  moon
-/*Fixed the problem with the 3D window drawing in black.
-/*The draw method needed to call Init() in the if (!valid()) block.  It had two
-/*checks, for !valid, and m_NeedsInitialization.  They just needed to be combined so that
-/*lighting, etc. was set up either way.  The bug seems to be fixed.
-/*
-/*Revision 1.4  2002/04/10 21:22:12  moon
-/*added some make_current calls to some methods, which seems to help the window to
-/*update better, but the color/lighting problem is still there.
-/*
-/*Revision 1.3  2002/04/10 20:26:24  moon
-/*just put in some debug statements.  Trying to debug the 3dwindow not drawing right.
-/*
-/*Revision 1.2  2002/03/08 14:06:32  moon
-/*Added Header and Log tags to all files
-/**/
+ *Revision 1.1  2003/07/12 04:46:51  pauly
+ *Initial checkin of the SNAP application into the InsightApplications tree.
+ *
+ *Revision 1.2  2003/07/12 01:34:18  pauly
+ *More final changes before ITK checkin
+ *
+ *Revision 1.1  2003/07/11 23:25:33  pauly
+ **** empty log message ***
+ *
+ *Revision 1.9  2003/06/08 23:27:56  pauly
+ *Changed variable names using combination of ctags, egrep, and perl.
+ *
+ *Revision 1.8  2003/06/04 04:52:17  pauly
+ *More UI fixes for the demo
+ *
+ *Revision 1.7  2003/05/08 21:59:05  pauly
+ *SNAP is almost working
+ *
+ *Revision 1.6  2003/05/07 19:14:46  pauly
+ *More progress on getting old segmentation working in the new SNAP.  Almost there, region of interest and bubbles are working.
+ *
+ *Revision 1.5  2003/04/29 14:01:42  pauly
+ *Charlotte Trip
+ *
+ *Revision 1.4  2003/04/23 06:05:18  pauly
+ **** empty log message ***
+ *
+ *Revision 1.3  2003/04/18 17:32:18  pauly
+ **** empty log message ***
+ *
+ *Revision 1.2  2003/04/16 05:04:17  pauly
+ *Incorporated intensity modification into the snap pipeline
+ *New IRISApplication
+ *Random goodies
+ *
+ *Revision 1.1  2003/03/07 19:29:48  pauly
+ *Initial checkin
+ *
+ *Revision 1.2  2002/12/16 16:40:19  pauly
+ **** empty log message ***
+ *
+ *Revision 1.1.1.1  2002/12/10 01:35:36  pauly
+ *Started the project repository
+ *
+ *
+ *Revision 1.10  2002/06/04 20:26:23  seanho
+ *new rotation code from iris
+ *
+ *Revision 1.9  2002/04/27 18:31:05  moon
+ *Finished commenting
+ *
+ *Revision 1.8  2002/04/24 17:15:13  bobkov
+ *made no changes
+ *
+ *Revision 1.7  2002/04/23 22:00:39  moon
+ *Just put in a couple glMatrixMode(GL_MODELVIEW) in a few places I thought it should
+ *be just to be cautious.  I don't think it changed anything.
+ *
+ *Revision 1.6  2002/04/22 21:56:21  moon
+ *Put in code to get crosshairs m_Mode working in 3D window.  Just checks global
+ *flag in the mouseclick method to see if we're in snake m_Mode, so that the
+ *right windows get redrawn.
+ *
+ *Revision 1.5  2002/04/13 16:22:40  moon
+ *Fixed the problem with the 3D window drawing in black.
+ *The draw method needed to call Init() in the if (!valid()) block.  It had two
+ *checks, for !valid, and m_NeedsInitialization.  They just needed to be combined so that
+ *lighting, etc. was set up either way.  The bug seems to be fixed.
+ *
+ *Revision 1.4  2002/04/10 21:22:12  moon
+ *added some make_current calls to some methods, which seems to help the window to
+ *update better, but the color/lighting problem is still there.
+ *
+ *Revision 1.3  2002/04/10 20:26:24  moon
+ *just put in some debug statements.  Trying to debug the 3dwindow not drawing right.
+ *
+ *Revision 1.2  2002/03/08 14:06:32  moon
+ *Added Header and Log tags to all files
+ **/

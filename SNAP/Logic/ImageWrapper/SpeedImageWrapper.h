@@ -38,6 +38,11 @@ namespace itk {
 class SpeedImageWrapper : virtual public ImageWrapper<float> 
 {
 public:
+  // Basics
+  typedef SpeedImageWrapper Self;
+  typedef ImageWrapper<float> Superclass;
+  typedef Superclass::ImageType ImageType;
+
   // The type definition for the image used to display speed slices
   typedef ImageWrapper<float>::SliceType DisplaySliceType;
   typedef itk::SmartPointer<DisplaySliceType> DisplaySlicePointer;
@@ -47,6 +52,19 @@ public:
   typedef itk::RGBAPixel<unsigned char> OverlayPixelType;
   typedef itk::Image<OverlayPixelType,2> OverlaySliceType;
   typedef itk::SmartPointer<OverlaySliceType> OverlaySlicePointer;
+
+  /**
+   * Set the preview source for the slices.  This means that the slices
+   * will be generated not from the internal image but from external 
+   * images (outputs of some preprocessing filters)
+   */
+  virtual void SetSliceSourceForPreview(unsigned int slice,ImageType *source) = 0;
+
+  /** 
+   * Unset the preview sources for all slices.  The slices will be now
+   * generated from the internal image 
+   */
+  virtual void RemoveSliceSourcesForPreview() = 0;
 
   /**
    * Indicate that this image is a In/Out speed image that has a 
@@ -99,6 +117,13 @@ public:
 
   typedef itk::ImageSource<ImageType> PreviewFilterType;
   typedef itk::SmartPointer<PreviewFilterType> PreviewFilterPointer;
+
+  /** Get a 'preview' voxel, i.e., a voxel from the previewing slices.  For
+   * the results to be valid, the voxel has to be on one of the previewing
+   * slices, and this method is intended for getting the voxel at the
+   * cross-hairs position */
+  virtual float GetPreviewVoxel(const Vector3i &index) const = 0;
+
 };
 
 #endif // __SpeedImageWrapper_h_

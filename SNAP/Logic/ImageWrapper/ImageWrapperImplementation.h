@@ -92,9 +92,9 @@ public:
                        bool isBigEndian,itk::Command *progressCommand);
   void Reset();
   bool IsInitialized() const;
-  TPixel &GetVoxel(unsigned int x, unsigned int y, unsigned int z);
-  const TPixel &GetVoxel(unsigned int x, unsigned int y, unsigned int z) const;
-  TPixel &GetVoxel(const Vector3i &index);
+  virtual TPixel &GetVoxelForUpdate(unsigned int x, unsigned int y, unsigned int z);
+  virtual const TPixel &GetVoxel(unsigned int x, unsigned int y, unsigned int z) const;
+  TPixel &GetVoxelForUpdate(const Vector3i &index);
   const TPixel &GetVoxel(const Vector3i &index) const;
 
   ImagePointer GetImage() const {
@@ -202,10 +202,10 @@ protected:
    */
   void CheckImageIntensityRange();
 
-private:
+protected:
   // Handle a change in the image pointer (i.e., a load operation on the image or 
   // an initialization operation)
-  void HandleImagePointerUpdate();
+  virtual void HandleImagePointerUpdate();
 
   // Common code for the different constructors
   void CommonInitialization();

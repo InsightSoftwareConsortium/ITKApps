@@ -194,6 +194,10 @@ protected:
   // The current zoom factor
   float m_ViewZoom;                         
 
+  // The default screen margin (area into which we do not paint) at lest in 
+  // default zoom
+  unsigned int m_Margin;
+
   // Grey texture object typedefs
   typedef OpenGLSliceTexture<unsigned char> GreyTextureType;
 

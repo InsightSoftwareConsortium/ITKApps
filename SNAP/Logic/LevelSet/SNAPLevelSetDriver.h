@@ -40,7 +40,7 @@ public:
   /** Initialize the level set driver.  Note that the type of snake (in/out
     or edge) is determined entirely by the speed image and by the values
     of the parameters */
-  void Initialize(BubbleImageType *init,
+  void Initialize(FloatImageType *initialLevelSet,
                   FloatImageType *speed,
                   const SnakeParameters *parms);
 
@@ -49,6 +49,9 @@ public:
   
   /** Run snake for N iterations */
   void Run(int nIterations);
+
+  /** Restart the snake */
+  void Restart(FloatImageType *init);
 
   /** Get the current state of the snake (level set and narrow band) */
   FloatImageType *GetCurrentState();

@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "IntensityCurveInterface.h"
 #include "ImageCoordinateTransform.h"
+#include "itkImageRegion.h"
 
 // Forward reference to the classes pointed at
 class GlobalState;
@@ -36,6 +37,7 @@ class IRISApplication
 public:
   // Typedefs
   typedef IntensityCurveInterface::Pointer IntensityCurvePointer;
+  typedef itk::ImageRegion<3> RegionType;
 
   /**
    * Constructor for the IRIS/SNAP application
@@ -75,7 +77,7 @@ public:
   /**
    * Initialize SNAP Image data using region of interest extents
    */
-  void InitializeSNAPImageData(const Vector3i &roiul,const Vector3i &roilr);
+  void InitializeSNAPImageData(const RegionType &roi);
 
   /**
    * Update IRIS image data with the segmentation contained in the SNAP image
@@ -152,11 +154,10 @@ private:
   UserInterfaceLogic *m_UserInterface;
 
   // Slice transform information
-  ImageCoordinateTransform 
-    m_ImageToAnatomyTransform, 
-  m_AnatomyToDisplayTransform,
-  m_ImageToDisplayTransform,
-  m_DisplayToImageTransform;
+  ImageCoordinateTransform m_ImageToAnatomyTransform;
+  ImageCoordinateTransform m_AnatomyToDisplayTransform;
+  ImageCoordinateTransform m_ImageToDisplayTransform;
+  ImageCoordinateTransform m_DisplayToImageTransform;
 
   // Slice intensity mapping information
   IntensityCurveInterface::Pointer m_IntensityCurve;

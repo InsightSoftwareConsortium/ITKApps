@@ -138,16 +138,19 @@ public:
   /**
    * Get reference to a voxel at a given position.
    */
-  virtual TPixel &GetVoxel(unsigned int x, unsigned int y, 
-                           unsigned int z) = 0;
-
+  virtual TPixel &GetVoxelForUpdate(unsigned int x, 
+                                    unsigned int y, 
+                                    unsigned int z) = 0;
+  
+  virtual TPixel &GetVoxelForUpdate(const Vector3i &index) = 0;
+  
   /**
    * Get a constant reference to a voxel at a given position.
    */
-  virtual const TPixel &GetVoxel(unsigned int x, unsigned int y, 
+  virtual const TPixel &GetVoxel(unsigned int x, 
+                                 unsigned int y, 
                                  unsigned int z) const = 0;
 
-  virtual TPixel &GetVoxel(const Vector3i &index) = 0;
   virtual const TPixel &GetVoxel(const Vector3i &index) const = 0;
 
 

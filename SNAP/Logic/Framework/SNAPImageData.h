@@ -18,6 +18,7 @@
 #include "IRISImageData.h"
 #include "SnakeParameters.h"
 #include "SpeedImageWrapper.h"
+#include "LevelSetImageWrapper.h"
 
 class SNAPLevelSetDriver;
 
@@ -32,9 +33,6 @@ class SNAPLevelSetDriver;
 class SNAPImageData : public IRISImageData 
 {
 public:
-
-  // Some types that we will deal with
-  typedef LabelImageWrapper SnakeWrapperType;
 
   // The type of the internal level set image
   typedef itk::Image<float,3> LevelSetImageType;
@@ -61,26 +59,11 @@ public:
    * Check the preprocessed image for validity
    */
   bool IsSpeedLoaded();
-
-  /**
-   * Get the snake initialization image
-   */
-  SnakeWrapperType* GetSnakeInitialization();
-
-  /**
-   * Clear the snake initialization image (discard data, etc)
-   */
-  void ClearSnakeInitialization();
-
-  /**
-   * Check the snake initialization image for validity
-   */
-  bool IsSnakeInitializationLoaded();
-
+  
   /**
    * Get the current snake image wrapper
    */
-  SnakeWrapperType* GetSnake();
+  LevelSetImageWrapper* GetSnake();
 
   /**
    * Clear the current snake (discard data, etc)
@@ -98,16 +81,18 @@ public:
   bool IsSnakeInitialized();
 
   /**
-   * Initialize the snake with an array of bubbles.  If successful,
-   * this method constructs a snake initialization image.
+   * This method computes the two-sided distance transform from the array of
+   * bubbles passed on and, if the segmentation image is not blank, the pixels
+   * in that image.  This method also initializes the level set driver, ie, the
+   * engine driving the segmentation process.
+   * 
    * @return Number of voxels of color labelColor in the resulting image
+   * TODO: return value.
    */
-  unsigned int InitializeSnakeImage(Bubble *bubbles, int nBubbles, unsigned int labelColor);
-
-  /**
-   * Initialize snake from snake initialization image
-   */
-  void InitalizeSnakeDriver(int snakeMode, const SnakeParameters &param);
+  unsigned int InitializeLevelSet(int snakeMode, 
+                                  const SnakeParameters &parameters,
+                                  Bubble *bubbles, int nBubbles, 
+                                  unsigned int labelColor);
 
   /**
    * Set current snake parameters
@@ -152,11 +137,36 @@ public:
   LevelSetImageType *GetLevelSetImage();
   
 private:
+  
+  /**
+   * Initialize the snake driver and allocate the SnakeWrapper.  Called from 
+   * InitializeLevelSet and RewindSnake
+   */
+  void InitalizeSnakeDriver(int snakeMode, const SnakeParameters &param);
+
+  /**
+   * Get the snake initialization image
+   */
+  LevelSetImageWrapper* GetSnakeInitialization();
+
+  /**
+   * Clear the snake initialization image (discard data, etc)
+   */
+  void ClearSnakeInitialization();
+
+  /**
+   * Check the snake initialization image for validity
+   */
+  bool IsSnakeInitializationLoaded();
+  
   // Speed image adata
   SpeedImageWrapper *m_SpeedWrapper;
 
-  // Snake image data
-  SnakeWrapperType *m_SnakeWrapper, *m_SnakeInitializationWrapper;
+  // Wrapper around the level set image
+  LevelSetImageWrapper *m_SnakeWrapper;
+  
+  // Snake initialization data (initial distance transform
+  LevelSetImageWrapper *m_SnakeInitializationWrapper;
 
   // Snake driver
   SNAPLevelSetDriver *m_LevelSetDriver;

@@ -21,7 +21,7 @@ SnakeParameters
 {
   SnakeParameters p;
 
-  p.m_TimeStep = 0.1f;
+  p.m_TimeStep = 0.0f;
   p.m_Ground = 5.0;
 
   p.m_Type = USER;
@@ -33,7 +33,7 @@ SnakeParameters
   p.m_CurvatureWeight = 1.0;
   p.m_CurvatureSpeedExponent = 0;
 
-  p.m_LaplacianWeight = 0.8f;
+  p.m_LaplacianWeight = 0.0f;
   p.m_LaplacianSpeedExponent = 0;
 
   p.m_AdvectionWeight = 0;
@@ -48,7 +48,7 @@ SnakeParameters
 {
   SnakeParameters p;
 
-  p.m_TimeStep = 0.1f;
+  p.m_TimeStep = 0.0f;
   p.m_Ground = 5.0;
 
   p.m_Type = USER;
@@ -60,7 +60,7 @@ SnakeParameters
   p.m_CurvatureWeight = 1.0;
   p.m_CurvatureSpeedExponent = -1;
 
-  p.m_LaplacianWeight = 0.8f;
+  p.m_LaplacianWeight = 0.0f;
   p.m_LaplacianSpeedExponent = 0;
 
   p.m_AdvectionWeight = 0;

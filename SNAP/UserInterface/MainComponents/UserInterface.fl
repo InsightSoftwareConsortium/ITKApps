@@ -37,13 +37,13 @@ class UserInterface {open : {public UserInterfaceBase}
   } {
     Fl_Window m_WinMain {
       label {SnAP: IRIS} open
-      xywh {401 53 875 710} align 0 resizable
+      xywh {239 120 875 710} align 0 resizable
       code0 {\#include "UserInterfaceBase.h"} visible
     } {
       Fl_Group Controls {open
-        xywh {0 0 290 710} color 245
+        xywh {0 0 145 710} box FLAT_BOX color 53
       } {
-        Fl_Menu_Bar m_MenubarMain {open
+        Fl_Menu_Bar m_MenubarMain {
           xywh {0 0 145 25} box PLASTIC_UP_BOX
         } {
           submenu {} {
@@ -129,10 +129,10 @@ class UserInterface {open : {public UserInterfaceBase}
         }
         Fl_Wizard m_WizControlPane {
           label {Control Pane} open
-          xywh {0 25 145 685} align 16
+          xywh {0 25 145 680} box NO_BOX align 16
         } {
           Fl_Group m_GrpToolbarPage {
-            xywh {0 25 145 685} box FLAT_BOX color 53 labelsize 12 hide
+            xywh {0 25 145 680} color 53 labelsize 12 hide
           } {
             Fl_Group m_GrpInteractionModes {
               label {Active Tool Selection}
@@ -295,15 +295,15 @@ m_GlobalState->SetCoverageMode(PAINT_OVER_ONE);}
               }
             }
           }
-          Fl_Group m_GrpWelcomePage {open
-            xywh {0 25 145 685} box FLAT_BOX color 53 hide
+          Fl_Group m_GrpWelcomePage {
+            xywh {0 25 145 680} color 53 hide
           } {
             Fl_Group {} {
               label {ITK+SnAP} open
               xywh {5 195 135 35} labelfont 3 labelsize 24 align 0
             } {}
             Fl_Group {} {
-              label {Version 0.2 - (Pre-Alpha)} open selected
+              label {Version 0.2 - (Pre-Alpha)} open
               xywh {5 225 135 20} labelsize 12 align 145
             } {}
             Fl_Group {} {
@@ -322,10 +322,10 @@ m_GlobalState->SetCoverageMode(PAINT_OVER_ONE);}
             }
           }
           Fl_Group m_GrpSNAPPage {open
-            xywh {0 25 145 685} box FLAT_BOX color 53
+            xywh {0 25 145 680} color 53
           } {
             Fl_Group {} {
-              label {Image Interaction} open
+              label {Image Interaction}
               xywh {5 45 135 120} box PLASTIC_DOWN_BOX color 41 labeltype EMBOSSED_LABEL labelsize 12 labelcolor 4
             } {
               Fl_Button m_BtnSNAPCrosshairs {
@@ -340,205 +340,235 @@ m_GlobalState->SetCoverageMode(PAINT_OVER_ONE);}
                 tooltip {3D paint: spray paint and cut planes} xywh {95 55 35 35} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 46 selection_color 46 align 16
               }
               Fl_Output m_OutSNAPProbe {
-                label {Intensity:}
-                tooltip {Intensity value at cursor position} xywh {90 115 45 20} box THIN_DOWN_BOX color 49 selection_color 48 labelsize 10 textsize 12
+                label {Grey:}
+                tooltip {Intensity value at cursor position} xywh {10 140 40 20} box THIN_DOWN_BOX color 49 selection_color 48 labelsize 10 align 5 textsize 10
               }
               Fl_Output m_OutSNAPLabelProbe {
                 label {Label:}
-                tooltip {Label at cursor position} xywh {90 135 45 20} box THIN_DOWN_BOX color 49 selection_color 48 labelsize 10 textsize 12
+                tooltip {Label at cursor position} xywh {105 140 30 20} box THIN_DOWN_BOX color 49 selection_color 48 labelsize 10 align 5 textsize 10
               }
-              Fl_Group m_GrpSNAPCurrentColor {open
-                tooltip {Color of current label} xywh {15 133 28 22} box BORDER_BOX color 23 selection_color 57
+              Fl_Group m_GrpSNAPCurrentColor {
+                label {Segmentation Label:} open
+                tooltip {Color of current label} xywh {10 115 125 10} box BORDER_BOX color 23 selection_color 57 labelsize 10 align 5
               } {}
+              Fl_Output m_OutSNAPSpeedProbe {
+                label {Prep:}
+                tooltip {Intensity value at cursor position} xywh {55 140 45 20} box THIN_DOWN_BOX color 49 selection_color 48 labelsize 10 align 5 textsize 10
+              }
             }
             Fl_Group {} {
               label {Segmentation Pipeline}
-              xywh {5 189 135 111} box PLASTIC_DOWN_BOX color 41 labeltype EMBOSSED_LABEL labelsize 12 labelcolor 4
+              xywh {5 184 135 111} box PLASTIC_DOWN_BOX color 41 labeltype EMBOSSED_LABEL labelsize 12 labelcolor 4
             } {
               Fl_Button m_BtnSNAPStepPreprocess {
                 label 1
-                callback {this->OnSNAPStepPreprocess();}
-                xywh {15 195 30 30} type Radio box PLASTIC_UP_BOX value 1 color 180 selection_color 94 labelfont 1
+                xywh {15 190 30 30} type Radio box PLASTIC_UP_BOX value 1 color 180 selection_color 94 labelfont 1
               }
               Fl_Button m_BtnSNAPStepInitialize {
                 label 2
-                callback {this->OnSNAPStepInitialize();}
-                xywh {15 230 30 30} type Radio box PLASTIC_UP_BOX color 180 selection_color 94 labelfont 1
+                xywh {15 225 30 30} type Radio box PLASTIC_UP_BOX color 180 selection_color 94 labelfont 1
               }
               Fl_Button m_BtnSNAPStepSegment {
                 label 3
-                callback {this->OnSNAPStepSegment();}
-                xywh {15 265 30 30} type Radio box PLASTIC_UP_BOX color 180 selection_color 94 labelfont 1
+                xywh {15 260 30 30} type Radio box PLASTIC_UP_BOX color 180 selection_color 94 labelfont 1
               }
               Fl_Group {} {
                 label {Preprocess image} open
-                xywh {50 195 85 30} labelsize 11 align 149
+                xywh {50 190 85 30} labelsize 11 align 149
               } {}
               Fl_Group {} {
                 label {Initialize segmentation} open
-                xywh {50 230 85 30} labelsize 11 align 149
+                xywh {50 225 85 30} labelsize 11 align 149
               } {}
               Fl_Group {} {
                 label {Perform segmentation} open
-                xywh {50 265 85 30} labelsize 11 align 149
+                xywh {50 260 85 30} labelsize 11 align 149
               } {}
             }
             Fl_Wizard m_WizSegmentationPipeline {
               label {Pipeline Step Options} open
-              xywh {5 325 135 210} box NO_BOX labeltype EMBOSSED_LABEL labelsize 12 labelcolor 4
+              xywh {5 318 135 237} box NO_BOX labeltype EMBOSSED_LABEL labelsize 12 labelcolor 4
             } {
               Fl_Group m_GrpSNAPStepPreprocess {
-                label {Preprocess Image}
-                xywh {5 325 135 210} box PLASTIC_DOWN_BOX color 41 labeltype EMBOSSED_LABEL labelsize 12 labelcolor 4
+                label {Preprocess Image} open
+                xywh {5 320 135 235} box PLASTIC_DOWN_BOX color 41 labeltype EMBOSSED_LABEL labelsize 12 labelcolor 4
               } {
                 Fl_Button m_BtnPreprocess {
-                  label {Preprocess...}
+                  label {Preprocess Image ...}
                   callback {OnPreprocessAction()}
-                  tooltip {Preprocess original data} xywh {25 500 95 25} box PLASTIC_UP_BOX color 180 labelsize 12 labelcolor 0
+                  tooltip {Preprocess original data} xywh {15 405 115 25} box PLASTIC_UP_BOX color 180 labelsize 11 labelcolor 0 align 144
                 }
                 Fl_Group m_GrpSnakeChoiceRadio {
-                  label {Segmentation mode}
-                  xywh {15 350 115 45} labelsize 12 align 5
+                  label {Snake mode:}
+                  xywh {15 350 125 45} labelsize 12 align 5
                 } {
                   Fl_Round_Button m_RadSnakeInOut {
-                    label {In/Out snake}
                     callback {OnInOutSnakeSelect();}
-                    tooltip {Select in/out snake} xywh {25 355 105 20} down_box ROUND_DOWN_BOX value 1 labelsize 12
+                    tooltip {Select in/out snake} xywh {15 350 120 25} down_box ROUND_DOWN_BOX value 1 color 205 align 148
                   }
+                  Fl_Group {} {
+                    label {Region competition} open
+                    xywh {35 350 100 25} labelsize 11 align 20
+                  } {}
                   Fl_Round_Button m_RadSnakeEdge {
-                    label {Edge snake}
                     callback {OnEdgeSnakeSelect();}
-                    tooltip {Select edge-driven snake} xywh {25 375 105 20} down_box ROUND_DOWN_BOX labelsize 12
+                    tooltip {Select edge-driven snake} xywh {15 370 105 25} down_box ROUND_DOWN_BOX
                   }
+                  Fl_Group {} {
+                    label {Edge stopping} open
+                    xywh {35 370 100 25} labelsize 11 align 148
+                  } {}
+                }
+                Fl_Button m_BtnAcceptPreprocessing {
+                  label {  Next @-1>}
+                  callback {OnAcceptPreprocessingAction();} selected
+                  tooltip {Accept initialization, begin running snake} xywh {75 520 55 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12 labelcolor 0 align 16
+                }
+                Fl_Button {} {
+                  label {@-1< Back  }
+                  tooltip {Accept initialization, begin running snake} xywh {15 520 55 25} box PLASTIC_UP_BOX color 180 labelsize 12 labelcolor 32 align 16 deactivate
                 }
               }
               Fl_Group m_GrpSNAPStepInitialize {
-                label {Initialize Segmentation}
-                xywh {5 325 135 210} box PLASTIC_DOWN_BOX color 41 labeltype EMBOSSED_LABEL labelsize 12 labelcolor 4 hide
+                label {Initialize Segmentation} open
+                xywh {5 318 135 237} box PLASTIC_DOWN_BOX color 41 labeltype EMBOSSED_LABEL labelsize 12 labelcolor 4 hide
               } {
                 Fl_Button m_BtnAddBubble {
-                  label {Add
-Bubble}
+                  label {Add Bubble}
                   callback {OnAddBubbleAction()}
-                  tooltip {Add bubble at cursor position} xywh {15 335 55 35} box PLASTIC_UP_BOX color 180 labelsize 12 labelcolor 0
+                  tooltip {Add bubble at cursor position} xywh {15 335 115 20} box PLASTIC_UP_BOX color 180 labelsize 11 labelcolor 0 align 128
                 }
                 Fl_Button m_BtnRemoveBubble {
-                  label {Remove
-Bubble}
+                  label {Remove Bubble}
                   callback {OnRemoveBubbleAction()}
-                  tooltip {Remove highlighted bubble from list} xywh {75 335 55 35} box PLASTIC_UP_BOX color 180 labelsize 12 labelcolor 0
+                  tooltip {Remove highlighted bubble from list} xywh {15 360 115 20} box PLASTIC_UP_BOX color 180 labelsize 11 labelcolor 0 align 128
                 }
                 Fl_Value_Slider m_InBubbleRadius {
-                  label Radius
+                  label {Radius:}
                   callback {OnBubbleRadiusChange()}
-                  xywh {15 395 115 20} type Horizontal labelsize 12 align 5 maximum 255 step 1 value 128
+                  xywh {15 400 115 20} type Horizontal color 53 selection_color 197 labelsize 12 align 5 maximum 255 step 1 value 128
                 }
                 Fl_Browser m_BrsActiveBubbles {
-                  label {Active bubbles}
+                  label {Active bubbles:}
                   callback {OnActiveBubblesChange()}
-                  tooltip {Click a bubble to modify radius or remove} xywh {15 435 115 50} type Hold labelsize 12 align 5 textsize 9
+                  tooltip {Click a bubble to modify radius or remove} xywh {15 440 115 70} type Hold color 53 labelsize 12 align 5 textsize 9
                 }
                 Fl_Button m_BtnAcceptInitialization {
-                  label {Accept Initialization}
+                  label {  Next @-1>}
                   callback {OnAcceptInitializationAction();}
-                  tooltip {Accept initialization, begin running snake} xywh {15 500 115 25} box PLASTIC_UP_BOX color 180 labelsize 12 labelcolor 0
+                  tooltip {Accept initialization, begin running snake} xywh {75 520 55 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12 labelcolor 0 align 16
                 }
-                Fl_Button m_BtnRestartInitialization {
-                  label {Restart Initialization}
-                  callback {OnRestartInitializationAction();}
-                  tooltip {Accept initialization, begin running snake} xywh {15 500 115 25} box PLASTIC_UP_BOX color 180 labelsize 12 labelcolor 0 hide
+                Fl_Button m_BtnRestartPreprocessing {
+                  label {@-1< Back  }
+                  callback {OnRestartPreprocessingAction();}
+                  tooltip {Accept initialization, begin running snake} xywh {15 520 55 25} box PLASTIC_UP_BOX color 180 labelsize 12 labelcolor 0 align 16
                 }
               }
               Fl_Group m_GrpSNAPStepSegment {
-                label {Perform Segmentation}
-                xywh {5 325 135 210} box PLASTIC_DOWN_BOX color 41 labeltype EMBOSSED_LABEL labelsize 12 labelcolor 4 hide
+                label {Perform Segmentation} open
+                xywh {5 320 135 235} box PLASTIC_DOWN_BOX color 41 labeltype EMBOSSED_LABEL labelsize 12 labelcolor 4 hide
               } {
                 Fl_Output m_OutCurrentIteration {
                   label {Iteration:}
-                  tooltip {Current snake iteration} xywh {75 455 60 20} box THIN_DOWN_BOX color 23 selection_color 48 labelsize 12 textsize 10
+                  tooltip {Current snake iteration} xywh {80 435 50 20} box THIN_DOWN_BOX color 23 selection_color 48 labelsize 12 align 5 textsize 10
                 }
                 Fl_Button m_BtnSnakeParameters {
                   label {Set Parameters...}
                   callback {OnSnakeParametersAction();}
-                  tooltip {Change snake parameters} xywh {15 335 115 25} box PLASTIC_UP_BOX color 180 labelsize 12
+                  tooltip {Change snake parameters} xywh {15 330 115 25} box PLASTIC_UP_BOX color 180 labelsize 12
                 }
                 Fl_Choice m_InStepSize {
                   label {Step size:}
                   callback {OnSnakeStepSizeChange();}
-                  tooltip {Number of iterations per step} xywh {75 430 60 20} down_box BORDER_BOX color 23 selection_color 7 labelsize 12 textsize 10
+                  tooltip {Number of iterations per step} xywh {15 435 60 20} down_box BORDER_BOX color 23 selection_color 7 labelsize 12 align 5 textsize 10
                 } {}
                 Fl_Button m_BtnAcceptSegmentation {
-                  label {Accept Results}
+                  label Finish
                   callback {OnAcceptSegmentationAction();}
-                  tooltip {Accept segmentation and return} xywh {10 500 125 25} box PLASTIC_UP_BOX color 140 labelsize 12 labelcolor 0
+                  tooltip {Accept segmentation and return} xywh {75 520 55 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12 labelcolor 0
                 }
                 Fl_Group m_GrpSnakeControl {
                   label {Snake controls:} open
-                  xywh {15 395 120 35} labelsize 12 align 5
+                  xywh {15 385 120 35} labelsize 12 align 5
                 } {
                   Fl_Button m_BtnSnakeRewind {
                     label {@<<}
                     callback {OnSnakeRewindAction();}
-                    tooltip {Rewind snake to beginning} xywh {15 397 28 25} box PLASTIC_UP_BOX color 140 labelcolor 0
+                    tooltip {Rewind snake to beginning} xywh {15 387 28 25} box PLASTIC_UP_BOX color 180 labelcolor 0 align 18
                   }
                   Fl_Button m_BtnSnakePlay {
                     label {@>}
                     callback {OnSnakePlayAction();}
-                    tooltip {Step snake continuously} xywh {45 397 28 25} box PLASTIC_UP_BOX color 140 labelcolor 0
+                    tooltip {Step snake continuously} xywh {45 387 28 25} box PLASTIC_UP_BOX color 180 labelcolor 0 align 22
                   }
                   Fl_Button m_BtnSnakeStop {
                     label {@square}
                     callback {OnSnakeStopAction();}
-                    tooltip {Stop snake} xywh {75 397 28 25} box PLASTIC_UP_BOX color 140 labelsize 8 labelcolor 0
+                    tooltip {Stop snake} xywh {75 387 28 25} box PLASTIC_UP_BOX color 180 labelsize 8 labelcolor 0
                   }
                   Fl_Button m_BtnSnakeStep {
                     label {@|>}
                     callback {OnSnakeStepAction();}
-                    tooltip {Step snake one step size} xywh {105 397 28 25} box PLASTIC_UP_BOX color 140 labelcolor 0
+                    tooltip {Step snake one step size} xywh {105 387 28 25} box PLASTIC_UP_BOX color 180 labelcolor 0 align 18
                   }
+                }
+                Fl_Button m_BtnRestartInitialization {
+                  label {@-1< Back  }
+                  callback {OnRestartInitializationAction();}
+                  tooltip {Accept initialization, begin running snake} xywh {15 520 55 25} box PLASTIC_UP_BOX color 180 selection_color 48 labelsize 12 labelcolor 0 align 16
                 }
               }
             }
             Fl_Group {} {
               label {Display Options} open
-              xywh {5 560 135 95} box PLASTIC_DOWN_BOX color 41 labeltype EMBOSSED_LABEL labelsize 12 labelcolor 4
+              xywh {5 575 135 95} box PLASTIC_DOWN_BOX color 41 labeltype EMBOSSED_LABEL labelsize 12 labelcolor 4
             } {
               Fl_Group m_GrpImageOptions {
-                label {Image to display:} open
-                xywh {15 585 115 40} labelsize 12 align 5
-              } {}
+                label {Image to display:}
+                xywh {15 600 120 35} labelsize 12 align 5
+              } {
+                Fl_Group {} {
+                  label {Original greyscale} open
+                  xywh {35 603 95 15} labelsize 11 align 20
+                } {}
+                Fl_Group {} {
+                  label Preprocessed open
+                  xywh {35 619 95 15} labelsize 11 align 20
+                } {}
+              }
               Fl_Round_Button m_RadioSNAPViewOriginal {
-                label Original
                 callback {OnSNAPViewOriginalSelect();}
-                xywh {25 585 105 15} type Radio down_box ROUND_DOWN_BOX value 1 labelsize 12
+                xywh {20 603 105 15} type Radio down_box ROUND_DOWN_BOX value 1
               }
               Fl_Round_Button m_RadioSNAPViewPreprocessed {
-                label Preprocessed
                 callback {OnViewPreprocessedSelect();}
-                xywh {25 600 105 15} type Radio down_box ROUND_DOWN_BOX labelsize 12
+                xywh {20 619 105 15} type Radio down_box ROUND_DOWN_BOX
               }
               Fl_Value_Slider m_InSNAPLabelOpacity {
                 label {Label opacity:}
                 callback {this->OnSNAPLabelOpacityChange();}
-                xywh {10 635 125 15} type Horizontal labelsize 12 align 5 maximum 255 step 1 value 128
+                xywh {15 650 120 15} type Horizontal labelsize 12 align 5 maximum 255 step 1 value 128
               }
             }
             Fl_Button m_BtnCancelSegmentation {
-              label {Cancel SNAP Mode}
+              label {Cancel Segmentation}
               callback {OnCancelSegmentationAction();}
-              tooltip {Cancel segmentation and return} xywh {10 670 125 25} box PLASTIC_UP_BOX color 140 labelsize 12 labelcolor 0
+              tooltip {Cancel segmentation and return} xywh {5 680 135 25} box PLASTIC_UP_BOX color 180 labelsize 12 labelcolor 0
             }
           }
         }
+        Fl_Group {} {open
+          xywh {0 705 145 5} color 154 resizable
+        } {}
       }
       Fl_Output m_OutMessage {
         label {IRIS Status Messages}
-        xywh {10 735 870 20} box FLAT_BOX color 14 labeltype NO_LABEL align 0
+        xywh {10 715 870 20} box FLAT_BOX color 14 labeltype NO_LABEL align 0
       }
       Fl_Wizard m_WizWindows {
-        xywh {145 -5 730 715}
+        xywh {145 -5 730 715} resizable
       } {
-        Fl_Group m_GrpIRISWindows {open
+        Fl_Group m_GrpIRISWindows {
           xywh {145 -5 730 715} resizable
         } {
           Fl_Group m_GrpIRISAxial {
@@ -554,24 +584,31 @@ Bubble}
               callback {this->PositionSliderCallback(0);}
               xywh {490 5 15 320} minimum 1 maximum 0
             }
-            Fl_Button {Accept_button[0]} {
-              label {accept poly}
-              callback {AcceptPolygonCallback(0);}
-              xywh {155 330 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128 deactivate
-            }
-            Fl_Button {m_BtnPaste[0]} {
-              label paste
-              callback {Win2D[0]->PastePolygon();}
-              xywh {250 330 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128 deactivate
-            }
-            Fl_Button {} {
-              label {reset view}
-              callback {Win2D[0]->ResetView();
+            Fl_Group {} {open
+              xywh {145 325 365 30}
+            } {
+              Fl_Button {Accept_button[0]} {
+                label {accept poly}
+                callback {AcceptPolygonCallback(0);}
+                xywh {155 330 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128 deactivate
+              }
+              Fl_Button {m_BtnPaste[0]} {
+                label paste
+                callback {Win2D[0]->PastePolygon();}
+                xywh {250 330 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128 deactivate
+              }
+              Fl_Button {} {
+                label {reset view}
+                callback {Win2D[0]->ResetView();
 Win2D[0]->redraw();}
-              xywh {340 330 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128
-            }
-            Fl_Output {Position[0]} {
-              xywh {420 330 65 20} box FLAT_BOX color 49 align 0 textsize 10 deactivate
+                xywh {340 330 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128
+              }
+              Fl_Output {Position[0]} {
+                xywh {420 330 65 20} box FLAT_BOX color 49 align 0 textsize 10 deactivate
+              }
+              Fl_Group {} {open
+                xywh {145 325 5 30} color 154 resizable
+              } {}
             }
           }
           Fl_Group m_GrpIRISSagittal {
@@ -587,51 +624,39 @@ Win2D[0]->redraw();}
               callback {this->PositionSliderCallback(1);}
               xywh {855 5 15 320} minimum 1 maximum 0
             }
-            Fl_Button {Accept_button[1]} {
-              label {accept poly}
-              callback {AcceptPolygonCallback(1);}
-              xywh {520 330 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128 deactivate
-            }
-            Fl_Button {m_BtnPaste[1]} {
-              label paste
-              callback {Win2D[1]->PastePolygon();}
-              xywh {615 330 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128 deactivate
-            }
-            Fl_Button {} {
-              label {reset view}
-              callback {Win2D[1]->ResetView();
+            Fl_Group {} {open
+              xywh {510 325 365 30}
+            } {
+              Fl_Button {Accept_button[1]} {
+                label {accept poly}
+                callback {AcceptPolygonCallback(1);}
+                xywh {520 330 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128 deactivate
+              }
+              Fl_Button {m_BtnPaste[1]} {
+                label paste
+                callback {Win2D[1]->PastePolygon();}
+                xywh {615 330 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128 deactivate
+              }
+              Fl_Button {} {
+                label {reset view}
+                callback {Win2D[1]->ResetView();
 Win2D[1]->redraw();}
-              xywh {710 330 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128
-            }
-            Fl_Output {Position[1]} {
-              xywh {785 330 70 20} box FLAT_BOX color 49 align 0 textsize 10 deactivate
+                xywh {710 330 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128
+              }
+              Fl_Output {Position[1]} {
+                xywh {785 330 70 20} box FLAT_BOX color 49 align 0 textsize 10 deactivate
+              }
+              Fl_Group {} {open
+                xywh {510 325 5 30} color 154 resizable
+              } {}
             }
           }
-          Fl_Group m_GrpIRISCoronal {
+          Fl_Group m_GrpIRISCoronal {open
             xywh {510 355 365 355} box UP_BOX
           } {
             Fl_Scrollbar {m_InIRISSliceSlider[2]} {
               callback {this->PositionSliderCallback(2);}
               xywh {855 360 15 315} minimum 1 maximum 0
-            }
-            Fl_Button {Accept_button[2]} {
-              label {accept poly}
-              callback {AcceptPolygonCallback(2);}
-              xywh {520 685 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128 deactivate
-            }
-            Fl_Button {m_BtnPaste[2]} {
-              label paste
-              callback {Win2D[2]->PastePolygon();}
-              xywh {615 685 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128 deactivate
-            }
-            Fl_Button {} {
-              label {reset view}
-              callback {Win2D[2]->ResetView();
-Win2D[2]->redraw();}
-              xywh {710 685 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128
-            }
-            Fl_Output {Position[2]} {
-              xywh {785 685 70 20} box FLAT_BOX color 49 align 0 textsize 10 deactivate
             }
             Fl_Box {Win2D[2]} {
               label {m_GrpIRISCoronal(2)}
@@ -639,8 +664,34 @@ Win2D[2]->redraw();}
               code0 {\#include "IRISSliceWindow.h"}
               class IRISSliceWindow
             }
+            Fl_Group {} {open
+              xywh {510 680 365 30}
+            } {
+              Fl_Button {Accept_button[2]} {
+                label {accept poly}
+                callback {AcceptPolygonCallback(2);}
+                xywh {520 685 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128 deactivate
+              }
+              Fl_Button {m_BtnPaste[2]} {
+                label paste
+                callback {Win2D[2]->PastePolygon();}
+                xywh {615 685 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128 deactivate
+              }
+              Fl_Button {} {
+                label {reset view}
+                callback {Win2D[2]->ResetView();
+Win2D[2]->redraw();}
+                xywh {710 685 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128
+              }
+              Fl_Output {Position[2]} {
+                xywh {785 685 70 20} box FLAT_BOX color 49 align 0 textsize 10 deactivate
+              }
+              Fl_Group {} {open
+                xywh {510 680 5 30} color 154 resizable
+              } {}
+            }
           }
-          Fl_Group m_GrpIRISView3D {
+          Fl_Group m_GrpIRISView3D {open
             xywh {145 355 365 355} box UP_BOX
           } {
             Fl_Box m_IRISWindow3D {
@@ -649,28 +700,35 @@ Win2D[2]->redraw();}
               code0 {\#include "Window3D.h"}
               class Window3D
             }
-            Fl_Button m_BtnMeshUpdate {
-              label {update mesh}
-              callback {m_IRISWindow3D->UpdateMesh();}
-              xywh {155 685 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128
-            }
-            Fl_Button m_BtnAccept3D {
-              label accept
-              callback {o->deactivate();
+            Fl_Group {} {open
+              xywh {145 680 365 30}
+            } {
+              Fl_Group {} {open
+                xywh {145 680 5 30} color 154 resizable
+              } {}
+              Fl_Button m_BtnMeshUpdate {
+                label {update mesh}
+                callback {m_IRISWindow3D->UpdateMesh();}
+                xywh {160 685 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128
+              }
+              Fl_Button m_BtnAccept3D {
+                label accept
+                callback {o->deactivate();
 m_IRISWindow3D->Accept();
 MakeSegTexturesCurrent();
 m_BtnMeshUpdate->activate();}
-              xywh {250 685 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128 deactivate
-            }
-            Fl_Button {} {
-              label {reset view}
-              callback {m_IRISWindow3D->ResetView();
+                xywh {255 685 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128 deactivate
+              }
+              Fl_Button {} {
+                label {reset view}
+                callback {m_IRISWindow3D->ResetView();
 m_IRISWindow3D->redraw();}
-              xywh {355 685 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128
+                xywh {360 685 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128
+              }
             }
           }
         }
-        Fl_Group m_GrpSNAPWindows {open
+        Fl_Group m_GrpSNAPWindows {
           xywh {145 0 730 710} hide
         } {
           Fl_Group m_GrpSNAPAxial {open
@@ -678,7 +736,7 @@ m_IRISWindow3D->redraw();}
           } {
             Fl_Box {m_SNAPWindow2D[0]} {
               label {m_GrpIRISAxial(0)}
-              xywh {150 5 340 320} box BORDER_BOX
+              xywh {150 5 340 320} box BORDER_BOX resizable
               code0 {\#include "SNAPSliceWindow.h"}
               class SNAPSliceWindow
             }
@@ -686,22 +744,29 @@ m_IRISWindow3D->redraw();}
               callback {this->OnIRISSliceSliderChange(0);}
               xywh {490 5 15 320} minimum 1 maximum 0
             }
-            Fl_Button {} {
-              label {reset view}
-              callback {m_SNAPWindow2D[0]->ResetView();
+            Fl_Group {} {open
+              xywh {145 325 365 30}
+            } {
+              Fl_Group {} {open
+                xywh {145 325 10 30} resizable
+              } {}
+              Fl_Button {} {
+                label {reset view}
+                callback {m_SNAPWindow2D[0]->ResetView();
 m_SNAPWindow2D[0]->redraw();}
-              xywh {345 330 65 20} box PLASTIC_UP_BOX color 140 labelsize 9 labelcolor 0 align 128
-            }
-            Fl_Output {OnSNAPSliceSliderChange[0]} {
-              xywh {430 330 70 20} box NO_BOX color 49 align 0 textsize 10 deactivate
+                xywh {345 330 65 20} box PLASTIC_UP_BOX color 140 labelsize 9 labelcolor 0 align 128
+              }
+              Fl_Output {OnSNAPSliceSliderChange[0]} {
+                xywh {430 330 70 20} box NO_BOX color 49 align 0 textsize 10 deactivate
+              }
             }
           }
-          Fl_Group m_GrpSNAPSagittal {
+          Fl_Group m_GrpSNAPSagittal {open
             xywh {510 0 365 355} box UP_BOX
           } {
             Fl_Box {m_SNAPWindow2D[1]} {
               label {m_GrpIRISSagittal(1)}
-              xywh {515 5 340 320} box BORDER_BOX
+              xywh {515 5 340 320} box BORDER_BOX resizable
               code0 {\#include "SNAPSliceWindow.h"}
               class SNAPSliceWindow
             }
@@ -709,63 +774,84 @@ m_SNAPWindow2D[0]->redraw();}
               callback {this->OnIRISSliceSliderChange(1);}
               xywh {855 5 15 320} minimum 1 maximum 0
             }
-            Fl_Button {} {
-              label {reset view}
-              callback {m_SNAPWindow2D[1]->ResetView();
+            Fl_Group {} {open
+              xywh {510 325 365 30}
+            } {
+              Fl_Group {} {open
+                xywh {510 325 10 30} resizable
+              } {}
+              Fl_Button {} {
+                label {reset view}
+                callback {m_SNAPWindow2D[1]->ResetView();
 m_SNAPWindow2D[1]->redraw();}
-              xywh {710 330 65 20} box PLASTIC_UP_BOX color 140 labelsize 9 labelcolor 0 align 128
-            }
-            Fl_Output {OnSNAPSliceSliderChange[1]} {
-              xywh {795 330 70 20} box NO_BOX color 49 align 0 textsize 10 deactivate
+                xywh {710 330 65 20} box PLASTIC_UP_BOX color 140 labelsize 9 labelcolor 0 align 128
+              }
+              Fl_Output {OnSNAPSliceSliderChange[1]} {
+                xywh {795 330 70 20} box NO_BOX color 49 align 0 textsize 10 deactivate
+              }
             }
           }
-          Fl_Group m_GrpSNAPCoronal {
+          Fl_Group m_GrpSNAPCoronal {open
             xywh {510 355 365 355} box UP_BOX
           } {
             Fl_Scrollbar {m_InSNAPSliceSlider[2]} {
               callback {this->OnIRISSliceSliderChange(2);}
               xywh {855 360 15 320} minimum 1 maximum 0
             }
-            Fl_Button {} {
-              label {reset view}
-              callback {m_SNAPWindow2D[2]->ResetView();
-m_SNAPWindow2D[2]->redraw();}
-              xywh {710 685 65 20} box PLASTIC_UP_BOX color 140 labelsize 9 labelcolor 0 align 128
-            }
-            Fl_Output {OnSNAPSliceSliderChange[2]} {
-              xywh {795 685 70 20} box NO_BOX color 49 align 0 textsize 10 deactivate
-            }
             Fl_Box {m_SNAPWindow2D[2]} {
               label {m_GrpIRISCoronal(2)}
-              xywh {515 360 340 320} box BORDER_BOX
+              xywh {515 360 340 320} box BORDER_BOX resizable
               code0 {\#include "SNAPSliceWindow.h"}
               class SNAPSliceWindow
             }
+            Fl_Group {} {open
+              xywh {510 680 365 30}
+            } {
+              Fl_Group {} {open
+                xywh {510 680 10 30} resizable
+              } {}
+              Fl_Button {} {
+                label {reset view}
+                callback {m_SNAPWindow2D[2]->ResetView();
+m_SNAPWindow2D[2]->redraw();}
+                xywh {710 685 65 20} box PLASTIC_UP_BOX color 140 labelsize 9 labelcolor 0 align 128
+              }
+              Fl_Output {OnSNAPSliceSliderChange[2]} {
+                xywh {795 685 70 20} box NO_BOX color 49 align 0 textsize 10 deactivate
+              }
+            }
           }
-          Fl_Group m_GRPSNAPView3D {
+          Fl_Group m_GRPSNAPView3D {open
             xywh {145 355 365 355} box UP_BOX
           } {
             Fl_Box m_SNAPWindow3D {
               label 3D
-              xywh {150 360 355 320} box BORDER_BOX
+              xywh {150 360 355 320} box BORDER_BOX resizable
               code0 {\#include "Window3D.h"}
               class Window3D
             }
-            Fl_Button m_BtnSNAPMeshUpdate {
-              label {update mesh}
-              callback {m_SNAPWindow3D->UpdateMesh();}
-              xywh {155 685 65 20} box PLASTIC_UP_BOX color 140 labelsize 9 labelcolor 0 align 128 deactivate
-            }
-            Fl_Button {} {
-              label {reset view}
-              callback {m_SNAPWindow3D->ResetView();
+            Fl_Group {} {open
+              xywh {145 680 365 30}
+            } {
+              Fl_Group {} {open
+                xywh {145 680 10 30} resizable
+              } {}
+              Fl_Button m_BtnSNAPMeshUpdate {
+                label {update mesh}
+                callback {m_SNAPWindow3D->UpdateMesh();}
+                xywh {155 685 65 20} box PLASTIC_UP_BOX color 140 labelsize 9 labelcolor 0 align 128 deactivate
+              }
+              Fl_Button {} {
+                label {reset view}
+                callback {m_SNAPWindow3D->ResetView();
 m_SNAPWindow3D->redraw();}
-              xywh {355 685 65 20} box PLASTIC_UP_BOX color 140 labelsize 9 labelcolor 0 align 128
-            }
-            Fl_Check_Button m_ChkContinuousView3DUpdate {
-              label {update continuously}
-              callback {OnContinuousViewUpdateChange();}
-              xywh {225 685 25 20} down_box DOWN_BOX labelsize 11 deactivate
+                xywh {355 685 65 20} box PLASTIC_UP_BOX color 140 labelsize 9 labelcolor 0 align 128
+              }
+              Fl_Check_Button m_ChkContinuousView3DUpdate {
+                label {update continuously}
+                callback {OnContinuousViewUpdateChange();}
+                xywh {225 685 25 20} down_box DOWN_BOX labelsize 11 deactivate
+              }
             }
           }
         }
@@ -826,7 +912,7 @@ m_InSaveLabelFilename->value((const char*)m_ChosedFile);}
     }
     Fl_Window m_WinEditLabel {
       label {Edit Color Label}
-      xywh {664 370 245 215} labelsize 12 visible
+      xywh {664 370 245 215} labelsize 12 hide
     } {
       Fl_Group m_GrpEditLabelColorChooser {
         label {Choose New Label Color} open
@@ -881,7 +967,7 @@ this->ChangeLabelsCallback();}
     }
     Fl_Window m_WinRenderOptions {
       label {Rendering Options}
-      xywh {4 30 375 245} align 0 visible
+      xywh {4 30 375 245} align 0 hide
     } {
       Fl_Tabs {} {
         xywh {0 5 375 210} labelsize 12 align 0
@@ -1037,110 +1123,173 @@ RedrawWindows();}
     }
     Fl_Window m_WinSnakeParameters {
       label {Snake Parameters}
-      xywh {484 320 344 269} hide non_modal
+      xywh {768 291 362 299} hide non_modal
     } {
       Fl_Return_Button m_BtnSnakeParametersOk {
         label Okay
         callback {OnSnakeParametersApplyAction();
 m_WinSnakeParameters->hide();}
-        xywh {5 235 65 30}
+        xywh {75 265 65 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12
       }
       Fl_Button m_BtnSnakeParametersClose {
         label Close
         callback {m_WinSnakeParameters->hide();}
-        xywh {275 235 64 30}
-      }
-      Fl_Group m_GrpSnakeParametersConstraints {
-        label Constraints open
-        xywh {5 95 335 135} box ENGRAVED_BOX labeltype ENGRAVED_LABEL align 17
-      } {
-        Fl_Group m_GrpSnakeParametersDefaults {
-          xywh {5 115 335 40} hide deactivate
-        } {
-          Fl_Round_Button m_BtnSnakeParametersUserDefined {
-            label {user defined:}
-            callback {OnSnakeParametersUserDefinedSelect();}
-            xywh {20 135 20 15} type Radio down_box ROUND_DOWN_BOX
-          }
-          Fl_Round_Button m_BtnSnakeParametersSchlegel {
-            label Schlegel
-            callback {OnSnakeParametersSchlegelSelect();}
-            xywh {135 115 20 15} type Radio down_box ROUND_DOWN_BOX
-          }
-          Fl_Round_Button m_BtnSnakeParametersTurello {
-            label Turello
-            callback {OnSnakeParametersTurelloSelect();}
-            xywh {255 115 20 15} type Radio down_box ROUND_DOWN_BOX
-          }
-          Fl_Round_Button m_BtnSnakeParametersSapiro {
-            label Sapiro
-            callback {OnSnakeParametersSapiroSelect();}
-            xywh {20 115 20 15} type Radio down_box ROUND_DOWN_BOX value 1
-          }
-        }
-        Fl_Group m_GrpSnakeParametersSliders {
-          xywh {5 115 335 110} labelsize 10
-        } {
-          Fl_Value_Slider m_InSnakeParametersGradientExponent {
-            label {r_delg:}
-            xywh {175 155 155 15} type Horizontal labelsize 10 align 5 step 1
-          }
-          Fl_Value_Slider m_InSnakeParametersSmoothingWeight {
-            label {c_smooth:}
-            xywh {15 205 155 15} type Horizontal labelsize 10 align 5
-          }
-          Fl_Value_Slider m_InSnakeParametersMCFWeight {
-            label {c_MCF:}
-            xywh {15 130 155 15} type Horizontal labelsize 10 align 5 value 0.7
-          }
-          Fl_Value_Slider m_InSnakeParametersSpeedExponent {
-            label {r_c:}
-            xywh {175 180 155 15} type Horizontal labelsize 10 align 5 maximum 2 step 1 value 1
-          }
-          Fl_Value_Slider m_InSnakeParametersSmoothingExponent {
-            label {r_smooth:}
-            xywh {175 205 155 15} type Horizontal labelsize 10 align 5 maximum 2 step 1
-          }
-          Fl_Value_Slider m_InSnakeParametersMCFExponent {
-            label {r_MCF:}
-            xywh {175 130 155 15} type Horizontal labelsize 10 align 5 minimum -1 maximum 2 step 1
-          }
-          Fl_Value_Slider m_InSnakeParametersGradientWeight {
-            label {c_delg:}
-            xywh {15 155 155 15} type Horizontal labelsize 10 align 5 step 1
-          }
-        }
-      }
-      Fl_Group m_GrpSnakeParametersProperties {
-        label Propagation open
-        xywh {5 5 335 85} box ENGRAVED_BOX labeltype ENGRAVED_LABEL align 17
-      } {
-        Fl_Value_Slider m_InSnakeParametersTimeStep {
-          label {Time Step}
-          xywh {15 40 155 15} type Horizontal labelsize 10 align 5 value 0.1
-        }
-        Fl_Value_Slider m_InSnakeParametersGround {
-          label Ground
-          xywh {175 65 155 15} type Horizontal labelsize 10 align 5 maximum 30 step 0.1 value 5 deactivate
-        }
-        Fl_Value_Slider m_InSnakeParametersSpeed {
-          label Speed
-          xywh {175 40 155 15} type Horizontal labelsize 10 align 5 minimum -5 maximum 5 step 0.1 value 5
-        }
-        Fl_Check_Button m_InSnakeParametersParamsClamp {
-          label {clamp to ground:}
-          callback {OnSnakeParametersClampChange();}
-          xywh {70 60 25 25} down_box DOWN_BOX labelsize 10
-        }
+        xywh {225 265 64 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12
       }
       Fl_Button m_BtnSnakeParametersApply {
         label Apply
         callback {OnSnakeParametersApplyAction()}
-        xywh {90 235 65 30}
+        xywh {150 265 65 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12
+      }
+      Fl_Tabs {} {
+        xywh {0 5 350 255} labelfont 2 labelsize 12
+      } {
+        Fl_Group {} {
+          label {Standard Interface} open
+          xywh {5 25 345 230} labelfont 2 labelsize 12 hide
+        } {}
+        Fl_Group {} {
+          label {Expert Interface} open
+          xywh {5 25 345 230} labelfont 2 labelsize 12 hide
+        } {
+          Fl_Group {} {open
+            image {Artwork/formula01.gif} xywh {25 50 310 35} box BORDER_BOX color 7 align 16
+          } {}
+          Fl_Group {} {
+            label {Snake evolution equation:} open
+            xywh {20 35 190 15} labelsize 11 align 22
+          } {}
+          Fl_Group {} {
+            label {(propagation)} open
+            xywh {25 120 90 20} labelsize 10 align 17
+          } {}
+          Fl_Group {} {
+            label {(curvature)} open
+            xywh {135 120 90 20} labelsize 10 align 17
+          } {}
+          Fl_Group {} {
+            label {(advection)} open
+            xywh {245 120 90 20} labelsize 10 align 17
+          } {}
+          Fl_Group {} {open
+            image {Artwork/formula03.gif} xywh {25 95 90 25} box BORDER_BOX color 7 align 16
+          } {}
+          Fl_Group {} {open
+            image {Artwork/formula04.gif} xywh {135 95 90 25} box BORDER_BOX color 7 align 16
+          } {}
+          Fl_Group {} {open
+            image {Artwork/formula05.gif} xywh {245 95 90 25} box BORDER_BOX color 7 align 16
+          } {}
+        }
+        Fl_Group {} {
+          label {Classic Interface} open
+          xywh {5 25 345 230} labelfont 2 labelsize 12
+        } {
+          Fl_Group m_GrpSnakeParametersConstraints {
+            label Constraints open
+            xywh {10 115 335 135} box ENGRAVED_BOX labeltype ENGRAVED_LABEL align 17
+          } {
+            Fl_Group m_GrpSnakeParametersDefaults {
+              xywh {10 135 335 40} hide deactivate
+            } {
+              Fl_Round_Button m_BtnSnakeParametersUserDefined {
+                label {user defined:}
+                callback {OnSnakeParametersUserDefinedSelect();}
+                xywh {25 155 20 15} type Radio down_box ROUND_DOWN_BOX
+              }
+              Fl_Round_Button m_BtnSnakeParametersSchlegel {
+                label Schlegel
+                callback {OnSnakeParametersSchlegelSelect();}
+                xywh {140 135 20 15} type Radio down_box ROUND_DOWN_BOX
+              }
+              Fl_Round_Button m_BtnSnakeParametersTurello {
+                label Turello
+                callback {OnSnakeParametersTurelloSelect();}
+                xywh {260 135 20 15} type Radio down_box ROUND_DOWN_BOX
+              }
+              Fl_Round_Button m_BtnSnakeParametersSapiro {
+                label Sapiro
+                callback {OnSnakeParametersSapiroSelect();}
+                xywh {25 135 20 15} type Radio down_box ROUND_DOWN_BOX value 1
+              }
+            }
+            Fl_Group m_GrpSnakeParametersSliders {
+              xywh {10 135 335 110} labelsize 10
+            } {
+              Fl_Value_Slider m_InSnakeParametersGradientExponent {
+                label {r_delg:}
+                xywh {180 175 155 15} type Horizontal labelsize 10 align 5 step 1
+              }
+              Fl_Value_Slider m_InSnakeParametersSmoothingWeight {
+                label {c_smooth:}
+                xywh {20 225 155 15} type Horizontal labelsize 10 align 5 hide deactivate
+              }
+              Fl_Value_Slider m_InSnakeParametersMCFWeight {
+                label {c_MCF:}
+                xywh {20 150 155 15} type Horizontal labelsize 10 align 5 value 0.7
+              }
+              Fl_Value_Slider m_InSnakeParametersSpeedExponent {
+                label {r_c:}
+                xywh {180 200 155 15} type Horizontal labelsize 10 align 5 maximum 2 step 1 value 1
+              }
+              Fl_Value_Slider m_InSnakeParametersSmoothingExponent {
+                label {r_smooth:}
+                xywh {180 225 155 15} type Horizontal labelsize 10 align 5 maximum 2 step 1 hide deactivate
+              }
+              Fl_Value_Slider m_InSnakeParametersMCFExponent {
+                label {r_MCF:}
+                xywh {180 150 155 15} type Horizontal labelsize 10 align 5 minimum -1 maximum 2 step 1
+              }
+              Fl_Value_Slider m_InSnakeParametersGradientWeight {
+                label {c_delg:}
+                xywh {20 175 155 15} type Horizontal labelsize 10 align 5 step 1
+              }
+            }
+          }
+          Fl_Group m_GrpSnakeParametersProperties {
+            label Propagation open
+            xywh {10 30 335 80} box ENGRAVED_BOX labeltype ENGRAVED_LABEL align 17
+          } {
+            Fl_Value_Slider m_InSnakeParametersSpeed {
+              label {Speed:}
+              xywh {185 65 150 15} type Horizontal labelsize 10 align 5 minimum -5 maximum 5 step 0.1 value 5
+            }
+            Fl_Value_Slider m_InSnakeParametersGround {
+              label Ground
+              xywh {185 85 155 15} type Horizontal labelsize 10 align 5 maximum 30 step 0.1 value 5 hide deactivate
+            }
+            Fl_Check_Button m_InSnakeParametersParamsClamp {
+              label {clamp to ground:}
+              callback {OnSnakeParametersClampChange();}
+              xywh {215 80 25 25} down_box DOWN_BOX labelsize 10 hide deactivate
+            }
+            Fl_Group {} {
+              label {Time Step:} open
+              xywh {20 65 165 35} labelsize 10 align 5
+            } {
+              Fl_Value_Slider m_InSnakeParametersTimeStep {
+                xywh {20 65 150 15} type Horizontal labelsize 10 align 5 value 0.1 deactivate
+              }
+              Fl_Check_Button m_BtnSnakeParametersTimeStepAuto {
+                label {Compute automatically}
+                callback {if(m_BtnSnakeParametersTimeStepAuto->value() == 1)
+  {
+  m_InSnakeParametersTimeStep->value(0);
+  m_InSnakeParametersTimeStep->deactivate();
+  }
+else 
+  {
+  m_InSnakeParametersTimeStep->activate();
+  }}
+                xywh {30 80 130 20} down_box DOWN_BOX value 1 labelsize 10
+              }
+            }
+          }
+        }
       }
     }
     Fl_Window m_WinHelp {
-      label {SNAP/IRIS Help Window} open
+      label {SNAP/IRIS Help Window}
       xywh {-32000 -32000 365 710} color 53 hide
     } {
       Fl_Help_View m_BrsHelp {

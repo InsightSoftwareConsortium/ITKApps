@@ -23,6 +23,7 @@
 #include "SmoothBinaryThresholdImageFilter.h"
 #include "EdgePreprocessingImageFilter.h"
 #include "SNAPImageData.h"
+#include "IRISVectorTypesToITKConversion.h"
 
 using namespace itk;
 
@@ -143,24 +144,20 @@ UserInterfaceLogic
 {
   if (!m_FileLoaded) return;
 
-  Vector3i roiul,roilr;
-  roiul[0]=roiul[1]=roiul[2]=0;
-  roilr = m_Driver->GetIRISImageData()->GetVolumeExtents();
-  roilr[0] -= 1;
-  roilr[1] -= 1;
-  roilr[2] -= 1;
-  if (roiul[0] == roilr[0] || roiul[1] == roilr[1] || roiul[2] == roilr[2]) 
-    {
-    cerr << "full_data is not a volume" << endl;
-    }
-  else 
-    {
-    m_GlobalState->SetROICorner(0,roiul);
-    m_GlobalState->SetROICorner(1,roilr);
-    m_GlobalState->SetIsValidROI(true);
-    RedrawWindows();
-    m_OutMessage->value("Region of interest set to volume extents");
-    }  
+  // Get the grey image's region
+  GlobalState::RegionType roi = 
+    m_Driver->GetIRISImageData()->GetImageRegion();
+
+  // The region can not be empty!
+  assert(roi.GetNumberOfPixels() > 0);
+
+  // Set the Region of interest
+  m_GlobalState->SetSegmentationROI(roi);
+  m_GlobalState->SetIsValidROI(true);
+  
+  // Update the UI
+  this->RedrawWindows();
+  m_OutMessage->value("Region of interest set to volume extents");
 }
 
 //--------------------------------------------
@@ -191,31 +188,21 @@ UserInterfaceLogic
     return;
     }
 
-  roiul = m_GlobalState->GetROICorner(0);
-  roilr = m_GlobalState->GetROICorner(1);
+  // Get the region of interest
+  GlobalState::RegionType roi = m_GlobalState->GetSegmentationROI();
 
-  if (roiul[0] == roilr[0] ||
-    roiul[1] == roilr[1] ||
-    roiul[2] == roilr[2]) 
-    {
-    m_OutMessage->value("Invalid ROI: must define a volume.");
-    return;
-    }
-
-  char msg[1024];
-
-  sprintf(msg,"Call snake with ROI:(%d,%d,%d),(%d,%d,%d).",roiul[0],roiul[1],
-    roiul[2],roilr[0],roilr[1],roilr[2]);
-  //  m_OutMessage->value(msg);
-  cerr << msg << endl;
-
+  // The region can not be empty
+  assert(roi.GetNumberOfPixels() > 0);
 
   // This is where a chunk of data (ROI) gets copied
   // TODO: Clean ROI chunking up!   
 
   // Set the current application image mode to SNAP data
-  m_Driver->InitializeSNAPImageData(roiul,roilr);
+  m_Driver->InitializeSNAPImageData(roi);
   m_Driver->SetCurrentImageDataToSNAP();
+
+  // Inform the global state that we're in sNAP
+  m_GlobalState->SetSNAPActive(true);
 
   // reinitialize the point of view
   Vector3i dims = m_Driver->GetCurrentImageData()->GetVolumeExtents();
@@ -250,7 +237,7 @@ UserInterfaceLogic
   else 
     {
     m_InBubbleRadius->range(1,(int)(mindim/2));
-    m_InBubbleRadius->value((int)(mindim/4));
+    m_InBubbleRadius->value((int)(mindim/8));
     }
   m_InBubbleRadius->redraw();
 
@@ -262,6 +249,7 @@ UserInterfaceLogic
 
   //initialize GUI widgets
   m_BtnPreprocess->activate();
+  m_BtnAcceptPreprocessing->deactivate();
   m_GrpSnakeChoiceRadio->activate();
   m_GrpSNAPStepInitialize->activate();
   m_GrpSnakeControl->deactivate();
@@ -346,6 +334,10 @@ void
 UserInterfaceLogic
 ::OnPreprocessAction()
 {
+  // Disable the 'Next' button on the preprocessing page
+  m_BtnAcceptPreprocessing->deactivate();
+
+  // Display the right window
   if(m_GlobalState->GetSnakeMode() == EDGE_SNAKE)
     {
     m_PreprocessingUI->DisplayEdgeWindow();
@@ -363,8 +355,16 @@ UserInterfaceLogic
   // Check if the preprocessing image has been computed
   if(m_GlobalState->GetSpeedValid())
     {
-    SetActiveSegmentationPipelinePage(1);
+    // Enable the 'Next' button on the preprocessing page
+    m_BtnAcceptPreprocessing->activate();
     }
+}
+
+void 
+UserInterfaceLogic
+::OnAcceptPreprocessingAction()
+{
+  SetActiveSegmentationPipelinePage(1);
 }
 
 //--------------------------------------------
@@ -523,31 +523,42 @@ void
 UserInterfaceLogic
 ::UpdateSNAPImageProbe()
 {
-  char label_str[50];
+  char strLabel[256];
   Vector3i crosshairs = m_GlobalState->GetCrosshairsPosition();
 
-  if (m_GlobalState->GetShowSpeed()) 
+  // Get a pointer to the SNAP image data
+  SNAPImageData *snap = m_Driver->GetSNAPImageData();
+  
+  // Get the grey value
+  GreyType grey = snap->GetGrey()->GetVoxel(crosshairs);
+  sprintf(strLabel,"%d",grey);
+  m_OutSNAPProbe->value(strLabel);
+
+  // Get the label value
+  LabelType label = snap->GetSegmentation()->GetVoxel(crosshairs);
+  sprintf(strLabel, "%d", (int) label);
+  m_OutSNAPLabelProbe->value(strLabel);
+
+  // Get the speed value (if possible)
+  if(m_GlobalState->GetSpeedPreviewValid())
     {
-    float preprocval = m_Driver->GetSNAPImageData()->GetSpeed()->GetVoxel(crosshairs);
-    sprintf(label_str, "%f", preprocval);
-    m_OutSNAPProbe->value(label_str);
+    // Speed preview is being shown.  Get a preview pixel
+    float speed = snap->GetSpeed()->GetPreviewVoxel(crosshairs);
+    sprintf(strLabel, "%6f", speed);
+    }
+  else if(m_GlobalState->GetSpeedValid())
+    {
+    // Speed image is valid, i.e., has been properly computed
+    float speed = snap->GetSpeed()->GetVoxel(crosshairs);
+    sprintf(strLabel, "%6f", speed);
     }
   else 
     {
-    GreyType greyval = m_Driver->GetCurrentImageData()->GetGrey()->GetVoxel(crosshairs);
-    /*
-    double grey_scale_factor = m_Driver->GetCurrentImageData()->GetGrey()->GetImageScaleFactor();
-    double grey_min = m_Driver->GetCurrentImageData()->GetGrey()->GetImageMin();
-    int origgreyval = (int) (greyval/grey_scale_factor + grey_min);
-    sprintf(label_str, "%d", origgreyval);
-    */
-    sprintf(label_str, "%d", greyval);
-    m_OutSNAPProbe->value(label_str);
+    sprintf(strLabel, "n/a");
     }
-
-  LabelType ret2 = m_Driver->GetCurrentImageData()->GetSegmentation()->GetVoxel(crosshairs);
-  sprintf(label_str, "%d", (int) ret2);
-  m_OutSNAPLabelProbe->value(label_str);
+  
+  // Display the speed string
+  m_OutSNAPSpeedProbe->value(strLabel);
 }
 
 void 
@@ -622,6 +633,7 @@ UserInterfaceLogic
   m_GlobalState->SetSpeedValid(false);
   m_GrpImageOptions->deactivate();
   m_MenuSavePreprocessed->deactivate();
+  m_BtnAcceptPreprocessing->deactivate();
 
   m_PreprocessingUI->HidePreprocessingWindows();
 
@@ -662,6 +674,7 @@ UserInterfaceLogic
   if (m_Driver->GetSNAPImageData()) m_Driver->GetSNAPImageData()->ClearSpeed();
   m_GlobalState->SetSpeedValid(false);
   m_GrpImageOptions->deactivate();
+  m_BtnAcceptPreprocessing->deactivate();
   m_MenuSavePreprocessed->deactivate();
   m_PreprocessingUI->HidePreprocessingWindows();
   m_RadioSNAPViewOriginal->setonly();
@@ -701,28 +714,33 @@ UserInterfaceLogic
   // Shorthand
   SNAPImageData *snapData = m_Driver->GetSNAPImageData();
 
+  // Put on a wait cursor
+  // TODO: Progress bar is needed here
+  fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+
   // Merge bubbles with the segmentation image and initialize the snake
-  if (snapData->InitializeSnakeImage(bubbles, numbubbles, 
-      m_GlobalState->GetDrawingColorLabel()) > 0) 
-    {
-    // Initialize the snake
-    snapData->InitalizeSnakeDriver(m_GlobalState->GetSnakeMode(),
-      m_GlobalState->GetSnakeParameters());
-    } 
-  else 
-    {
+  int nInitVoxels = snapData->InitializeLevelSet(
+    m_GlobalState->GetSnakeMode(),m_GlobalState->GetSnakeParameters(),
+    bubbles, numbubbles,m_GlobalState->GetDrawingColorLabel());
+
+  // Restore the cursor
+  fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+  
+  // Check if we need to bail
+  if (nInitVoxels <= 0) 
+    {    
     // There were no voxels selected in the end
     m_OutMessage->value("No valid snake initialization specified!");
     m_BtnPreprocess->activate();
     m_GrpSnakeChoiceRadio->activate();
     m_GrpSNAPStepInitialize->activate();
 
+    // Clear bubble array
     if (bubbles)
       delete [] bubbles;
 
     return;        
     } 
-
 
   m_BtnAcceptInitialization->hide();
   m_BtnRestartInitialization->show();
@@ -807,6 +825,24 @@ UserInterfaceLogic
   m_SNAPWindow3D->ResetView();   // reset cursor
   RedrawWindows();
   m_OutMessage->value("Snake initialization restarted");
+
+  // Flip to the second page
+  SetActiveSegmentationPipelinePage(1);
+}
+
+void
+UserInterfaceLogic
+::OnRestartPreprocessingAction()
+{
+  // Clear the bubble list
+  m_BrsActiveBubbles->clear();
+  m_HighlightedBubble = 0;
+
+  // Flip to the first page
+  SetActiveSegmentationPipelinePage(0);
+
+  // Repaint the screen
+  RedrawWindows();
 }
 
 void 
@@ -1426,51 +1462,71 @@ UserInterfaceLogic
 
 void 
 UserInterfaceLogic
-::OnAcceptSegmentationAction()
+::CloseSegmentationCommon()
 {
-  if (!m_Driver->GetSNAPImageData()) 
-    {
-    cerr << "Shouldn't be able to call OnAcceptSegmentationAction without a m_Driver->GetSNAPImageData()" << endl;
-    return;
-    }
+  // This makes no sense if there is no SNAP
+  assert(m_Driver->GetSNAPImageData());
 
+  // Snake is no longer running
   m_SnakeIsRunning = 0;
-
-  // get data from roi_data back into full_data
-  m_Driver->UpdateIRISWithSnapImageData();
 
   // Clean up SNAP image data
   m_Driver->SetCurrentImageDataToIRIS();
   m_Driver->ReleaseSNAPImageData();
 
+  // Speed image is no longer visible
+  m_GlobalState->SetSpeedValid(false);
   m_GlobalState->SetShowSpeed(false);
 
-  // reinitialize the point of view
-  Vector3i dims = m_Driver->GetCurrentImageData()->GetVolumeExtents();
-  Vector3i init_pos;
-  int i;
-  for (i=0; i<3; i++) init_pos[i] = dims[i] / 2;
-
-  // TODO: Unify this!
-  m_Driver->GetCurrentImageData()->SetCrosshairs(init_pos);
-  m_GlobalState->SetCrosshairsPosition(init_pos) ;
+  // Set the crosshair position in IRIS
+  Vector3i xCross = m_Driver->GetCurrentImageData()->GetVolumeExtents() / 2;
+  
+  // TODO: Unify this
+  m_Driver->GetCurrentImageData()->SetCrosshairs(xCross);
+  m_GlobalState->SetCrosshairsPosition(xCross);
   this->ResetScrollbars();
 
+  // Updates some UI components (?)
   SyncIRISToSnake();
 
-  // Kick the Window2D's
-  for (i=0; i<3; i++) 
+  // Update the source for Window2D's
+  for (unsigned int i=0; i<3; i++) 
     Win2D[i]->InitializeSlice(m_Driver->GetCurrentImageData());
 
+  // Reset the mesh display
+  m_SNAPWindow3D->ClearScreen();
+  m_SNAPWindow3D->ResetView();
+
+  // Make sure that the SNAP 'wizard' is in the right state for 
+  // returning to the application
+  SetActiveSegmentationPipelinePage(0);
+
+  // Clear the list of bubbles
   m_BrsActiveBubbles->clear();
   m_HighlightedBubble = 0;
   m_GlobalState->SetSnakeActive(false);
-
-  // show IRIS window, hide snake window
+  
+  // Inform the global state that we're not in sNAP
+  m_GlobalState->SetSNAPActive(false);
+  
+  // Show IRIS window, Hide the snake window
   ShowIRIS();
 
+  // Redraw the windows
   RedrawWindows();
+}
 
+void 
+UserInterfaceLogic
+::OnAcceptSegmentationAction()
+{
+  // Get data from SNAP back into IRIS
+  m_Driver->UpdateIRISWithSnapImageData();
+
+  // Close up SNAP
+  this->CloseSegmentationCommon();
+
+  // Message to the user
   m_OutMessage->value("Accepted snake segmentation");
 }
 
@@ -1478,36 +1534,10 @@ void
 UserInterfaceLogic
 ::OnCancelSegmentationAction()
 {
-  m_SnakeIsRunning = 0;
-
   // Clean up SNAP image data
-  m_Driver->SetCurrentImageDataToIRIS();
-  m_Driver->ReleaseSNAPImageData();
+  this->CloseSegmentationCommon();
 
-  m_GlobalState->SetShowSpeed(false);
-
-  // reinitialize the point of view
-  Vector3i dims = m_Driver->GetCurrentImageData()->GetVolumeExtents();
-  Vector3i init_pos;
-  int i;
-  for (i=0; i<3; i++) init_pos[i] = dims[i] / 2;
-
-  // TODO: Unify this!
-  m_Driver->GetCurrentImageData()->SetCrosshairs(init_pos);
-  m_GlobalState->SetCrosshairsPosition(init_pos) ;
-  this->ResetScrollbars();
-
-  SyncIRISToSnake();
-
-  // Kick the Window2D's
-  for (i=0; i<3; i++) 
-    Win2D[i]->InitializeSlice(m_Driver->GetCurrentImageData());
-
-  m_BrsActiveBubbles->clear();
-
-  m_GlobalState->SetSnakeActive(false);
-
-  ShowIRIS();
+  // Message to the user
   m_OutMessage->value("Snake segmentation cancelled");
 }
 
@@ -1885,21 +1915,28 @@ void
 UserInterfaceLogic
 ::UpdateImageProbe() 
 {
-  char label_str[50];
-  Vector3i crosshairs = m_GlobalState->GetCrosshairsPosition();
+  if(m_GlobalState->GetSNAPActive())
+    {
+    UpdateSNAPImageProbe();
+    }
+  else
+    {
+    char label_str[50];
+    Vector3i crosshairs = m_GlobalState->GetCrosshairsPosition();
 
-  GreyType greyval = m_Driver->GetCurrentImageData()->GetGrey()->GetVoxel(crosshairs);
-  /*
-  double grey_scale_factor = m_Driver->GetCurrentImageData()->GetGrey()->GetImageScaleFactor();
-  double grey_min = m_Driver->GetCurrentImageData()->GetGrey()->GetImageMin();
-  int origgreyval = (int) (greyval/grey_scale_factor + grey_min);
-  sprintf(label_str, "%d", origgreyval);*/
-  sprintf(label_str, "%d", greyval);
-  this->m_OutGreyProbe->value(label_str);
+    GreyType greyval = m_Driver->GetCurrentImageData()->GetGrey()->GetVoxel(crosshairs);
+    /*
+    double grey_scale_factor = m_Driver->GetCurrentImageData()->GetGrey()->GetImageScaleFactor();
+    double grey_min = m_Driver->GetCurrentImageData()->GetGrey()->GetImageMin();
+    int origgreyval = (int) (greyval/grey_scale_factor + grey_min);
+    sprintf(label_str, "%d", origgreyval);*/
+    sprintf(label_str, "%d", greyval);
+    this->m_OutGreyProbe->value(label_str);
 
-  LabelType ret2 = m_Driver->GetCurrentImageData()->GetSegmentation()->GetVoxel(crosshairs);
-  sprintf(label_str, "%d", (int) ret2);
-  this->m_OutLabelProbe->value(label_str);
+    LabelType ret2 = m_Driver->GetCurrentImageData()->GetSegmentation()->GetVoxel(crosshairs);
+    sprintf(label_str, "%d", (int) ret2);
+    this->m_OutLabelProbe->value(label_str);
+    }
 }
 
 void 
@@ -2610,34 +2647,31 @@ UserInterfaceLogic
   InitColorMap();
   m_InDrawingColor->set_changed();
   m_InDrawOverColor->set_changed();
-  RedrawWindows();
-  m_WinMain->redraw();
 
   m_GlobalState->SetGreyExtension((char *)m_WizGreyIO->GetFileName());
   UpdateMainLabel((char *)m_WizGreyIO->GetFileName(),NULL);
-  Vector3i roiul,roilr;
-  roiul[0]=roiul[1]=roiul[2]=0;
-  roilr = m_Driver->GetIRISImageData()->GetVolumeExtents();
-  roilr[0] -= 1;
-  roilr[1] -= 1;
-  roilr[2] -= 1;
-  if (roiul[0] == roilr[0] || roiul[1] == roilr[1] || roiul[2] == roilr[2]) 
+  
+  // Get the largest image region
+  GlobalState::RegionType roi = m_Driver->GetIRISImageData()->GetImageRegion();
+  
+  // Check if the region is real
+  if (roi.GetNumberOfPixels() == 0) 
     {
     m_BtnStartSnake->deactivate();
     m_GlobalState->SetIsValidROI(false);
-    RedrawWindows();
     } 
   else 
     {
-    m_GlobalState->SetROICorner(0,roiul);
-    m_GlobalState->SetROICorner(1,roilr);
+    m_GlobalState->SetSegmentationROI(roi);
     m_GlobalState->SetIsValidROI(true);
-    // ShowROI_check->value(0);
-    // ShowROI_check->activate();
+
     m_BtnResetROI->activate();
     m_BtnStartSnake->activate();
-    RedrawWindows();
     }   
+
+  // Redraw the user interface
+  RedrawWindows();
+  m_WinMain->redraw();
 }
 
 /**
@@ -2777,366 +2811,369 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 
 /*Log: UserInterfaceLogic.cxx
-/*Revision 1.1  2003/07/11 23:33:57  pauly
-/**** empty log message ***
-/*
-/*Revision 1.20  2003/07/10 14:30:26  pauly
-/*Integrated ITK into SNAP level set segmentation
-/*
-/*Revision 1.19  2003/07/01 16:53:59  pauly
-/**** empty log message ***
-/*
-/*Revision 1.18  2003/06/23 23:59:32  pauly
-/*Command line argument parsing
-/*
-/*Revision 1.17  2003/06/14 22:42:06  pauly
-/*Several changes.  Started working on implementing the level set function
-/*in ITK.
-/*
-/*Revision 1.16  2003/06/08 23:27:56  pauly
-/*Changed variable names using combination of ctags, egrep, and perl.
-/*
-/*Revision 1.15  2003/06/08 16:11:42  pauly
-/*User interface changes
-/*Automatic mesh updating in SNAP mode
-/*
-/*Revision 1.14  2003/05/22 17:36:19  pauly
-/*Edge preprocessing settings
-/*
-/*Revision 1.13  2003/05/17 21:39:30  pauly
-/*Auto-update for in/out preprocessing
-/*
-/*Revision 1.12  2003/05/14 18:33:58  pauly
-/*SNAP Component is working. Double thresholds have been enabled.  Many other changes.
-/*
-/*Revision 1.11  2003/05/12 02:51:08  pauly
-/*Got code to compile on UNIX
-/*
-/*Revision 1.10  2003/05/08 21:59:05  pauly
-/*SNAP is almost working
-/*
-/*Revision 1.9  2003/05/07 19:14:46  pauly
-/*More progress on getting old segmentation working in the new SNAP.  Almost there, region of interest and bubbles are working.
-/*
-/*Revision 1.8  2003/05/05 12:30:18  pauly
-/**** empty log message ***
-/*
-/*Revision 1.7  2003/04/29 14:01:42  pauly
-/*Charlotte Trip
-/*
-/*Revision 1.6  2003/04/25 02:58:29  pauly
-/*New window2d model with InteractionModes
-/*
-/*Revision 1.5  2003/04/23 20:36:23  pauly
-/**** empty log message ***
-/*
-/*Revision 1.4  2003/04/23 06:05:18  pauly
-/**** empty log message ***
-/*
-/*Revision 1.3  2003/04/18 17:32:18  pauly
-/**** empty log message ***
-/*
-/*Revision 1.2  2003/04/18 00:25:37  pauly
-/**** empty log message ***
-/*
-/*Revision 1.1  2003/04/16 05:04:17  pauly
-/*Incorporated intensity modification into the snap pipeline
-/*New IRISApplication
-/*Random goodies
-/*
-/*Revision 1.2  2003/04/01 18:20:56  pauly
-/**** empty log message ***
-/*
-/*Revision 1.1  2003/03/07 19:29:47  pauly
-/*Initial checkin
-/*
-/*Revision 1.1.1.1  2002/12/10 01:35:36  pauly
-/*Started the project repository
-/*
-/*
-/*Revision 1.63  2002/05/08 17:32:57  moon
-/*I made some changes Guido wanted in the GUI, including removing
-/*Turello/Sapiro/Schlegel options (I only hid them, the code is all still there), changing a bunch of the ranges, etc. of the snake parameters.
-/*
-/*Revision 1.62  2002/04/28 17:29:43  scheuerm
-/*Added some documentation
-/*
-/*Revision 1.61  2002/04/27 18:30:03  moon
-/*Finished commenting
-/*
-/*Revision 1.60  2002/04/27 17:48:33  bobkov
-/*Added comments
-/*
-/*Revision 1.59  2002/04/27 00:08:27  talbert
-/*Final commenting run through . . . no functional changes.
-/*
-/*Revision 1.58  2002/04/26 17:37:12  moon
-/*Fixed callback on save preproc dialog cancel button.
-/*Fixed bubble browser output.  Position was zero-based, which didn't match the 2D
-/*window slice numbers (1 based), so I changed the bubble positions to be cursor
-/*position +1.
-/*Disallowed starting snake window if current label in not visible.
-/*Put in Apply+ button in threshold dialog, which changes seg overlay to be an
-/*overlay of the positive voxels in the preproc data (a zero-level visualization).
-/*Added more m_OutMessage and m_OutMessage messages.
-/*
-/*Revision 1.57  2002/04/25 14:13:13  moon
-/*Enabled render options in snake window.
-/*Changed snake params dialog slider (messed one up last time)
-/*Hide r_ params in snake params dialog with in/out snake (they don't apply)
-/*Calling segment3D with clear color is not allowed (error dialog)
-/*
-/*Revision 1.56  2002/04/24 19:50:22  moon
-/*Pulled LoadGreyFileCallback out of GUI into UserInterfaceLogic, made modifications due
-/*to change in ROI semantics.  Before, the ROI was from ul to lr-1, which is a bad
-/*decision.  I changed everything to work with a ROI that is inclusive, meaning
-/*that all voxels from ul through lr inclusive are part of the ROI. This involved
-/*a lot of small changes to a lot of files.
-/*
-/*Revision 1.55  2002/04/24 17:10:33  bobkov
-/*Added some changes to OnSnakeStartAction(),
-/*OnAcceptInitializationAction() and
-/*OnRestartInitializationAction()
-/*so that ClearScreen() method is called on
-/*m_IRISWindow3D and m_SNAPWindow3D to clear the glLists and
-/*the previous segmentation is not shown in the 3D window
-/*
-/*Revision 1.54  2002/04/24 14:54:32  moon
-/*Changed the ranges of some of the snake parameters after talking with Guido.
-/*Put in a line to update mesh when the update continuously checkbox is checked.
-/*
-/*Revision 1.53  2002/04/24 14:13:26  moon
-/*Implemented separate brightness/contrast settings for grey/preproc data
-/*
-/*Revision 1.52  2002/04/24 01:05:00  talbert
-/*Changed IRIS2000 labels to SnAP.
-/*
-/*Revision 1.51  2002/04/23 21:56:50  moon
-/*small bug fix with the snake params and the global state.  wasn't getting
-/*the sapiro/turello/etc. option from the dialog to put into the global state.
-/*
-/*Revision 1.50  2002/04/23 03:19:40  talbert
-/*Made some changes so that the load preproc menu option is unuseable once
-/*the snake starts.
-/*
-/*Revision 1.49  2002/04/22 21:54:39  moon
-/*Closed dialogs when accept/restart initialization is pressed, or snake type is
-/*switched.
-/*
-/*Revision 1.48  2002/04/22 21:24:20  talbert
-/*Small changes so that error messages for preprocessing loading appeared in
-/*the correct status bar.
-/*
-/*Revision 1.47  2002/04/20 21:56:47  talbert
-/*Made it impossible to save preprocessed data when it doesn't make sense
-/*(if no preprocessing has been done since the last preproc load or since
-/*the snake win opened).  Moved some checks for data type validity out of
-/*the callbacks and into the Vox and SnakeVoxData classes where they belong.
-/*
-/*Revision 1.46  2002/04/19 23:03:59  moon
-/*Changed more stuff to get the snake params state synched with the global state.
-/*Changed the range of ground in snake params dialog.
-/*Removed the use_del_g stuff, since it's really not necessary, I found out.
-/*
-/*Revision 1.45  2002/04/19 20:34:58  moon
-/*Made preproc dialogs check global state and only preproc if parameters have changed.
-/*So no if you hit apply, then ok, it doesn't re process on the ok.
-/*
-/*Revision 1.44  2002/04/18 21:36:51  scheuerm
-/*Added documentation for my recent changes.
-/*Fixed inverted display of edge preprocessing.
-/*
-/*Revision 1.43  2002/04/18 21:14:03  moon
-/*I had changed the Cancel buttons to be Close on the Filter dialogs, and I changed
-/*the names of the callbacks in GUI, but not in UserInterfaceLogic.  So I just hooked them
-/*up so the dialogs get closed.
-/*
-/*Revision 1.42  2002/04/18 21:04:51  moon
-/*Changed the IRIS window ROI stuff.  Now the ROI is always valid if an image is
-/*loaded, but there is a toggle to show it or not.  This will work better with
-/*Konstantin's addition of being able to drag the roi box.
-/*
-/*I also changed a bunch of areas where I was calling InitializeSlice for the 2D windows,
-/*when this is not at all what I should have done.  Now those spots call
-/*MakeSegTextureCurrent, or MakeGreyTextureCurrent.  This means that the view is not
-/*reset every time the snake steps, the preproc/orig radio buttons are changed, etc.
-/*
-/*Revision 1.41  2002/04/16 18:54:32  moon
-/*minor bug with not stopping snake when play is pushed, and then other
-/*buttons are pushed.  Also added a function that can be called when the user
-/*clicks the "X" on a window, but it's not what we want, I don't think.  The
-/*problem is if the user clicks the "X" on the snake window when a "non modal"
-/*dialog is up, all the windows close, but the program doesn't quit.  I think
-/*it's a bug in FLTK, but I can't figure out how to solve it.
-/*
-/*Revision 1.40  2002/04/16 14:44:49  moon
-/*Changed bubbles to be in world coordinates instead of image coordinates.
-/*
-/*Revision 1.39  2002/04/16 13:07:56  moon
-/*Added tooltips to some widgets, made minor changes to enabling/disabling of
-/*widgets, clearing 3D window when initialization is restarted in snake window,
-/*changed kappa in edge preproc dialog to be [0..1] range instead of [0..3]
-/*
-/*Revision 1.38  2002/04/14 22:02:54  scheuerm
-/*Changed loading dialog for preprocessed image data. Code restructuring
-/*along the way: Most important is addition of
-/*SnakeVoxDataClass::ReadRawPreprocData()
-/*
-/*Revision 1.37  2002/04/13 17:43:48  moon
-/*Added some initslice calls to Win2Ds, so the redraw problem comming back
-/*from snake to iris window (where the whole 2D window is yellow) would go away.
-/*
-/*Revision 1.36  2002/04/13 16:20:08  moon
-/*Just put in a bunch of debug printouts.  They'll have to come out eventually.
-/*
-/*Revision 1.35  2002/04/10 21:20:16  moon
-/*just added debug comments.
-/*
-/*Revision 1.34  2002/04/10 20:19:40  moon
-/*got play and stop vcr buttons to work.
-/*put in lots of comments.
-/*
-/*Revision 1.33  2002/04/10 14:45:03  scheuerm
-/*Added documentation to the methods I worked on.
-/*
-/*Revision 1.32  2002/04/09 21:56:42  bobkov
-/*
-/*modified Step button callback to display snake in 3d window
-/*
-/*Revision 1.31  2002/04/09 19:32:22  talbert
-/*Added comments to the save and load preprocessed functions.  Checked that
-/*only float files entered as preprocessed.  Made some small cosmetic
-/*changes:  loading a file switches to preproc view and sets snake mode.
-/*
-/*Revision 1.30  2002/04/09 18:59:33  moon
-/*Put in dialog to change snake parameters.  Also implemented Rewind button, which
-/*now restarts the snake.  It seems for now that changing snake parameters restarts
-/*the snake.  I don't know if this is the way it has to be, or I just did something
-/*wrong in snakewrapper.  I'll have to check with Sean.
-/*
-/*Revision 1.29  2002/04/09 17:59:37  talbert
-/*Made changes to LoadPreprocessedCallback which allowed edge detection
-/*preproc data to be loaded correctly.
-/*
-/*Revision 1.28  2002/04/09 03:48:51  talbert
-/*Changed some functionality in the LoadPreprocessedCallback() so that it
-/*would work with floating point data being loaded.  Most of the stuff
-/*is uncommented, hackish, and limited in its testing beyond verification
-/*that it displays on the screen with the right values.  These changes
-/*will have to be cleaned up.
-/*
-/*Revision 1.27  2002/04/08 13:32:35  talbert
-/*Added a preprocessed save dialog box as well as a save preprocessed menu
-/*option in the snake window.  Added the code necessary to implement the
-/*GUI side of saving.
-/*
-/*Revision 1.26  2002/04/07 02:22:49  scheuerm
-/*Improved handling of OK and Apply buttons in preprocessing dialogs.
-/*
-/*Revision 1.23  2002/04/05 03:42:29  scheuerm
-/*Thresholding sort of works. Steepness needs to be made configurable.
-/*
-/*Revision 1.21  2002/04/04 15:30:08  moon
-/*Put in code to get StepSize choice box filled with values and working.
-/*AcceptSegment button callback puts snake seg data into full_data (IRIS)
-/*Fixed a couple more UI cosmetic things.
-/*
-/*Revision 1.20  2002/04/03 22:12:07  moon
-/*Added color chip, image probe, seg probe to snake window, although seg probe
-/*maybe shouldn't be there.  added update continuously checkbox to 3Dwindow.
-/*changes accept/restart to be on top of each other, and one is shown at a time,
-/*which I think is more intuitive.
-/*changed snake iteration field to be text output.  added callback for step size
-/*choice.
-/*
-/*Revision 1.19  2002/04/02 23:51:17  scheuerm
-/*Gradient magnitude preprocessing is implemented. Stupid, stupid VTK.
-/*Adjusted the range and resolution of the sigma slider. Apply button
-/*still doesn't do anything but I think we don't need it.
-/*
-/*Revision 1.18  2002/04/02 15:12:43  moon
-/*Put code in the step vcr button.  Now the snake can be "stepped"
-/*
-/*Revision 1.17  2002/04/01 22:29:54  moon
-/*Modified OnAcceptInitializationAction, added functionality to
-/*OnRestartInitializationAction
-/*
-/*Revision 1.16  2002/03/29 20:17:25  scheuerm
-/*Implemented remapping of preprocessed data to (-1,1). The mapping can
-/*be changed by altering the parameters to RemapPreprocData(...) in
-/*LoadPreprocessedDataCallback() (UserInterfaceLogic.cpp).
-/*
-/*Revision 1.15  2002/03/29 03:33:29  scheuerm
-/*Loaded preprocessed data is now converted to float. No remapping yet.
-/*Stupid VTK. Added vtkImageDeepCopyFloat which copies the region of
-/*interest out of a gray image and converts it to float as it goes.
-/*
-/*Revision 1.14  2002/03/27 17:59:40  moon
-/*changed a couple things.  nothing big. a callback in .fl was bool return type
-/*which didn't compile in windows. this is the version I think will work for a
-/*demo for Kye
-/*
-/*Revision 1.13  2002/03/27 17:05:04  talbert
-/*Made changes necessary to compile in Windows 2000 using Microsoft Visual C++ 6.0.
-/*GUI.cpp - needed to return something from function LoadPreprocessedCallback()
-/*UserInterfaceLogic.cpp - moved definitions of for loop control variables outside of loop for
-/*scope reasons.
-/*SnakeWrapper.cpp - changed outdt1->data to *outdt1 and outdt2->data to *outdt because
-/*these variables are float, not structures.  Also changed a line using snprintf to
-/*sprintf because snprintf is a GNU extension.
-/*Added the files snake32.dsp and snake32.dsw for compiling in Windows 2000.
-/*
-/*Revision 1.12  2002/03/27 15:04:26  moon
-/*Changed a bunch of stuff so that the state was basically reset when the snake
-/*window is hidden (accept or cancel segmentation), and then opened again.  for
-/*example, the bubbles browser needed to be emptied, the active/inactive groups
-/*needed to be set to the defaults again, the radio button for the preproc
-/*data needed to be turned off (so original data is shown), etc.
-/*
-/*Added code to the acceptinitialization button that converts bubble information
-/*into binary snake initialization image, and previous segmentation info of the
-/*same label should also be preserved (i.e. segmentation info that comes from
-/*IRIS can be used for the initialization as well as bubbles). The snake is
-/*initialized, and the controls are activated.
-/*
-/*Still need to code the resetinitialization so that the bubble stuff, etc. is re-
-/*enabled.
-/*
-/*None of the vcr buttons do anything, still.
-/*
-/*Revision 1.11  2002/03/26 19:22:14  moon
-/*I don't think I really changed anything, but I had updated, and it tried to "merge" versions with and without ^M endline characters
-/*
-/*Revision 1.10  2002/03/26 18:16:32  scheuerm
-/*Added loading and display of preprocessed data:
-/*- added vtkImageDeepCopy function
-/*- added flags indicating which dataset to display in GlobalState
-/*- added flag indicating whether to load gray or preprocessed data
-/*  in the GUI class
-/*
-/*Revision 1.9  2002/03/25 02:15:57  scheuerm
-/*Added loading of preprocessed data. It isn't being converted
-/*to floats yet. It's not possible to actually display the data
-/*right now.
-/*
-/*Revision 1.8  2002/03/24 19:27:46  talbert
-/*Added callback the preprocess button to show dialog boxes for filtering.  Added callbacks for buttons in filtering dialog boxes.  Modified the AddBubbles callback so that the newest bubble is selected in the Bubble Browser.  m_OutAboutCompiled and ran to verify that new bubbles are selected and that the dialogs appear over the
-/*3d window.  talbert s f
-/*
-/*Revision 1.7  2002/03/22 16:44:16  moon
-/*added OpenGL display of bubbles in Window2D_s::draw
-/*
-/*Revision 1.6  2002/03/21 15:45:46  bobkov
-/*implemented callbacks for buttons AddBubble and RemoveBubble, implemented callbacks for Radius slider and ActiveBubble browser, created methods getBubbles and getNumberOfBubbles   e
-/*
-/*Revision 1.5  2002/03/19 19:35:32  moon
-/*added snakewrapper to makefile so it gets compiled. started putting in callback,
-/*etc. for snake vcr buttons.  added snake object to IrisGlobals, instantiated in Main
-/*
-/*Revision 1.4  2002/03/19 17:47:10  moon
-/*added some code to disable widgets, make the radio buttons work, etc. in the snake window.  fixed the quit callback from the snake window to work (crashed before)
-/*changed the [accept/restart]bubble_button widgets to be acceptinitialization_button and added callbacks (empty).
-/*
-/*Revision 1.3  2002/03/08 14:06:29  moon
-/*Added Header and Log tags to all files
-/**/
+ *Revision 1.1  2003/07/12 04:46:50  pauly
+ *Initial checkin of the SNAP application into the InsightApplications tree.
+ *
+ *Revision 1.1  2003/07/11 23:33:57  pauly
+ **** empty log message ***
+ *
+ *Revision 1.20  2003/07/10 14:30:26  pauly
+ *Integrated ITK into SNAP level set segmentation
+ *
+ *Revision 1.19  2003/07/01 16:53:59  pauly
+ **** empty log message ***
+ *
+ *Revision 1.18  2003/06/23 23:59:32  pauly
+ *Command line argument parsing
+ *
+ *Revision 1.17  2003/06/14 22:42:06  pauly
+ *Several changes.  Started working on implementing the level set function
+ *in ITK.
+ *
+ *Revision 1.16  2003/06/08 23:27:56  pauly
+ *Changed variable names using combination of ctags, egrep, and perl.
+ *
+ *Revision 1.15  2003/06/08 16:11:42  pauly
+ *User interface changes
+ *Automatic mesh updating in SNAP mode
+ *
+ *Revision 1.14  2003/05/22 17:36:19  pauly
+ *Edge preprocessing settings
+ *
+ *Revision 1.13  2003/05/17 21:39:30  pauly
+ *Auto-update for in/out preprocessing
+ *
+ *Revision 1.12  2003/05/14 18:33:58  pauly
+ *SNAP Component is working. Double thresholds have been enabled.  Many other changes.
+ *
+ *Revision 1.11  2003/05/12 02:51:08  pauly
+ *Got code to compile on UNIX
+ *
+ *Revision 1.10  2003/05/08 21:59:05  pauly
+ *SNAP is almost working
+ *
+ *Revision 1.9  2003/05/07 19:14:46  pauly
+ *More progress on getting old segmentation working in the new SNAP.  Almost there, region of interest and bubbles are working.
+ *
+ *Revision 1.8  2003/05/05 12:30:18  pauly
+ **** empty log message ***
+ *
+ *Revision 1.7  2003/04/29 14:01:42  pauly
+ *Charlotte Trip
+ *
+ *Revision 1.6  2003/04/25 02:58:29  pauly
+ *New window2d model with InteractionModes
+ *
+ *Revision 1.5  2003/04/23 20:36:23  pauly
+ **** empty log message ***
+ *
+ *Revision 1.4  2003/04/23 06:05:18  pauly
+ **** empty log message ***
+ *
+ *Revision 1.3  2003/04/18 17:32:18  pauly
+ **** empty log message ***
+ *
+ *Revision 1.2  2003/04/18 00:25:37  pauly
+ **** empty log message ***
+ *
+ *Revision 1.1  2003/04/16 05:04:17  pauly
+ *Incorporated intensity modification into the snap pipeline
+ *New IRISApplication
+ *Random goodies
+ *
+ *Revision 1.2  2003/04/01 18:20:56  pauly
+ **** empty log message ***
+ *
+ *Revision 1.1  2003/03/07 19:29:47  pauly
+ *Initial checkin
+ *
+ *Revision 1.1.1.1  2002/12/10 01:35:36  pauly
+ *Started the project repository
+ *
+ *
+ *Revision 1.63  2002/05/08 17:32:57  moon
+ *I made some changes Guido wanted in the GUI, including removing
+ *Turello/Sapiro/Schlegel options (I only hid them, the code is all still there), changing a bunch of the ranges, etc. of the snake parameters.
+ *
+ *Revision 1.62  2002/04/28 17:29:43  scheuerm
+ *Added some documentation
+ *
+ *Revision 1.61  2002/04/27 18:30:03  moon
+ *Finished commenting
+ *
+ *Revision 1.60  2002/04/27 17:48:33  bobkov
+ *Added comments
+ *
+ *Revision 1.59  2002/04/27 00:08:27  talbert
+ *Final commenting run through . . . no functional changes.
+ *
+ *Revision 1.58  2002/04/26 17:37:12  moon
+ *Fixed callback on save preproc dialog cancel button.
+ *Fixed bubble browser output.  Position was zero-based, which didn't match the 2D
+ *window slice numbers (1 based), so I changed the bubble positions to be cursor
+ *position +1.
+ *Disallowed starting snake window if current label in not visible.
+ *Put in Apply+ button in threshold dialog, which changes seg overlay to be an
+ *overlay of the positive voxels in the preproc data (a zero-level visualization).
+ *Added more m_OutMessage and m_OutMessage messages.
+ *
+ *Revision 1.57  2002/04/25 14:13:13  moon
+ *Enabled render options in snake window.
+ *Changed snake params dialog slider (messed one up last time)
+ *Hide r_ params in snake params dialog with in/out snake (they don't apply)
+ *Calling segment3D with clear color is not allowed (error dialog)
+ *
+ *Revision 1.56  2002/04/24 19:50:22  moon
+ *Pulled LoadGreyFileCallback out of GUI into UserInterfaceLogic, made modifications due
+ *to change in ROI semantics.  Before, the ROI was from ul to lr-1, which is a bad
+ *decision.  I changed everything to work with a ROI that is inclusive, meaning
+ *that all voxels from ul through lr inclusive are part of the ROI. This involved
+ *a lot of small changes to a lot of files.
+ *
+ *Revision 1.55  2002/04/24 17:10:33  bobkov
+ *Added some changes to OnSnakeStartAction(),
+ *OnAcceptInitializationAction() and
+ *OnRestartInitializationAction()
+ *so that ClearScreen() method is called on
+ *m_IRISWindow3D and m_SNAPWindow3D to clear the glLists and
+ *the previous segmentation is not shown in the 3D window
+ *
+ *Revision 1.54  2002/04/24 14:54:32  moon
+ *Changed the ranges of some of the snake parameters after talking with Guido.
+ *Put in a line to update mesh when the update continuously checkbox is checked.
+ *
+ *Revision 1.53  2002/04/24 14:13:26  moon
+ *Implemented separate brightness/contrast settings for grey/preproc data
+ *
+ *Revision 1.52  2002/04/24 01:05:00  talbert
+ *Changed IRIS2000 labels to SnAP.
+ *
+ *Revision 1.51  2002/04/23 21:56:50  moon
+ *small bug fix with the snake params and the global state.  wasn't getting
+ *the sapiro/turello/etc. option from the dialog to put into the global state.
+ *
+ *Revision 1.50  2002/04/23 03:19:40  talbert
+ *Made some changes so that the load preproc menu option is unuseable once
+ *the snake starts.
+ *
+ *Revision 1.49  2002/04/22 21:54:39  moon
+ *Closed dialogs when accept/restart initialization is pressed, or snake type is
+ *switched.
+ *
+ *Revision 1.48  2002/04/22 21:24:20  talbert
+ *Small changes so that error messages for preprocessing loading appeared in
+ *the correct status bar.
+ *
+ *Revision 1.47  2002/04/20 21:56:47  talbert
+ *Made it impossible to save preprocessed data when it doesn't make sense
+ *(if no preprocessing has been done since the last preproc load or since
+ *the snake win opened).  Moved some checks for data type validity out of
+ *the callbacks and into the Vox and SnakeVoxData classes where they belong.
+ *
+ *Revision 1.46  2002/04/19 23:03:59  moon
+ *Changed more stuff to get the snake params state synched with the global state.
+ *Changed the range of ground in snake params dialog.
+ *Removed the use_del_g stuff, since it's really not necessary, I found out.
+ *
+ *Revision 1.45  2002/04/19 20:34:58  moon
+ *Made preproc dialogs check global state and only preproc if parameters have changed.
+ *So no if you hit apply, then ok, it doesn't re process on the ok.
+ *
+ *Revision 1.44  2002/04/18 21:36:51  scheuerm
+ *Added documentation for my recent changes.
+ *Fixed inverted display of edge preprocessing.
+ *
+ *Revision 1.43  2002/04/18 21:14:03  moon
+ *I had changed the Cancel buttons to be Close on the Filter dialogs, and I changed
+ *the names of the callbacks in GUI, but not in UserInterfaceLogic.  So I just hooked them
+ *up so the dialogs get closed.
+ *
+ *Revision 1.42  2002/04/18 21:04:51  moon
+ *Changed the IRIS window ROI stuff.  Now the ROI is always valid if an image is
+ *loaded, but there is a toggle to show it or not.  This will work better with
+ *Konstantin's addition of being able to drag the roi box.
+ *
+ *I also changed a bunch of areas where I was calling InitializeSlice for the 2D windows,
+ *when this is not at all what I should have done.  Now those spots call
+ *MakeSegTextureCurrent, or MakeGreyTextureCurrent.  This means that the view is not
+ *reset every time the snake steps, the preproc/orig radio buttons are changed, etc.
+ *
+ *Revision 1.41  2002/04/16 18:54:32  moon
+ *minor bug with not stopping snake when play is pushed, and then other
+ *buttons are pushed.  Also added a function that can be called when the user
+ *clicks the "X" on a window, but it's not what we want, I don't think.  The
+ *problem is if the user clicks the "X" on the snake window when a "non modal"
+ *dialog is up, all the windows close, but the program doesn't quit.  I think
+ *it's a bug in FLTK, but I can't figure out how to solve it.
+ *
+ *Revision 1.40  2002/04/16 14:44:49  moon
+ *Changed bubbles to be in world coordinates instead of image coordinates.
+ *
+ *Revision 1.39  2002/04/16 13:07:56  moon
+ *Added tooltips to some widgets, made minor changes to enabling/disabling of
+ *widgets, clearing 3D window when initialization is restarted in snake window,
+ *changed kappa in edge preproc dialog to be [0..1] range instead of [0..3]
+ *
+ *Revision 1.38  2002/04/14 22:02:54  scheuerm
+ *Changed loading dialog for preprocessed image data. Code restructuring
+ *along the way: Most important is addition of
+ *SnakeVoxDataClass::ReadRawPreprocData()
+ *
+ *Revision 1.37  2002/04/13 17:43:48  moon
+ *Added some initslice calls to Win2Ds, so the redraw problem comming back
+ *from snake to iris window (where the whole 2D window is yellow) would go away.
+ *
+ *Revision 1.36  2002/04/13 16:20:08  moon
+ *Just put in a bunch of debug printouts.  They'll have to come out eventually.
+ *
+ *Revision 1.35  2002/04/10 21:20:16  moon
+ *just added debug comments.
+ *
+ *Revision 1.34  2002/04/10 20:19:40  moon
+ *got play and stop vcr buttons to work.
+ *put in lots of comments.
+ *
+ *Revision 1.33  2002/04/10 14:45:03  scheuerm
+ *Added documentation to the methods I worked on.
+ *
+ *Revision 1.32  2002/04/09 21:56:42  bobkov
+ *
+ *modified Step button callback to display snake in 3d window
+ *
+ *Revision 1.31  2002/04/09 19:32:22  talbert
+ *Added comments to the save and load preprocessed functions.  Checked that
+ *only float files entered as preprocessed.  Made some small cosmetic
+ *changes:  loading a file switches to preproc view and sets snake mode.
+ *
+ *Revision 1.30  2002/04/09 18:59:33  moon
+ *Put in dialog to change snake parameters.  Also implemented Rewind button, which
+ *now restarts the snake.  It seems for now that changing snake parameters restarts
+ *the snake.  I don't know if this is the way it has to be, or I just did something
+ *wrong in snakewrapper.  I'll have to check with Sean.
+ *
+ *Revision 1.29  2002/04/09 17:59:37  talbert
+ *Made changes to LoadPreprocessedCallback which allowed edge detection
+ *preproc data to be loaded correctly.
+ *
+ *Revision 1.28  2002/04/09 03:48:51  talbert
+ *Changed some functionality in the LoadPreprocessedCallback() so that it
+ *would work with floating point data being loaded.  Most of the stuff
+ *is uncommented, hackish, and limited in its testing beyond verification
+ *that it displays on the screen with the right values.  These changes
+ *will have to be cleaned up.
+ *
+ *Revision 1.27  2002/04/08 13:32:35  talbert
+ *Added a preprocessed save dialog box as well as a save preprocessed menu
+ *option in the snake window.  Added the code necessary to implement the
+ *GUI side of saving.
+ *
+ *Revision 1.26  2002/04/07 02:22:49  scheuerm
+ *Improved handling of OK and Apply buttons in preprocessing dialogs.
+ *
+ *Revision 1.23  2002/04/05 03:42:29  scheuerm
+ *Thresholding sort of works. Steepness needs to be made configurable.
+ *
+ *Revision 1.21  2002/04/04 15:30:08  moon
+ *Put in code to get StepSize choice box filled with values and working.
+ *AcceptSegment button callback puts snake seg data into full_data (IRIS)
+ *Fixed a couple more UI cosmetic things.
+ *
+ *Revision 1.20  2002/04/03 22:12:07  moon
+ *Added color chip, image probe, seg probe to snake window, although seg probe
+ *maybe shouldn't be there.  added update continuously checkbox to 3Dwindow.
+ *changes accept/restart to be on top of each other, and one is shown at a time,
+ *which I think is more intuitive.
+ *changed snake iteration field to be text output.  added callback for step size
+ *choice.
+ *
+ *Revision 1.19  2002/04/02 23:51:17  scheuerm
+ *Gradient magnitude preprocessing is implemented. Stupid, stupid VTK.
+ *Adjusted the range and resolution of the sigma slider. Apply button
+ *still doesn't do anything but I think we don't need it.
+ *
+ *Revision 1.18  2002/04/02 15:12:43  moon
+ *Put code in the step vcr button.  Now the snake can be "stepped"
+ *
+ *Revision 1.17  2002/04/01 22:29:54  moon
+ *Modified OnAcceptInitializationAction, added functionality to
+ *OnRestartInitializationAction
+ *
+ *Revision 1.16  2002/03/29 20:17:25  scheuerm
+ *Implemented remapping of preprocessed data to (-1,1). The mapping can
+ *be changed by altering the parameters to RemapPreprocData(...) in
+ *LoadPreprocessedDataCallback() (UserInterfaceLogic.cpp).
+ *
+ *Revision 1.15  2002/03/29 03:33:29  scheuerm
+ *Loaded preprocessed data is now converted to float. No remapping yet.
+ *Stupid VTK. Added vtkImageDeepCopyFloat which copies the region of
+ *interest out of a gray image and converts it to float as it goes.
+ *
+ *Revision 1.14  2002/03/27 17:59:40  moon
+ *changed a couple things.  nothing big. a callback in .fl was bool return type
+ *which didn't compile in windows. this is the version I think will work for a
+ *demo for Kye
+ *
+ *Revision 1.13  2002/03/27 17:05:04  talbert
+ *Made changes necessary to compile in Windows 2000 using Microsoft Visual C++ 6.0.
+ *GUI.cpp - needed to return something from function LoadPreprocessedCallback()
+ *UserInterfaceLogic.cpp - moved definitions of for loop control variables outside of loop for
+ *scope reasons.
+ *SnakeWrapper.cpp - changed outdt1->data to *outdt1 and outdt2->data to *outdt because
+ *these variables are float, not structures.  Also changed a line using snprintf to
+ *sprintf because snprintf is a GNU extension.
+ *Added the files snake32.dsp and snake32.dsw for compiling in Windows 2000.
+ *
+ *Revision 1.12  2002/03/27 15:04:26  moon
+ *Changed a bunch of stuff so that the state was basically reset when the snake
+ *window is hidden (accept or cancel segmentation), and then opened again.  for
+ *example, the bubbles browser needed to be emptied, the active/inactive groups
+ *needed to be set to the defaults again, the radio button for the preproc
+ *data needed to be turned off (so original data is shown), etc.
+ *
+ *Added code to the acceptinitialization button that converts bubble information
+ *into binary snake initialization image, and previous segmentation info of the
+ *same label should also be preserved (i.e. segmentation info that comes from
+ *IRIS can be used for the initialization as well as bubbles). The snake is
+ *initialized, and the controls are activated.
+ *
+ *Still need to code the resetinitialization so that the bubble stuff, etc. is re-
+ *enabled.
+ *
+ *None of the vcr buttons do anything, still.
+ *
+ *Revision 1.11  2002/03/26 19:22:14  moon
+ *I don't think I really changed anything, but I had updated, and it tried to "merge" versions with and without ^M endline characters
+ *
+ *Revision 1.10  2002/03/26 18:16:32  scheuerm
+ *Added loading and display of preprocessed data:
+ *- added vtkImageDeepCopy function
+ *- added flags indicating which dataset to display in GlobalState
+ *- added flag indicating whether to load gray or preprocessed data
+ *  in the GUI class
+ *
+ *Revision 1.9  2002/03/25 02:15:57  scheuerm
+ *Added loading of preprocessed data. It isn't being converted
+ *to floats yet. It's not possible to actually display the data
+ *right now.
+ *
+ *Revision 1.8  2002/03/24 19:27:46  talbert
+ *Added callback the preprocess button to show dialog boxes for filtering.  Added callbacks for buttons in filtering dialog boxes.  Modified the AddBubbles callback so that the newest bubble is selected in the Bubble Browser.  m_OutAboutCompiled and ran to verify that new bubbles are selected and that the dialogs appear over the
+ *3d window.  talbert s f
+ *
+ *Revision 1.7  2002/03/22 16:44:16  moon
+ *added OpenGL display of bubbles in Window2D_s::draw
+ *
+ *Revision 1.6  2002/03/21 15:45:46  bobkov
+ *implemented callbacks for buttons AddBubble and RemoveBubble, implemented callbacks for Radius slider and ActiveBubble browser, created methods getBubbles and getNumberOfBubbles   e
+ *
+ *Revision 1.5  2002/03/19 19:35:32  moon
+ *added snakewrapper to makefile so it gets compiled. started putting in callback,
+ *etc. for snake vcr buttons.  added snake object to IrisGlobals, instantiated in Main
+ *
+ *Revision 1.4  2002/03/19 17:47:10  moon
+ *added some code to disable widgets, make the radio buttons work, etc. in the snake window.  fixed the quit callback from the snake window to work (crashed before)
+ *changed the [accept/restart]bubble_button widgets to be acceptinitialization_button and added callbacks (empty).
+ *
+ *Revision 1.3  2002/03/08 14:06:29  moon
+ *Added Header and Log tags to all files
+ **/

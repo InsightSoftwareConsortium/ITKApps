@@ -108,6 +108,20 @@ SpeedImageWrapperImplementation
     }
 }
 
+void 
+SpeedImageWrapperImplementation
+::HandleImagePointerUpdate()
+{
+  // Call the parent's method
+  ImageWrapperImplementation<float>::HandleImagePointerUpdate();
+
+  // Update the sources
+  for(unsigned int i=0;i<3;i++)
+    if(m_PreviewSource[i])
+      m_Slicer[i]->SetInput(m_PreviewSource[i]);      
+}
+
+
 SpeedImageWrapperImplementation::OverlayPixelType 
 SpeedImageWrapperImplementation
 ::GetOverlayColor() const

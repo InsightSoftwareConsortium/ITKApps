@@ -76,11 +76,11 @@ void ImageIOWizardLogic<TPixel>::GoForward(Fl_Group *current) {
 template <class TPixel>
 const char *ImageIOWizardLogic<TPixel>::GetFilePatterns() {
   static const char *pattern = 
+      "All Image Files (*.{gipl,mha,mhd,img,raw})\t"
       "GIPL Files (*.{gipl,gipl.gz})\t"
       "MetaImage Files (*.{mha,mhd})\t"
       "Analyze Files (*.{img,img.gz})\t"
-      "RAW Files (*.{raw,raw.gz})\t"
-      "All Files (*.*)";
+      "RAW Files (*.{raw,raw.gz})";
   return pattern;
 }
 
@@ -508,11 +508,15 @@ bool ImageIOWizardLogic<TPixel>::DisplayInputWizard(WrapperType *target) {
   while (m_WinInput->visible())
     Fl::wait();
 
-  // Release the IO related resources of the image
-  m_Image->ReleaseImageIO();
+  // Destroy the internal image if it has been loaded
+  if(m_ImageLoaded)
+  {
+    // Release the IO related resources of the image
+    m_Image->ReleaseImageIO();
   
-  // The image pointer is set to NULL
-  m_Image = NULL;
+    // The image pointer is set to NULL
+    m_Image = NULL;
+  }
 
   // Whether or not the load has been succesfull
   return m_ImageLoaded;

@@ -229,19 +229,9 @@ IRISImageData
  */
 void 
 IRISImageData
-::DeepCopyROI(Vector3i ul, Vector3i lr, IRISImageData &target)
+::DeepCopyROI(const RegionType &roi, IRISImageData &target,
+              LabelType passThroughLabel)
 {
-  // Create an ITK region object for the region of interest
-  ImageRegion<3> roi;
-  for (unsigned int i=0;i<3;i++)
-    {
-    // The region of interest should be ordered correctly
-    assert(lr[i] >= ul[i]);
-
-    roi.SetIndex(i,ul[i]);
-    roi.SetSize(i,1 + lr[i] - ul[i]);
-    }
-
   // Create a new grey image wrapper
   GreyWrapperType *wrapGrey = new GreyImageWrapperImplementation();  
   LabelWrapperType *wrapSeg = new LabelImageWrapperImplementation();
@@ -249,6 +239,19 @@ IRISImageData
   // Place the partial image into this wrapper
   wrapGrey->SetImage(m_GreyWrapper->DeepCopyRegion(roi));
   wrapSeg->SetImage(m_LabelWrapper->DeepCopyRegion(roi));
+
+  // Allow only the pass through label to pass through
+  // TODO: Make this more elegant, perhaps
+  typedef ImageRegionIterator<LabelWrapperType::ImageType> IteratorType;
+  IteratorType itLabel(wrapSeg->GetImage(),
+                       wrapSeg->GetImage()->GetBufferedRegion());
+  
+  while(!itLabel.IsAtEnd())
+    {
+    if(itLabel.Value() != passThroughLabel)
+      itLabel.Value() = (LabelType) 0;
+    ++itLabel;
+    }
 
   // The segmentation wrapper needs the label colors
   wrapSeg->SetLabelColorTable(m_ColorLabels);
@@ -266,7 +269,7 @@ IRISImageData
   assert(m_GreyWrapper && m_LabelWrapper);
 
   // Store the voxel
-  m_LabelWrapper->GetVoxel(index) = value;
+  m_LabelWrapper->GetVoxelForUpdate(index) = value;
 
   // Make sure this label is set as valid
   if (!m_ColorLabels[value].IsValid())
@@ -320,7 +323,7 @@ IRISImageData
           {
 
           // Get the next voxel
-          LabelType &voxel = m_LabelWrapper->GetVoxel(x,y,z);
+          LabelType &voxel = m_LabelWrapper->GetVoxelForUpdate(x,y,z);
 
           // Get the color label associated with voxel
           const ColorLabel &cl = GetColorLabel(voxel);
@@ -334,6 +337,8 @@ IRISImageData
         }
       }
     }
+
+  m_LabelWrapper->GetImage()->Modified();
 }
 
 
@@ -645,3 +650,13 @@ IRISImageData
   m_GreyWrapper->SetSliceIndex(crosshairs);
   m_LabelWrapper->SetSliceIndex(crosshairs);
 }
+
+
+IRISImageData::RegionType
+IRISImageData
+::GetImageRegion() const
+{
+  assert(m_GreyWrapper != NULL);
+  return m_GreyWrapper->GetImage()->GetLargestPossibleRegion();
+}
+

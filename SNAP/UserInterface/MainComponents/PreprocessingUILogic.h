@@ -32,7 +32,8 @@ template<typename TInputImage,typename TOutputImage>
 
 // ITK forward references
 namespace itk {
-  template<typename TPixel, unsigned int VDimension> class Image;
+  template<class TPixel, unsigned int VDimension> class Image;
+  template<class TObject> class SimpleMemberCommand;
 }
 
 /**
@@ -78,9 +79,6 @@ private:
   IRISApplication *m_Driver;
   UserInterfaceLogic *m_ParentUI;
 
-  /** Whether or not progress events are shown in the progress bar */
-  bool m_ShowProgress;
-
   /** The image types used for preprocessing */
   typedef itk::Image<GreyType,3> GreyImageType;
   typedef itk::Image<float,3> SpeedImageType;
@@ -95,14 +93,17 @@ private:
     GreyImageType,SpeedImageType> EdgeFilterType;
   typedef itk::SmartPointer<EdgeFilterType> EdgeFilterPointer;
 
+  /** A command type for progress reporting */
+  typedef itk::SimpleMemberCommand<PreprocessingUILogic> CommandType;
+  typedef itk::SmartPointer<CommandType> CommandPointer;
+
   /** The filter used for in-out thresholding */
-  InOutFilterPointer m_InOutFilter;
+  InOutFilterPointer m_InOutPreviewFilter[3];
+  InOutFilterPointer m_InOutFilterWhole;
 
-  /** The filter used for edge preprocessing */
-  EdgeFilterPointer m_EdgeFilter;
-
-  /** A method that detaches speed image from the filtering pipeline */
-  void DisconnectSpeedWrapper();
+  /** The filters used for edge preprocessing */
+  EdgeFilterPointer m_EdgePreviewFilter[3];
+  EdgeFilterPointer m_EdgeFilterWhole;
 
   /** Update the plot shown in the edge plot box */
   void UpdateEdgePlot();
@@ -115,6 +116,9 @@ private:
 
   /** Progress callback for thresholding preprocessing */
   void OnThresholdProgress();
+
+  /** Common closing code for both preprocessors */
+  void OnCloseCommon();
 
 };
 

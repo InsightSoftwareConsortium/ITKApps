@@ -34,6 +34,9 @@ GlobalState
   m_LockOwner = 0;
   m_SegmentationAlpha = 0;
 
+  // SNAP is off initially
+  m_SNAPActive = false;
+
   // Snake stuff:
   m_SpeedValid = false;
   m_ShowSpeed = false;
@@ -49,6 +52,9 @@ GlobalState
   // Default preview modes: enabled for in-out, disabled for edges (too slow)
   m_ShowPreprocessedEdgePreview = false;
   m_ShowPreprocessedInOutPreview = true;
+
+  // The preview is not currently valid
+  m_SpeedPreviewValid = false;
 }
 
 GlobalState
@@ -90,26 +96,6 @@ GlobalState
 }
 
 #endif /* DRAWING_LOCK */
-
-Vector3i 
-GlobalState
-::GetROICorner(unsigned int index)
-{
-  assert(index < 2);
-  static Vector3i *dummy[] = 
-    {&m_ROIUpperLeft,&m_ROILowerRight};
-  return *dummy[index];
-}
-
-void 
-GlobalState
-::SetROICorner(unsigned int index, const Vector3i &corner)
-{
-  assert(index < 2);
-  static Vector3i *dummy[] = 
-    {&m_ROIUpperLeft,&m_ROILowerRight};
-  *dummy[index] = corner;
-}
 
 /**
  * Pulls the extension off of a filename and

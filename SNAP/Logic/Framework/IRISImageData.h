@@ -35,6 +35,7 @@ class IRISImageData {
 public:
   typedef GreyImageWrapper GreyWrapperType;
   typedef LabelImageWrapper LabelWrapperType;
+  typedef itk::ImageRegion<3> RegionType;
 
   IRISImageData();
   virtual ~IRISImageData();
@@ -86,12 +87,16 @@ public:
                      const Vector3d &ray, 
                      Vector3i &hit) const;
 
-  /**
-   * Deep copy a region of interest from this class 
-   * to another instance of this class (copies labels 
-   * and images)
+  /** 
+   * This method is used to create a copy of the region of the grey
+   * and segmentation images contained in this class.  The grey image
+   * is simply copied, and the segmentation image is filtered in such
+   * a way that the pixels that are not equal to the passThroughLabel are
+   * copied as zero.
    */
-  void DeepCopyROI(Vector3i ul, Vector3i lr, IRISImageData &target);
+  void DeepCopyROI(const RegionType &roi, 
+                   IRISImageData &target,
+                   LabelType passThroughLabel);
 
 
   /**
@@ -119,6 +124,11 @@ public:
     assert(m_GreyWrapper->GetSize() == m_Size);
     return m_Size;
   }
+
+  /** 
+   * Get the ImageRegion (largest possible region of all the images)
+   */
+  RegionType GetImageRegion() const;
 
   /**
    * Get the scaling of the voxels

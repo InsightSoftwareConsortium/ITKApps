@@ -55,8 +55,10 @@ public:
   virtual void OnIRISSliceSliderChange(int id) = 0;
   virtual void OnInOutSnakeSelect() = 0;
   virtual void OnEdgeSnakeSelect() = 0;
+  virtual void OnAcceptPreprocessingAction() = 0;
   virtual void OnAcceptInitializationAction() = 0;
   virtual void OnRestartInitializationAction() = 0;
+  virtual void OnRestartPreprocessingAction() = 0;
   virtual void OnSnakeRewindAction() = 0;
   virtual void OnSnakeStopAction() = 0;
   virtual void OnSnakePlayAction() = 0;

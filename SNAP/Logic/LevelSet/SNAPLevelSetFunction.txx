@@ -32,8 +32,10 @@ SNAPLevelSetFunction<TImageType>
   m_PropagationSpeedInterpolator = ImageInterpolatorType::New();
   m_CurvatureSpeedInterpolator = ImageInterpolatorType::New();
   m_LaplacianSmoothingSpeedInterpolator = ImageInterpolatorType::New();
-
   m_AdvectionFieldInterpolator = VectorInterpolatorType::New();
+
+  
+  m_AdvectionFilter = AdvectionFilterType::New();
 }
 
 template<class TImageType>
@@ -42,6 +44,17 @@ SNAPLevelSetFunction<TImageType>
 {
 
 }
+
+template<class TImageType>
+void 
+SNAPLevelSetFunction<TImageType>
+::SetSpeedImage(ImageType *pointer)
+{
+  m_SpeedImage = pointer;
+  m_AdvectionFilter->SetInput(m_SpeedImage);
+}
+
+
 
 template<class TImageType>
 void
@@ -70,7 +83,7 @@ SNAPLevelSetFunction<TImageType>
     {
     // For powers of 0 and 1, which are by far the most common, there is
     // nothing to compute
-    if(powers[iPower] == 0 && powers[iPower] == 1) 
+    if(powers[iPower] == 0 || powers[iPower] == 1) 
       {
       continue;
       }
@@ -123,13 +136,12 @@ SNAPLevelSetFunction<TImageType>
   m_LaplacianSmoothingSpeedImage = powerMap[m_LaplacianSmoothingSpeedExponent];
   
   // There is still the business of the advection image to attend to
-  // Create a gradient filter to compute \f$ \nabla g() \f$.
-  typedef itk::GradientImageFilter<ImageType> GradientFilterType;
-  typename GradientFilterType::Pointer fltGradient = 
-    GradientFilterType::New();
-  fltGradient->SetInput(m_SpeedImage);
-  fltGradient->Update();
+  // Compute \f$ \nabla g() \f$ (will be cached from run to run)
+  assert(m_AdvectionSpeedExponent >= 0);
+  m_AdvectionFilter->SetExponent((unsigned int)m_AdvectionSpeedExponent);
+  m_AdvectionFilter->Update();
 
+/*
   // Allocate the advection image
   m_AdvectionField = VectorImageType::New();
   m_AdvectionField->SetRequestedRegion(m_SpeedImage->GetRequestedRegion());
@@ -138,7 +150,7 @@ SNAPLevelSetFunction<TImageType>
   m_AdvectionField->Allocate();
 
   itk::ImageRegionIterator<GradientFilterType::OutputImageType> 
-    git( fltGradient->GetOutput(), 
+    git( m_GradientFilter->GetOutput(), 
          m_AdvectionField->GetRequestedRegion());
 
   itk::ImageRegionIterator<VectorImageType> 
@@ -182,6 +194,12 @@ SNAPLevelSetFunction<TImageType>
   // Set up the advection interpolator
   if(m_AdvectionSpeedExponent != 0)
     m_AdvectionFieldInterpolator->SetInputImage(m_AdvectionField);
+*/
+  
+  // Set up the advection interpolator
+  // if(m_AdvectionSpeedExponent != 0)
+  m_AdvectionFieldInterpolator->SetInputImage(
+    reinterpret_cast<VectorImageType *>(m_AdvectionFilter->GetOutput()));
 }
 
 
@@ -189,7 +207,8 @@ template<class TImageType>
 typename SNAPLevelSetFunction<TImageType>::ScalarValueType
 SNAPLevelSetFunction<TImageType>
 ::CurvatureSpeed(const NeighborhoodType &neighborhood, 
-                 const FloatOffsetType &offset) const 
+                 const FloatOffsetType &offset,
+                 GlobalDataStruct *) const 
 {
   // If the exponent is zero, there is nothing to return
   if(m_CurvatureSpeedExponent == 0)
@@ -214,7 +233,8 @@ template<class TImageType>
 typename SNAPLevelSetFunction<TImageType>::ScalarValueType
 SNAPLevelSetFunction<TImageType>
 ::PropagationSpeed(const NeighborhoodType &neighborhood, 
-                 const FloatOffsetType &offset) const 
+                   const FloatOffsetType &offset,
+                   GlobalDataStruct *) const 
 {
   // If the exponent is zero, there is nothing to return
   if(m_PropagationSpeedExponent == 0)
@@ -239,7 +259,8 @@ template<class TImageType>
 typename SNAPLevelSetFunction<TImageType>::ScalarValueType
 SNAPLevelSetFunction<TImageType>
 ::LaplacianSmoothingSpeed(const NeighborhoodType &neighborhood, 
-                 const FloatOffsetType &offset) const 
+                          const FloatOffsetType &offset,
+                          GlobalDataStruct *) const 
 {
   // If the exponent is zero, there is nothing to return
   if(m_LaplacianSmoothingSpeedExponent == 0)
@@ -264,7 +285,8 @@ template <class TImageType>
 typename SNAPLevelSetFunction<TImageType>::VectorType
 SNAPLevelSetFunction<TImageType>
 ::AdvectionField(const NeighborhoodType &neighborhood,
-                 const FloatOffsetType &offset)  const
+                 const FloatOffsetType &offset,
+                 GlobalDataStruct *) const
 {
   IndexType idx = neighborhood.GetIndex();
   ContinuousIndexType cdx;

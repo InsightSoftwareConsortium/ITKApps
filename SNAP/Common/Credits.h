@@ -61,35 +61,38 @@ Support/Maintenance team: \n\
 #endif // __Credits_h_
 
 /*Log: Credits.h
-/*Revision 1.5  2003/07/12 01:34:17  pauly
-/*More final changes before ITK checkin
-/*
-/*Revision 1.4  2003/07/11 23:29:46  pauly
-/**** empty log message ***
-/*
-/*Revision 1.3  2003/07/11 21:23:36  pauly
-/*Renames and code cleanup for ITK checkin (temp)
-/*
-/*Revision 1.2  2003/06/08 23:27:56  pauly
-/*Changed variable names using combination of ctags, egrep, and perl.
-/*
-/*Revision 1.1  2003/03/07 19:29:47  pauly
-/*Initial checkin
-/*
-/*Revision 1.1.1.1  2002/12/10 01:35:36  pauly
-/*Started the project repository
-/*
-/*
-/*Revision 1.5  2002/04/25 17:09:22  moon
-/*Changed credits so we come first!  There's no scrollbar on the credits
-/*display, so it's useless to put our stuff at the bottom.
-/*
-/*Revision 1.4  2002/04/24 01:33:04  scheuerm
-/*Fixed a compile problem on Windows
-/*
-/*Revision 1.3  2002/04/24 01:04:42  talbert
-/*Added this semester's credits.
-/*
-/*Revision 1.2  2002/03/08 14:06:20  moon
-/*Added Header and Log tags to all files
-/**/
+ *Revision 1.1  2003/07/12 04:53:16  pauly
+ *Initial checkin of SNAP application to the InsightApplications tree
+ *
+ *Revision 1.5  2003/07/12 01:34:17  pauly
+ *More final changes before ITK checkin
+ *
+ *Revision 1.4  2003/07/11 23:29:46  pauly
+ **** empty log message ***
+ *
+ *Revision 1.3  2003/07/11 21:23:36  pauly
+ *Renames and code cleanup for ITK checkin (temp)
+ *
+ *Revision 1.2  2003/06/08 23:27:56  pauly
+ *Changed variable names using combination of ctags, egrep, and perl.
+ *
+ *Revision 1.1  2003/03/07 19:29:47  pauly
+ *Initial checkin
+ *
+ *Revision 1.1.1.1  2002/12/10 01:35:36  pauly
+ *Started the project repository
+ *
+ *
+ *Revision 1.5  2002/04/25 17:09:22  moon
+ *Changed credits so we come first!  There's no scrollbar on the credits
+ *display, so it's useless to put our stuff at the bottom.
+ *
+ *Revision 1.4  2002/04/24 01:33:04  scheuerm
+ *Fixed a compile problem on Windows
+ *
+ *Revision 1.3  2002/04/24 01:04:42  talbert
+ *Added this semester's credits.
+ *
+ *Revision 1.2  2002/03/08 14:06:20  moon
+ *Added Header and Log tags to all files
+ **/

@@ -275,7 +275,7 @@ ImageWrapperImplementation<TPixel>
   m_Image = ImageType::New();
   m_Image->SetRegions(size);
   m_Image->Allocate();
-  m_Image->FillBuffer(0);
+  // m_Image->FillBuffer(0);
 
   m_Image->SetOrigin(source->GetOrigin());
   m_Image->SetSpacing(source->GetSpacing());
@@ -339,15 +339,15 @@ ImageWrapperImplementation<TPixel>
 template <class TPixel>
 inline TPixel& 
 ImageWrapperImplementation<TPixel>
-::GetVoxel(const Vector3i &index) 
+::GetVoxelForUpdate(const Vector3i &index) 
 {
-  return GetVoxel(index[0],index[1],index[2]);
+  return GetVoxelForUpdate(index[0],index[1],index[2]);
 }
 
 template <class TPixel>
 inline TPixel& 
 ImageWrapperImplementation<TPixel>
-::GetVoxel(unsigned int x, unsigned int y, unsigned int z) 
+::GetVoxelForUpdate(unsigned int x, unsigned int y, unsigned int z) 
 {
   itk::Index<3> index;
   index[0] = x;
@@ -496,5 +496,6 @@ ImageWrapperImplementation<TPixel>
 
   RemapIntensityToRange(numeric_limits<TPixel>::min(),numeric_limits<TPixel>::max());
 }
+
 
 #endif // __ImageWrapper_txx_

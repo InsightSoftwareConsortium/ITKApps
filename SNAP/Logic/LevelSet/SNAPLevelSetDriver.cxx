@@ -15,11 +15,6 @@
 #include "SNAPLevelSetDriver.h"
 #include "IRISVectorTypesToITKConversion.h"
 
-#include "itkRescaleIntensityImageFilter.h"
-#include "itkDanielssonDistanceMapImageFilter.h"
-#include "itkSubtractImageFilter.h"
-#include "itkUnaryFunctorImageFilter.h"
-
 using namespace itk;
 
 // Create an inverting functor
@@ -32,41 +27,9 @@ public:
 
 void
 SNAPLevelSetDriver
-::Initialize(BubbleImageType *init, FloatImageType *speed,
+::Initialize(FloatImageType *init, FloatImageType *speed,
              const SnakeParameters *sparms)
 {
-  // Create the inverse image
-  typedef UnaryFunctorImageFilter<BubbleImageType,BubbleImageType,
-    InvertFunctor> InvertFilterType;
-  InvertFilterType::Pointer fltInvert = InvertFilterType::New();
-  fltInvert->SetInput(init);
-  fltInvert->ReleaseDataFlagOn();
-
-  // Compute the signed distance function from the bubble image
-  typedef DanielssonDistanceMapImageFilter
-    <BubbleImageType,FloatImageType> DistanceFilterType;
-  DistanceFilterType::Pointer fltDistanceOutside = DistanceFilterType::New();
-  fltDistanceOutside->SetInput(init);
-  fltDistanceOutside->SetInputIsBinary(true);
-  fltDistanceOutside->ReleaseDataFlagOn();
-
-  // Compute the second distance function
-  DistanceFilterType::Pointer fltDistanceInside = DistanceFilterType::New();
-  fltDistanceInside->SetInput(fltInvert->GetOutput());
-  fltDistanceInside->SetInputIsBinary(true);
-  fltDistanceInside->ReleaseDataFlagOn();
-
-  // Subtract the inside from the outside, forming a signed distance map
-  typedef SubtractImageFilter<FloatImageType,
-    FloatImageType,FloatImageType> SubtractFilterType;
-  SubtractFilterType::Pointer fltSubtract = SubtractFilterType::New();
-  fltSubtract->SetInput1(fltDistanceOutside->GetDistanceMap());
-  fltSubtract->SetInput2(fltDistanceInside->GetDistanceMap());
-
-  // Update this filter.  Now we have a distance transform image
-  fltSubtract->Update();
-  FloatImageType::Pointer imgDistance = fltSubtract->GetOutput();
-
   // Create the level set function
   m_Phi = LevelSetFunctionType::New();
 
@@ -77,14 +40,7 @@ SNAPLevelSetDriver
   AssignParametersToPhi(sparms);
 
   // Create the 'fake' filter used for snake stepping
-  m_LevelSetFilter = LevelSetFilterType::New();
-  
-  // Configure the level set filter
-  m_LevelSetFilter->SetInput(imgDistance);
-  m_LevelSetFilter->SetNumberOfLayers(3);
-  m_LevelSetFilter->SetIsoSurfaceValue(0.0f);
-  m_LevelSetFilter->SetDifferenceFunction(m_Phi);
-  m_LevelSetFilter->Start();
+  this->Restart(init);
 }
 
 void 
@@ -105,10 +61,26 @@ SNAPLevelSetDriver
   m_Phi->Initialize(to_itkSize(Vector3i(1)));
 }
 
+void
+SNAPLevelSetDriver
+::Restart(FloatImageType *init)
+{
+  // Create the 'fake' filter used for snake stepping
+  m_LevelSetFilter = LevelSetFilterType::New();
+  
+  // Configure the level set filter
+  m_LevelSetFilter->SetInput(init);
+  m_LevelSetFilter->SetNumberOfLayers(3);
+  m_LevelSetFilter->SetIsoSurfaceValue(0.0f);
+  m_LevelSetFilter->SetDifferenceFunction(m_Phi);
+  m_LevelSetFilter->Start();
+}
+
 void 
 SNAPLevelSetDriver
 ::Run(int nIterations)
 {
+  m_LevelSetFilter->GetOutput()->SetRequestedRegionToLargestPossibleRegion();
   m_LevelSetFilter->Run(nIterations);
 }
 
@@ -139,6 +111,6 @@ SNAPLevelSetDriver
   // Pass the parameters to the phi function
   AssignParametersToPhi(sparms);
 
-  // We need to reinitialize the filter (perhaps more is needed?)
-  m_LevelSetFilter->Start();
+  // TODO: Figure out if this overhead is necessary.  
+  // Restart(m_LevelSetFilter->GetOutput());
 }

@@ -763,25 +763,28 @@ PolygonDrawing
 
 
 /*Log: PolygonDrawing.cxx
-/*Revision 1.1  2003/07/11 23:28:10  pauly
-/**** empty log message ***
-/*
-/*Revision 1.3  2003/06/08 23:27:56  pauly
-/*Changed variable names using combination of ctags, egrep, and perl.
-/*
-/*Revision 1.2  2003/04/29 14:01:42  pauly
-/*Charlotte Trip
-/*
-/*Revision 1.1  2003/03/07 19:29:47  pauly
-/*Initial checkin
-/*
-/*Revision 1.2  2002/12/16 16:40:19  pauly
-/**** empty log message ***
-/*
-/*Revision 1.1.1.1  2002/12/10 01:35:36  pauly
-/*Started the project repository
-/*
-/*
-/*Revision 1.2  2002/03/08 14:06:30  moon
-/*Added Header and Log tags to all files
-/**/
+ *Revision 1.1  2003/07/12 04:46:50  pauly
+ *Initial checkin of the SNAP application into the InsightApplications tree.
+ *
+ *Revision 1.1  2003/07/11 23:28:10  pauly
+ **** empty log message ***
+ *
+ *Revision 1.3  2003/06/08 23:27:56  pauly
+ *Changed variable names using combination of ctags, egrep, and perl.
+ *
+ *Revision 1.2  2003/04/29 14:01:42  pauly
+ *Charlotte Trip
+ *
+ *Revision 1.1  2003/03/07 19:29:47  pauly
+ *Initial checkin
+ *
+ *Revision 1.2  2002/12/16 16:40:19  pauly
+ **** empty log message ***
+ *
+ *Revision 1.1.1.1  2002/12/10 01:35:36  pauly
+ *Started the project repository
+ *
+ *
+ *Revision 1.2  2002/03/08 14:06:30  moon
+ *Added Header and Log tags to all files
+ **/

@@ -204,22 +204,25 @@ Trackball
 }
 
 /*Log: Trackball.cxx
-/*Revision 1.2  2003/07/12 01:34:18  pauly
-/*More final changes before ITK checkin
-/*
-/*Revision 1.1  2003/07/11 23:25:33  pauly
-/**** empty log message ***
-/*
-/*Revision 1.1  2003/03/07 19:29:48  pauly
-/*Initial checkin
-/*
-/*Revision 1.2  2002/12/16 16:40:19  pauly
-/**** empty log message ***
-/*
-/*Revision 1.1.1.1  2002/12/10 01:35:36  pauly
-/*Started the project repository
-/*
-/*
-/*Revision 1.2  2002/03/08 14:06:32  moon
-/*Added Header and Log tags to all files
-/**/
+ *Revision 1.1  2003/07/12 04:46:51  pauly
+ *Initial checkin of the SNAP application into the InsightApplications tree.
+ *
+ *Revision 1.2  2003/07/12 01:34:18  pauly
+ *More final changes before ITK checkin
+ *
+ *Revision 1.1  2003/07/11 23:25:33  pauly
+ **** empty log message ***
+ *
+ *Revision 1.1  2003/03/07 19:29:48  pauly
+ *Initial checkin
+ *
+ *Revision 1.2  2002/12/16 16:40:19  pauly
+ **** empty log message ***
+ *
+ *Revision 1.1.1.1  2002/12/10 01:35:36  pauly
+ *Started the project repository
+ *
+ *
+ *Revision 1.2  2002/03/08 14:06:32  moon
+ *Added Header and Log tags to all files
+ **/

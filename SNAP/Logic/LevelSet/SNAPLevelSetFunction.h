@@ -19,6 +19,9 @@
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkVectorLinearInterpolateImageFunction.h"
 #include "itkVectorCastImageFilter.h"
+// #include "itkGradientImageFilter.h"
+
+#include "SNAPAdvectionFieldImageFilter.h"
 
 /**
   \class SNAPLevelSetFunction
@@ -90,6 +93,7 @@ public:
   typedef typename VectorImageType::Pointer VectorImagePointer;
 
   typedef typename Superclass::TimeStepType TimeStepType;
+  typedef typename Superclass::GlobalDataStruct GlobalDataStruct;
 
   /** Interpolators used to access the speed images */
   typedef itk::LinearInterpolateImageFunction<
@@ -109,11 +113,8 @@ public:
       computation of the variuous internal speed images is
       based.  The function g() should be near zero at edges
       of structures in the image and near one at flat regions */
-  void SetSpeedImage(ImageType *pointer) 
-    {
-    m_SpeedImage = pointer;
-    }
-
+  void SetSpeedImage(ImageType *pointer);
+      
   /** Get the speed image g() */
   ImageType *GetSpeedImage()
     {
@@ -126,22 +127,26 @@ public:
   /** Local multiplier for the curvature term */
   virtual ScalarValueType CurvatureSpeed(
     const NeighborhoodType &neighbourhood,
-    const FloatOffsetType &offset) const;
+    const FloatOffsetType &offset, 
+    GlobalDataStruct * = 0 ) const;
 
   /** Local multiplier for the laplacian smoothing term */
   virtual ScalarValueType LaplacianSmoothingSpeed(
     const NeighborhoodType &neighbourhood,
-    const FloatOffsetType &offset) const;
+    const FloatOffsetType &offset, 
+    GlobalDataStruct * = 0 ) const;
 
   /** Local multiplier for the propagation term */
   virtual ScalarValueType PropagationSpeed(
     const NeighborhoodType &neighbourhood,
-    const FloatOffsetType &offset) const;
+    const FloatOffsetType &offset, 
+    GlobalDataStruct * = 0 ) const;
 
   /** Local multiplier for the advection term */
   virtual VectorType AdvectionField(
     const NeighborhoodType &neighbourhood,
-    const FloatOffsetType &offset) const;
+    const FloatOffsetType &offset, 
+    GlobalDataStruct * = 0 ) const;
 
   /** Set the exponent to which the speed image g() is taken
       when converted to the curvature speed */
@@ -206,10 +211,16 @@ public:
   const TimeStepType &GetTimeStep() const
     { return m_TimeStep; }
 
-  /** Returns the time step supplied by the user.  We don't need to use the
-   * global data supplied since we are returning a fixed value.  */
-  virtual TimeStepType ComputeGlobalTimeStep(void *itkNotUsed(GlobalData)) const
-    { return this->GetTimeStep(); }
+  /** Returns the time step supplied by the user.  If the time step value
+      passed on to this filter is equal to zero, this method will use the
+      automatic time step calculation from the parent class.  If the value
+      is non-zero, the fixed time step will be returned. */
+  virtual TimeStepType ComputeGlobalTimeStep(void *GlobalData) const
+    { 
+    return m_TimeStep == 0
+      ? Superclass::ComputeGlobalTimeStep(GlobalData)
+      : m_TimeStep; 
+    }
 
 protected:
 
@@ -249,6 +260,10 @@ private:
 
   /** The advection field (possibly scaled by speed image g() */
   VectorImagePointer m_AdvectionField;
+
+  /** Gradient filter used to produce the advection field */
+  typedef SNAPAdvectionFieldImageFilter<TImageType,float> AdvectionFilterType;
+  typename AdvectionFilterType::Pointer m_AdvectionFilter;
 
   /** Instances of the interpolators */
   typename ImageInterpolatorType::Pointer m_PropagationSpeedInterpolator;

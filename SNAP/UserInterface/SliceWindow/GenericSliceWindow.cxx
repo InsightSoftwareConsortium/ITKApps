@@ -55,6 +55,9 @@ GenericSliceWindow
   m_LabelTexture = new LabelTextureType;
   m_LabelTexture->SetGlComponents(4);
   m_LabelTexture->SetGlFormat(GL_RGBA);
+
+  // Initalize the margin
+  m_Margin = 2;
 }
 
 GenericSliceWindow
@@ -161,10 +164,13 @@ GenericSliceWindow
   // Set the view position (position of the center of the image?)
   m_ViewPosition = worldSize * 0.5f;
 
+  // Reduce the width and height of the slice by the margin
+  Vector2i szCanvas = Vector2i(w(),h()) - Vector2i(2 * m_Margin);
+  
   // Compute the ratios of window size to slice size
   Vector2f ratios(
-    w() / worldSize(0),
-    h() / worldSize(1));
+    szCanvas(0) / worldSize(0),
+    szCanvas(1) / worldSize(1));
 
   // The zoom factor is the bigger of these ratios
   m_ViewZoom = ratios.min_value();

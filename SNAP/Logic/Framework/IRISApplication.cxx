@@ -61,7 +61,7 @@ IRISApplication
 
 void 
 IRISApplication
-::InitializeSNAPImageData(const Vector3i &roiul,const Vector3i &roilr) 
+::InitializeSNAPImageData(const RegionType &roi) 
 {
   assert(m_SNAPImageData == NULL);
 
@@ -69,16 +69,13 @@ IRISApplication
   m_SNAPImageData = new SNAPImageData();
 
   // Copy the contents
-  m_IRISImageData->DeepCopyROI(roiul,roilr,*m_SNAPImageData);
+  m_IRISImageData->DeepCopyROI(roi,*m_SNAPImageData,m_GlobalState->GetDrawingColorLabel());
 
   // Assign the intensity mapping function to the Snap data
   m_SNAPImageData->GetGrey()->SetIntensityMapFunction(m_IntensityCurve);
 
   // Initialize the speed image of the SNAP image data
   m_SNAPImageData->InitializeSpeed();
-
-  // TODO: Hack.  Intialize the snake image with zero bubbles
-  m_SNAPImageData->InitializeSnakeImage(NULL,0,0);
 }
 
 void 
@@ -88,20 +85,20 @@ IRISApplication
   assert(m_SNAPImageData != NULL);
 
   // Get pointers to the source and destination images
-  typedef LabelImageWrapper::ImageType ImageType;
-  ImageType *source = m_SNAPImageData->GetSnake()->GetImage();
-  ImageType *destination = m_IRISImageData->GetSegmentation()->GetImage();
+  typedef LevelSetImageWrapper::ImageType SourceImageType;
+  typedef LabelImageWrapper::ImageType TargetImageType;
+  
+  SourceImageType *source = m_SNAPImageData->GetSnake()->GetImage();
+  TargetImageType *target = m_IRISImageData->GetSegmentation()->GetImage();
 
   // Construct are region of interest into which the result will be pasted
-  Vector3i roiIndex = m_GlobalState->GetROICorner(0);
-  Vector3i roiSize = Vector3i(1) + m_GlobalState->GetROICorner(1) - roiIndex;
-  ImageType::RegionType roi(to_itkIndex(roiIndex),to_itkSize(roiSize));
+  SourceImageType::RegionType roi = m_GlobalState->GetSegmentationROI();
 
   // Create iterators for copying from one to the other
-  typedef ImageRegionIterator<ImageType> IteratorType;
-  typedef ImageRegionConstIterator<ImageType> ConstIteratorType;
-  ConstIteratorType itSource(source,source->GetLargestPossibleRegion());
-  IteratorType itDestination(destination,roi);
+  typedef ImageRegionConstIterator<SourceImageType> SourceIteratorType;
+  typedef ImageRegionIterator<TargetImageType> TargetIteratorType;
+  SourceIteratorType itSource(source,source->GetLargestPossibleRegion());
+  TargetIteratorType itTarget(target,roi);
 
   // We need this information for merging the images 
   LabelType clrDrawing = m_GlobalState->GetDrawingColorLabel();
@@ -131,34 +128,28 @@ IRISApplication
       }
     }
 
-  // Compute the shift amount needed to make clrDrawing into 1
-  // This is done to eliminate 'if' statements in the merge operation
-  unsigned int shift = 0;
-  while(clrDrawing >> shift != 1)
-    shift++;
-
   // Go through both iterators, copy the new over the old
   itSource.GoToBegin();
-  itDestination.GoToBegin();
+  itTarget.GoToBegin();
   while(!itSource.IsAtEnd())
     {
     // Get the two voxels
-    LabelType &voxIRIS = itDestination.Value();    
-    LabelType voxSNAP = itSource.Value();
+    LabelType &voxIRIS = itTarget.Value();    
+    float voxSNAP = itSource.Value();
 
     // Check that we're ok (debug mode only)
-    assert(voxSNAP == clrDrawing || voxSNAP == 0);
-    assert(!itDestination.IsAtEnd());
+    assert(!itTarget.IsAtEnd());
 
     // Perform the merge
-    voxIRIS = mergeTable[voxSNAP >> shift][voxIRIS];
+    voxIRIS = mergeTable[voxSNAP <= 0 ? 1 : 0][voxIRIS];
 
     // Iterate
     ++itSource;
-    ++itDestination;
+    ++itTarget;
     }
 
-  // Done!  The IRIS data should now have the region pasted in, except that...
+  // The target has been modified
+  target->Modified();
 }
 
 void 

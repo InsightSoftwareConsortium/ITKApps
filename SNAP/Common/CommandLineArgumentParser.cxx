@@ -84,11 +84,11 @@ CommandLineArgumentParser
       }
 
     // Tell the result that the option has been encountered
-    outResult.AddOption(arg,nParameters);
+    outResult.AddOption(m_OptionMap[arg].CommonName,nParameters);
 
     // Pass in the parameters
     for(unsigned int j=0;j<nParameters;j++,i++)
-      outResult.AddParameter(arg,string(argv[i+1]));
+      outResult.AddParameter(m_OptionMap[arg].CommonName,string(argv[i+1]));
     
     }
 
@@ -109,8 +109,8 @@ const char *
 CommandLineArgumentParseResult
 ::GetOptionParameter(const char *option, unsigned int number)
 {
-  assert(IsOptionPresent(option) 
-         && number < m_OptionMap[string(option)].size());
+  assert(IsOptionPresent(option));
+  assert(number < m_OptionMap[string(option)].size());
 
   return m_OptionMap[string(option)][number].c_str();
 }

@@ -134,7 +134,7 @@ private:
   void ComputeMatricies( int *vport, double *mview, double *proj );
   void ComputeRay( int x, int y, double *mvmatrix, double *projmat,
                    int *viewport, Vector3d &v, Vector3d &r );
-  int IntersectSegData(int mouse_x, int mouse_y, Vector3i *hit);
+  int IntersectSegData(int mouse_x, int mouse_y, Vector3i &hit);
 
   void OnCutPlanePointRayAction(int mouse_x, int mouse_y, int i);
   void ComputePlane();
@@ -151,30 +151,33 @@ private:
 #endif // __Window3D_h_
 
 /*Log: Window3D.h
-/*Revision 1.6  2003/07/12 01:34:18  pauly
-/*More final changes before ITK checkin
-/*
-/*Revision 1.5  2003/07/11 23:25:33  pauly
-/**** empty log message ***
-/*
-/*Revision 1.4  2003/06/08 23:27:56  pauly
-/*Changed variable names using combination of ctags, egrep, and perl.
-/*
-/*Revision 1.3  2003/04/23 06:05:18  pauly
-/**** empty log message ***
-/*
-/*Revision 1.2  2003/04/16 05:04:17  pauly
-/*Incorporated intensity modification into the snap pipeline
-/*New IRISApplication
-/*Random goodies
-/*
-/*Revision 1.1  2003/03/07 19:29:48  pauly
-/*Initial checkin
-/*
-/*Revision 1.1.1.1  2002/12/10 01:35:36  pauly
-/*Started the project repository
-/*
-/*
-/*Revision 1.2  2002/03/08 14:06:32  moon
-/*Added Header and Log tags to all files
-/**/
+ *Revision 1.1  2003/07/12 04:46:51  pauly
+ *Initial checkin of the SNAP application into the InsightApplications tree.
+ *
+ *Revision 1.6  2003/07/12 01:34:18  pauly
+ *More final changes before ITK checkin
+ *
+ *Revision 1.5  2003/07/11 23:25:33  pauly
+ **** empty log message ***
+ *
+ *Revision 1.4  2003/06/08 23:27:56  pauly
+ *Changed variable names using combination of ctags, egrep, and perl.
+ *
+ *Revision 1.3  2003/04/23 06:05:18  pauly
+ **** empty log message ***
+ *
+ *Revision 1.2  2003/04/16 05:04:17  pauly
+ *Incorporated intensity modification into the snap pipeline
+ *New IRISApplication
+ *Random goodies
+ *
+ *Revision 1.1  2003/03/07 19:29:48  pauly
+ *Initial checkin
+ *
+ *Revision 1.1.1.1  2002/12/10 01:35:36  pauly
+ *Started the project repository
+ *
+ *
+ *Revision 1.2  2002/03/08 14:06:32  moon
+ *Added Header and Log tags to all files
+ **/
