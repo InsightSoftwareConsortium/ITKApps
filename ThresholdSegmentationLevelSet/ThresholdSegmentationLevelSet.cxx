@@ -65,7 +65,7 @@ ThresholdSegmentationLevelSet
   m_ThresholdLevelSetFilter->AddObserver( itk::IterationEvent(), iterationCommand );      
 
   /** synchronize the filter with the parameters in the GUI */
-  m_ThresholdLevelSetFilter->SetMaximumIterations( 
+  m_ThresholdLevelSetFilter->SetNumberOfIterations( 
           static_cast<int>( maxIterationsValueInput->value() ) );
   m_ThresholdLevelSetFilter->SetLowerThreshold( lowerThresholdValueInput->value() );
   m_ThresholdLevelSetFilter->SetUpperThreshold( upperThresholdValueInput->value() );
