@@ -57,7 +57,13 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 
   vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
-
+  // make sure there is only one component of input data
+  if (info->InputVolumeNumberOfComponents != 1)
+    {
+    info->SetProperty( info, VVP_ERROR, "This filter only works with single component data" ); 
+    return -1;
+    }
+ 
   try 
   {
   switch( info->InputVolumeScalarType )
@@ -192,7 +198,7 @@ void VV_PLUGIN_EXPORT vvITKCannyEdgeDetectionInit(vtkVVPluginInfo *info)
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
                                  "Edge detection using the Canny filter");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,
-    "This filter applies an edge-detection filter developed by Canny. First it smooths the image using a discrete Gaussian filter. Then it detects local maxima and marks the position of those local maxima.");
+    "This filter applies an edge-detection filter developed by Canny. First it smooths the image using a discrete Gaussian filter. Then it detects local maxima and marks the position of those local maxima. Note that edges in the output image will be set to value 1.0, so you may need to adjust the intensity windowing parameters for visualizing the resulting edges.");
   info->SetProperty(info, VVP_SUPPORTS_IN_PLACE_PROCESSING, "0");
   info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "0");
   info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "3");
