@@ -13,10 +13,10 @@ guiMainImplementation
   m_FixedImageLoaded = false;
   m_MovingImageLoaded = false;
 
-  m_FixedImage = NULL;
-  m_MovingImage = NULL;
-  m_InitializedMovingImage = NULL; //ImageType::New();
-  m_RegisteredMovingImage = NULL; //ImageType::New();
+  m_FixedImage = 0;
+  m_MovingImage = 0;
+  m_InitializedMovingImage = 0; //ImageType::New();
+  m_RegisteredMovingImage = 0; //ImageType::New();
 
   m_FixedLandmarkSpatialObject = LandmarkSpatialObjectType::New();
   m_MovingLandmarkSpatialObject = LandmarkSpatialObjectType::New();
@@ -290,21 +290,21 @@ guiMainImplementation
   {
   if (i == 0)
     {
-    if ( m_MovingImageLoaded && m_MovingImage != 0 )
+    if ( m_MovingImageLoaded && m_MovingImage )
       {
       tkResultImageViewer->SetSecondInputImage(m_MovingImage);
       }
     }
   else if ( i == 1)
     {
-    if ( m_RegisteredMovingImage != 0 )
+    if ( m_RegisteredMovingImage )
       {
       tkResultImageViewer->SetSecondInputImage(m_InitializedMovingImage);
       }
     }
   else if ( i == 2)
     {
-    if ( m_RegisteredMovingImage != 0 )
+    if ( m_RegisteredMovingImage )
       {
       tkResultImageViewer->SetSecondInputImage(m_RegisteredMovingImage);
       }
