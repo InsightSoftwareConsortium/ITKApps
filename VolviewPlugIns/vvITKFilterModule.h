@@ -137,6 +137,17 @@ public:
       return;
       }
 
+    this->CopyOutputData( pds );
+
+   }
+
+
+
+  /**  ProcessData performs the actual filtering on the data */
+  virtual void 
+  CopyOutputData( const vtkVVProcessDataStruct * pds )
+  {
+
     // Copy the data (with casting) to the output buffer provided by the PlugIn API
     typename OutputImageType::ConstPointer outputImage =
                                                m_Filter->GetOutput();
