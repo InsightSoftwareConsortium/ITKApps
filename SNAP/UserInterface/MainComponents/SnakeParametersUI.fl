@@ -172,13 +172,13 @@ and may cause the segmentation to converge.} open
               xywh {20 55 325 30}
             } {
               Fl_Group m_GrpEquationEdge {open
-                image {C:/grant/app/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/formula01.gif} xywh {20 55 325 30} box BORDER_BOX color 7 align 16
+                image {Artwork/formula01.gif} xywh {20 55 325 30} box BORDER_BOX color 7 align 16
               } {}
               Fl_Group m_GrpEquationRegion {open
-                image {C:/grant/app/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/formula02.gif} xywh {20 55 325 30} box BORDER_BOX color 7 align 16 hide
+                image {Artwork/formula02.gif} xywh {20 55 325 30} box BORDER_BOX color 7 align 16 hide
               } {}
               Fl_Group m_GrpEquationExperimental {open
-                image {C:/grant/app/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/formula03.gif} xywh {20 55 325 30} box BORDER_BOX color 7 align 16 hide
+                image {Artwork/formula03.gif} xywh {20 55 325 30} box BORDER_BOX color 7 align 16 hide
               } {}
             }
           }
@@ -193,7 +193,7 @@ and may cause the segmentation to converge.} open
             }
             Fl_Value_Input m_InCurvatureExponentMathText {
               callback {OnCurvatureExponentChange(o);}
-              image {C:/grant/app/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/rb.gif} xywh {235 220 30 20} labelsize 11 maximum 2 step 1 textsize 12 hide
+              image {Artwork/rb.gif} xywh {235 220 30 20} labelsize 11 maximum 2 step 1 textsize 12 hide
             }
             Fl_Slider m_InCurvatureWeightMathSlider {
               callback {OnCurvatureWeightChange(o);}
@@ -215,7 +215,7 @@ and may cause the segmentation to converge.} open
             }
             Fl_Value_Input m_InAdvectionExponentMathText {
               callback {OnAdvectionExponentChange(o);}
-              image {C:/grant/app/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/rc.gif} xywh {235 285 30 20} labelsize 11 maximum 2 step 1 textsize 12 hide
+              image {Artwork/rc.gif} xywh {235 285 30 20} labelsize 11 maximum 2 step 1 textsize 12 hide
             }
             Fl_Slider m_InAdvectionWeightMathSlider {
               callback {OnAdvectionWeightChange(o);}
@@ -241,7 +241,7 @@ and may cause the segmentation to converge.} open
             }
             Fl_Value_Input m_InPropagationExponentMathText {
               callback {OnPropagationExponentChange(o);}
-              image {C:/grant/app/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/ra.gif} xywh {235 155 30 20} labelfont 2 labelsize 12 maximum 2 step 1 value 1 textsize 12 hide
+              image {Artwork/ra.gif} xywh {235 155 30 20} labelfont 2 labelsize 12 maximum 2 step 1 value 1 textsize 12 hide
             }
             Fl_Slider m_InPropagationExponentMathSlider {
               callback {OnPropagationExponentChange(o);}
