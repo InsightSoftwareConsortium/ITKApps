@@ -1,0 +1,134 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0102 
+header_name {.h} 
+code_name {.cxx}
+class SegmenterConsole3DGUI {open : {public SegmenterConsole3DBase}
+} {
+  Function {SegmenterConsole3DGUI()} {open
+  } {
+    Fl_Window consoleWindow {
+      label {Segmenter 3D} open
+      xywh {358 217 793 192} color 215 resizable
+      code0 {\#include <SegmenterConsole3DBase.h>}
+      code1 {\#include <fltkLightButton.h>} visible
+    } {
+      Fl_Group controlsGroup {open
+        xywh {0 1 880 362} color 29 deactivate
+      } {
+        Fl_Light_Button inputButton {
+          label {Show Input Image}
+          callback {ShowInputImage();}
+          xywh {25 70 150 30} type Normal value 1 selection_color 121 align 16
+          class {fltk::LightButton}
+        }
+        Fl_Light_Button GradientButton {
+          label {Show Gradient Image}
+          callback {ShowGradientImage();}
+          xywh {222 20 168 24} type Normal value 1 selection_color 121 align 16
+          class {fltk::LightButton}
+        }
+        Fl_Light_Button SegmentButton {
+          label {Show Watershed Segmentation Image}
+          callback {ShowSegmentedImage();}
+          xywh {425 20 355 24} selection_color 121 align 16
+          class {fltk::LightButton}
+        }
+        Fl_Box {} {
+          xywh {91 49 10 20} box THIN_UP_BOX color 12 labeltype NO_LABEL
+        }
+        Fl_Box {} {
+          label label
+          xywh {175 78 20 10} box THIN_UP_BOX color 12 labeltype NO_LABEL
+        }
+        Fl_Box {} {
+          label label
+          xywh {194 28 10 60} box THIN_UP_BOX color 12 labeltype NO_LABEL
+        }
+        Fl_Box {} {
+          label label
+          xywh {390 27 35 10} box THIN_UP_BOX color 12 labeltype NO_LABEL
+        }
+        Fl_Group {} {open
+          xywh {222 43 168 57} box UP_FRAME color 110 labeltype NO_LABEL
+        } {}
+        Fl_Group {} {open
+          xywh {425 44 355 91} box UP_FRAME color 2
+        } {
+          Fl_Button {} {
+            label {Image Filename@>}
+            callback {SaveSegmentedImage();}
+            xywh {448 95 147 25}
+          }
+          Fl_Button {} {
+            label {Tree Filename@>}
+            callback {SaveTree();}
+            xywh {627 95 125 25}
+          }
+        }
+      }
+      Fl_Output statusTextOutput {
+        xywh {10 155 575 25}
+      }
+      Fl_Light_Button loadButton {
+        label {Load Source File}
+        callback {Load();}
+        xywh {25 19 150 30} type Normal value 1 selection_color 121 align 16
+        class {fltk::LightButton}
+      }
+      Fl_Button {} {
+        label Quit
+        callback {Quit();}
+        xywh {700 150 80 35}
+      }
+      Fl_Value_Input SmoothingVariance {
+        label {Smoothing Variance}
+        callback {SetVariance( o->value() );}
+        xywh {280 67 50 25} align 1 maximum 100
+      }
+      Fl_Box {} {
+        label label
+        xywh {204 28 18 10} box THIN_UP_BOX color 12 labeltype NO_LABEL
+      }
+      Fl_Value_Input MaxFlood {
+        label {Max Flood Level}
+        callback {SetMaxFlood( o->value() );}
+        xywh {545 58 50 25} step 0.001 value 0.1
+      }
+      Fl_Value_Input Threshold {
+        label {Lower Threshold}
+        callback {SetThreshold( o->value() );}
+        xywh {719 58 50 25} align 132 step 0.001 value 0.01
+      }
+      Fl_Button {} {
+        label {Show Help}
+        callback {helpWin->show();}
+        xywh {605 150 80 35}
+      }
+    }
+    Fl_Window helpWin {
+      label Help open
+      xywh {499 497 525 365} labeltype NORMAL_LABEL resizable visible
+    } {
+      Fl_Output instructTextOutput {selected
+        xywh {10 10 520 295} type Multiline labeltype NO_LABEL resizable
+      }
+      Fl_Button {} {
+        label Close
+        callback {helpWin->hide();}
+        xywh {208 320 105 35}
+      }
+    }
+  }
+  Function {~SegmenterConsole3DGUI()} {return_type virtual
+  } {}
+  Function {Quit( void )} {return_type {virtual void}
+  } {}
+  Function {Load( void )} {return_type {virtual void}
+  } {}
+  Function {ShowInputImage( void )} {return_type {virtual void}
+  } {}
+  Function {ShowGradientImage( void )} {return_type {virtual void}
+  } {}
+  Function {ShowSegmentedImage( void )} {return_type {virtual void}
+  } {}
+} 
