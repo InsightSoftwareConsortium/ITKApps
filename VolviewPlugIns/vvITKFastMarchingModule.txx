@@ -196,7 +196,7 @@ FastMarchingModule<TInputPixelType>
  *  Get LevelSet (returns the time-crossing map)
  */
 template <class TInputPixelType >
-const FastMarchingModule<TInputPixelType>::RealImageType *
+const typename FastMarchingModule<TInputPixelType>::RealImageType *
 FastMarchingModule<TInputPixelType>
 ::GetLevelSet()
 {
@@ -214,7 +214,7 @@ FastMarchingModule<TInputPixelType>
  *  ShapeDetection one.
  */
 template <class TInputPixelType >
-const FastMarchingModule<TInputPixelType>::SpeedImageType *
+const typename FastMarchingModule<TInputPixelType>::SpeedImageType *
 FastMarchingModule<TInputPixelType>
 ::GetSpeedImage()
 {
