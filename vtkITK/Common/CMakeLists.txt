@@ -26,6 +26,7 @@ vtkITKMutualInformationTransform.cxx
 vtkITKNeighborhoodConnectedImageFilter.h
 vtkITKNormalizeImageFilterSF.h
 vtkITKNormalizeImageFilter.h
+vtkITKOtsuThresholdImageFilter.h
 vtkITKPDEDeformableRegistrationFilter.h
 vtkITKStatisticsImageFilterULUL.h
 vtkITKSmoothingRecursiveGaussianImageFilterSS.h
@@ -77,5 +78,5 @@ IF(BORLAND)
 ENDIF(BORLAND)
 
 TARGET_LINK_LIBRARIES(vtkVTKITKCommon vtkImaging
-                      ITKIO ITKNumerics ITKBasicFilters)
+                      ITKIO ITKNumerics ITKBasicFilters ITKAlgorithms)
 
