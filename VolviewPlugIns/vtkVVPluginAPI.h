@@ -171,6 +171,8 @@ gets passed into the ProcessData function.
     float InputVolumeOrigin[3];
     double InputVolumeScalarRange[2]; /* actual scalar range */
     double InputVolumeScalarTypeRange[2]; /* possible scalar range */
+    int NumberOfMarkers;
+    float *Markers;
     
     /* specify the charateristics of the output data */
     int OutputVolumeScalarType;
