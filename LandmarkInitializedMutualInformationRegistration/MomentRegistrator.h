@@ -30,7 +30,7 @@ class MomentRegistrator : public ImageRegistrationMethod < TImage, TImage >
     typedef typename TImage::RegionType RegionType ;
 
     /** preprocessing related typedefs */
-    typedef AffineTransform<double, ImageDimension> TransformType ;
+    typedef AffineTransform<double, itkGetStaticConstMacro(ImageDimension)> TransformType ;
     typedef typename TransformType::ParametersType ParametersType ;
     typedef typename TransformType::ParametersType ScalesType ;
 
