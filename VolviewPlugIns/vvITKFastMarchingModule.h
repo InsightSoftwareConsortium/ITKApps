@@ -108,10 +108,18 @@ public:
     void SetSigma( float value );
     void SetLowestBorderValue( float value );
     void SetLowestBasinValue(  float value );
+    void SetInitialSeedValue(  float value );
 
     void ProcessData( const vtkVVProcessDataStruct * pds );
+    void PostProcessData( const vtkVVProcessDataStruct * pds );
     void ProgressUpdate( itk::Object * caller, const itk::EventObject & event );
     void SetPluginInfo( vtkVVPluginInfo * info );
+
+    /** This methods allows to disable postprocessing. Useful when 
+        this module is used for initializing other level set methods */
+    void SetPerformPostProcessing( bool value );
+    
+    const RealImageType * GetLevelSet();
 
 private:
     typename ImportFilterType::Pointer              m_ImportFilter;
@@ -134,6 +142,8 @@ private:
   
     float                                           m_LowestBasinValue;
     float                                           m_LowestBorderValue;
+
+    bool                                            m_PerformPostprocessing;
 
 };
 

@@ -29,6 +29,8 @@ FastMarchingModule<TInputPixelType>
 
     m_InitialSeedValue        = 0.0;
 
+    m_PerformPostprocessing   = true;
+
     m_CommandObserver         = CommandType::New();
     m_Info                    = 0;
 
@@ -120,6 +122,21 @@ FastMarchingModule<TInputPixelType>
 }
 
 
+/*
+ *  Set the initial value of the seed.
+ *  This can be used to generate zero sets at
+ *  a certain distance of the set of seeds.
+ */
+template <class TInputPixelType >
+void 
+FastMarchingModule<TInputPixelType>
+::SetInitialSeedValue( float value )
+{
+  m_InitialSeedValue = value;
+}
+
+
+
 
 /*
  *  Set the Plugin Info structure 
@@ -177,9 +194,8 @@ FastMarchingModule<TInputPixelType>
 
 
 
-
 /*
- *  Set the lowest value of the gradient magnitude in the border of the region to be segmented
+ *  Set the lowest value of the basin border to be segmented
  */
 template <class TInputPixelType >
 void 
@@ -187,6 +203,34 @@ FastMarchingModule<TInputPixelType>
 ::SetLowestBorderValue( float value )
 {
   m_LowestBorderValue = value;
+}
+
+
+
+
+/*
+ *  Set the boolean flag controlling whether 
+ *  post-processing will be performed or not.
+ */
+template <class TInputPixelType >
+void 
+FastMarchingModule<TInputPixelType>
+::SetPerformPostProcessing( bool value )
+{
+  m_PerformPostprocessing = value;
+}
+
+
+
+/*
+ *  Set the Plugin Info structure 
+ */
+template <class TInputPixelType >
+const FastMarchingModule<TInputPixelType>::RealImageType *
+FastMarchingModule<TInputPixelType>
+::GetLevelSet()
+{
+   return m_FastMarchingFilter->GetOutput();
 }
 
 
@@ -257,6 +301,26 @@ FastMarchingModule<TInputPixelType>
   m_GradientMagnitudeFilter->Update();
   m_SigmoidFilter->Update();
   m_FastMarchingFilter->Update();
+
+  if( m_PerformPostprocessing )
+    {
+    this->PostProcessData( pds );
+    }
+
+} // end of ProcessData
+
+
+
+/*
+ *  Performs post-processing of data. 
+ *  This involves an intensity window operation and
+ *  data copying into the volview provided buffer.
+ */
+template <class TInputPixelType >
+void 
+FastMarchingModule<TInputPixelType>
+::PostProcessData( const vtkVVProcessDataStruct * pds )
+{
   m_IntensityWindowingFilter->Update();
 
   // Copy the data (with casting) to the output buffer provided by the Plug In API
@@ -277,7 +341,7 @@ FastMarchingModule<TInputPixelType>
     ++outData;
     }
 
-} // end of ProcessData
+} // end of PostProcessData
 
 
 } // end of namespace PlugIn
