@@ -34,7 +34,7 @@ class ImageRegistrationAppViewer
         return;
         }
 
-      const OptimizerType * opt = static_cast<const OptimizerType *>(object);
+      const OptimizerType * opt = dynamic_cast<const OptimizerType *>(object);
 
       std::cout << opt->GetCurrentPosition() << " : "
                 << opt->GetValue( opt->GetCurrentPosition() )
