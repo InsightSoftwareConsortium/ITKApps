@@ -17,6 +17,7 @@
 
 #include "IRISSlicer.h"
 #include <itkSmartPointer.h>
+#include <itkCovariantVector.h>
 typedef IRISSlicer<unsigned char> SNAPBorlandDummyIRISSlicer;
 typedef itk::SmartPointer<SNAPBorlandDummyIRISSlicer> SNAPBorlandDummyIRISSlicerSP;
 typedef IRISSlicer<float> SNAPBorlandDummyIRISSlicer2;
