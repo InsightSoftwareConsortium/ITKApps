@@ -118,15 +118,17 @@ public:
 
     OutputIteratorType ot( outputImage, outputImage->GetBufferedRegion() );
 
-    OutputPixelType * outData = (OutputPixelType *)(pds->outData);
+    typedef unsigned char OutputVolumePixelType;
+    OutputVolumePixelType * outData = (OutputVolumePixelType *)(pds->outData);
 
     ot.GoToBegin(); 
     while( !ot.IsAtEnd() )
       {
-      *outData = static_cast<unsigned char>( ( ot.Get() + 5.0 ) * 255.0 / 10.0 );
+      *outData = static_cast<unsigned char>( ( ot.Get() + 4.0 ) * 255.0 / 8.0 );
       ++ot;
       ++outData;
       }
+
   } // end of ProcessData
 
 
