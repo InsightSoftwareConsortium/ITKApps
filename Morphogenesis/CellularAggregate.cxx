@@ -312,17 +312,22 @@ CellularAggregate
   bool regionExist = m_Mesh->GetCell( id, region );
   if( regionExist )
     {
-    VoronoiRegionAutoPointer realRegion;
-    realRegion.TakeOwnership( 
-              dynamic_cast < VoronoiRegionType * >( region.ReleaseOwnership() ) );
+    VoronoiRegionType * realRegion =
+              dynamic_cast < VoronoiRegionType * >( region.GetPointer() );
 
-    VoronoiRegionType::PointIdIterator neighbor = realRegion->PointIdsBegin();
-    VoronoiRegionType::PointIdIterator end      = realRegion->PointIdsEnd();
-    while( neighbor != end )
+    if( !realRegion )
       {
-      neighbor++;
+      std::cerr << "CellularAggregate::Remove() couldn't dynamic_cast region " << std::endl;
       }
-    
+    else
+      {
+      VoronoiRegionType::PointIdIterator neighbor = realRegion->PointIdsBegin();
+      VoronoiRegionType::PointIdIterator end      = realRegion->PointIdsEnd();
+      while( neighbor != end )
+        {
+        neighbor++;
+        }
+      }
     // update voronoi connections
     }
  
@@ -487,10 +492,17 @@ CellularAggregate
     bool neighborVoronoiExist = m_Mesh->GetCell( neighborId, cellPointer );
     if( neighborVoronoiExist ) 
       {
-      VoronoiRegionAutoPointer neighborVoronoi;
-      neighborVoronoi.TakeOwnership( 
-         dynamic_cast < VoronoiRegionType * >( cellPointer.ReleaseOwnership() ) );
-      neighborVoronoi->AddPointId( newcellId );
+      VoronoiRegionType * region =
+         dynamic_cast < VoronoiRegionType * >( cellPointer.GetPointer() );
+
+      if( !region )
+        {
+        std::cerr << "CellularAggregate::Add() Failed to find a region"  << std::endl;
+        }
+      else
+        {
+        region->AddPointId( newcellId );
+        }
       }
     neighbor++;
     }
