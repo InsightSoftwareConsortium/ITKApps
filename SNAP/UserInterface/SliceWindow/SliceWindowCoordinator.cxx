@@ -40,6 +40,7 @@ SliceWindowCoordinator
   for(unsigned int i=0;i<3;i++)
     {
     m_Window[i] = windows[i];
+    m_Window[i]->SetManagedZoom(m_LinkedZoom);
     }
   m_WindowsRegistered = true;
 }
@@ -49,8 +50,17 @@ SliceWindowCoordinator
 ::SetLinkedZoom(bool flag)
 {
   m_LinkedZoom = flag;
-  if(m_LinkedZoom && m_WindowsRegistered)
-    SetCommonZoomToSmallestWindowZoom();
+
+  if(m_WindowsRegistered)
+    {
+    // Tell the windows whether they are managed or not
+    for(unsigned int i=0;i<3;i++)
+      m_Window[i]->SetManagedZoom(m_LinkedZoom);
+    
+    // Set the common zoom
+    if(m_LinkedZoom)
+      SetCommonZoomToSmallestWindowZoom();
+    }
 }
 
 void

@@ -119,6 +119,9 @@ public:
   /** Compute the optimal zoom (best fit) */
   irisGetMacro(OptimalZoom,float);
 
+  /** Set the zoom management flag */
+  irisSetMacro(ManagedZoom,bool);
+
   /** Get the slice spacing in the display space orientation */
   irisGetMacro(SliceSpacing,Vector3f);
 
@@ -224,6 +227,10 @@ protected:
   // The zoom level at which the slice fits snugly into the window
   float m_OptimalZoom;
 
+  // Flag indicating whether the window's zooming is managed externally by
+  // the SliceWindowCoordinator
+  bool m_ManagedZoom;
+
   // The default screen margin (area into which we do not paint) at lest in 
   // default zoom
   unsigned int m_Margin;
@@ -261,7 +268,7 @@ protected:
   void DrawThumbnail();
 
   /** Access the next window in the slice pipeline */
-  GenericSliceWindow *GetNextWindow();
+  GenericSliceWindow *GetNextSliceWindow();
 };
 
 #endif // __GenericSliceWindow_h_

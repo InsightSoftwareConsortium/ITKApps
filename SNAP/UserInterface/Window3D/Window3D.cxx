@@ -428,9 +428,6 @@ void
 Window3D
 ::ClearScreen()
 {
-  // Update the GL state
-  make_current(); 
-
   // Hide the crosshairs.
   m_CursorVisible = 0;  
 
@@ -442,9 +439,6 @@ void
 Window3D
 ::ResetView()
 {
-  // Update the GL state
-  make_current(); 
-
   // Reset the trackball
   m_Trackball.Reset();
 
@@ -484,10 +478,10 @@ Window3D
   m_DefaultHalf[X] = m_DefaultHalf[Y] = m_DefaultHalf[Z] = maxdim * 0.7 + 1.0;
   m_DefaultHalf[Z] *= 4.0;
 
-  this->SetupProjection();
-
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
+  // this->SetupProjection();
+  // 
+  // glMatrixMode(GL_MODELVIEW);
+  // glLoadIdentity();
 
   m_CursorVisible = 1;  // Show the crosshairs.
   m_Plane.valid = -1; // Resets the Cut m_Plane
@@ -499,7 +493,7 @@ void
 Window3D
 ::UpdateMesh()
 {
-  make_current();
+  // make_current();
   m_Mesh.GenerateMesh();
   redraw();
 }
@@ -558,6 +552,9 @@ Window3D
   Vector3ui crosshair = m_GlobalState->GetCrosshairsPosition();
   for (int i=0; i<3; i++) 
     m_CenterOfRotation[i] = m_Spacing[i] * crosshair[i];
+
+  // Set up the projection matrix
+  SetupProjection();
 
   // Set up the model view matrix
   glMatrixMode(GL_MODELVIEW);
@@ -762,7 +759,7 @@ Window3D
     case WIN3D_ROTATE: m_Trackball.TrackRot(x,y,w(),h()); break;
     case WIN3D_ZOOM:   
       m_Trackball.TrackZoom(y); 
-      this->SetupProjection();
+      // this->SetupProjection();
       break;
     case WIN3D_PAN:    
       m_Trackball.TrackPan(x,y,w(),h(),2*m_ViewHalf[X],2*m_ViewHalf[Y]);
@@ -783,7 +780,7 @@ Window3D
     case WIN3D_PAN:     m_Trackball.StopPan(); break;
     case WIN3D_ZOOM:    
       m_Trackball.StopZoom(); 
-      this->SetupProjection();
+      // this->SetupProjection();
       break;
     default: break;
     }
@@ -860,7 +857,7 @@ void
 Window3D
 ::SetupProjection()
 {
-  make_current();
+  // make_current();
 
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
@@ -1313,6 +1310,9 @@ void Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.17  2004/06/01 13:33:55  king
+ *ERR: Fix for cross_3d to work with both the ITK version and current cvs version of vxl.
+ *
  *Revision 1.16  2004/05/12 18:09:12  pauly
  *FIX:Error with cross_3d symbol
  *

@@ -19,20 +19,9 @@
 #include "SNAPOpenGL.h"
 
 #include <iostream>
+#include <list>
 #include "SNAPCommonUI.h"
 
-enum PolygonState
-{
-  INACTIVE_STATE,
-  DRAWING_STATE,
-  EDITING_STATE
-};
-
-struct PolygonVertex 
-{
-  float x,y;
-  int selected;
-};
 
 /**
  * \class PolygonDrawing
@@ -40,12 +29,22 @@ struct PolygonVertex
  */
 class PolygonDrawing
 {
-
 public:
+  /** States that the polygon drawing is in */
+  enum PolygonState { INACTIVE_STATE, DRAWING_STATE, EDITING_STATE };
+
+  /** Vertex structure */
+  struct Vertex 
+    { 
+    float x, y; 
+    bool selected;
+    Vertex(float x_, float y_, bool on_) : x(x_), y(y_), selected(on_) {}
+    Vertex() : x(0.0f), y(0.0f), selected(false) {}
+    };
+
   PolygonDrawing();
   virtual ~PolygonDrawing();
-  PolygonState GetState();
-  int  CachedPolygon(void);
+  
   void AcceptPolygon(unsigned char *buffer, int width, int height);
   void PastePolygon(void);
   void Draw(float pixel_x, float pixel_y);
@@ -55,41 +54,58 @@ public:
   void Insert();
   void Reset();
 
+  /** Get the current state of the polygon editor */
+  irisGetMacro(State, PolygonState);
+  
   /** How many vertices are selected */
-  irisGetMacro(SelectedVertices,int);
+  irisGetMacro(SelectedVertices,bool);
+
+  /** How many vertices are selected */
+  irisGetMacro(CachedPolygon,bool);
 
 private:
+  // Array of vertices, cached vertices from last operation
+  typedef std::list<Vertex> VertexList;
+  typedef VertexList::iterator VertexIterator;
+  VertexList m_Vertices, m_Cache;
+
+  // State of the system
   PolygonState m_State;
-  PolygonVertex *m_Vertices;
-  PolygonVertex *m_Cache;
-  
-  int m_CachedPolygon;
-  int m_NumberOfAllocatedVertices;
-  int m_NumberOfUsedVertices;
-  int m_NumberOfCachedVertices;
-  int m_SelectedVertices;
-  int m_DraggingPickBox;
+
+  bool m_CachedPolygon;
+  bool m_SelectedVertices;
+  bool m_DraggingPickBox;
 
   // contains selected points
   float m_EditBox[4];         
 
   // box the user drags to select new points
   float m_SelectionBox[4];         
-  
-  float m_StartX, m_StartY;
 
+  float m_StartX, m_StartY;
 
   GLUtesselatorObj *m_Tesselator;
 
   void ComputeEditBox();
   void Add(float x, float y, int selected);
 
+  // Callbacks for the GL tesselator
+  static void VertexCallback(void *data);
+  static void BeginCallback(GLenum which); 
+  static void EndCallback(void); 
+  static void ErrorCallback(GLenum errorCode);
+  static void CombineCallback(
+    GLdouble coords[3], GLdouble **irisNotUsed(vertex_data),  
+    GLfloat *irisNotUsed(weight), GLdouble **dataOut);
 };
 
 #endif // __PolygonDrawing_h_
 
 /*
  *Log: PolygonDrawing.h
+ *Revision 1.7  2004/01/27 17:34:00  pauly
+ *FIX: Compiling on Mac OSX, issue with GLU include file
+ *
  *Revision 1.6  2003/10/09 22:45:15  pauly
  *EMH: Improvements in 3D functionality and snake parameter preview
  *

@@ -17,13 +17,14 @@
 
 #include "SNAPOpenGL.h"
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
+#include <algorithm>
 
-using std::cerr;
-using std::endl;
+using namespace std;
 
 // glu Tess callbacks
 
+/*
 #ifdef WIN32
 typedef void (CALLBACK *TessCallback)();
 #else
@@ -79,6 +80,7 @@ CombineCallback(GLdouble coords[3],
   vertex[2] = coords[2];
   *dataOut = vertex;
 }
+*/
 
 /**
  * PolygonDrawing()
@@ -89,25 +91,29 @@ CombineCallback(GLdouble coords[3],
 PolygonDrawing
 ::PolygonDrawing()
 {
-  m_Vertices = new PolygonVertex[8];
-  m_Cache = new PolygonVertex[8];
-  m_NumberOfUsedVertices = 0; 
-  m_NumberOfAllocatedVertices = 8;
-  m_CachedPolygon = 0;
+  m_CachedPolygon = false;
   m_State = INACTIVE_STATE;
-  m_SelectedVertices = 0;
-  m_DraggingPickBox = 0;
+  m_SelectedVertices = false;
+  m_DraggingPickBox = false;
+
+  // Typecast for the callback functions
+  #ifdef WIN32
+  typedef void (CALLBACK *TessCallback)();
+  #else
+  typedef void (*TessCallback)();
+  #endif
 
   // create glu Tesselator for rendering polygons
-
   m_Tesselator = gluNewTess();
   gluTessCallback(m_Tesselator,(GLenum) GLU_TESS_VERTEX, (TessCallback) glVertex3dv);
-  gluTessCallback(m_Tesselator,(GLenum) GLU_TESS_BEGIN, (TessCallback) BeginCallback);
-  gluTessCallback(m_Tesselator,(GLenum) GLU_TESS_END, (TessCallback) EndCallback);
-  gluTessCallback(m_Tesselator,(GLenum) GLU_TESS_ERROR, (TessCallback) ErrorCallback);     
-  gluTessCallback(m_Tesselator,(GLenum) GLU_TESS_COMBINE, (TessCallback) CombineCallback);
-  gluTessProperty(m_Tesselator,(GLenum) GLU_TESS_WINDING_RULE,GLU_TESS_WINDING_NONZERO);  
-  gluTessNormal(m_Tesselator,0,0,1);
+  gluTessCallback(m_Tesselator,(GLenum) GLU_TESS_BEGIN, (TessCallback) glBegin); 
+  gluTessCallback(m_Tesselator,(GLenum) GLU_TESS_END, (TessCallback) glEnd);
+  gluTessCallback(m_Tesselator,(GLenum) GLU_TESS_ERROR, 
+    (TessCallback) &PolygonDrawing::ErrorCallback);     
+  gluTessCallback(m_Tesselator,(GLenum) GLU_TESS_COMBINE, 
+    (TessCallback) &PolygonDrawing::CombineCallback);
+  gluTessProperty(m_Tesselator,(GLenum) GLU_TESS_WINDING_RULE, GLU_TESS_WINDING_NONZERO);  
+  gluTessNormal(m_Tesselator,0.0,0.0,1.0);
 }
 
 /**
@@ -119,9 +125,6 @@ PolygonDrawing
 PolygonDrawing
 ::~PolygonDrawing()
 {
-  delete [] m_Vertices;
-
-  delete [] m_Cache;
   gluDeleteTess(m_Tesselator);
 }
 
@@ -138,51 +141,36 @@ void
 PolygonDrawing
 ::ComputeEditBox() 
 {
-  // set m_SelectedVertices if a selected vertex is found; 
-  // also init box extents with that vertex
+  VertexIterator it;
 
-  int i;
-
-  m_SelectedVertices = 0;
-  for (i = 0; i < m_NumberOfUsedVertices; i++) 
+  // Find the first selected vertex and initialize the selection box
+  m_SelectedVertices = false;
+  for (it = m_Vertices.begin(); it!=m_Vertices.end();++it) 
     {
-    if (m_Vertices[i].selected) 
+    if (it->selected) 
       {
-      m_EditBox[0] = m_EditBox[1] = m_Vertices[i].x;
-      m_EditBox[2] = m_EditBox[3] = m_Vertices[i].y;
-      m_SelectedVertices = 1;
+      m_EditBox[0] = m_EditBox[1] = it->x;
+      m_EditBox[2] = m_EditBox[3] = it->y;
+      m_SelectedVertices = true;
       break;
       }
     }
 
+  // Continue only if a selection exists
   if (!m_SelectedVertices) return;
 
-  // grow box extents
-  for (i = 0; i < m_NumberOfUsedVertices; i++) 
+  // Grow selection box to fit all selected vertices
+  for(it = m_Vertices.begin(); it!=m_Vertices.end();++it)
     {
-    if (m_Vertices[i].selected) 
+    if (it->selected) 
       {
-      if (m_Vertices[i].x < m_EditBox[0]) m_EditBox[0] = m_Vertices[i].x;
-      else if (m_Vertices[i].x > m_EditBox[1]) m_EditBox[1] = m_Vertices[i].x;
+      if (it->x < m_EditBox[0]) m_EditBox[0] = it->x;
+      else if (it->x > m_EditBox[1]) m_EditBox[1] = it->x;
 
-      if (m_Vertices[i].y < m_EditBox[2]) m_EditBox[2] = m_Vertices[i].y;
-      else if (m_Vertices[i].y > m_EditBox[3]) m_EditBox[3] = m_Vertices[i].y;
+      if (it->y < m_EditBox[2]) m_EditBox[2] = it->y;
+      else if (it->y > m_EditBox[3]) m_EditBox[3] = it->y;
       }
     }
-}
-
-/**
- * GetState()
- *
- * purpose:
- * return the m_State of polygon_drawing, either INACTIVE_STATE, DRAWING_STATE,
- * or EDITING_STATE
- */
-PolygonState
-PolygonDrawing
-::GetState()
-{
-  return m_State;
 }
 
 /**
@@ -194,26 +182,15 @@ PolygonDrawing
  * pre: 
  * m_NumberOfAllocatedVertices > 0
  */
+/*
 void
 PolygonDrawing
 ::Add(float x, float y, int selected)
 {
-  // make sure there's room
-
-  if (m_NumberOfUsedVertices == m_NumberOfAllocatedVertices) 
-  {
-    PolygonVertex *temp;
-    temp = new PolygonVertex[m_NumberOfAllocatedVertices * 2];
-    m_NumberOfAllocatedVertices *= 2;
-        
-    for (int i = 0; i < m_NumberOfUsedVertices; i++) temp[i] = m_Vertices[i];
-        
-    delete [] m_Vertices;
-    m_Vertices = temp;
-  }
-
-    
   // add a new vertex
+  Vertex vNew;
+  vNew.x = x; vNew.y = y; vNew.selected = selected;
+
 
   m_Vertices[m_NumberOfUsedVertices].x = x;
   m_Vertices[m_NumberOfUsedVertices].y = y;
@@ -221,6 +198,7 @@ PolygonDrawing
     
   m_NumberOfUsedVertices++;
 }
+*/
 
 /**
  * Delete()
@@ -236,13 +214,16 @@ void
 PolygonDrawing
 ::Delete() 
 {
-  int kept = 0;
-  for (int i=0; i<m_NumberOfUsedVertices; i++)
-    if (!m_Vertices[i].selected) m_Vertices[kept++] = m_Vertices[i];
-
-  m_SelectedVertices = 0;
-  m_NumberOfUsedVertices = kept;
-  if (m_NumberOfUsedVertices == 0) m_State = INACTIVE_STATE;
+  VertexIterator it=m_Vertices.begin();
+  while(it!=m_Vertices.end())
+    {
+    if(it->selected)
+      it = m_Vertices.erase(it);
+    else ++it;
+    }
+  
+  if (m_Vertices.empty()) 
+    m_State = INACTIVE_STATE;
 }
 
 void 
@@ -250,7 +231,7 @@ PolygonDrawing
 ::Reset()
 {
   m_State = INACTIVE_STATE;
-  m_NumberOfUsedVertices = 0;
+  m_Vertices.clear();
 }
 
 /**
@@ -266,38 +247,26 @@ void
 PolygonDrawing
 ::Insert() 
 {
-  // don't ever shrink m_Vertices array, or pasting might crash
-
-  PolygonVertex *temp = new PolygonVertex[m_NumberOfAllocatedVertices];
-  int i;
-  for (i = 0; i < m_NumberOfUsedVertices; i++) temp[i] = m_Vertices[i];
-
-  int num_m_Vertices = m_NumberOfUsedVertices;
-  m_NumberOfUsedVertices = 0;
-
-  for (i = 0; i < num_m_Vertices; i++) 
+  // Insert a vertex between every pair of adjacent vertices
+  VertexIterator it = m_Vertices.begin();
+  while(it != m_Vertices.end())
     {
-    int n = (i + 1)%num_m_Vertices;
-    Add(temp[i].x,temp[i].y,temp[i].selected);
+    // Get the itNext iterator to point to the next point in the list
+    VertexIterator itNext = it;
+    if(++itNext == m_Vertices.end()) 
+      itNext = m_Vertices.begin();
 
-    if (temp[i].selected && temp[n].selected)
+    // Check if the insertion is needed
+    if(it->selected && itNext->selected)
       {
-      Add((float)((temp[i].x + temp[n].x)/2.0),(float)((temp[i].y + temp[n].y)/2.0),1);
+      // Insert a new vertex
+      Vertex vNew(0.5 * (it->x + itNext->x), 0.5 * (it->y + itNext->y), true);
+      it = m_Vertices.insert(++it, vNew);
       }
-    }
-}
 
-/**
- * CachedPolygon()
- *
- * purpose:
- * return whether polygon has m_Cached polygon
- */
-int
-PolygonDrawing
-::CachedPolygon(void)
-{
-  return m_CachedPolygon;
+    // On to the next point
+    ++it;
+    }
 }
 
 /**
@@ -324,79 +293,119 @@ PolygonDrawing
 ::AcceptPolygon(unsigned char *buffer, int width, int height) 
 {
   // Push the GL attributes
-  glPushAttrib(GL_COLOR_BUFFER_BIT | GL_VIEWPORT_BIT);
+  glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+  // Tesselate the polygon and save the tesselation as a display list
+  GLint dl = glGenLists(1);
+  glNewList(dl, GL_COMPILE);
+
+  // Set the background to black
+  glClearColor(0,0,0,1);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  // Paint in white
+  glColor3d(1.0, 1.0, 1.0);
+
+  // Allocate an array to hold the vertices
+  double *vArray = new double[3 * m_Vertices.size() + 3], *vPointer = vArray;
+  for(VertexIterator it = m_Vertices.begin(); it!=m_Vertices.end();++it)
+    {
+    *vPointer++ = (double) it->x;
+    *vPointer++ = (double) it->y;
+    *vPointer++ = 0.0;
+    }
+
+  // Start the tesselation
+  gluTessBeginPolygon(m_Tesselator,NULL);
+  gluTessBeginContour(m_Tesselator);
+
+  // Add the vertices
+  for(unsigned int i=0; i < m_Vertices.size(); i++)
+    { gluTessVertex(m_Tesselator, vArray + 3*i, vArray + 3*i); }
+    
+  // End the tesselation
+  gluTessEndContour(m_Tesselator);
+  gluTessEndPolygon(m_Tesselator);
+
+  // Clean up the array
+  delete vArray;
+
+  // End the display list
+  glEndList();
 
   // Draw polygon into back buffer - back buffer should get redrawn
   // anyway before it gets swapped to the screen.
   glDrawBuffer(GL_BACK);
   glReadBuffer(GL_BACK);
 
-  glClearColor(0,0,0,1);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  // We will perform a tiled drawing, because the backbuffer may be smaller
+  // than the size of the image. First get the viewport size, i.e., tile size
+  GLint xViewport[4]; glGetIntegerv(GL_VIEWPORT, xViewport);
+  unsigned int wTile = (unsigned int) xViewport[2];
+  unsigned int hTile = (unsigned int) xViewport[3];
 
-  // Create a new projection matrix.  Why do this?  
-  glMatrixMode(GL_PROJECTION);
-  glPushMatrix();
-  glLoadIdentity();
-  gluOrtho2D(0,(float)width,0,(float)height);
+  // Figure out the number of tiles in x and y dimension
+  unsigned int nTilesX = (unsigned int) ceil( width * 1.0 / wTile );
+  unsigned int nTilesY = (unsigned int) ceil( height * 1.0 / hTile );
 
-  // New model matrix
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-  glLoadIdentity();
-
-  // Set up the viewport
-  glViewport(0,0,width,height);
-
-  // Paint in white
-  glColor3d(1,1,1);
-
-  // GLU m_Tesselatorelator draws the poly
-  double (*v)[3];
-  int i;
-  v = new double [m_NumberOfUsedVertices][3];
-  for (i = 0; i < m_NumberOfUsedVertices; i++) 
+  // Draw and retrieve each tile
+  for(int iTileX = 0; iTileX < nTilesX; iTileX++)
     {
-    v[i][0] = (double)m_Vertices[i].x;
-    v[i][1] = (double)m_Vertices[i].y;
-    v[i][2] = 0.0;
+    for(int iTileY = 0; iTileY < nTilesY; iTileY++)
+      {
+      // Get the corner of the tile
+      unsigned int xTile = iTileX * wTile, yTile = iTileY * hTile;
+
+      // Set the projection matrix
+      glMatrixMode(GL_PROJECTION);
+      glPushMatrix();
+      glLoadIdentity();
+      gluOrtho2D(xTile, xTile + wTile, yTile, yTile + hTile);
+
+      // Set the model view matrix
+      glMatrixMode(GL_MODELVIEW);
+      glPushMatrix();
+      glLoadIdentity();
+
+      // Draw the triangles
+      glCallList(dl);
+
+      // Figure out the size of the data chunk to copy
+      unsigned int wCopy = width - xTile < wTile ? width - xTile : wTile;
+      unsigned int hCopy = height - yTile < hTile ? height - yTile : hTile;
+      
+      // Set up the copy so that the strides are correct
+      glPixelStorei(GL_PACK_ALIGNMENT, 1);
+      glPixelStorei(GL_PACK_ROW_LENGTH, width);
+      glPixelStorei(GL_PACK_SKIP_PIXELS, xTile);
+      glPixelStorei(GL_PACK_SKIP_ROWS, yTile);
+
+      // Copy the pixels to the buffer
+      glReadPixels(0,0,wCopy,hCopy,GL_LUMINANCE,GL_UNSIGNED_BYTE,buffer);
+
+      // Restore the GL state
+      glPopMatrix();
+      glMatrixMode(GL_PROJECTION);
+      glPopMatrix();
+      }
     }
 
-  gluTessBeginPolygon(m_Tesselator,NULL);
-  gluTessBeginContour(m_Tesselator);
-  for (i = 0; i < m_NumberOfUsedVertices; i++) 
-    gluTessVertex(m_Tesselator,v[i],v[i]);
-  gluTessEndContour(m_Tesselator);
-  gluTessEndPolygon(m_Tesselator);
+  // Get rid of the display list
+  glDeleteLists(dl,1);
 
-  delete [] v;
-
-  glPopMatrix();
-
-  glMatrixMode(GL_PROJECTION);
-
-  glPopMatrix();
-
-
-  // fetch it back into buffer
-
-  glReadPixels(0,0,width,height,GL_RGBA,GL_UNSIGNED_BYTE,buffer);
-
-  // copy polygon into polygon m_Cache
-
+  // Restore the GL state
   glPopAttrib();
 
-  delete [] m_Cache;
-  m_Cache = new PolygonVertex[m_NumberOfUsedVertices];
-  for (i = 0; i < m_NumberOfUsedVertices; i++) m_Cache[i] = m_Vertices[i];
-  m_NumberOfCachedVertices = m_NumberOfUsedVertices;
-  m_CachedPolygon = 1;
+  // Copy polygon into polygon m_Cache
+  m_CachedPolygon = true;
+  m_Cache = m_Vertices;
 
-  // reset the vertex array for next time
+  // Reset the vertex array for next time
+  m_Vertices.clear();
+  m_SelectedVertices = false;
 
-  m_NumberOfUsedVertices = 0;
+  // Set the state
   m_State = INACTIVE_STATE;
-  m_SelectedVertices = 0;
 }
 
 /**
@@ -416,19 +425,19 @@ void
 PolygonDrawing
 ::PastePolygon(void)
 {
-  // the number of m_Vertices alloced never decreases, so the m_Cache will 
-  // always fit in the current vertex list
+  // Copy the cache into the vertices
+  m_Vertices = m_Cache;
 
-  for (int i = 0; i < m_NumberOfCachedVertices; i++) 
-    {    
-    m_Vertices[i].x = m_Cache[i].x;
-    m_Vertices[i].y = m_Cache[i].y;
-    m_Vertices[i].selected = 1;
-    }
-  m_NumberOfUsedVertices = m_NumberOfCachedVertices;
+  // Select everything
+  for(VertexIterator it = m_Vertices.begin(); it!=m_Vertices.end();++it)
+    it->selected = true;
+
+  // Set the state
+  m_SelectedVertices = true;
   m_State = EDITING_STATE;
+  
+  // Compute the edit box
   ComputeEditBox();
-  m_SelectedVertices = 1;
 }
 
 /**
@@ -449,14 +458,13 @@ void
 PolygonDrawing
 ::Draw(float pixel_x, float pixel_y)
 {
-
-
+  // Must be in active state
   if (m_State == INACTIVE_STATE) return;
-    
-  int i;
+
+  // Push the line state
+  glPushAttrib(GL_LINE_BIT | GL_COLOR_BUFFER_BIT);  
 
   // set line and point drawing parameters
-
   glPointSize(4);
   glLineWidth(2);
   glEnable(GL_LINE_SMOOTH);
@@ -464,20 +472,27 @@ PolygonDrawing
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  // draw the line segments
-
+  // Draw the line segments
+  VertexIterator it, itNext;
   if (m_State == EDITING_STATE)
   {
     glBegin(GL_LINES);
-      
-    for (i = 0; i < m_NumberOfUsedVertices; i++) 
-    {
-      int n = (i + 1)%m_NumberOfUsedVertices;
-      if (m_Vertices[i].selected && m_Vertices[n].selected) glColor3f(0,1,0);
-      else glColor3f(1,0,0);
+    for(it = m_Vertices.begin(); it!=m_Vertices.end();++it)
+      {
+      // Point to the next vertex
+      itNext = it; ++itNext; 
+      if(itNext == m_Vertices.end())
+        itNext = m_Vertices.begin();
 
-      glVertex3f(m_Vertices[i].x,m_Vertices[i].y,0);
-      glVertex3f(m_Vertices[n].x,m_Vertices[n].y,0);
+      // Set the color based on the mode
+      if (it->selected && itNext->selected) 
+        glColor3f(0,1,0);
+      else 
+        glColor3f(1,0,0);
+  
+      // Draw the line
+      glVertex3f(it->x, it->y,0);
+      glVertex3f(itNext->x, itNext->y, 0);
     }
     glEnd();
   }
@@ -485,24 +500,25 @@ PolygonDrawing
   {
     glBegin(GL_LINE_STRIP);
     glColor3f(1,0,0);
-    for (i = 0; i < m_NumberOfUsedVertices; i++) glVertex3f(m_Vertices[i].x,m_Vertices[i].y,0);
+    for(it = m_Vertices.begin(); it!=m_Vertices.end();++it) 
+      glVertex3f(it->x, it->y, 0);
     glEnd();
   }
     
   // draw the vertices
-
   glBegin(GL_POINTS);
-  for (i = 0; i < m_NumberOfUsedVertices; i++) 
+  for(it = m_Vertices.begin(); it!=m_Vertices.end();++it) 
   {
-    if (m_Vertices[i].selected) glColor3f(0, 1, 0); 
-    else glColor3f(1, 0, 0);
-    glVertex3f(m_Vertices[i].x,m_Vertices[i].y,0.0);
+    if (it->selected) 
+      glColor3f(0.0f, 1.0f, 0.0f); 
+    else
+      glColor3f(1.0f, 0.0f, 0.0f);
 
+    glVertex3f(it->x,it->y,0.0f);
   }
   glEnd();
 
   // draw edit or pick box
-
   if (m_DraggingPickBox) 
   {
     glLineWidth(1);
@@ -528,8 +544,7 @@ PolygonDrawing
     glEnd();
   }
 
-  glDisable(GL_BLEND);
-  glDisable(GL_LINE_SMOOTH);
+  glPopAttrib();
 }
 
 /**
@@ -574,14 +589,14 @@ PolygonDrawing
 ::Handle(int event, int button, float x, float y, 
          float pixel_x, float pixel_y)
 {
-  int i;
+  VertexIterator it, itNext;
 
   switch (m_State) {
   case INACTIVE_STATE:
     if ((event == FL_PUSH) && (button == FL_LEFT_MOUSE)) 
       {
       m_State = DRAWING_STATE;
-      Add(x,y,0);
+      m_Vertices.push_back( Vertex(x, y, false) );
       return 1;
       }
     break;
@@ -591,15 +606,17 @@ PolygonDrawing
       {
       if (button == FL_LEFT_MOUSE)
         {
-        Add(x,y,0);
+        m_Vertices.push_back( Vertex(x, y, false) );
         return 1;
         } 
       else if (button == FL_RIGHT_MOUSE) 
         {
         m_State = EDITING_STATE;
-        for (i = 0; i < m_NumberOfUsedVertices; i++) 
-          m_Vertices[i].selected = 1;
-        m_SelectedVertices = 1;
+        m_SelectedVertices = true;
+
+        for(it = m_Vertices.begin(); it!=m_Vertices.end(); ++it)
+          it->selected = true;
+
         ComputeEditBox();
         return 1;
         }
@@ -619,21 +636,19 @@ PolygonDrawing
         if (Fl::event_state(FL_SHIFT)) 
           {
           // check if vertex clicked
-          for (i = 0; i < m_NumberOfUsedVertices; i++) 
+          for(it = m_Vertices.begin(); it!=m_Vertices.end(); ++it)
             {
-            if ((x >= m_Vertices[i].x - 2.0*pixel_x) &&
-              (x <= m_Vertices[i].x + 2.0*pixel_x) &&
-              (y >= m_Vertices[i].y - 2.0*pixel_y) &&
-              (y <= m_Vertices[i].y + 2.0*pixel_y)) 
+            if((x >= it->x - 2.0*pixel_x) && (x <= it->x + 2.0*pixel_x)
+              && (y >= it->y - 2.0*pixel_y) && (y <= it->y + 2.0*pixel_y)) 
               {
-              m_Vertices[i].selected = (button == 1);
+              it->selected = (button == 1);
               ComputeEditBox();
               return 1;
               }
             }
 
           // otherwise start dragging pick box
-          m_DraggingPickBox = 1;
+          m_DraggingPickBox = true;
           m_SelectionBox[0] = m_SelectionBox[1] = x;
           m_SelectionBox[2] = m_SelectionBox[3] = y;
           return 1;
@@ -649,25 +664,24 @@ PolygonDrawing
 
         // clicked outside of edit box & shift not held, this means the 
         // current selection will be cleared
-        for (i = 0; i < m_NumberOfUsedVertices; i++) m_Vertices[i].selected = 0;
-        m_SelectedVertices = 0;
+        for(it = m_Vertices.begin(); it!=m_Vertices.end(); ++it) 
+          it->selected = false;
+        m_SelectedVertices = false;
 
         // check if point clicked
-        for (i = 0; i < m_NumberOfUsedVertices; i++) 
+        for(it = m_Vertices.begin(); it!=m_Vertices.end(); ++it)  
           {
-          if ((x >= m_Vertices[i].x - 2.0*pixel_x) &&
-            (x <= m_Vertices[i].x + 2.0*pixel_x) &&
-            (y >= m_Vertices[i].y - 2.0*pixel_y) &&
-            (y <= m_Vertices[i].y + 2.0*pixel_y)) 
+          if((x >= it->x - 2.0*pixel_x) &&(x <= it->x + 2.0*pixel_x) 
+            && (y >= it->y - 2.0*pixel_y) && (y <= it->y + 2.0*pixel_y)) 
             {
-            m_Vertices[i].selected = 1;
+            it->selected = true;
             ComputeEditBox();
             return 1;
             }
           }
 
         // didn't click a point - start dragging pick box
-        m_DraggingPickBox = 1;
+        m_DraggingPickBox = true;
         m_SelectionBox[0] = m_SelectionBox[1] = x;
         m_SelectionBox[2] = m_SelectionBox[3] = y;
         return 1;
@@ -691,12 +705,12 @@ PolygonDrawing
             m_EditBox[2] += (y - m_StartY);
             m_EditBox[3] += (y - m_StartY);
 
-            for (i = 0; i < m_NumberOfUsedVertices; i++) 
+            for(it = m_Vertices.begin(); it!=m_Vertices.end(); ++it) 
               {
-              if (m_Vertices[i].selected) 
+              if (it->selected) 
                 {
-                m_Vertices[i].x += (x - m_StartX);
-                m_Vertices[i].y += (y - m_StartY);
+                it->x += (x - m_StartX);
+                it->y += (y - m_StartY);
                 }
               }
             m_StartX = x;
@@ -712,7 +726,7 @@ PolygonDrawing
         {
         if (m_DraggingPickBox) 
           {
-          m_DraggingPickBox = 0;
+          m_DraggingPickBox = false;
 
           float temp;
           if (m_SelectionBox[0] > m_SelectionBox[1]) 
@@ -728,13 +742,11 @@ PolygonDrawing
             m_SelectionBox[3] = temp;
             }
 
-          for (i = 0; i < m_NumberOfUsedVertices; i++) 
+          for(it = m_Vertices.begin(); it!=m_Vertices.end(); ++it) 
             {
-            if ((m_Vertices[i].x >= m_SelectionBox[0]) && 
-              (m_Vertices[i].x <= m_SelectionBox[1]) &&
-              (m_Vertices[i].y >= m_SelectionBox[2]) && 
-              (m_Vertices[i].y <= m_SelectionBox[3]))
-              m_Vertices[i].selected = (button == 1);
+            if((it->x >= m_SelectionBox[0]) && (it->x <= m_SelectionBox[1]) 
+              && (it->y >= m_SelectionBox[2]) && (it->y <= m_SelectionBox[3]))
+              it->selected = (button == 1);
             }
           ComputeEditBox();
           }
@@ -769,11 +781,42 @@ PolygonDrawing
   return 0;
 }
 
+void PolygonDrawing::VertexCallback(void *data)
+{
+  glVertex3dv((double *)data);
+}
 
+void PolygonDrawing::BeginCallback(GLenum which) 
+{ 
+  glBegin(which); 
+}
+
+void PolygonDrawing::EndCallback(void) 
+{ 
+  glEnd(); 
+}
+
+void PolygonDrawing::ErrorCallback(GLenum errorCode)
+{ 
+  cerr << "Tesselation Error: " << gluErrorString(errorCode) << endl; 
+}
+
+void PolygonDrawing::CombineCallback(GLdouble coords[3], 
+                GLdouble **irisNotUsed(vertex_data),  
+                GLfloat *irisNotUsed(weight), 
+                GLdouble **dataOut) 
+{
+  GLdouble *vertex = new GLdouble[3];
+  vertex[0] = coords[0]; vertex[1] = coords[1]; vertex[2] = coords[2];
+  *dataOut = vertex;
+}
 
 
 /*
  *Log: PolygonDrawing.cxx
+ *Revision 1.7  2004/01/27 17:49:47  pauly
+ *FIX: MAC OSX Compilation fixes
+ *
  *Revision 1.6  2003/10/09 22:45:15  pauly
  *EMH: Improvements in 3D functionality and snake parameter preview
  *

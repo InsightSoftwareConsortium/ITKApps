@@ -134,7 +134,7 @@ protected:
   PolygonDrawing *m_PolygonDrawing;
 
   // Type definition for the slice used for polygon rendering
-  typedef LabelImageWrapper::DisplaySliceType PolygonSliceType;
+  typedef GreyImageWrapper::DisplaySliceType PolygonSliceType;
   typedef itk::SmartPointer<PolygonSliceType> PolygonSlicePointer;
   
   /** Slice used for polygon drawing and merging */

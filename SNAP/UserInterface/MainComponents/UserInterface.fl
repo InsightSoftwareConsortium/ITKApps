@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0104 
+version 1.0105 
 header_name {.h} 
 code_name {.cxx}
 decl {\#include <stdio.h>} {public
@@ -38,7 +38,7 @@ class UserInterface {open : {public UserInterfaceBase}
     Fl_Window m_WinMain {
       label {SnAP: IRIS}
       callback {OnMainWindowCloseAction();} open
-      xywh {387 207 875 710} type Double align 0 resizable
+      xywh {647 214 877 710} type Double align 0 resizable
       code0 {\#include "UserInterfaceBase.h"} visible
     } {
       Fl_Menu_Bar m_MenubarMain {
@@ -366,12 +366,12 @@ OnDrawOverLabelUpdate();} open
             xywh {0 25 145 680} color 53
           } {
             Fl_Group {} {
-              label {ITK+SnAP} open
-              xywh {5 195 135 35} labelfont 3 labelsize 24 align 0
+              label InsightSnAP open
+              xywh {5 195 135 35} labelfont 3 labelsize 20 align 0
             } {}
             Fl_Group {} {
-              label {Version 1.0
-01.20.2004} open
+              label {Version 1.2-beta
+08.01.2004} open
               xywh {5 225 135 35} labelsize 12 align 145
             } {}
             Fl_Group {} {
@@ -380,7 +380,7 @@ OnDrawOverLabelUpdate();} open
             } {
               Fl_Group {} {
                 label {Thank you for using
-ITK-SnAP software!} open
+InsightSnAP!} open
                 xywh {10 466 124 164} box DOWN_BOX color 52 labelsize 11 align 149
               } {}
               Fl_Button {} {
@@ -694,23 +694,20 @@ this->OnSNAPLabelOpacityChange();}
         } {}
       }
       Fl_Wizard m_WizWindows {open
-        xywh {147 -5 730 715} resizable
+        xywh {147 0 730 710} resizable
       } {
         Fl_Group m_GrpIRISWindows {open
-          xywh {147 0 730 715} resizable
+          xywh {147 0 730 710} resizable
         } {
-          Fl_Group m_GrpIRISAxial {
+          Fl_Group {m_GrpIRISSlicePanel[0]} {
+            label {m_GrpIRISSlicePanel[0]} open
             xywh {147 0 365 355} box UP_BOX
           } {
             Fl_Box {m_IRISWindow2D[0]} {
-              label {m_GrpIRISAxial(0)}
-              xywh {152 5 340 320} box BORDER_BOX color 0 labelcolor 7 resizable
+              label {m_GrpIRISAxial(0)} selected
+              xywh {152 5 333 320} box BORDER_BOX color 0 labelcolor 7 resizable
               code0 {\#include "IRISSliceWindow.h"}
               class IRISSliceWindow
-            }
-            Fl_Scrollbar {m_InIRISSliceSlider[0]} {
-              callback {this->OnSliceSliderChange(0);}
-              xywh {492 5 15 320} minimum 1 maximum 0
             }
             Fl_Group {} {open
               xywh {147 325 365 30} color 48
@@ -723,54 +720,62 @@ this->OnSNAPLabelOpacityChange();}
               Fl_Output {m_OutIRISSliceIndex[0]} {
                 xywh {437 330 70 20} box FLAT_BOX color 49 align 0 textsize 10 deactivate
               }
-              Fl_Group {m_GrpPolygonEdit[0]} {open
-                xywh {152 325 190 30} hide
+              Fl_Group {m_GrpPolygonEdit[0]} {
+                xywh {152 325 208 30} hide
               } {
                 Fl_Button {m_BtnPolygonAccept[0]} {
                   label accept
                   callback {OnAcceptPolygonAction(0);}
-                  tooltip {Fill in the polygon using the currently selected label} xywh {157 330 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
+                  tooltip {Fill in the polygon using the currently selected label} xywh {185 330 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
                 }
                 Fl_Button {m_BtnPolygonPaste[0]} {
                   label paste
                   callback {OnPastePolygonAction(0);}
-                  tooltip {Paste the previously used polygon into the window} xywh {292 330 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
+                  tooltip {Paste the previously used polygon into the window} xywh {320 330 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
                 }
                 Fl_Button {m_BtnPolygonInsert[0]} {
                   label insert
                   callback {OnInsertIntoPolygonSelectedAction(0);}
-                  tooltip {Insert a new vertex between pairs of selected vertices} xywh {202 330 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
+                  tooltip {Insert a new vertex between pairs of selected vertices} xywh {230 330 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
                 }
                 Fl_Button {m_BtnPolygonDelete[0]} {
                   label delete
                   callback {OnDeletePolygonSelectedAction(0);}
-                  tooltip {Delete the selected vertices} xywh {247 330 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
+                  tooltip {Delete the selected vertices} xywh {275 330 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
                 }
               }
               Fl_Group {} {
                 xywh {147 325 5 30} color 154 resizable
               } {}
-              Fl_Button {} {
-                label {...}
+            }
+            Fl_Pack {} {open
+              xywh {488 5 20 25}
+            } {
+              Fl_Button {m_BtnIRISPanelZoom[0]} {
+                label {@+}
                 callback {OnIRISWindowFocus(0);}
-                xywh {155 330 20 20} box PLASTIC_UP_BOX color 177 labelfont 1 labelsize 12
+                xywh {488 5 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139
               }
             }
+            Fl_Scrollbar {m_InIRISSliceSlider[0]} {
+              callback {this->OnSliceSliderChange(0);}
+              xywh {489 30 18 295} box THIN_DOWN_BOX labelcolor 0 minimum 1 maximum 0
+            }
           }
-          Fl_Group m_GrpIRISSagittal {
+          Fl_Group {m_GrpIRISSlicePanel[1]} {open
             xywh {512 0 365 355} box UP_BOX
           } {
             Fl_Box {m_IRISWindow2D[1]} {
               label {m_GrpIRISSagittal(1)}
-              xywh {517 5 340 320} box BORDER_BOX color 0 labelcolor 7 resizable
+              xywh {517 5 333 320} box BORDER_BOX color 0 labelcolor 7 resizable
               code0 {\#include "IRISSliceWindow.h"}
               class IRISSliceWindow
             }
             Fl_Scrollbar {m_InIRISSliceSlider[1]} {
               callback {this->OnSliceSliderChange(1);}
-              xywh {857 5 15 320} minimum 1 maximum 0
+              xywh {854 30 18 295} box THIN_DOWN_BOX labelcolor 0 minimum 1 maximum 0
             }
-            Fl_Group {} {open
+            Fl_Group {} {
               xywh {517 325 355 30}
             } {
               Fl_Button {} {
@@ -782,49 +787,49 @@ this->OnSNAPLabelOpacityChange();}
                 xywh {802 330 70 20} box FLAT_BOX color 49 align 0 textsize 10 deactivate
               }
               Fl_Group {m_GrpPolygonEdit[1]} {open
-                xywh {517 325 195 30} hide
+                xywh {540 325 195 30} hide
               } {
                 Fl_Button {m_BtnPolygonAccept[1]} {
                   label accept
                   callback {OnAcceptPolygonAction(1);}
-                  tooltip {Fill in the polygon using the currently selected label} xywh {527 330 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
+                  tooltip {Fill in the polygon using the currently selected label} xywh {550 330 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
                 }
                 Fl_Button {m_BtnPolygonPaste[1]} {
                   label paste
                   callback {OnPastePolygonAction(1);}
-                  tooltip {Paste the previously used polygon into the window} xywh {662 330 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
+                  tooltip {Paste the previously used polygon into the window} xywh {685 330 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
                 }
                 Fl_Button {m_BtnPolygonInsert[1]} {
                   label insert
                   callback {OnInsertIntoPolygonSelectedAction(1);}
-                  tooltip {Insert a new vertex between pairs of selected vertices} xywh {572 330 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
+                  tooltip {Insert a new vertex between pairs of selected vertices} xywh {595 330 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
                 }
                 Fl_Button {m_BtnPolygonDelete[1]} {
                   label delete
                   callback {OnDeletePolygonSelectedAction(1);}
-                  tooltip {Delete the selected vertices} xywh {617 330 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
+                  tooltip {Delete the selected vertices} xywh {640 330 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
                 }
               }
               Fl_Group {} {open
                 xywh {517 325 0 30} color 154 resizable
               } {}
-              Fl_Button {} {
-                label {...}
+            }
+            Fl_Pack {} {open
+              xywh {853 5 20 25}
+            } {
+              Fl_Button {m_BtnIRISPanelZoom[1]} {
+                label {@+}
                 callback {OnIRISWindowFocus(1);}
-                xywh {520 330 20 20} box PLASTIC_UP_BOX color 177 labelfont 1 labelsize 12
+                xywh {853 5 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139
               }
             }
           }
-          Fl_Group m_GrpIRISCoronal {
+          Fl_Group {m_GrpIRISSlicePanel[2]} {open
             xywh {512 355 365 355} box UP_BOX
           } {
-            Fl_Scrollbar {m_InIRISSliceSlider[2]} {
-              callback {this->OnSliceSliderChange(2);}
-              xywh {857 360 15 315} minimum 1 maximum 0
-            }
             Fl_Box {m_IRISWindow2D[2]} {
               label {m_GrpIRISCoronal(2)}
-              xywh {517 360 340 320} box BORDER_BOX color 0 labelcolor 7 resizable
+              xywh {517 360 333 320} box BORDER_BOX color 0 labelcolor 7 resizable
               code0 {\#include "IRISSliceWindow.h"}
               class IRISSliceWindow
             }
@@ -840,40 +845,48 @@ this->OnSNAPLabelOpacityChange();}
                 xywh {802 685 70 20} box FLAT_BOX color 49 align 0 textsize 10 deactivate
               }
               Fl_Group {m_GrpPolygonEdit[2]} {open
-                xywh {517 680 195 30} hide
+                xywh {540 680 195 30} hide
               } {
                 Fl_Button {m_BtnPolygonAccept[2]} {
                   label accept
                   callback {OnAcceptPolygonAction(2);}
-                  tooltip {Fill in the polygon using the currently selected label} xywh {527 685 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
+                  tooltip {Fill in the polygon using the currently selected label} xywh {550 685 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
                 }
                 Fl_Button {m_BtnPolygonPaste[2]} {
                   label paste
                   callback {OnPastePolygonAction(2);}
-                  tooltip {Paste the previously used polygon into the window} xywh {662 685 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
+                  tooltip {Paste the previously used polygon into the window} xywh {685 685 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
                 }
                 Fl_Button {m_BtnPolygonInsert[2]} {
                   label insert
                   callback {OnInsertIntoPolygonSelectedAction(2);}
-                  tooltip {Insert a new vertex between pairs of selected vertices} xywh {572 685 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
+                  tooltip {Insert a new vertex between pairs of selected vertices} xywh {595 685 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
                 }
                 Fl_Button {m_BtnPolygonDelete[2]} {
                   label delete
                   callback {OnDeletePolygonSelectedAction(2);}
-                  tooltip {Delete the selected vertices} xywh {617 685 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
+                  tooltip {Delete the selected vertices} xywh {640 685 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
                 }
               }
               Fl_Group {} {open
                 xywh {512 680 5 30} color 154 resizable
               } {}
-              Fl_Button {} {
-                label {...}
+            }
+            Fl_Pack {} {open
+              xywh {853 360 20 25}
+            } {
+              Fl_Button {m_BtnIRISPanelZoom[2]} {
+                label {@+}
                 callback {OnIRISWindowFocus(2);}
-                xywh {520 685 20 20} box PLASTIC_UP_BOX color 177 labelfont 1 labelsize 12
+                xywh {853 360 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139
               }
             }
+            Fl_Scrollbar {m_InIRISSliceSlider[2]} {
+              callback {this->OnSliceSliderChange(2);}
+              xywh {854 385 18 295} box THIN_DOWN_BOX labelcolor 0 minimum 1 maximum 0
+            }
           }
-          Fl_Group m_GrpIRISView3D {selected
+          Fl_Group m_GrpIRISView3D {
             xywh {147 355 365 355} box UP_BOX
           } {
             Fl_Box m_IRISWindow3D {
@@ -888,22 +901,27 @@ this->OnSNAPLabelOpacityChange();}
               Fl_Button m_BtnMeshUpdate {
                 label {update mesh}
                 callback {m_IRISWindow3D->UpdateMesh();}
-                xywh {287 685 70 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146
+                xywh {265 685 70 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146
               }
               Fl_Button m_BtnAccept3D {
                 label accept
                 callback {OnAcceptIRIS3DAction();}
-                xywh {362 685 70 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146 deactivate
+                xywh {340 685 70 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146 deactivate
               }
               Fl_Button {} {
                 label {reset view}
                 callback {m_IRISWindow3D->ResetView();
 m_IRISWindow3D->redraw();}
-                xywh {437 685 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146
+                xywh {415 685 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146
               }
               Fl_Group {} {open
                 xywh {147 680 5 30} color 154 resizable
               } {}
+              Fl_Button {m_BtnIRISPanelZoom[3]} {
+                label {@+}
+                callback {OnIRISWindowFocus(3);}
+                xywh {485 685 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139
+              }
             }
           }
         }
@@ -1048,7 +1066,7 @@ m_SNAPWindow3D->redraw();}
     }
     Fl_Window m_WinEditLabel {
       label {Edit Color Label}
-      xywh {499 319 217 403} type Double labelsize 12 hide
+      xywh {629 284 217 403} type Double labelsize 12 hide non_modal
     } {
       Fl_Group m_GrpEditLabelColorChooser {
         label {Color Chooser} open
@@ -1449,13 +1467,13 @@ RedrawWindows();}
     }
     Fl_Window m_WinSplash {
       label {Welcome to ITK-SnAP}
-      xywh {307 240 405 210} type Double color 52 visible
+      xywh {307 240 405 210} type Double color 52 hide
     } {
       Fl_Group {} {open
         image {Artwork/logo.gif} xywh {35 15 338 105} box FLAT_BOX color 0 align 16
       } {}
       Fl_Group {} {
-        label {ITK-SnAP Loading...} open
+        label {Initializing Application...} open
         xywh {15 130 375 30} labeltype ENGRAVED_LABEL align 16
       } {}
       Fl_Group m_OutSplashMessage {
@@ -1467,12 +1485,12 @@ RedrawWindows();}
       } {}
     }
     Fl_Window m_WinProgress {
-      label {SNAP Progress Meter} open
+      label {SNAP Progress Meter}
       xywh {434 461 485 70} type Double box BORDER_BOX color 53 modal noborder visible
     } {
       Fl_Group {} {
         label {Working... Please Wait!} open
-        xywh {5 0 480 25} labeltype EMBOSSED_LABEL labelfont 1 labelsize 12 align 16
+        xywh {0 0 480 25} labeltype EMBOSSED_LABEL labelfont 1 labelsize 12 align 16
       } {}
       Fl_Group {} {open
         xywh {10 25 470 40} box ENGRAVED_BOX
@@ -1486,5 +1504,8 @@ RedrawWindows();}
         }
       }
     }
+    Fl_Window {} {open
+      xywh {37 76 679 585} type Double color 35 hide
+    } {}
   }
 } 

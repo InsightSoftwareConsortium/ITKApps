@@ -133,7 +133,8 @@ IRISSliceWindow
   assert(m_IsRegistered && m_IsSliceInitialized);
 
   // Make sure we are in editing mode
-  if (m_PolygonDrawing->GetState() != EDITING_STATE) return false;
+  if (m_PolygonDrawing->GetState() != PolygonDrawing::EDITING_STATE) 
+    return false;
 
 #ifdef DRAWING_LOCK
   if (m_GlobalState->GetDrawingLock(id)) {
@@ -158,19 +159,23 @@ IRISSliceWindow
     LabelImageWrapper::SlicePointer slice = seg->GetSlice(m_Id);
     slice->Update();
 
-    // Iterate over the slice
+    // Create an iterator to iterate over the slice
     typedef ImageRegionIteratorWithIndex<PolygonSliceType> PolygonIterator;
     PolygonIterator itPolygon(m_PolygonSlice,
                               m_PolygonSlice->GetLargestPossibleRegion());
 
+    // Keep track of the number of pixels changed
+    unsigned int nUpdates = 0;
+
+    // Iterate
     for (itPolygon.Begin(); !itPolygon.IsAtEnd(); ++itPolygon)
     {
       // Get the current polygon pixel      
       PolygonSliceType::PixelType pxPolygon = itPolygon.Get();
       
       // Check for non-zero alpha of the pixel
-      if((pxPolygon[2] != 0) ^  m_GlobalState->GetPolygonInvert())
-      {
+      if((pxPolygon != 0) ^  m_GlobalState->GetPolygonInvert())
+        {
         // Get the corresponding segmentation image pixel
         Index<2> idx = itPolygon.GetIndex();
         LabelType pxLabel = slice->GetPixel(idx);
@@ -179,7 +184,7 @@ IRISSliceWindow
         if (mode == PAINT_OVER_ALL ||
             (mode == PAINT_OVER_ONE && pxLabel == overwrt_color) ||
             (mode == PAINT_OVER_COLORS && pxLabel != 0))
-        {
+          {
           // Get the index into the image that we'll be updating
           Vector3f idxImageFloat = 
             MapSliceToImage(Vector3f(idx[0]+0.5f,idx[1]+0.5f,m_DisplayAxisPosition));
@@ -187,22 +192,22 @@ IRISSliceWindow
           // Convert to integer
           Vector3ui idxImage = to_unsigned_int(idxImageFloat);
           
-          // Check for rounding errors!  We could be editing the wrong pixel
-          // assert(to_float(idxImage) == idxImageFloat);
-
           // Set the value of the pixel in segmentation image
           m_Driver->GetCurrentImageData()->SetSegmentationVoxel(
             idxImage, drawing_color);
+
+          // Increment the counter
+          nUpdates++;
+          }
         }
       }
-    }
 
 #ifdef DRAWING_LOCK
     m_GlobalState->ReleaseDrawingLock(m_Id);
   }
 #endif /* DRAWING_LOCK */
 
-  return true;
+  return (nUpdates > 0);
 }
 
 void 
@@ -216,7 +221,7 @@ IRISSliceWindow
     {
 #endif /* DRAWING_LOCK */
 
-    if (m_PolygonDrawing->CachedPolygon()) 
+    if (m_PolygonDrawing->GetCachedPolygon()) 
       {
       m_PolygonDrawing->PastePolygon();
       redraw();

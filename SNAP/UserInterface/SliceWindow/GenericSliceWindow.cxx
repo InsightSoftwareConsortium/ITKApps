@@ -59,6 +59,9 @@ GenericSliceWindow
 
   // Initalize the margin
   m_Margin = 2;
+
+  // Initialize the zoom management
+  m_ManagedZoom = false;
 }
 
 GenericSliceWindow
@@ -307,7 +310,19 @@ GenericSliceWindow
 
     // Compute the optimal zoom
     if(m_IsRegistered && m_IsSliceInitialized)
-      ComputeOptimalZoom();
+      {
+      // If the zoom is set to fit, maintain the fit, otherwise, maintain the 
+      // optimal zoom level
+      if(!m_ManagedZoom && m_ViewZoom == m_OptimalZoom)
+        {
+        ComputeOptimalZoom();
+        m_ViewZoom = m_OptimalZoom;
+        }
+      else
+        {
+        ComputeOptimalZoom();
+        }
+      }
   }
 
   // Clear the display
@@ -558,7 +573,7 @@ GenericSliceWindow
 
 GenericSliceWindow *
 GenericSliceWindow
-::GetNextWindow()
+::GetNextSliceWindow()
 {
   SliceWindowCoordinator *swc = m_ParentUI->GetSliceCoordinator();
   return swc->GetWindow( (m_Id+1) % 3);

@@ -1804,11 +1804,20 @@ void
 UserInterfaceLogic
 ::OnAcceptPolygonAction(unsigned int window)
 {
-  m_IRISWindow2D[window]->AcceptPolygon();
-  OnPolygonStateUpdate(window);
-  
-  MakeSegTexturesCurrent();
-  m_BtnMeshUpdate->activate();
+  if(m_IRISWindow2D[window]->AcceptPolygon())
+    {
+    // The polygon update was successful
+    OnPolygonStateUpdate(window);
+    MakeSegTexturesCurrent();
+    m_BtnMeshUpdate->activate();
+    }
+  else
+    {
+    // Probably, the draw-over-label is set incorrectly!
+    fl_message(
+      "The segmentation was not updated. Most likely, the 'Draw Over' label \n"
+      "is set incorrectly. Change it to 'All Labels' or 'Clear Label'.");
+    }
 }
 
 void 
@@ -1842,7 +1851,7 @@ UserInterfaceLogic
   // Get the drawing object
   PolygonDrawing *draw = m_IRISWindow2D[id]->GetPolygonDrawing();
 
-  if (draw->GetState() == INACTIVE_STATE) 
+  if (draw->GetState() == PolygonDrawing::INACTIVE_STATE) 
     {
     // There is no active polygon
     m_BtnPolygonAccept[id]->deactivate();
@@ -1850,12 +1859,12 @@ UserInterfaceLogic
     m_BtnPolygonInsert[id]->deactivate();
 
     // Check if there is a cached polygon for pasting
-    if(draw->CachedPolygon()) 
+    if(draw->GetCachedPolygon()) 
       m_BtnPolygonPaste[id]->activate();
     else
       m_BtnPolygonPaste[id]->deactivate();      
     }
-  else if(draw->GetState() == DRAWING_STATE)
+  else if(draw->GetState() == PolygonDrawing::DRAWING_STATE)
     {
     // There is no active polygon
     m_BtnPolygonAccept[id]->deactivate();
@@ -1868,7 +1877,7 @@ UserInterfaceLogic
     m_BtnPolygonAccept[id]->activate();
     m_BtnPolygonPaste[id]->deactivate();
 
-    if(draw->GetSelectedVertices() > 0)
+    if(draw->GetSelectedVertices())
       {
       m_BtnPolygonDelete[id]->activate();
       m_BtnPolygonInsert[id]->activate();
@@ -2032,8 +2041,10 @@ void
 UserInterfaceLogic
 ::OnIRISWindowFocus(unsigned int i)
 {
-  Fl_Group *panels[] = { m_GrpIRISAxial, m_GrpIRISSagittal, m_GrpIRISCoronal, m_GrpIRISView3D };
-  Fl_Gl_Window *boxes[] = { m_IRISWindow2D[0], m_IRISWindow2D[1], m_IRISWindow2D[2], m_IRISWindow3D };
+  Fl_Group *panels[] = 
+    { m_GrpIRISSlicePanel[0], m_GrpIRISSlicePanel[1], m_GrpIRISSlicePanel[2], m_GrpIRISView3D };
+  Fl_Gl_Window *boxes[] = 
+    { m_IRISWindow2D[0], m_IRISWindow2D[1], m_IRISWindow2D[2], m_IRISWindow3D };
 
   // The dimensions of the parent window
   int x = m_GrpIRISWindows->x(), y = m_GrpIRISWindows->y();
@@ -2053,6 +2064,7 @@ UserInterfaceLogic
       {
       panels[j]->show();
       boxes[j]->show();
+      panels[j]->redraw();
       }
     }
   else 
@@ -3127,6 +3139,9 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.21  2004/07/21 18:17:45  pauly
+ *ENH: Enhancements to the way that the slices are displayed
+ *
  *Revision 1.20  2004/03/19 00:54:48  pauly
  *ENH: Added the ability to externally load the advection image
  *

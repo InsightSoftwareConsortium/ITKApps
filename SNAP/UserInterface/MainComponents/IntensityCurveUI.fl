@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0102 
+version 1.0105 
 header_name {.h} 
 code_name {.cxx}
 class IntensityCurveUI {open : IntensityCurveUIBase
@@ -7,10 +7,10 @@ class IntensityCurveUI {open : IntensityCurveUIBase
   Function {MakeWindow()} {open
   } {
     Fl_Window m_WinCurve {
-      label {Image to Screen Intensity Mapping} open
-      xywh {165 299 414 239} box PLASTIC_DOWN_BOX hide
+      label {Image to Screen Intensity Mapping} open selected
+      xywh {214 445 414 239} type Double box PLASTIC_DOWN_BOX
       code0 {\#include "IntensityCurveUIBase.h"}
-      code1 {\#include "IntensityCurveBox.h"}
+      code1 {\#include "IntensityCurveBox.h"} non_modal visible
     } {
       Fl_Box m_BoxCurve {
         label label
@@ -23,7 +23,7 @@ class IntensityCurveUI {open : IntensityCurveUIBase
         xywh {310 165 95 25} box PLASTIC_UP_BOX color 180 labelsize 12
       }
       Fl_Group {} {
-        label {input image intensity} open selected
+        label {input image intensity} open
         xywh {85 220 150 15} labelsize 11 align 0
       } {}
       Fl_Button {} {
