@@ -60,6 +60,14 @@ public:
                       InternalSpeedImageType 
                                > SmoothingFilterType;
 
+  typedef unsigned char                    OutputPixelType;
+  typedef itk::Image< OutputPixelType, 3 > OutputImageType;
+
+  typedef  itk::RescaleIntensityImageFilter< 
+                      InternalSpeedImageType,
+                      OutputImageType 
+                               > RescaleOutputFilterType;
+
 public:
 
   /**  Constructor */
@@ -68,6 +76,7 @@ public:
     m_RescaleSpeedFilter    = RescaleSpeedFilterType::New();
     m_RescaleLevelSetFilter = RescaleLeveSetFilterType::New();
     m_SmoothingFilter       = SmoothingFilterType::New();
+    m_RescaleOutputFilter   = RescaleOutputFilterType::New();
 
     m_RescaleSpeedFilter->SetInput( this->GetInput2() );
     m_RescaleSpeedFilter->SetOutputMaximum( 1.0 );
@@ -82,6 +91,9 @@ public:
     m_RescaleSpeedFilter->ReleaseDataFlagOn();
     m_RescaleLevelSetFilter->ReleaseDataFlagOn();
     m_SmoothingFilter->ReleaseDataFlagOn();
+
+    m_RescaleOutputFilter->SetOutputMaximum(255);
+    m_RescaleOutputFilter->SetOutputMinimum( 0 );
     }
 
 
@@ -132,6 +144,9 @@ public:
     try
       {
       filter->Update();
+      filter->ReleaseDataFlagOn();
+      m_RescaleOutputFilter->SetInput( filter->GetOutput() );
+      m_RescaleOutputFilter->Update();
       }
     catch( itk::ProcessAborted & )
       {
@@ -140,7 +155,7 @@ public:
 
     // Copy the data (with casting) to the output buffer provided by the PlugIn API
     OutputImageType::ConstPointer outputImage =
-                                         filter->GetOutput();
+                                     m_RescaleOutputFilter->GetOutput();
 
     typedef itk::ImageRegionConstIterator< OutputImageType >  OutputIteratorType;
 
@@ -165,7 +180,7 @@ private:
   SmoothingFilterType::Pointer          m_SmoothingFilter;
   RescaleLeveSetFilterType::Pointer     m_RescaleLevelSetFilter;
   RescaleSpeedFilterType::Pointer       m_RescaleSpeedFilter;
-
+  RescaleOutputFilterType::Pointer      m_RescaleOutputFilter;
 };
 
 
