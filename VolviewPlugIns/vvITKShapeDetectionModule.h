@@ -59,6 +59,11 @@ public:
     void SetLowestBasinValue(  float value );
     void SetDistanceFromSeeds( float value );
 
+    void SetCurvatureScaling(  float value );
+    void SetPropagationScaling( float value );
+    void SetMaximumRMSError( float value );
+    void SetMaximumIterations( unsigned int iterations );
+
     void ProcessData( const vtkVVProcessDataStruct * pds );
     void PostProcessData( const vtkVVProcessDataStruct * pds );
 

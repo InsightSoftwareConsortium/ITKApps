@@ -14,6 +14,11 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
   const float distanceFromSeeds     = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
   const float lowestBasinValue      = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
   const float lowestBorderValue     = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ));
+  const float curvatureScaling      = atof( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ));
+  const float propagationScaling    = atof( info->GetGUIProperty(info, 4, VVP_GUI_VALUE ));
+  const float maximumRMSError       = atof( info->GetGUIProperty(info, 5, VVP_GUI_VALUE ));
+
+  const unsigned int maximumNumberOfIterations = atof( info->GetGUIProperty(info, 6, VVP_GUI_VALUE ));
 
   const unsigned int numberOfSeeds = info->NumberOfMarkers;
   if( numberOfSeeds < 1 )
@@ -40,6 +45,10 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.SetDistanceFromSeeds( distanceFromSeeds );
       module.SetLowestBasinValue( lowestBasinValue ); 
       module.SetLowestBorderValue( lowestBorderValue );
+      module.SetCurvatureScaling( curvatureScaling );
+      module.SetPropagationScaling( propagationScaling );
+      module.SetMaximumRMSError( maximumRMSError );
+      module.SetMaximumIterations( maximumNumberOfIterations );
       for(unsigned int i=0; i< numberOfSeeds; i++)
         {
         const float seedx =  static_cast< int >( seedCoordinates[0] );
@@ -63,6 +72,10 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.SetUpdateMessage("Computing Shape Detection Module...");
       module.SetLowestBasinValue( lowestBasinValue ); 
       module.SetLowestBorderValue( lowestBorderValue );
+      module.SetCurvatureScaling( curvatureScaling );
+      module.SetPropagationScaling( propagationScaling );
+      module.SetMaximumRMSError( maximumRMSError );
+      module.SetMaximumIterations( maximumNumberOfIterations );
       for(unsigned int i=0; i< numberOfSeeds; i++)
         {
         const float seedx =  static_cast< int >( seedCoordinates[0] );
@@ -106,6 +119,30 @@ static int UpdateGUI(void *inf)
   info->SetGUIProperty(info, 2, VVP_GUI_HELP, "The lowest value of the gradient magnitude in the border of the region to be segmented. This value will be mapped by the Sigmoid into the slowest propagation in the speed image.");
   info->SetGUIProperty(info, 2, VVP_GUI_HINTS , "0.1 50.0 0.1");
 
+  info->SetGUIProperty(info, 3, VVP_GUI_LABEL, "Curvature scaling.");
+  info->SetGUIProperty(info, 3, VVP_GUI_TYPE, VVP_GUI_SCALE);
+  info->SetGUIProperty(info, 3, VVP_GUI_DEFAULT, "1.0");
+  info->SetGUIProperty(info, 3, VVP_GUI_HELP, "Scaling factor for the curvature contribution. Larger values will result in smoother contours");
+  info->SetGUIProperty(info, 3, VVP_GUI_HINTS , "0.1 10.0 0.1");
+
+  info->SetGUIProperty(info, 4, VVP_GUI_LABEL, "Propagation scaling.");
+  info->SetGUIProperty(info, 4, VVP_GUI_TYPE, VVP_GUI_SCALE);
+  info->SetGUIProperty(info, 4, VVP_GUI_DEFAULT, "1.0");
+  info->SetGUIProperty(info, 4, VVP_GUI_HELP, "Scaling factor for the inflation factor. Larger factors will result in rapid expansion with irregular borders");
+  info->SetGUIProperty(info, 4, VVP_GUI_HINTS , "0.1 10.0 0.1");
+
+  info->SetGUIProperty(info, 5, VVP_GUI_LABEL, "Maximum RMS Error.");
+  info->SetGUIProperty(info, 5, VVP_GUI_TYPE, VVP_GUI_SCALE);
+  info->SetGUIProperty(info, 5, VVP_GUI_DEFAULT, "6.0");
+  info->SetGUIProperty(info, 5, VVP_GUI_HELP, "Threshold of the RMS change between one iteration and the previous one. This is a convergence criteria, the process will stop when the RMS change is lower than the value set here");
+  info->SetGUIProperty(info, 5, VVP_GUI_HINTS , "0.1 50.0 0.1");
+
+  info->SetGUIProperty(info, 6, VVP_GUI_LABEL, "Maximum iterations.");
+  info->SetGUIProperty(info, 6, VVP_GUI_TYPE, VVP_GUI_SCALE);
+  info->SetGUIProperty(info, 6, VVP_GUI_DEFAULT, "10.0");
+  info->SetGUIProperty(info, 6, VVP_GUI_HELP, "The maximum number of iteration to apply the time step in the partial differental equation.");
+  info->SetGUIProperty(info, 6, VVP_GUI_HINTS , "1.0 500.0 1.0");
+
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, "0");
   
   info->OutputVolumeScalarType = VTK_UNSIGNED_CHAR;
@@ -137,7 +174,7 @@ void VV_PLUGIN_EXPORT vvITKShapeDetectionModuleInit(vtkVVPluginInfo *info)
 
   info->SetProperty(info, VVP_SUPPORTS_IN_PLACE_PROCESSING, "0");
   info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "0");
-  info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "3");
+  info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "7");
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP,           "0");
   info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,   "16");
 

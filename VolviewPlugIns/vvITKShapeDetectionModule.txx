@@ -114,6 +114,53 @@ ShapeDetectionModule<TInputPixelType>
 
 
 
+/*
+ *  Set the factor that will scale curvature
+ */
+template <class TInputPixelType >
+void 
+ShapeDetectionModule<TInputPixelType>
+::SetCurvatureScaling( float value )
+{
+  m_ShapeDetectionFilter->SetCurvatureScaling( value );
+}
+
+
+/*
+ *  Set the factor that will scale curvature
+ */
+template <class TInputPixelType >
+void 
+ShapeDetectionModule<TInputPixelType>
+::SetPropagationScaling( float value )
+{
+  m_ShapeDetectionFilter->SetPropagationScaling( value );
+}
+
+
+/*
+ *  Set the threshold of RMS error that will define convergence
+ */
+template <class TInputPixelType >
+void 
+ShapeDetectionModule<TInputPixelType>
+::SetMaximumRMSError( float value )
+{
+  m_ShapeDetectionFilter->SetMaximumRMSError( value );
+}
+
+
+/*
+ *  Set the maximum number of iterations to attempt in order to get
+ *  convergence.
+ */
+template <class TInputPixelType >
+void 
+ShapeDetectionModule<TInputPixelType>
+::SetMaximumIterations( unsigned int value )
+{
+  m_ShapeDetectionFilter->SetMaximumIterations( value );
+}
 
 
 /*
