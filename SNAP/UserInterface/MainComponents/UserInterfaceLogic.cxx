@@ -172,8 +172,7 @@ void
 UserInterfaceLogic
 ::OnSnakeStartAction()
 {
-  Vector3i roiul,roilr;
-
+  
   uchar index = m_GlobalState->GetDrawingColorLabel();
 
   if (0 == index) 
@@ -218,12 +217,13 @@ UserInterfaceLogic
 
   for (i=0; i<3; i++) 
     {
-    m_InSNAPSliceSlider[i]->range( roilr[i]-roiul[i], 0.0 );
-    m_InSNAPSliceSlider[i]->slider_size( 1.0/(roilr[i]-roiul[i]+1) );
+    // As with the other sliders, the range is negative
+    m_InSNAPSliceSlider[i]->range( 1.0 - roi.GetSize(i), 0.0 );
+    m_InSNAPSliceSlider[i]->slider_size( 1.0/ roi.GetSize(i) );
     m_InSNAPSliceSlider[i]->linesize(1);
-    OnSNAPSliceSliderChange[i]->activate();
+    m_OutSNAPSliceIndex[i]->activate();
     }
-  this->ResetSNAPScrollbars();
+  this->ResetScrollbars();
 
   //set bubble radius range according to volume dimensions (world dimensions)
   Vector3f voxdims = m_Driver->GetSNAPImageData()->GetVoxelScaleFactor();
@@ -509,18 +509,6 @@ UserInterfaceLogic
 
 void 
 UserInterfaceLogic
-::ResetSNAPScrollbars()
-{
-  Vector3i newpos = m_GlobalState->GetCrosshairsPosition();
-  for (int xyz=0; xyz<3; xyz++) 
-    {
-    m_InSNAPSliceSlider[xyz]->Fl_Valuator::value( (double)newpos[xyz] );
-    this->UpdateSNAPPositionDisplay(xyz);
-    }
-}
-
-void 
-UserInterfaceLogic
 ::UpdateSNAPImageProbe()
 {
   char strLabel[256];
@@ -568,18 +556,18 @@ UserInterfaceLogic
   // Textbox below the Window2D sliders
   char temp[20];
   sprintf(temp,"%d of %d",
-    (int) m_InSNAPSliceSlider[id]->value()+1,
-    (int) m_InSNAPSliceSlider[id]->minimum()+1);
-  OnSNAPSliceSliderChange[id]->value((const char*) temp);
+    1 - (int) m_InSNAPSliceSlider[id]->value(),
+    1 - (int) m_InSNAPSliceSlider[id]->minimum());
+  m_OutSNAPSliceIndex[id]->value((const char*) temp);
 }
 
 void 
 UserInterfaceLogic
-::OnIRISSliceSliderChange(int id)
+::OnSNAPSliceSliderChange(int id)
 {
   // Sliders selecting the slice in a Window2D
   Vector3i pos = m_GlobalState->GetCrosshairsPosition();
-  pos[id] = (int) m_InSNAPSliceSlider[id]->value();
+  pos[id] =  (int) - m_InSNAPSliceSlider[id]->value();
 
   // TODO: Unify this!
   m_Driver->GetCurrentImageData()->SetCrosshairs(pos);  
@@ -1874,11 +1862,24 @@ void
 UserInterfaceLogic
 ::ResetScrollbars() 
 {
-  Vector3i newpos = m_GlobalState->GetCrosshairsPosition();
-  for (int xyz=0; xyz<3; xyz++) 
+  // Get the crosshairs position
+  Vector3i xCross = m_GlobalState->GetCrosshairsPosition();
+
+  // Update the correct scroll bars
+  for (unsigned int dim=0; dim<3; dim++)
     {
-    m_InIRISSliceSlider[xyz]->Fl_Valuator::value( (double)newpos[xyz] );
-    this->UpdatePositionDisplay(xyz);
+    if (!m_GlobalState->GetSNAPActive())
+      {
+      // IRIS Scrollbars (notice the negation of the value!)
+      m_InIRISSliceSlider[dim]->Fl_Valuator::value( (double)-xCross[dim] );
+      this->UpdatePositionDisplay(dim);
+      }
+    else
+      {
+      // SNAP Scrollbars (notice the negation of the value!)
+      m_InSNAPSliceSlider[dim]->Fl_Valuator::value( (double)-xCross[dim] );
+      this->UpdateSNAPPositionDisplay(dim);
+      }
     }
 }
 
@@ -2244,11 +2245,11 @@ UserInterfaceLogic
 
 void 
 UserInterfaceLogic
-::PositionSliderCallback(int id) 
+::OnIRISSliceSliderChange(int id) 
 {
   // Sliders selecting the slice in a Window2D
   Vector3i pos = m_GlobalState->GetCrosshairsPosition();
-  pos[id] = (int) m_InIRISSliceSlider[id]->value();
+  pos[id] = (int) - m_InIRISSliceSlider[id]->value();
 
   // TODO: Unify this!
   m_Driver->GetCurrentImageData()->SetCrosshairs(pos);
@@ -2265,9 +2266,9 @@ UserInterfaceLogic
   // Textbox below the Window2D sliders
   char temp[20];
   sprintf(temp,"%d of %d", 
-    (int) m_InIRISSliceSlider[id]->value()+1,
-    (int) m_InIRISSliceSlider[id]->minimum()+1);
-  Position[id]->value(temp);
+    1 - (int) m_InIRISSliceSlider[id]->value(),
+    1 - (int) m_InIRISSliceSlider[id]->minimum());
+  m_OutIRISSliceIndex[id]->value(temp);
 }
 
 void 
@@ -2638,10 +2639,12 @@ UserInterfaceLogic
   // Set the 2D slice sliders and textboxes
   for (i=0; i<3; i++) 
     {
-    m_InIRISSliceSlider[i]->range( dims[i]-1.0, 0.0 );
+    // Notice the sliders have a negative range!  That's so that the 1 position is at the 
+    // bottom.  We need to always negate the slider values
+    m_InIRISSliceSlider[i]->range( 1.0 - dims[i], 0.0 );
     m_InIRISSliceSlider[i]->slider_size( 1.0/dims[i] );
     m_InIRISSliceSlider[i]->linesize(1);
-    Position[i]->activate();
+    m_OutIRISSliceIndex[i]->activate();
     }
 
   this->ResetScrollbars();
@@ -2820,6 +2823,10 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.4  2003/08/28 14:37:09  pauly
+ *FIX: Clean 'unused parameter' and 'static keyword' warnings in gcc.
+ *FIX: Label editor repaired
+ *
  *Revision 1.3  2003/08/27 14:03:22  pauly
  *FIX: Made sure that -Wall option in gcc generates 0 warnings.
  *FIX: Removed 'comment within comment' problem in the cvs log.

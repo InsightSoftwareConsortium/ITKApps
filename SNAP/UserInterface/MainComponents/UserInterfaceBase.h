@@ -48,7 +48,6 @@ public:
   virtual void OnSnakeParametersClampChange() = 0;
   virtual void OnAcceptSegmentationAction() = 0;
   virtual void OnCancelSegmentationAction() = 0;
-  virtual void ResetSNAPScrollbars() = 0;
   virtual void UpdateSNAPPositionDisplay(int id) = 0;
   virtual void UpdateSNAPImageProbe() = 0;
   virtual void OnContinuousViewUpdateChange() = 0;
@@ -91,7 +90,7 @@ public:
   virtual void LoadLabelsCallback() = 0;
   virtual void UpdateEditLabelWindow() = 0;
   virtual void ChangeLabelsCallback() = 0;
-  virtual void PositionSliderCallback(int id) = 0;
+  virtual void OnSNAPSliceSliderChange(int id) = 0;
   virtual void UpdatePositionDisplay(int id) = 0;
   virtual void AcceptPolygonCallback(int id) = 0;
   virtual int CheckOrient(const char *txt, Vector3i &RAI) = 0;

@@ -355,19 +355,6 @@ public:
   /**
    *
    * DESCRIPTION:
-   * sync the scrollbars with the current cursor position.
-   * snake window version of ResetScrollbars
-   *
-   * PRECONDITIONS:
-   *
-   * POSTCONDITIONS:
-   *
-   */
-  void ResetSNAPScrollbars();
-
-  /**
-   *
-   * DESCRIPTION:
    * snake window version of UpdatePositionDisplay
    * set the textbox display of slice number for 2d window id
    *
@@ -416,7 +403,7 @@ public:
    * POSTCONDITIONS:
    *
    */
-  void OnIRISSliceSliderChange(int id);
+  void OnSNAPSliceSliderChange(int id);
 
   /**
    *
@@ -730,7 +717,7 @@ protected:
 
   void LoadLabelsCallback();
   void ChangeLabelsCallback();
-  void PositionSliderCallback(int id);
+  void OnIRISSliceSliderChange(int id);
   void AcceptPolygonCallback(int id);
   void SaveLabelsCallback();
   void PrintVoxelCountsCallback();
@@ -871,6 +858,10 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.4  2003/08/28 14:37:09  pauly
+ *FIX: Clean 'unused parameter' and 'static keyword' warnings in gcc.
+ *FIX: Label editor repaired
+ *
  *Revision 1.3  2003/08/27 14:03:23  pauly
  *FIX: Made sure that -Wall option in gcc generates 0 warnings.
  *FIX: Removed 'comment within comment' problem in the cvs log.

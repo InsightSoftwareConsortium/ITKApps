@@ -40,10 +40,10 @@ class UserInterface {open : {public UserInterfaceBase}
       xywh {273 68 875 710} align 0 resizable
       code0 {\#include "UserInterfaceBase.h"} visible
     } {
-      Fl_Group Controls {open
+      Fl_Group Controls {
         xywh {0 0 145 710} box FLAT_BOX color 53
       } {
-        Fl_Menu_Bar m_MenubarMain {selected
+        Fl_Menu_Bar m_MenubarMain {
           xywh {0 0 145 25} box PLASTIC_UP_BOX
         } {
           submenu {} {
@@ -565,13 +565,13 @@ m_GlobalState->SetCoverageMode(PAINT_OVER_ONE);}
         label {IRIS Status Messages}
         xywh {10 715 870 20} box FLAT_BOX color 14 labeltype NO_LABEL align 0
       }
-      Fl_Wizard m_WizWindows {
+      Fl_Wizard m_WizWindows {open
         xywh {145 -5 730 715} resizable
       } {
-        Fl_Group m_GrpIRISWindows {
-          xywh {145 -5 730 715} resizable
+        Fl_Group m_GrpIRISWindows {open
+          xywh {145 -5 730 715} hide resizable
         } {
-          Fl_Group m_GrpIRISAxial {
+          Fl_Group m_GrpIRISAxial {open
             xywh {145 0 365 355} box UP_BOX
           } {
             Fl_Box {Win2D[0]} {
@@ -581,10 +581,10 @@ m_GlobalState->SetCoverageMode(PAINT_OVER_ONE);}
               class IRISSliceWindow
             }
             Fl_Scrollbar {m_InIRISSliceSlider[0]} {
-              callback {this->PositionSliderCallback(0);}
+              callback {this->OnIRISSliceSliderChange(0);}
               xywh {490 5 15 320} minimum 1 maximum 0
             }
-            Fl_Group {} {open
+            Fl_Group {} {
               xywh {145 325 365 30}
             } {
               Fl_Button {Accept_button[0]} {
@@ -603,7 +603,7 @@ m_GlobalState->SetCoverageMode(PAINT_OVER_ONE);}
 Win2D[0]->redraw();}
                 xywh {340 330 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128
               }
-              Fl_Output {Position[0]} {
+              Fl_Output {m_OutIRISSliceIndex[0]} {
                 xywh {420 330 65 20} box FLAT_BOX color 49 align 0 textsize 10 deactivate
               }
               Fl_Group {} {open
@@ -611,7 +611,7 @@ Win2D[0]->redraw();}
               } {}
             }
           }
-          Fl_Group m_GrpIRISSagittal {
+          Fl_Group m_GrpIRISSagittal {open
             xywh {510 0 365 355} box UP_BOX
           } {
             Fl_Box {Win2D[1]} {
@@ -621,10 +621,10 @@ Win2D[0]->redraw();}
               class IRISSliceWindow
             }
             Fl_Scrollbar {m_InIRISSliceSlider[1]} {
-              callback {this->PositionSliderCallback(1);}
+              callback {this->OnIRISSliceSliderChange(1);}
               xywh {855 5 15 320} minimum 1 maximum 0
             }
-            Fl_Group {} {open
+            Fl_Group {} {
               xywh {510 325 365 30}
             } {
               Fl_Button {Accept_button[1]} {
@@ -643,7 +643,7 @@ Win2D[0]->redraw();}
 Win2D[1]->redraw();}
                 xywh {710 330 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128
               }
-              Fl_Output {Position[1]} {
+              Fl_Output {m_OutIRISSliceIndex[1]} {
                 xywh {785 330 70 20} box FLAT_BOX color 49 align 0 textsize 10 deactivate
               }
               Fl_Group {} {open
@@ -655,7 +655,7 @@ Win2D[1]->redraw();}
             xywh {510 355 365 355} box UP_BOX
           } {
             Fl_Scrollbar {m_InIRISSliceSlider[2]} {
-              callback {this->PositionSliderCallback(2);}
+              callback {this->OnIRISSliceSliderChange(2);}
               xywh {855 360 15 315} minimum 1 maximum 0
             }
             Fl_Box {Win2D[2]} {
@@ -664,7 +664,7 @@ Win2D[1]->redraw();}
               code0 {\#include "IRISSliceWindow.h"}
               class IRISSliceWindow
             }
-            Fl_Group {} {open
+            Fl_Group {} {
               xywh {510 680 365 30}
             } {
               Fl_Button {Accept_button[2]} {
@@ -683,7 +683,7 @@ Win2D[1]->redraw();}
 Win2D[2]->redraw();}
                 xywh {710 685 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 9 labelcolor 0 align 128
               }
-              Fl_Output {Position[2]} {
+              Fl_Output {m_OutIRISSliceIndex[2]} {
                 xywh {785 685 70 20} box FLAT_BOX color 49 align 0 textsize 10 deactivate
               }
               Fl_Group {} {open
@@ -691,7 +691,7 @@ Win2D[2]->redraw();}
               } {}
             }
           }
-          Fl_Group m_GrpIRISView3D {open
+          Fl_Group m_GrpIRISView3D {
             xywh {145 355 365 355} box UP_BOX
           } {
             Fl_Box m_IRISWindow3D {
@@ -728,8 +728,8 @@ m_IRISWindow3D->redraw();}
             }
           }
         }
-        Fl_Group m_GrpSNAPWindows {
-          xywh {145 0 730 710} hide
+        Fl_Group m_GrpSNAPWindows {open
+          xywh {145 0 730 710}
         } {
           Fl_Group m_GrpSNAPAxial {open
             xywh {145 0 365 355} box UP_BOX
@@ -741,10 +741,10 @@ m_IRISWindow3D->redraw();}
               class SNAPSliceWindow
             }
             Fl_Scrollbar {m_InSNAPSliceSlider[0]} {
-              callback {this->OnIRISSliceSliderChange(0);}
+              callback {this->OnSNAPSliceSliderChange(0);}
               xywh {490 5 15 320} minimum 1 maximum 0
             }
-            Fl_Group {} {open
+            Fl_Group {} {
               xywh {145 325 365 30}
             } {
               Fl_Group {} {open
@@ -756,8 +756,8 @@ m_IRISWindow3D->redraw();}
 m_SNAPWindow2D[0]->redraw();}
                 xywh {345 330 65 20} box PLASTIC_UP_BOX color 140 labelsize 9 labelcolor 0 align 128
               }
-              Fl_Output {OnSNAPSliceSliderChange[0]} {
-                xywh {430 330 70 20} box NO_BOX color 49 align 0 textsize 10 deactivate
+              Fl_Output {m_OutSNAPSliceIndex[0]} {
+                xywh {430 330 70 20} box FLAT_BOX color 49 align 0 textsize 10 deactivate
               }
             }
           }
@@ -771,10 +771,10 @@ m_SNAPWindow2D[0]->redraw();}
               class SNAPSliceWindow
             }
             Fl_Scrollbar {m_InSNAPSliceSlider[1]} {
-              callback {this->OnIRISSliceSliderChange(1);}
+              callback {this->OnSNAPSliceSliderChange(1);}
               xywh {855 5 15 320} minimum 1 maximum 0
             }
-            Fl_Group {} {open
+            Fl_Group {} {
               xywh {510 325 365 30}
             } {
               Fl_Group {} {open
@@ -786,8 +786,8 @@ m_SNAPWindow2D[0]->redraw();}
 m_SNAPWindow2D[1]->redraw();}
                 xywh {710 330 65 20} box PLASTIC_UP_BOX color 140 labelsize 9 labelcolor 0 align 128
               }
-              Fl_Output {OnSNAPSliceSliderChange[1]} {
-                xywh {795 330 70 20} box NO_BOX color 49 align 0 textsize 10 deactivate
+              Fl_Output {m_OutSNAPSliceIndex[1]} {
+                xywh {795 330 70 20} box FLAT_BOX color 49 align 0 textsize 10 deactivate
               }
             }
           }
@@ -795,7 +795,7 @@ m_SNAPWindow2D[1]->redraw();}
             xywh {510 355 365 355} box UP_BOX
           } {
             Fl_Scrollbar {m_InSNAPSliceSlider[2]} {
-              callback {this->OnIRISSliceSliderChange(2);}
+              callback {this->OnSNAPSliceSliderChange(2);} selected
               xywh {855 360 15 320} minimum 1 maximum 0
             }
             Fl_Box {m_SNAPWindow2D[2]} {
@@ -804,7 +804,7 @@ m_SNAPWindow2D[1]->redraw();}
               code0 {\#include "SNAPSliceWindow.h"}
               class SNAPSliceWindow
             }
-            Fl_Group {} {open
+            Fl_Group {} {
               xywh {510 680 365 30}
             } {
               Fl_Group {} {open
@@ -816,12 +816,12 @@ m_SNAPWindow2D[1]->redraw();}
 m_SNAPWindow2D[2]->redraw();}
                 xywh {710 685 65 20} box PLASTIC_UP_BOX color 140 labelsize 9 labelcolor 0 align 128
               }
-              Fl_Output {OnSNAPSliceSliderChange[2]} {
-                xywh {795 685 70 20} box NO_BOX color 49 align 0 textsize 10 deactivate
+              Fl_Output {m_OutSNAPSliceIndex[2]} {
+                xywh {795 685 70 20} box FLAT_BOX color 49 align 0 textsize 10 deactivate
               }
             }
           }
-          Fl_Group m_GRPSNAPView3D {open
+          Fl_Group m_GRPSNAPView3D {
             xywh {145 355 365 355} box UP_BOX
           } {
             Fl_Box m_SNAPWindow3D {
@@ -911,8 +911,8 @@ m_InSaveLabelFilename->value((const char*)m_ChosedFile);}
       }
     }
     Fl_Window m_WinEditLabel {
-      label {Edit Color Label} open
-      xywh {499 319 217 403} labelsize 12 visible
+      label {Edit Color Label}
+      xywh {499 319 217 403} labelsize 12 hide
     } {
       Fl_Group m_GrpEditLabelColorChooser {
         label {Color Chooser} open

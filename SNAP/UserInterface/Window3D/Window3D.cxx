@@ -445,22 +445,14 @@ Window3D
 
       if (this->IntersectSegData(Fl::event_x(), Fl::event_y(), hit))
         {
-
         // TODO: Unify this!
         m_Driver->GetCurrentImageData()->SetCrosshairs(hit);
         m_GlobalState->SetCrosshairsPosition( hit );
         }
 
-      //Addition: Nathan Moon
-      if (m_GlobalState->GetSnakeActive())
-        {
-        m_ParentUI->ResetSNAPScrollbars();
-        m_ParentUI->RedrawWindows();
-        } else
-        {
-        m_ParentUI->ResetScrollbars();
-        m_ParentUI->RedrawWindows();
-        }   
+      m_ParentUI->ResetScrollbars();
+      m_ParentUI->RedrawWindows();
+
       break;
     default: break;
     }
@@ -929,6 +921,10 @@ void Window3D::DrawCutPlane() {
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.3  2003/08/27 14:03:24  pauly
+ *FIX: Made sure that -Wall option in gcc generates 0 warnings.
+ *FIX: Removed 'comment within comment' problem in the cvs log.
+ *
  *Revision 1.2  2003/08/27 04:57:47  pauly
  *FIX: A large number of bugs has been fixed for 1.4 release
  *
