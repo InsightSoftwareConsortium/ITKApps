@@ -17,5 +17,5 @@ ADD_GUI_EXECUTABLE(FastMarchingLevelSet "${FastMarchingLevelSet_SRCS}")
 
 FLTK_WRAP_UI(FastMarchingLevelSet FastMarchingLevelSetGUI.fl)
 
-TARGET_LINK_LIBRARIES(FastMarchingLevelSet ITKVtkFltk
-                      ITKBasicFilters ITKNumerics ITKIO ITKFltkImageViewer)
+TARGET_LINK_LIBRARIES(FastMarchingLevelSet ITKIO ITKVtkFltk
+                      ITKBasicFilters ITKNumerics ITKFltkImageViewer)
