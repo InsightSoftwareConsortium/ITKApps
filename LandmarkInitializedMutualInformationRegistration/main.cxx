@@ -260,7 +260,7 @@ int main(int argc, char **argv)
           GroupType::TransformType::Pointer transform;
           transform = group->GetObjectToParentTransform();
           LoadedTType::Pointer loadedTransform = LoadedTType::New();
-          loadedTransform->SetCenter(transform->GetCenterOfRotationComponent());
+          loadedTransform->SetCenter(transform->GetCenter());
           loadedTransform->SetMatrix(transform->GetMatrix());
           loadedTransform->SetOffset(transform->GetOffset());
           if(i == 0)

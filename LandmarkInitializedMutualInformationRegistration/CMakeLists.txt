@@ -1,4 +1,4 @@
-PROJECT(miRegTool)
+PROJECT(imageRegTool)
 
 
 IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
@@ -41,16 +41,16 @@ INCLUDE_DIRECTORIES(
   ${InsightApplications_BINARY_DIR}/LandmarkInitializedMutualInformationRegistration
 )
 
-ADD_EXECUTABLE(miRegTool
+ADD_EXECUTABLE(imageRegTool
   guiMainImplementation.cxx
   LandmarkRegistrator.cxx
   main.cxx
 )
 
-FLTK_WRAP_UI(miRegTool guiMain.fl)
+FLTK_WRAP_UI(imageRegTool guiMain.fl)
 ITK_DISABLE_FLTK_GENERATED_WARNINGS(guiMain.fl)
 
-TARGET_LINK_LIBRARIES (miRegTool
+TARGET_LINK_LIBRARIES (imageRegTool
 ITKIO 
 ITKMetaIO 
 ITKBasicFilters 

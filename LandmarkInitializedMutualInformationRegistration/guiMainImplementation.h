@@ -13,6 +13,7 @@
 
 // ITK related includes....
 #include <itkAffineTransform.h>
+#include <itkScalableAffineTransform.h>
 #include <itkExceptionObject.h>
 #include <itkImageIOFactory.h>
 #include <itkImageFileReader.h>

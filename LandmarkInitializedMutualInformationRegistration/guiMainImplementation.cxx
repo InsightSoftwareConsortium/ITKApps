@@ -1144,7 +1144,7 @@ guiMainImplementation
     {
     typedef itk::SpatialObjectWriter< >         WriterType;
     typedef itk::GroupSpatialObject< >          GroupType;
-    typedef itk::FixedCenterOfRotationAffineTransform< double, 3 > 
+    typedef itk::ScalableAffineTransform< double, 3 > 
                                                 TransformType;
 
     WriterType::Pointer writer = WriterType::New();
