@@ -189,21 +189,21 @@ public:
   /** Associate an FLTK widget with a flag */
   void AddWidget(Fl_Widget *widget, TFlag flag)
     {
-    typedef typename GenericWidgetWrapper<Fl_Widget> WrapperType;
+    typedef GenericWidgetWrapper<Fl_Widget> WrapperType;
     AddWidgetWrapper(new WrapperType(widget), flag);
     }
 
   /** Associate an FLTK menu item with a flag */
   void AddMenuItem(Fl_Menu_Item *menu, TFlag flag)
     {
-    typedef typename GenericWidgetWrapper<Fl_Menu_Item> WrapperType;
+    typedef GenericWidgetWrapper<Fl_Menu_Item> WrapperType;
     AddWidgetWrapper(new WrapperType(menu), flag);
     }
 
   /** Associate an FLTK checkbox with a flag and two values */
   void AddCheckBox(Fl_Check_Button *cb, TFlag flag, bool onState, bool offState)
     {
-    typedef typename ValuatorWidgetWrapper<Fl_Check_Button, int> WrapperType;
+    typedef ValuatorWidgetWrapper<Fl_Check_Button, int> WrapperType;
     AddWidgetWrapper(new WrapperType(cb,onState ? 1 : 0,offState ? 1 : 0), flag);    
     }
 

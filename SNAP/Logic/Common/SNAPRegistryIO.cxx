@@ -322,8 +322,8 @@ SNAPRegistryIO
   for(unsigned int d = 0; d < 3; d++)
     {
     Registry &sub = folder.Folder(folder.Key("ROIBox[%d]",d));
-    outRegion.SetIndex(d, sub["Index"][dflRegion.GetIndex(d)]);
-    outRegion.SetSize(d,  sub["Size"][(long) dflRegion.GetSize(d)]);    
+    outRegion.SetIndex(d, sub["Index"][(int)dflRegion.GetIndex(d)]);
+    outRegion.SetSize(d,  sub["Size"][(int) dflRegion.GetSize(d)]);    
     }
   out.SetROI(outRegion);
 

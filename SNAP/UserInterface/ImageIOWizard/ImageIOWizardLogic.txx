@@ -16,7 +16,7 @@
 #define __ImageIOWizardLogic_txx_
 
 #include "FL/fl_file_chooser.h"
-#include "FL/FL_Text_Buffer.H"
+#include "FL/Fl_Text_Buffer.H"
 #include <limits>
 #include <stdio.h>
 #include <cmath>
@@ -623,7 +623,7 @@ ImageIOWizardLogic<TPixel>
   MetaDataDictionary &mdd = m_Image->GetMetaDataDictionary();
 
   // Find the entry dealing with orientation
-  typedef typename MetaDataObject<ValidCoordinateOrientationFlags> ObjectType;
+  typedef MetaDataObject<ValidCoordinateOrientationFlags> ObjectType;
   ObjectType *entry = 
     reinterpret_cast<ObjectType *> ( mdd[ITK_CoordinateOrientation].GetPointer() );
 

@@ -1260,11 +1260,13 @@ void Window3D::DrawCrosshairs()
 
     // The cube around the image
     glColor3dv(eltBox.NormalColor.data_block());
-    DrawCube( Vector3f(0.0f), to_float(m_ImageSize) );
+    Vector3f zeros(0.0f);
+    Vector3f imageSize = to_float(m_ImageSize);
+    DrawCube( zeros, imageSize );
 
     // The slice planes
     glColor3dv(eltBox.ActiveColor.data_block());
-    DrawCutPlanes( Vector3f(0.0f), to_float(m_ImageSize), xCross );
+    DrawCutPlanes(zeros, imageSize, xCross );
     }
 
   // Get the UI element properties for the crosshairs
@@ -1419,6 +1421,9 @@ Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.22  2004/09/21 15:50:51  jjomier
+ *FIX: vector_multiply_mixed requires template parameters otherwise MSVC cannot deduce them
+ *
  *Revision 1.21  2004/09/14 14:11:11  pauly
  *ENH: Added an activation manager to main UI class, improved snake code, various UI fixes and additions
  *
