@@ -115,7 +115,7 @@ SNAPLevelSetDriver<VDimension>
     typedef LevelSetExtensionFilter<LevelSetFilterType> ExtensionFilterType;
       
     // Create a new extended filter
-    ExtensionFilterType::Pointer filter = ExtensionFilterType::New();
+    typename ExtensionFilterType::Pointer filter = ExtensionFilterType::New();
 
     // Cast this specific filter down to the lowest common denominator that is
     // a filter
@@ -140,7 +140,7 @@ SNAPLevelSetDriver<VDimension>
     typedef LevelSetExtensionFilter<LevelSetFilterType> ExtensionFilterType;
     
     // Create a new extended filter
-    ExtensionFilterType::Pointer filter = ExtensionFilterType::New();
+    typename ExtensionFilterType::Pointer filter = ExtensionFilterType::New();
 
     // Cast this specific filter down to the lowest common denominator that is
     // a filter
@@ -166,7 +166,7 @@ SNAPLevelSetDriver<VDimension>
     typedef LevelSetExtensionFilter<LevelSetFilterType> ExtensionFilterType;
     
     // Create a new extended filter
-    ExtensionFilterType::Pointer filter = ExtensionFilterType::New();
+    typename ExtensionFilterType::Pointer filter = ExtensionFilterType::New();
 
     // Cast this specific filter down to the lowest common denominator that is
     // a filter
