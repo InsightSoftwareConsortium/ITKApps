@@ -56,3 +56,13 @@ ThresholdSettings
 
   return settings;
 }
+
+ThresholdSettings
+::ThresholdSettings()
+{
+  m_LowerThresholdEnabled = true;
+  m_UpperThresholdEnabled = true;  
+  m_LowerThreshold = 0;
+  m_UpperThreshold = 0; 
+  m_Smoothness = 1;
+}

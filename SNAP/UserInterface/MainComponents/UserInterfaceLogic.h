@@ -547,8 +547,14 @@ public:
   void OnPastePolygonAction(unsigned int window);
   void OnPolygonStateUpdate(unsigned int id);
 
+  // 3D Window callbacks
+  void OnAcceptIRIS3DAction();
+  void OnUpdateIRIS3DAction();
+  void OnResetIRIS3DAction();
+
   // Method called when user tries to close the window
   void OnMainWindowCloseAction();
+
 
 protected:
 
@@ -748,6 +754,9 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.9  2003/10/09 22:45:14  pauly
+ *EMH: Improvements in 3D functionality and snake parameter preview
+ *
  *Revision 1.8  2003/10/07 00:37:27  jjomier
  *ENH: Added cygwin support
  *

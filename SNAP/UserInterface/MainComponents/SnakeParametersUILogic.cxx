@@ -406,6 +406,7 @@ void SnakeParametersUILogic
 ::OnSaveParametersAction()
 {
   // Show the save dialog using the correct history
+  m_IODialog->SetTitle("Save Snake Parameters");
   m_IODialog->DisplaySaveDialog(
     m_SystemInterface->GetHistory("SnakeParameters"),NULL);
 }
@@ -441,6 +442,7 @@ void SnakeParametersUILogic
 ::OnLoadParametersAction()
 {
   // Show the save dialog using the correct history
+  m_IODialog->SetTitle("Load Snake Parameters");
   m_IODialog->DisplayLoadDialog(
     m_SystemInterface->GetHistory("SnakeParameters"),NULL);
 }

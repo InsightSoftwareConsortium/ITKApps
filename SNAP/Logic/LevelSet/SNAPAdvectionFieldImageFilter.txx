@@ -18,7 +18,8 @@
 template<class TInputImage, class TOutputValueType>
 SNAPAdvectionFieldImageFilter<TInputImage,TOutputValueType>
 ::SNAPAdvectionFieldImageFilter()
-{  
+{
+  m_Exponent = 0;
 }
 
 template<class TInputImage, class TOutputValueType>

@@ -21,14 +21,18 @@ EdgePreprocessingSettings
   return memcmp(this,&other,sizeof(EdgePreprocessingSettings)) == 0;
 }
 
+EdgePreprocessingSettings::
+EdgePreprocessingSettings()
+{
+  SetGaussianBlurScale(1.0f);
+  SetRemappingSteepness(0.1f);
+  SetRemappingExponent(2.0f);
+}
+
 EdgePreprocessingSettings
 EdgePreprocessingSettings
 ::MakeDefaultSettings()
 {
   EdgePreprocessingSettings settings;
-  settings.SetGaussianBlurScale(1.0f);
-  settings.SetRemappingSteepness(0.1f);
-  settings.SetRemappingExponent(2.0f);
-  
   return settings;
 }

@@ -13,12 +13,20 @@
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "HelpViewerLogic.h"
+#include <FL/Fl_Shared_Image.H>
+#include <FL/filename.H>
 
 using namespace std;
 
 // Callback for when links are clicked
 const char *HelpViewerLogicLinkCallback(Fl_Widget *w, const char *uri)
 {
+  // Only deal with visited html
+  const char *ext = fl_filename_ext(uri);
+  if(strcmp(ext,".html") != 0 && strcmp(ext,".HTML") != 0)
+    return uri;
+
+  // Pass on to the class
   HelpViewerLogic *hvl = static_cast<HelpViewerLogic *>(w->user_data());
   return hvl->LinkCallback(uri);  
 }
@@ -26,6 +34,10 @@ const char *HelpViewerLogicLinkCallback(Fl_Widget *w, const char *uri)
 HelpViewerLogic
 ::HelpViewerLogic()
 {
+  // Make sure that Fl is set up for GIF/PNG images
+  fl_register_images();
+
+  // Clear the linked list
   m_Iterator = m_LinkList.begin();  
 }
   

@@ -23,6 +23,7 @@
 template<class TImageType>
 SNAPLevelSetFunction<TImageType>
 ::SNAPLevelSetFunction()
+: Superclass()
 {
   m_TimeStep = 1.0f;
   
@@ -35,7 +36,6 @@ SNAPLevelSetFunction<TImageType>
   m_CurvatureSpeedInterpolator = ImageInterpolatorType::New();
   m_LaplacianSmoothingSpeedInterpolator = ImageInterpolatorType::New();
   m_AdvectionFieldInterpolator = VectorInterpolatorType::New();
-
   
   m_AdvectionFilter = AdvectionFilterType::New();
 }
@@ -208,6 +208,21 @@ SNAPLevelSetFunction<TImageType>
   if(m_AdvectionSpeedExponent != 0)
     m_AdvectionFieldInterpolator->SetInputImage(m_AdvectionField);
 */
+
+
+  // Set up the image interpolators to point to the generated images
+  if(m_PropagationSpeedExponent != 0)
+    m_PropagationSpeedInterpolator->SetInputImage(m_PropagationSpeedImage);
+  if(m_CurvatureSpeedExponent != 0)
+    m_CurvatureSpeedInterpolator->SetInputImage(m_CurvatureSpeedImage);
+  if(m_LaplacianSmoothingSpeedExponent != 0)
+    m_LaplacianSmoothingSpeedInterpolator->SetInputImage(
+      m_LaplacianSmoothingSpeedImage);
+
+  // Set up the advection interpolator
+  if(m_AdvectionSpeedExponent != 0)
+    m_AdvectionFieldInterpolator->SetInputImage(m_AdvectionField);
+
   
   // Set up the advection interpolator
   // if(m_AdvectionSpeedExponent != 0)

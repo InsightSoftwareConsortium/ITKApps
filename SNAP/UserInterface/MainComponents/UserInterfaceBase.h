@@ -80,6 +80,11 @@ public:
   virtual void OnDeletePolygonSelectedAction(unsigned int window) = 0;
   virtual void OnInsertIntoPolygonSelectedAction(unsigned int window) = 0;
   virtual void OnPastePolygonAction(unsigned int window) = 0;
+
+  // IRIS: 3D Window callbacks
+  virtual void OnAcceptIRIS3DAction() = 0;
+  virtual void OnUpdateIRIS3DAction() = 0;
+  virtual void OnResetIRIS3DAction() = 0;
   
   // IRIS: ROI manipulation callbacks
   virtual void OnResetROIAction() = 0;

@@ -26,7 +26,8 @@ IRISSlicer<TPixel>
   m_SliceDirectionImageAxis = 2;
   m_LineDirectionImageAxis = 1;
   m_PixelDirectionImageAxis = 0;
-  m_LineTraverseForward = true;
+  
+  m_PixelTraverseForward = true;
   m_LineTraverseForward = true;
 
   // Initialize to a zero slice index

@@ -44,6 +44,9 @@ SpeedImageWrapper
     m_OverlayFilter[i]->SetInput(GetSlice(i));
     }
 
+  // Initialize the overlay functor
+  m_OverlayFunctor.m_Cutoff = 0.0f;
+
   // Initialize to Edge mode
   m_IsModeInsideOutside = false;
 }

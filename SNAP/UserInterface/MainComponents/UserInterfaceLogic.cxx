@@ -1608,7 +1608,7 @@ UserInterfaceLogic
     }
 
   char title[100];
-  sprintf(title, "Edit Color Label: Index %d", index);
+  sprintf(title, "Label No. %d", index);
   m_WinEditLabel->label(title);
 }
 
@@ -2191,6 +2191,7 @@ UserInterfaceLogic
 ::OnMenuWriteVoxelCounts() 
 {
   // Display the load labels dialog
+  m_DlgVoxelCountsIO->SetTitle("Save Volume Statistics");
   m_DlgVoxelCountsIO->DisplaySaveDialog(
     m_SystemInterface->GetHistory("VolumeStatistics"));
 }
@@ -2514,6 +2515,7 @@ UserInterfaceLogic
 ::OnMenuLoadLabels() 
 {
   // Display the load labels dialog
+  m_DlgLabelsIO->SetTitle("Load Labels");
   m_DlgLabelsIO->DisplayLoadDialog(
     m_SystemInterface->GetHistory("LabelDescriptions"));
 }
@@ -2522,6 +2524,7 @@ void UserInterfaceLogic
 ::OnMenuSaveLabels() 
 {
   // Display the save labels dialog
+  m_DlgLabelsIO->SetTitle("Save Labels");
   m_DlgLabelsIO->DisplaySaveDialog(
     m_SystemInterface->GetHistory("LabelDescriptions"));
 }
@@ -2910,6 +2913,30 @@ UserInterfaceLogic
 {
 }
 
+void
+UserInterfaceLogic
+::OnAcceptIRIS3DAction()
+{
+  m_BtnAccept3D->deactivate();
+  m_IRISWindow3D->Accept();
+  m_BtnMeshUpdate->activate();
+}
+
+void
+UserInterfaceLogic
+::OnUpdateIRIS3DAction()
+{
+  m_IRISWindow3D->UpdateMesh();
+}
+
+void
+UserInterfaceLogic
+::OnResetIRIS3DAction()
+{
+  m_IRISWindow3D->ResetView();
+  m_IRISWindow3D->redraw();
+}
+
 /*
 void UserInterfaceLogic
 ::OnCursorPositionUpdate()
@@ -2925,6 +2952,9 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.10  2003/10/09 22:45:14  pauly
+ *EMH: Improvements in 3D functionality and snake parameter preview
+ *
  *Revision 1.9  2003/10/06 12:30:00  pauly
  *ENH: Added history lists, remembering of settings, new snake parameter preview
  *

@@ -58,13 +58,13 @@ IRISMeshPipeline
 {
   // Initialize the region of interest filter
   m_ROIFilter = ROIFilter::New();
-  //m_ROIFilter->ReleaseDataFlagOn();
+  m_ROIFilter->ReleaseDataFlagOn();
 
   // Define the binary thresholding filter that will map the image onto the 
   // range 0 to 255
   m_ThrehsoldFilter = ThresholdFilter::New();
   m_ThrehsoldFilter->SetInput(m_ROIFilter->GetOutput());
-  //m_ThrehsoldFilter->ReleaseDataFlagOn();
+  m_ThrehsoldFilter->ReleaseDataFlagOn();
   m_ThrehsoldFilter->SetInsideValue(255);
   m_ThrehsoldFilter->SetOutsideValue(0);
 
@@ -76,13 +76,12 @@ IRISMeshPipeline
 
   // Initialize the VTK Exporter
   m_VTKExporter = VTKExportType::New();
-  // m_VTKExporter->SetInput(m_GaussianFilter->GetOutput());
   m_VTKExporter->SetInput(m_ThrehsoldFilter->GetOutput());
-  //m_VTKExporter->ReleaseDataFlagOn();
+  m_VTKExporter->ReleaseDataFlagOn();
   
   // Initialize the VTK Importer
   m_VTKImporter = vtkImageImport::New();
-  //m_VTKImporter->ReleaseDataFlagOn();
+  m_VTKImporter->ReleaseDataFlagOn();
 
   // Pipe the importer into the exporter (that's a lot of code)
   m_VTKImporter->SetUpdateInformationCallback(
@@ -115,9 +114,8 @@ IRISMeshPipeline
   
   // Create and configure the contour filter
   m_ContourFilter = vtkContourFilter::New();
-  // m_ContourFilter->SetInput(m_VTKImporter->GetOutput());      
   m_ContourFilter->SetInput(m_VTKGaussianFilter->GetOutput());
-  //m_ContourFilter->ReleaseDataFlagOn();
+  m_ContourFilter->ReleaseDataFlagOn();
   m_ContourFilter->ComputeNormalsOff();
   m_ContourFilter->ComputeScalarsOff();
   m_ContourFilter->ComputeGradientsOff();
@@ -128,20 +126,20 @@ IRISMeshPipeline
   // Create and configure a filter for triangle decimation
   m_DecimateFilter = vtkDecimatePro::New();
   m_DecimateFilter->SetInput(m_ContourFilter->GetOutput());
-  //m_DecimateFilter->ReleaseDataFlagOn();
+  m_DecimateFilter->ReleaseDataFlagOn();
 
   // Create and configure the normal computer
   m_NormalsFilter = vtkPolyDataNormals::New();
   m_NormalsFilter->SetInput(m_DecimateFilter->GetOutput());
   m_NormalsFilter->SplittingOff();
   m_NormalsFilter->ConsistencyOff();
-  //m_NormalsFilter->AutoOrientNormalsOff();
-  //m_NormalsFilter->ReleaseDataFlagOn();
+  m_NormalsFilter->AutoOrientNormalsOff();
+  m_NormalsFilter->ReleaseDataFlagOn();
 
   // Create and configure a filter for polygon smoothing
   m_PolygonSmoothingFilter = vtkSmoothPolyDataFilter::New();
   m_PolygonSmoothingFilter->SetInput(m_NormalsFilter->GetOutput());
-  //m_PolygonSmoothingFilter->ReleaseDataFlagOn();
+  m_PolygonSmoothingFilter->ReleaseDataFlagOn();
 
   // Create and configure a filter for triangle strip generation
   m_StripperFilter = vtkStripper::New();
@@ -156,7 +154,9 @@ IRISMeshPipeline
   m_StripperFilter->Delete();
   m_PolygonSmoothingFilter->Delete();
   m_DecimateFilter->Delete();
+  m_NormalsFilter->Delete();
   m_ContourFilter->Delete();
+  m_VTKGaussianFilter->Delete();
   m_VTKImporter->Delete();
 }
 
@@ -319,14 +319,6 @@ IRISMeshPipeline
   // The label must be present in the image
   if(m_Histogram[label] == 0)
     return false;
-
-  // Use the Gaussian filter to expand that region appropriately
-  // (This is a cheat, the Filter should provide a direct interface to this
-  // method)
-  //m_GaussianFilter->GetOutput()->SetRequestedRegion(m_BoundingBox[label]);
-  //m_GaussianFilter->GetOutput()->SetLargestPossibleRegion(
-  //  m_InputImage->GetLargestPossibleRegion());
-  //m_GaussianFilter->GenerateInputRequestedRegion();
 
   // TODO: make this more elegant
   clock_t now,start = clock();

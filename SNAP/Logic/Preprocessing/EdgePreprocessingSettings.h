@@ -44,6 +44,9 @@ public:
    */
   static EdgePreprocessingSettings MakeDefaultSettings();
 
+  // Constructor
+  EdgePreprocessingSettings();
+
 private:
   float m_GaussianBlurScale;
   float m_RemappingSteepness;

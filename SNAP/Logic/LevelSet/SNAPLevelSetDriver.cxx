@@ -189,12 +189,16 @@ void
 SNAPLevelSetDriver
 ::DoRestart()
 {
+  // To be on the safe side, just create a new filter (alternative is commented
+  // out below, but seems to be unstable)
+  DoCreateLevelSetFilter();
+
   // Update the image currently in the filter
-  m_LevelSetFilter->SetInput(m_InitializationImage);
+  // m_LevelSetFilter->SetInput(m_InitializationImage);
 
   // Reset the filter, so the next time it is Updated, it will run again, even
   // if the input image has not changed
-  m_LevelSetFilter->Modified();
+  // m_LevelSetFilter->Modified();
 }
 
 void 

@@ -55,6 +55,9 @@ public:
    * of 40 and 100 */
   static ThresholdSettings MakeDefaultSettingsWithoutImage();
 
+  // Constructor: creates dummy settings
+  ThresholdSettings();
+
 private:
   unsigned int m_LowerThreshold;
   unsigned int m_UpperThreshold;

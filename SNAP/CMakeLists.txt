@@ -208,13 +208,50 @@ SET(APPLICATION_FLUIDS
   UserInterface/MainComponents/UserInterface.fl
 )
 
-# Documentation HTML files
+# All program files
 SET(PROGRAM_DATA_FILES
   ProgramData/SNAPProgramDataDirectory.txt
-  ProgramData/HTMLHelp/Tutorial.html
   ProgramData/Images2D/EdgeForcesExample.png
   ProgramData/Images2D/RegionForcesExample.png
   ProgramData/Presets/SnakeParameterPreviewCurve.txt
+  ProgramData/HTMLHelp/Credits.html
+  ProgramData/HTMLHelp/Tutorial.html
+  ProgramData/HTMLHelp/TutorialSectionIntroduction.html
+  ProgramData/HTMLHelp/TutorialSectionIntroductionToAutomatic.html
+  ProgramData/HTMLHelp/TutorialSectionLoadingImages.html
+  ProgramData/HTMLHelp/TutorialSectionManualSegmentation.html
+  ProgramData/HTMLHelp/TutorialSectionViewingImages.html
+  ProgramData/HTMLHelp/Artwork/ttIconAction.gif
+  ProgramData/HTMLHelp/Artwork/ttIconExpert.gif
+  ProgramData/HTMLHelp/Artwork/ttIconTip.gif
+  ProgramData/HTMLHelp/Artwork/ttIntroScreenLayout.gif
+  ProgramData/HTMLHelp/Artwork/ttLoadImageBrowser.gif
+  ProgramData/HTMLHelp/Artwork/ttLoadImageMenuBar.gif
+  ProgramData/HTMLHelp/Artwork/ttLoadImageResult.gif
+  ProgramData/HTMLHelp/Artwork/ttLoadImageWizardOrientation.gif
+  ProgramData/HTMLHelp/Artwork/ttLoadImageWizardPreview.gif
+  ProgramData/HTMLHelp/Artwork/ttLoadImageWizardPreviewWithFile.gif
+  ProgramData/HTMLHelp/Artwork/ttLoadImageWizardSummary.gif
+  ProgramData/HTMLHelp/Artwork/ttManualSegmentLabelEditor.gif
+  ProgramData/HTMLHelp/Artwork/ttManualSegmentLabelEditorChanged.gif
+  ProgramData/HTMLHelp/Artwork/ttManualSegmentLabelFileDialog.gif
+  ProgramData/HTMLHelp/Artwork/ttManualSegmentLabelSubPanel.gif
+  ProgramData/HTMLHelp/Artwork/ttManualSegmentLabelSubPanel02.gif
+  ProgramData/HTMLHelp/Artwork/ttManualSegmentPaintClosePath.gif
+  ProgramData/HTMLHelp/Artwork/ttManualSegmentPaintStart.gif
+  ProgramData/HTMLHelp/Artwork/ttManualSegmentRightCaudate.gif
+  ProgramData/HTMLHelp/Artwork/ttManualSegmentToolbarManual.gif
+  ProgramData/HTMLHelp/Artwork/ttViewImageControlPanel.gif
+  ProgramData/HTMLHelp/Artwork/ttViewImageControlPanelToolbox01.gif
+  ProgramData/HTMLHelp/Artwork/ttViewImageControlPanelToolbox02.gif
+  ProgramData/HTMLHelp/Artwork/ttViewImageControlPanelToolOptions01.gif
+  ProgramData/HTMLHelp/Artwork/ttViewImageControlPanelToolOptions02.gif
+  ProgramData/HTMLHelp/Artwork/ttViewImageDisplayOptions.gif
+  ProgramData/HTMLHelp/Artwork/ttViewImageIntensityDialog.gif
+  ProgramData/HTMLHelp/Artwork/ttViewImageIntensityDialogWindowing.gif
+  ProgramData/HTMLHelp/Artwork/ttViewImageIntensityDialogWindowingCurve.gif
+  ProgramData/HTMLHelp/Artwork/ttViewImageSliceWindowClick.gif
+  ProgramData/HTMLHelp/Artwork/ttViewImageSliceWindowZoom.gif
 )
 
 # The sources needed to build the SNAP logic library
