@@ -106,9 +106,6 @@ PreprocessingUILogic
   unsigned int lower = settings.GetLowerThreshold();
   unsigned int upper = settings.GetUpperThreshold();
 
-  // Make sure that the specified range is valid
-  assert(lower <= upper);
-
   // Set the ranges for the two thresholds.  These ranges do not require the
   // lower slider to be less than the upper slider, that will be corrected
   // dynamically as the user moves the sliders
@@ -129,6 +126,13 @@ PreprocessingUILogic
   //m_InThresholdSteepness->maximum(iMax-iMin);
   m_InThresholdSteepness->minimum(1);
   m_InThresholdSteepness->maximum(10);
+
+  // Make sure that the specified range is valid
+  if(lower > upper)
+    {
+    lower = (unsigned int) (0.67 * iMin + 0.33 * iMax);
+    upper = (unsigned int) (0.33 * iMin + 0.67 * iMax);
+    }
 
   // Make sure the current values of the upper and lower threshold are 
   // within the bounds (Nathan Moon)
