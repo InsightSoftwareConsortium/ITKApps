@@ -11,6 +11,11 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 
   const unsigned int Dimension = 3;
 
+  const float windowMinimum  = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
+  const float windowMaximum  = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
+  const float outputMinimum  = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ) );
+  const float outputMaximum  = atof( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ) );
+
   try 
   {
   switch( info->InputVolumeScalarType )
@@ -21,13 +26,13 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       typedef  itk::Image< PixelType, Dimension >   ImageType; 
       typedef  itk::IntensityWindowingImageFilter< ImageType,  ImageType >   FilterType;
       VolView::PlugIn::FilterModule< FilterType > module;
-      module.SetPlugInfo( info );
+      module.SetPluginInfo( info );
       module.SetUpdateMessage("Transforming intensities with a IntensityWindowing function...");
       // Set the parameters on it
-      module.GetFilter()->SetWindowMinimum(  atoi( info->GUIItems[ 0 ].CurrentValue) );
-      module.GetFilter()->SetWindowMaximum(  atoi( info->GUIItems[ 1 ].CurrentValue) );
-      module.GetFilter()->SetOutputMinimum(  atoi( info->GUIItems[ 2 ].CurrentValue) );
-      module.GetFilter()->SetOutputMaximum(  atoi( info->GUIItems[ 3 ].CurrentValue) );
+      module.GetFilter()->SetWindowMinimum( static_cast<PixelType>( windowMinimum  ) );
+      module.GetFilter()->SetWindowMaximum( static_cast<PixelType>( windowMaximum  ) );
+      module.GetFilter()->SetOutputMinimum( static_cast<PixelType>( outputMinimum  ) );
+      module.GetFilter()->SetOutputMaximum( static_cast<PixelType>( outputMaximum  ) );
       // Execute the filter
       module.ProcessData( pds  );
       break; 
@@ -38,13 +43,13 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       typedef  itk::Image< PixelType, Dimension >   ImageType; 
       typedef  itk::IntensityWindowingImageFilter< ImageType,  ImageType >   FilterType;
       VolView::PlugIn::FilterModule< FilterType > module;
-      module.SetPlugInfo( info );
+      module.SetPluginInfo( info );
       module.SetUpdateMessage("Transforming intensities with a IntensityWindowing function...");
       // Set the parameters on it
-      module.GetFilter()->SetWindowMinimum(  atoi( info->GUIItems[ 0 ].CurrentValue) );
-      module.GetFilter()->SetWindowMaximum(  atoi( info->GUIItems[ 1 ].CurrentValue) );
-      module.GetFilter()->SetOutputMinimum(  atoi( info->GUIItems[ 2 ].CurrentValue) );
-      module.GetFilter()->SetOutputMaximum(  atoi( info->GUIItems[ 3 ].CurrentValue) );
+      module.GetFilter()->SetWindowMinimum( static_cast<PixelType>( windowMinimum  ) );
+      module.GetFilter()->SetWindowMaximum( static_cast<PixelType>( windowMaximum  ) );
+      module.GetFilter()->SetOutputMinimum( static_cast<PixelType>( outputMinimum  ) );
+      module.GetFilter()->SetOutputMaximum( static_cast<PixelType>( outputMaximum  ) );
       // Execute the filter
       module.ProcessData( pds );
       break; 
@@ -53,7 +58,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
   }
   catch( itk::ExceptionObject & except )
   {
-    info->DisplayError( info, except.what() ); 
+    info->SetProperty( info, VVP_ERROR, except.what() ); 
     return -1;
   }
   return 0;
@@ -62,37 +67,39 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 
 static int UpdateGUI(void *inf)
 {
+  char tmp[1024];
   vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
-  info->GUIItems[0].Label = "Window Minimum";
-  info->GUIItems[0].GUIType = VV_GUI_SCALE;
-  info->GUIItems[0].Default = "0";
-  info->GUIItems[0].Help = "Desired value for the minimum intensity of the input window.";
-  info->GUIItems[0].Hints = "0 255 1";
+  info->SetGUIProperty(info, 0, VVP_GUI_LABEL, "Window Minimum");
+  info->SetGUIProperty(info, 0, VVP_GUI_TYPE, VVP_GUI_SCALE);
+  info->SetGUIProperty(info, 0, VVP_GUI_DEFAULT, VolView::PlugIn::FilterModuleBase::GetInputVolumeScalarMinimum( info ) );
+  info->SetGUIProperty(info, 0, VVP_GUI_HELP, "Desired value for the minimum intensity of the input window.");
+  info->SetGUIProperty(info, 0, VVP_GUI_HINTS, VolView::PlugIn::FilterModuleBase::GetInputVolumeScalarRange( info ) );
 
-  info->GUIItems[1].Label = "Window Maximum";
-  info->GUIItems[1].GUIType = VV_GUI_SCALE;
-  info->GUIItems[1].Default = "255";
-  info->GUIItems[1].Help = "Desired value for the maximum intensity of the input window.";
-  info->GUIItems[1].Hints = "0 255 1";
+  info->SetGUIProperty(info, 1, VVP_GUI_LABEL, "Window Maximum");
+  info->SetGUIProperty(info, 1, VVP_GUI_TYPE, VVP_GUI_SCALE);
+  info->SetGUIProperty(info, 1, VVP_GUI_DEFAULT, VolView::PlugIn::FilterModuleBase::GetInputVolumeScalarMaximum( info ) );
+  info->SetGUIProperty(info, 1, VVP_GUI_HELP, "Desired value for the maximum intensity of the input window.");
+  info->SetGUIProperty(info, 1, VVP_GUI_HINTS, VolView::PlugIn::FilterModuleBase::GetInputVolumeScalarRange( info ) );
 
-  info->GUIItems[2].Label = "Output Minimum";
-  info->GUIItems[2].GUIType = VV_GUI_SCALE;
-  info->GUIItems[2].Default = "0";
-  info->GUIItems[2].Help = "Desired value for the minimum intensity of the output image.";
-  info->GUIItems[2].Hints = "0 255 1";
+  info->SetGUIProperty(info, 2, VVP_GUI_LABEL, "Output Minimum");
+  info->SetGUIProperty(info, 2, VVP_GUI_TYPE, VVP_GUI_SCALE);
+  info->SetGUIProperty(info, 2, VVP_GUI_DEFAULT, VolView::PlugIn::FilterModuleBase::GetInputVolumeScalarTypeMinimum( info ) );
+  info->SetGUIProperty(info, 2, VVP_GUI_HELP, "Desired value for the minimum intensity of the output image.");
+  info->SetGUIProperty(info, 2, VVP_GUI_HINTS, VolView::PlugIn::FilterModuleBase::GetInputVolumeScalarTypeRange( info ) );
 
-  info->GUIItems[3].Label = "Output Maximum";
-  info->GUIItems[3].GUIType = VV_GUI_SCALE;
-  info->GUIItems[3].Default = "255";
-  info->GUIItems[3].Help = "Desired value for the maximum intensity of the output image.";
-  info->GUIItems[3].Hints = "0 255 1";
+  info->SetGUIProperty(info, 3, VVP_GUI_LABEL, "Output Maximum");
+  info->SetGUIProperty(info, 3, VVP_GUI_TYPE, VVP_GUI_SCALE);
+  info->SetGUIProperty(info, 3, VVP_GUI_DEFAULT, VolView::PlugIn::FilterModuleBase::GetInputVolumeScalarTypeMaximum( info ) );
+  info->SetGUIProperty(info, 3, VVP_GUI_HELP, "Desired value for the maximum intensity of the output image.");
+  info->SetGUIProperty(info, 3, VVP_GUI_HINTS, VolView::PlugIn::FilterModuleBase::GetInputVolumeScalarTypeRange( info ) );
 
-  info->RequiredZOverlap = 0;
+  info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, "0");
   
-  info->OutputVolumeScalarType = info->InputVolumeScalarType;
+  info->OutputVolumeScalarType = 
+                       info->InputVolumeScalarType;
   info->OutputVolumeNumberOfComponents = 
-    info->InputVolumeNumberOfComponents;
+                       info->InputVolumeNumberOfComponents;
   memcpy(info->OutputVolumeDimensions,info->InputVolumeDimensions,
          3*sizeof(int));
   memcpy(info->OutputVolumeSpacing,info->InputVolumeSpacing,
@@ -111,20 +118,17 @@ void VV_PLUGIN_EXPORT vvITKIntensityWindowingInit(vtkVVPluginInfo *info)
   // setup information that never changes
   info->ProcessData = ProcessData;
   info->UpdateGUI   = UpdateGUI;
-  info->Name = "Intensity Windowing (ITK)";
-  info->TerseDocumentation = "Intensity Windowing Transform";
-  info->FullDocumentation = 
-    "This filters applies a pixel-wise intensity transform by using a IntensityWindowing function";
-  info->SupportsInPlaceProcessing = 0;
-  info->SupportsProcessingPieces = 1;
-  info->RequiredZOverlap = 0;
+  info->SetProperty(info, VVP_NAME, "Intensity Windowing (ITK)");
+  info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
+                                "Intensity Windowing Transform");
+  info->SetProperty(info, VVP_FULL_DOCUMENTATION,
+    "This filters applies a pixel-wise intensity transform by using a IntensityWindowing function");
+  info->SetProperty(info, VVP_SUPPORTS_IN_PLACE_PROCESSING, "0");
+  info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "1");
+  info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "4");
+  info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP,           "0");
+  info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "1"); // actually depends on pixel size
 
-  // Number of bytes required in intermediate memory per voxel
-  info->PerVoxelMemoryRequired = 1; // actually depends on the input pixel size
-  
-  /* setup the GUI components */
-  info->NumberOfGUIItems = 4;
-  info->GUIItems = (vtkVVGUIItem *)malloc(info->NumberOfGUIItems*sizeof(vtkVVGUIItem));
 }
 
 }
