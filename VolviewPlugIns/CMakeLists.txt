@@ -55,6 +55,7 @@ SET (PLUGINS
   vvITKCurvatureFlow 
   vvITKFastMarching
   vvITKFastMarchingModule
+  vvITKGeodesicActiveContourModule
   vvITKGradientAnisotropicDiffusion
   vvITKGradientMagnitude
   vvITKGradientMagnitudeRecursiveGaussian
