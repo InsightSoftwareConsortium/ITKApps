@@ -1,6 +1,6 @@
 /* perform segmentation using the confidence connected image filter */
 
-#include "vvITKFilterModule.h"
+#include "vvITKFilterModuleDoubleOutput.h"
 
 #include "itkConfidenceConnectedImageFilter.h"
 
@@ -38,7 +38,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       typedef  InputImageType::IndexType            IndexType;
       typedef  itk::ConfidenceConnectedImageFilter< InputImageType,  
                                                     OutputImageType >   FilterType;
-      VolView::PlugIn::FilterModule< FilterType > module;
+      VolView::PlugIn::FilterModuleDoubleOutput< FilterType > module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Confidence Connected Region Growing...");
       // Set the parameters on it
@@ -60,7 +60,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       typedef  InputImageType::IndexType            IndexType;
       typedef  itk::ConfidenceConnectedImageFilter< InputImageType,  
                                                     OutputImageType >   FilterType;
-      VolView::PlugIn::FilterModule< FilterType > module;
+      VolView::PlugIn::FilterModuleDoubleOutput< FilterType > module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Confidence Connected Region Growing...");
       // Set the parameters on it
@@ -114,8 +114,8 @@ static int UpdateGUI(void *inf)
 
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, "0");
   
-  info->OutputVolumeScalarType = VTK_UNSIGNED_CHAR;
-  info->OutputVolumeNumberOfComponents = 1;
+  info->OutputVolumeScalarType = info->InputVolumeScalarType;
+  info->OutputVolumeNumberOfComponents = 2; // original input in first component and segmentation in second component
 
   memcpy(info->OutputVolumeDimensions,info->InputVolumeDimensions,
          3*sizeof(int));
