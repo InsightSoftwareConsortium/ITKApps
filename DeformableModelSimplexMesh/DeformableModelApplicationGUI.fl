@@ -75,17 +75,22 @@ class DeformableModelApplicationGUI {open : {public DeformableModelApplicationBa
       Fl_Value_Input m_InternalForceValueInput {
         label {Internal: }
         callback {m_DeformFilter->SetAlpha( o->value() );}
-        xywh {505 770 50 25} maximum 10 step 0.1 value 0.2
+        xywh {482 770 50 25} maximum 10 step 0.1 value 0.2
       }
       Fl_Value_Input m_ExternalForceValueInput {
         label {External: }
         callback {m_DeformFilter->SetBeta( o->value() );}
-        xywh {650 770 50 25} maximum 10 step 0.1 value 0.1
+        xywh {602 770 50 25} maximum 10 step 0.1 value 0.1
       }
       Fl_Value_Input m_BalloonForceValueInput {
-        label {Balloon: : }
-        callback {m_DeformFilter->SetKappa( o->value() );} selected
-        xywh {790 770 50 25} maximum 10 step 0.1 value 0.5
+        label {Balloon: }
+        callback {m_DeformFilter->SetKappa( o->value() );}
+        xywh {715 770 50 25} maximum 10 step 0.1 value 0.5
+      }
+      Fl_Value_Input m_IterationsValueInput {
+        label {N:: }
+        callback {m_DeformFilter->SetIterations( (int)(o->value()) );} selected
+        xywh {802 770 50 25} maximum 1000 step 1 value 10
       }
     }
   }

@@ -125,6 +125,8 @@ protected:
   SimplexFilterType::Pointer              m_SimplexFilter;
 
   SimplexMeshType::Pointer                m_SimplexMesh;
+
+  SimplexMeshType::Pointer                m_SimplexMeshToShow;
  
   DeformFilterType::Pointer               m_DeformFilter;
 

@@ -86,7 +86,7 @@ public:
    virtual void Hide();
    virtual void Quit();
    virtual void LoadMesh();
-   virtual void LoadMeshProcessing();
+   virtual void RefreshMeshVisualization();
    virtual void DeformMesh();
    virtual void ComputeInternalForces();
    virtual void Load();
@@ -99,15 +99,12 @@ public:
    virtual void ProcessSagittalViewInteraction( void );
   
    virtual void SyncAllViews(void);
-
-   // leila's additions
-
+   virtual void IterationCallback();
 
    typedef itk::CellInterfaceVisitorImplementation< SimplexMeshType::PixelType,
                                                     SimplexMeshType::CellTraits,
                                                     lineType, 
                                                     VistVTKCellsClass>  LineVisitor;
-
    
 private:
 

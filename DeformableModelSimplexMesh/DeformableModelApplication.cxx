@@ -66,7 +66,8 @@ DeformableModelApplication
   m_DeformFilter->SetAlpha( alpha );
   m_DeformFilter->SetBeta( beta );
   m_DeformFilter->SetKappa( kappa );
-  m_DeformFilter->SetRigidity( 0 );
+
+  m_DeformFilter->SetRigidity( 1 );
  
   m_InternalForcesComputed = false;
 }
@@ -134,10 +135,11 @@ DeformableModelApplication
   m_SphereMeshSource->SetCenter(m_SeedPoint);
   m_SimplexFilter->Update();
 
-  m_SimplexMesh  = m_SimplexFilter->GetOutput();
-  m_SimplexMesh->DisconnectPipeline();
+  m_SimplexMesh = m_SimplexFilter->GetOutput();
 
-  this->LoadMeshProcessing();
+  m_SimplexMeshToShow = m_SimplexMesh;
+
+  this->RefreshMeshVisualization();
    
   // force a redraw
   axialView->redraw();
@@ -150,11 +152,11 @@ DeformableModelApplication
 
 void
 DeformableModelApplication
-::LoadMeshProcessing()
+::RefreshMeshVisualization()
 {
   
-  CellIterator cellIterator = m_SimplexMesh->GetCells()->Begin();
-  CellIterator cellEnd      = m_SimplexMesh->GetCells()->End();
+  CellIterator cellIterator = m_SimplexMeshToShow->GetCells()->Begin();
+  CellIterator cellEnd      = m_SimplexMeshToShow->GetCells()->End();
   int i=0;
   while (cellIterator != cellEnd)
     {
@@ -167,7 +169,7 @@ DeformableModelApplication
     ++cellIterator;
     }
 
- int numPoints =  m_SimplexMesh->GetNumberOfPoints();
+ int numPoints =  m_SimplexMeshToShow->GetNumberOfPoints();
 
  if (numPoints == 0)
     {
@@ -187,7 +189,7 @@ DeformableModelApplication
 
  // iterate over all the points in the itk mesh filling in
   // the vtkPoints object as we go
- SimplexMeshType::PointsContainer::Pointer points = m_SimplexMesh->GetPoints();
+ SimplexMeshType::PointsContainer::Pointer points = m_SimplexMeshToShow->GetPoints();
  for(SimplexMeshType::PointsContainer::Iterator i = points->Begin();
      i != points->End(); ++i)
     {
@@ -210,7 +212,7 @@ DeformableModelApplication
 
  //set up the visitors
  int vtkCellCount = 0; // running counter for current cell inserted into vtk
- int numCells = m_SimplexMesh->GetNumberOfCells();
+ int numCells = m_SimplexMeshToShow->GetNumberOfCells();
  int *types = new int[numCells]; //type array for vtk
 
  //create vtk cells and estimate the size
@@ -224,7 +226,7 @@ DeformableModelApplication
 
  mv->AddVisitor(lv);
 
- m_SimplexMesh->Accept(mv);
+ m_SimplexMeshToShow->Accept(mv);
 
 
  vgrid->SetLines(cells);
@@ -259,6 +261,17 @@ DeformableModelApplication
 
 
 void 
+DeformableModelApplication::IterationCallback()
+{
+  // The visualization cannot be refreshed at every iteration because the
+  // deformable model filter do not fully recomputes its output at every
+  // iteration. It only does it when the iterations are completed.
+  // 
+  // this->DeformableModelApplicationBase::IterationCallback();
+  //
+}
+
+void 
 DeformableModelApplication
 ::DeformMesh()
 {
@@ -266,19 +279,23 @@ DeformableModelApplication
     {
     this->ComputeInternalForces();
     }
+ 
+  const unsigned int numberOfIterationsToGo = (unsigned int)(m_IterationsValueInput->value());
   
-  m_SimplexMesh->DisconnectPipeline();
-
-  for (unsigned int i=0; i< 10; i++ ) 
+  for( unsigned int i=0; i<numberOfIterationsToGo; i++ )
     {
+    m_SimplexMesh->DisconnectPipeline();
+
     m_DeformFilter->SetInput( m_SimplexMesh );
-    m_DeformFilter->SetIterations(10); 
+
+    m_DeformFilter->SetIterations(1); 
     m_DeformFilter->Update();
 
     m_SimplexMesh =  m_DeformFilter->GetOutput();
-    m_SimplexMesh->DisconnectPipeline();
+    
+    m_SimplexMeshToShow  = m_SimplexMesh;
 
-    this->LoadMeshProcessing();
+     this->RefreshMeshVisualization();
      
     // force a redraw
     axialView->redraw();
@@ -288,8 +305,9 @@ DeformableModelApplication
 
     Fl::check(); 
     }
-    
 }
+   
+
 void 
 DeformableModelApplication
 ::Load()
