@@ -20,7 +20,7 @@
 #include "itkObject.h"
 #include "itkPermuteAxesImageFilter.h"
 #include "itkFlipImageFilter.h"
-
+#include "itkAffineTransform.h"
 
 /** \class Preprocessor
  *
