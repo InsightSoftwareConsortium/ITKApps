@@ -34,6 +34,8 @@ class RigidRegistrator : public ImageRegistrationMethod < TImage, TImage >
     typedef typename TImage::PixelType PixelType ;
     typedef typename TImage::RegionType RegionType ;
 
+    typedef typename Superclass::OptimizerType           OptimizerType;
+
     /** preprocessing related typedefs */
     typedef VersorRigid3DTransform<double>      TransformType ;
 
