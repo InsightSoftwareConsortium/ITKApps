@@ -152,6 +152,9 @@ SUBDIRS(MultichannelTissueClassificationValidation)
 # Build the DICOMApp example to output raw and png versions of DICOM file
 SUBDIRS(DICOMApp)
 
+#Build the examples of various fourth-order level set PDEs 
+SUBDIRS (LevelSetSurfaceProcessing)
+
 # Applications requiring MetaImages and Fltk GUI 
 IF(FLTK_FOUND)
   IF(WIN32)
