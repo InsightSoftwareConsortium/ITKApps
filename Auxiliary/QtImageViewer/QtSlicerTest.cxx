@@ -34,7 +34,7 @@ int main( int argc, char* argv[] )
 
   ReaderType::Pointer reader = ReaderType::New();
   
-  QString s = QFileDialog::getOpenFileName(".","Images (*.mha)", 0, "open file dialog","Chose an image filename" );
+  QString s = QFileDialog::getOpenFileName(".","Images (*.*)", 0, "open file dialog","Chose an image filename" );
 
   reader->SetFileName( s.latin1() );
   
