@@ -37,7 +37,7 @@ public:
   void SetParameters(float intensityMin, float intensityMax,
                      float exponent, float kappa)
   {
-    m_KappaFactor = 1.0f / (kappa * kappa);
+    m_KappaFactor = 1.0f / kappa;
     m_Exponent = exponent;
     m_IntensityBase = intensityMin;
     m_IntensityScale = 1.0f / (intensityMax - intensityMin);
@@ -46,7 +46,7 @@ public:
   inline TOutput operator()(const TInput &x)
   {
     float xNorm = (static_cast<float>(x)-m_IntensityBase)*m_IntensityScale;
-    float y = 1.0 / (1.0 + pow(xNorm,m_Exponent) * m_KappaFactor);
+    float y = 1.0 / (1.0 + pow(xNorm * m_KappaFactor,m_Exponent));
     return static_cast<TOutput> (y);
   }
 
