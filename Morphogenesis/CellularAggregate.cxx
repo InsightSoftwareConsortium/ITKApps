@@ -52,6 +52,7 @@ CellularAggregate
 
   m_FrictionForce = 1.0f;
 
+  m_DrawLines = false;
 }
 
 
@@ -115,51 +116,54 @@ CellularAggregate
   }
  
   // Draw edges connecting neighbor cells
-  glBegin(GL_LINES);
-  cellIt = m_Mesh->GetPointData()->Begin();
-  while( cellIt != end )
+  if( m_DrawLines )
     {
-    Cell * cell = cellIt.Value();
-    const IdentifierType id1 = cell->GetSelfIdentifier();
-
-    PointType position1;
-    PointType position2;
-
-    m_Mesh->GetPoint( id1, &position1 );
-
-    VoronoiRegionAutoPointer voronoiRegion;
-    this->GetVoronoi( id1, voronoiRegion );
-              
-    VoronoiRegionType::PointIdIterator neighbor = voronoiRegion->PointIdsBegin();
-    VoronoiRegionType::PointIdIterator end      = voronoiRegion->PointIdsEnd();
-
-    while( neighbor != end )
+    glBegin(GL_LINES);
+    cellIt = m_Mesh->GetPointData()->Begin();
+    while( cellIt != end )
       {
-      const IdentifierType id2 = (*neighbor);  
-      
-      if( !m_Mesh->GetPoint( id2, &position2 ) )
+      Cell * cell = cellIt.Value();
+      const IdentifierType id1 = cell->GetSelfIdentifier();
+
+      PointType position1;
+      PointType position2;
+
+      m_Mesh->GetPoint( id1, &position1 );
+
+      VoronoiRegionAutoPointer voronoiRegion;
+      this->GetVoronoi( id1, voronoiRegion );
+                
+      VoronoiRegionType::PointIdIterator neighbor = voronoiRegion->PointIdsBegin();
+      VoronoiRegionType::PointIdIterator end      = voronoiRegion->PointIdsEnd();
+
+      while( neighbor != end )
         {
-        ++neighbor;
-        continue;// if the neigbor has been removed, skip it
+        const IdentifierType id2 = (*neighbor);  
+        
+        if( !m_Mesh->GetPoint( id2, &position2 ) )
+          {
+          ++neighbor;
+          continue;// if the neigbor has been removed, skip it
+          }
+
+        switch( Cell::Dimension )
+        {
+        case 2:
+          glVertex3f( position1[0], position1[1], 0.0 );
+          glVertex3f( position2[0], position2[1], 0.0 );
+          break;
+        case 3:
+          glVertex3f( position1[0], position1[1], position1[2] );
+          glVertex3f( position2[0], position2[1], position2[2] );
+          break;
         }
 
-      switch( Cell::Dimension )
-      {
-      case 2:
-        glVertex3f( position1[0], position1[1], 0.0 );
-        glVertex3f( position2[0], position2[1], 0.0 );
-        break;
-      case 3:
-        glVertex3f( position1[0], position1[1], position1[2] );
-        glVertex3f( position2[0], position2[1], position2[2] );
-        break;
+        ++neighbor;
+        }
+      cellIt++;
       }
-
-      ++neighbor;
-      }
-    cellIt++;
-    }
     glEnd();
+    }
 
 }
 
