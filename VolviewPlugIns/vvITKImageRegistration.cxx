@@ -3,13 +3,13 @@
 
 #include "vtkVVPluginAPI.h"
 
-#include "itkCenteredQuaternionRigidTransform.h"
 #include "itkCenteredTransformInitializer.h"
 #include "itkImage.h"
 #include "itkImageRegistrationMethod.h"
 #include "itkImportImageFilter.h"
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkNormalizedCorrelationImageToImageMetric.h"
+#include "itkQuaternionRigidTransform.h"
 #include "itkRegularStepGradientDescentOptimizer.h"
 #include "itkResampleImageFilter.h"
 #include "itkShrinkImageFilter.h"
@@ -28,7 +28,7 @@ public:
   typedef itk::Image< PixelType, 3 >                 ImageType; 
   typedef itk::ImportImageFilter< PixelType, 3>      ImportFilterType;
   typedef itk::ShrinkImageFilter<ImageType, ImageType> ShrinkFilterType;
-  typedef itk::CenteredQuaternionRigidTransform< double > TransformType;
+  typedef itk::QuaternionRigidTransform< double >    TransformType;
   typedef itk::RegularStepGradientDescentOptimizer   OptimizerType;
   typedef itk::NormalizedCorrelationImageToImageMetric<
     ImageType, ImageType> MetricType;
