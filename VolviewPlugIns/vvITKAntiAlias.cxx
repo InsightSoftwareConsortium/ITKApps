@@ -9,6 +9,14 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 
   vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
+  // make sure there is only one component of input data
+  if (info->InputVolumeNumberOfComponents != 1)
+    {
+    info->SetProperty( info, VVP_ERROR, 
+                       "The AntiAlias filter only works with single component data" ); 
+    return -1;
+    }
+  
   const unsigned int Dimension = 3;
 
   typedef   float       InternalPixelType;
@@ -53,6 +61,11 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.ProcessData( pds );
       break; 
       }
+    default:
+      info->SetProperty( info, VVP_ERROR, 
+                         "The AntiAlias filter only works with unsigned char and unsigned short data" ); 
+      return -1;
+      break;
     }
   }
   catch( itk::ExceptionObject & except )
