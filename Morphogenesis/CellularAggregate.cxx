@@ -860,7 +860,7 @@ CellularAggregate
   SubstrateType::SizeType  substrateSize = 
                     substrate->GetBufferedRegion().GetSize();
 
-  const double * spacing = substrate->GetSpacing();
+  const double * spacing = substrate->GetSpacing().GetDataPointer();
 
   PointType centeredPosition;
   for(unsigned int i=0; i<Cell::Dimension; i++)

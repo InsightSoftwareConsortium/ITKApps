@@ -179,7 +179,7 @@ IRISMeshPipeline
     m_GaussianFilter->SetVariance(variance.data_block());
 
     // Sigma is in millimeters
-    const double *spacing = m_InputImage->GetSpacing();
+    const InputImageType::SpacingType &spacing = m_InputImage->GetSpacing();
     m_VTKGaussianFilter->SetStandardDeviation(
       sigma / spacing[0], sigma / spacing[1], sigma / spacing[2]);
     m_VTKGaussianFilter->SetRadiusFactors(
