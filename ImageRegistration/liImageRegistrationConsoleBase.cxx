@@ -320,7 +320,7 @@ liImageRegistrationConsoleBase
   case patternIntensity:
     {
     m_ImageRegistrationMethod->SetMetric( 
-                 PatternIntensityImageMetricType::New() );
+                 MeanReciprocalSquareDifferenceImageMetricType::New() );
     break;
     }
 

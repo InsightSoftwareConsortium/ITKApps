@@ -26,7 +26,7 @@
 #include <itkMutualInformationImageToImageMetric.h>
 #include <itkMeanSquaresImageToImageMetric.h>
 #include <itkNormalizedCorrelationImageToImageMetric.h>
-#include <itkPatternIntensityImageToImageMetric.h>
+#include <itkMeanReciprocalSquareDifferenceImageToImageMetric.h>
 
 #include <itkGradientDescentOptimizer.h>
 #include <itkRegularStepGradientDescentOptimizer.h>
@@ -127,10 +127,10 @@ public:
                                   MovingImageType 
                                          > NormalizedCorrelationImageMetricType;
 
-  typedef   itk::PatternIntensityImageToImageMetric< 
+  typedef   itk::MeanReciprocalSquareDifferenceImageToImageMetric< 
                                   FixedImageType,
                                   MovingImageType 
-                                         > PatternIntensityImageMetricType;
+                                         > MeanReciprocalSquareDifferenceImageMetricType;
 
   typedef   itk::ResampleImageFilter< MovingImageType,
                                       MovingImageType>  ResampleFilterType;
