@@ -30,6 +30,42 @@
 
 #include "SNAPCommon.h"
 
+
+ 
+inline Vector3i GetValueWithDefault(const std::string &source, bool isNull, Vector3i defaultValue)
+{
+  // Initialize with the default value
+  Vector3i returnValue = defaultValue;
+
+  // Default value is returned if the entry is Null
+  if(isNull)
+    return returnValue;
+
+  // Try to access the value using c++ formatting
+  IRISIStringStream iss(source);
+  iss >> returnValue;
+  
+  // Proceed as if the operation succeeded
+  return returnValue;
+}
+
+inline Vector2i GetValueWithDefault(const std::string &source, bool isNull, Vector2i defaultValue)
+{
+  // Initialize with the default value
+  Vector2i returnValue = defaultValue;
+
+  // Default value is returned if the entry is Null
+  if(isNull)
+    return returnValue;
+
+  // Try to access the value using c++ formatting
+  IRISIStringStream iss(source);
+  iss >> returnValue;
+  
+  // Proceed as if the operation succeeded
+  return returnValue;
+}
+
 template <class T>
 inline T GetValueWithDefault(const std::string &source, bool isNull, T defaultValue)
 {
@@ -121,6 +157,7 @@ public:
     else
       return m_String;
   }
+  
 
   Vector3i operator[](const Vector3i &defaultValue)
   {
