@@ -276,7 +276,7 @@ ImageSliceViewer
 
   // Convert display point to world point
   double wpoint[4];
-  const double z = m_SliceNum / ( m_FarPlane - m_NearPlane );
+
   m_Renderer->SetDisplayPoint( x, y, 0 );
   m_Renderer->DisplayToWorld();
   m_Renderer->GetWorldPoint( wpoint );

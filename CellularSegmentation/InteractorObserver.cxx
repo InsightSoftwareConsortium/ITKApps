@@ -34,7 +34,7 @@ InteractorObserver
 
 void 
 InteractorObserver
-::Execute(vtkObject * caller, unsigned long eventId, void *callData)
+::Execute(vtkObject * caller, unsigned long eventId, void *)
 {
   if ( eventId == ::vtkCommand::LeftButtonPressEvent )
     {
