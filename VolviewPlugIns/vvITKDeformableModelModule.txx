@@ -34,8 +34,15 @@ DeformableModelModule<TInputPixelType>
     m_DeformableModelFilter->SetGradient( m_GradientFilter->GetOutput()           );
 
     // Allow progressive release of memory as the pipeline is executed
-    m_GradientMagnitudeFilter->ReleaseDataFlagOn();
     m_GradientFilter->ReleaseDataFlagOn();
+    m_GradientMagnitudeFilter->ReleaseDataFlagOn();
+
+    // Set the Observer for updating progress in the GUI
+    m_MeshSource->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
+    m_GradientFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
+    m_GradientMagnitudeFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
+    m_DeformableModelFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
+
 }
 
 
@@ -51,107 +58,6 @@ DeformableModelModule<TInputPixelType>
 
 
 
-/*
- *    Define the center of the sphere used to initialize the deformable model.
- */
-template <class TInputPixelType >
-void 
-DeformableModelModule<TInputPixelType>
-::SetEllipsoidCenter( float centerX, float centerY, float centerZ )
-{
-  PointType center;
-  center[0] = centerX;
-  center[1] = centerY;
-  center[2] = centerZ;
-  m_MeshSource->SetCenter( center );
-}
-
-
-
-/*
- *    Define the radius of the sphere used to initialize the deformable model.
- */
-template <class TInputPixelType >
-void 
-DeformableModelModule<TInputPixelType>
-::SetEllipsoidRadius( float rx, float ry, float rz )
-{
-  PointType radius;
-  radius[0] = rx;
-  radius[1] = ry;
-  radius[2] = rz;
-  m_MeshSource->SetScale( radius );
-}
-
-
-/*
- *  Set the Sigma value for the Gradient Magnitude filter
- */
-template <class TInputPixelType >
-void 
-DeformableModelModule<TInputPixelType>
-::SetSigma( float value )
-{
-  m_GradientMagnitudeFilter->SetSigma( value );
-  m_GradientFilter->SetSigma( value );
-}
-
-
-
-/*
- *  Set the Stiffness of the deformable model.
- */
-template <class TInputPixelType >
-void 
-DeformableModelModule<TInputPixelType>
-::SetStiffness( float value )
-{
-  itk::CovariantVector<double, 2>   stiffnessVector;
-  stiffnessVector[0] = value;
-  stiffnessVector[1] = value;
-  m_DeformableModelFilter->SetStiffness( stiffnessVector );
-}
-
-
-/*
- *  Set time Step
- */
-template <class TInputPixelType >
-void 
-DeformableModelModule<TInputPixelType>
-::SetTimeStep( float value )
-{
-  m_DeformableModelFilter->SetTimeStep( value );
-}
-
-
-
-/*
- *  Set the factor for weighting external forces.
- */
-template <class TInputPixelType >
-void 
-DeformableModelModule<TInputPixelType>
-::SetExternalForceWeight( float value )
-{
-  m_DeformableModelFilter->SetGradientMagnitude( value );
-}
-
-
-
-/*
- *  Set the number of iterations 
- */
-template <class TInputPixelType >
-void 
-DeformableModelModule<TInputPixelType>
-::SetNumberOfIterations( unsigned int value )
-{
-  m_DeformableModelFilter->SetStepThreshold( value );
-}
-
-
-
 
 /*
  *  Performs the actual filtering on the data 
@@ -162,13 +68,64 @@ DeformableModelModule<TInputPixelType>
 ::ProcessData( const vtkVVProcessDataStruct * pds )
 {
 
+  this->SetUpdateMessage("Computing Deformable Model...");
+
+  vtkVVPluginInfo * info = this->GetPluginInfo();
+
+  const float radiusX               = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
+  const float radiusY               = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
+  const float radiusZ               = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ));
+  const float sigma                 = atof( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ));
+  const float stiffness             = atof( info->GetGUIProperty(info, 4, VVP_GUI_VALUE ));
+  const float externalForceWeight   = atof( info->GetGUIProperty(info, 5, VVP_GUI_VALUE ));
+  const float timeStep              = atof( info->GetGUIProperty(info, 6, VVP_GUI_VALUE ));
+
+  const unsigned int numberOfIterations  = atoi( info->GetGUIProperty(info, 7, VVP_GUI_VALUE ));
+  const unsigned int resolutionX         = atoi( info->GetGUIProperty(info, 8, VVP_GUI_VALUE ));
+  const unsigned int resolutionY         = atoi( info->GetGUIProperty(info, 9, VVP_GUI_VALUE ));
+
+  const unsigned int numberOfSeeds = info->NumberOfMarkers;
+  if( numberOfSeeds < 1 )
+    {
+    info->SetProperty( info, VVP_ERROR, "Please select the center of the initial spherical model using the 3D Markers in the Annotation menu" ); 
+    return;
+    }
+
+  PointType center;
+  center[0] = info->Markers[0];
+  center[1] = info->Markers[0];
+  center[2] = info->Markers[0];
+  m_MeshSource->SetCenter( center );
+
+  PointType radius;
+  radius[0] = radiusX;
+  radius[1] = radiusY;
+  radius[2] = radiusZ;
+  m_MeshSource->SetScale( radius );
+
+  m_GradientMagnitudeFilter->SetSigma( sigma );
+  m_GradientFilter->SetSigma( sigma );
+
+  itk::CovariantVector<double, 2>   stiffnessVector;
+  stiffnessVector[0] = stiffness;
+  stiffnessVector[1] = stiffness;
+  m_DeformableModelFilter->SetStiffness( stiffnessVector );
+
+  m_DeformableModelFilter->SetGradientMagnitude( externalForceWeight );
+  m_DeformableModelFilter->SetTimeStep( timeStep );
+  m_DeformableModelFilter->SetStepThreshold( numberOfIterations );
+
+  m_MeshSource->SetResolutionX( resolutionX );
+  m_MeshSource->SetResolutionY( resolutionY );
+
+  ofs.open("track.txt");
+
   SizeType   size;
   IndexType  start;
 
   double     origin[3];
   double     spacing[3];
 
-  const vtkVVPluginInfo * info = this->GetPluginInfo();
 
   size[0]     =  info->InputVolumeDimensions[0];
   size[1]     =  info->InputVolumeDimensions[1];
@@ -204,17 +161,27 @@ DeformableModelModule<TInputPixelType>
                                     totalNumberOfPixels,
                                     importFilterWillDeleteTheInputBuffer );
 
-  // Set the Observer for updating progress in the GUI
-  m_GradientMagnitudeFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
-  m_DeformableModelFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
+  ofs << "Just before start Updating() " << std::endl;
+
+  m_DeformableModelFilter->Print( ofs );
+
+  ofs << std::endl << std::endl;
 
   // Execute the filters and progressively remove temporary memory
   m_MeshSource->Update();
   m_GradientMagnitudeFilter->Update();
   m_GradientFilter->Update();
- // m_DeformableModelFilter->Update();
+  m_DeformableModelFilter->Update();
 
   this->PostProcessData( pds );
+
+  char tmp[1024];
+  sprintf( tmp, "The resulting mesh has\n %d Points \n %d Cells ", 
+                                m_DeformableModelFilter->GetOutput()->GetNumberOfPoints(),
+                                m_DeformableModelFilter->GetOutput()->GetNumberOfCells() );
+  info->SetProperty( info, VVP_REPORT_TEXT, tmp );
+
+  ofs.close();
 
 } // end of ProcessData
 
@@ -230,6 +197,7 @@ void
 DeformableModelModule<TInputPixelType>
 ::PostProcessData( const vtkVVProcessDataStruct * pds )
 {
+
 
   // A change in ProcessData signature could prevent this const_cast...
   vtkVVProcessDataStruct * opds = const_cast<vtkVVProcessDataStruct *>( pds );
@@ -253,6 +221,7 @@ DeformableModelModule<TInputPixelType>
 
   while( pointItr != pointsEnd )
     {
+    ofs << pointItr.Value() << std::endl;
     *outputPointsItr++ = pointItr.Value()[0]; 
     *outputPointsItr++ = pointItr.Value()[1]; 
     *outputPointsItr++ = pointItr.Value()[2]; 
@@ -291,12 +260,14 @@ DeformableModelModule<TInputPixelType>
     {
     const CellType * cell = cellItr.Value();
     const unsigned int np = cell->GetNumberOfPoints();
+    ofs << std::endl << np << "  ";
     *cellsTopItr = np;
     ++cellsTopItr;
     PointIdIterator pointIdItr = cell->PointIdsBegin();
     PointIdIterator pointIdEnd = cell->PointIdsEnd();
     while( pointIdItr != pointIdEnd )
       {
+      ofs <<  *pointIdItr << "  ";
       *cellsTopItr = *pointIdItr;
       ++cellsTopItr;
       ++pointIdItr;

@@ -94,16 +94,6 @@ public:
     DeformableModelModule();
    ~DeformableModelModule();
 
-    void SetEllipsoidCenter( float rx, float ry, float rz );
-    void SetEllipsoidRadius( float rx, float ry, float rz );
-
-    void SetSigma( float value );
-
-    void SetStiffness( float value );
-    void SetExternalForceWeight( float value );
-    void SetTimeStep( float value );
-    void SetNumberOfIterations( unsigned int value );
-
     void ProcessData( const vtkVVProcessDataStruct * pds );
     void PostProcessData( const vtkVVProcessDataStruct * pds );
 
@@ -114,6 +104,7 @@ private:
     typename DeformableModelFilterType::Pointer     m_DeformableModelFilter;
     typename MeshSourceType::Pointer                m_MeshSource;
 
+    std::ofstream ofs;
 };
 
 } // end of namespace PlugIn
