@@ -27,7 +27,9 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     {
     case VTK_UNSIGNED_CHAR:
       {
-      VolView::PlugIn::FilterModuleWithCasting< unsigned char, FilterType > module;
+      VolView::PlugIn::FilterModuleWithCasting< unsigned char, 
+                                                FilterType,
+                                                unsigned char > module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Smoothing with Curvature Flow...");
       // Set the parameters on it
@@ -39,7 +41,9 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       }
     case VTK_UNSIGNED_SHORT:
       {
-      VolView::PlugIn::FilterModuleWithCasting< unsigned short, FilterType > module;
+      VolView::PlugIn::FilterModuleWithCasting< unsigned short, 
+                                                FilterType,
+                                                unsigned short > module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Smoothing with Curvature Flow...");
       // Set the parameters on it
@@ -79,8 +83,7 @@ static int UpdateGUI(void *inf)
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, "0");
   
   info->OutputVolumeScalarType = info->InputVolumeScalarType;
-  info->OutputVolumeNumberOfComponents = 
-    info->InputVolumeNumberOfComponents;
+  info->OutputVolumeNumberOfComponents = 1; 
   memcpy(info->OutputVolumeDimensions,info->InputVolumeDimensions,
          3*sizeof(int));
   memcpy(info->OutputVolumeSpacing,info->InputVolumeSpacing,

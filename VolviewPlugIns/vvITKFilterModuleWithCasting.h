@@ -20,17 +20,21 @@ namespace VolView
 namespace PlugIn
 {
 
-template <class TPixelType, class TFilterType >
+template <class TInputPixelType, class TFilterType, class TFinalPixelType >
 class FilterModuleWithCasting : public FilterModuleBase {
 
 public:
 
    // Instantiate the image types
-  typedef TPixelType                     InputPixelType;
-  typedef TFilterType                    FilterType;
+  typedef TInputPixelType                         InputPixelType;
+  typedef TFilterType                             FilterType;
 
   typedef typename FilterType::InputImageType     InternalImageType;
   typedef typename InternalImageType::PixelType   InternalPixelType;
+
+  typedef typename FilterType::OutputImageType    OutputImageType;
+
+  typedef typename TFinalPixelType                FinalPixelType;
 
   itkStaticConstMacro( Dimension, unsigned int, 
          itk::GetImageDimension< InternalImageType >::ImageDimension );
@@ -141,27 +145,27 @@ public:
     m_Filter->Update();
 
     // Copy the data (with casting) to the output buffer provided by the Plug In API
-    typename InternalImageType::ConstPointer outputImage =
+    typename OutputImageType::ConstPointer outputImage =
                                                m_Filter->GetOutput();
 
-    typedef itk::ImageRegionConstIterator< InternalImageType >  OutputIteratorType;
+    typedef itk::ImageRegionConstIterator< OutputImageType >  OutputIteratorType;
 
     OutputIteratorType ot( outputImage, outputImage->GetBufferedRegion() );
 
-    InputPixelType * outData = (InputPixelType *)(pds->outData);
+    FinalPixelType * outData = (FinalPixelType *)(pds->outData);
 
     ot.GoToBegin(); 
     while( !ot.IsAtEnd() )
       {
       // NOTE: some combination of ClampMacro and 
       // NumericTraits should be used here. 
-      // The code below is ok only for unsigned types in the InputPixelType...
+      // The code below is ok only for unsigned types in the FinalPixelType...
       InternalPixelType value = ot.Get();
       if( value < itk::NumericTraits<InternalPixelType>::Zero ) 
         {
         value = itk::NumericTraits<InternalPixelType>::Zero;
         }
-      *outData = static_cast< InputPixelType >( value );
+      *outData = static_cast< FinalPixelType >( value );
       ++ot;
       ++outData;
       }

@@ -28,7 +28,9 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     {
     case VTK_UNSIGNED_CHAR:
       {
-      VolView::PlugIn::FilterModuleWithCasting< unsigned char, FilterType > module;
+      VolView::PlugIn::FilterModuleWithCasting< unsigned char, 
+                                                FilterType,
+                                                unsigned char > module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Smoothing with Gradient Anisotropic Diffusion...");
       // Set the parameters on it
@@ -41,7 +43,9 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       }
     case VTK_UNSIGNED_SHORT:
       {
-      VolView::PlugIn::FilterModuleWithCasting< unsigned short, FilterType > module;
+      VolView::PlugIn::FilterModuleWithCasting< unsigned short, 
+                                                FilterType,
+                                                unsigned char > module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Smoothing with Gradient Anisotropic Diffusion...");
       // Set the parameters on it
@@ -96,7 +100,7 @@ static int UpdateGUI(void *inf)
     }
 
   info->OutputVolumeScalarType = info->InputVolumeScalarType;
-  info->OutputVolumeNumberOfComponents = info->InputVolumeNumberOfComponents;
+  info->OutputVolumeNumberOfComponents = 1;
 
   info->OutputVolumeDimensions[0] = info->InputVolumeDimensions[0]; // + 2 * numberOfIterations;
   info->OutputVolumeDimensions[1] = info->InputVolumeDimensions[1]; // + 2 * numberOfIterations;
