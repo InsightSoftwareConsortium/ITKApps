@@ -1,4 +1,5 @@
 #include "guiMainImplementation.h"
+#include <ITKFlFileWriter.h>
  
 guiMainImplementation
 ::guiMainImplementation()
@@ -217,6 +218,8 @@ void
 guiMainImplementation
 ::SaveLandmarkRegisteredImage()
   {
+  itkFlFileWriter< ImageType >( m_LandmarkRegisteredMovingImage.GetPointer(), "Save pre-registered image file...", "*.mh?", "", 0 );
+/*
   const char * filename = fl_file_chooser("Save pre-registered image file...",
                                           "*.mh?","");
 
@@ -234,13 +237,15 @@ guiMainImplementation
       {
       std::cout<<e<<std::endl;
       }
-    }
+    }*/
   }
 
 void
 guiMainImplementation
 ::SaveFinalRegisteredImage()
   {
+  itkFlFileWriter< ImageType >( m_RegisteredMovingImage.GetPointer(), "Save registered image file...", "*.mh?", "", 0 );
+/*
   const char * filename = fl_file_chooser("Save registered image file...","*.mh?","");
 
   if( filename )
@@ -257,7 +262,7 @@ guiMainImplementation
       {
       std::cout<<e<<std::endl;
       }
-    }
+    }*/
   }
 
 /////////////////////////////////////////////////
