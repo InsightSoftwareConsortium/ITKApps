@@ -59,12 +59,12 @@ public:
     }
 
   /**  Copy the result of the processing to the output */
-  virtual void CopyOutputData( const vtkVVProcessDataStruct * pds )
+  virtual void CopyOutputData( unsigned int component, const vtkVVProcessDataStruct * pds )
     {
 
     if( !m_ProduceDoubleOutput )
       {
-      this->Superclass::CopyOutputData( pds );
+      this->Superclass::CopyOutputData( component, pds );
       return;
       }
 
