@@ -132,8 +132,8 @@ private:
 
     std::string                                     m_UpdateMessage;
   
-    float                                          m_LowestBasinValue;
-    float                                          m_LowestBorderValue;
+    float                                           m_LowestBasinValue;
+    float                                           m_LowestBorderValue;
 
 };
 
