@@ -207,7 +207,7 @@ ShapeDetectionModule<TInputPixelType>
  *  from the ShapeDetection filter.
  */
 template <class TInputPixelType >
-const ShapeDetectionModule<TInputPixelType>::RealImageType *
+const typename ShapeDetectionModule<TInputPixelType>::RealImageType *
 ShapeDetectionModule<TInputPixelType>
 ::GetLevelSet()
 {

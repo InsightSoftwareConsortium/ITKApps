@@ -222,7 +222,7 @@ GeodesicActiveContourModule<TInputPixelType>
  *  from the GeodesicActiveContour filter.
  */
 template <class TInputPixelType >
-const GeodesicActiveContourModule<TInputPixelType>::RealImageType *
+const typename GeodesicActiveContourModule<TInputPixelType>::RealImageType *
 GeodesicActiveContourModule<TInputPixelType>
 ::GetLevelSet()
 {
