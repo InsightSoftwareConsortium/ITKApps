@@ -32,8 +32,8 @@ vtkImaging
 vtkIO
 vtkFiltering
 vtkCommon
-ITKFltkImageViewer
 ITKVtkFltk
+ITKFltkImageViewer
 )
 
 ADD_GUI_EXECUTABLE(ShapeDetectionLevelSet "${ShapeDetectionLevelSet_SRCS}")
