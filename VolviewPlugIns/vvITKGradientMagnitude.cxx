@@ -130,6 +130,21 @@ static int UpdateGUI(void *inf)
   memcpy(info->OutputVolumeOrigin,info->InputVolumeOrigin,
          3*sizeof(float));
 
+  // if multi component we have 1 scalar for input and 1 scalar for output
+  if (info->InputVolumeNumberOfComponents > 1)
+    {
+    int sizeReq = 2*info->InputVolumeScalarSize*
+      info->InputVolumeNumberOfComponents;
+    char tmps[500];
+    sprintf(tmps,"%i",sizeReq);
+    info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED, tmps); 
+    }
+  else
+    {
+    // otherwise no memory is required
+    info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED, "0"); 
+    }
+  
   return 1;
 }
 
@@ -153,7 +168,7 @@ void VV_PLUGIN_EXPORT vvITKGradientMagnitudeInit(vtkVVPluginInfo *info)
   info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "0");
   info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "0");
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP,           "0");
-  info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "1"); // actually depends on pixel size
+  info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "0"); 
 }
 
 }

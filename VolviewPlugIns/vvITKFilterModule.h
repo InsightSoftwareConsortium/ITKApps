@@ -99,7 +99,9 @@ public:
 
       this->ImportPixelBuffer( component, pds );
 
-       // Execute the filter
+      this->ExportPixelBuffer( component, pds );
+      
+      // Execute the filter
       try
         {
         m_Filter->Update();
@@ -122,16 +124,23 @@ public:
   CopyOutputData( unsigned int component, const vtkVVProcessDataStruct * pds )
   {
 
-    // Copy the data (with casting) to the output buffer provided by the PlugIn API
+    // Copy the data (with casting) to the output buffer provided by the 
+    // PlugIn API
     typename OutputImageType::ConstPointer outputImage =
-                                               m_Filter->GetOutput();
+      m_Filter->GetOutput();
 
-    const unsigned int numberOfComponents = this->GetPluginInfo()->InputVolumeNumberOfComponents;
-
+    const unsigned int numberOfComponents = 
+      this->GetPluginInfo()->OutputVolumeNumberOfComponents;
+    
+    if (numberOfComponents == 1)
+      {
+      return;
+      }
+    
     typedef itk::ImageRegionConstIterator< OutputImageType >  OutputIteratorType;
 
     OutputIteratorType ot( outputImage, outputImage->GetBufferedRegion() );
-
+    
     OutputPixelType * outData = static_cast< OutputPixelType * >( pds->outData );
 
     outData += component;  // move to the start of the selected component;
@@ -224,6 +233,47 @@ public:
 
   } // end of ImportPixelBuffer
 
+  virtual void 
+  ExportPixelBuffer( unsigned int component, 
+                     const vtkVVProcessDataStruct * pds )
+  {
+    
+    SizeType   size;
+    IndexType  start;
+    
+    size[0]     =  this->GetPluginInfo()->OutputVolumeDimensions[0];
+    size[1]     =  this->GetPluginInfo()->OutputVolumeDimensions[1];
+    size[2]     =  pds->NumberOfSlicesToProcess;
+
+    for(unsigned int i=0; i<3; i++)
+      {
+      start[i]    =  0;
+      }
+
+    RegionType region;
+
+    region.SetIndex( start );
+    region.SetSize(  size  );
+   
+    const unsigned int totalNumberOfPixels = region.GetNumberOfPixels();
+
+
+
+    const unsigned int numberOfComponents = this->GetPluginInfo()->InputVolumeNumberOfComponents;
+
+    const unsigned int numberOfPixelsPerSlice = size[0] * size[1];
+
+    if( numberOfComponents == 1 )
+      {
+      m_Filter->GetOutput()->SetRegions(region);
+      m_Filter->GetOutput()->GetPixelContainer()->SetImportPointer( 
+        static_cast< OutputPixelType * >( pds->outData ), 
+        totalNumberOfPixels, false);
+      m_Filter->GetOutput()->Allocate( );
+      }
+    // otherwise let ITK allocate the memory
+  
+  } // end of ExportPixelBuffer
 
 private:
     typename ImportFilterType::Pointer    m_ImportFilter;
