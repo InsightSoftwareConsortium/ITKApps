@@ -5,8 +5,8 @@
 #ifndef __vtkITKImageToImageFilter_h
 #define __vtkITKImageToImageFilter_h
 
-
 #include "itkCommand.h"
+#include "vtkSystemIncludes.h"
 #include "vtkCommand.h"
 #include "itkProcessObject.h"
 #include "vtkImageImport.h"
@@ -14,6 +14,11 @@
 #include "vtkImageToImageFilter.h"
 #include "vtkImageCast.h"
 #include "vtkImageData.h"
+
+#ifndef vtkFloatingPointType
+#define vtkFloatingPointType float
+#endif
+
 
 #undef itkExceptionMacro  
 #define itkExceptionMacro(x) \

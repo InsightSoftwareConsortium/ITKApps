@@ -54,7 +54,7 @@
 #include "itkNumericTraits.h"
 #include "vnl/vnl_math.h"
 
-vtkCxxRevisionMacro(vtkITKMutualInformationTransform, "$Revision: 1.10 $");
+vtkCxxRevisionMacro(vtkITKMutualInformationTransform, "$Revision: 1.11 $");
 vtkStandardNewMacro(vtkITKMutualInformationTransform);
 
 //----------------------------------------------------------------------------
@@ -132,7 +132,7 @@ static void vtkITKMutualInformationExecute(vtkITKMutualInformationTransform *sel
   vtkImageExport *movingVtkExporter = vtkImageExport::New();
     movingVtkExporter->SetInput(source);
 
-  typedef itk::VTKImageImport<OutputType> ImageImportType;
+  typedef itk::VTKImageImport<OutputType,vtkFloatingPointType> ImageImportType;
 
   typename ImageImportType::Pointer movingItkImporter = ImageImportType::New();
   ConnectPipelines(movingVtkExporter, movingItkImporter);
