@@ -186,9 +186,10 @@ void RawImageSequenceReader<TOutputImage, ConvertPixelTraits>::GenerateData()
     m_ImageIO->SetFileName(fileName.c_str());
     m_ImageIO->SetIORegion(ioRegion);
 
-    if ( m_ImageIO->GetPixelType() == typeid(TOutputImage::PixelType) &&
-         (m_ImageIO->GetNumberOfComponents() == 
-          ConvertPixelTraits::GetNumberOfComponents()))
+    if ( m_ImageIO->GetComponentTypeInfo()
+         == typeid(ITK_TYPENAME ConvertPixelTraits::ComponentType)
+         && (m_ImageIO->GetNumberOfComponents()
+             == ConvertPixelTraits::GetNumberOfComponents()))
       {
       itkDebugMacro(<< "No buffer conversion required.");
       // allocate a buffer and have the ImageIO read directly into it
@@ -200,8 +201,9 @@ void RawImageSequenceReader<TOutputImage, ConvertPixelTraits>::GenerateData()
         new char[m_ImageIO->GetImageSizeInBytes()];
       m_ImageIO->Read(loadBuffer);
       itkDebugMacro(<< "Buffer conversion required from: "
-                   << m_ImageIO->GetPixelType().name()
-                   << " to: " << typeid(TOutputImage::PixelType).name());
+                    << m_ImageIO->GetComponentTypeInfo().name()
+                    << " to: "
+                    << typeid(ITK_TYPENAME ConvertPixelTraits::ComponentType).name());
       this->DoConvertBuffer(loadBuffer, buffer, numPixelsPerSilce);
       delete [] loadBuffer;
       }
@@ -224,7 +226,7 @@ RawImageSequenceReader<TOutputImage, ConvertPixelTraits>
 // class to convert the data block to TOutputImage's pixel type
 // see DefaultConvertPixelTraits and ConvertPixelBuffer
 #define ITK_CONVERT_BUFFER_IF_BLOCK(type)               \
- else if( m_ImageIO->GetPixelType() == typeid(type) )   \
+ else if( m_ImageIO->GetComponentTypeInfo() == typeid(type) )   \
     {                                                   \
     ConvertPixelBuffer<                                 \
       type,                                             \
@@ -255,7 +257,8 @@ RawImageSequenceReader<TOutputImage, ConvertPixelTraits>
     RawImageSequenceReaderException e(__FILE__, __LINE__);
     OStringStream msg;
     msg <<"Couldn't convert pixel type: "
-        << std::endl << "    " << m_ImageIO->GetPixelType().name()
+        << std::endl << "    "
+        << m_ImageIO->GetComponentTypeAsString(m_ImageIO->GetComponentType())
         << std::endl << "to one of: "
         << std::endl << "    " << typeid(unsigned char).name()
         << std::endl << "    " << typeid(char).name()
