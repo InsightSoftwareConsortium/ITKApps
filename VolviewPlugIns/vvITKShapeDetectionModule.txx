@@ -19,21 +19,24 @@ template <class TInputPixelType >
 ShapeDetectionModule<TInputPixelType>
 ::ShapeDetectionModule()
 {
-    m_ShapeDetectionFilter       = ShapeDetectionFilterType::New();
-    m_IntensityWindowingFilter   = IntensityWindowingFilterType::New();
+  m_ShapeDetectionFilter       = ShapeDetectionFilterType::New();
+  m_IntensityWindowingFilter   = IntensityWindowingFilterType::New();
 
-    m_CommandObserver         = CommandType::New();
-    m_Info                    = 0;
+  m_PerformPostprocessing   = true;
 
-    m_PerformPostprocessing   = true;
+  // Set up the pipeline
+  m_ShapeDetectionFilter->SetInput(        m_FastMarchingModule.GetLevelSet() );
+  m_ShapeDetectionFilter->SetFeatureImage( m_FastMarchingModule.GetSpeedImage()   );
+  m_IntensityWindowingFilter->SetInput(    m_ShapeDetectionFilter->GetOutput() );
 
+  m_IntensityWindowingFilter->SetOutputMinimum(   0 );
+  m_IntensityWindowingFilter->SetOutputMaximum( 255 );
 
-    // Set up the pipeline
-    m_ShapeDetectionFilter->SetInput(        m_FastMarchingModule.GetLevelSet() );
-    m_ShapeDetectionFilter->SetFeatureImage( m_FastMarchingModule.GetSpeedImage()   );
+  // Allow progressive release of memory as the pipeline is executed
+  m_ShapeDetectionFilter->ReleaseDataFlagOn();
 
-    // Allow progressive release of memory as the pipeline is executed
-    m_ShapeDetectionFilter->ReleaseDataFlagOn();
+  m_ShapeDetectionFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
+  m_IntensityWindowingFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
 }
 
 
@@ -64,29 +67,6 @@ ShapeDetectionModule<TInputPixelType>
 
 
 
-/*
- *    Method provided as a callback for the progress update.
- */
-template <class TInputPixelType >
-void 
-ShapeDetectionModule<TInputPixelType>
-::ProgressUpdate( itk::Object * caller, const itk::EventObject & event )
-{
-
-  if( typeid( itk::ProgressEvent ) != typeid( event ) )
-    {
-    return;
-    }
-
-  itk::ProcessObject::Pointer process =
-            dynamic_cast< itk::ProcessObject *>( caller );
-
-  const float progress = process->GetProgress();
-
-  m_Info->UpdateProgress( m_Info, progress, m_UpdateMessage.c_str() ); 
-
-}
-
 
 /*
  *  Set the initial value of the seed.
@@ -103,19 +83,6 @@ ShapeDetectionModule<TInputPixelType>
 }
 
 
-
-
-/*
- *  Set the Plugin Info structure 
- */
-template <class TInputPixelType >
-void 
-ShapeDetectionModule<TInputPixelType>
-::SetPluginInfo( vtkVVPluginInfo * info )
-{
-  m_Info = info;
-  m_FastMarchingModule.SetPluginInfo( info );
-}
 
 
 
@@ -173,9 +140,11 @@ void
 ShapeDetectionModule<TInputPixelType>
 ::ProcessData( const vtkVVProcessDataStruct * pds )
 {
+
+  m_FastMarchingModule.SetPluginInfo( this->GetPluginInfo() );
+
   // Set the Observer for updating progress in the GUI
-  m_CommandObserver->SetCallbackFunction( this, &ShapeDetectionModule::ProgressUpdate );
-  m_ShapeDetectionFilter->AddObserver( itk::ProgressEvent(), m_CommandObserver );
+  m_ShapeDetectionFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
 
   // Execute the FastMarching module as preprocessing stage
   m_FastMarchingModule.ProcessData( pds );
@@ -202,6 +171,20 @@ void
 ShapeDetectionModule<TInputPixelType>
 ::PostProcessData( const vtkVVProcessDataStruct * pds )
 {
+ 
+  typedef itk::MinimumMaximumImageCalculator< 
+                                  RealImageType > CalculatorType;
+ 
+  CalculatorType::Pointer calculator = CalculatorType::New();
+  calculator->SetImage( m_ShapeDetectionFilter->GetOutput() );
+  calculator->Compute();
+
+  const typename RealImageType::PixelType minimum = calculator->GetMinimum(); 
+  const typename RealImageType::PixelType maximum = calculator->GetMaximum(); 
+  
+  m_IntensityWindowingFilter->SetWindowMaximum( maximum );
+  m_IntensityWindowingFilter->SetWindowMinimum( minimum );
+
   m_IntensityWindowingFilter->Update();
 
   // Copy the data (with casting) to the output buffer provided by the Plug In API

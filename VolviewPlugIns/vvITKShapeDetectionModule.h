@@ -15,7 +15,7 @@ namespace PlugIn
 {
 
 template <class TInputPixelType >
-class ShapeDetectionModule {
+class ShapeDetectionModule : public FilterModuleBase {
 
 public:
 
@@ -33,9 +33,6 @@ public:
   typedef typename FastMarchingModuleType::SpeedImageType     SpeedImageType;
 
   typedef itk::Image< float, 3 > RealImageType;
-
-  // Command/Observer intended to update the progress
-  typedef itk::MemberCommand< ShapeDetectionModule >  CommandType;
 
   // Instantiation of the Intensity windowing filter.
   // This filter is used to remove infinite times from the non-visited
@@ -64,8 +61,6 @@ public:
 
     void ProcessData( const vtkVVProcessDataStruct * pds );
     void PostProcessData( const vtkVVProcessDataStruct * pds );
-    void ProgressUpdate( itk::Object * caller, const itk::EventObject & event );
-    void SetPluginInfo( vtkVVPluginInfo * info );
 
     const RealImageType * GetLevelSet();
 
@@ -74,12 +69,6 @@ private:
     typename ShapeDetectionFilterType::Pointer      m_ShapeDetectionFilter;
     typename IntensityWindowingFilterType::Pointer  m_IntensityWindowingFilter;
 
-    typename CommandType::Pointer                   m_CommandObserver;
-
-    vtkVVPluginInfo                               * m_Info;
-
-    std::string                                     m_UpdateMessage;
-  
     bool                                            m_PerformPostprocessing;
 
 };
