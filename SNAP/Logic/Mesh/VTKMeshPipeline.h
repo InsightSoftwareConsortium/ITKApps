@@ -45,6 +45,11 @@
   #include <vtkDecimatePro.h>
 #endif
 
+#ifndef vtkFloatingPointType
+# define vtkFloatingPointType vtkFloatingPointType
+typedef float vtkFloatingPointType;
+#endif
+
 /**
  * \class VTKMeshPipeline
  * \brief A small pipeline used to convert an ITK image with a level set into
