@@ -8,7 +8,7 @@ ${ITK_SOURCE_DIR}/Code/IO
 ${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer
 ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
 ${WatershedSegmentationFltkGui_SOURCE_DIR}
-${WatershedSegmentationFltkGui_BINRY_DIR}
+${WatershedSegmentationFltkGui_BINARY_DIR}
 ${FLTK_INCLUDE_PATH}
 ${OPENGL_INCLUDE_PATH}
 )
