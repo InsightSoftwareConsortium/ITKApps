@@ -44,7 +44,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
                                                     OutputImageType >   FilterType;
       VolView::PlugIn::FilterModule< FilterType > module;
       module.SetPluginInfo( info );
-      module.SetUpdateMessage("Threshold Connected Region Growing...");
+      module.SetUpdateMessage("Isolated Connected Region Growing...");
       // Set the parameters on it
       module.GetFilter()->SetIsolatedValueTolerance( static_cast<InputPixelType>( upperTolerance  ) );
       module.GetFilter()->SetUpperValueLimit( static_cast<InputPixelType>( upperLimit  ) );
@@ -54,7 +54,9 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.GetFilter()->SetSeed2( seed2 );
       // Execute the filter
       module.ProcessData( pds  );
-      sprintf( tmp, "Upper threshold found = %f", module.GetFilter()->GetIsolatedValue() ); 
+      const float isolatedValue = static_cast<float>( module.GetFilter()->GetIsolatedValue() );
+      sprintf( tmp, "Upper threshold found = %f\n This is the intensity value that disconnects the two seeds",
+               isolatedValue ); 
       info->SetProperty( info, VVP_REPORT_TEXT, tmp );
       break; 
       }
@@ -69,7 +71,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
                                                     OutputImageType >   FilterType;
       VolView::PlugIn::FilterModule< FilterType > module;
       module.SetPluginInfo( info );
-      module.SetUpdateMessage("Threshold Connected Region Growing...");
+      module.SetUpdateMessage("Isolated Connected Region Growing...");
       // Set the parameters on it
       module.GetFilter()->SetIsolatedValueTolerance( static_cast<InputPixelType>( upperTolerance  ) );
       module.GetFilter()->SetUpperValueLimit( static_cast<InputPixelType>( upperLimit  ) );
@@ -79,8 +81,9 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.GetFilter()->SetSeed2( seed2 );
       // Execute the filter
       module.ProcessData( pds );
+      const float isolatedValue = static_cast<float>( module.GetFilter()->GetIsolatedValue() );
       sprintf( tmp, "Upper threshold found = %f\n This is the intensity value that disconnects the two seeds",
-               module.GetFilter()->GetIsolatedValue() ); 
+               isolatedValue ); 
       info->SetProperty( info, VVP_REPORT_TEXT, tmp );
       break; 
       }
