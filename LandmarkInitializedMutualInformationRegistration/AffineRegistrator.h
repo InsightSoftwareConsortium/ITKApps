@@ -6,8 +6,13 @@
 #include "itkImageRegistrationMethod.h"
 #include "itkScaleSkewVersor3DTransform.h"
 #include "itkMattesMutualInformationImageToImageMetric.h"
+
 #include "itkOnePlusOneEvolutionaryOptimizer.h"
 #include "itkNormalVariateGenerator.h"
+#include "itkGradientDescentOptimizer.h"
+#include "itkConjugateGradientOptimizer.h"
+#include "itkRegularStepGradientDescentOptimizer.h"
+
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkStatisticsImageFilter.h"
 #include "itkRegionOfInterestImageFilter.h"
@@ -32,14 +37,21 @@ class AffineRegistrator : public ImageRegistrationMethod < TImage, TImage >
     typedef typename TImage::RegionType RegionType ;
 
     typedef ScaleSkewVersor3DTransform<double> TransformType ;
-    typedef OnePlusOneEvolutionaryOptimizer OptimizerType ;
+
+    typedef enum { ONEPLUSONE, GRADIENT, REGULARGRADIENT, CONJUGATEGRADIENT }
+                                                OptimizerMethodType;
+
+    typedef OnePlusOneEvolutionaryOptimizer     OnePlusOneOptimizerType ;
+    typedef GradientDescentOptimizer            GradientOptimizerType ;
+    typedef RegularStepGradientDescentOptimizer RegularGradientOptimizerType;
+    typedef ConjugateGradientOptimizer          ConjugateGradientOptimizerType;
     typedef Statistics::NormalVariateGenerator  OptimizerNormalGeneratorType;
-    typedef OptimizerType::ParametersType ParametersType ;
-    typedef typename OptimizerType::ScalesType ScalesType ;
+    typedef TransformType::ParametersType       ParametersType ;
+    typedef TransformType::ParametersType       ScalesType ;
     typedef LinearInterpolateImageFunction< TImage, double > 
-                 InterpolatorType ;
-    typedef MattesMutualInformationImageToImageMetric< 
-                 TImage, TImage > MetricType ;
+                                                InterpolatorType ;
+    typedef MattesMutualInformationImageToImageMetric< TImage, TImage >
+                                                MetricType ;
 
     void StartRegistration() ;
 
@@ -48,10 +60,10 @@ class AffineRegistrator : public ImageRegistrationMethod < TImage, TImage >
       return static_cast<TransformType *>(Superclass::GetTransform());
       }
 
-    OptimizerType * GetTypedOptimizer(void)
-      {
-      return static_cast<OptimizerType *>(Superclass::GetOptimizer());
-      }
+    void SetOptimizerToOnePlusOne();
+    void SetOptimizerToGradient();
+    void SetOptimizerToRegularGradient();
+    void SetOptimizerToConjugateGradient();
 
     itkSetMacro(OptimizerNumberOfIterations, unsigned int) ;
     itkGetConstMacro(OptimizerNumberOfIterations, unsigned int) ;
@@ -78,8 +90,9 @@ class AffineRegistrator : public ImageRegistrationMethod < TImage, TImage >
 
   private:
 
-    unsigned int  m_OptimizerNumberOfIterations;
-    ScalesType    m_OptimizerScales;
+    OptimizerMethodType   m_OptimizerMethod;
+    unsigned int          m_OptimizerNumberOfIterations;
+    ScalesType            m_OptimizerScales;
 
     unsigned int  m_MetricNumberOfSpatialSamples;
   } ; // end of class

@@ -114,7 +114,7 @@ ImageRegistrationApp< TImage >
   m_RigidRegValid = false;
   m_AffineRegValid = false;
   m_PriorRegistrationMethod = NONE;
-  m_OptimizerMethod = ONEPLUSONE;
+  m_OptimizerMethod = GRADIENT;
   }
 
 template< class TImage >
@@ -129,7 +129,7 @@ ImageRegistrationApp< TImage >
   m_RigidRegValid = false;
   m_AffineRegValid = false;
   m_PriorRegistrationMethod = NONE;
-  m_OptimizerMethod = ONEPLUSONE;
+  m_OptimizerMethod = GRADIENT;
   }
 
 
@@ -552,7 +552,7 @@ ImageRegistrationApp< TImage >
   registrator->SetFixedImageRegion( m_MovingImageRegion ) ;
   registrator->SetOptimizerScales( m_AffineScales );
   registrator->SetOptimizerNumberOfIterations(m_AffineNumberOfIterations);
-  /*
+
   switch(m_OptimizerMethod)
     {
     case ONEPLUSONE:
@@ -576,7 +576,6 @@ ImageRegistrationApp< TImage >
       break;
       }
     }
-  */
 
   AffineParametersType params = m_AffineRegTransform->GetParameters();
   itk::Point<double, 3> center;

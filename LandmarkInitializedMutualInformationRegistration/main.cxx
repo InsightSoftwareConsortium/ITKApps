@@ -6,7 +6,7 @@
 int usage()
   {
   std::cout 
-    << "limir [options] fixedImage movingImage outputResampledMovingImage" 
+    << "limir [options] fixedImage movingImage" 
     << std::endl;
   std::cout << "Options:" << std::endl;
   std::cout << "  -I <method#> : Registration initialization" << std::endl;
@@ -27,6 +27,7 @@ int usage()
   std::cout << "        3 - Conjugate gradient" << std::endl;
   std::cout << "  -L <fixedLandmarksfile> <movingLandmarksfile>" << std::endl;
   std::cout << "  -T <filename> : save registration transform" << std::endl;
+  std::cout << "  -W <filename> : save registered moving image" << std::endl;
   return 1;
   }
 
@@ -34,7 +35,7 @@ int main(int argc, char **argv)
   {
   if(argc > 1)
     {
-    if(argc < 4)
+    if(argc < 3)
       {
       return usage();
       }
@@ -45,7 +46,9 @@ int main(int argc, char **argv)
 
     char fixedImageFilename[255];
     char movingImageFilename[255];
+
     char outputImageFilename[255];
+    outputImageFilename[0] = '\0';
 
     char fixedLandmarksFilename[255];
     fixedLandmarksFilename[0] = '\0';
@@ -81,19 +84,22 @@ int main(int argc, char **argv)
           argNum++;
           optimizationMethod = (int)atof(argv[argNum++]);
           break;
+        case 'W':
+          argNum++;
+          strcpy(outputImageFilename, argv[argNum++]);
+          break;
         default:
           return usage();
         }
       }
 
-    if(argNum != argc-3)
+    if(argNum != argc-2)
       {
       return usage();
       }
 
     strcpy(fixedImageFilename, argv[argNum++]);
     strcpy(movingImageFilename, argv[argNum++]);
-    strcpy(outputImageFilename, argv[argNum++]);
 
     typedef itk::Image<short, 3>            ImageType;
     typedef ImageRegistrationApp<ImageType> ImageRegistrationAppType;
@@ -250,17 +256,20 @@ int main(int argc, char **argv)
     std::cout << "Time total = " 
               << timeRegEnd - timeStart << std::endl;
     
-    ImageWriterType::Pointer imageWriter = ImageWriterType::New();
-    imageWriter->SetFileName( outputImageFilename );
-    imageWriter->SetInput( 
-                 imageRegistrationApp->GetFinalRegisteredMovingImage() );
-    try
+    if(strlen(outputImageFilename)>1)
       {
-      imageWriter->Update();
-      }
-    catch( itk::ExceptionObject &e )
-      {
-      std::cout << e << std::endl;
+      ImageWriterType::Pointer imageWriter = ImageWriterType::New();
+      imageWriter->SetFileName( outputImageFilename );
+      imageWriter->SetInput( 
+                   imageRegistrationApp->GetFinalRegisteredMovingImage() );
+      try
+        {
+        imageWriter->Update();
+        }
+      catch( itk::ExceptionObject &e )
+        {
+        std::cout << e << std::endl;
+        }
       }
 
     if( strlen( outputTransformFilename ) > 1)

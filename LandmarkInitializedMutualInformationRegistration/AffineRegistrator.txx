@@ -15,7 +15,7 @@ AffineRegistrator< TImage >
 
   this->SetInterpolator(InterpolatorType::New());
   
-  this->SetOptimizer(OptimizerType::New());
+  m_OptimizerMethod = GRADIENT;
   m_OptimizerNumberOfIterations = 100 ;
   m_OptimizerScales.set_size(15) ; 
   m_OptimizerScales[0] = 200; // rotations
@@ -34,9 +34,6 @@ AffineRegistrator< TImage >
   m_OptimizerScales[13] = 400;
   m_OptimizerScales[14] = 400;
   
-  this->GetTypedOptimizer()->SetNormalVariateGenerator(
-                             OptimizerNormalGeneratorType::New());
-  
   this->SetMetric(MetricType::New());
   m_MetricNumberOfSpatialSamples = 40000 ;
   }
@@ -50,17 +47,91 @@ AffineRegistrator< TImage >
 template< class TImage >
 void
 AffineRegistrator< TImage >
+::SetOptimizerToOnePlusOne() 
+  {
+  m_OptimizerMethod = ONEPLUSONE;
+  }
+
+template< class TImage >
+void
+AffineRegistrator< TImage >
+::SetOptimizerToGradient() 
+  {
+  m_OptimizerMethod = GRADIENT;
+  }
+
+template< class TImage >
+void
+AffineRegistrator< TImage >
+::SetOptimizerToRegularGradient() 
+  {
+  m_OptimizerMethod = REGULARGRADIENT;
+  }
+
+template< class TImage >
+void
+AffineRegistrator< TImage >
+::SetOptimizerToConjugateGradient() 
+  {
+  m_OptimizerMethod = CONJUGATEGRADIENT;
+  }
+
+template< class TImage >
+void
+AffineRegistrator< TImage >
 ::Initialize() throw(ExceptionObject)
   {
   this->GetInterpolator()->SetInputImage( this->GetMovingImage() ) ;
 
-  this->GetTypedOptimizer()->SetScales( m_OptimizerScales );
-  this->GetTypedOptimizer()->SetMaximumIteration(m_OptimizerNumberOfIterations);
-  this->GetTypedOptimizer()->Initialize(1.01); // Initial search radius
-  this->GetTypedOptimizer()->SetEpsilon(0.0000000000001);
-
   this->GetTypedMetric()->SetNumberOfSpatialSamples( 
                           m_MetricNumberOfSpatialSamples );
+
+  switch(m_OptimizerMethod)
+    {
+    case ONEPLUSONE:
+      {
+      OnePlusOneOptimizerType::Pointer opt = OnePlusOneOptimizerType::New();
+      opt->SetNormalVariateGenerator( OptimizerNormalGeneratorType::New() );
+      opt->SetMaximumIteration( m_OptimizerNumberOfIterations);
+      opt->SetEpsilon(0.0000000000001);
+      opt->Initialize(1.01); // Initial search radius
+      opt->SetScales( m_OptimizerScales );
+      this->SetOptimizer(opt);
+      break;
+      }
+    case GRADIENT:
+      {
+      GradientOptimizerType::Pointer opt = GradientOptimizerType::New();
+      opt->SetMaximize(false);
+      opt->SetLearningRate(0.001);
+      opt->SetNumberOfIterations(m_OptimizerNumberOfIterations);
+      opt->SetScales( m_OptimizerScales );
+      this->SetOptimizer(opt);
+      break;
+      }
+    case REGULARGRADIENT:
+      {
+      RegularGradientOptimizerType::Pointer opt;
+      opt = RegularGradientOptimizerType::New();
+      opt->SetMaximize(false);
+      //opt->SetLearningRate(0.001);
+      opt->SetNumberOfIterations(m_OptimizerNumberOfIterations);
+      opt->SetScales( m_OptimizerScales );
+      this->SetOptimizer(opt);
+      break;
+      }
+    case CONJUGATEGRADIENT:
+      {
+      ConjugateGradientOptimizerType::Pointer opt;
+      opt = ConjugateGradientOptimizerType::New();
+      //opt->SetLearningRate(0.001);
+      //opt->SetNumberOfIterations(m_OptimizerNumberOfIterations);
+      opt->SetScales( m_OptimizerScales );
+      this->SetOptimizer(opt);
+      break;
+      }
+    }
+
 
   try
     {
