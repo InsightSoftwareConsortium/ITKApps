@@ -35,20 +35,14 @@ public:
    * A structure that describes the appearance of a screen element 
    */
   struct Element 
-    {
+  {
     Vector3d NormalColor;
     Vector3d ActiveColor;
     double LineThickness;
     double DashSpacing;
     int FontSize;
     bool Visible, AlphaBlending;
-
-    Element(Vector3d inNormalColor, Vector3d inActiveColor, double inLineThickness,
-      double inDashSpacing, int inFontSize, bool inVisible, inAlphaBlending)
-      : NormalColor(inNormalColor), ActiveColor(inActiveColor), 
-        LineThickness(inLineThickness), DashSpacing(inDashSpacing), FontSize(inFontSize),
-        Visible(inVisible), AlphaBlending(inAlphaBlending) {}
-    };
+  };
 
   /** An enumeration of available screen elements */
   enum UIElements 
@@ -113,12 +107,13 @@ private:
   static const int m_Applicable[ELEMENT_COUNT][FEATURE_COUNT];
 
   /** The set of default values for each element */
-  Element m_DefaultElementSettings[ELEMENT_COUNT];
+  static Element m_DefaultElementSettings[ELEMENT_COUNT];
 
   /** Text constants for the elements */
   static const char *m_ElementNames[ELEMENT_COUNT];
 
-
+  /** Initialize the default settings */
+  static void InitializeDefaultSettings();
 };
 
 

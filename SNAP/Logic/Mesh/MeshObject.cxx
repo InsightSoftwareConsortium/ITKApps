@@ -15,7 +15,7 @@
 // Borland compiler is very lazy so we need to instantiate the template
 //  by hand 
 #if defined(__BORLANDC__)
-#include <../../../SNAPBorlandDummyTypes.h>
+#include "SNAPBorlandDummyTypes.h"
 #endif
 #include "MeshObject.h"
 
@@ -334,6 +334,9 @@ MeshObject
 
 /*
  *Log: MeshObject.cxx
+ *Revision 1.13  2004/08/03 23:26:32  ibanez
+ *ENH: Modification for building in multple platforms. By Julien Jomier.
+ *
  *Revision 1.12  2004/07/29 14:01:56  pauly
  *ENH: An interface for changing SNAP appearance settings
  *

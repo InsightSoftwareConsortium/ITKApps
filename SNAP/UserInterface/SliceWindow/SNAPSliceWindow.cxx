@@ -18,7 +18,7 @@
 #include <itkCommand.h>
 #include <itkSmartPointer.h>
 typedef itk::SmartPointer<itk::Command> SNAPSliceWindowDummyCommandSPType;
-#include <../../../SNAPBorlandDummyTypes.h>
+#include "SNAPBorlandDummyTypes.h"
 #endif
 
 #include "SNAPSliceWindow.h"

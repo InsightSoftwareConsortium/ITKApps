@@ -15,7 +15,7 @@
 // Borland compiler is very lazy so we need to instantiate the template
 //  by hand 
 #if defined(__BORLANDC__)
-#include <../../../SNAPBorlandDummyTypes.h>
+#include "SNAPBorlandDummyTypes.h"
 #endif
 
 #include "IRISMeshPipeline.h"

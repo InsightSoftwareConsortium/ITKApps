@@ -15,7 +15,7 @@
 // Borland compiler is very lazy so we need to instantiate the template
 //  by hand 
 #if defined(__BORLANDC__)
-#include <../../../SNAPBorlandDummyTypes.h>
+#include "SNAPBorlandDummyTypes.h"
 #endif
 
 #include "UserInterfaceLogic.h"
@@ -2981,6 +2981,9 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.26  2004/08/26 18:29:19  pauly
+ *ENH: New user interface for configuring the UI options
+ *
  *Revision 1.25  2004/08/03 23:26:32  ibanez
  *ENH: Modification for building in multple platforms. By Julien Jomier.
  *

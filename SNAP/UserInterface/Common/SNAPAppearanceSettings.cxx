@@ -29,42 +29,94 @@ SNAPAppearanceSettings
     { 1, 0, 1, 1, 0, 1, 1 },    // Thumbnail Crosshairs
     };
 
-SNAPAppearanceSettings::Element
+SNAPAppearanceSettings::Element 
 SNAPAppearanceSettings
-::m_DefaultElementSettings[SNAPAppearanceSettings::ELEMENT_COUNT] = 
+::m_DefaultElementSettings[SNAPAppearanceSettings::ELEMENT_COUNT];
+
+void 
+SNAPAppearanceSettings
+::InitializeDefaultSettings()
 {
   // Crosshairs
-  SNAPAppearanceSettings::Element( 
-    Vector3d(0.3, 0.3, 1.0), Vector3d(0.0, 0.0, 0.0), 1.0, 1.0, 0.0, true, false ),
+  Element &elt = m_DefaultElementSettings[CROSSHAIRS];
+  elt.NormalColor = Vector3d(0.3, 0.3, 1.0);
+  elt.ActiveColor = Vector3d(0.0, 0.0, 0.0);
+  elt.LineThickness = 1.0;
+  elt.DashSpacing = 1.0;
+  elt.FontSize = 0.0;
+  elt.Visible = true;
+  elt.AlphaBlending = false;
 
   // Markers
-  SNAPAppearanceSettings::Element(
-    Vector3d(1.0, 0.75, 0.0), Vector3d(0.0, 0.0, 0.0), 0.0, 0.0, 16.0, true, false ),
+  elt = m_DefaultElementSettings[MARKERS];
+  elt.NormalColor = Vector3d(1.0, 0.75, 0.0);
+  elt.ActiveColor = Vector3d(0.0, 0.0, 0.0);
+  elt.LineThickness = 0.0;
+  elt.DashSpacing = 0.0;
+  elt.FontSize = 16.0;
+  elt.Visible = true;
+  elt.AlphaBlending = false;
 
   // ROI
-  SNAPAppearanceSettings::Element(
-    Vector3d(1.0, 0.0, 0.2), Vector3d(1.0, 1.0, 0.2), 1.0, 3.0, 0.0, true, false ),
+  elt = m_DefaultElementSettings[ROI_BOX];
+  elt.NormalColor = Vector3d(1.0, 0.0, 0.2);
+  elt.ActiveColor = Vector3d(1.0, 1.0, 0.2);
+  elt.LineThickness = 1.0;
+  elt.DashSpacing = 3.0;
+  elt.FontSize = 0.0;
+  elt.Visible = true;
+  elt.AlphaBlending = false;
 
   // Slice background
-  SNAPAppearanceSettings::Element(
-    Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0), 0.0, 0.0, 0.0, true, false ),
+  elt = m_DefaultElementSettings[BACKGROUND_3D];
+  elt.NormalColor = Vector3d(0.0, 0.0, 0.0);
+  elt.ActiveColor = Vector3d(0.0, 0.0, 0.0);
+  elt.LineThickness = 0.0;
+  elt.DashSpacing = 0.0;
+  elt.FontSize = 0.0;
+  elt.Visible = true;
+  elt.AlphaBlending = false;
 
   // 3D Window background
-  SNAPAppearanceSettings::Element(
-    Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0), 0.0, 0.0, 0.0, true, false ),
+  elt = m_DefaultElementSettings[BACKGROUND_3D];
+  elt.NormalColor = Vector3d(0.0, 0.0, 0.0);
+  elt.ActiveColor = Vector3d(0.0, 0.0, 0.0);
+  elt.LineThickness = 0.0;
+  elt.DashSpacing = 0.0;
+  elt.FontSize = 0.0;
+  elt.Visible = true;
+  elt.AlphaBlending = false;
 
   // Zoom thumbail
-  SNAPAppearanceSettings::Element(
-    Vector3d(1.0, 1.0, 0.0), Vector3d(1.0, 1.0, 1.0), 1.0, 0.0, 0.0, true, false ),
+  elt = m_DefaultElementSettings[ZOOM_THUMBNAIL];
+  elt.NormalColor = Vector3d(1.0, 1.0, 0.0);
+  elt.ActiveColor = Vector3d(1.0, 1.0, 1.0);
+  elt.LineThickness = 1.0;
+  elt.DashSpacing = 0.0;
+  elt.FontSize = 0.0;
+  elt.Visible = true;
+  elt.AlphaBlending = false;
 
   // 3D crosshairs
-  SNAPAppearanceSettings::Element(
-    Vector3d(0.3, 0.3, 1.0), Vector3d(0.0, 0.0, 0.0), 1.0, 1.0, 0.0, true, true ),
+  elt = m_DefaultElementSettings[CROSSHAIRS_3D];
+  elt.NormalColor = Vector3d(0.3, 0.3, 1.0);
+  elt.ActiveColor = Vector3d(0.0, 0.0, 0.0);
+  elt.LineThickness = 1.0;
+  elt.DashSpacing = 1.0;
+  elt.FontSize = 0.0;
+  elt.Visible = true;
+  elt.AlphaBlending = true;
 
   // Thumbnail crosshairs
-  SNAPAppearanceSettings::Element(
-    Vector3d(0.3, 0.3, 1.0), Vector3d(0.0, 0.0, 0.0), 1.0, 1.0, 0.0, true, false ) 
-};  
+  elt = m_DefaultElementSettings[CROSSHAIRS_THUMB];
+  elt.NormalColor = Vector3d(0.3, 0.3, 1.0);
+  elt.ActiveColor = Vector3d(0.0, 0.0, 0.0);
+  elt.LineThickness = 1.0;
+  elt.DashSpacing = 1.0;
+  elt.FontSize = 0.0;
+  elt.Visible = true;
+  elt.AlphaBlending = false;
+}
 
 const char *
 SNAPAppearanceSettings
@@ -75,47 +127,15 @@ SNAPAppearanceSettings
 SNAPAppearanceSettings
 ::SNAPAppearanceSettings()
 {
+  // Initialize the default settings
+  InitializeDefaultSettings();
+
   // Set the common flags
   m_FlagLinkedZoomByDefault = false;
   m_ZoomThumbnailMaximumSize = 160;
   m_ZoomThumbnailSizeInPercent = 30.0;
   m_FlagDisplayZoomThumbnail = true;
 
-  m_DefaultElementSettings[0].NormalColor = Vector3d(0.5, 0.5, 1.0);
-  m_DefaultElementSettings[0].ActiveColor = Vector3d(0.0, 0.0, 0.0);
-  m_DefaultElementSettings[0].LineThickness = 1.0;
-  m_DefaultElementSettings[0].DashSpacing = 3.0;
-  m_DefaultElementSettings[0].FontSize = 0.0;
-
-  m_DefaultElementSettings[1].NormalColor = Vector3d(1.0, 1.0, 0.2);
-  m_DefaultElementSettings[1].ActiveColor = Vector3d(0.0, 0.0, 0.0);
-  m_DefaultElementSettings[1].LineThickness = 0.0;
-  m_DefaultElementSettings[1].DashSpacing = 0.0;
-  m_DefaultElementSettings[1].FontSize = 12.0;
-
-  m_DefaultElementSettings[2].NormalColor = Vector3d(1.0, 0.0, 0.2);
-  m_DefaultElementSettings[2].ActiveColor = Vector3d(1.0, 1.0, 0.2);
-  m_DefaultElementSettings[2].LineThickness = 1.0;
-  m_DefaultElementSettings[2].DashSpacing = 3.0;
-  m_DefaultElementSettings[2].FontSize = 0.0;
-
-  m_DefaultElementSettings[3].NormalColor = Vector3d(0.0, 0.0, 0.0);
-  m_DefaultElementSettings[2].ActiveColor = Vector3d(0.0, 0.0, 0.0);
-  m_DefaultElementSettings[2].LineThickness = 0.0;
-  m_DefaultElementSettings[2].DashSpacing = 0.0;
-  m_DefaultElementSettings[2].FontSize = 0.0;
-
-  m_DefaultElementSettings[4].NormalColor = Vector3d(0.0, 0.0, 0.0);
-  m_DefaultElementSettings[2].ActiveColor = Vector3d(0.0, 0.0, 0.0);
-  m_DefaultElementSettings[2].LineThickness = 0.0;
-  m_DefaultElementSettings[2].DashSpacing = 0.0;
-  m_DefaultElementSettings[2].FontSize = 0.0;
-
-  m_DefaultElementSettings[5].NormalColor = Vector3d(1.0, 1.0, 0.0);
-  m_DefaultElementSettings[2].ActiveColor = Vector3d(0.0, 0.0, 0.0);
-  m_DefaultElementSettings[2].LineThickness = 0.0;
-  m_DefaultElementSettings[2].DashSpacing = 0.0;
-  m_DefaultElementSettings[2].FontSize = 0.0;
 
   // Set the UI elements to their default values  
   for(unsigned int iElement = 0; iElement < ELEMENT_COUNT; iElement++)
