@@ -666,11 +666,11 @@ ImageIOWizardLogic<TPixel>
     // Dump out the file type info
     
     // TODO: This is a workaround on an itk bug with RawImageIO
-    if(m_ImageIO->GetComponentType() != itk::ImageIOBase::UNKNOWN)
+    if(m_ImageIO->GetComponentType() != itk::ImageIOBase::UNKNOWNCOMPONENTTYPE)
       {
       // There actually is a type in the IO object
       m_OutSummaryPixelType->value(
-        m_ImageIO->ReturnTypeAsString(m_ImageIO->GetComponentType()).c_str());
+        m_ImageIO->GetComponentTypeInfo().name());
       }
     else
       {
