@@ -106,7 +106,8 @@ int main(int argc, char * argv [] )
   if( argc < 2 )
     {
     std::cerr << "Missing parameters" << std::endl;
-    std::cerr << "Usage: " << argv[0] << " inputImageFilename [seedX seedY seedZ] [output.vtk]" << std::endl;
+    std::cerr << "Usage: " << argv[0] << " inputImageFilename ";
+    std::cerr << "[seedX seedY seedZ] [output.vtk] [surface=0 wireframe=1]" << std::endl;
     return 1;
     }
   
@@ -269,7 +270,7 @@ int main(int argc, char * argv [] )
     property->SetSpecular(0.5);
     property->SetColor(1.0,0.0,0.0);
     property->SetLineWidth(2.0);
-    property->SetRepresentationToWireframe();
+    property->SetRepresentationToSurface();
 
     polyActor->SetProperty( property );
   
@@ -283,6 +284,20 @@ int main(int argc, char * argv [] )
       writer->Write();
       }
  
+    if( argc >=6 )
+      {
+      int representation = atoi( argv[6] );
+      switch(representation)
+        {
+        case 0:
+          property->SetRepresentationToSurface();
+          break;
+        case 1:
+          property->SetRepresentationToWireframe();
+          break;
+        }
+      }
+
     // Bring up the render window and begin interaction.
     renWin->Render();
     iren->Start();
