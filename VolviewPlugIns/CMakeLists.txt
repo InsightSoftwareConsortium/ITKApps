@@ -56,8 +56,9 @@ SET (PLUGINS
   vvITKIntensityWindowing
   vvITKIsolatedConnected
   vvITKIsotropicFourthOrderLevelSet
-  vvITKMedian
   vvITKLandmarkWarping
+  vvITKMask
+  vvITKMedian
   vvITKRescaleIntensityTo8Bits
   vvITKScalarImageKMeansClassifier
   vvITKSigmoid
