@@ -74,13 +74,13 @@ int vtkBinaryVolume::WriteToDisk(const char *fn)
   out.write((char *)this->GetScalarPointer(), volume_size_in_bytes);
   out.close();
 
-  //  std::cout << "vtkBinaryVolume::WriteToDisk: header size is "
-  //              << sizeof(int) * 6 << std::endl;
-  //  std::cout << "vtkBinaryVolume::WriteToDisk: volume size in bytes is "
-  //            << volume_size_in_bytes << std::endl;
-  //  std::cout << "vtkBinaryVolume::WriteToDisk: volume dimensions are: "
-  //            << (e[1] + 1 - e[0]) << "x" << (e[3] +1 - e[2]) << "x" << (e[5] +1 - e[4])
-  //            << std::endl;
+    std::cout << "vtkBinaryVolume::WriteToDisk: header size is "
+                << sizeof(int) * 6 << std::endl;
+    std::cout << "vtkBinaryVolume::WriteToDisk: volume size in bytes is "
+              << volume_size_in_bytes << std::endl;
+    std::cout << "vtkBinaryVolume::WriteToDisk: volume dimensions are: "
+              << (e[1] + 1 - e[0]) << "x" << (e[3] +1 - e[2]) << "x" << (e[5] +1 - e[4])
+              << std::endl;
   return 0; // all OK  
 }
 

@@ -110,8 +110,8 @@ bool EditorConsole::StartEditor() {
   mapToRGBA->SetLookupTable( manager->GetLookupTable() );
 
   // configure the binary volume
-  binaryVolume->SetExtent(0, x, 0, y , 0, z);
-  binaryVolume->SetUpdateExtent(0, x, 0, y, 0, z);
+  binaryVolume->SetExtent(0, x-1, 0, y-1 , 0, z-1);
+  binaryVolume->SetUpdateExtent(0, x-1, 0, y-1, 0, z-1);
   binaryVolume->AllocateScalars();
   binaryVolume->Clear();
 
