@@ -50,6 +50,9 @@ class RigidRegistrator : public ImageRegistrationMethod < TImage, TImage >
     typedef MattesMutualInformationImageToImageMetric< TImage, TImage >
                                                 MetricType ;
 
+    typedef typename Superclass::OptimizerType OptimizerType;
+    typedef typename OptimizerType::Pointer OptimizerPointer;
+
     void StartRegistration() ;
 
     TransformType * GetTypedTransform(void)
@@ -96,7 +99,7 @@ class RigidRegistrator : public ImageRegistrationMethod < TImage, TImage >
 
     unsigned int            m_MetricNumberOfSpatialSamples;
 
-    OptimizerType::Pointer  m_SecondaryOptimizer;
+    OptimizerPointer        m_SecondaryOptimizer;
 
 
 
