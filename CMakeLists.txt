@@ -188,7 +188,9 @@ ENDIF(NOT BORLAND)
 SUBDIRS(DICOMApp)
 
 #Build the examples of various fourth-order level set PDEs 
+IF(NOT BORLAND)
 SUBDIRS (LevelSetSurfaceProcessing)
+ENDIF(NOT BORLAND)
 
 # Build the Intensity based 2D-3D Registration application
 SUBDIRS(IntensityBased2D3DRegistration)
