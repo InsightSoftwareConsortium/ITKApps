@@ -262,7 +262,7 @@ int main(int argc, char* argv[])
   typedef itk::Statistics::SampleClassifierWithMask
     < ImageSampleType, ClassMaskSampleType > ClassifierType ;
 
-  typedef MaximumRatioDecisionRule DecisionRuleType ;
+  typedef itk::MaximumRatioDecisionRule DecisionRuleType ;
 
   std::vector< DensityFunctionType::Pointer > densityFunctions ;
   std::vector< MeanCalculatorType::Pointer > meanCalculatorVector ;
