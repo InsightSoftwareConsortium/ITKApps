@@ -15,6 +15,10 @@
 #ifndef __UserInterfaceLogic_h_
 #define __UserInterfaceLogic_h_
 
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4786 )
+#endif
+
 #include "SNAPCommonUI.h"
 #include "UserInterface.h"
 
@@ -777,6 +781,9 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.17  2004/07/29 14:00:36  pauly
+ *ENH: A new interface for changing the appearance of SNAP
+ *
  *Revision 1.16  2004/07/24 19:00:06  pauly
  *ENH: Thumbnail UI for slice zooming
  *

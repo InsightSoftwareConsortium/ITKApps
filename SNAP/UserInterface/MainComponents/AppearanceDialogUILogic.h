@@ -15,6 +15,10 @@
 #ifndef __AppearanceDialogUILogic_h_
 #define __AppearanceDialogUILogic_h_
 
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4786 )
+#endif
+
 #include "AppearanceDialogUI.h"
 
 class UserInterfaceLogic;
