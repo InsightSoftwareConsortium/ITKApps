@@ -30,17 +30,12 @@ DeformableModelApplicationBase
   m_SimplexFilter->SetInput( m_SphereMeshSource->GetOutput() );
 
   //deformation stuff
-
-  m_DistanceMap = DistanceMapFilterType::New();
-  m_DistanceMap->SetInput( m_VolumeReader->GetOutput() );
-
   m_DeformFilter = DeformFilterType::New();
 
-
   m_GradientFilter = GradientFilterType::New();
-  m_GradientFilter->SetInput( m_DistanceMap->GetOutput() );
-  m_GradientFilter->SetSigma( 1.0 );
-  
+
+  m_GradientFilter->SetInput( m_VolumeReader->GetOutput() );
+  m_GradientFilter->SetSigma( 5.0 );
 }
 
 

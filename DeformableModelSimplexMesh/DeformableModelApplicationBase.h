@@ -16,7 +16,6 @@
 
 #include "itkDeformableSimplexMesh3DBalloonForceFilter.h"
 #include "itkGradientRecursiveGaussianImageFilter.h"
-#include "itkDanielssonDistanceMapImageFilter.h"
 
 class Leila
 {
@@ -61,11 +60,13 @@ public:
   typedef itk::Mesh<double,3, TriangleMeshTraits> TriangleMeshType;
   typedef itk::SimplexMesh<double,3, SimplexMeshTraits> SimplexMeshType;
 
-  // declare triangle mesh source (inital mesh must be replaced with creating mesh from 
-  // binary image using marching cubes
+
+  // declare triangle mesh source (inital mesh must be replaced with creating
+  // mesh from binary image using marching cubes
   typedef itk::RegularSphereMeshSource<TriangleMeshType>  SphereMeshSourceType;
   typedef SphereMeshSourceType::PointType PointType;
   typedef SphereMeshSourceType::VectorType VectorType;
+
 
   // declare the triangle to simplex mesh filter
   typedef itk::TriangleMeshToSimplexMeshFilter<TriangleMeshType, SimplexMeshType> SimplexFilterType;
@@ -76,20 +77,13 @@ public:
                       SimplexMeshType::CellTraits >  CellInterfaceType;
   typedef itk::VertexCell<CellInterfaceType>      vertexCell;
   typedef itk::LineCell<CellInterfaceType> lineCell;
-  //typedef SimplexMeshType::PointType pointType;
-  // typedef SimplexMeshType::vertexType vertexType;
+  
+ 
   typedef SimplexMeshType::LineType  lineType;
   typedef SimplexMeshType::CellType  cellType;
 
 
-
-  //typedef itk::VertexCell<cellType> VertexType;
-  //typedef itk::LineCell< cellType >   LineType;
-
   //deformation stuff
-   typedef itk::DanielssonDistanceMapImageFilter<VolumeType,VolumeType> DistanceMapFilterType;
-  
-  
 
    typedef itk::DeformableSimplexMesh3DBalloonForceFilter<SimplexMeshType,SimplexMeshType> DeformFilterType;
  
@@ -129,8 +123,6 @@ protected:
 
   SimplexMeshType::Pointer                m_SimplexMesh;
  
-  DistanceMapFilterType::Pointer          m_DistanceMap;
-  
   DeformFilterType::Pointer               m_DeformFilter;
 
   GradientFilterType::Pointer             m_GradientFilter;
