@@ -29,7 +29,7 @@ LandmarkSliceViewer<TImagePixel>
 
   cColorTable->SetColor(0, 0, 0, 1, "Blue");
   cColorTable->SetColor(1, 1, 0, 0, "Red");
-  cColorTable->SetColor(2, 0, 1, 0), "Green";
+  cColorTable->SetColor(2, 0, 1, 0, "Green");
   cColorTable->SetColor(3, 0.741, 0.86, 0.84, "Yellow");
   }
 
@@ -80,6 +80,8 @@ void
 LandmarkSliceViewer<TImagePixel>
 ::SetLandmarkList(LandmarkPointListType * landmarkPointList)
   {
+  this->HideLandmarks();
+
   unsigned int size = m_LandmarkPointList->size();
   for ( unsigned int i = 0; i < size; ++i )
     {
@@ -96,17 +98,15 @@ LandmarkSliceViewer<TImagePixel>
     landmark.SetID( id );
     landmark.SetColor( iter->GetColor() );
     landmark.SetPosition( iter->GetPosition() );
-    this->DrawLandmark( landmark );
     this->SetLandmark( id, landmark );
     ++iter;
     ++id;
     }
 
-  this->update();
-  this->redraw();
+  this->ShowLandmarks();
 
   m_LandmarkPointList = & m_LandmarkSpatialObject->GetPoints();
-}
+  }
 
 template<class TImagePixel>
 unsigned int
@@ -163,6 +163,7 @@ LandmarkSliceViewer<TImagePixel>
     }
   if(id < m_LandmarkPointList->size())
     {
+    this->DeleteLandmark( id );
     (*m_LandmarkPointList)[id] = landmark;
     }
   else
@@ -173,6 +174,7 @@ LandmarkSliceViewer<TImagePixel>
       }
     m_LandmarkPointList->push_back(landmark);
     }
+  DrawLandmark( landmark );
   }
 
 template<class TImagePixel>
@@ -204,8 +206,6 @@ LandmarkSliceViewer<TImagePixel>
       m_LandmarkPointList->at(id).SetColor( color );
       DrawLandmark( m_LandmarkPointList->at(id) );
       m_LandmarkPointList->at(id).SetID( -1 );
-      this->update();
-      this->redraw();
       }
     }
   }
@@ -224,16 +224,16 @@ LandmarkSliceViewer<TImagePixel>
         {
         ClickPoint coord;
         this->getClickedPoint(0, coord);
-        IndexType index;
-        index[0] = (long) coord.x;
-        index[1] = (long) coord.y;
-        index[2] = (long) coord.z;
+        ContinuousIndexType index;
+        index[0] = (double) coord.x;
+        index[1] = (double) coord.y;
+        index[2] = (double) coord.z;
         PointType point;
 
         switch( m_Action )
           {
           case Add:
-            cImData->TransformIndexToPhysicalPoint( index, point );
+            cImData->TransformContinuousIndexToPhysicalPoint( index, point );
             m_LandmarkCandidate.SetPosition( point );
             m_LandmarkCandidate.SetID(m_LandmarkCandidateId);
             this->SetLandmark(m_LandmarkCandidateId, m_LandmarkCandidate);
@@ -243,8 +243,6 @@ LandmarkSliceViewer<TImagePixel>
               m_LandmarkChangeCallBack( m_LandmarkChangeCallBackObject );
               }
             m_Action = None;
-            this->update();
-            this->redraw();
             break;
           default:
             break;
@@ -273,8 +271,6 @@ LandmarkSliceViewer<TImagePixel>
       }
     ++iter;
     }
-  this->update();
-  this->redraw();
   }
 
 
@@ -300,8 +296,6 @@ LandmarkSliceViewer<TImagePixel>
       }
     ++iter;
     }
-  this->update();
-  this->redraw();
   }
 
 /**
@@ -383,6 +377,9 @@ LandmarkSliceViewer<TImagePixel>
       cOverlayData->SetPixel(modifiedIndex, color);
       }
     }
+
+  this->update();
+  this->redraw();
   }
 
 template<class TImagePixel>

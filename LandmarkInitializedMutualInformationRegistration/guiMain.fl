@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0103 
+version 1.0105 
 header_name {.h} 
 code_name {.cxx}
 class guiMain {open
@@ -8,7 +8,7 @@ class guiMain {open
   } {
     Fl_Window tkWindow {
       label {Landmarkd Initialized Mutual Information 3D Registration Tool } open
-      xywh {223 422 1060 705} box PLASTIC_UP_BOX color 159 resizable visible
+      xywh {223 422 1060 705} type Double box PLASTIC_UP_BOX color 159 resizable visible
     } {
       Fl_Group tkMainGroup {open
         xywh {0 30 1050 710} resizable
@@ -50,9 +50,13 @@ Register();}
           xywh {740 666 155 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 63 selection_color 63 labelsize 10
         }
         Fl_Choice tkRegistrationMethodChoice {
-          label {Registration Method:} open
+          label {Registration Method:} open selected
           xywh {640 666 90 19} box PLASTIC_UP_BOX down_box BORDER_BOX color 255 selection_color 255 labelsize 10 align 36 when 1 textsize 10
         } {
+          menuitem tkLandmarkMethod {
+            label Landmark
+            xywh {25 25 100 34} labelsize 10
+          }
           menuitem tkRigidMethod {
             label Rigid
             xywh {15 15 100 34} labelsize 10
@@ -60,10 +64,6 @@ Register();}
           menuitem tkAffineMethod {
             label Affine
             xywh {15 15 100 34} labelsize 10
-          }
-          menuitem tkDeformable {
-            label Deformable
-            xywh {15 15 100 34} labelsize 10 hide deactivate
           }
         }
         Fl_Box tkResultImageViewer {
@@ -681,6 +681,6 @@ tkMovingImageViewer->DrawRegionOfInterest() ;}
   } {}
   Function {UpdateFixedSliceNumber()} {open return_type {virtual void}
   } {}
-  Function {UpdateMovingImageSpacing(  )} {open selected return_type {virtual void}
+  Function {UpdateMovingImageSpacing(  )} {open return_type {virtual void}
   } {}
 } 

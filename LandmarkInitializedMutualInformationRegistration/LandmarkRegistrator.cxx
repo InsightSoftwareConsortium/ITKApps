@@ -78,7 +78,7 @@ LandmarkRegistrator
   vnl_matrix<double> mTemp(3,3);
   m.set_identity();
 
-  itk::Vector<double> vct;
+  itk::Vector<double, 3> vct;
   itk::Versor<double> vsr;
   itk::Versor<double> vsrTemp;
   itk::Matrix<double, 3, 3> mat;
@@ -103,10 +103,17 @@ LandmarkRegistrator
       mat = outer_product(v2, vTemp);
       vsrTemp.Set(mat);
 
-      vct[0] = vsr.GetX() + weight *  vsrTemp.GetX();
+      vct[0] = vsr.GetX() + weight * vsrTemp.GetX();
       vct[1] = vsr.GetY() + weight * vsrTemp.GetY();
       vct[2] = vsr.GetZ() + weight * vsrTemp.GetZ();
+      if(vct.GetNorm() > 1) 
+        {
+        vct.Normalize();
+        }
+      std::cout << "vct = " << vct << std::endl;
+      std::cout << "vct.norm = " << vct.GetNorm() << std::endl;
       vsr.Set(vct);
+      std::cout << "   done" << std::endl;
 
       m = vsr.GetMatrix().GetVnlMatrix();
       }

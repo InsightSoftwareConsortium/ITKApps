@@ -35,6 +35,7 @@ class LandmarkSliceViewer : public GLSliceView< TImagePixel,
     typedef itk::Image< OverlayPixelType, 3 >      OverlayImageType;
   
     typedef typename ImageType::IndexType          IndexType;
+    typedef itk::ContinuousIndex< double, 3 >      ContinuousIndexType;
     typedef itk::Point< double, 3 >                PointType;
     
     typedef itk::LandmarkSpatialObject< 3 >         LandmarkSpatialObjectType;

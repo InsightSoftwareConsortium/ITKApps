@@ -679,9 +679,13 @@ guiMainImplementation
                                 tkFixedImageViewer->GetLandmarkList());
   m_MovingLandmarkSpatialObject->SetPoints(
                                  tkMovingImageViewer->GetLandmarkList());
-  for(unsigned int i=0; i < m_FixedLandmarkSpatialObject->GetNumberOfPoints(); i++)
+  for(unsigned int i=0; 
+      i < m_FixedLandmarkSpatialObject->GetNumberOfPoints();
+      i++)
     {
-    for(unsigned int j=i+1; j < m_FixedLandmarkSpatialObject->GetNumberOfPoints(); j++)
+    for(unsigned int j=i+1; 
+        j < m_FixedLandmarkSpatialObject->GetNumberOfPoints();
+        j++)
       {
       dist = 0;
       for(int x=0; x<3; x++)
@@ -714,11 +718,14 @@ guiMainImplementation
   spacing[2] = m_MovingImage->GetSpacing()[2] * scale;
 
   LandmarkPointType landmark;
-  IndexType index[4];
-  for(unsigned int i=0; i < m_MovingLandmarkSpatialObject->GetNumberOfPoints(); i++)
+  ContinuousIndex<double, 3> index[4];
+  for(unsigned int i=0;
+      i < m_MovingLandmarkSpatialObject->GetNumberOfPoints();
+      i++)
     {
     tkMovingImageViewer->GetLandmark(i, landmark);
-    m_MovingImage->TransformPhysicalPointToIndex(landmark.GetPosition(),
+    m_MovingImage->TransformPhysicalPointToContinuousIndex(
+                                                 landmark.GetPosition(),
                                                  index[i]);
     }
 
@@ -734,10 +741,12 @@ guiMainImplementation
                                 "Save moving image...", "*.mh?", "", 0 );
 
   PointType point;
-  for(unsigned int i=0; i < m_MovingLandmarkSpatialObject->GetNumberOfPoints(); i++)
+  for(unsigned int i=0;
+      i < m_MovingLandmarkSpatialObject->GetNumberOfPoints();
+      i++)
     {
     tkMovingImageViewer->GetLandmark(i, landmark);
-    m_MovingImage->TransformIndexToPhysicalPoint( index[i], point );
+    m_MovingImage->TransformContinuousIndexToPhysicalPoint( index[i], point );
     landmark.SetPosition(point);
     tkMovingImageViewer->SetLandmark(i, landmark);
     }
@@ -1209,21 +1218,23 @@ guiMainImplementation
                                 tkFixedImageViewer->GetLandmarkList() );
   m_MovingLandmarkSpatialObject->SetPoints( 
                                  tkMovingImageViewer->GetLandmarkList() );
+  bool newResult = false;
   if( m_FixedLandmarkSpatialObject->GetPoints().size() == 4 &&
       m_MovingLandmarkSpatialObject->GetPoints().size() == 4)
     {
+    newResult = true;
     this->ChangeStatusDisplay("Register using landmarks");
 
     m_ImageRegistrationApp->RegisterUsingLandmarks ( 
                             m_FixedLandmarkSpatialObject.GetPointer(),
                             m_MovingLandmarkSpatialObject.GetPointer() );
 
-    this->ChangeStatusDisplay("Transforming the landmarks...");
+    //this->ChangeStatusDisplay("Transforming the landmarks...");
 
-    this->TransformLandmarks( 
-          & m_MovingLandmarkSpatialObject->GetPoints(),
-          & m_LandmarkRegisteredMovingLandmarkSpatialObject->GetPoints(),
-          m_ImageRegistrationApp->GetLandmarkAffineTransform() );
+    //this->TransformLandmarks( 
+          //& m_MovingLandmarkSpatialObject->GetPoints(),
+          //& m_LandmarkRegisteredMovingLandmarkSpatialObject->GetPoints(),
+          //m_ImageRegistrationApp->GetLandmarkAffineTransform() );
     this->ChangeStatusDisplay("Resampling registered moving image...");
     m_LandmarkRegisteredMovingImage = m_ImageRegistrationApp->
           GetLandmarkRegisteredMovingImage();
@@ -1235,32 +1246,38 @@ guiMainImplementation
     tkLandmarkRegisteredView->deactivate();
     }
   
-  this->ChangeStatusDisplay("Registering using the rigid method...");
-
-  RegionType region;
-  region = m_MovingImage->GetLargestPossibleRegion();
-
-  if ( tkRigidUseUserRegion->value() == 1
-        && tkMovingImageViewer->IsRegionOfInterestAvailable() )
+  if( tkRegistrationMethodChoice->value() > 0 ) // also do rigid
     {
-    std::cout << "Rigid registration using user roi." << std::endl;
-    region = tkMovingImageViewer->GetRegionOfInterest();
+    newResult = true;
+    this->ChangeStatusDisplay("Registering using the rigid method...");
+
+    RegionType region;
+    region = m_MovingImage->GetLargestPossibleRegion();
+  
+    if ( tkRigidUseUserRegion->value() == 1
+          && tkMovingImageViewer->IsRegionOfInterestAvailable() )
+      {
+      std::cout << "Rigid registration using user roi." << std::endl;
+      region = tkMovingImageViewer->GetRegionOfInterest();
+      }
+    else if ( tkRigidUseLandmarkRegion->value() == 1 
+              && tkMovingImageViewer->GetNumberOfLandmarks() == 4 
+              && tkFixedImageViewer->GetNumberOfLandmarks() == 4)
+      {
+      std::cout << "Rigid registration using landmark roi." << std::endl;
+      region = tkMovingImageViewer->ComputeLandmarkRegion
+        (tkRigidRegionScale->value());
+      }
+  
+    m_ImageRegistrationApp->SetMovingImageRegion(region);
+    m_ImageRegistrationApp->RegisterUsingRigidMethod();
     }
-  else if ( tkRigidUseLandmarkRegion->value() == 1 
-            && tkMovingImageViewer->GetNumberOfLandmarks() == 4 
-            && tkFixedImageViewer->GetNumberOfLandmarks() == 4)
-    {
-    std::cout << "Rigid registration using landmark roi." << std::endl;
-    region = tkMovingImageViewer->ComputeLandmarkRegion
-      (tkRigidRegionScale->value());
-    }
 
-  m_ImageRegistrationApp->SetMovingImageRegion(region);
-  m_ImageRegistrationApp->RegisterUsingRigidMethod();
-
-  if( tkRegistrationMethodChoice->value() > 0 ) // also do affine
+  if( tkRegistrationMethodChoice->value() > 1 ) // also do affine
     {
+    newResult = true;
     this->ChangeStatusDisplay("Registering using the affine method...");
+    RegionType region;
     if ( tkAffineUseUserRegion->value() == 1
           && tkMovingImageViewer->IsRegionOfInterestAvailable() )
       {
@@ -1279,21 +1296,24 @@ guiMainImplementation
     m_ImageRegistrationApp->RegisterUsingAffineMethod();
     }
   
-  this->TransformLandmarks( & m_MovingLandmarkSpatialObject->GetPoints(),
-                        & m_RegisteredMovingLandmarkSpatialObject->GetPoints(),
-                        m_ImageRegistrationApp->GetFinalTransform() );
+  //this->TransformLandmarks( & m_MovingLandmarkSpatialObject->GetPoints(),
+                        //& m_RegisteredMovingLandmarkSpatialObject->GetPoints(),
+                        //m_ImageRegistrationApp->GetFinalTransform() );
   
-  this->ChangeStatusDisplay("Resampling the moving image...");
-  m_RegisteredMovingImage = 
-    m_ImageRegistrationApp->GetFinalRegisteredMovingImage();
+  if(newResult)
+    {
+    this->ChangeStatusDisplay("Resampling the moving image...");
+    m_RegisteredMovingImage = 
+      m_ImageRegistrationApp->GetFinalRegisteredMovingImage();
 
-  tkRegisteredView->activate();
-  
-  tkDisplayMovingImageChoice->value(2);
-  this->SelectImageSet(2);
+    tkRegisteredView->activate();
+    
+    tkDisplayMovingImageChoice->value(2);
+    this->SelectImageSet(2);
+    this->ChangeStatusDisplay("Registration done");
+    }
   
   fl_cursor(Fl_Cursor(FL_CURSOR_DEFAULT), (Fl_Color) 56, (Fl_Color) 255);
-  this->ChangeStatusDisplay("Registration done");
   }
 
 /////////////////////////////////////////////////
