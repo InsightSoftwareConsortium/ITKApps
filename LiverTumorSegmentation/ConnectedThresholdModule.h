@@ -118,7 +118,7 @@ public:
 public:
     
   ConnectedThresholdModule();
-  ~ConnectedThresholdModule();
+  virtual ~ConnectedThresholdModule();
   
   void SetInput( const InputImageType * image );
   const OutputImageType * GetOutput();

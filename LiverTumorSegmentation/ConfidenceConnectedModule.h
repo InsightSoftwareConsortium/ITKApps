@@ -121,7 +121,7 @@ public:
   
   ConfidenceConnectedModule();
 
-  ~ConfidenceConnectedModule();
+  virtual ~ConfidenceConnectedModule();
   
   void SetInput( const InputImageType * image );
 

@@ -141,7 +141,7 @@ public:
     
     ThresholdLevelSetSegmentationModule();
 
-    ~ThresholdLevelSetSegmentationModule();
+    virtual ~ThresholdLevelSetSegmentationModule();
 
     void SetInput( const InputImageType * image );
 
