@@ -50,7 +50,7 @@ SimpleAppInputParser<TImage>
 
   m_TranslationScale = 100.0;
 
-  m_PGMDirectoryName = "";
+  m_OutputFileName = "";
 
 }
 
@@ -86,41 +86,6 @@ SimpleAppInputParser<TImage>
   std::string fixedImageFileName = currentLine;
   std::cout << "Fixed image filename: " << fixedImageFileName << std::endl;
 
-  // get fixed image big endian flag
-  if( fscanf( paramFile, "%d", &uNumber ) != 1)
-    {
-    itkExceptionMacro( << "Could not find fixed image file big endian flag." );
-    }
-  bool fixedImageBigEndian = !(!uNumber);
-  std::cout << "Big Endian: " << fixedImageBigEndian << std::endl;
-
-  // get fixed image size
-  typename ImageType::SizeType fixedImageSize;
-  for( unsigned int j = 0; j < ImageDimension; j++ )
-    {
-    if( fscanf( paramFile, "%d", &uNumber ) != 1 )
-      {
-      itkExceptionMacro( << "Could not find fixed image size." );
-      }
-
-    fixedImageSize[j] = uNumber;
-    } 
-  std::cout << "Image Size: " << fixedImageSize << std::endl;
-
-  // get fixed image spacing
-  SpacingType fixedImageSpacing;
-  for( unsigned int j = 0; j < ImageDimension; j++ )
-    {
-    if( fscanf( paramFile, "%f", &fNumber ) != 1 ) 
-      {
-      itkExceptionMacro( << "Could not find fixed image spacing." );
-      }
-
-    fixedImageSpacing[j] = fNumber;
-    }
-  std::cout << "Image Spacing: " << fixedImageSpacing;
-
-
   /************************************
    * Parse moving image information
    ************************************/
@@ -131,40 +96,6 @@ SimpleAppInputParser<TImage>
     }
   std::string movingImageFileName = currentLine;
   std::cout << "Moving image filename: " << movingImageFileName << std::endl;
-
-  // get moving image big endian flag
-  if( fscanf( paramFile, "%d", &uNumber ) != 1)
-    {
-    itkExceptionMacro( << "Could not find moving image file big endian flag." );
-    }
-  bool movingImageBigEndian = !(!uNumber);
-  std::cout << "Big Endian: " << movingImageBigEndian << std::endl;
-
-  // get moving image size
-  typename ImageType::SizeType movingImageSize;
-  for( unsigned int j = 0; j < ImageDimension; j++ )
-    {
-    if( fscanf( paramFile, "%d", &uNumber ) != 1 )
-      {
-      itkExceptionMacro( << "Could not find moving image size." );
-      }
-
-    movingImageSize[j] = uNumber;
-    } 
-  std::cout << "Image Size: " << movingImageSize << std::endl;
-
-  // get moving image spacing
-  SpacingType movingImageSpacing;
-  for( unsigned int j = 0; j < ImageDimension; j++ )
-    {
-    if( fscanf( paramFile, "%f", &fNumber ) != 1 ) 
-      {
-      itkExceptionMacro( << "Could not find moving image spacing." );
-      }
-    movingImageSpacing[j] = fNumber;
-    }
-  std::cout << "Image Spacing: " << movingImageSpacing;
-
 
   /************************************
    * Parse permute and flip parameters
@@ -179,7 +110,7 @@ SimpleAppInputParser<TImage>
 
     m_PermuteOrder[j] = uNumber;
     }
-  std::cout << "Permute order: " << m_PermuteOrder;
+  std::cout << "Permute order: " << m_PermuteOrder << std::endl;
 
 
   // get which axes to flip
@@ -192,7 +123,7 @@ SimpleAppInputParser<TImage>
 
     m_FlipAxes[j] = !(!uNumber);
     }
-  std::cout << "Flip axes: " << m_FlipAxes;
+  std::cout << "Flip axes: " << m_FlipAxes << std::endl;
 
 
   /************************************
@@ -218,6 +149,7 @@ SimpleAppInputParser<TImage>
     m_FixedImageShrinkFactors[j] = uNumber;
     }
   std::cout << "Fixed image shrink factors: " << m_FixedImageShrinkFactors;
+  std::cout << std::endl;
  
   // get moving image shrink factors
   for( unsigned int j = 0; j < ImageDimension; j++ )
@@ -229,6 +161,7 @@ SimpleAppInputParser<TImage>
     m_MovingImageShrinkFactors[j] = uNumber;
     }
   std::cout << "Moving image shrink factors: " << m_MovingImageShrinkFactors;
+  std::cout << std::endl;
 
   // get number of iterations
   {
@@ -245,6 +178,7 @@ SimpleAppInputParser<TImage>
     m_NumberOfIterations[j] = uNumber;
     }
   std::cout << "Number of iterations: " << m_NumberOfIterations;
+  std::cout << std::endl;
 
   // get learning rates
   {
@@ -261,6 +195,7 @@ SimpleAppInputParser<TImage>
     m_LearningRates[j] = fNumber;
     }
   std::cout << "Learning rates: " << m_LearningRates;
+  std::cout << std::endl;
 
   // get translation scale
   if( fscanf( paramFile, "%f", &fNumber) != 1 )
@@ -274,15 +209,15 @@ SimpleAppInputParser<TImage>
   /************************************
    * Parse output related parameters
    ************************************/
-  // pgm directory
+  // output filename
   if( fscanf( paramFile, "%s", currentLine ) != 1 ) 
   {
-  itkExceptionMacro( << "Could not find PGM directory name." );
+  itkExceptionMacro( << "Could not find the output filename." );
   }
 
-  m_PGMDirectoryName = currentLine;
+  m_OutputFileName = currentLine;
 
-  std::cout << "PGM directory: " << m_PGMDirectoryName << std::endl;
+  std::cout << "Output filename: " << m_OutputFileName << std::endl;
   std::cout << std::endl;
 
 

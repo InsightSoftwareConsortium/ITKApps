@@ -36,7 +36,7 @@ namespace itk
  *  - pointer to the fixed image
  *  - pointer to the moving image
  *  - pointer to an affine tranform
- *  - name of directory to output PGM files
+ *  - name of output file
  *
  * Outputs:
  *  - pointer to the resampled image
@@ -77,8 +77,8 @@ public:
   /** Set the transform. */
   itkSetObjectMacro( Transform, AffineTransformType );
 
-  /** Set the output directory name. */
-  itkSetStringMacro( DirectoryName );
+  /** Set the output filename. */
+  itkSetStringMacro( OutputFileName );
 
   /** Activiate the process. */
   void Execute();
@@ -98,7 +98,7 @@ private:
 
   AffineTransformPointer  m_Transform;
 
-  std::string m_DirectoryName;
+  std::string m_OutputFileName;
 
 
 };

@@ -38,7 +38,7 @@ SimpleAppOutput<TImage>
 
   m_Transform = NULL;
 
-  m_DirectoryName = "";
+  m_OutputFileName = "";
 }
 
 
@@ -49,7 +49,7 @@ SimpleAppOutput<TImage>
 {
 
   if ( !m_MovingImage || !m_FixedImage || !m_Transform ||
-    m_DirectoryName == "" )
+    m_OutputFileName == "" )
     {
     ExceptionObject err(__FILE__, __LINE__);
     err.SetLocation( "Execute()" );
@@ -81,27 +81,15 @@ SimpleAppOutput<TImage>
   m_ResampledImage = resampler->GetOutput();
 
 
-  // write out image as pgm files
+  // write out resampled image
   typedef ImageFileWriter<ImageType> WriterType;
-  typename WriterType::Pointer fixedWriter          = WriterType::New();
-  typename WriterType::Pointer movingwriter         = WriterType::New();
   typename WriterType::Pointer resampleMovingwriter = WriterType::New();
 
   try
     {
-
-    fixedWriter->SetInput( m_FixedImage );
-    fixedWriter->SetFileName( "FixedImage.mhd" );
-    fixedWriter->Update();
-
-    movingwriter->SetInput( m_MovingImage );
-    movingwriter->SetFileName( "MovingImage.mhd" );
-    movingwriter->Update();
-
     resampleMovingwriter->SetInput( m_ResampledImage );
-    resampleMovingwriter->SetFileName( "ResampledMovingImage.mhd" );
+    resampleMovingwriter->SetFileName( m_OutputFileName.c_str() );
     resampleMovingwriter->Update();
-
     }
   catch( itk::ExceptionObject & excp )
     {

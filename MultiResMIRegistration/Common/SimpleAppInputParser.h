@@ -48,7 +48,7 @@ namespace itk
  *  - the learning rate at each level
  *  - scaling factor applied to translation parameters during optimization
  *
- *  - directory where to write the PGM files
+ *  - the output resampled file name
  */
 template <typename TImage>
 class ITK_EXPORT SimpleAppInputParser : public Object
@@ -127,8 +127,8 @@ public:
   /** Get the translation parameters scale. */
   itkGetConstMacro( TranslationScale, double );
  
-  /** Get the output PGM directory. */
-  itkGetStringMacro( PGMDirectoryName );
+  /** Get the output filename. */
+  itkGetStringMacro( OutputFileName );
 
 protected:
   SimpleAppInputParser();
@@ -149,7 +149,7 @@ private:
   IterationsArrayType           m_NumberOfIterations;
   RatesArrayType                m_LearningRates;
   double                        m_TranslationScale;
-  std::string                   m_PGMDirectoryName;
+  std::string                   m_OutputFileName;
 
 };
 

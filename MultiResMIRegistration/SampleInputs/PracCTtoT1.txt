@@ -1,11 +1,5 @@
-N:/Vanderbilt/registration/images/practice/mr_T1/image.bin
-1
-256 256 26
-1.25 1.25 4.0
-N:/Vanderbilt/registration/images/practice/ct/image.bin
-1
-512 512 29
-0.653595 0.653595 4.0
+N:/Vanderbilt/registration/meta_headers/practice_mr_T1.mhd
+N:/Vanderbilt/registration/meta_headers/practice_ct.mhd
 0 1 2
 0 0 0
 5
@@ -14,6 +8,7 @@ N:/Vanderbilt/registration/images/practice/ct/image.bin
 2500 2500 2500 2500 2500
 1e-4 1e-5 5e-6 1e-6 5e-7
 320
-cttot1
+cttot1.mhd
+
 
 

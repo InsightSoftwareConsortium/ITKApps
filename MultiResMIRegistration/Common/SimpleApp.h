@@ -91,7 +91,7 @@ protected:
     m_Generator->SetFixedImage( m_Parser->GetFixedImage() );
     m_Generator->SetMovingImage( m_Parser->GetMovingImage() );
     m_Generator->SetTransform( m_Transform );
-    m_Generator->SetDirectoryName( m_Parser->GetPGMDirectoryName() );
+    m_Generator->SetOutputFileName( m_Parser->GetOutputFileName() );
     };
 
 
