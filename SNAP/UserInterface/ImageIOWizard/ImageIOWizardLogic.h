@@ -15,6 +15,12 @@
 #ifndef __ImageIOWizardLogic_h_
 #define __ImageIOWizardLogic_h_
 
+#if defined(_WIN32)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <winbase.h>
+#endif
+
 #include <cassert>
 #include <string>
 #include <vector>

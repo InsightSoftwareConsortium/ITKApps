@@ -15,6 +15,10 @@
 #ifndef __PreprocessingUILogic_h_
 #define __PreprocessingUILogic_h_
 
+#if defined(_WIN32)
+#include <itkWindows.h>
+#endif
+
 #include "PreprocessingUI.h"
 #include "IRISTypes.h"
 #include "itkSmartPointer.h"

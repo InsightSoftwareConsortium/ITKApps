@@ -15,6 +15,10 @@
 #ifndef __UserInterfaceLogic_h_
 #define __UserInterfaceLogic_h_
 
+#if defined(_WIN32)
+#include <itkWindows.h>
+#endif
+
 #include "UserInterface.h"
 
 // Necessary forward references
@@ -741,6 +745,9 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.7  2003/10/06 12:30:00  pauly
+ *ENH: Added history lists, remembering of settings, new snake parameter preview
+ *
  *Revision 1.6  2003/10/02 14:55:52  pauly
  *ENH: Development during the September code freeze
  *
