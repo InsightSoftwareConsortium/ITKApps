@@ -284,8 +284,7 @@ GradientEatingBacteria
     m_Genome->SetExpressionLevel( BlueGene,  StarvingColor.GetBlue() );
     }
 
-  const double cdk2E = 0.9;  // by now, it is always ready to replicate. 
-                             // this must be link to radius growth.
+  const double cdk2E = Genome::Sigmoide( 2.0, -0.5, m_Pressure );
   m_Genome->SetExpressionLevel( Cdk2E, cdk2E );
 
 }
