@@ -141,7 +141,10 @@ SUBDIRS(Auxiliary)
 SUBDIRS (AnisotropicDiffusionImageFilter)
 
 #Build the example of various methods of segmentation using level sets.
+IF(${CMAKE_CXX_COMPILER} MATCHES "bcc32")
+ELSE(${CMAKE_CXX_COMPILER} MATCHES "bcc32")
 SUBDIRS (LevelSetSegmentation)
+ENDIF(${CMAKE_CXX_COMPILER} MATCHES "bcc32")
 
 #Build the example of how to create a static library for 
 # select filters in itk.
