@@ -5,6 +5,8 @@
 #define _itkVVWatershedModule_txx
 
 #include "vvITKWatershedModule.h"
+#include <set>
+
 
 namespace VolView 
 {
@@ -215,9 +217,28 @@ WatershedModule<TInputPixelType>
 
   // Copy the data (with casting) to the output buffer provided by the Plug In API
   typedef typename WatershedFilterType::OutputImageType   LabeledImageType;
+  typedef typename LabeledImageType::PixelType            LabelType;
 
   typename LabeledImageType::ConstPointer outputImage =
                                m_WatershedFilter->GetOutput();
+
+
+  // Collect the label values associated with all the seed points.
+  typedef std::set<unsigned long>   LabelsTable;
+  LabelsTable  labels;
+
+  SeedsContainerType::const_iterator seed = m_Seeds.begin();
+  SeedsContainerType::const_iterator last = m_Seeds.end();
+  std::ofstream ofs("seedlabels.txt");
+  while( seed != last )
+    {
+    labels.insert( outputImage->GetPixel( *seed ) );
+    ofs << outputImage->GetPixel( *seed ) << std::endl;
+    ++seed;
+    }
+  ofs << "size = " << labels.size() << std::endl;  
+  ofs.close();
+  
 
   typedef itk::ImageRegionConstIterator< LabeledImageType >  OutputIteratorType;
 
@@ -225,10 +246,38 @@ WatershedModule<TInputPixelType>
 
   OutputPixelType * outData = (OutputPixelType *)(pds->outData);
 
+  LabelsTable::const_iterator firstLabel = labels.begin();
+  LabelsTable::const_iterator lastLabel  = labels.end();
+  LabelsTable::const_iterator label;
+
+  bool found = false;
+
   ot.GoToBegin(); 
   while( !ot.IsAtEnd() )
     {
-    *outData = static_cast< OutputPixelType >( ot.Get() );
+    const OutputPixelType labeledPixel =  ot.Get();
+
+    label = firstLabel;
+    found = false;
+    while( label != lastLabel )
+      {
+      if( *label == labeledPixel )
+        {
+        found = true;
+        break;
+        }
+      ++label;
+      }
+
+    if( found )
+      { 
+      *outData = 0;
+      }
+    else
+      {
+      *outData = 255;
+      }
+    
     ++ot;
     ++outData;
     }
