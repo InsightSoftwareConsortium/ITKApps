@@ -5,20 +5,23 @@
 #include "vvITKGeodesicActiveContour.h"
 
 
-static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
-{
 
-  vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
-
-  char tmp[1024];
-
-  try 
+template <class InputPixelType>
+class GeodesicActiveContoureRunner
   {
-  switch( info->InputVolumeScalarType )
+  public:
+    typedef itk::Image< InputPixelType, 3 > InputImageType;
+    typedef InputImageType                  InputSpeedImageType;
+    
+    typedef VolView::PlugIn::GeodesicActiveContour< InputImageType,
+                                                    InputSpeedImageType >   ModuleType;
+    
+  public:
+    GeodesicActiveContoureRunner() {}
+    void Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
     {
-    case VTK_UNSIGNED_CHAR:
-      {
-      typedef VolView::PlugIn::GeodesicActiveContour  ModuleType;
+      char tmp[1024];
+
       ModuleType  module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Computing Geodesic Active Contour...");
@@ -27,10 +30,88 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
                          module.GetFilter()->GetElapsedIterations(),
                          module.GetFilter()->GetRMSChange());
       info->SetProperty( info, VVP_REPORT_TEXT, tmp );
+
+    }
+  };
+
+
+
+
+static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
+{
+
+  vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
+
+  if( info->InputVolumeNumberOfComponents != 1 )
+    {
+    info->SetProperty( info, VVP_ERROR, "This filter requires a single-component data set as input" ); 
+    return -1;
+    }
+
+  try 
+  {
+  switch( info->InputVolumeScalarType )
+    {
+    case VTK_CHAR:
+      {
+      GeodesicActiveContoureRunner<signed char> runner;
+      runner.Execute( info, pds );
       break; 
       }
-    default:
-      info->SetProperty( info, VVP_ERROR, "This filter is intended to operate only on Unsigned Char data since the input is a binary mask");
+    case VTK_UNSIGNED_CHAR:
+      {
+      GeodesicActiveContoureRunner<unsigned char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_SHORT:
+      {
+      GeodesicActiveContoureRunner<signed short> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_SHORT:
+      {
+      GeodesicActiveContoureRunner<unsigned short> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_INT:
+      {
+      GeodesicActiveContoureRunner<signed int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_INT:
+      {
+      GeodesicActiveContoureRunner<unsigned int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_LONG:
+      {
+      GeodesicActiveContoureRunner<signed long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_LONG:
+      {
+      GeodesicActiveContoureRunner<unsigned long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_FLOAT:
+      {
+      GeodesicActiveContoureRunner<float> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_DOUBLE:
+      {
+      GeodesicActiveContoureRunner<double> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
     }
   }
   catch( itk::ExceptionObject & except )

@@ -1,4 +1,4 @@
-/** This module implemetes the limited preprocessing for 
+/** This module implements the limited preprocessing for 
     the GeodesicActiveContours filter. The module expects
     two inputs. First, a binary mask, second a speed image.
     the binary mask is passed through the ReinitializeImageFilter
@@ -27,18 +27,20 @@ typedef itk::GeodesicActiveContourLevelSetImageFilter<
                           itk::Image< float,3 >
                                   > GeodesicActiveContourFilterType;
  
-typedef itk::Image< unsigned char, 3 > BinaryMaskImageType;
-typedef itk::Image< unsigned char, 3 > InputSpeedImageType;
 
-typedef itk::Image< float, 3 > InternalSpeedImageType;
-
+template< class TBinaryMaskImageType, class TInputSpeedImageType>
 class GeodesicActiveContour : public 
                    FilterModuleTwoInputs<
                               GeodesicActiveContourFilterType,
-                              BinaryMaskImageType,
-                              InputSpeedImageType > {
+                              TBinaryMaskImageType,
+                              TInputSpeedImageType > {
 
 public:
+
+  typedef TBinaryMaskImageType    BinaryMaskImageType;
+  typedef TInputSpeedImageType    InputSpeedImageType;
+
+  typedef itk::Image< float, 3 > InternalSpeedImageType;
 
   typedef  FilterModuleTwoInputs<
                       GeodesicActiveContourFilterType,
@@ -176,10 +178,10 @@ public:
 
 private:
 
-  SmoothingFilterType::Pointer          m_SmoothingFilter;
-  RescaleLeveSetFilterType::Pointer     m_RescaleLevelSetFilter;
-  RescaleSpeedFilterType::Pointer       m_RescaleSpeedFilter;
-  RescaleOutputFilterType::Pointer      m_RescaleOutputFilter;
+  typename SmoothingFilterType::Pointer          m_SmoothingFilter;
+  typename RescaleLeveSetFilterType::Pointer     m_RescaleLevelSetFilter;
+  typename RescaleSpeedFilterType::Pointer       m_RescaleSpeedFilter;
+  typename RescaleOutputFilterType::Pointer      m_RescaleOutputFilter;
 };
 
 
