@@ -87,7 +87,6 @@ void print_usage()
 
 typedef itk::MRIBiasFieldCorrectionFilter<ImageType, ImageType, MaskType> Corrector ;
 
-#if 0
 void printResult(Corrector::Pointer filter, OptionList& options)
 {
   options.DumpOption("input") ;
@@ -97,14 +96,7 @@ void printResult(Corrector::Pointer filter, OptionList& options)
   options.DumpOption("use-log") ;
 
   std::cout << " --degree " << filter->GetBiasFieldDegree() ;
-  Corrector::BiasFieldType::DomainSizeType sizes = 
-    filter->GetBiasFieldDomainSize() ;
-  std::cout << " --size " ;
-  for (unsigned int i = 0 ; i < sizes.size() ; i++)
-    {
-      std::cout << sizes[i] << " " ;
-    }
-  
+
   std::cout << "--grow " << filter->GetOptimizerGrowthFactor() ;
   std::cout << " --shrink " << filter->GetOptimizerShrinkFactor() ;
   std::cout << " --volume-max-iteration " << filter->GetVolumeCorrectionMaximumIteration();
@@ -117,9 +109,7 @@ void printResult(Corrector::Pointer filter, OptionList& options)
     std::cout << " --init-step-size " << filter->GetOptimizerInitialRadius() ;
 
 
-  std::cout << " --coefficient-length " << filter->GetNoOfBiasFieldCoefficients()
-            << " --coefficients " ;
-
+  std::cout << " --coefficients " ;
   Corrector::BiasFieldType::CoefficientArrayType coefficients = 
     filter->GetEstimatedBiasFieldCoefficients() ;
 
@@ -133,7 +123,6 @@ void printResult(Corrector::Pointer filter, OptionList& options)
     } 
   std::cout << std::endl ;
 }
-#endif
 
 int main(int argc, char* argv[])
 {
@@ -247,8 +236,7 @@ int main(int argc, char* argv[])
   std::cout << "Estimating the bias field..." << std::endl ;
   filter->Update() ;
 
-#if 0
   printResult(filter, options) ;
-#endif
+
   return 0 ;
 }
