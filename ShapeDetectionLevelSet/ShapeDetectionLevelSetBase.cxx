@@ -44,7 +44,7 @@ ShapeDetectionLevelSetBase
   m_TrialPoints = NodeContainer::New();
 
   m_FastMarchingFilter = FastMarchingFilterType::New();
-  m_FastMarchingFilter->SetSpeedConstant( 1.0 );
+  m_FastMarchingFilter->SetInput( m_SigmoidFilter->GetOutput() );
   m_FastMarchingFilter->SetTrialPoints( m_TrialPoints );
 
   m_InputThresholdFilter = ThresholdFilterType::New();
@@ -60,6 +60,7 @@ ShapeDetectionLevelSetBase
 
   m_ShapeDetectionFilter->SetMaximumRMSError( 0.02 );
   m_ShapeDetectionFilter->SetNumberOfIterations( 100 );
+  m_ShapeDetectionFilter->UseImageSpacingOn();
 
   m_ThresholdFilter = ThresholdFilterType::New();
   m_ThresholdFilter->SetInput( m_ShapeDetectionFilter->GetOutput() );

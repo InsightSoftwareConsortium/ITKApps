@@ -129,7 +129,7 @@ class GeodesicActiveContourGUI {open : {public GeodesicActiveContourBase}
           xywh {162 39 35 24} labelsize 12 maximum 50 step 0.1 value 1.2 textsize 12
         }
         Fl_Value_Input zeroSetValueInput {
-          label Distance
+          label {Time Threshold}
           callback {this->SetZeroSetValue( o->value() );}
           xywh {261 210 39 25} labelsize 12 maximum 100 step 0.1 value 5 textsize 12
         }
@@ -165,7 +165,7 @@ class GeodesicActiveContourGUI {open : {public GeodesicActiveContourBase}
           xywh {447 43 44 23} labelsize 12 maximum 500 step 1 value 50 textsize 12
         }
         Fl_Value_Input fastMarchingStoppingValueInput {
-          label Stopping
+          label {Stopping Time}
           callback {m_FastMarchingFilter->SetStoppingValue( o->value() );}
           xywh {262 155 39 23} labelsize 12 maximum 100 step 0.1 value 10 textsize 12
         }

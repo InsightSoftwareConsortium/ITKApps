@@ -44,7 +44,7 @@ GeodesicActiveContourBase
   m_TrialPoints = NodeContainer::New();
 
   m_FastMarchingFilter = FastMarchingFilterType::New();
-  m_FastMarchingFilter->SetSpeedConstant( 1.0 );
+  m_FastMarchingFilter->SetInput( m_SigmoidFilter->GetOutput() );
   m_FastMarchingFilter->SetTrialPoints( m_TrialPoints );
 
   m_InputThresholdFilter = ThresholdFilterType::New();
@@ -61,6 +61,7 @@ GeodesicActiveContourBase
   m_GeodesicActiveContourFilter->SetCurvatureScaling( 0.1 );
   m_GeodesicActiveContourFilter->SetPropagationScaling( 1.0 );
   m_GeodesicActiveContourFilter->SetAdvectionScaling( 1.0 );
+  m_GeodesicActiveContourFilter->UseImageSpacingOn();
 
   m_ThresholdFilter = ThresholdFilterType::New();
   m_ThresholdFilter->SetInput( m_GeodesicActiveContourFilter->GetOutput() );
