@@ -58,7 +58,10 @@
 #define vtkFloatingPointType float
 #endif
 
-vtkCxxRevisionMacro(vtkITKMutualInformationTransform, "$Revision: 1.16 $");
+typedef itk::Size<3> SizeType;
+typedef itk::Index<3> IndexType;
+
+vtkCxxRevisionMacro(vtkITKMutualInformationTransform, "$Revision: 1.17 $");
 vtkStandardNewMacro(vtkITKMutualInformationTransform);
 
 //----------------------------------------------------------------------------
@@ -200,6 +203,7 @@ static void vtkITKMutualInformationExecute(vtkITKMutualInformationTransform *sel
   metric->SetMovingImageStandardDeviation( self->GetSourceStandardDeviation() );
   metric->SetFixedImageStandardDeviation( self->GetTargetStandardDeviation() );
   metric->SetNumberOfSpatialSamples( self->GetNumberOfSamples() );
+  metric->SetFixedImageRegion( self->GetFixedImageRegion() );
 
   fixedItkImporter->Update();
   movingItkImporter->Update();
@@ -393,6 +397,19 @@ void vtkITKMutualInformationTransform::SetTargetImage(vtkImageData *target)
   this->TargetImage = target;
   this->Modified();
 }
+
+void vtkITKMutualInformationTransform::SetFixedImageRegion(int xMin, int xMax, int yMin, int yMax, int zMin, int zMax)
+{
+  int sizeX = xMax-xMin+1;
+  int sizeY = yMax-yMin+1;
+  int sizeZ = zMax-zMin+1;
+
+  SizeType size = {sizeX, sizeY, sizeX};
+  IndexType index = {{xMin, yMin, zMin}};
+  FixedImageRegion.SetIndex(index);
+  FixedImageRegion.SetSize(size);
+}
+
 
 //----------------------------------------------------------------------------
 void vtkITKMutualInformationTransform::Inverse()
