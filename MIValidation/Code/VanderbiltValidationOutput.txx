@@ -117,11 +117,11 @@ VanderbiltValidationOutput<TImage>
     fprintf(file, "Point      x          y          z        new_x       new_y       new_z\n\n");
 
 
-  AffineTransformPointer invTransform;
+  AffineTransformPointer invTransform = AffineTransformType::New();
   if ( !m_InvertTransform )
     {
       // need to invert the input transform
-      invTransform = m_Transform->Inverse();
+      m_Transform->GetInverse(invTransform);
     }
   else
     { 

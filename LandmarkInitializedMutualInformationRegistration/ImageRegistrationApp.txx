@@ -415,7 +415,10 @@ ImageRegistrationApp< TImage >
   resample->SetSize(output->GetLargestPossibleRegion().GetSize());
   resample->SetOutputOrigin(output->GetOrigin());
   resample->SetOutputSpacing(output->GetSpacing());
-  resample->SetTransform(transform->Inverse());
+
+  typename AffineTransformType::Pointer inverse = AffineTransformType::New();
+  transform->GetInverse(inverse);
+  resample->SetTransform(inverse);
   resample->Update();
   
   return resample->GetOutput();
