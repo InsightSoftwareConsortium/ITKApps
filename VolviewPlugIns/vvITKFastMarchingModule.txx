@@ -332,7 +332,7 @@ FastMarchingModule<TInputPixelType>
 ::PostProcessData( const vtkVVProcessDataStruct * pds )
 {
   // note that there is 10% of progress left for Postprocessing
-  this->SetCurrentFilterProgressWeight( 0.5 );
+  this->SetCurrentFilterProgressWeight( 0.1 );
   this->SetUpdateMessage("Postprocessing output...");
   m_IntensityWindowingFilter->Update();
 
