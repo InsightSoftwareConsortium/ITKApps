@@ -24,13 +24,15 @@
 class guiMainImplementation : public guiMain
 {
 public:
-  typedef short ImagePixelType;
+  typedef unsigned char ImagePixelType;
+  typedef unsigned char RealImagePixelType ;
   typedef itk::Image<ImagePixelType,3> ImageType;
-  typedef itk::Image<float,3> RealImageType;
+  typedef itk::Image< RealImagePixelType,3 > RealImageType;
   typedef ImageType::Pointer ImagePointer ;
   typedef unsigned char OverlayImagePixelType;
+  typedef itk::RGBAPixel< OverlayImagePixelType > OverlayPixelType;
 
-  typedef itk::RGBPixel< float > RGBPixelType;
+  typedef itk::RGBPixel< RealImagePixelType > RGBPixelType;
   typedef itk::Image<RGBPixelType,3> RGBImageType;
   typedef RGBImageType::Pointer RGBImagePointer ;
 
@@ -112,10 +114,36 @@ public:
   void LoadLandmarks( bool moving );
   void SaveLandmarks( bool moving );
   void UpdateLandmark( Fl_Group* parent, unsigned int index );
+
+  static void MovingImageViewerLandmarkChangeEventHandlerWrapper(void* prtSelf)
+  {
+    guiMainImplementation* self = (guiMainImplementation*) prtSelf ;
+    self->MovingImageViewerLandmarkChangeEventHandler() ;
+  }
+
+  void MovingImageViewerLandmarkChangeEventHandler()
+  {
+    m_NonRegisteredMovingLandmarks->SetPoints
+      (tkMovingImageViewer->GetSpatialPoints()) ;
+    std::cout << "DEBUG: handler: " 
+              << m_NonRegisteredMovingLandmarks->GetPoints().size() 
+              << std::endl ;
+  }
+    
   void ClearLandmarks(Fl_Group* parent);
   void TransformLandmarks(LandmarksType* source,
                           LandmarksType* target,
                           AffineTransformType* transform) ;
+
+
+  /////////////////////////////////////////////////
+  // Region of interest related functions
+  /////////////////////////////////////////////////
+  void ShowRegionOfInterestWindow() ;
+  void ApplyRegionOfInterest() ;
+  void CancelRegionOfInterest() ;
+  void MoveRegionOfInterest(unsigned int direction) ;
+  void ResizeRegionOfInterest(unsigned int direction) ;
 
   /////////////////////////////////////////////////
   // Advanced option related functions
@@ -157,6 +185,7 @@ private:
   LandmarksType::Pointer m_RegisteredMovingLandmarks ;
   LandmarksType::Pointer m_LandmarkRegisteredMovingLandmarks ;
   LandmarksType::Pointer m_NonRegisteredMovingLandmarks ;
+  OverlayPixelType m_DefaultColor[4];
 
   ImageType::Pointer m_FixedImage ;
   ImageType::Pointer m_MovingImage ;
@@ -170,6 +199,16 @@ private:
   std::string m_LastLoadedImagePath;
   bool m_FixedImageLoaded;
   bool m_MovingImageLoaded;
+
+  bool m_RigidUseLargestRegion ;
+  bool m_RigidUseUserRegion ;
+  bool m_RigidUseLandmarkRegion ;
+  double m_RigidRegionScale ;
+
+  bool m_AffineUseLargestRegion ;
+  bool m_AffineUseUserRegion ;
+  bool m_AffineUseLandmarkRegion ;
+  double m_AffineRegionScale ;
 
   RegistrationAppType::LandmarkScalesType m_Scales;
 };

@@ -41,6 +41,7 @@ public:
   virtual ~ImageRegistrationApp() ;
 
   typedef typename TImage::PixelType ImagePixelType ;
+  typedef typename TImage::RegionType RegionType ;
 
   typedef itk::LinearInterpolateImageFunction< TRealImage, double > 
   InterpolatorType ;
@@ -95,9 +96,7 @@ public:
   typedef DoubleArrayType LandmarkScalesType ;
 
   void RegisterUsingLandmarks(LandmarksType* fixedImageLandmarks,
-                              LandmarksType* movingImageLandmarks,
-                              LandmarkScalesType& scales,
-                              unsigned int numberOfIterations = 1000) ;
+                              LandmarksType* movingImageLandmarks) ;
 
   void RegisterUsingRigidMethod() ;
 
@@ -116,6 +115,12 @@ public:
   itkGetObjectMacro(CenteredLandmarkTransform, AffineTransformType) ;
   itkGetObjectMacro(LandmarkRigidTransform, RigidTransformType) ;
   itkGetObjectMacro(CenteredLandmarkRigidTransform, RigidTransformType) ;
+
+  itkSetMacro(LandmarkNumberOfIterations, unsigned int) ;
+  itkGetConstMacro(LandmarkNumberOfIterations, unsigned int) ;
+
+  itkSetMacro(LandmarkScales, RigidScalesType) ;
+  itkGetConstMacro(LandmarkScales, RigidScalesType) ;
 
   itkSetMacro(RigidNumberOfIterations, unsigned int) ;
   itkGetConstMacro(RigidNumberOfIterations, unsigned int) ;
@@ -153,6 +158,9 @@ public:
   itkSetMacro(AffineScales, AffineScalesType) ;
   itkGetConstMacro(AffineScales, AffineScalesType) ;
 
+  itkSetMacro(FixedImageRegion, RegionType) ;
+  itkGetConstMacro(FixedImageRegion, RegionType) ;
+  
   void NormalizeAndCenter() ;
 
   //  void CenterImage(TRealImage* input, typename TRealImage::Pointer output) ;
@@ -218,6 +226,9 @@ private:
   OffsetType m_FixedImageOffset ;
   OffsetType m_MovingImageOffset ;
 
+  unsigned int m_LandmarkNumberOfIterations ;
+  RigidScalesType m_LandmarkScales ;
+
   unsigned int m_RigidNumberOfIterations ;
   double m_RigidLearningRate ;
   double m_RigidFixedImageStandardDeviation ;
@@ -231,6 +242,7 @@ private:
   double m_AffineMovingImageStandardDeviation ;
   unsigned int m_AffineNumberOfSpatialSamples ;
   AffineScalesType m_AffineScales ;
+  RegionType m_FixedImageRegion ;
 
   typename ImagePyramidType::Pointer m_FixedImagePyramid ;
   typename ImagePyramidType::Pointer m_MovingImagePyramid ;

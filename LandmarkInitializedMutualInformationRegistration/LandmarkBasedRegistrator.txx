@@ -61,6 +61,7 @@ LandmarkBasedRegistrator<TInputImage, TOutputImage, TTransform >
     m_Optimizer->SetCostFunction(m_CostFunction);
     m_Optimizer->SetNormalVariateGenerator(m_Generator);
     m_Optimizer->SetMaximumIteration(m_NumberOfIterations);
+    m_Optimizer->DebugOn() ;
     m_Optimizer->StartOptimization();
     }
   catch( itk::ExceptionObject &e )
@@ -114,17 +115,10 @@ LandmarkBasedRegistrator<TInputImage, TOutputImage, TTransform >
   
   dest->Initialize();
 
-  std::cout<<"CopyPointSet("<<size<<")"<<std::endl;
-
   for( i=0; i<size; i++ )
     {
     dest->InsertElement(i,source->GetElement(i));
-    std::cout<<"Source["<<i<<"] :"<<source->GetElement(i)<<std::endl;
-    std::cout<<"Dest["<<i<<"] :"<<dest->GetElement(i)<<std::endl;
     }
-
-  std::cout<<"Size after copy: "<<dest->Size()<<std::endl;
-
 }
 
 #endif //__LandmarkBasedRegistrator_txx

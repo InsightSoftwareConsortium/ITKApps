@@ -8,7 +8,7 @@ class guiMain {open
   } {
     Fl_Window tkWindow {
       label {3D Registration Tool ====> downloadable on http://caddlab.rad.unc.edu <=====} open
-      xywh {652 52 1060 735} type Double box PLASTIC_UP_BOX color 159 resizable
+      xywh {302 141 1060 735} type Double box PLASTIC_UP_BOX color 159 resizable
       code0 {itk::ImageRegion< 3 > tempRegion ;} visible
     } {
       Fl_Group tkMainGroup {open
@@ -80,17 +80,11 @@ Register();}
           label label
           xywh {448 56 600 601} box FLAT_BOX color 42 deactivate resizable
           code0 {\#include <GLColorSliceView.h>}
-          class {GLColorSliceView< float, unsigned char >}
+          class {GLColorSliceView< unsigned char, unsigned char >}
         }
         Fl_Group tkSubGroup {open
           xywh {5 51 420 609}
         } {
-          Fl_Box tkFixedImageViewer {
-            label label
-            xywh {149 74 275 275} box FLAT_BOX color 42 deactivate
-            code0 {\#include <LandmarkSliceViewer.h>}
-            class {LandmarkSliceViewer< short >}
-          }
           Fl_Button tkSelectFixedImageButton {
             label {Select Reference Image...}
             callback {SelectFixedImage();}
@@ -108,7 +102,7 @@ Register();}
             xywh {149 54 275 15} box PLASTIC_DOWN_BOX color 247 labeltype NO_LABEL labelsize 10 textsize 9
           }
           Fl_Group tkFixedImageLandmarkGroup {open
-            xywh {9 95 131 145} deactivate
+            xywh {9 95 131 179} deactivate
           } {
             Fl_Button tkFixedImageLandmarksClearButton {
               label {clear landmarks}
@@ -165,6 +159,11 @@ Register();}
               callback {UpdateLandmark(o->parent(), 3);}
               tooltip {Landmark 4: extreme right point of the mucosa} xywh {10 157 85 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 3
             }
+            Fl_Button {} {
+              label {Region of interest...}
+              callback {ShowRegionOfInterestWindow() ;}
+              xywh {10 255 130 17} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 248 labelsize 9
+            }
           }
           Fl_Group tkMovingImageLandmarkGroup {open
             xywh {10 400 130 145} deactivate
@@ -191,7 +190,7 @@ Register();}
             }
             Fl_Button tkMovingImageLandmark4JumpButton {
               label {Go to...}
-              callback {JumpToLandmark(1,3);} selected
+              callback {JumpToLandmark(1,3);}
               xywh {95 463 45 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 10
             }
             Fl_Button tkMovingImageLandmarksLoadButton {
@@ -228,7 +227,13 @@ Register();}
           Fl_Box tkMovingImageViewer {
             label label
             xywh {150 380 275 275} box FLAT_BOX color 42 deactivate
-            class {LandmarkSliceViewer< short >}
+            class {LandmarkSliceViewer< unsigned char >}
+          }
+          Fl_Box tkFixedImageViewer {
+            label label
+            xywh {154 79 275 275} box FLAT_BOX color 42 deactivate
+            code0 {\#include <LandmarkSliceViewer.h>}
+            class {LandmarkSliceViewer< unsigned char >}
           }
         }
         Fl_Group tkViewAxisGroup {
@@ -314,16 +319,155 @@ Register();}
         }
       }
     }
+    Fl_Window tkHelpWindow {
+      xywh {-32000 -32000 409 630} type Double box PLASTIC_UP_BOX color 159 hide
+    } {
+      Fl_Help_View tkHelpView {
+        xywh {10 10 390 585} labelsize 10
+      }
+      Fl_Button {} {
+        label Close
+        callback {tkHelpWindow->hide();}
+        xywh {280 605 120 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 88 labelsize 10
+      }
+    }
+    Fl_Window tkRegionOfInterestWindow {
+      label {Region of Interest}
+      xywh {810 292 350 280} type Double box PLASTIC_UP_BOX color 159 visible
+    } {
+      Fl_Group {} {
+        label Move open
+        xywh {76 52 253 43} box PLASTIC_DOWN_BOX labeltype EMBOSSED_LABEL labelsize 12 align 4
+      } {
+        Fl_Button {} {
+          label Left
+          callback {MoveRegionOfInterest(0) ;}
+          xywh {86 62 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
+        }
+        Fl_Button {} {
+          label Right
+          callback {MoveRegionOfInterest(1) ;}
+          xywh {146 62 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
+        }
+        Fl_Button {} {
+          label Up
+          callback {MoveRegionOfInterest(2) ;}
+          xywh {206 62 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
+        }
+        Fl_Button {} {
+          label Down
+          callback {MoveRegionOfInterest(3) ;}
+          xywh {266 62 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
+        }
+      }
+      Fl_Group {} {
+        label Resize open
+        xywh {76 103 253 43} box PLASTIC_DOWN_BOX labeltype EMBOSSED_LABEL labelsize 12 align 4
+      } {
+        Fl_Button {} {
+          label {Hor. -}
+          callback {ResizeRegionOfInterest(0) ;}
+          xywh {86 113 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
+        }
+        Fl_Button {} {
+          label {Hor. +}
+          callback {ResizeRegionOfInterest(1) ;}
+          xywh {146 113 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
+        }
+        Fl_Button {} {
+          label {Vert. -}
+          callback {ResizeRegionOfInterest(2) ;}
+          xywh {206 113 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
+        }
+        Fl_Button {} {
+          label {Vert. +}
+          callback {ResizeRegionOfInterest(3) ;}
+          xywh {266 113 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
+        }
+      }
+      Fl_Group tkROIViewAxisGroup {
+        label {View axis:} open
+        xywh {80 20 175 25} box PLASTIC_DOWN_FRAME labeltype EMBOSSED_LABEL align 4
+      } {
+        Fl_Round_Button tkROIViewAxisX {
+          label X
+          user_data 0
+          callback {SetViewAxis(0) ;
+tkViewAxisX->value(1) ;
+tkViewAxisY->value(0) ;
+tkViewAxisZ->value(0) ;}
+          xywh {123 21 25 24} type Radio down_box ROUND_DOWN_BOX
+        }
+        Fl_Round_Button tkROIViewAxisY {
+          label Y
+          user_data 1
+          callback {SetViewAxis(1) ;
+tkViewAxisX->value(0) ;
+tkViewAxisY->value(1) ;
+tkViewAxisZ->value(0) ;}
+          xywh {168 21 25 24} type Radio down_box ROUND_DOWN_BOX
+        }
+        Fl_Round_Button tkROIViewAxisZ {
+          label Z
+          user_data 2
+          callback {SetViewAxis(2) ;
+tkViewAxisX->value(0) ;
+tkViewAxisY->value(0) ;
+tkViewAxisZ->value(1) ;}
+          xywh {208 21 25 24} type Radio down_box ROUND_DOWN_BOX
+        }
+      }
+      Fl_Value_Input tkROIStep {
+        label Step
+        xywh {295 22 35 25} labeltype EMBOSSED_LABEL maximum 10 step 1 value 1
+      }
+      Fl_Button tkROIOkButton {
+        label OK
+        callback {ApplyRegionOfInterest();}
+        xywh {40 237 125 29} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 63
+      }
+      Fl_Button tkROICancelButton {
+        label Cancel
+        callback {CancelRegionOfInterest() ;}
+        xywh {190 237 125 29} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 88
+      }
+      Fl_Group {} {
+        label {Region by landmarks} open
+        xywh {149 152 178 38} box PLASTIC_DOWN_BOX labeltype EMBOSSED_LABEL labelsize 12 align 4
+      } {
+        Fl_Button {} {
+          label Reset
+          callback {tkFixedImageViewer->InitializeRegionOfInterestWithLandmarks( tkROIScale->value() ) ;
+tkFixedImageViewer->DrawRegionOfInterest() ;}
+          xywh {261 159 58 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
+        }
+        Fl_Value_Input tkROIScale {
+          label Scale
+          xywh {202 159 39 25} maximum 10 step 0.1 value 1
+        }
+      }
+      Fl_Group {} {
+        label {Largest possible region} open
+        xywh {150 192 178 38} box PLASTIC_DOWN_BOX labeltype EMBOSSED_LABEL labelsize 12 align 4
+      } {
+        Fl_Button {} {
+          label Reset
+          callback {tkFixedImageViewer->InitializeRegionOfInterestWithLargestPossibleRegion() ;
+tkFixedImageViewer->DrawRegionOfInterest() ;}
+          xywh {262 199 58 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
+        }
+      }
+    }
     Fl_Window tkAdvancedOptionsWindow {
-      label {Advanced Options...}
-      xywh {1726 206 405 520} type Double box PLASTIC_UP_BOX color 159 labelsize 10 resizable visible
+      label {Advanced Options...} open
+      xywh {799 87 405 520} type Double box PLASTIC_UP_BOX color 159 labelsize 10 resizable visible
     } {
       Fl_Tabs {} {open
-        xywh {15 15 375 455} labelsize 12
+        xywh {15 15 385 465} labelsize 12
       } {
         Fl_Group {} {
-          label {Rigid Registration Options} open
-          xywh {15 40 375 430} labelsize 12 align 2 hide
+          label Rigid open
+          xywh {15 40 375 430} align 2 hide
         } {
           Fl_Button {} {
             label {Help...}
@@ -336,15 +480,15 @@ Register();}
           }
           Fl_Value_Input tkRigidRotationScaleX {
             label {X:}
-            xywh {110 145 65 25} labelsize 12 maximum 1e+09 value 1
+            xywh {110 150 65 25} labelsize 12 maximum 1e+09 value 1
           }
           Fl_Value_Input tkRigidRotationScaleY {
             label {Y:}
-            xywh {110 175 65 25} labelsize 12 maximum 1e+09 value 1
+            xywh {110 180 65 25} labelsize 12 maximum 1e+09 value 1
           }
           Fl_Value_Input tkRigidRotationScaleZ {
             label {Z:}
-            xywh {110 205 65 25} labelsize 12 maximum 1e+09 value 1
+            xywh {110 210 65 25} labelsize 12 maximum 1e+09 value 1
           }
           Fl_Box {} {
             label {Translation Scales}
@@ -352,15 +496,15 @@ Register();}
           }
           Fl_Value_Input tkRigidTranslationScaleX {
             label {X:}
-            xywh {290 145 65 25} labelsize 12 maximum 1e+09 value 100
+            xywh {290 150 65 25} labelsize 12 maximum 1e+09 value 100
           }
           Fl_Value_Input tkRigidTranslationScaleY {
             label {Y:}
-            xywh {290 175 65 25} labelsize 12 maximum 1e+09 value 100
+            xywh {290 180 65 25} labelsize 12 maximum 1e+09 value 100
           }
           Fl_Value_Input tkRigidTranslationScaleZ {
             label {Z:}
-            xywh {290 205 65 25} labelsize 12 maximum 1e+09 value 100
+            xywh {290 210 65 25} labelsize 12 maximum 1e+09 value 100
           }
           Fl_Value_Input tkRigidNumberOfIterations {
             label {Number of Iterations:}
@@ -369,18 +513,6 @@ Register();}
           Fl_Value_Input tkRigidLearningRate {
             label {Learning Rate:}
             xywh {305 285 65 25} labeltype EMBOSSED_LABEL labelsize 12 minimum 1e-10 value 0.0001
-          }
-          Fl_Box {} {
-            xywh {35 65 335 55} box THIN_DOWN_FRAME labelsize 12
-          }
-          Fl_Check_Button tkRigidUseRegion {
-            label {Register using region determined by landmarks}
-            xywh {40 77 225 33} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelsize 12 align 148
-          }
-          Fl_Button {} {
-            label {options...}
-            callback {ShowRegionOptions();}
-            xywh {290 80 70 25} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 12
           }
           Fl_Value_Input tkRigidFixedImageStdDev {
             label {Fixed Image Standard Deviation:}
@@ -396,8 +528,8 @@ Register();}
           }
         }
         Fl_Group {} {
-          label {Affine Registration Options} open
-          xywh {15 40 375 430} labelsize 12
+          label Affine open
+          xywh {15 40 375 430} hide
         } {
           Fl_Box {} {
             label {Matrix Scales}
@@ -491,6 +623,100 @@ Register();}
             xywh {310 435 65 25} labeltype EMBOSSED_LABEL labelsize 12 maximum 10000 value 50
           }
         }
+        Fl_Group {} {
+          label Landmark open
+          xywh {15 40 370 430} hide
+        } {
+          Fl_Box {} {
+            label {Rotation Scales}
+            xywh {40 95 155 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
+          }
+          Fl_Box {} {
+            label {Translation Scales}
+            xywh {215 95 155 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
+          }
+          Fl_Value_Input tkLandmarkNumberOfIterations {
+            label {Number of Iterations:}
+            xywh {300 225 45 25} labeltype EMBOSSED_LABEL labelsize 12 value 200
+          }
+          Fl_Value_Input tkLandmarkRotationScaleY {
+            label {Y:}
+            xywh {115 105 65 25} labelsize 12 maximum 1e+09 value 1
+          }
+          Fl_Value_Input tkLandmarkRotationScaleZ {
+            label {Z:}
+            xywh {115 132 65 25} labelsize 12 maximum 1e+09 value 1
+          }
+          Fl_Value_Input tkLandmarkTranslationScaleX {
+            label {X:}
+            xywh {295 105 65 25} labelsize 12 maximum 1e+09 value 100
+          }
+          Fl_Value_Input tkLandmarkTranslationScaleY {
+            label {Y:}
+            xywh {295 135 65 25} labelsize 12 maximum 1e+09 value 100
+          }
+          Fl_Value_Input tkLandmarkTranslationScaleZ {
+            label {Z:}
+            xywh {295 165 65 25} labelsize 12 maximum 1e+09 value 100
+          }
+          Fl_Value_Input tkLandmarkRotationScaleX {
+            label {X:}
+            xywh {115 160 65 25} labelsize 12 maximum 1e+09 value 1
+          }
+        }
+        Fl_Group {} {
+          label Region open
+          xywh {25 50 365 430}
+        } {
+          Fl_Box {} {
+            label {Rigid }
+            xywh {35 75 345 110} box THIN_DOWN_BOX labeltype EMBOSSED_LABEL align 5
+          }
+          Fl_Box {} {
+            label Affine
+            xywh {35 215 345 110} box THIN_DOWN_BOX labeltype EMBOSSED_LABEL align 5
+          }
+          Fl_Value_Input tkRigidRegionScale {
+            label {Lanmark region scale:}
+            xywh {320 152 40 25} minimum 0.1 maximum 4 step 0.01 value 1
+          }
+          Fl_Group tkRigidRegionChoiceGroup {open
+            xywh {50 80 315 70}
+          } {
+            Fl_Round_Button tkRigidUseLandmarkRegion {
+              label {Use the region determined by the landmarks}
+              xywh {55 125 25 25} type Radio down_box ROUND_DOWN_BOX
+            }
+            Fl_Round_Button tkRigidUseLargestRegion {
+              label {Use the whole image} selected
+              xywh {55 85 25 25} type Radio down_box ROUND_DOWN_BOX value 1
+            }
+            Fl_Round_Button tkRigidUseUserRegion {
+              label {Use the user specified region}
+              xywh {55 105 25 25} type Radio down_box ROUND_DOWN_BOX
+            }
+          }
+          Fl_Value_Input tkAffineRegionScale {
+            label {Landmark region scale:}
+            xywh {320 290 40 25} minimum 0.1 maximum 4 step 0.01 value 1
+          }
+          Fl_Group tkAffineRegionChoiceGroup {open
+            xywh {45 215 320 75}
+          } {
+            Fl_Round_Button tkAffineUseLandmarkRegion {
+              label {Use the region determined by the landmarks}
+              xywh {55 265 25 25} type Radio down_box ROUND_DOWN_BOX
+            }
+            Fl_Round_Button tkAffineUseLargestRegion {
+              label {Use the whole image}
+              xywh {55 225 25 25} type Radio down_box ROUND_DOWN_BOX value 1
+            }
+            Fl_Round_Button tkAffineUseUserRegion {
+              label {Use the user specified region}
+              xywh {55 245 25 25} type Radio down_box ROUND_DOWN_BOX
+            }
+          }
+        }
       }
       Fl_Button tkApplyAdvancedOptionsButton {
         label OK
@@ -501,18 +727,6 @@ Register();}
         label Cancel
         callback {tkAdvancedOptionsWindow->hide();}
         xywh {220 485 125 25} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 88 labelsize 12
-      }
-    }
-    Fl_Window tkHelpWindow {open
-      xywh {-32000 -32000 409 630} type Double box PLASTIC_UP_BOX color 159 hide
-    } {
-      Fl_Help_View tkHelpView {
-        xywh {10 10 390 585} labelsize 10
-      }
-      Fl_Button {} {
-        label Close
-        callback {tkHelpWindow->hide();}
-        xywh {280 605 120 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 88 labelsize 10
       }
     }
   }
@@ -569,5 +783,15 @@ Register();}
   Function {LoadOptions()} {open return_type {virtual void}
   } {}
   Function {SetViewAxis(unsigned int axis)} {open return_type {virtual void}
+  } {}
+  Function {MoveRegionOfInterest(unsigned int direction)} {open return_type {virtual void}
+  } {}
+  Function {ResizeRegionOfInterest(unsigned int direction)} {open return_type {virtual void}
+  } {}
+  Function {ApplyRegionOfInterest()} {open return_type {virtual void}
+  } {}
+  Function {CancelRegionOfInterest()} {open return_type {virtual void}
+  } {}
+  Function {ShowRegionOfInterestWindow()} {open return_type {virtual void}
   } {}
 } 

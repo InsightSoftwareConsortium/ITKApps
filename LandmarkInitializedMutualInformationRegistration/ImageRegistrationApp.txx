@@ -7,6 +7,14 @@ template< class TImage, class TRealImage >
 ImageRegistrationApp< TImage, TRealImage >
 ::ImageRegistrationApp()
 {
+  m_LandmarkScales.resize(7) ;
+  m_LandmarkScales.Fill(100);
+  m_LandmarkScales[0] = 1;
+  m_LandmarkScales[1] = 1;
+  m_LandmarkScales[2] = 1;
+  m_LandmarkScales[3] = 10000000 ; // no scale
+  m_LandmarkNumberOfIterations = 200 ;
+  
   m_RigidNumberOfIterations = 200 ;
   m_RigidLearningRate = 0.0001 ;
   m_RigidFixedImageStandardDeviation = 0.4 ;
@@ -63,15 +71,6 @@ ImageRegistrationApp< TImage, TRealImage >
   // for multi-resolution registration
   m_FixedImagePyramid = ImagePyramidType::New() ;
   m_MovingImagePyramid = ImagePyramidType::New() ;
-
-//   m_FixedImageNormalizer = NormalizerType::New() ;
-//   m_MovingImageNormalizer = NormalizerType::New() ;
-//   m_FixedImageCenterer = CentererType::New() ;
-//   m_MovingImageCenterer = CentererType::New() ;
-
-  //  m_AffineTransform = AffineTransformType::New() ;
-//   std::cout << "BUG: ImageRegistrationApp constructor = " 
-//             << m_AffineTransform << std::endl ;
 }
 
 template< class TImage, class TRealImage >
@@ -112,45 +111,6 @@ ImageRegistrationApp< TImage, TRealImage >
       m_MovingImageOffset[i] = m_RealMovingImage->GetOrigin()[i] ;
     }
 
-//   typename AffineTransformType::OffsetType offset = 
-//     m_LandmarkTransform->GetOffset() ;
-  
-//   typename RigidTransformType::OffsetType offsetRigid =
-//     m_LandmarkRigidTransform->GetOffset() ;
-
-//   std::cout << "DEBUG: offsets before centering" << std::endl ;
-//   std::cout << offset << std::endl ;
-//   std::cout << offsetRigid << std::endl ;
-//   for ( unsigned int i = 0 ; i < TImage::ImageDimension ; i++ )
-//     {
-//       offset[i] += m_FixedImageOffset[i] - m_MovingImageOffset[i] ;
-//       offsetRigid[i] += m_FixedImageOffset[i] - m_MovingImageOffset[i] ;
-//     }
-
-//   std::cout << "DEBUG: offsets after centering" << std::endl ;
-//   std::cout << offset << std::endl ;
-//   std::cout << offsetRigid << std::endl ;
-  
-//   for ( unsigned int i = 0 ; i < TImage::ImageDimension ; i++ )
-//     {
-//       offset[i] = m_FixedImageOffset[i] + 
-//         m_LandmarkTransform->GetOffset()[i] - m_MovingImageOffset[i] ;
-//       offsetRigid[i] = m_FixedImageOffset[i] + 
-//         m_LandmarkRigidTransform->GetOffset()[i] - m_MovingImageOffset[i] ;
-//     }
-//   m_CenteredLandmarkTransform->SetParameters
-//     (m_LandmarkTransform->GetParameters()) ;
-//   m_CenteredLandmarkTransform->SetOffset(offset) ;
-
-//   std::cout << "DEBUG: landmark transform ===== " << std::endl ;
-//   std::cout << m_LandmarkTransform << std::endl ;
-
-//   std::cout << "DEBUG: landmark transform ===== " << std::endl ;
-//   std::cout << m_LandmarkRigidTransform << std::endl ;
-
-//   std::cout << "DEBUG: centered landmark transform ===== " << std::endl ;
-//   std::cout << m_CenteredLandmarkTransform << std::endl ;
-
   AffineTransformType::Pointer tempMoving = AffineTransformType::New() ;
   tempMoving->SetIdentity() ;
   tempMoving->SetOffset(m_MovingImageOffset) ;
@@ -169,120 +129,7 @@ ImageRegistrationApp< TImage, TRealImage >
     (m_LandmarkRigidTransform->GetRotation()) ;
   m_CenteredLandmarkRigidTransform->SetOffset
     (m_CenteredLandmarkTransform->GetOffset()) ;
-
-//   // debug centering
-//   typename AffineTransformType::Pointer tempTransform = AffineTransformType::New() ;
-//   tempTransform->SetMatrix (m_CenteredLandmarkRigidTransform->GetRotationMatrix());
-//   tempTransform->SetOffset(m_CenteredLandmarkRigidTransform->GetOffset());
-
-//   typedef itk::ImageFileWriter< TRealImage > WriterType ;
-//   typename WriterType::Pointer writer = WriterType::New() ;
-//   writer->SetFileName("fixed_image.mhd") ;
-//   writer->SetInput(m_RealFixedImage) ;
-//   writer->Update() ;
-  
-//   typedef itk::ResampleImageFilter< TRealImage, TRealImage > 
-//     ResampleImageFilterType ;
-//   // resample the moving image 
-//   typename InterpolatorType::Pointer interpolator = 
-//     InterpolatorType::New();
-//   interpolator->SetInputImage(m_RealMovingImage);
-  
-//   typename ResampleImageFilterType::Pointer resample = 
-//     ResampleImageFilterType::New();
-//   resample->SetInput(m_RealMovingImage.GetPointer());
-//   resample->SetInterpolator(interpolator.GetPointer());
-//   resample->SetSize(m_RealMovingImage->GetLargestPossibleRegion().GetSize());
-//   resample->SetOutputOrigin(m_RealMovingImage->GetOrigin());
-//   resample->SetOutputSpacing(m_RealMovingImage->GetSpacing());
-//   resample->SetTransform(tempTransform);
-//   resample->Update();
-  
-//   typename WriterType::Pointer writer2 = WriterType::New() ;
-//   writer2->SetFileName("moving_image.mhd") ;
-//   writer2->SetInput(resample->GetOutput()) ;
-//   writer2->Update() ;
 }
-
-// template< class TImage, class TRealImage >
-// void
-// ImageRegistrationApp< TImage, TRealImage >
-// ::NormalizeAndCenter(AffineTransformType* initialAffineTransform,
-//                      AffineTransformType* outputTransform,
-//                      OffsetType& fixedImageOffset,
-//                      OffsetType& movingImageOffset)
-// {
-//   m_FixedImageNormalizer->SetInput( m_FixedImage );
-//   m_FixedImageCenterer->SetInput( m_FixedImageNormalizer->GetOutput() );
-//   m_FixedImageCenterer->CenterImageOn();
-//   m_FixedImageCenterer->Update();
-  
-//   m_RealFixedImage = m_FixedImageCenterer->GetOutput() ;
-  
-//   std::cout << "DEBUG: normcenter fixed image output2 = " 
-//             << m_RealFixedImage << std::endl ;
-
-//   m_MovingImageNormalizer->SetInput( m_MovingImage );
-//   m_MovingImageCenterer->SetInput( m_MovingImageNormalizer->GetOutput() );
-//   m_MovingImageCenterer->CenterImageOn();
-//   m_MovingImageCenterer->Update();
-  
-//   m_RealMovingImage = m_MovingImageCenterer->GetOutput() ;
-  
-//   std::cout << "DEBUG: normcenter moving image output2 = " 
-//             << m_RealMovingImage << std::endl ;
-
-//   std::cout << "DEBUG: image centered." << std::endl ;
-
-//   for ( unsigned int i = 0 ; i < TImage::ImageDimension ; i++ )
-//     {
-//       fixedImageOffset[i] = m_RealFixedImage->GetOrigin()[i] ;
-//       movingImageOffset[i] = m_RealMovingImage->GetOrigin()[i] ;
-//     }
-
-//   std::cout << "DEBUG: NORMCENTER adjusting offset" << std::endl ;
-
-//   typename AffineTransformType::OffsetType offset = 
-//     initialAffineTransform->GetOffset() ;
-
-//   for ( unsigned int i = 0 ; i < TImage::ImageDimension ; i++ )
-//     {
-//       offset += fixedImageOffset[i] - movingImageOffset[i] ;
-//     }
-  
-//   std::cout << "DEBUG: NORMCENTER set offset" << std::endl ;
-//   outputTransform->SetOffset(offset) ;
-//   std::cout << "DEBUG: NORMCENTER end" << std::endl ;
-
-// //   if ( m_UseMultiResolution )
-// //     {
-// //       this->GenerateImagePyramid( m_CenteredNormalizedFixedImage, 
-// //                                   m_FixedImagePyramid, 
-// //                                   m_NumberOfLevels,
-// //                                   m_FixedImageShrinkFactors ) ;
-        
-// //       this->GenerateImagePyramid( m_CenteredNormalizedMovingImage, 
-// //                                   m_MovingImagePyramid, 
-// //                                   m_NumberOfLevels,
-// //                                   m_MovingImageShrinkFactors ) ;
-// //     }
-
-// //   if ( m_UseDeformableRegistration )
-// //     {
-// //       this->MatchIntensity( m_NormalizedFixedImage, m_NormalizedMovingImage,
-// //                            m_MatchedNormalizedMovingImage ) ;
-
-// //       this->GenerateImagePyramid( m_NormalizedFixedImage, 
-// //                                   m_MatchedFixedImagePyramid, 
-// //                                   m_NumberOfLevels,
-// //                                   m_FixedImageShrinkFactors ) ;
-        
-// //       this->GenerateImagePyramid( m_MatchedNormalizedMovingImage, 
-// //                                   m_MatchedMovingImagePyramid, 
-// //                                   m_NumberOfLevels,
-// //                                   m_MovingImageShrinkFactors ) ;
-// //     }
-// }
 
 template< class TImage, class TRealImage >
 void
@@ -294,7 +141,6 @@ ImageRegistrationApp< TImage, TRealImage >
                   PointType& fixedImageLandmarkCenter,
                   PointType& movingImageLandmarkCenter)
 {
-  std::cout << "DEBUG: CenterLandmarks() " << std::endl ;
   PointType point;
 
   point.Fill(0);
@@ -348,9 +194,7 @@ template< class TImage, class TRealImage >
 void
 ImageRegistrationApp< TImage, TRealImage >
 ::RegisterUsingLandmarks(LandmarksType* fixedImageLandmarks,
-                         LandmarksType* movingImageLandmarks,
-                         LandmarkScalesType& scales,
-                         unsigned int numberOfIterations)
+                         LandmarksType* movingImageLandmarks)
 {
   typename LandmarksType::Pointer centeredFixedImageLandmarks = 
     LandmarksType::New() ;
@@ -370,10 +214,6 @@ ImageRegistrationApp< TImage, TRealImage >
   movingImageLandmarkCenter.Fill(0);
   
   // calculate the center of landmarks
-//   std::cout << "DEBUG: REGLAND # of landmarks = " 
-//             << fixedImageLandmarks->Size() << " "
-//             << movingImageLandmarks->Size() << std::endl ;
-
   for( unsigned int i = 0 ; i < fixedImageLandmarks->Size() ; i++ )
     {
       for ( unsigned int j = 0 ; j < PointType::PointDimension ; j++ )
@@ -391,15 +231,7 @@ ImageRegistrationApp< TImage, TRealImage >
         fixedImageLandmarks->Size() ;
     }
   
-//   std::cout << "DEBUG: center of fixed image landmarks = " 
-//             << fixedImageLandmarkCenter << std::endl ;
-
-//   std::cout << "DEBUG: center of moving image landmarks = " 
-//             << movingImageLandmarkCenter << std::endl ;
-
-  
   // center both pointset on (0,0,0)...
-  
   for( unsigned int i = 0 ; i < fixedImageLandmarks->Size() ; i++ )
     {
       for ( unsigned int j = 0 ; j < PointType::PointDimension ; j++ )
@@ -417,16 +249,7 @@ ImageRegistrationApp< TImage, TRealImage >
         }
       
       centeredMovingImageLandmarks->InsertElement(i,point);
-
-//       std::cout << "DEBUG: centered image landmark  " << std::endl ;
-//       std::cout << centeredFixedImageLandmarks->GetElement(i) << ", " 
-//                 << centeredMovingImageLandmarks->GetElement(i) << std::endl ;
     }
-//   this->CenterLandmarks(fixedImageLandmarks, movingImageLandmarks,
-//                         centeredFixedImageLandmarks.GetPointer(),
-//                         centeredMovingImageLandmarks.GetPointer(),
-//                         fixedImageLandmarkCenter,
-//                         movingImageLandmarkCenter) ;
 
   typename LandmarkRegistratorType::Pointer registrator = 
     LandmarkRegistratorType::New();
@@ -439,11 +262,9 @@ ImageRegistrationApp< TImage, TRealImage >
   registrator->SetFixedPointSet( fixedImageLandmarks );
   registrator->SetMovingPointSet( movingImageLandmarks );
   registrator->SetInput( m_FixedImage );
-  registrator->SetScales( scales );
-  registrator->SetNumberOfIterations( numberOfIterations );
+  registrator->SetScales( m_LandmarkScales );
+  registrator->SetNumberOfIterations( m_LandmarkNumberOfIterations );
   
-  std::cout << "DEBUG: start registration ."
-            << std::endl ;
   try
     {
       registrator->StartRegistration();
@@ -497,18 +318,6 @@ ImageRegistrationApp< TImage, TRealImage >
   affineTransform->SetMatrix (regTransform->GetRotationMatrix());
   affineTransform->SetOffset(regTransform->GetOffset());
   
-//   affineTransform->SetMatrix (regTransform->Inverse()->GetRotationMatrix());
-//   affineTransform->SetOffset(regTransform->Inverse()->GetOffset());
-
-//   AffineTransformType::Pointer resultTransform =
-//     AffineTransformType::New() ;
-//   std::cout << "DEBUG: m_AffineTransform = " 
-//             << resultTransform << std::endl ;
-//   outputTransform->SetIdentity();
-//   outputTransform->Compose(preTransform,true);
-//   outputTransform->Compose(affineTransform2,false);
-//   outputTransform->Compose(postTransform,false);
-  
   m_LandmarkTransform->SetIdentity();
   m_LandmarkTransform->Compose(postTransform,true);
   m_LandmarkTransform->Compose(affineTransform,true);
@@ -517,20 +326,6 @@ ImageRegistrationApp< TImage, TRealImage >
   m_LandmarkRigidTransform->SetRotation(regTransform->GetRotation()) ;
   m_LandmarkRigidTransform->SetOffset(m_LandmarkTransform->GetOffset()) ;
 
-//   std::cout << "DEBUG: before inverse" << std::endl ;
-//   std::cout << affineTransform2 << std::endl ;
-//   outputTransform->SetParameters(affineTransform2->Inverse()->GetParameters()) ;
-//   std::cout << "DEBUG: after inverse" << std::endl ;
-//   std::cout << affineTransform2->Inverse() << std::endl ;
-
-//   outputRigidTransform->SetRotation(regTransform->GetRotation().inverse()) ;
-//   outputRigidTransform->SetOffset(outputTransform->GetOffset()) ;
-
-//   outputRigidTransform->SetRotation(regTransform->Inverse()->GetRotation()) ;
-//   outputRigidTransform->SetOffset(outputTransform->Inverse()->GetOffset()) ;
-//   std::cout << "DEBUG: landmark registration result = " 
-//             << resultTransform << std::endl ;
-//   return resultTransform ;
   std::cout << "DEBUG: landmark registration result transform: " << m_LandmarkTransform << std::endl ;
 }
 
@@ -540,8 +335,6 @@ void
 ImageRegistrationApp< TImage, TRealImage >
 ::RegisterUsingRigidMethod()
 {
-  std::cout << "DEBUG: RegisterUsingRigidMethod." << std::endl ;
-
   typename SingleResolutionRegistrationMethodType::Pointer registration = 
     SingleResolutionRegistrationMethodType::New();
   RigidTransformType::Pointer transform = RigidTransformType::New();
@@ -565,8 +358,7 @@ ImageRegistrationApp< TImage, TRealImage >
   metric->SetNumberOfSpatialSamples( m_RigidNumberOfSpatialSamples );
 
   registration->SetFixedImage( m_RealFixedImage ) ;
-  registration->SetFixedImageRegion
-    ( m_RealFixedImage->GetLargestPossibleRegion() ) ;
+  registration->SetFixedImageRegion( m_FixedImageRegion ) ;
   registration->SetMovingImage( m_RealMovingImage ) ;
   registration->SetInterpolator( interpolator.GetPointer() ) ;
   registration->SetMetric( metric );
@@ -585,7 +377,6 @@ ImageRegistrationApp< TImage, TRealImage >
   registration->SetInitialTransformParameters
     ( params );
 
-  std::cout << "DEBUG: before registration " << std::endl ;
   try
     {   
       registration->StartRegistration();
@@ -656,8 +447,7 @@ ImageRegistrationApp< TImage, TRealImage >
   registration->SetFixedImage( m_RealFixedImage );
   registration->SetMovingImage( m_RealMovingImage ) ;
 
-  registration->SetFixedImageRegion
-    ( m_RealFixedImage->GetRequestedRegion() );
+  registration->SetFixedImageRegion( m_FixedImageRegion );
 
   registration->SetInterpolator( interpolator.GetPointer() ) ;
 
@@ -700,15 +490,10 @@ ImageRegistrationApp< TImage, TRealImage >
 
   affineTransform->SetParameters( finalParameters );
 
-//   this->ReverseCenteringTransform(outputTransform, affineTransform, 
-//                                   m_FixedImageOffset, m_MovingImageOffset) ;
-
   m_AffineTransform->SetParameters(affineTransform->GetParameters()) ;
   this->ReverseCenteringTransform(m_AffineTransform, affineTransform, 
                                   m_FixedImageOffset, m_MovingImageOffset) ;
 
-  std::cout << "DEBUG: centered landmark registration result transform: " << m_CenteredLandmarkTransform << std::endl ;
-  std::cout << "DEBUG: full affine registration result transform before recentering: " << affineTransform << std::endl ;
   std::cout << "DEBUG: full affine registration result transform: " << m_AffineTransform << std::endl ;
   std::cout << "DEBUG: final metric value = " << metric->GetValue(finalParameters) << std::endl ;
 }
@@ -719,39 +504,6 @@ ImageRegistrationApp< TImage, TRealImage >
 ::RegisterUsingDeformableMethod()
 {
 }
-
-// template< class TImage, class TRealImage >
-// void
-// ImageRegistrationApp< TImage, TRealImage >
-// ::CenterImage(TRealImage* input, typename TRealImage::Pointer output)
-// {
-//   typedef itk::ChangeInformationImageFilter< TRealImage >  FilterType ;
-
-//   typename FilterType::Pointer filter = FilterType::New();
-//   filter->SetInput( input );
-//   filter->CenterImageOn();
-//   filter->Update();
-  
-//   output = filter->GetOutput() ;
-// }
-
-// template< class TImage, class TRealImage >
-// void
-// ImageRegistrationApp< TImage, TRealImage >
-// ::NormalizeImageToZeroMean(TImage* input, typename TRealImage::Pointer output)
-// {
-//   typedef itk::NormalizeImageFilter< TImage, TRealImage > FilterType ;
-
-//   typename FilterType::Pointer filter = FilterType::New() ;
-//   filter->SetInput( input );
-//   filter->Update();
-
-//   std::cout << "DEBUG: NormalizeImage before output = " 
-//             << output << std::endl ;
-//   output = filter->GetOutput() ;
-//   std::cout << "DEBUG: NormalizeImage after output = " 
-//             << output << std::endl ;
-// }
 
 template< class TImage, class TRealImage >
 void

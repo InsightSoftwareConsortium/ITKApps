@@ -20,10 +20,33 @@ guiMainImplementation
   m_ViewLandmarkRegisteredMovingImage = ImageType::New() ;
   m_ViewRegisteredMovingImage = ImageType::New() ;
 
-  m_NumberOfActiveMovingLandmarks = 0 ;
   m_NonRegisteredMovingLandmarks = LandmarksType::New() ;
   m_LandmarkRegisteredMovingLandmarks = LandmarksType::New() ;
   m_RegisteredMovingLandmarks = LandmarksType::New() ;
+
+  m_RigidUseLargestRegion = true ;
+  m_RigidUseUserRegion = false ;
+  m_RigidUseLandmarkRegion = false ;
+  m_RigidRegionScale = 1.0 ;
+
+  m_AffineUseLargestRegion = true ;
+  m_AffineUseUserRegion = false ;
+  m_AffineUseLandmarkRegion = false ;
+  m_AffineRegionScale = 1.0 ;
+
+  OverlayPixelType p;
+
+  p.Set(0,0,255,255);
+  m_DefaultColor[0] = p;
+
+  p.Set(255,0,0,255);
+  m_DefaultColor[1] = p;
+
+  p.Set(0,255,0,255);
+  m_DefaultColor[2] = p;
+
+  p.Set(255,255,0,255);
+  m_DefaultColor[3] = p;
 
   m_App = new RegistrationAppType() ;
   
@@ -306,6 +329,10 @@ guiMainImplementation
 
   tkFixedImageFile->value("no image loaded...");
   tkMovingImageFile->value("no image loaded...");
+
+  tkMovingImageViewer->RegisterLandmarkChangeCallBack
+    ((void*) this, 
+     guiMainImplementation::MovingImageViewerLandmarkChangeEventHandlerWrapper) ;
 }
 
 void
@@ -406,10 +433,16 @@ guiMainImplementation
     {
     resampler->Update();
     }
-  catch(itk::ExceptionObject &e)
+  catch( itk::ExceptionObject &e )
     {
     std::cout<<e<<std::endl;
     }
+  catch(...)
+    {
+    std::cout << " Unknow exception caught in ResampleUsingResolution!!!" 
+              << std::endl;
+    }
+
 
   return resampler->GetOutput();
 }
@@ -418,15 +451,16 @@ guiMainImplementation::RGBImagePointer
 guiMainImplementation
 ::MakeRGBImage(ImageType * redImage, ImageType * greenImage )
 {
-  typedef itk::NormalizeImageFilter< ImageType, RealImageType > NormalizerType ;
+  typedef itk::NormalizeImageFilter< ImageType, RealImageType > 
+    NormalizerType ;
   NormalizerType::Pointer redImageNormalizer = NormalizerType::New() ;
   NormalizerType::Pointer greenImageNormalizer = NormalizerType::New() ;
-
+  
   redImageNormalizer->SetInput(redImage) ;
   greenImageNormalizer->SetInput(greenImage) ;
   redImageNormalizer->Update() ;
   greenImageNormalizer->Update() ;
-
+  
   typedef itk::ImageRegionIterator< RealImageType > RealImageIterator ;
   RealImageIterator redImageIterator   
     (redImageNormalizer->GetOutput() , redImage->GetLargestPossibleRegion());
@@ -437,15 +471,29 @@ guiMainImplementation
   rgbImage->SetRegions(redImage->GetLargestPossibleRegion());
   rgbImage->SetSpacing(redImage->GetSpacing());
   rgbImage->SetOrigin(redImage->GetOrigin());
-  rgbImage->Allocate() ;
-
+  try
+    {
+    rgbImage->Allocate() ;
+    }
+  catch( itk::ExceptionObject &e )
+    {
+    std::cout<<e<<std::endl;
+    return 0 ;
+    }
+  catch(...)
+    {
+    std::cout << "RGB image allocation fail" 
+              << std::endl;
+    return 0 ;
+    }
+  
   RGBImageRegionIteratorType  rgbImageIterator
     (rgbImage,rgbImage->GetLargestPossibleRegion());
-
+  
   redImageIterator.GoToBegin();
   greenImageIterator.GoToBegin();
   rgbImageIterator.GoToBegin();
-
+  
   for( ; !redImageIterator.IsAtEnd() ; 
        ++redImageIterator, ++greenImageIterator, ++rgbImageIterator )
     {
@@ -453,7 +501,7 @@ guiMainImplementation
     rgbImageIterator.Value()[1] = greenImageIterator.Value();
     rgbImageIterator.Value()[2] = 0;
     }
-
+  
   return rgbImage ;
 }
 
@@ -530,90 +578,53 @@ guiMainImplementation
 
 void 
 guiMainImplementation
-::ShowMovingLandmarks(unsigned int i)
+::ShowMovingLandmarks(unsigned int imageIndex)
 {
-  std::cout << "DEBUG: ShowMovingLandmarks called" << std::endl ;
-  if (i == 0)
+  SliceViewType* view = tkMovingImageViewer ;
+  if (imageIndex == 0)
     {
+    Fl_Group* grp = tkMovingImageLandmarkGroup ;
+    for(unsigned int i=0; i < grp->children(); i++)
+      {
+      ((Fl_Button *)grp->child(i))->activate() ;
+      }   
+
     if ( m_NonRegisteredMovingLandmarks->GetPoints().size() > 0 )
       {
-      tkMovingImageViewer->SetLandmarks(m_NonRegisteredMovingLandmarks) ;
-      m_NumberOfActiveMovingLandmarks = 
-        tkMovingImageViewer->GetRegistrationLandmarks()->Size() ;
-      Fl_Group* grp = tkMovingImageLandmarkGroup ;
-      for(unsigned int i=0; i < grp->children(); i++)
-        {
-        ((Fl_Button *)grp->child(i))->activate() ;
-        }   
-
-      if ( tkMovingImageViewer->GetNumberOfLandmarks() > 0 )
-        {
-        tkMovingImageLandmark1Button->value(1) ;
-        }
-      else
-        {
-        tkMovingImageLandmark1Button->value(0) ;
-        }
-      
-      if ( tkMovingImageViewer->GetNumberOfLandmarks() > 1 )
-        {
-        tkMovingImageLandmark2Button->value(1) ;
-        }
-      else
-        {
-        tkMovingImageLandmark2Button->value(0) ;
-        }
-
-      if ( tkMovingImageViewer->GetNumberOfLandmarks() > 2 )
-        {
-        tkMovingImageLandmark3Button->value(1) ;
-        }
-      else
-        {
-        tkMovingImageLandmark3Button->value(0) ;
-        }
-
-      if ( tkMovingImageViewer->GetNumberOfLandmarks() > 3 )
-        {
-        tkMovingImageLandmark4Button->value(1) ;
-        }
-      else
-        {
-        tkMovingImageLandmark4Button->value(0) ;
-        }
+      view->SetSpatialPoints(m_NonRegisteredMovingLandmarks->GetPoints()) ;
       }
     }
   else 
     {
-    if ( i == 1 )
-      {
-      if ( m_LandmarkRegisteredMovingLandmarks->GetPoints().size() == 4 )
-        {
-        tkMovingImageViewer->SetLandmarks(m_LandmarkRegisteredMovingLandmarks);
-        }
-      }
-    else if ( i == 2 )
-      {
-      if ( m_RegisteredMovingLandmarks->GetPoints().size() > 0 )
-        {
-        tkMovingImageViewer->SetLandmarks(m_RegisteredMovingLandmarks) ;
-        }
-      }
-
-     for( unsigned int i=0 ;
-          i < m_RegisteredMovingLandmarks->GetPoints().size() ;
-          i++ )
-       {
-       ((Fl_Button *)tkMovingImageLandmarkGroup->child(i))->value(1);
-       }   
-    
     tkMovingImageLandmark1Button->deactivate() ;
     tkMovingImageLandmark2Button->deactivate() ;
     tkMovingImageLandmark3Button->deactivate() ;
     tkMovingImageLandmark4Button->deactivate() ;
     tkMovingImageLandmarksClearButton->deactivate() ;
     tkMovingImageLandmarksLoadButton->deactivate() ;
+
+    if ( imageIndex == 1 )
+      {
+      if ( m_LandmarkRegisteredMovingLandmarks->GetPoints().size() == 4 )
+        {
+        tkMovingImageViewer->
+          SetSpatialPoints(m_LandmarkRegisteredMovingLandmarks->GetPoints());
+        }
+      }
+    else if ( imageIndex == 2 )
+      {
+      if ( m_RegisteredMovingLandmarks->GetPoints().size() > 0 )
+        {
+        tkMovingImageViewer->
+          SetSpatialPoints(m_RegisteredMovingLandmarks->GetPoints()) ;
+        }
+      }
     }
+
+  tkMovingImageLandmark1Button->value( view->IsLandmarkAvailable( 0 ) ) ;
+  tkMovingImageLandmark2Button->value( view->IsLandmarkAvailable( 1 ) ) ;
+  tkMovingImageLandmark3Button->value( view->IsLandmarkAvailable( 2 ) ) ;
+  tkMovingImageLandmark4Button->value( view->IsLandmarkAvailable( 3 ) ) ;
 }
 
 void
@@ -705,72 +716,19 @@ guiMainImplementation
       }
     }
 
-  std::cout << "DEBUG: parent = " << parent << std::endl ;
-  std::cout << "DEBUG: grp = " << grp << std::endl ;
-  std::cout << "DEBUG: index = " << index << std::endl ;
-  std::cout 
-    << "DEBUG: tkMovingImageLandmarkGroup = " 
-    << tkMovingImageLandmarkGroup
-    << std::endl ;
-
-  std::cout 
-    << "DEBUG: tkFixedImageLandmarkGroup = " 
-    << tkFixedImageLandmarkGroup
-    << std::endl ;
-
-  std::cout << "DEBUG: tkFixedImageLandmark1Button = " 
-            << tkFixedImageLandmark1Button << " value = " 
-            << tkFixedImageLandmark1JumpButton->value() << std::endl ;
-  std::cout << "DEBUG: tkFixedImageLandmark2Button = " 
-            << tkFixedImageLandmark2Button << " value = " 
-            << tkFixedImageLandmark2JumpButton->value() << std::endl ;
-  std::cout << "DEBUG: tkFixedImageLandmark3Button = " 
-            << tkFixedImageLandmark3Button << " value = " 
-            << tkFixedImageLandmark3Button->value() << std::endl ;
-  std::cout << "DEBUG: tkFixedImageLandmark4Button = " 
-            << tkFixedImageLandmark4Button << " value = " 
-            << tkFixedImageLandmark4Button->value() << std::endl ;
-
-  std::cout << "DEBUG: tkMovingImageLandmark1Button = " 
-            << tkMovingImageLandmark1Button << " value = " 
-            << tkMovingImageLandmark1Button->value() << std::endl ;
-  std::cout << "DEBUG: tkMovingImageLandmark2Button = " 
-            << tkMovingImageLandmark2Button << " value = " 
-            << tkMovingImageLandmark2Button->value() << std::endl ;
-  std::cout << "DEBUG: tkMovingImageLandmark3Button = " 
-            << tkMovingImageLandmark3Button << " value = " 
-            << tkMovingImageLandmark3Button->value() << std::endl ;
-  std::cout << "DEBUG: tkMovingImageLandmark4Button = " 
-            << tkMovingImageLandmark4Button << " value = " 
-            << tkMovingImageLandmark4Button->value() << std::endl ;
-
-
-  std::cout << "DEBUG: button = " 
-            << button << std::endl ;
-
-  std::cout << "DEBUG: button value = " << button->value() << std::endl ;
-  if (!(button->value()))
+  if (!(view->IsLandmarkAvailable( index ) ))
     {
     button->value(1) ;
-    view->AddLandmark(index) ;
-    std::cout << "add landmark." << std::endl ;
+    view->AddLandmark(index, m_DefaultColor[index]) ;
     }
   else
     {
-    if ( view->GetLandmark(index) )
+    view->DeleteLandmark(index) ;
+    if ( view == tkMovingImageViewer )
       {
-      view->DeleteLandmark(index) ;
-      std::cout << "delete landmark." << std::endl ;
+      this->MovingImageViewerLandmarkChangeEventHandler() ;
       }
     button->value(0) ;
-    }
-
-  if ( view == tkMovingImageViewer )
-    {
-    m_NonRegisteredMovingLandmarks->SetPoints
-      ( tkMovingImageViewer->GetLandmarks()->GetPoints() ) ;
-    m_NumberOfActiveMovingLandmarks = 
-      tkMovingImageViewer->GetRegistrationLandmarks()->Size() ;
     }
 }
 
@@ -778,23 +736,21 @@ void
 guiMainImplementation
 ::JumpToLandmark(bool moving,unsigned int index )
 {
-  std::cout << "DEBUG: index = " << index
-            << " Landmark = " 
-            << tkMovingImageViewer->GetLandmark(index)
-            << " IndexLandmark(index) " 
-            << tkMovingImageViewer->GetLandmark(index) << std::endl ;
+  VisualLandmark landmark ;
   if( moving )
     {
-    if( tkMovingImageViewer->GetLandmark(index) )
+    if( tkMovingImageViewer->IsLandmarkAvailable( index ) )
       {
-      tkSliceValuator->value((*(tkMovingImageViewer->GetIndexLandmark(index)))[m_ViewAxis]);
+      tkMovingImageViewer->GetLandmark(index, landmark) ;
+      tkSliceValuator->value(landmark.GetIndex()[m_ViewAxis]);
       }
     }
   else
     {
-    if( tkFixedImageViewer->GetLandmark(index) )
+    if( tkFixedImageViewer->IsLandmarkAvailable( index ) )
       {
-      tkSliceValuator->value((*(tkFixedImageViewer->GetIndexLandmark(index)))[m_ViewAxis]);
+      tkFixedImageViewer->GetLandmark(index, landmark) ;
+      tkSliceValuator->value(landmark.GetIndex()[m_ViewAxis]);
       }
     }
   
@@ -819,7 +775,7 @@ guiMainImplementation
     {
     Fl_Button* button = (Fl_Button*)(parent->child(i)) ;
   
-    if ( view->GetLandmark(i) )
+    if ( view->IsLandmarkAvailable(i) )
       {
       view->DeleteLandmark(i) ;
       }
@@ -832,10 +788,8 @@ guiMainImplementation
   
   if ( view == tkMovingImageViewer )
     {
-    m_NonRegisteredMovingLandmarks->SetPoints
-      ( tkMovingImageViewer->GetLandmarks()->GetPoints() ) ;
-    m_NumberOfActiveMovingLandmarks = 
-      tkMovingImageViewer->GetNumberOfLandmarks() ;
+    m_NonRegisteredMovingLandmarks->
+      SetPoints( tkMovingImageViewer->GetSpatialPoints() ) ;
     }
 }
 
@@ -860,12 +814,12 @@ guiMainImplementation
 
     if (moving)
       {
-      m_NonRegisteredMovingLandmarks = landmarks ;
+      m_NonRegisteredMovingLandmarks->SetPoints( landmarks->GetPoints() ) ;
       this->ShowMovingLandmarks( 0 ) ;
       }
     else
       {
-      tkFixedImageViewer->SetLandmarks(landmarks) ;
+      tkFixedImageViewer->SetSpatialPoints( landmarks->GetPoints() ) ;
 
       Fl_Group* grp = tkFixedImageLandmarkGroup ;
       for(unsigned int i=0; i < grp->children(); i++)
@@ -873,42 +827,10 @@ guiMainImplementation
         ((Fl_Button*)grp->child(i))->activate();
         }   
       
-      if ( tkFixedImageViewer->GetNumberOfLandmarks() > 0 )
-        {
         tkFixedImageLandmark1Button->value(1) ;
-        }
-      else
-        {
-        tkFixedImageLandmark1Button->value(0) ;
-        }
-
-      if ( tkFixedImageViewer->GetNumberOfLandmarks() > 1 )
-        {
         tkFixedImageLandmark2Button->value(1) ;
-        }
-      else
-        {
-        tkFixedImageLandmark2Button->value(0) ;
-        }
-
-      if ( tkFixedImageViewer->GetNumberOfLandmarks() > 2 )
-        {
         tkFixedImageLandmark3Button->value(1) ;
-        }
-      else
-        {
-        tkFixedImageLandmark3Button->value(0) ;
-        }
-
-      if ( tkFixedImageViewer->GetNumberOfLandmarks() > 3 )
-        {
         tkFixedImageLandmark4Button->value(1) ;
-        }
-      else
-        {
-        tkFixedImageLandmark4Button->value(0) ;
-        }
-
       }     
     } 
 }
@@ -931,14 +853,15 @@ guiMainImplementation
   
   WriterType::Pointer writer = WriterType::New() ;
   writer->SetFullFileName(filename) ;
-  ObjectType* landmarks ;
+  ObjectType::Pointer landmarks = ObjectType::New() ;
+
   if (moving)
     {
-    landmarks = tkMovingImageViewer->GetLandmarks() ;
+    landmarks->SetPoints(tkMovingImageViewer->GetSpatialPoints()) ;
     }
   else
     {
-    landmarks = tkFixedImageViewer->GetLandmarks() ;
+    landmarks->SetPoints(tkFixedImageViewer->GetSpatialPoints()) ;
     }
   
   writer->SetInput(landmarks) ;
@@ -951,18 +874,170 @@ guiMainImplementation
                      LandmarksType* target,
                      AffineTransformType* transform)
 {
-  typedef LandmarksType::PointListType ListType ;
-  target->GetPoints().resize( source->GetPoints().size() ) ;
+  LandmarksType::PointListType landmarkList ;
+  LandmarksType::LandmarkPointType point ;
 
-  ListType::iterator s_iter = source->GetPoints().begin() ;
-  ListType::iterator t_iter = target->GetPoints().begin() ;
+  LandmarksType::PointListType::iterator s_iter = source->GetPoints().begin() ;
+  unsigned int id = 0 ;
+  typedef LandmarksType::LandmarkPointType::PixelType ColorType ;
+  ColorType color ;
   while ( s_iter != source->GetPoints().end() )
     {
-    (*t_iter).SetPosition
-      ( transform->Inverse()->TransformPoint( (*s_iter).GetPosition() ) ) ;
+    tkMovingImageViewer->ConvertColorType( m_DefaultColor[id], color ) ;
+    point.SetPosition
+      ( transform->Inverse()->TransformPoint( s_iter->GetPosition() ) ) ;
+    point.SetColor( color ) ;
+    s_iter->SetColor( color ) ;
+    landmarkList.push_back(point) ;
     ++s_iter ;
-    ++t_iter ;
+    ++id ;
     }
+  tkMovingImageViewer->SetSpatialPoints( source->GetPoints() ) ;
+  target->SetPoints( landmarkList ) ;
+}
+
+/////////////////////////////////////////////////
+// Region of interest related functions
+/////////////////////////////////////////////////
+void
+guiMainImplementation
+::ShowRegionOfInterestWindow()
+{
+  tkFixedImageViewer->HideLandmarks() ;
+  tkFixedImageViewer->ShowRegionOfInterest() ;
+
+  tkROIViewAxisX->value(tkViewAxisX->value()) ;
+  tkROIViewAxisY->value(tkViewAxisY->value()) ;
+  tkROIViewAxisZ->value(tkViewAxisZ->value()) ;
+
+  tkRegionOfInterestWindow->show() ;
+}
+
+void 
+guiMainImplementation
+::ApplyRegionOfInterest()
+{
+  tkFixedImageViewer->ApplyRegionOfInterest() ;
+  tkFixedImageViewer->HideRegionOfInterest() ;
+  tkFixedImageViewer->ShowLandmarks() ;
+  tkRegionOfInterestWindow->hide() ;
+}
+
+void 
+guiMainImplementation
+::CancelRegionOfInterest()
+{
+  tkFixedImageViewer->HideRegionOfInterest() ;
+  tkFixedImageViewer->ShowLandmarks() ;
+  tkRegionOfInterestWindow->hide() ;
+}
+
+void 
+guiMainImplementation
+::MoveRegionOfInterest(unsigned int direction)
+{
+  unsigned int axis ;
+  int step ;
+  if ( tkROIViewAxisX->value() )
+    {
+    if ( direction == 0 || direction == 1)
+      {
+      axis = 1 ;
+      }
+    else
+      {
+      axis = 2 ;
+      }
+    }
+
+  if ( tkROIViewAxisY->value() )
+    {
+    if ( direction == 0 || direction == 1)
+      {
+      axis = 0 ;
+      }
+    else
+      {
+      axis = 2 ;
+      }
+    }
+
+  if ( tkROIViewAxisZ->value() )
+    {
+    if ( direction == 0 || direction == 1)
+      {
+      axis = 0 ;
+      }
+    else
+      {
+      axis = 1 ;
+      }
+    }
+
+  if ( direction == 1 || direction == 2 )
+    {
+    step = (int) tkROIStep->value() ;
+    }
+  else
+    {
+    step = -1 * (int) tkROIStep->value() ;
+    }
+  
+  tkFixedImageViewer->MoveRegionOfInterest(axis, step) ;
+}
+
+void 
+guiMainImplementation
+::ResizeRegionOfInterest(unsigned int direction)
+{
+  unsigned int axis ;
+  int step ;
+  if ( tkROIViewAxisX->value() )
+    {
+    if ( direction == 0 || direction == 1)
+      {
+      axis = 1 ;
+      }
+    else
+      {
+      axis = 2 ;
+      }
+    }
+
+  if ( tkROIViewAxisY->value() )
+    {
+    if ( direction == 0 || direction == 1)
+      {
+      axis = 0 ;
+      }
+    else
+      {
+      axis = 2 ;
+      }
+    }
+
+  if ( tkROIViewAxisZ->value() )
+    {
+    if ( direction == 0 || direction == 1)
+      {
+      axis = 0 ;
+      }
+    else
+      {
+      axis = 1 ;
+      }
+    }
+
+  if ( direction == 0 || direction == 2 )
+    {
+    step = -1 * (int) tkROIStep->value() ;
+    }
+  else
+    {
+    step = (int) tkROIStep->value() ;
+    }
+  
+  tkFixedImageViewer->ResizeRegionOfInterest(axis, step) ;
 }
 
 /////////////////////////////////////////////////
@@ -974,6 +1049,15 @@ guiMainImplementation
 ::ShowAdvancedOptions()
 {
   tkAdvancedOptionsWindow->show();
+
+  // set landmark advance option values
+  tkLandmarkRotationScaleX->value(m_App->GetLandmarkScales()[0]) ;
+  tkLandmarkRotationScaleY->value(m_App->GetLandmarkScales()[1]) ;
+  tkLandmarkRotationScaleZ->value(m_App->GetLandmarkScales()[2]) ;
+  tkLandmarkTranslationScaleX->value(m_App->GetLandmarkScales()[4]) ;
+  tkLandmarkTranslationScaleY->value(m_App->GetLandmarkScales()[5]) ;
+  tkLandmarkTranslationScaleZ->value(m_App->GetLandmarkScales()[6]) ;
+  tkLandmarkNumberOfIterations->value(m_App->GetLandmarkNumberOfIterations()) ;
 
   // set rigid advance option values
   tkRigidRotationScaleX->value(m_App->GetRigidScales()[0]) ;
@@ -990,8 +1074,13 @@ guiMainImplementation
     (m_App->GetRigidMovingImageStandardDeviation()) ;
   tkRigidNumberOfSpatialSamples->value
     (m_App->GetRigidNumberOfSpatialSamples()) ;
+  
+  tkRigidUseLargestRegion->value(m_RigidUseLargestRegion) ;
+  tkRigidUseUserRegion->value(m_RigidUseUserRegion) ;
+  tkRigidUseLandmarkRegion->value(m_RigidUseLandmarkRegion) ;
+  tkRigidRegionScale->value(m_RigidRegionScale) ;
 
-  // set rigid advance option values
+  // set affine advance option values
   tkAffineMatrixScale0->value(m_App->GetAffineScales()[0]) ;
   tkAffineMatrixScale1->value(m_App->GetAffineScales()[1]) ;
   tkAffineMatrixScale2->value(m_App->GetAffineScales()[2]) ;
@@ -1012,12 +1101,30 @@ guiMainImplementation
     (m_App->GetAffineMovingImageStandardDeviation()) ;
   tkAffineNumberOfSpatialSamples->value
     (m_App->GetAffineNumberOfSpatialSamples()) ;
+
+  tkAffineUseLargestRegion->value(m_AffineUseLargestRegion) ;
+  tkAffineUseUserRegion->value(m_AffineUseUserRegion) ;
+  tkAffineUseLandmarkRegion->value(m_AffineUseLandmarkRegion) ;
+  tkAffineRegionScale->value(m_AffineRegionScale) ;
 }
 
 void
 guiMainImplementation
 ::ApplyAdvancedOptions()
 {
+
+  // set landmark advance option values
+  RegistrationAppType::RigidScalesType landmarkScales = 
+    m_App->GetLandmarkScales() ;
+  landmarkScales[0] = tkLandmarkRotationScaleX->value() ;
+  landmarkScales[1] = tkLandmarkRotationScaleY->value() ;
+  landmarkScales[2] = tkLandmarkRotationScaleZ->value() ;
+  landmarkScales[4] = tkLandmarkTranslationScaleX->value() ;
+  landmarkScales[5] = tkLandmarkTranslationScaleY->value() ;
+  landmarkScales[6] = tkLandmarkTranslationScaleZ->value() ;
+  m_App->SetLandmarkScales(landmarkScales) ;
+  m_App->SetLandmarkNumberOfIterations((unsigned int) tkLandmarkNumberOfIterations->value()) ;
+
   // set rigid advance option values
   RegistrationAppType::RigidScalesType rigidScales = m_App->GetRigidScales() ;
   rigidScales[0] = tkRigidRotationScaleX->value() ;
@@ -1035,6 +1142,11 @@ guiMainImplementation
     (tkRigidMovingImageStdDev->value()) ;
   m_App->SetRigidNumberOfSpatialSamples
     ((unsigned int) tkRigidNumberOfSpatialSamples->value()) ;
+
+  m_RigidUseLargestRegion = tkRigidUseLargestRegion->value() ;
+  m_RigidUseUserRegion = tkRigidUseUserRegion->value() ;
+  m_RigidUseLandmarkRegion = tkRigidUseLandmarkRegion->value() ;
+  m_RigidRegionScale = tkRigidRegionScale->value() ;
 
   // set affine advance option values
   RegistrationAppType::AffineScalesType affineScales = 
@@ -1062,6 +1174,11 @@ guiMainImplementation
   m_App->SetAffineNumberOfSpatialSamples
     ((unsigned int) tkAffineNumberOfSpatialSamples->value()) ;
 
+  m_AffineUseLargestRegion = tkAffineUseLargestRegion->value() ;
+  m_AffineUseUserRegion = tkAffineUseUserRegion->value() ;
+  m_AffineUseLandmarkRegion = tkAffineUseLandmarkRegion->value() ;
+  m_AffineRegionScale = tkAffineRegionScale->value() ;
+
   tkAdvancedOptionsWindow->hide();
 }
 
@@ -1086,7 +1203,19 @@ guiMainImplementation
     std::cout << "ERROR: cannot open the option file" << std::endl ;
     }
   
+  // landmark
+  RegistrationAppType::RigidScalesType landmarkScales = 
+    m_App->GetLandmarkScales() ;
+  for ( unsigned int i = 0 ; i < landmarkScales.Size() ; ++i )
+    {
+    outputFile << "LandmarkScales_" << i << " " 
+               << landmarkScales[i] << std::endl ;
+    }
   
+  outputFile << "LandmarkNumberOfIterations " 
+             << m_App->GetLandmarkNumberOfIterations() << std::endl ;
+
+  // rigid
   RegistrationAppType::RigidScalesType rigidScales = 
     m_App->GetRigidScales() ;
   for ( unsigned int i = 0 ; i < rigidScales.Size() ; ++i )
@@ -1108,6 +1237,15 @@ guiMainImplementation
   outputFile << "RigidNumberOfSpatialSamples " 
              << m_App->GetRigidNumberOfSpatialSamples() << std::endl ;
   
+  outputFile << "RigidUseLargestRegion " << m_RigidUseLargestRegion 
+             << std::endl ;
+  outputFile << "RigidUseUserRegion " << m_RigidUseUserRegion 
+             << std::endl ;
+  outputFile << "RigidUserLandmarkRegion " << m_RigidUseLandmarkRegion
+             << std::endl ;
+  outputFile << "RigidRegionScale " << m_RigidRegionScale 
+             << std::endl ;
+
   // set affine advance option values
   RegistrationAppType::AffineScalesType affineScales = 
     m_App->GetAffineScales() ;
@@ -1130,6 +1268,15 @@ guiMainImplementation
              << std::endl ;
   outputFile << "AffineNumberOfSpatialSamples " 
              << m_App->GetAffineNumberOfSpatialSamples() << std::endl ;
+
+  outputFile << "AffineUseLargestRegion " << m_AffineUseLargestRegion 
+             << std::endl ;
+  outputFile << "AffineUseUserRegion " << m_AffineUseUserRegion 
+             << std::endl ;
+  outputFile << "AffineUseLandmarkRegion " << m_AffineUseLandmarkRegion
+             << std::endl ;
+  outputFile << "AffineRegionScale " << m_AffineRegionScale 
+             << std::endl ;
 }
 
 void
@@ -1166,6 +1313,20 @@ guiMainImplementation
     }
 
   // set options 
+
+  // landmark
+  RegistrationAppType::RigidScalesType landmarkScales = 
+    m_App->GetLandmarkScales();
+  for ( unsigned int i = 0 ; i < landmarkScales.Size() ; ++i )
+    {
+    std::ostringstream temp ;
+    temp <<  "LandmarkScales_" << i ;
+    landmarkScales[i] = options[temp.str()] ;
+    }
+  m_App->SetLandmarkScales(landmarkScales) ;
+  m_App->SetLandmarkNumberOfIterations((unsigned int)options["LandmarkNumberOfIterations"]) ;
+
+  // rigid
   RegistrationAppType::RigidScalesType rigidScales = m_App->GetRigidScales();
   for ( unsigned int i = 0 ; i < rigidScales.Size() ; ++i )
     {
@@ -1180,6 +1341,12 @@ guiMainImplementation
   m_App->SetRigidMovingImageStandardDeviation(options["RigidMovingImageStandardDeviation"]) ; 
   m_App->SetRigidNumberOfSpatialSamples((unsigned int)options["RigidNumberOfSpatialSamples"]) ;
 
+  m_RigidUseLargestRegion = (bool) options["RigidUseLargestRegion"] ;
+  m_RigidUseUserRegion = (bool) options["RigidUseUserRegion"] ;
+  m_RigidUseLandmarkRegion = (bool) options["RigidUseLandmarkRegion"] ;
+  m_RigidRegionScale = options["RigidRegionScale"] ;
+  
+  // affine
   RegistrationAppType::AffineScalesType affineScales = 
     m_App->GetAffineScales() ;
   for ( unsigned int i = 0 ; i < affineScales.Size() ; ++i )
@@ -1194,6 +1361,11 @@ guiMainImplementation
   m_App->SetAffineFixedImageStandardDeviation(options["AffineFixedImageStandardDeviation"]) ;
   m_App->SetAffineMovingImageStandardDeviation(options["AffineMovingImageStandardDeviation"]) ; 
   m_App->SetAffineNumberOfSpatialSamples((unsigned int)options["AffineNumberOfSpatialSamples"]) ;
+
+  m_AffineUseLargestRegion = (bool) options["AffineUseLargestRegion"] ;
+  m_AffineUseUserRegion = (bool) options["AffineUseUserRegion"] ;
+  m_AffineUseLandmarkRegion = (bool) options["AffineUseLandmarkRegion"] ;
+  m_AffineRegionScale = options["AffineRegionScale"] ;
 }
 
 /////////////////////////////////////////////////
@@ -1259,18 +1431,14 @@ guiMainImplementation
   fl_cursor(Fl_Cursor(FL_CURSOR_WAIT), (Fl_Color) 56, (Fl_Color) 255) ;
   m_App->SetFixedImage(m_FixedImage.GetPointer()) ;
   m_App->SetMovingImage(m_MovingImage.GetPointer()) ;
+  typedef itk::VectorContainer<int, Point< double, 3 > > PointSetType;
+  PointSetType::Pointer registrationLandmarks = PointSetType::New() ;
 
-  std::cout << "DEBUG: register: " << m_NumberOfActiveMovingLandmarks
-            << std::endl ;
-  std::cout << "DEBUG: register: " 
-            << tkMovingImageViewer->GetNumberOfLandmarks() << std::endl ;
   if( tkFixedImageViewer->GetNumberOfLandmarks() == 4 &&
-      m_NumberOfActiveMovingLandmarks == 4)
+      m_NonRegisteredMovingLandmarks->GetPoints().size() == 4)
     {
     this->ChangeStatusDisplay("Register using landmarks") ;
 
-    typedef itk::VectorContainer<int, Point< double, 3 > > PointSetType;
-    PointSetType::Pointer registrationLandmarks = PointSetType::New() ;
     registrationLandmarks->Reserve
       (m_NonRegisteredMovingLandmarks->GetPoints().size()) ;
     LandmarksType::PointListType::iterator iter = 
@@ -1282,15 +1450,13 @@ guiMainImplementation
       ++iter ;
       ++id ;
       }
-
     m_App->RegisterUsingLandmarks
-      (tkFixedImageViewer->GetRegistrationLandmarks(),
-       registrationLandmarks,
-       m_Scales,
-       1000) ;
+      (tkFixedImageViewer->GetLandmarkVector(),
+       registrationLandmarks.GetPointer()) ;
 
-    this->TransformLandmarks( m_NonRegisteredMovingLandmarks.GetPointer(),
-                              m_LandmarkRegisteredMovingLandmarks.GetPointer(),
+    this->ChangeStatusDisplay("Transforming the landmarks...") ;
+    this->TransformLandmarks( m_NonRegisteredMovingLandmarks,
+                              m_LandmarkRegisteredMovingLandmarks,
                               m_App->GetLandmarkTransform() ) ;
     this->ChangeStatusDisplay("Resampling registered moving image...") ;
     m_LandmarkRegisteredMovingImage = 
@@ -1319,11 +1485,28 @@ guiMainImplementation
     tkLandmarkRegisteredView->deactivate() ;
     }
   
+  RegionType region ;
+  region = m_FixedImage->GetLargestPossibleRegion() ;
+    
   switch( tkRegistrationMethodChoice->value() )
     {
     case 0: // rigid 
     {
     this->ChangeStatusDisplay("Registering using the rigid method...") ;
+  
+    if ( tkRigidUseUserRegion->value() == true 
+         && tkFixedImageViewer->IsRegionOfInterestAvailable() )
+      {
+      region = tkFixedImageViewer->GetRegionOfInterest() ;
+      }
+    else if ( tkRigidUseLandmarkRegion->value() == true 
+              && tkFixedImageViewer->GetNumberOfLandmarks() == 4 )
+      {
+      region = tkFixedImageViewer->ComputeLandmarkRegion
+        (tkRigidRegionScale->value()) ;
+      }
+
+    m_App->SetFixedImageRegion(region) ;
     m_App->NormalizeAndCenter() ;
     m_App->RegisterUsingRigidMethod() ;
     break ;
@@ -1331,6 +1514,18 @@ guiMainImplementation
     case 1: // affine
     {
     this->ChangeStatusDisplay("Registering using the affine method...") ;
+    if ( tkAffineUseUserRegion->value() == true 
+         && tkFixedImageViewer->IsRegionOfInterestAvailable() )
+      {
+      region = tkFixedImageViewer->GetRegionOfInterest() ;
+      }
+    else if ( tkAffineUseLandmarkRegion->value() == true 
+              && tkFixedImageViewer->GetNumberOfLandmarks() == 4 )
+      {
+      region = tkFixedImageViewer->ComputeLandmarkRegion
+        (tkAffineRegionScale->value()) ;
+      }
+    m_App->SetFixedImageRegion(region) ;
     m_App->NormalizeAndCenter() ;
     m_App->RegisterUsingAffineMethod() ;
     break ;
@@ -1342,8 +1537,8 @@ guiMainImplementation
       break ;
     }
 
-  this->TransformLandmarks( m_NonRegisteredMovingLandmarks.GetPointer(),
-                            m_RegisteredMovingLandmarks.GetPointer(),
+  this->TransformLandmarks( m_NonRegisteredMovingLandmarks,
+                            m_RegisteredMovingLandmarks,
                             m_App->GetAffineTransform() ) ;
   
   this->ChangeStatusDisplay("Resampling the moving image...") ;
