@@ -39,6 +39,7 @@
 #include "vtkProperty.h"
 #include "vtkImagePlaneWidget.h"
 #include "vtkCellPicker.h"
+#include "vtkPolyDataWriter.h"
 
 #include <iostream>
 
@@ -107,7 +108,7 @@ int main(int argc, char * argv [] )
   if( argc < 2 )
     {
     std::cerr << "Missing parameters" << std::endl;
-    std::cerr << "Usage: " << argv[0] << " inputImageFilename " << std::endl;
+    std::cerr << "Usage: " << argv[0] << " inputImageFilename [seedX seedY seedZ]" << std::endl;
     return 1;
     }
   
@@ -133,12 +134,21 @@ int main(int argc, char * argv [] )
     filter->SetReplaceValue(255);
     filter->SetMultiplier(2.5);
 
-    ImageType::IndexType index;
-    index[0] = 100;
-    index[1] = 100;
-    index[2] = 100;
+    ImageType::IndexType seed;
+    seed[0] = 100;
+    seed[1] = 100;
+    seed[2] = 100;
 
-    filter->SetSeed( index );
+    if( argc >= 4 )
+      {
+      seed[0] = atoi( argv[2] );
+      seed[1] = atoi( argv[3] );
+      seed[2] = atoi( argv[4] );
+      }
+
+    std::cout << "Seed point = " << seed << std::endl;
+
+    filter->SetSeed( seed );
       
     
     typedef itk::VTKImageExport< ImageType > ExportFilterType;
@@ -253,9 +263,15 @@ int main(int argc, char * argv [] )
     polyActor->SetMapper( polyMapper );
     polyMapper->SetInput( contour->GetOutput() );
     
+    contour->Update();
+    contour->GetOutput()->Print( std::cout );
+
+    vtkPolyDataWriter * writer = vtkPolyDataWriter::New();
+    writer->SetFileName("Contour.vtk");
+    writer->SetInput( contour->GetOutput() );
+    writer->Write();
 
     vtkProperty * property = vtkProperty::New();
-    property->SetRepresentationToSurface();
     property->SetAmbient(0.1);
     property->SetDiffuse(0.1);
     property->SetSpecular(0.5);
