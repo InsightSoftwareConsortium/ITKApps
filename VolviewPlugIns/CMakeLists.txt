@@ -58,6 +58,7 @@ SET (PLUGINS
   vvITKDeformableModelModule
   vvITKFastMarching
   vvITKFastMarchingModule
+  vvITKGeodesicActiveContour
   vvITKGeodesicActiveContourModule
   vvITKGradientAnisotropicDiffusion
   vvITKGradientMagnitude
