@@ -26,9 +26,11 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
   const float * seedCoordinates = info->Markers;
 
   itk::Index<Dimension> seed;
-  seed[0] =  static_cast< int >( seedCoordinates[0] );
-  seed[1] =  static_cast< int >( seedCoordinates[1] );
-  seed[2] =  static_cast< int >( seedCoordinates[2] );
+  for(unsigned int i=0; i<3; i++)
+    { 
+    seed[i] =  static_cast< int >( 
+         (seedCoordinates[i] - info->InputVolumeOrigin[i] ) / info->InputVolumeSpacing[i] );
+    }
 
   try 
   {
@@ -59,7 +61,6 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       typedef  itk::Image< PixelType, Dimension >   ImageType; 
       typedef  ImageType::IndexType                 IndexType;
       typedef  itk::ConfidenceConnectedImageFilter< ImageType,  ImageType >   FilterType;
-      IndexType seed;
       VolView::PlugIn::FilterModule< FilterType > module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Confidence Connected Region Growing...");
