@@ -145,7 +145,7 @@ int main(int argc, char **argv)
       {
       LandmarkReaderType::Pointer fixedLandmarkReader =
                                   LandmarkReaderType::New();
-      fixedLandmarkReader->SetFullFileName(fixedLandmarksFilename);
+      fixedLandmarkReader->SetFileName(fixedLandmarksFilename);
       fixedLandmarkReader->Update();
       GroupType::Pointer group = fixedLandmarkReader->GetGroup();
       GroupType::ChildrenListType * children = group->GetChildren();
@@ -156,7 +156,7 @@ int main(int argc, char **argv)
 
       LandmarkReaderType::Pointer movingLandmarkReader =
                                   LandmarkReaderType::New();
-      movingLandmarkReader->SetFullFileName(movingLandmarksFilename);
+      movingLandmarkReader->SetFileName(movingLandmarksFilename);
       movingLandmarkReader->Update();
       group = movingLandmarkReader->GetGroup();
       children = group->GetChildren();
@@ -266,7 +266,7 @@ int main(int argc, char **argv)
     if( strlen( outputTransformFilename ) > 1)
       {
       GroupWriterType::Pointer transformWriter = GroupWriterType::New();
-      transformWriter->SetFullFileName(outputTransformFilename);
+      transformWriter->SetFileName(outputTransformFilename);
       GroupType::Pointer group = GroupType::New();
       itk::SpatialObject<3>::TransformType::Pointer transform =
           itk::SpatialObject<3>::TransformType::New();

@@ -526,7 +526,7 @@ guiMainImplementation
     typedef itk::SpatialObjectReader<> ReaderType;
       
     ReaderType::Pointer reader = ReaderType::New();
-    reader->SetFullFileName(filename);
+    reader->SetFileName(filename);
     reader->Update();
     ReaderType::GroupPointer group = reader->GetGroup();
     ReaderType::GroupType::ChildrenListType* children = group->GetChildren();
@@ -588,7 +588,7 @@ guiMainImplementation
   typedef itk::GroupSpatialObject< > GroupType;
   
   WriterType::Pointer writer = WriterType::New();
-  writer->SetFullFileName(filename);
+  writer->SetFileName(filename);
   ObjectType::Pointer landmarks = ObjectType::New();
 
   if (moving)
@@ -1148,7 +1148,7 @@ guiMainImplementation
       TransformType;
 
     WriterType::Pointer writer = WriterType::New();
-    writer->SetFullFileName(filename);
+    writer->SetFileName(filename);
       
     GroupType::Pointer grp = GroupType::New();
     TransformType::Pointer transform = TransformType::New();
