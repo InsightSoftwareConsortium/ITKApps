@@ -37,7 +37,7 @@ public:
   typedef   float                             InputPixelType;
   typedef   float                             PixelType;
   typedef   float                             OutputPixelType;
-  typedef   unsigned char                     WritePixelType;
+  typedef   float                     WritePixelType;
 
   typedef   float                             ComputationType;
 

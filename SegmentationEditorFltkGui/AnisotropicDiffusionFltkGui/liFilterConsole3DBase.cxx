@@ -143,7 +143,7 @@ liFilterConsole3DBase
   m_Rescaler->Update();
 
   m_Writer->SetFileName( filename );
-  m_Writer->SetInput(  m_Rescaler->GetOutput()  );
+  m_Writer->SetInput(  m_FilterG->GetOutput()  );
   m_Writer->Update();
 
 }
@@ -166,7 +166,7 @@ liFilterConsole3DBase
   m_Rescaler->Update();
 
   m_Writer->SetFileName( filename );
-  m_Writer->SetInput(  m_Rescaler->GetOutput()  );
+  m_Writer->SetInput(  m_FilterC->GetOutput()  );
   m_Writer->Update();
 
 }
