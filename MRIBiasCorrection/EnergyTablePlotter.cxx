@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
 
   EnergyFunction energy(classMeans, classSigmas) ;
   
-  double higher = energy.GetHigherBound() ;
+  double higher = energy.GetUpperBound() ;
   double lower = energy.GetLowerBound() ;
   long noOfSamples = energy.GetNumberOfSamples() ; 
   double TableInc = (double) ((higher - lower) / 
