@@ -644,6 +644,7 @@ protected:
 
   // Help system callbacks
   void OnLaunchTutorialAction();
+  void ShowHTMLPage(const char *link);
 
   // Set the active page in the segmentation pipeline
   void SetActiveSegmentationPipelinePage(unsigned int page);
@@ -754,6 +755,10 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.10  2003/11/10 00:27:26  pauly
+ *FIX: Bug with linear interpolation in PDE solver
+ *ENH: Help viewer and tutorial
+ *
  *Revision 1.9  2003/10/09 22:45:14  pauly
  *EMH: Improvements in 3D functionality and snake parameter preview
  *

@@ -2749,11 +2749,20 @@ UserInterfaceLogic
 ::OnLaunchTutorialAction()
 {
   // Find the tutorial file name
+  ShowHTMLPage("Tutorial.html");
+}
+
+void
+UserInterfaceLogic
+::ShowHTMLPage(const char *link)
+{
+  // Get the path to the file name
+  string completeLink = string("HTMLHelp") +  link;
   string file = 
-    m_SystemInterface->GetFileInRootDirectory("HTMLHelp/Tutorial.html");
+    m_SystemInterface->GetFileInRootDirectory(completeLink.c_str());
 
   // Show the help window
-  m_HelpUI->ShowHelp(file.c_str());
+  m_HelpUI->ShowHelp(file.c_str());  
 }
 
 void
@@ -2953,6 +2962,9 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.12  2003/11/29 14:02:42  pauly
+ *FIX: History list and file associations faili with spaces in filenames
+ *
  *Revision 1.11  2003/11/10 00:27:26  pauly
  *FIX: Bug with linear interpolation in PDE solver
  *ENH: Help viewer and tutorial

@@ -140,6 +140,7 @@ public:
 
   // Help related callbacks
   virtual void OnLaunchTutorialAction() = 0;
+  virtual void ShowHTMLPage(const char *link) = 0;
 
 protected:
     GlobalState *m_GlobalState;

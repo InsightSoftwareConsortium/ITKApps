@@ -41,7 +41,7 @@ class UserInterface {open : {public UserInterfaceBase}
       xywh {270 66 878 710} type Double align 0 resizable
       code0 {\#include "UserInterfaceBase.h"} visible
     } {
-      Fl_Menu_Bar m_MenubarMain {
+      Fl_Menu_Bar m_MenubarMain {selected
         xywh {0 0 146 25} labelsize 12 textsize 12
       } {
         submenu {} {
@@ -155,7 +155,7 @@ class UserInterface {open : {public UserInterfaceBase}
           }
           menuitem {} {
             label {&About}
-            callback {m_WinAbout->show();}
+            callback {this->ShowHTMLPage("Credits.html");}
             xywh {30 30 100 20} labelsize 12
           }
         }
@@ -353,7 +353,7 @@ OnDrawOverLabelUpdate();} open
               tooltip {3D paint tool: spray paint and scalpel tools} image {Artwork/scalpel.gif} xywh {95 545 35 35} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 180 align 16
             }
           }
-          Fl_Group m_GrpWelcomePage {open selected
+          Fl_Group m_GrpWelcomePage {open
             xywh {0 25 145 680} color 53
           } {
             Fl_Group {} {
