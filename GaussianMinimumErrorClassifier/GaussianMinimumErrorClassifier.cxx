@@ -248,7 +248,7 @@ int main(int argc, char* argv[])
   generator->SetNumberOfClasses(numberOfClasses) ;
   generator->GenerateData() ;
  
-  MembershipSampleType::Pointer membershipSample = generator->GetOutput() ;
+  MembershipSampleType::ConstPointer membershipSample = generator->GetOutput() ;
 
   /* =================================================== */
   std::cout << "Inducing the gaussian density function parameters and"
