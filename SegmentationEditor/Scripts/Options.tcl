@@ -40,7 +40,7 @@ set Options(menu_text_color)            "black"
 set Options(help_box_color)             "lightgreen"
 set Options(message_box_font)           "WST_Message"
 set Options(minimum_console_window_width)  30
-set Options(minimum_console_window_height) 20
+set Options(minimum_console_window_height) 10
 set Options(normal_font)                "WST_Normal"
 set Options(pleasant_background_color)  "lightblue"
 set Options(program_name)               "Segmentation Editor"

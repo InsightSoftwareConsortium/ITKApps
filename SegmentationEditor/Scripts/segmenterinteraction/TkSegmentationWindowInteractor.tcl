@@ -62,7 +62,8 @@ proc SelectRegion {widget x y resampler dataReader WSmanager} {
     if { $magX != 0 } { set x [expr int ($x / $magX) ]  }
     if { $magY != 0 } { set y [expr int ($y / $magY) ] }
 
-    set val [ [$dataReader GetOutput] GetScalarComponentAsFloat $x $y $z 0]
+#    set val [ [$dataReader GetOutput] GetScalarComponentAsFloat $x $y $z 0]
+    set val [ [$dataReader GetOutput] GetScalarComponentAsDouble $x $y $z 0]
 
     $WSmanager CompileEquivalenciesFor $x $y $z [$dataReader GetOutput]
 
@@ -100,7 +101,8 @@ proc AppendRegion {widget x y resampler dataReader WSmanager} {
     if { $magX != 0 } { set x [expr int ($x / $magX) ]  }
     if { $magY != 0 } { set y [expr int ($y / $magY) ] }
 
-    set val [ [$dataReader GetOutput] GetScalarComponentAsFloat $x $y $z 0]
+#    set val [ [$dataReader GetOutput] GetScalarComponentAsFloat $x $y $z 0]
+    set val [ [$dataReader GetOutput] GetScalarComponentAsDouble $x $y $z 0]
 
     $WSmanager AppendEquivalenciesFor $x $y $z [$dataReader GetOutput]
 

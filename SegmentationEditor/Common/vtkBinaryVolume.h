@@ -46,17 +46,34 @@ public:
   void Unset(int x, int y, int z)
     { *( (unsigned char *)( GetScalarPointer(x, y, z) )) = 0;}
   bool   Get(int x, int y, int z)
-    { return (bool) (*( (unsigned char *)( GetScalarPointer(x, y, z) ))); }
+  {
+    if ( *(static_cast<unsigned char*>( GetScalarPointer(x,y,z) )) != 0 )
+      {
+      return true;
+      }
+    else
+      {
+      return false;
+      }
+  }
 
   int WriteToDisk(const char *fn);
   int ReadFromDisk(const char *fn);
   
   // For interfacing with Tcl.
   int   GetAsInt(int x, int y, int z)
-    { return (int) (*( (unsigned char *)( GetScalarPointer(x, y, z) ))); }
+  {
+    return (int) (*( (unsigned char *)( GetScalarPointer(x, y, z) )));
+  }
   float GetAsFloat(int x, int y, int z)
-    { return (float) (*( (unsigned char *)( GetScalarPointer(x, y, z) ))); }
-
+  {
+    return (float) (*( (unsigned char *)( GetScalarPointer(x, y, z) )));
+  }
+  //  double GetAsDouble(int x, int y, int z)
+  //  {
+  //    return this->GetScalarComponentAsDouble(x,y,z,0);
+  //  }
+  
   void SetPaintRadius(int r)
     { paint_radius = r; }
 

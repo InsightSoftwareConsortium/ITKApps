@@ -19,7 +19,7 @@ package require vtkinteraction
 set PostprocessorGlobals(has_run_segmentation) 0
 set PostprocessorGlobals(flip_y_axis) 0
 set PostprocessorGlobals(load_count) 0
-set PostprocessorGlobals(frame_title_text)    "Postprocessor"
+set PostprocessorGlobals(frame_title_text)    "Level Sets Postprocessor"
 set PostprocessorGlobals(source_window_label) "Seed Volume"
 set PostprocessorGlobals(feature_window_label) "Feature/Output Volume"
 set PostprocessorGlobals(source_label)        "Seed Data"
@@ -538,7 +538,7 @@ proc PostprocessorInitialize {} {
     vtkITKThresholdSegmentationLevelSetImageFilter PostprocessorThresholdSegmenter
     PostprocessorThresholdSegmenter SetLowerThreshold $PostprocessorGlobals(default_lower_threshold)
     PostprocessorThresholdSegmenter SetUpperThreshold $PostprocessorGlobals(default_upper_threshold)
-    PostprocessorThresholdSegmenter SetMaximumIterations $PostprocessorGlobals(default_maximum_iterations)
+    PostprocessorThresholdSegmenter SetNumberOfIterations $PostprocessorGlobals(default_maximum_iterations)
     PostprocessorThresholdSegmenter SetMaximumRMSError $PostprocessorGlobals(default_maximum_rms_error)
     set PostprocessorGlobals(threshold_segmenter) PostprocessorThresholdSegmenter
 
@@ -546,7 +546,7 @@ proc PostprocessorInitialize {} {
     # Laplacian based level set style segmentation
     #
     vtkITKLaplacianSegmentationLevelSetImageFilter PostprocessorLaplacianSegmenter
-    PostprocessorLaplacianSegmenter SetMaximumIterations $PostprocessorGlobals(default_maximum_iterations)
+    PostprocessorLaplacianSegmenter SetNumberOfIterations $PostprocessorGlobals(default_maximum_iterations)
     PostprocessorLaplacianSegmenter SetMaximumRMSError $PostprocessorGlobals(default_maximum_rms_error)
     set PostprocessorGlobals(laplacian_segmenter) PostprocessorLaplacianSegmenter
 
@@ -622,8 +622,8 @@ proc PostprocessorLoadData {} {
     $PostprocessorGlobals(source_reader) Modified
 
     ConstructProgressWindow sourceReaderProgressWindow
-    $PostprocessorGlobals(source_reader) SetProgressMethod \
-        "ProgressProc $PostprocessorGlobals(source_reader) .sourceReaderProgressWindow"
+    $PostprocessorGlobals(source_reader) AddObserver ProgressEvent \
+        {ProgressProc $PostprocessorGlobals(source_reader) .sourceReaderProgressWindow}
 
     [$PostprocessorGlobals(source_reader) GetOutput] SetUpdateExtentToWholeExtent
     $PostprocessorGlobals(source_reader) Update
@@ -717,8 +717,8 @@ proc PostprocessorLoadFeature {} {
     $PostprocessorGlobals(feature_reader) Modified
 
     ConstructProgressWindow featureReaderProgressWindow
-    $PostprocessorGlobals(feature_reader) SetProgressMethod \
-        "ProgressProc $PostprocessorGlobals(feature_reader) .featureReaderProgressWindow"
+    $PostprocessorGlobals(feature_reader) AddObserver ProgressEvent \
+        {ProgressProc $PostprocessorGlobals(feature_reader) .featureReaderProgressWindow}
 
     [$PostprocessorGlobals(feature_reader) GetOutput] SetUpdateExtentToWholeExtent
     $PostprocessorGlobals(feature_reader) Update
@@ -845,7 +845,7 @@ proc PostprocessorStartSegmentation {} {
 
     ## Set up the segmentation filters
 
-    $PostprocessorGlobals(threshold_segmenter) SetMaximumIterations \
+    $PostprocessorGlobals(threshold_segmenter) SetNumberOfIterations \
         [expr int([$PostprocessorGlobals(iterations_entry) get]) ]
     $PostprocessorGlobals(threshold_segmenter) SetMaximumRMSError \
         [$PostprocessorGlobals(rms_entry) get]
@@ -856,9 +856,9 @@ proc PostprocessorStartSegmentation {} {
     $PostprocessorGlobals(threshold_segmenter) SetIsoSurfaceValue \
         [$PostprocessorGlobals(isovalue_entry) get]
     if { $PostprocessorGlobals(negative_speed) == 1 } {
-        $PostprocessorGlobals(threshold_segmenter) SetUseNegativeFeatures 1
+        $PostprocessorGlobals(threshold_segmenter) SetReverseExpansionDirection 1
     } else {
-        $PostprocessorGlobals(threshold_segmenter) SetUseNegativeFeatures 0
+        $PostprocessorGlobals(threshold_segmenter) SetReverseExpansionDirection 0
     }
     $PostprocessorGlobals(threshold_segmenter) SetFeatureScaling \
         [$PostprocessorGlobals(feature_scaling) get]
@@ -866,16 +866,16 @@ proc PostprocessorStartSegmentation {} {
     $PostprocessorGlobals(threshold_segmenter) SetCurvatureScaling \
         [$PostprocessorGlobals(curvature_scaling) get]
 
-    $PostprocessorGlobals(laplacian_segmenter) SetMaximumIterations \
+    $PostprocessorGlobals(laplacian_segmenter) SetNumberOfIterations \
         [expr int([$PostprocessorGlobals(iterations_entry) get]) ]
     $PostprocessorGlobals(laplacian_segmenter) SetMaximumRMSError \
         [$PostprocessorGlobals(rms_entry) get]
     $PostprocessorGlobals(laplacian_segmenter) SetIsoSurfaceValue \
         [$PostprocessorGlobals(isovalue_entry) get]
     if { $PostprocessorGlobals(negative_speed) == 1 } {
-        $PostprocessorGlobals(laplacian_segmenter) SetUseNegativeFeatures 1
+        $PostprocessorGlobals(laplacian_segmenter) SetReverseExpansionDirection 1
     } else {
-        $PostprocessorGlobals(laplacian_segmenter) SetUseNegativeFeatures 0
+        $PostprocessorGlobals(laplacian_segmenter) SetReverseExpansionDirection 0
     }
     $PostprocessorGlobals(laplacian_segmenter) SetFeatureScaling \
         [$PostprocessorGlobals(feature_scaling) get]
@@ -895,8 +895,8 @@ proc PostprocessorStartSegmentation {} {
             [$PostprocessorGlobals(feature_caster) GetOutput]
         $PostprocessorGlobals(threshold_segmenter) SetInput \
             [$PostprocessorGlobals(source_caster) GetOutput]
-        $PostprocessorGlobals(threshold_segmenter) SetProgressMethod \
-            "PostprocessorProgressProc $PostprocessorGlobals(threshold_segmenter) .preprocessorSegmentationProgressWindow"
+        $PostprocessorGlobals(threshold_segmenter) AddObserver ProgressEvent \
+            {PostprocessorProgressProc $PostprocessorGlobals(threshold_segmenter) .preprocessorSegmentationProgressWindow}
         
         [$PostprocessorGlobals(threshold_segmenter) GetOutput] SetUpdateExtentToWholeExtent
         $PostprocessorGlobals(threshold_segmenter) Update 
@@ -911,8 +911,8 @@ proc PostprocessorStartSegmentation {} {
             [$PostprocessorGlobals(feature_caster) GetOutput]
         $PostprocessorGlobals(laplacian_segmenter) SetInput \
             [$PostprocessorGlobals(source_caster) GetOutput]
-        $PostprocessorGlobals(laplacian_segmenter) SetProgressMethod \
-            "PostprocessorProgressProc $PostprocessorGlobals(laplacian_segmenter) .preprocessorSegmentationProgressWindow"
+        $PostprocessorGlobals(laplacian_segmenter) AddObserver ProgressEvent \
+            {PostprocessorProgressProc $PostprocessorGlobals(laplacian_segmenter) .preprocessorSegmentationProgressWindow}
         
         [$PostprocessorGlobals(laplacian_segmenter) GetOutput] SetUpdateExtentToWholeExtent
         $PostprocessorGlobals(laplacian_segmenter) Update 

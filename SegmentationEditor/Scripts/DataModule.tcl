@@ -291,9 +291,9 @@ proc ConstructDataFrame {f} {
 
         # Configure layout
         grid configure $f.configure.$optionlabel \
-            -padx 3 -column 0 -row $i -sticky nw
+            -padx 1 -column 0 -row $i -sticky nw
         grid configure $f.configure.$option      \
-            -padx 3 -column 1 -row $i -sticky nw
+            -padx 1 -column 1 -row $i -sticky nw
 
         set i [expr $i + 1]
     }
@@ -324,22 +324,22 @@ proc ConstructDataFrame {f} {
         bind $f.add.$option <Motion> +$commandStr
 
         # Configure layout
-        grid configure $f.add.$optionlabel -padx 3 -column 0 -row $i -sticky nw
-        grid configure $f.add.$option      -padx 3 -column 1 -row $i -sticky nw
+        grid configure $f.add.$optionlabel -padx 1 -column 0 -row $i -sticky nw
+        grid configure $f.add.$option      -padx 1 -column 1 -row $i -sticky nw
         set i [expr $i + 1]
     }
     
     button $f.add.loadbutton -text "Add/Update" \
         -command { AddDataCacheEntryFromGUI }
-    grid configure $f.add.loadbutton -padx 3 \
-        -pady 10 -column 1 -row $i -sticky nw
+    grid configure $f.add.loadbutton -padx 1 \
+        -pady 0 -column 1 -row $i -sticky nw
 
     #Set up data cache member list
     frame $f.cachelist -background $Options(text_background_color)
     text $f.cachelist.textwindow -font $Options(mono_font) \
         -background $Options(pleasant_background_color) \
         -wrap "none" \
-        -width 90 \
+        -width 70 \
         -height 10 \
         -insertontime 0 \
         -setgrid true  \
@@ -362,7 +362,7 @@ proc ConstructDataFrame {f} {
     button $f.saveload.save -text "Save session" -command SaveCacheList
     button $f.saveload.load -text "Load session" -command LoadCacheList
     button $f.saveload.clear -text "Clear session" -command EraseDataCache
-    pack $f.saveload.load $f.saveload.save $f.saveload.clear -side left -padx 2
+    pack $f.saveload.load $f.saveload.save $f.saveload.clear -side left -padx 1
 
     # Create a little box for instructions
     frame $f.instructions
@@ -401,17 +401,16 @@ proc ConstructDataFrame {f} {
     
 
     # Configure layout
-    grid configure $f.title -row 0 -column 0 -columnspan 2 -sticky w -padx 10
-    grid configure $f.configure -row 1 -column 0 -columnspan 1 -rowspan 1 -sticky nw -padx 10
-    grid configure $f.add       -row 1 -column 1 -columnspan 1 -rowspan 2 -sticky nw -padx 10
-    grid configure $f.instructions -row 2 -column 0 -columnspan 1 -sticky nw -padx 10
-    grid configure $f.cachelist -row 3 -column 0 -columnspan 2 -sticky nw -padx 10
-    grid configure $f.saveload  -row 4 -column 0 -columnspan 1 -sticky nw -padx 10 -pady 10
+    grid configure $f.title -row 0 -column 0 -columnspan 2 -sticky nw -padx 1
+    grid configure $f.saveload  -row 1 -column 0 -columnspan 1 -sticky nw -padx 1
+    grid configure $f.configure -row 1 -column 1 -columnspan 1 -sticky nw -rowspan 1 -padx 1
+    grid configure $f.instructions -row 2 -column 0 -columnspan 1 -sticky nw -rowspan 1 -padx 1
+    grid configure $f.add          -row 2 -column 1 -columnspan 1 -sticky nw -rowspan 1 -padx 1
+    grid configure $f.cachelist -row 3 -column 0 -columnspan 2  -sticky nw -padx 1
 
-    grid rowconfigure $f 0 -pad 20 -weight 0
-    grid rowconfigure $f 1 -pad 5 -weight 1
-    grid rowconfigure $f 2 -pad 5 -weight 3
-
+    grid rowconfigure $f 0 -pad 0 -weight 0
+    grid rowconfigure $f 1 -pad 0 -weight 1
+    grid rowconfigure $f 2 -pad 0 -weight 2
 }
 
 proc SaveCacheList {} {

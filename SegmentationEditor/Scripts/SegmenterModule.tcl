@@ -264,6 +264,10 @@ proc SegmenterLoadData {} {
 proc SegmenterInitialize {} {
     global SegmenterGlobals DataGlobals
     
+    # A statistics image filter
+    vtkITKStatisticsImageFilterULUL SegmenterStatistics
+    set SegmenterGlobals(statistics_filter) SegmenterStatistics
+
     # A watershed image filter
     vtkITKWatershedFilterAndWriter SegmenterWatershed
     SegmenterWatershed SetThreshold $SegmenterGlobals(default_threshold_parameter)
@@ -281,10 +285,13 @@ proc SegmenterInitialize {} {
     set SegmenterGlobals(source_flipper) SegmenterFlipper
     
     # A reader for the segmentation data
-    vtkPatchedImageReader SegmentationReader
+#    vtkPatchedImageReader SegmentationReader
+    vtkImageReader SegmentationReader
     SegmentationReader SetHeaderSize 0
     SegmentationReader SetDataByteOrderToLittleEndian
-    SegmentationReader SetDataScalarTypeToUnsignedLong
+#    SegmentationReader SetDataScalarTypeToUnsignedLong
+    # VTK scalar type 9 is UnsignedLong
+    SegmentationReader SetDataScalarType 9 
     set SegmenterGlobals(segmentation_reader) SegmentationReader
 
     # A lookup table manager for the segmentation viewer
@@ -356,8 +363,8 @@ proc SegmenterStartSegmentation {} {
     ConstructProgressWindow "segmenterProgress"
 
     #Execute the pipeline
-    $SegmenterGlobals(watershed_filter) \
-        SetProgressMethod "ProgressProc $SegmenterGlobals(watershed_filter) .segmenterProgress"
+    $SegmenterGlobals(watershed_filter) AddObserver ProgressEvent\
+        {ProgressProc $SegmenterGlobals(watershed_filter) .segmenterProgress}
     $SegmenterGlobals(watershed_filter) Update
     destroy .segmenterProgress
     update
@@ -375,12 +382,17 @@ proc SegmenterStartSegmentation {} {
     [$SegmenterGlobals(segmentation_reader) GetOutput] \
         SetUpdateExtentToWholeExtent
     $SegmenterGlobals(segmentation_reader) Update
-    set maxLabel [$SegmenterGlobals(segmentation_reader) \
-                      GetMaximumUnsignedLongValue]
+#    set maxLabel [$SegmenterGlobals(segmentation_reader) \
+#                      GetMaximumUnsignedLongValue]
+
+    # Find the maximum value in the segmented image
+    $SegmenterGlobals(statistics_filter) SetInput [$SegmenterGlobals(segmentation_reader) GetOutput]
+    $SegmenterGlobals(statistics_filter) Update
+    set maxLabel [$SegmenterGlobals(statistics_filter) GetMaximum]
 
     $SegmenterGlobals(lookup_table_manager) Initialize
     $SegmenterGlobals(lookup_table_manager) LoadTreeFile $tree_fn
-    $SegmenterGlobals(lookup_table_manager) SetNumberOfLabels $maxLabel
+    $SegmenterGlobals(lookup_table_manager) SetNumberOfLabels [expr $maxLabel + 1]
     $SegmenterGlobals(lookup_table_manager) GenerateColorTable
 
     $SegmenterGlobals(color_mapper) \

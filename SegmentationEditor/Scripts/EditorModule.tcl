@@ -521,12 +521,16 @@ proc EditorSegmentationReaderLoadData {} {
     append endianString "Endian"
     $EditorGlobals(labeledImgReader) $endianString
 
-    set datatypeString "SetDataScalarTypeTo"
-    append datatypeString [GetCacheEntryValue $cacheEntry "data_type"]
+    if {[GetCacheEntryValue $cacheEntry "data_type"] == "UnsignedLong"} {
+#        set datatypeString "SetDataScalarType 9" 
+    } else {
+        set datatypeString "SetDataScalarTypeTo"
+        append datatypeString [GetCacheEntryValue $cacheEntry "data_type"]
+        $EditorGlobals(labeledImgReader) $datatypeString
+    }
 
     $EditorGlobals(labeledImgReader) SetNumberOfScalarComponents \
         [GetCacheEntryValue $cacheEntry "number_of_components"]
-    $EditorGlobals(labeledImgReader) $datatypeString
 
     $EditorGlobals(labeledImgReader) SetDataExtent \
         0 [GetCacheEntryValue $cacheEntry "size_x"] \
@@ -553,13 +557,16 @@ proc EditorSegmentationReaderLoadData {} {
     $EditorGlobals(labeledImgReader) Modified
 
     ConstructProgressWindow sourceReaderProgressWindow
-    $EditorGlobals(labeledImgReader) SetProgressMethod \
-        "ProgressProc $EditorGlobals(labeledImgReader) .sourceReaderProgressWindow"
+    $EditorGlobals(labeledImgReader) AddObserver ProgressEvent \
+        {ProgressProc $EditorGlobals(labeledImgReader) .sourceReaderProgressWindow}
     [$EditorGlobals(labeledImgReader) GetOutput] SetUpdateExtentToWholeExtent
     $EditorGlobals(labeledImgReader) Update
 
-    set EditorGlobals(maxLabel) [$EditorGlobals(labeledImgReader) \
-                      GetMaximumUnsignedLongValue]
+    # Find the maximum value in the segmented image
+    $EditorGlobals(statistics_filter) SetInput [$EditorGlobals(labeledImgReader) GetOutput]
+    $EditorGlobals(statistics_filter) Update
+    set EditorGlobals(maxLabel) [$EditorGlobals(statistics_filter) GetMaximum]
+    set EditorGlobals(maxLabel) [expr $EditorGlobals(maxLabel) + 1]
 
     $EditorGlobals(resamplerSeg) SetInput [ $EditorGlobals(labeledImgReader) GetOutput ]
     destroy .sourceReaderProgressWindow
@@ -613,8 +620,8 @@ proc EditorSourceReaderLoadData {} {
     $EditorGlobals(colorImgReader) Modified
 
     ConstructProgressWindow sourceReaderProgressWindow
-    $EditorGlobals(colorImgReader) SetProgressMethod \
-        "ProgressProc $EditorGlobals(colorImgReader) .sourceReaderProgressWindow"
+    $EditorGlobals(colorImgReader) AddObserver ProgressEvent \
+        {ProgressProc $EditorGlobals(colorImgReader) .sourceReaderProgressWindow}
     [$EditorGlobals(colorImgReader) GetOutput] SetUpdateExtentToWholeExtent
     $EditorGlobals(colorImgReader) Update
 
@@ -710,6 +717,7 @@ proc EditorStartEditor {} {
     $EditorGlobals(binaryVolume) SetUpdateExtent 0 $EditorGlobals(X) \
         0 $EditorGlobals(Y) 0 $EditorGlobals(Z)
     $EditorGlobals(binaryVolume) AllocateScalars
+    $EditorGlobals(binaryVolume) Clear
 
     $EditorGlobals(resamplerBin) SetInput $EditorGlobals(binaryVolume)
     $EditorGlobals(antialias_caster) SetInput $EditorGlobals(binaryVolume)
@@ -759,6 +767,9 @@ proc EditorInitialize {} {
     global EditorGlobals Options
 
     #### Data sources
+    # A statistics filter
+    vtkITKStatisticsImageFilterULUL EditorStatisticsFilter
+    set EditorGlobals(statistics_filter) EditorStatisticsFilter
 
     # Reader for the source data
     vtkImageReader colorImgReader
@@ -768,8 +779,10 @@ proc EditorInitialize {} {
     #
     # Reader for segmented data
     #
-    vtkPatchedImageReader labeledImgReader
+#    vtkPatchedImageReader labeledImgReader
+    vtkImageReader labeledImgReader
     labeledImgReader SetFileDimensionality 3
+    labeledImgReader SetDataScalarType 9
     set EditorGlobals(labeledImgReader) labeledImgReader
 
     #
@@ -833,6 +846,10 @@ proc EditorInitialize {} {
     lutBin SetTableValue 1 1.0 0.0 0.0 0.3
     lutBin SetTableValue 2 0.0 1.0 0.0 0.3
     lutBin SetTableValue 3 0.0 0.0 1.0 0.3
+    lutBin SetTableValue 4 1.0 0.0 1.0 0.3
+    lutBin SetTableValue 5 1.0 1.0 0.5 0.3
+    lutBin SetTableValue 6 1.0 0.5 1.0 0.3
+    lutBin SetTableValue 205 1.0 0.0 1.0 0.6
 
     set EditorGlobals(lutBin) lutBin
 
@@ -983,7 +1000,7 @@ proc EditorInitialize {} {
 
     vtkITKAntiAliasBinaryImageFilter EditorAntialiaser
     EditorAntialiaser SetMaximumRMSError 0.02
-    EditorAntialiaser SetMaximumIterations 20
+    EditorAntialiaser SetNumberOfIterations 20
     set EditorGlobals(antialiaser) EditorAntialiaser
 }
 
@@ -1254,9 +1271,10 @@ proc EditorWriteBinaryVolume {} {
     set size_x $EditorGlobals(X)
     set size_y $EditorGlobals(Y)
     set size_z $EditorGlobals(Z)
+    set filename "$filename.data"
 
-    set entryStr "$filename UnsignedChar $size_x $size_y $size_z $DataGlobals(default_file_endianness) No 1 $DataGlobals(default_file_pattern) 0 24"
-    AddDataCacheEntry $EditorGlobals(binary_volume_tag) $entryStr
+    set entryStr "$filename UnsignedChar $size_x $size_y $size_z $DataGlobals(default_file_endianness) No 1 $DataGlobals(default_file_pattern) 0 0"
+    AddDataCacheEntry [string range $filename [expr [string last "/" $filename] + 1] [expr [string first "." $filename] - 1]] $entryStr
 }
 
 proc EditorReadBinaryVolume {} {
@@ -1291,8 +1309,8 @@ proc EditorToggleAntialiasing {} {
             $EditorGlobals(marcher1) SetInput [$EditorGlobals(thresher1) GetOutput]
             $EditorGlobals(vtk_antialiaser) SetInput [$EditorGlobals(marcher1) GetOutput]
             
-            $EditorGlobals(vtk_antialiaser) SetProgressMethod \
-                "ProgressProc $EditorGlobals(vtk_antialiaser) .antialiasProgressWindow"
+            $EditorGlobals(vtk_antialiaser) AddObserver ProgressEvent \
+                {ProgressProc $EditorGlobals(vtk_antialiaser) .antialiasProgressWindow}
 
             $EditorGlobals(map1) SetInput [$EditorGlobals(vtk_antialiaser) GetOutput]
             [$EditorGlobals(blob1) GetProperty] SetInterpolationToFlat
@@ -1301,17 +1319,17 @@ proc EditorToggleAntialiasing {} {
             $EditorGlobals(map1) SetInput [$EditorGlobals(marcher1) GetOutput]
             $EditorGlobals(thresher1) SetInput $EditorGlobals(binaryVolume)
             $EditorGlobals(antialias_caster) SetInput [$EditorGlobals(thresher1) GetOutput]
-            $EditorGlobals(antialias_caster) SetProgressMethod \
-                "ProgressProc $EditorGlobals(antialias_caster) .antialiasProgressWindow"
+            $EditorGlobals(antialias_caster) AddObserver ProgressEvent \
+                {ProgressProc $EditorGlobals(antialias_caster) .antialiasProgressWindow}
             $EditorGlobals(antialias_caster) Update
             $EditorGlobals(antialiaser) SetInput [$EditorGlobals(antialias_caster) GetOutput]
-            $EditorGlobals(antialiaser) SetProgressMethod \
-               "ProgressProc $EditorGlobals(antialiaser) .antialiasProgressWindow"
+            $EditorGlobals(antialiaser) AddObserver ProgressEvent \
+                {ProgressProc $EditorGlobals(antialiaser) .antialiasProgressWindow}
             $EditorGlobals(antialiaser) Update
         
             $EditorGlobals(marcher1) SetInput [$EditorGlobals(antialiaser) GetOutput]
-            $EditorGlobals(marcher1) SetProgressMethod \
-                "ProgressProc $EditorGlobals(marcher1) .antialiasProgressWindow"
+            $EditorGlobals(marcher1) AddObserver ProgressEvent \
+                {ProgressProc $EditorGlobals(marcher1) .antialiasProgressWindow}
             [$EditorGlobals(blob1) GetProperty] SetInterpolationToGouraud
 
         }
@@ -1320,16 +1338,16 @@ proc EditorToggleAntialiasing {} {
         
         $EditorGlobals(marcher1) SetInput [$EditorGlobals(thresher1) GetOutput]
         $EditorGlobals(map1) SetInput [$EditorGlobals(marcher1) GetOutput]
-        $EditorGlobals(marcher1) SetProgressMethod \
-            "ProgressProc $EditorGlobals(marcher1) .antialiasProgressWindow"
+        $EditorGlobals(marcher1) AddObserver ProgressEvent \
+            {ProgressProc $EditorGlobals(marcher1) .antialiasProgressWindow}
     }
 
     $EditorGlobals(renWin) Render
 
-    $EditorGlobals(antialias_caster) SetProgressMethod " "
-    $EditorGlobals(antialiaser) SetProgressMethod " "
-    $EditorGlobals(marcher1) SetProgressMethod " "
-    $EditorGlobals(vtk_antialiaser) SetProgressMethod " "
+    $EditorGlobals(antialias_caster) AddObserver ProgressEvent {}
+    $EditorGlobals(antialiaser) AddObserver ProgressEvent {}
+    $EditorGlobals(marcher1) AddObserver ProgressEvent {}
+    $EditorGlobals(vtk_antialiaser) AddObserver ProgressEvent {}
 
     destroy .antialiasProgressWindow
 

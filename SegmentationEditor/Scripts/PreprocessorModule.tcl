@@ -545,8 +545,8 @@ proc PreprocessorLoadData {} {
     $PreprocessorGlobals(source_reader) Modified
 
     ConstructProgressWindow sourceReaderProgressWindow
-    $PreprocessorGlobals(source_reader) SetProgressMethod \
-        "ProgressProc $PreprocessorGlobals(source_reader) .sourceReaderProgressWindow"
+    $PreprocessorGlobals(source_reader) AddObserver ProgressEvent \
+        {ProgressProc $PreprocessorGlobals(source_reader) .sourceReaderProgressWindow}
 
     [$PreprocessorGlobals(source_reader) GetOutput] SetUpdateExtentToWholeExtent
     $PreprocessorGlobals(source_reader) Update
@@ -630,15 +630,15 @@ proc PreprocessorStartDiffusion {} {
             [$PreprocessorGlobals(caster) GetOutput]
         $PreprocessorGlobals(diffusion_writer) SetInput \
             [$PreprocessorGlobals(diffuser) GetOutput]
-        $PreprocessorGlobals(diffuser) SetProgressMethod \
-            "ProgressProc $PreprocessorGlobals(diffuser) .preprocessorDiffusionProgressWindow"
+        $PreprocessorGlobals(diffuser) AddObserver ProgressEvent \
+            {ProgressProc $PreprocessorGlobals(diffuser) .preprocessorDiffusionProgressWindow}
     } else {
         $PreprocessorGlobals(curvature_diffuser) SetInput \
             [$PreprocessorGlobals(caster) GetOutput]
         $PreprocessorGlobals(diffusion_writer) SetInput \
             [$PreprocessorGlobals(curvature_diffuser) GetOutput]
-        $PreprocessorGlobals(curvature_diffuser) SetProgressMethod \
-            "ProgressProc $PreprocessorGlobals(curvature_diffuser) .preprocessorDiffusionProgressWindow"
+        $PreprocessorGlobals(curvature_diffuser) AddObserver ProgressEvent \
+            {ProgressProc $PreprocessorGlobals(curvature_diffuser) .preprocessorDiffusionProgressWindow}
     }
     
     if {$DataGlobals(default_file_dimensionality) == 2} {
@@ -708,8 +708,8 @@ proc PreprocessorStartGradient {} {
     append fn $PreprocessorGlobals(gradient_volume_filename)
   
     ConstructProgressWindow gradientProgressBar
-$PreprocessorGlobals(gradient_magnitude) SetProgressMethod \
-        "ProgressProc $PreprocessorGlobals(gradient_magnitude) .gradientProgressBar"
+    $PreprocessorGlobals(gradient_magnitude) AddObserver ProgressEvent \
+        {ProgressProc $PreprocessorGlobals(gradient_magnitude) .gradientProgressBar}
     
     if { $PreprocessorGlobals(diffusion_type) == "gradient" } {
         $PreprocessorGlobals(gradient_magnitude) SetInput [$PreprocessorGlobals(diffuser) GetOutput]

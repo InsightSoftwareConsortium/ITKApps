@@ -18,12 +18,13 @@
 #include "vtkBinaryVolume.h"
 #include "vtkObjectFactory.h"
 #include <fstream>
+#include <string>
 
 vtkBinaryVolume::vtkBinaryVolume()
 {
   this->paint_radius = 0;
   this->SetNumberOfScalarComponents(1);
-  this->SetScalarType(VTK_UNSIGNED_CHAR);
+  this->SetScalarTypeToUnsignedChar();
   this->m_LabelValue = 1;
 }
 
@@ -71,9 +72,16 @@ int vtkBinaryVolume::WriteToDisk(const char *fn)
   out.open(fn);
   if (! out ) return -1;
   out.write((char *)e, sizeof(int) * 6);
+  out.close();
+
+  std::string rawfn(fn);
+  rawfn += ".data";
+  out.open(rawfn.c_str());
+  if (! out) return -1;
   out.write((char *)this->GetScalarPointer(), volume_size_in_bytes);
   out.close();
 
+  
   //  std::cout << "vtkBinaryVolume::WriteToDisk: header size is "
   //              << sizeof(int) * 6 << std::endl;
   //  std::cout << "vtkBinaryVolume::WriteToDisk: volume size in bytes is "
@@ -107,12 +115,16 @@ int vtkBinaryVolume::ReadFromDisk(const char *fn)
   if (! in ) return -1;
   in.read((char *)e, sizeof(int) * 6);
   if ( in.gcount() != sizeof(int) * 6) return -3;
-
+  in.close();
+  
   // check size
   for (unsigned i = 0; i < 6; ++i) { if (e[i] != c[i]) return -2; }
-  
-  in.read((char *)this->GetScalarPointer(), volume_size_in_bytes);
 
+  std::string rawfn(fn);
+  rawfn += ".data";
+  in.open(rawfn.c_str());
+  in.read((char *)this->GetScalarPointer(), volume_size_in_bytes);
+  
   if (static_cast<long>(in.gcount()) != static_cast<long>(volume_size_in_bytes)) return -3;
 
   in.close();
