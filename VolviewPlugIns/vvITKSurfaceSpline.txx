@@ -99,27 +99,6 @@ SurfaceSpline<TInputPixelType>
   landmark[2] = 0.0;
   sourceLandmarkItr.Value() = landmark;
   
-  PointType point;
- 
-  point[2] =  0.0;  // always in the plane Z=0 
-
-  for(unsigned int row=0; row <= m_SideCellsRow; row++ )
-    {
-
-    point[1] =  static_cast<float>( row) / 
-                static_cast<float>( m_SideCellsRow );
-
-    for(unsigned int col=0; col<= m_SideCellsCol; col++ )
-      {
-
-      point[0] =  static_cast<float>(col) / 
-                  static_cast<float>( m_SideCellsCol );
-
-      m_SourcePoints.push_back( point );
-
-      }
-    }
-  
 }
 
 
@@ -147,7 +126,6 @@ SurfaceSpline<TInputPixelType>
 ::SetNumberOfPointsAlongColumns( unsigned int num )
 {
    m_SidePointsCol = num;
-   m_SideCellsCol  = m_SidePointsCol - 1;
 }
 
 
@@ -161,7 +139,6 @@ SurfaceSpline<TInputPixelType>
 ::SetNumberOfPointsAlongRows( unsigned int num )
 {
    m_SidePointsRow = num;
-   m_SideCellsRow  = m_SidePointsRow - 1;
 }
 
 
@@ -228,6 +205,29 @@ SurfaceSpline<TInputPixelType>
   this->SetCurrentFilterProgressWeight( 0.1 );
   this->SetUpdateMessage("Preprocessing: Spline Surface...");
    
+
+  PointType point;
+ 
+  point[2] =  0.0;  // always in the plane Z=0 
+
+  for(unsigned int row=0; row < m_SidePointsRow; row++ )
+    {
+
+    point[1] =  static_cast<float>( row) / 
+                static_cast<float>( m_SidePointsRow-1 );
+
+    for(unsigned int col=0; col< m_SidePointsCol; col++ )
+      {
+
+      point[0] =  static_cast<float>(col) / 
+                  static_cast<float>( m_SidePointsCol-1 );
+
+      m_SourcePoints.push_back( point );
+
+      }
+    }
+  
+
   LandmarkContainerPointer targetLandmarks = m_TargetLandmarks->GetPoints();
   LandmarkIterator targetLandmarkItr = targetLandmarks->Begin();
 
@@ -266,10 +266,8 @@ SurfaceSpline<TInputPixelType>
   this->SetCurrentFilterProgressWeight( 0.9 );
   this->SetUpdateMessage("Preprocessing: Marking one side of the surface...");
 
-  // Add here blanking one side of the surface
 
   this->PostProcessData( pds );
-
 
 
 } // end of ProcessData
@@ -313,7 +311,7 @@ SurfaceSpline<TInputPixelType>
     ++pointItr;
     }
 
-  opds->NumberOfMeshCells = m_SideCellsRow * m_SideCellsCol;
+  opds->NumberOfMeshCells = ( m_SidePointsRow - 1 ) * ( m_SidePointsCol - 1 );
   
   // Cell connectivity entries follow the format of vtkCellArray:
   // n1, id1, id2,... idn1,  n2, id1, id2,.. idn2....
@@ -324,11 +322,9 @@ SurfaceSpline<TInputPixelType>
 
   int * cellsTopItr = cellsTopology;
 
-  ofs << "Cell topology" << std::endl;
-
-  for(unsigned int row=0; row < m_SideCellsRow; row++ )
+  for(unsigned int row=0; row < m_SidePointsRow - 1 ; row++ )
     {
-    for(unsigned int col=0; col < m_SideCellsCol; col++ )
+    for(unsigned int col=0; col < m_SidePointsCol - 1; col++ )
       {
       const unsigned int cornerPoint = row * m_SidePointsCol + col;
       const unsigned int pointId1 = cornerPoint;
@@ -342,15 +338,6 @@ SurfaceSpline<TInputPixelType>
       *cellsTopItr++ = pointId3;
       *cellsTopItr++ = pointId4;
 
-      ofs << "  " << pointId1 ;
-      ofs << "  " << pointId2 ;
-      ofs << "  " << pointId3 ;
-      ofs << "  " << pointId4  << std::endl;
-
-      ofs << m_TargetPoints[ pointId1 ] << std::endl;
-      ofs << m_TargetPoints[ pointId2 ] << std::endl;
-      ofs << m_TargetPoints[ pointId3 ] << std::endl;
-      ofs << m_TargetPoints[ pointId4 ] << std::endl;
       }
     }
     

@@ -85,8 +85,6 @@ private:
 
     unsigned int                                    m_SidePointsCol;
     unsigned int                                    m_SidePointsRow;
-    unsigned int                                    m_SideCellsCol;
-    unsigned int                                    m_SideCellsRow;
 
     SplinePointer                                   m_Spline;
 

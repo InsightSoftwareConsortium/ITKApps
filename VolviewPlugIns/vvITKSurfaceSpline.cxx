@@ -20,6 +20,8 @@ class SurfaceSplineRunner
       ModuleType  module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Computing Surface Spline...");
+      module.SetNumberOfPointsAlongRows( 7 );
+      module.SetNumberOfPointsAlongColumns( 7 );
       // Execute the filter
       module.ProcessData( pds  );
     }
