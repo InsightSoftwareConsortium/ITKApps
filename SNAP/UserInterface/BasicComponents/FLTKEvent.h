@@ -1,0 +1,71 @@
+/*=========================================================================
+
+  Program:   Insight Segmentation & Registration Toolkit
+  Module:    FLTKEvent.h
+  Language:  C++
+  Date:      $Date$
+  Version:   $Revision$
+  Copyright (c) 2003 Insight Consortium. All rights reserved.
+  See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even 
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     PURPOSE.  See the above copyright notices for more information.
+=========================================================================*/
+#ifndef __FLTKEvent_h_
+#define __FLTKEvent_h_
+
+#include <FL/Fl.h>
+#include <FL/Enumerations.h>
+
+#include "IRISTypes.h"
+
+class FLTKCanvas;
+
+/**
+ * \class FLTKEvent
+ * \brief A wrapper around FLTK event info.
+ *
+ * \sa FLTKCanvas
+ */
+struct FLTKEvent {
+    /**
+     * The FLTK id of the event
+     */
+    int Id;
+
+    /**
+     * The cursor position of the event in window coordinates
+     */
+    Vector2i XCanvas;
+
+    /**
+     * The cursor position of the event in object space coordinates
+     */
+    Vector3f XSpace;
+
+    /**
+     * Time when the event was generated (value of the clock() function)
+     */
+    long int TimeStamp;
+    
+    /**
+     * The button that generated this event
+     */
+    int Button;
+
+    /**
+     * The state of the interface (ALT,CTRL,SHIFT)
+     */
+    int State;
+
+    /**
+     * Pointer to the FLTKCanvas that generated this event.  This is a safety
+     * measure because the recipient of these events should already have such
+     * a pointer to the specific subclass of FLTKCanvas
+     */
+    FLTKCanvas *Source;
+};
+
+#endif // __FLTKEvent_h_
+
