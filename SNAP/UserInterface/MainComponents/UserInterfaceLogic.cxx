@@ -3174,9 +3174,6 @@ UserInterfaceLogic
 
   // Clear the cursor
   fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
-
-  m_SnakeParametersUI->SetParameters(m_GlobalState->GetSnakeParameters());
-  m_SnakeParametersUI->DisplayWindow();
 }
 
 void
@@ -3281,6 +3278,9 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.6  2003/10/02 14:55:52  pauly
+ *ENH: Development during the September code freeze
+ *
  *Revision 1.5  2003/09/16 16:10:17  pauly
  *FIX: No more Internal compiler errors on VC
  *FIX: Intensity curve no longer crashes

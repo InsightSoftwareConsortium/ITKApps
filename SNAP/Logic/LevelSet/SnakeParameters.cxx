@@ -28,10 +28,10 @@ SnakeParameters
   p.m_SnakeType = EDGE_SNAKE;
   p.m_Clamp = true;
 
-  p.m_PropagationWeight = 5.0;
+  p.m_PropagationWeight = 1.0;
   p.m_PropagationSpeedExponent = 1;
 
-  p.m_CurvatureWeight = 1.0;
+  p.m_CurvatureWeight = 0.2;
   p.m_CurvatureSpeedExponent = 0;
 
   p.m_LaplacianWeight = 0.0f;
@@ -58,10 +58,10 @@ SnakeParameters
   p.m_SnakeType = REGION_SNAKE;
   p.m_Clamp = true;
 
-  p.m_PropagationWeight = 5.0;
+  p.m_PropagationWeight = 1.0;
   p.m_PropagationSpeedExponent = 1;
 
-  p.m_CurvatureWeight = 1.0;
+  p.m_CurvatureWeight = 0.2;
   p.m_CurvatureSpeedExponent = -1;
 
   p.m_LaplacianWeight = 0.0f;

@@ -32,6 +32,7 @@ class vtkSmoothPolyDataFilter;
 class vtkDecimatePro;
 class vtkStripper;
 class vtkPolyData;
+class vtkPolyDataNormals;
 
 /**
  * \class LevelSetMeshPipeline
@@ -85,6 +86,9 @@ private:
 
   // The contour filter
   vtkContourFilter *          m_ContourFilter;
+
+  // A filter that computes normals
+  vtkPolyDataNormals *        m_NormalsFilter;
   
   // The triangle decimation driver
   vtkDecimatePro *            m_DecimateFilter;

@@ -38,6 +38,7 @@
 #include <vtkImageToStructuredPoints.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
+#include <vtkPolyDataNormals.h>
 #include <vtkSmoothPolyDataFilter.h>
 #include <vtkStripper.h>
 
@@ -91,21 +92,28 @@ LevelSetMeshPipeline
   m_ContourFilter->ReleaseDataFlagOn();
   m_ContourFilter->ComputeScalarsOff();
   m_ContourFilter->ComputeGradientsOff();
+  m_ContourFilter->UseScalarTreeOn();
   m_ContourFilter->SetNumberOfContours(1);
   m_ContourFilter->SetValue(0, 0.0);
 
+  // Create and configure the normal computer
+  m_NormalsFilter = vtkPolyDataNormals::New();
+  m_NormalsFilter->SetInput(m_ContourFilter->GetOutput());
+  m_NormalsFilter->SetFeatureAngle(60.0);
+
   // Create and configure a filter for triangle decimation
   m_DecimateFilter = vtkDecimatePro::New();
-  m_DecimateFilter->SetInput(m_ContourFilter->GetOutput());
+  m_DecimateFilter->SetInput(m_NormalsFilter->GetOutput());
   m_DecimateFilter->ReleaseDataFlagOn();
 
   // Create and configure a filter for polygon smoothing
   m_PolygonSmoothingFilter = vtkSmoothPolyDataFilter::New();
-  m_PolygonSmoothingFilter->SetInput(m_DecimateFilter->GetOutput());
+  m_PolygonSmoothingFilter->SetInput(m_NormalsFilter->GetOutput());
   m_PolygonSmoothingFilter->ReleaseDataFlagOn();
 
   // Create and configure a filter for triangle strip generation
   m_StripperFilter = vtkStripper::New();
+  // m_StripperFilter->SetInput( m_PolygonSmoothingFilter->GetOutput() );
   m_StripperFilter->SetInput( m_PolygonSmoothingFilter->GetOutput() );
   m_StripperFilter->ReleaseDataFlagOn();
 }

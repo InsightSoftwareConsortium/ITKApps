@@ -42,6 +42,7 @@
 #include <vtkImageToStructuredPoints.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
+#include <vtkPolyDataNormals.h>
 #include <vtkSmoothPolyDataFilter.h>
 #include <vtkStripper.h>
 
@@ -116,8 +117,14 @@ IRISMeshPipeline
   m_ContourFilter->ReleaseDataFlagOn();
   m_ContourFilter->ComputeScalarsOff();
   m_ContourFilter->ComputeGradientsOff();
+  m_ContourFilter->UseScalarTreeOn();
   m_ContourFilter->SetNumberOfContours(1);
   m_ContourFilter->SetValue(0, 128.0);
+
+  // Create and configure the normal computer
+  m_NormalsFilter = vtkPolyDataNormals::New();
+  m_NormalsFilter->SetInput(m_ContourFilter->GetOutput());
+  m_NormalsFilter->SetFeatureAngle(60.0);
 
   // Create and configure a filter for triangle decimation
   m_DecimateFilter = vtkDecimatePro::New();
@@ -126,7 +133,7 @@ IRISMeshPipeline
 
   // Create and configure a filter for polygon smoothing
   m_PolygonSmoothingFilter = vtkSmoothPolyDataFilter::New();
-  m_PolygonSmoothingFilter->SetInput(m_DecimateFilter->GetOutput());
+  m_PolygonSmoothingFilter->SetInput(m_NormalsFilter->GetOutput());
   m_PolygonSmoothingFilter->ReleaseDataFlagOn();
 
   // Create and configure a filter for triangle strip generation
@@ -153,73 +160,74 @@ IRISMeshPipeline
   // Store the options
   m_MeshOptions = options;
 
-  // Apply parameters to the Gaussian filter
-  float sigma = options.GetGaussianStandardDeviation();
-  Vector3f variance(sigma * sigma);
-  m_GaussianFilter->SetVariance(variance.data_block());
-
-  // What would be a suitable setting?  I suppose we don't really care
-  // how close the the Gaussian this filter is, we just want some smoothing
-  // to happen
-  m_GaussianFilter->SetMaximumError(options.GetGaussianError());    
-  
-  // Apply parameters to the decimation filter
-  m_DecimateFilter->SetTargetReduction(
-    options.GetDecimateTargetReduction());
-  
-  m_DecimateFilter->SetPreserveTopology(
-    options.GetDecimatePreserveTopology());
-  
-  // Apply parameters to the mesh smoothing filter
-  m_PolygonSmoothingFilter->SetNumberOfIterations(
-    options.GetMeshSmoothingIterations());
-
-  m_PolygonSmoothingFilter->SetRelaxationFactor(
-    options.GetMeshSmoothingRelaxationFactor()); 
-
-  m_PolygonSmoothingFilter->SetFeatureAngle(
-    options.GetMeshSmoothingFeatureAngle());
-
-  m_PolygonSmoothingFilter->SetFeatureEdgeSmoothing(
-    options.GetMeshSmoothingFeatureEdgeSmoothing());
-
-  m_PolygonSmoothingFilter->SetBoundarySmoothing(
-    options.GetMeshSmoothingBoundarySmoothing());
-
-  m_PolygonSmoothingFilter->SetConvergence(
-    options.GetMeshSmoothingConvergence());
-/*  
-  // If Gaussian smoothing is not used, the thresholding filter is piped into
-  // the VTK exporter
-  if(options.GetUseGaussianSmoothing())
+  // Route the pipeline according to the settings
+  if(options.GetUseGaussianSmoothing()) 
     {
+    // Pipe smoothed output into the pipeline
     m_VTKExporter->SetInput(m_GaussianFilter->GetOutput());
+
+    // Apply parameters to the Gaussian filter
+    float sigma = options.GetGaussianStandardDeviation();
+    Vector3f variance(sigma * sigma);
+    m_GaussianFilter->SetVariance(variance.data_block());
+
+    // What would be a suitable setting?  I suppose we don't really care
+    // how close the the Gaussian this filter is, we just want some smoothing
+    // to happen
+    m_GaussianFilter->SetMaximumError(options.GetGaussianError());    
     }
   else
     {
+    // Bypass the gaussian
     m_VTKExporter->SetInput(m_ThrehsoldFilter->GetOutput());
     }
 
-  // Work out the piping in the VTK pipeline
-  if(options.GetUseDecimation() && options.GetUseMeshSmoothing())
+  // Need this variable for pipeline routing
+  vtkPolyData *pipeEnd = m_NormalsFilter->GetOutput();
+
+  if(options.GetUseDecimation())
     {
-    m_PolygonSmoothingFilter->SetInput(m_DecimateFilter->GetOutput());
+    // The decimate filter is the new pipe end
+    pipeEnd = m_DecimateFilter->GetOutput();
+
+    // Apply parameters to the decimation filter
+    m_DecimateFilter->SetTargetReduction(
+      options.GetDecimateTargetReduction());
+
+    m_DecimateFilter->SetPreserveTopology(
+      options.GetDecimatePreserveTopology());
+    }
+  
+  if(options.GetUseMeshSmoothing())
+    {
+    // Pipe smoothed output into the pipeline
+    m_PolygonSmoothingFilter->SetInput(pipeEnd);
     m_StripperFilter->SetInput(m_PolygonSmoothingFilter->GetOutput());
+
+    // Apply parameters to the mesh smoothing filter
+    m_PolygonSmoothingFilter->SetNumberOfIterations(
+      options.GetMeshSmoothingIterations());
+
+    m_PolygonSmoothingFilter->SetRelaxationFactor(
+      options.GetMeshSmoothingRelaxationFactor()); 
+
+    m_PolygonSmoothingFilter->SetFeatureAngle(
+      options.GetMeshSmoothingFeatureAngle());
+
+    m_PolygonSmoothingFilter->SetFeatureEdgeSmoothing(
+      options.GetMeshSmoothingFeatureEdgeSmoothing());
+
+    m_PolygonSmoothingFilter->SetBoundarySmoothing(
+      options.GetMeshSmoothingBoundarySmoothing());
+
+    m_PolygonSmoothingFilter->SetConvergence(
+      options.GetMeshSmoothingConvergence());
     }
-  else if(options.GetUseMeshSmoothing())
+  else 
     {
-    m_PolygonSmoothingFilter->SetInput(m_ContourFilter->GetOutput());
-    m_StripperFilter->SetInput(m_PolygonSmoothingFilter->GetOutput());
+    // Pipe previous output into the pipeline
+    m_StripperFilter->SetInput(pipeEnd);
     }
-  else if(options.GetUseDecimation())
-    {
-    m_StripperFilter->SetInput(m_DecimateFilter->GetOutput());
-    }
-  else
-    {
-    m_StripperFilter->SetInput(m_ContourFilter->GetOutput());
-    m_StripperFilter->SetInput(m_ContourFilter->GetOutput());
-*/
 }
 
 void
@@ -319,6 +327,15 @@ IRISMeshPipeline
   
   // This does the image processing steps
   m_VTKImporter->UpdateWholeExtent();
+
+  m_VTKImporter->SetCallbackUserData(
+    m_VTKExporter->GetCallbackUserData());
+
+  // Create and configure the contour filter
+  m_ContourFilter->UpdateWholeExtent();
+  m_NormalsFilter->UpdateWholeExtent();
+  m_DecimateFilter->UpdateWholeExtent();
+  m_PolygonSmoothingFilter->UpdateWholeExtent();
   
   // Graft the polydata to the last filter in the pipeline
   m_StripperFilter->SetOutput(outMesh);
