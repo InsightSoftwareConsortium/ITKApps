@@ -5,6 +5,7 @@ guiMainImplementation * ptr;
 guiMainImplementation
 ::guiMainImplementation()
 {
+  m_ViewAxis = 2;
   m_FixedImageFileName = "" ;
   m_MovingImageFileName = "" ;
 
