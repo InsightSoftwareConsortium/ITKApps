@@ -54,7 +54,8 @@ CommandLineArgumentParser
 bool 
 CommandLineArgumentParser
 ::TryParseCommandLine(int argc, char *argv[], 
-                      CommandLineArgumentParseResult &outResult)
+                      CommandLineArgumentParseResult &outResult,
+                      bool failOnUnknownTrailingParameters)
 {
   // Clear the result
   outResult.Clear();
@@ -68,9 +69,13 @@ CommandLineArgumentParser
     // Check if the argument is known
     if(m_OptionMap.find(arg) == m_OptionMap.end())
       {
-      // Unknown argument found
-      cerr << "Unrecognized command line option '" << arg << "'" << endl;
-      return false;
+      if(failOnUnknownTrailingParameters)
+        {
+        // Unknown argument found
+        cerr << "Unrecognized command line option '" << arg << "'" << endl;
+        return false;
+        }
+      else return true;
       }
 
     // Check if the number of parameters is correct

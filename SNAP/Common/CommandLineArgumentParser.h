@@ -37,7 +37,7 @@ public:
   bool IsOptionPresent(const char *option);
 
   /** Get one of the parameters to the option */
-  const char *GetOptionParameter(const char *option, unsigned int number);
+  const char *GetOptionParameter(const char *option, unsigned int number = 0);
 
 private:
   typedef std::vector< std::string > ParameterArrayType;
@@ -85,7 +85,8 @@ public:
 
   /** Try processing a command line.  Returns false if something breaks */
   bool TryParseCommandLine(int argc, char *argv[], 
-                           CommandLineArgumentParseResult &outResult);
+                           CommandLineArgumentParseResult &outResult,
+                           bool failOnUnknownTrailingParameters = true);
 private:
   // Synonim list type
   typedef std::list< std::string > NameListType;

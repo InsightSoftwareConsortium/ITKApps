@@ -26,6 +26,9 @@ static const char IRISver[] = "$Name:  $";
 // Full RCS info
 static const char IRISversion[] = "@(#) Id";
 
+// Non-cvs version
+static const char IRISSoftVersion[] = "ITK-SnAP 0.4";
+
 #define PIPE_UNCOMPRESS 1
 
 #ifdef WIN32
@@ -164,6 +167,23 @@ public:
 } 
 
 /**
+ * Set macro for strings
+ */
+#define irisSetStringMacro(name) \
+    virtual void Set##name (const char *_arg) \
+{ \
+    this->m_##name = _arg; \
+} 
+
+/**
+ * Get macro borrowed from VTK and modified.  Assumes m_ for private vars
+ */
+#define irisGetStringMacro(name) \
+    virtual const char *Get##name () const { \
+    return this->m_##name.c_str(); \
+} 
+
+/**
  * A get macro for boolean variables, IsXXX instead of GetXXX
  */
 #define irisIsMacro(name) \
@@ -183,6 +203,14 @@ public:
 #endif // __IrisTypes_h_
 /*
  *Log: IRISTypes.h
+ *Revision 1.12  2003/09/11 13:50:29  pauly
+ *FIX: Enabled loading of images with different orientations
+ *ENH: Implemented image save and load operations
+ *
+ *Revision 1.4  2003/08/28 14:37:09  pauly
+ *FIX: Clean 'unused parameter' and 'static keyword' warnings in gcc.
+ *FIX: Label editor repaired
+ *
  *Revision 1.3  2003/08/27 14:03:20  pauly
  *FIX: Made sure that -Wall option in gcc generates 0 warnings.
  *FIX: Removed 'comment within comment' problem in the cvs log.
