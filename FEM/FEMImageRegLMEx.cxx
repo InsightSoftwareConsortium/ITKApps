@@ -60,24 +60,12 @@ void ReadRawImageFiles( RegistrationType* X)
   typedef  itk::ImageFileReader< fileImageType >      FileSourceType;
   typedef  fileImageType::PixelType PixType;
   const unsigned int ImageDimension=fileImageType::ImageDimension;
-  typedef  itk::RawImageIO< PixType,ImageDimension>   RawReaderType;
 
   FileSourceType::Pointer reffilter = FileSourceType::New();
-  reffilter->SetFileName( (X->GetReferenceFile()).c_str() );
+  reffilter->SetFileName( (X->GetMovingFile()).c_str() );
   FileSourceType::Pointer tarfilter = FileSourceType::New();
-  tarfilter->SetFileName( (X->GetTargetFile()).c_str() );
+  tarfilter->SetFileName( (X->GetFixedFile()).c_str() );
 
-  RawReaderType::Pointer  rawReader  = RawReaderType::New();
-  rawReader->SetFileDimensionality( ImageDimension );
-
-  ImageType::SizeType ImageSize=X->GetImageSize();
-  for (unsigned int ii=0; ii<ImageDimension; ii++)     
-  {
-    unsigned int temp=(unsigned int) ImageSize[ii];
-    rawReader->SetDimensions( ii, temp );
-  }
-  reffilter->SetImageIO( rawReader );
-  tarfilter->SetImageIO( rawReader );
 
   try
     {
@@ -128,8 +116,9 @@ void ReadRawImageFiles( RegistrationType* X)
   IntensityEqualizeFilter->ThresholdAtMeanIntensityOn();
   IntensityEqualizeFilter->Update();
 
-  X->SetReferenceImage(refrescalefilter->GetOutput());
-  X->SetTargetImage(IntensityEqualizeFilter->GetOutput()/*tarrescalefilter->GetOutput()*/);
+  X->SetMovingImage(refrescalefilter->GetOutput());
+  X->SetFixedImage(IntensityEqualizeFilter->GetOutput()
+/*tarrescalefilter->GetOutput()*/);
 //  X->SetReferenceImage(reffilter->GetOutput());
 //  X->SetTargetImage(tarfilter->GetOutput());
 }
