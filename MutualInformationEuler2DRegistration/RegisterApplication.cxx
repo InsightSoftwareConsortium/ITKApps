@@ -9,6 +9,7 @@ RegisterApplication::RegisterApplication()
 {
   m_FixedImageReader = ImageReaderType::New() ;
   m_MovingImageReader = ImageReaderType::New() ;
+  m_ImageCaster = ImageCasterType::New() ;
   m_RegisteredImageWriter = ImageWriterType::New() ;
   m_RegisteredImageWriter->SetImageIO( itk::PNGImageIO::New() );
 
@@ -81,7 +82,9 @@ void RegisterApplication::SaveRegisteredImage(const char* filename)
 
   m_RegisteredImageFlipper->SetInput(m_RegisteredImage) ;
   m_RegisteredImageFlipper->Update() ;
-  m_RegisteredImageWriter->SetInput(m_RegisteredImageFlipper->GetOutput()) ;
+  m_ImageCaster->SetInput( m_RegisteredImageFlipper->GetOutput() ) ;
+  m_ImageCaster->Update() ;
+  m_RegisteredImageWriter->SetInput(m_ImageCaster->GetOutput()) ;
   m_RegisteredImageWriter->SetFileName( filename );
   m_RegisteredImageWriter->Write();
 }

@@ -5,6 +5,7 @@
 #include "itkPNGImageIO.h"
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
+#include "itkCastImageFilter.h"
 
 #include "Preprocessor.h"
 #include "MIEuler2DRegistrator.h"
@@ -23,9 +24,12 @@ public:
   typedef unsigned short PixelType ;
   typedef itk::Image< PixelType, ImageDimension > InputImageType ;
   typedef itk::Image< float, ImageDimension > OutputImageType ;
+  typedef itk::Image< unsigned char, ImageDimension > ResultImageType ;
   typedef itk::PNGImageIO ImageIOType ;
   typedef itk::ImageFileReader< InputImageType > ImageReaderType ;
-  typedef itk::ImageFileWriter< InputImageType > ImageWriterType ;
+  typedef itk::CastImageFilter< InputImageType, ResultImageType > 
+  ImageCasterType ;
+  typedef itk::ImageFileWriter< ResultImageType > ImageWriterType ;
   typedef itk::FlipImageFilter< InputImageType > ImageFlipperType ;
 
   typedef Preprocessor< InputImageType, OutputImageType > PreprocessorType ;
@@ -100,6 +104,7 @@ protected:
 
   ImageReaderType::Pointer m_FixedImageReader ;
   ImageReaderType::Pointer m_MovingImageReader ;
+  ImageCasterType::Pointer m_ImageCaster ;
   ImageWriterType::Pointer m_RegisteredImageWriter ;
   ImageFlipperType::Pointer m_FixedImageFlipper ;
   ImageFlipperType::Pointer m_MovingImageFlipper ;
