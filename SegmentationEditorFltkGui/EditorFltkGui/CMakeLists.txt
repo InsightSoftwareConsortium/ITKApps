@@ -72,7 +72,6 @@ vtkFiltering
 vtkImaging
 vtkIO
 vtkRendering
-vtkPatented	
 ITKVtkFltk
 ITKFltkImageViewer
 ${FLTK_LIBRARY}

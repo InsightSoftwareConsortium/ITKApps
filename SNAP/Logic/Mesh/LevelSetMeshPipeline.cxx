@@ -29,11 +29,11 @@
 
 // VTK includes
 #include <vtkCellArray.h>
-#include <vtkDecimate.h>
+#include <vtkDecimatePro.h>
 #include <vtkImageData.h>
 #include <vtkImageImport.h>
 #include <vtkImageGaussianSmooth.h>
-#include <vtkImageMarchingCubes.h>
+#include <vtkContourFilter.h>
 #include <vtkImageThreshold.h>
 #include <vtkImageToStructuredPoints.h>
 #include <vtkPointData.h>
@@ -85,18 +85,18 @@ LevelSetMeshPipeline
   m_VTKImporter->SetCallbackUserData(
     m_VTKExporter->GetCallbackUserData());
 
-  // Create and configure the marching cubes filter
-  m_MarchingCubesFilter = vtkImageMarchingCubes::New();
-  m_MarchingCubesFilter->SetInput(m_VTKImporter->GetOutput());    
-  m_MarchingCubesFilter->ReleaseDataFlagOn();
-  m_MarchingCubesFilter->ComputeScalarsOff();
-  m_MarchingCubesFilter->ComputeGradientsOff();
-  m_MarchingCubesFilter->SetNumberOfContours(1);
-  m_MarchingCubesFilter->SetValue(0, 0.0);
+  // Create and configure the contour filter
+  m_ContourFilter = vtkContourFilter::New();
+  m_ContourFilter->SetInput(m_VTKImporter->GetOutput());    
+  m_ContourFilter->ReleaseDataFlagOn();
+  m_ContourFilter->ComputeScalarsOff();
+  m_ContourFilter->ComputeGradientsOff();
+  m_ContourFilter->SetNumberOfContours(1);
+  m_ContourFilter->SetValue(0, 0.0);
 
   // Create and configure a filter for triangle decimation
-  m_DecimateFilter = vtkDecimate::New();
-  m_DecimateFilter->SetInput(m_MarchingCubesFilter->GetOutput());
+  m_DecimateFilter = vtkDecimatePro::New();
+  m_DecimateFilter->SetInput(m_ContourFilter->GetOutput());
   m_DecimateFilter->ReleaseDataFlagOn();
 
   // Create and configure a filter for polygon smoothing
@@ -117,7 +117,7 @@ LevelSetMeshPipeline
   m_StripperFilter->Delete();
   m_PolygonSmoothingFilter->Delete();
   m_DecimateFilter->Delete();
-  m_MarchingCubesFilter->Delete();
+  m_ContourFilter->Delete();
   m_VTKImporter->Delete();
 }
 
@@ -131,21 +131,6 @@ LevelSetMeshPipeline
   // Apply parameters to the decimation filter
   m_DecimateFilter->SetTargetReduction(
     options.GetDecimateTargetReduction());
-  
-  m_DecimateFilter->SetAspectRatio(
-    options.GetDecimateAspectRatio());
-  
-  m_DecimateFilter->SetInitialError(
-    options.GetDecimateInitialError());
-  
-  m_DecimateFilter->SetErrorIncrement(
-    options.GetDecimateErrorIncrement());
-  
-  m_DecimateFilter->SetMaximumIterations(
-    options.GetDecimateMaximumIterations());
-  
-  m_DecimateFilter->SetInitialFeatureAngle(
-    options.GetDecimateFeatureAngle());
   
   m_DecimateFilter->SetPreserveTopology(
     options.GetDecimatePreserveTopology());
@@ -183,7 +168,7 @@ LevelSetMeshPipeline
   // Graft the polydata to the last filter in the pipeline
   m_StripperFilter->SetOutput(outMesh);
 
-  // Now the marching cubes and subsequent filters
+  // Now the subsequent filters
   m_StripperFilter->UpdateWholeExtent();
 }
 

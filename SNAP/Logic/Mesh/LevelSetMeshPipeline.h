@@ -27,9 +27,9 @@ namespace itk {
 
 // Forward references to vtk classes
 class vtkImageImport;
-class vtkImageMarchingCubes;
+class vtkContourFilter;
 class vtkSmoothPolyDataFilter;
-class vtkDecimate;
+class vtkDecimatePro;
 class vtkStripper;
 class vtkPolyData;
 
@@ -37,8 +37,8 @@ class vtkPolyData;
  * \class LevelSetMeshPipeline
  * \brief A pipeline used to compute a mesh of the zero level set in SNAP.
  *
- * This pipeline takes a floating point image computed by the level set filter
- * and uses marching cubes to get a triangular mesh
+ * This pipeline takes a floating point image computed by the level
+ * set filter and uses a contour algorithm to get a triangular mesh
  */
 class LevelSetMeshPipeline
 {
@@ -83,11 +83,11 @@ private:
   // The VTK importer for the data
   vtkImageImport *            m_VTKImporter;
 
-  // The marching cubes driver
-  vtkImageMarchingCubes *     m_MarchingCubesFilter;
+  // The contour filter
+  vtkContourFilter *          m_ContourFilter;
   
   // The triangle decimation driver
-  vtkDecimate *               m_DecimateFilter;
+  vtkDecimatePro *            m_DecimateFilter;
 
   // The polygon smoothing filter
   vtkSmoothPolyDataFilter *   m_PolygonSmoothingFilter;

@@ -39,7 +39,7 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkImageThreshold.h>
-#include <vtkMarchingCubes.h>
+#include <vtkContourFilter.h>
 #include <vtkOpenGLPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkWindowedSincPolyDataFilter.h>
@@ -150,7 +150,7 @@ protected:
 
   vtkImageThreshold* thresher[4];
 
-  vtkMarchingCubes* marcher[4];
+  vtkContourFilter* contour[4];
 
   vtkOpenGLPolyDataMapper* mapper[4];
 

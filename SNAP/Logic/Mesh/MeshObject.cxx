@@ -34,11 +34,11 @@
 
 // VTK includes
 #include <vtkCellArray.h>
-#include <vtkDecimate.h>
+#include <vtkDecimatePro.h>
 #include <vtkImageData.h>
 #include <vtkImageImport.h>
 #include <vtkImageGaussianSmooth.h>
-#include <vtkImageMarchingCubes.h>
+#include <vtkContourFilter.h>
 #include <vtkImageThreshold.h>
 #include <vtkImageToStructuredPoints.h>
 #include <vtkPointData.h>
@@ -317,6 +317,10 @@ MeshObject
 
 /*
  *Log: MeshObject.cxx
+ *Revision 1.5  2003/08/28 14:37:09  pauly
+ *FIX: Clean 'unused parameter' and 'static keyword' warnings in gcc.
+ *FIX: Label editor repaired
+ *
  *Revision 1.4  2003/08/27 14:03:21  pauly
  *FIX: Made sure that -Wall option in gcc generates 0 warnings.
  *FIX: Removed 'comment within comment' problem in the cvs log.

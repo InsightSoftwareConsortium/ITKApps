@@ -99,7 +99,7 @@ bool EditorConsole::StartEditor() {
   binaryWin->SetInput(colorMapBin->GetOutput());
 
   overlayMapper->SetInput(colorMapBin->GetOutput());
-  mapper[1]->SetInput(marcher[1]->GetOutput());
+  mapper[1]->SetInput(contour[1]->GetOutput());
   renWin->AddRenderer(ren1);
 
   // read the data
@@ -423,8 +423,8 @@ void EditorConsole::ToggleAntialiasing() {
     for(int i=1; i<4; i++) {
       if(has_data[i]) {
         thresher[i]->SetInput(binaryVolume);
-        marcher[i]->SetInput(thresher[i]->GetOutput());
-        vtk_antialiaser[i]->SetInput(marcher[i]->GetOutput());
+        contour[i]->SetInput(thresher[i]->GetOutput());
+        vtk_antialiaser[i]->SetInput(contour[i]->GetOutput());
         mapper[i]->SetInput(vtk_antialiaser[i]->GetOutput());
         (blob[i]->GetProperty())->SetInterpolationToFlat();
       }
@@ -434,8 +434,8 @@ void EditorConsole::ToggleAntialiasing() {
     for(int i=1; i<4; i++) {
       if(has_data[i]) {
         thresher[1]->SetInput(binaryVolume);
-        marcher[1]->SetInput(thresher[1]->GetOutput());
-        mapper[1]->SetInput(marcher[1]->GetOutput());
+        contour[1]->SetInput(thresher[1]->GetOutput());
+        mapper[1]->SetInput(contour[1]->GetOutput());
       }
     }
   }
@@ -599,9 +599,9 @@ void EditorConsole::AddRenderer(int isovalue)
 
 
   thresher[isovalue]->SetInput(binaryVolume);
-  marcher[isovalue]->SetInput(thresher[isovalue]->GetOutput());
+  contour[isovalue]->SetInput(thresher[isovalue]->GetOutput());
 
-  mapper[isovalue]->SetInput(marcher[isovalue]->GetOutput());
+  mapper[isovalue]->SetInput(contour[isovalue]->GetOutput());
 
   ToggleAntialiasing();
   

@@ -78,7 +78,7 @@ public:
    * the surface it performs the following steps (GB, MS, TMR 
    * are optional): 
    *   1.Gaussian Blur on the imported image data 
-   *   2.Triangle generation using a Marching Cubes algorithm 
+   *   2.Triangle generation using a contour algorithm 
    *   3.Mesh Smoothing 
    *   4.Triangle Mesh Reduction 
    *   5.Triangle stripping
@@ -122,6 +122,10 @@ public:
 
 /*
  *Log: MeshObject.h
+ *Revision 1.4  2003/08/28 14:37:09  pauly
+ *FIX: Clean 'unused parameter' and 'static keyword' warnings in gcc.
+ *FIX: Label editor repaired
+ *
  *Revision 1.3  2003/08/27 14:03:21  pauly
  *FIX: Made sure that -Wall option in gcc generates 0 warnings.
  *FIX: Removed 'comment within comment' problem in the cvs log.

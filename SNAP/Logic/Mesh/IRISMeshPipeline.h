@@ -33,9 +33,9 @@ namespace itk {
 
 // Forward references to vtk classes
 class vtkImageImport;
-class vtkImageMarchingCubes;
+class vtkContourFilter;
 class vtkSmoothPolyDataFilter;
-class vtkDecimate;
+class vtkDecimatePro;
 class vtkStripper;
 class vtkPolyData;
 
@@ -120,11 +120,11 @@ private:
   // The VTK importer for the data
   vtkImageImport *            m_VTKImporter;
 
-  // The marching cubes driver
-  vtkImageMarchingCubes *     m_MarchingCubesFilter;
+  // The contour filter
+  vtkContourFilter *          m_ContourFilter;
   
   // The triangle decimation driver
-  vtkDecimate *               m_DecimateFilter;
+  vtkDecimatePro *            m_DecimateFilter;
 
   // The polygon smoothing filter
   vtkSmoothPolyDataFilter *   m_PolygonSmoothingFilter;

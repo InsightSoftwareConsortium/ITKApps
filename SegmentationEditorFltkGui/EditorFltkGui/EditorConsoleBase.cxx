@@ -182,7 +182,7 @@ EditorConsoleBase
   for(int i=1; i<4; i++) {
     if(has_data[i]) {
       thresher[i]->Delete();
-      marcher[i]->Delete();
+      contour[i]->Delete();
       mapper[i]->Delete();
       blob[i]->Delete();
       vtk_antialiaser[i]->Delete();
@@ -409,22 +409,22 @@ void EditorConsoleBase::AddSurfaceRenderer(int isovalue, float r, float g, float
 
     threshname->Update();
     
-    // marching cubes algorithm
-    marcher[isovalue] = vtkMarchingCubes::New();
-    vtkMarchingCubes* marchername = marcher[isovalue];
-    marchername->SetNumberOfContours(1);
-    marchername->SetValue(0, isovalue);
+    // contour algorithm
+    contour[isovalue] = vtkContourFilter::New();
+    vtkContourFilter* contourname = contour[isovalue];
+    contourname->SetNumberOfContours(1);
+    contourname->SetValue(0, isovalue);
     
-    marchername->SetInput(threshname->GetOutput());
+    contourname->SetInput(threshname->GetOutput());
 
-    marchername->Update();
+    contourname->Update();
     
     // polygon mapper for surface rendering
     mapper[isovalue] = vtkOpenGLPolyDataMapper::New();
     vtkOpenGLPolyDataMapper* mapname = mapper[isovalue];
     mapname->ScalarVisibilityOff();
     mapname->ImmediateModeRenderingOn();
-    mapname->SetInput(marchername->GetOutput());
+    mapname->SetInput(contourname->GetOutput());
     mapname->Update();
 
     // create an actor for the surface
