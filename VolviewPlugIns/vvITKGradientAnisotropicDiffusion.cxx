@@ -85,7 +85,15 @@ static int UpdateGUI(void *inf)
   info->SetGUIProperty(info, 2, VVP_GUI_HELP, "Factor that multiplies the image gradient in order to compute the effective conductance locally. The higher the value of this parameter, the stronger the diffusion will be");
   info->SetGUIProperty(info, 2, VVP_GUI_HINTS , "0.1 10.0 0.1");
 
-  info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
+  const char * stringValue = info->GetGUIProperty(info, 0, VVP_GUI_VALUE );
+  if( !stringValue )
+    {
+    info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, "0");
+    }
+  else
+    {
+    info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, stringValue);
+    }
 
   info->OutputVolumeScalarType = info->InputVolumeScalarType;
   info->OutputVolumeNumberOfComponents = info->InputVolumeNumberOfComponents;
