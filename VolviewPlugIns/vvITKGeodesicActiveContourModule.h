@@ -48,6 +48,8 @@ public:
                                             RealImageType >    
                                                    GeodesicActiveContourFilterType;
 
+    unsigned int GetElapsedIterations() const;
+    float GetRMSChange() const;
 
 public:
     GeodesicActiveContourModule();

@@ -194,6 +194,30 @@ GeodesicActiveContourModule<TInputPixelType>
 
 
 /*
+ *  Get real number of iterations performed
+ */
+template <class TInputPixelType >
+unsigned int  
+GeodesicActiveContourModule<TInputPixelType>
+::GetElapsedIterations() const
+{
+  return m_GeodesicActiveContourFilter->GetElapsedIterations();
+}
+
+
+/*
+ *  Get the RMS error from the last iteration
+ */
+template <class TInputPixelType >
+float 
+GeodesicActiveContourModule<TInputPixelType>
+::GetRMSChange() const
+{
+  return m_GeodesicActiveContourFilter->GetRMSChange();
+}
+
+
+/*
  *  Returns the level set resulting 
  *  from the GeodesicActiveContour filter.
  */

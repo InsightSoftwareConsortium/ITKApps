@@ -94,6 +94,9 @@ public:
 
     const RealImageType * GetLevelSet();
 
+    unsigned int GetElapsedIterations() const;
+    float GetRMSChange() const;
+
 private:
 
     typename ImportFilterType::Pointer              m_ImportFilter;

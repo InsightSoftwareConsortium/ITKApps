@@ -42,7 +42,6 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       typedef  unsigned char                              PixelType;
       typedef VolView::PlugIn::ShapeDetectionModule< 
                                             PixelType >   ModuleType;
-      info->SetProperty( info, VVP_REPORT_TEXT, "" );
       ModuleType  module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Computing Shape Detection Module...");
@@ -75,7 +74,6 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       typedef  unsigned short                             PixelType;
       typedef VolView::PlugIn::ShapeDetectionModule< 
                                             PixelType >   ModuleType;
-      info->SetProperty( info, VVP_REPORT_TEXT, "" );
       ModuleType  module;
       module.SetPluginInfo( info );
       module.SetDistanceFromSeeds( distanceFromSeeds );

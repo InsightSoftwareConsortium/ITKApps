@@ -200,6 +200,30 @@ CannySegmentationLevelSetModule<TInputPixelType>
   m_CannySegmentationLevelSetFilter->SetMaximumIterations( value );
 }
 
+/*
+ *  Get the RMS error from the last iteration
+ */
+template <class TInputPixelType >
+float 
+CannySegmentationLevelSetModule<TInputPixelType>
+::GetRMSChange() const
+{
+  return m_CannySegmentationLevelSetFilter->GetRMSChange();
+}
+
+
+
+/*
+ *  Get real number of iterations performed
+ */
+template <class TInputPixelType >
+unsigned int  
+CannySegmentationLevelSetModule<TInputPixelType>
+::GetElapsedIterations() const
+{
+  return m_CannySegmentationLevelSetFilter->GetElapsedIterations();
+}
+
 
 
 /*
