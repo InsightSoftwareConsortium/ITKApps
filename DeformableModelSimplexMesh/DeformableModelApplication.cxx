@@ -55,13 +55,7 @@ DeformableModelApplication
   m_SurfaceViewerCommand->SetCallbackFunction(this, &DeformableModelApplication::ProcessAxialViewInteraction);
   m_SimplexMeshViewer.AddObserver(ClickedPointEvent(), m_SurfaceViewerCommand);
   
-  
-  VectorType sphereRadius;
-  sphereRadius.Fill( 35.0 );
-  m_SphereMeshSource->SetScale( sphereRadius );
-  m_SphereMeshSource->SetResolution(2); 
-
-  m_InternalForcesComputed = false;
+   m_InternalForcesComputed = false;
 }
 
 
@@ -124,19 +118,9 @@ void
 DeformableModelApplication
 ::LoadMesh()
 {
-  std::cout << "LoadMesh()" << std::endl;
-  std::cout << "simplex" << std::endl;
-
-  std::cout << "Center = " << m_SeedPoint << std::endl;
-
   m_SphereMeshSource->SetCenter(m_SeedPoint);
-  m_SphereMeshSource->Update();
-
-  std::cout << "simplex and me" << std::endl;
-  m_SimplexFilter->SetInput( m_SphereMeshSource->GetOutput() );
   m_SimplexFilter->Update();
 
-  std::cout << "simplex and me and " << std::endl;
   m_SimplexMesh  = m_SimplexFilter->GetOutput();
   m_SimplexMesh->DisconnectPipeline();
 
@@ -199,13 +183,12 @@ DeformableModelApplication
     // Set the vtk point at the index with the the coord array from itk
     // itk returns a const pointer, but vtk is not const correct, so
     // we have to use a const cast to get rid of the const
-    vpoints->SetPoint(idx, const_cast<vtkDoubleType*>(i->Value().GetDataPointer()));
+    vtkDoubleType * pp = const_cast<vtkDoubleType*>(i->Value().GetDataPointer());
+    vpoints->SetPoint(idx, pp);
     }
 
  // Set the points on the vtk grid
  vgrid->SetPoints(vpoints);
- //vgrid->GetPointData()->SetScalars(scalars);
- //vgrid->GetPointData()->CopyAllOn();
 
  SimplexMeshType::CellType::MultiVisitor::Pointer mv =
    SimplexMeshType::CellType::MultiVisitor::New();
@@ -213,15 +196,15 @@ DeformableModelApplication
  LineVisitor::Pointer lv = LineVisitor::New();
 
  //set up the visitors
-
  int vtkCellCount = 0; // running counter for current cell inserted into vtk
  int numCells = m_SimplexMesh->GetNumberOfCells();
  int *types = new int[numCells]; //type array for vtk
+
  //create vtk cells and estimate the size
  vtkCellArray* cells = vtkCellArray::New();
  cells->EstimateSize(numCells, 4);
- // Set the TypeArray CellCount and CellArray for both visitors
 
+ // Set the TypeArray CellCount and CellArray for both visitors
  lv->SetTypeArray(types);
  lv->SetCellCounter(&vtkCellCount);
  lv->SetCellArray(cells);
@@ -283,7 +266,7 @@ DeformableModelApplication
     std::cout << "I is " << i << std::endl;
 
     m_DeformFilter->SetInput( m_SimplexMesh );
-    m_DeformFilter->SetIterations(10); 
+    m_DeformFilter->SetIterations(1); 
     m_DeformFilter->Update();
 
     m_SimplexMesh =  m_DeformFilter->GetOutput();

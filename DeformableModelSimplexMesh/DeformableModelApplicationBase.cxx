@@ -19,12 +19,13 @@ DeformableModelApplicationBase
   m_SphereMeshSource        = SphereMeshSourceType::New();
   PointType center; 
   center.Fill(0);
+ 
+  VectorType sphereRadius;
+  sphereRadius.Fill( 35.0 );
 
-  PointType::ValueType scaleInit[3] = {10,10,10};
-  VectorType scale = scaleInit;
   m_SphereMeshSource->SetCenter(center);
+  m_SphereMeshSource->SetScale( sphereRadius );
   m_SphereMeshSource->SetResolution(2); 
-  m_SphereMeshSource->SetScale(scale);
 
   m_SimplexFilter  = SimplexFilterType::New();
   m_SimplexFilter->SetInput( m_SphereMeshSource->GetOutput() );
