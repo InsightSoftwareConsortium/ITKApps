@@ -779,6 +779,7 @@ proc EditorInitialize {} {
     binaryVolume SetExtent 0 1 0 1 0 1
     binaryVolume SetUpdateExtent 0 1 0 1 0 1
     binaryVolume SetLabelValue 1
+    binaryVolume Clear
     set EditorGlobals(binaryVolume) binaryVolume
     
 
