@@ -1,0 +1,69 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0104 
+header_name {.h} 
+code_name {.cxx}
+class CellularSegmentationApplicationGUI {open : {public CellularSegmentationApplicationBase}
+} {
+  Function {CellularSegmentationApplicationGUI()} {open
+  } {
+    Fl_Window mainWindow {
+      label CellularSegmentationApplication open selected
+      xywh {195 100 870 850} type Double resizable
+      code0 {\#include "CellularSegmentationApplicationBase.h"} visible
+    } {
+      Fl_Button {} {
+        label Quit
+        callback {this->Quit();}
+        xywh {780 795 75 40}
+      }
+      Fl_Button loadImageButton {
+        label {Load Image}
+        callback {this->Load();}
+        xywh {15 795 75 40} align 128
+      }
+      Fl_Box imageView {
+        xywh {10 10 850 770} box DOWN_FRAME align 2 resizable
+        code0 {\#include "vtkFlRenderWindowInteractor.h"}
+        class vtkFlRenderWindowInteractor
+      }
+      Fl_Button runButton {
+        label {@+5>}
+        callback {this->Run();}
+        xywh {190 795 75 40} align 128 deactivate
+      }
+      Fl_Button stopButton {
+        label {@square}
+        callback {this->Stop();}
+        xywh {280 795 75 40} align 128 deactivate
+      }
+      Fl_Choice displayChoice {
+        label {Display:}
+        callback {this->SetDisplayOption();} open
+        xywh {574 799 135 30} down_box BORDER_BOX
+      } {}
+      Fl_Button clearButton {
+        label {@+51+}
+        callback {this->Clear();}
+        xywh {369 795 75 40} align 128 deactivate
+      }
+    }
+  }
+  Function {~CellularSegmentationApplicationGUI()} {return_type virtual
+  } {}
+  Function {Quit()} {return_type {virtual void}
+  } {}
+  Function {Load()} {return_type {virtual void}
+  } {}
+  Function {Show()} {return_type {virtual void}
+  } {}
+  Function {Hide()} {return_type {virtual void}
+  } {}
+  Function {Run()} {return_type {virtual void}
+  } {}
+  Function {Stop()} {return_type {virtual void}
+  } {}
+  Function {SetDisplayOption()} {return_type {virtual void}
+  } {}
+  Function {Clear()} {return_type {virtual void}
+  } {}
+} 
