@@ -15,6 +15,10 @@
 #include "vtkImageCast.h"
 #include "vtkImageData.h"
 
+#ifdef VTK_USE_EXECUTIVES
+#include "vtkExecutive.h"
+#endif
+
 #ifndef vtkFloatingPointType
 #define vtkFloatingPointType float
 #endif
@@ -134,7 +138,19 @@ public:
   // Description:
   // This method returns the cache to make a connection
   // It justs feeds the request to the sub filter.
-  void SetOutput ( vtkImageData* d ) { this->vtkImporter->SetOutput ( d ); };
+  void SetOutput ( vtkImageData* d ) { 
+#ifdef VTK_USE_EXECUTIVES
+    if (d == this->vtkImporter->GetOutput())
+      {
+      return;
+      }
+    // Ask the executive to setup the new output.
+    this->vtkImporter->GetExecutive()->SetOutputData(0, d);
+    this->vtkImporter->Modified();
+#else
+    this->vtkImporter->SetOutput(d);
+#endif
+  };
   virtual vtkImageData *GetOutput() { return this->vtkImporter->GetOutput(); };
   virtual vtkImageData *GetOutput(int idx)
   {
@@ -171,7 +187,8 @@ public:
       else
         {
         // skip the cast operation
-        this->vtkExporter->SetInput( this->vtkCast->GetInput() );
+        this->vtkExporter->SetInput( 
+          static_cast<vtkImageData *>(this->vtkCast->GetInput()) );
         }
       
       
@@ -201,7 +218,8 @@ public:
       else
         {
         // skip the cast operation
-        this->vtkExporter->SetInput( this->vtkCast->GetInput() );
+        this->vtkExporter->SetInput( 
+          static_cast<vtkImageData *>(this->vtkCast->GetInput() ));
         }
       
       
