@@ -192,7 +192,17 @@ int main(int argc, char * argv [] )
 
     polyActor->SetMapper( polyMapper );
     polyMapper->SetInput( contour->GetOutput() );
-    polyActor->GetProperty()->SetColor(1,0,0);
+    
+
+    vtkProperty * property = vtkProperty::New();
+    property->SetRepresentationToSurface();
+    property->SetAmbient(0.1);
+    property->SetDiffuse(0.1);
+    property->SetSpecular(0.5);
+    property->SetColor(1.0,0.0,0.0);
+    property->SetLineWidth(2.0);
+
+    polyActor->SetProperty( property );
     
     renderer->AddActor( polyActor );
 
