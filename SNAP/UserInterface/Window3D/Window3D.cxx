@@ -730,7 +730,7 @@ Window3D
 
 void 
 Window3D
-::OnZoomStartAction(int x, int y)
+::OnZoomStartAction(int irisNotUsed(x), int y)
 {
   if ( m_Mode != WIN3D_NONE ) return;
   m_Mode = WIN3D_ZOOM;
@@ -802,7 +802,7 @@ Window3D
   if (!m_Driver->GetCurrentImageData()->IsGreyLoaded()) return;
 
   Vector3i hit;
-  if (this->IntersectSegData(Fl::event_x(), Fl::event_y(), hit))
+  if (this->IntersectSegData(x, y, hit))
     {
     AddSample( hit );
     m_ParentUI->Activate3DAccept(true);
@@ -1348,6 +1348,9 @@ void Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.9  2003/10/10 15:04:21  pauly
+ *ENH: Cut plane improvements (paint-over-visible and paint-over-one)
+ *
  *Revision 1.8  2003/10/10 14:25:55  pauly
  *FIX: Ensured that code compiles on gcc 3-3
  *

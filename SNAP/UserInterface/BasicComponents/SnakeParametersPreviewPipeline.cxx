@@ -567,12 +567,11 @@ SnakeParametersPreviewPipeline
 {
 }
 
+#ifdef SNAKE_PREVIEW_ADVANCED
 void
 SnakeParametersPreviewPipeline
 ::UpdateLevelSet(Fl_Gl_Window *context)
 {
-#ifdef SNAKE_PREVIEW_ADVANCED
-  
   // Allocate the flood fill image  
   m_FloodFillImage->SetRegions(m_SpeedImage->GetBufferedRegion());
   m_FloodFillImage->Allocate();
@@ -580,9 +579,14 @@ SnakeParametersPreviewPipeline
 
   // Compute the distance image
   m_DistanceFilter->Update();
-
-#endif // SNAKE_PREVIEW_ADVANCED
 }
+#else
+void
+SnakeParametersPreviewPipeline
+::UpdateLevelSet(Fl_Gl_Window *irisNotUsed(context))
+{
+}
+#endif // SNAKE_PREVIEW_ADVANCED
 
 void
 SnakeParametersPreviewPipeline

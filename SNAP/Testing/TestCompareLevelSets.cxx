@@ -360,7 +360,9 @@ public:
     m_LastClock = clock();
   }
 
-  void Callback(itk::Object *object, const itk::EventObject &event)
+  void Callback(
+    itk::Object *irisNotUsed(object), 
+    const itk::EventObject &irisNotUsed(event))
   {
     // Record the time
     clock_t currentClock = clock();
@@ -368,7 +370,8 @@ public:
     m_Iteration++;
 
     // Write data
-    m_Out << m_Iteration << "\t" << delta << /* "\t" << CountInterfaceVoxels() << */ endl;
+    m_Out << m_Iteration << "\t" << delta << 
+      /* "\t" << CountInterfaceVoxels() << */ endl;
   }
 
   unsigned long CountInterfaceVoxels()
