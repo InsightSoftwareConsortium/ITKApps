@@ -40,6 +40,7 @@ class AntiAliasRunner
       // Set the parameters on it
       module.GetFilter()->SetMaximumIterations(     maxNumberOfIterations );
       module.GetFilter()->SetMaximumRMSError(       maximumRMSError    );
+      module.GetFilter()->SetNumberOfLayers(  3 );
       // Execute the filter
       module.ProcessData( pds  );
     }
@@ -153,7 +154,7 @@ static int UpdateGUI(void *inf)
   info->SetGUIProperty(info, 1, VVP_GUI_TYPE, VVP_GUI_SCALE);
   info->SetGUIProperty(info, 1, VVP_GUI_DEFAULT, "0.05");
   info->SetGUIProperty(info, 1, VVP_GUI_HELP, "Maximum RMS error allows. This value defines the convergence criterion for the smoothing.");
-  info->SetGUIProperty(info, 1, VVP_GUI_HINTS , "0.01 1.0 0.005");
+  info->SetGUIProperty(info, 1, VVP_GUI_HINTS , "0.001 0.1 0.001");
 
   const char * stringValue = info->GetGUIProperty(info, 0, VVP_GUI_VALUE );
   if( !stringValue )
@@ -191,7 +192,7 @@ void VV_PLUGIN_EXPORT vvITKAntiAliasInit(vtkVVPluginInfo *info)
   info->ProcessData = ProcessData;
   info->UpdateGUI = UpdateGUI;
   info->SetProperty(info, VVP_NAME, "Anti-Aliasing (ITK)");
-  info->SetProperty(info, VVP_GROUP, "Noise Suppression");
+  info->SetProperty(info, VVP_GROUP, "Surface Generation");
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
                                   "Reduction of aliasing effects");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,
