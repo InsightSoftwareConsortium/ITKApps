@@ -31,6 +31,8 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
   // Take the first marker as the seed point
   const float * seedCoordinates = info->Markers;
 
+  char tmp[1024];
+
   try 
   {
   switch( info->InputVolumeScalarType )
@@ -40,6 +42,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       typedef  unsigned char                              PixelType;
       typedef VolView::PlugIn::ShapeDetectionModule< 
                                             PixelType >   ModuleType;
+      info->SetProperty( info, VVP_REPORT_TEXT, "" );
       ModuleType  module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Computing Shape Detection Module...");
@@ -61,6 +64,10 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
         }
       // Execute the filter
       module.ProcessData( pds  );
+      sprintf(tmp,"Total number of iterations = %d \n Final RMS error = %f",
+                         module.GetElapsedIterations(),
+                         module.GetRMSChange());
+      info->SetProperty( info, VVP_REPORT_TEXT, tmp );
       break; 
       }
     case VTK_UNSIGNED_SHORT:
@@ -68,6 +75,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       typedef  unsigned short                             PixelType;
       typedef VolView::PlugIn::ShapeDetectionModule< 
                                             PixelType >   ModuleType;
+      info->SetProperty( info, VVP_REPORT_TEXT, "" );
       ModuleType  module;
       module.SetPluginInfo( info );
       module.SetDistanceFromSeeds( distanceFromSeeds );
@@ -89,6 +97,10 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
         }
       // Execute the filter
       module.ProcessData( pds  );
+      sprintf(tmp,"Total number of iterations = %d \n Final RMS error = %f",
+                         module.GetElapsedIterations(),
+                         module.GetRMSChange());
+      info->SetProperty( info, VVP_REPORT_TEXT, tmp );
       break; 
       } 
     }

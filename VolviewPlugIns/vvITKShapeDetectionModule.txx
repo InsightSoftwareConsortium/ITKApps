@@ -165,6 +165,17 @@ ShapeDetectionModule<TInputPixelType>
   m_ShapeDetectionFilter->SetMaximumRMSError( value );
 }
 
+/*
+ *  Get the RMS error from the last iteration
+ */
+template <class TInputPixelType >
+float 
+ShapeDetectionModule<TInputPixelType>
+::GetRMSChange() const
+{
+  return m_ShapeDetectionFilter->GetRMSChange();
+}
+
 
 /*
  *  Set the maximum number of iterations to attempt in order to get
@@ -176,6 +187,18 @@ ShapeDetectionModule<TInputPixelType>
 ::SetMaximumIterations( unsigned int value )
 {
   m_ShapeDetectionFilter->SetMaximumIterations( value );
+}
+
+
+/*
+ *  Get real number of iterations performed
+ */
+template <class TInputPixelType >
+unsigned int  
+ShapeDetectionModule<TInputPixelType>
+::GetElapsedIterations() const
+{
+  return m_ShapeDetectionFilter->GetElapsedIterations();
 }
 
 

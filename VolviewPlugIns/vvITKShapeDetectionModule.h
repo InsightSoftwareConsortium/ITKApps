@@ -70,6 +70,9 @@ public:
 
     const RealImageType * GetLevelSet();
 
+    unsigned int GetElapsedIterations() const;
+    float GetRMSChange() const;
+
 private:
     FastMarchingModuleType                          m_FastMarchingModule;
     typename ShapeDetectionFilterType::Pointer      m_ShapeDetectionFilter;
