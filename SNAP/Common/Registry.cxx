@@ -332,7 +332,7 @@ Registry
     string value = "";
     if (iValue != line.npos) 
       {
-      line.substr(iValue);
+      value = line.substr(iValue);
       }
  
     // Now the key-value pair is present.  Add it using the normal interface
