@@ -4,11 +4,11 @@ header_name {.h}
 code_name {.cxx}
 class guiMain {open
 } {
-  Function {guiMain()} {open selected
+  Function {guiMain()} {open
   } {
     Fl_Window tkWindow {
       label {3D Registration Tool ====> downloadable on http://caddlab.rad.unc.edu <=====} open
-      xywh {924 76 1060 735} type Double box PLASTIC_UP_BOX color 159 resizable
+      xywh {284 225 1060 705} type Double box PLASTIC_UP_BOX color 159 resizable
       code0 {itk::ImageRegion< 3 > tempRegion ;} visible
     } {
       Fl_Group tkMainGroup {open
@@ -17,11 +17,6 @@ class guiMain {open
         Fl_Value_Slider tkSliceValuator {
           callback {UpdateSliceNumber();}
           xywh {430 52 16 603} type {Vert Fill} box PLASTIC_DOWN_BOX color 247 selection_color 247 labelsize 8 step 1
-        }
-        Fl_Button tkResetButton {
-          label Reset
-          callback {Reset();}
-          xywh {910 660 135 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 1 selection_color 247 labelfont 2 labelsize 10
         }
         Fl_Choice tkDisplayMovingImageChoice {
           label {Currently Displayed Moving Image:}
@@ -44,24 +39,20 @@ class guiMain {open
             xywh {25 25 100 20} labelsize 10 deactivate
           }
         }
-        Fl_Group {} {
-          label {Developed by Computer Aided Diagnosis and Display Laboratories  ( http://caddlab.rad.unc.edu ), Oct. 2002}
-          xywh {530 705 520 15} labelsize 10 align 25
-        } {}
         Fl_Button {} {
           label Quit
           callback {Quit();}
-          xywh {910 680 135 15} box PLASTIC_UP_BOX color 1 labelfont 2 labelsize 10
+          xywh {910 665 135 20} box PLASTIC_UP_BOX color 1 labelsize 10
         }
         Fl_Button tkRegisterButton {
           label Register
           callback {//PreRegister();
 Register();}
-          xywh {740 660 155 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 63 selection_color 63 labelsize 10
+          xywh {740 666 155 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 63 selection_color 63 labelsize 10
         }
         Fl_Choice tkRegistrationMethodChoice {
           label {Registration Method:} open
-          xywh {640 661 90 19} box PLASTIC_UP_BOX down_box BORDER_BOX color 255 selection_color 255 labelsize 10 align 36 when 1 textsize 10
+          xywh {640 666 90 19} box PLASTIC_UP_BOX down_box BORDER_BOX color 255 selection_color 255 labelsize 10 align 36 when 1 textsize 10
         } {
           menuitem tkRigidMethod {
             label Rigid
@@ -84,7 +75,7 @@ Register();}
           class {GLColorSliceView< RealImagePixelType, unsigned char >}
         }
         Fl_Group tkSubGroup {open
-          xywh {5 51 420 609}
+          xywh {5 51 424 609}
         } {
           Fl_Button tkSelectFixedImageButton {
             label {Select Reference Image...}
@@ -263,7 +254,7 @@ Register();}
         }
         Fl_Output tkStatusDisplay {
           label Status
-          xywh {80 695 415 20} labelsize 10 textsize 10
+          xywh {43 667 383 20} labelsize 10 textsize 10
         }
       }
       Fl_Menu_Bar {} {open
@@ -461,8 +452,8 @@ tkFixedImageViewer->DrawRegionOfInterest() ;}
       }
     }
     Fl_Window tkAdvancedOptionsWindow {
-      label {Advanced Options...} open
-      xywh {1342 158 405 520} type Double box PLASTIC_UP_BOX color 159 labelsize 10 resizable visible
+      label {Advanced Registration Options} open selected
+      xywh {1342 158 405 520} type Double box PLASTIC_UP_BOX color 159 labeltype NORMAL_LABEL labelsize 10 resizable visible
     } {
       Fl_Tabs {} {open
         xywh {15 15 385 465} labelsize 12
@@ -471,11 +462,6 @@ tkFixedImageViewer->DrawRegionOfInterest() ;}
           label Rigid open
           xywh {15 40 375 430} align 2 hide
         } {
-          Fl_Button {} {
-            label {Help...}
-            callback {ShowHelp("Help/RegistrationParametersHelp.html");}
-            xywh {285 410 85 20} box PLASTIC_UP_BOX color 88 labelsize 12
-          }
           Fl_Box {} {
             label {Rotation Scales}
             xywh {35 140 155 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
