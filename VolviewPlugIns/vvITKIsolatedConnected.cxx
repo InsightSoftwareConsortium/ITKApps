@@ -55,7 +55,7 @@ class IsolatedConnectedRunner
       module.ProcessData( pds  );
       const float isolatedValue = static_cast<float>( module.GetFilter()->GetIsolatedValue() );
       char tmp[1024];
-      sprintf( tmp, "Upper threshold found = %f\n This is the intensity value that disconnects the two seeds",
+      sprintf( tmp, "Upper threshold found = %g\n This is the intensity value that disconnects the two seeds",
                isolatedValue ); 
       info->SetProperty( info, VVP_REPORT_TEXT, tmp );
     }

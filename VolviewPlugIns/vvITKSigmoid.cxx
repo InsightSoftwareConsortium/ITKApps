@@ -18,10 +18,18 @@ class SigmoidRunner
     SigmoidRunner() {}
     void Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
     {
-      const float alpha   = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
-      const float beta    = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
-      const float minimum = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ));
-      const float maximum = atof( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ));
+      const double normalizedAlpha   = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
+      const double normalizedBeta    = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
+      const double minimum = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ));
+      const double maximum = atof( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ));
+
+      const double lower = info->InputVolumeScalarRange[0];
+      const double upper = info->InputVolumeScalarRange[1];
+
+      const double alpha = normalizedAlpha * upper - normalizedAlpha * lower;
+
+      const double beta  = ( 1 + normalizedBeta ) / 2.0 * upper + 
+                           ( 1 - normalizedBeta ) / 2.0 * lower;
 
       ModuleType  module;
       module.SetPluginInfo( info );
@@ -123,24 +131,20 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 
 static int UpdateGUI(void *inf)
 {
-  char tmp[1024];
   vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
   info->SetGUIProperty(info, 0, VVP_GUI_LABEL, "Alpha");
   info->SetGUIProperty(info, 0, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 0, VVP_GUI_DEFAULT, "5");
+  info->SetGUIProperty(info, 0, VVP_GUI_DEFAULT, "5.0");
   info->SetGUIProperty(info, 0, VVP_GUI_HELP, "Factor that defines the width of the Sigmoid in the range scale. Setting a small alpha results in a step transion on the Sigmoid function. A large alpha value produces a very smooth and low slanted Sigmoid.");
-  info->SetGUIProperty(info, 0, VVP_GUI_HINTS , "-100 100 0.1");
+  info->SetGUIProperty(info, 0, VVP_GUI_HINTS , "-10 10 0.1");
 
   info->SetGUIProperty(info, 1, VVP_GUI_LABEL, "Beta");
   info->SetGUIProperty(info, 1, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  const float meanValue = (info->InputVolumeScalarTypeRange[1] - 
-                           info->InputVolumeScalarTypeRange[0]) / 2.0;
-  sprintf(tmp,"%f",meanValue);
-  info->SetGUIProperty(info, 1, VVP_GUI_DEFAULT, tmp );
-  info->SetGUIProperty(info, 1, VVP_GUI_HELP, "Origin of the Sigmoid function in the range scale. It cooresponds to the intensity of the imput image that will be mapped almost linearly to the output image. Intensities far from this value will be transformed non-linearly.");
-  info->SetGUIProperty(info, 1, VVP_GUI_HINTS , VolView::PlugIn::FilterModuleBase::GetInputVolumeScalarTypeRange( info ) );
-
+  info->SetGUIProperty(info, 1, VVP_GUI_DEFAULT, "0.0");
+  info->SetGUIProperty(info, 1, VVP_GUI_HELP, "Origin of the Sigmoid function in the range scale. Normalized in the range [-1:1]. It corresponds to the intensity of the imput image that will be mapped almost linearly to the output image. Intensities far from this value will be transformed non-linearly.");
+  info->SetGUIProperty(info, 1, VVP_GUI_HINTS ,  "-1.0 1.0 0.01");
+  
   // The output image type is equal to the input image type. 
   // We can use then the ranges returned by the GetInput... methods.
   //

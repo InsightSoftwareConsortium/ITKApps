@@ -54,7 +54,7 @@ class ShapeDetectionModuleRunner
       module.ProcessData( pds  );
 
       char tmp[1024];
-      sprintf(tmp,"Total number of iterations = %d \n Final RMS error = %f",
+      sprintf(tmp,"Total number of iterations = %d \n Final RMS error = %g",
                                                          module.GetElapsedIterations(),
                                                          module.GetRMSChange());
       info->SetProperty( info, VVP_REPORT_TEXT, tmp );

@@ -75,33 +75,56 @@ public:
   const char * GetInputVolumeScalarRange( const vtkVVPluginInfo  * info )
   {
     static char tmp[1024];
-    const float lower = info->InputVolumeScalarRange[0];
-    const float upper = info->InputVolumeScalarRange[1];
-    sprintf(tmp,"%f %f %f", lower, upper, 1.0 ); 
-    return tmp;
+    double stepSize = 1.0;
+    
+  /* set the range of the sliders */
+  if (info->InputVolumeScalarType == VTK_FLOAT || 
+      info->InputVolumeScalarType == VTK_DOUBLE) 
+    { 
+    /* for float and double use a step size of 1/200 th the range */
+    stepSize = info->InputVolumeScalarRange[1]*0.005 - 
+      info->InputVolumeScalarRange[0]*0.005; 
+    }
+  const double lower = info->InputVolumeScalarRange[0];
+  const double upper = info->InputVolumeScalarRange[1];
+  sprintf(tmp,"%g %g %g", lower, upper, stepSize ); 
+  return tmp;
   }
 
   static 
-  const char * GetInputVolumeScalarRangeFraction( const vtkVVPluginInfo  * info , float fraction, float multiplier )
+  const char * GetInputVolumeScalarRangeFraction( const vtkVVPluginInfo  * info , double fraction, double multiplier )
   {
     static char tmp[1024];
-    const float lower = info->InputVolumeScalarRange[0];
-    const float upper = info->InputVolumeScalarRange[1];
-    const float resolution = (upper - lower) * fraction;
-    const float maximumValue = resolution * multiplier;
-    sprintf(tmp,"%f %f %f", resolution,maximumValue,resolution); 
+    const double lower = info->InputVolumeScalarRange[0];
+    const double upper = info->InputVolumeScalarRange[1];
+    const double resolution = upper * fraction - lower * fraction;
+    const double maximumValue = resolution * multiplier;
+    sprintf(tmp,"%g %g %g", resolution,maximumValue,resolution); 
     return tmp;
   }
+
+
+static 
+const char * GetInputVolumeScalarTypeRangeFraction( const vtkVVPluginInfo  * info , double fraction, double multiplier )
+{
+  static char tmp[1024];
+  const double lower = info->InputVolumeScalarTypeRange[0];
+  const double upper = info->InputVolumeScalarTypeRange[1];
+  const double resolution = upper * fraction - lower * fraction;
+  const double maximumValue = resolution * multiplier;
+  sprintf(tmp,"%g %g %g", resolution,maximumValue,resolution); 
+  return tmp;
+}
 
 
   static 
   const char * GetInputVolumeScalarMidValue( const vtkVVPluginInfo  * info )
   {
     static char tmp[1024];
-    const float lower = info->InputVolumeScalarRange[0];
-    const float upper = info->InputVolumeScalarRange[1];
-    const float midvalue = ( upper + lower ) / 2.0;
-    sprintf( tmp,"%f", midvalue ); 
+    const double lower = info->InputVolumeScalarRange[0];
+    const double upper = info->InputVolumeScalarRange[1];
+    const double midvalue = ( upper + lower ) / 2.0;
+    sprintf( tmp,"%g", midvalue ); 
     return tmp;
   }
 
@@ -110,9 +133,18 @@ public:
   const char * GetInputVolumeScalarTypeRange( const vtkVVPluginInfo  * info )
   {
     static char tmp[1024];
-    const float lower = info->InputVolumeScalarTypeRange[0];
-    const float upper = info->InputVolumeScalarTypeRange[1];
-    sprintf(tmp,"%f %f %f", lower, upper, 1.0 ); 
+    double stepSize = 1.0;
+    /* set the range of the sliders */
+    if (info->InputVolumeScalarType == VTK_FLOAT || 
+        info->InputVolumeScalarType == VTK_DOUBLE) 
+      { 
+      /* for float and double use a step size of 1/200 th the range */
+      stepSize = info->InputVolumeScalarTypeRange[1]*0.005 - 
+        info->InputVolumeScalarTypeRange[0]*0.005; 
+      }
+    const double lower = info->InputVolumeScalarTypeRange[0];
+    const double upper = info->InputVolumeScalarTypeRange[1];
+    sprintf(tmp,"%g %g %g", lower, upper, stepSize ); 
     return tmp;
   }
 
@@ -120,10 +152,10 @@ public:
   const char * GetInputVolumeScalarTypeMidValue( const vtkVVPluginInfo  * info )
   {
     static char tmp[1024];
-    const float lower = info->InputVolumeScalarTypeRange[0];
-    const float upper = info->InputVolumeScalarTypeRange[1];
-    const float midvalue = ( upper + lower ) / 2.0;
-    sprintf( tmp,"%f", midvalue ); 
+    const double lower = info->InputVolumeScalarTypeRange[0];
+    const double upper = info->InputVolumeScalarTypeRange[1];
+    const double midvalue = upper*0.5 + lower*0.5;
+    sprintf( tmp,"%g", midvalue ); 
     return tmp;
   }
 
@@ -131,8 +163,8 @@ public:
   const char * GetInputVolumeScalarMinimum( const vtkVVPluginInfo  * info )
   {
     static char tmp[1024];
-    const float value = info->InputVolumeScalarRange[0];
-    sprintf(tmp,"%f", value); 
+    const double value = info->InputVolumeScalarRange[0];
+    sprintf(tmp,"%g", value); 
     return tmp;
   }
 
@@ -141,8 +173,8 @@ public:
   const char * GetInputVolumeScalarMaximum( const vtkVVPluginInfo  * info )
   {
     static char tmp[1024];
-    const float value = info->InputVolumeScalarRange[1];
-    sprintf(tmp,"%f", value); 
+    const double value = info->InputVolumeScalarRange[1];
+    sprintf(tmp,"%g", value); 
     return tmp;
   }
 
@@ -150,8 +182,8 @@ public:
   const char * GetInputVolumeScalarTypeMinimum( const vtkVVPluginInfo  * info )
   {
     static char tmp[1024];
-    const float value = info->InputVolumeScalarTypeRange[0];
-    sprintf(tmp,"%f", value); 
+    const double value = info->InputVolumeScalarTypeRange[0];
+    sprintf(tmp,"%g", value); 
     return tmp;
   }
 
@@ -159,8 +191,8 @@ public:
   const char * GetInputVolumeScalarTypeMaximum( const vtkVVPluginInfo  * info )
   {
     static char tmp[1024];
-    const float value = info->InputVolumeScalarTypeRange[1];
-    sprintf(tmp,"%f", value); 
+    const double value = info->InputVolumeScalarTypeRange[1];
+    sprintf(tmp,"%g", value); 
     return tmp;
   }
 
@@ -170,7 +202,7 @@ public:
   {
     static char tmp[1024];
     const float limit = info->InputVolumeDimensions[ axis ];
-    sprintf(tmp,"%f %f %f", 0.0, limit, 1.0 ); 
+    sprintf(tmp,"%g %g %g", 0.0, limit, 1.0 ); 
     return tmp;
   }
 
