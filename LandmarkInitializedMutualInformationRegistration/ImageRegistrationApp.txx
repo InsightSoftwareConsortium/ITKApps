@@ -168,8 +168,8 @@ ImageRegistrationApp< TImage >
     }
    else
     {
-    TImage::SizeType size;
-    TImage::IndexType fixedCenterIndex;
+    typename TImage::SizeType size;
+    typename TImage::IndexType fixedCenterIndex;
     itk::Point<double, 3> fixedCenterPoint;
     size = m_FixedImage->GetLargestPossibleRegion().GetSize();
     fixedCenterIndex[0] = size[0]/2;
@@ -177,7 +177,7 @@ ImageRegistrationApp< TImage >
     fixedCenterIndex[2] = size[2]/2;
     m_FixedImage->TransformIndexToPhysicalPoint(fixedCenterIndex,
                                                 fixedCenterPoint);
-    TImage::IndexType movingCenterIndex;
+    typename TImage::IndexType movingCenterIndex;
     itk::Point<double, 3> movingCenterPoint;
     size = m_MovingImage->GetLargestPossibleRegion().GetSize();
     movingCenterIndex[0] = size[0]/2;
@@ -263,8 +263,8 @@ ImageRegistrationApp< TImage >
     }
   else
     {
-    TImage::SizeType size;
-    TImage::IndexType fixedCenterIndex;
+    typename TImage::SizeType size;
+    typename TImage::IndexType fixedCenterIndex;
     itk::Point<double, 3> fixedCenterPoint;
     size = m_FixedImage->GetLargestPossibleRegion().GetSize();
     fixedCenterIndex[0] = size[0]/2;
@@ -272,7 +272,7 @@ ImageRegistrationApp< TImage >
     fixedCenterIndex[2] = size[2]/2;
     m_FixedImage->TransformIndexToPhysicalPoint(fixedCenterIndex,
                                                 fixedCenterPoint);
-    TImage::IndexType movingCenterIndex;
+    typename TImage::IndexType movingCenterIndex;
     itk::Point<double, 3> movingCenterPoint;
     size = m_MovingImage->GetLargestPossibleRegion().GetSize();
     movingCenterIndex[0] = size[0]/2;
