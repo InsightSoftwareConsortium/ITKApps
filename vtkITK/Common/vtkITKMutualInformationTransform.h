@@ -104,6 +104,25 @@ public:
     { return UseMattes; }
 
   // Description:
+  // Set/Unset/Get use of Viola-Wells Mutual Information 
+  void ViolaWellsOn()
+    { UseViolaWells = true; }
+  void ViolaWellsOff()
+    { UseViolaWells = false; }
+  bool GetViolaWells()
+    { return UseViolaWells; }
+
+  // Description:
+  // Set the transform to Affine
+  void SetModeToAffine()
+    { AffineMode = true; }
+
+  // Description:
+  // Set the transform to Quaternion Rigid
+  void SetModeToQuaternionRigid()
+    { QuaternionRigidMode = true; }
+
+  // Description:
   // Set the number of iterations
   vtkSetMacro(NumberOfIterations, int);
   vtkGetMacro(NumberOfIterations, int);
@@ -166,6 +185,10 @@ protected:
   float MinimumStepLength;   //For Mattes Mutual Information Optimizer
 
   bool UseMattes;
+  bool UseViolaWells;
+
+  bool AffineMode;
+  bool QuaternionRigidMode;
 
   ImageExtentType FixedImageExtent;
 
