@@ -58,7 +58,7 @@
 #define vtkFloatingPointType float
 #endif
 
-vtkCxxRevisionMacro(vtkITKMutualInformationTransform, "$Revision: 1.14 $");
+vtkCxxRevisionMacro(vtkITKMutualInformationTransform, "$Revision: 1.15 $");
 vtkStandardNewMacro(vtkITKMutualInformationTransform);
 
 //----------------------------------------------------------------------------
@@ -266,15 +266,15 @@ void vtkITKMutualInformationTransform::InternalUpdate()
   if (this->SourceImage->GetScalarType() != VTK_FLOAT)
     {
     vtkErrorMacro (<< "Source type " << this->SourceImage->GetScalarType()
-                   << "must be float");
+                   << " must be float");
     this->Matrix->Identity();
     return;
     }
 
   if (this->TargetImage->GetScalarType() != VTK_FLOAT)
     {
-    vtkErrorMacro (<< "Target type " << this->SourceImage->GetScalarType()
-                   << "must be float");
+    vtkErrorMacro (<< "Target type " << this->TargetImage->GetScalarType()
+                   << " must be float");
     this->Matrix->Identity();
     return;
     }
