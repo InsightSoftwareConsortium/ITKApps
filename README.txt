@@ -12,10 +12,11 @@ these applications are tricky to build and depend on external packages.
 Some important configuration details:
 
      * VTK requires VTK version 4.2 and must be built ANSI_STDLIB
+       (the ANSI_STDLIB flag is only a concern with VisualStudio 6.0).
 
-     * CMake version 1.6.5 or later should be used.
+     * CMake version 1.8.3 or later should be used.
 
-     * FLTK version 1.1.3 is required
+     * FLTK version 1.1.4 is required
 
      * Qt  version 2.3 is required
 
