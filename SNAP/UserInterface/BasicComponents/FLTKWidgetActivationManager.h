@@ -174,46 +174,12 @@ private:
   set<WidgetWrapper *> m_AllWidgets;
 };
 
-/**
- * \class FLWidgetActivationManager
- * \brief Simplifies management of widget on/off status
- * This class can link the on-off status of FLTK widgets and menu items
- * with a set of flags in a 'state machine'. The flags can be related to
- * each other, for example, a flag can imply another flag or a set of
- * flags can be mutually exclusive
- */
-template<typename TFlag>
-class FLTKWidgetActivationManager : public WidgetActivationManager<TFlag>
-{
-public:
-  /** Associate an FLTK widget with a flag */
-  void AddWidget(Fl_Widget *widget, TFlag flag)
-    {
-    typedef GenericWidgetWrapper<Fl_Widget> WrapperType;
-    AddWidgetWrapper(new WrapperType(widget), flag);
-    }
 
-  /** Associate an FLTK menu item with a flag */
-  void AddMenuItem(Fl_Menu_Item *menu, TFlag flag)
-    {
-    typedef GenericWidgetWrapper<Fl_Menu_Item> WrapperType;
-    AddWidgetWrapper(new WrapperType(menu), flag);
-    }
-
-  /** Associate an FLTK checkbox with a flag and two values */
-  void AddCheckBox(Fl_Check_Button *cb, TFlag flag, bool onState, bool offState)
-    {
-    typedef ValuatorWidgetWrapper<Fl_Check_Button, int> WrapperType;
-    AddWidgetWrapper(new WrapperType(cb,onState ? 1 : 0,offState ? 1 : 0), flag);    
-    }
-
-protected:
-  
-  /** 
+ /** 
    * A wrapper for a generic FLTK widget or menu item, calls activate
    * or deactivate depending on the state 
    */
-  template<class TWidget>
+  template<class TWidget,typename TFlag>
     class GenericWidgetWrapper : public WidgetActivationManager<TFlag>::WidgetWrapper {
   public:
     
@@ -231,29 +197,69 @@ protected:
     TWidget *m_Widget;
   };
 
-  /** 
+
+/** 
    * A special wrapper for FLTK widgets that can be assigned a value. It
    * can assign a default value to the widget when it's deactivated and when
    * it's activated
    */
-  template<class TWidget, class TValue>
+  template<class TWidget, class TValue, typename TFlag>
   class ValuatorWidgetWrapper
-  : public GenericWidgetWrapper<TWidget> {
+  : public GenericWidgetWrapper<TWidget,TFlag> {
   public:
     // State change method
     virtual void OnStateChange(bool newState)
       {
-      GenericWidgetWrapper<TWidget>::OnStateChange(newState);
+      GenericWidgetWrapper<TWidget,TFlag>::OnStateChange(newState);
       m_Widget->value( newState ? m_OnValue : m_OffValue );
       }
 
     // Constructor
     ValuatorWidgetWrapper(TWidget *w, const TValue &on, const TValue &off)
-      : GenericWidgetWrapper<TWidget>(w), m_OnValue(on), m_OffValue(off) {}
+      : GenericWidgetWrapper<TWidget,TFlag>(w), m_OnValue(on), m_OffValue(off) {}
 
   protected:
     TValue m_OffValue, m_OnValue;
   };
+
+
+
+
+/**
+ * \class FLWidgetActivationManager
+ * \brief Simplifies management of widget on/off status
+ * This class can link the on-off status of FLTK widgets and menu items
+ * with a set of flags in a 'state machine'. The flags can be related to
+ * each other, for example, a flag can imply another flag or a set of
+ * flags can be mutually exclusive
+ */
+template<typename TFlag>
+class FLTKWidgetActivationManager : public WidgetActivationManager<TFlag>
+{
+public:
+  /** Associate an FLTK widget with a flag */
+  void AddWidget(Fl_Widget *widget, TFlag flag)
+    {
+    typedef GenericWidgetWrapper<Fl_Widget,TFlag> WrapperType;
+    AddWidgetWrapper(new WrapperType(widget), flag);
+    }
+
+  /** Associate an FLTK menu item with a flag */
+  void AddMenuItem(Fl_Menu_Item *menu, TFlag flag)
+    {
+    typedef GenericWidgetWrapper<Fl_Menu_Item,TFlag> WrapperType;
+    AddWidgetWrapper(new WrapperType(menu), flag);
+    }
+
+  /** Associate an FLTK checkbox with a flag and two values */
+  void AddCheckBox(Fl_Check_Button *cb, TFlag flag, bool onState, bool offState)
+    {
+    typedef ValuatorWidgetWrapper<Fl_Check_Button, int, TFlag> WrapperType;
+    AddWidgetWrapper(new WrapperType(cb,onState ? 1 : 0,offState ? 1 : 0), flag);    
+    }
+
+protected:
+ 
   
 };
 
