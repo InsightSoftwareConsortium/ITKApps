@@ -80,7 +80,7 @@ int main(int argc, char **argv)
           if(initializationMethod == 5)
             {
             loadedTransformNumber = (int)atof(argv[argNum++]);
-            for(unsigned int i=0; i<loadedTransformNumber; i++)
+            for(int i=0; i<loadedTransformNumber; i++)
               {
               loadedTransformFilename[i] = argv[argNum++];
               }
@@ -224,7 +224,6 @@ int main(int argc, char **argv)
         break;
       }
 
-    clock_t timeStart = clock();
     switch(initializationMethod)
       {
       default:
@@ -252,7 +251,7 @@ int main(int argc, char **argv)
         break;
       case 5:
         typedef ImageRegistrationAppType::LoadedRegTransformType LoadedTType;
-        for(unsigned int i=0; i<loadedTransformNumber; i++)
+        for(int i=0; i<loadedTransformNumber; i++)
           {
           GroupReaderType::Pointer transformReader = GroupReaderType::New();
           transformReader->SetFileName(loadedTransformFilename[i].c_str());
