@@ -497,7 +497,7 @@ liFilterConsole
     {
     liFilterConsoleBase::Execute();
     }
-  catch( itk::ProcessAborted  & except )
+  catch( itk::ProcessAborted  & )
     {
     this->ShowStatus("Process cancelled by the User !");
     return;
