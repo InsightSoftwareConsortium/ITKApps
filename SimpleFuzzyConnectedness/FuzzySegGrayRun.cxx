@@ -46,7 +46,7 @@ FuzzySegGrayRun::LoadImage()
 
 int
 FuzzySegGrayRun::
-Load( const char * filename )
+Load( const char * )
 {
   Fl_Window window(200,280);
   Fl_Int_Input inputcols(80, 10, 100, 25, "Columns:");
@@ -60,10 +60,10 @@ Load( const char * filename )
   Fl_Button cancel(40, 240, 60, 25, "cancel");
   Fl_Return_Button ok(120, 240, 60, 25, "OK");
   Fl_Menu_Item pulldown[] = {
-    {"Unsigned Char"},
-    {"Unsigned Short"},
-    {"Float"},
-    {0}
+    {"Unsigned Char", 0, 0, 0, 0, 0, 0, 0, 0},
+    {"Unsigned Short", 0, 0, 0, 0, 0, 0, 0, 0},
+    {"Float", 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0}
   };
   Fl_Choice ch(45,140,140,25,"Data:"); ch.menu(pulldown);
 
@@ -183,11 +183,11 @@ void
 FuzzySegGrayRun::
 ComputeStats(void)
 {
-  unsigned int numPoints=m_Viewer->numClickedPointsStored();
-  unsigned int i,j,k,l;  
+  int numPoints=m_Viewer->numClickedPointsStored();
+  int i,j,k,l;  
   int x,y,z,ex,bx,ey,by,ez,bz;
-  unsigned int halfr=m_SampleRegion/2;
-  unsigned int totalp=0;
+  int halfr=m_SampleRegion/2;
+  int totalp=0;
   float totalv=0;
   float totalvv=0;
   float currp=0;
@@ -237,7 +237,6 @@ GenerateData()
   m_Segmenter->SetMean(m_Mean);
   m_Segmenter->SetVariance(m_Variance);
   m_Segmenter->SetThreshold(m_Threshold);
-  unsigned int numPoints=m_Viewer->numClickedPointsStored();
   IndexType idx;
 
   ClickPoint point;

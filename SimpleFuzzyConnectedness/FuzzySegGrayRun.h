@@ -29,9 +29,9 @@ protected:
   void Save(const char *outputFileName);
 
 
-  unsigned int m_Cols;
-  unsigned int m_Rows;
-  unsigned int m_Pages;
+  int m_Cols;
+  int m_Rows;
+  int m_Pages;
   float m_Mean;
   float m_Variance;
   unsigned int m_Seed[3];
