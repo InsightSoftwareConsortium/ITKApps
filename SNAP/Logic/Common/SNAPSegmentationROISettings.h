@@ -30,6 +30,9 @@ public:
     NEAREST_NEIGHBOR, TRILINEAR, TRICUBIC
   };
 
+  SNAPSegmentationROISettings() {}
+  virtual SNAPSegmentationROISettings() {}
+
   // Get the region of interest, in the main IRIS image
   irisSetMacro(ROI,itk::ImageRegion<3>);
   
