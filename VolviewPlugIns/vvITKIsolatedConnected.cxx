@@ -68,6 +68,12 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 
   vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
+  if( info->InputVolumeNumberOfComponents != 1 )
+    {
+    info->SetProperty( info, VVP_ERROR, "This filter requires a single-component data set as input" ); 
+    return -1;
+    }
+
   try 
     {
     switch( info->InputVolumeScalarType )
