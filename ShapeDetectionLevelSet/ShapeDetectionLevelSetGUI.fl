@@ -161,7 +161,7 @@ class ShapeDetectionLevelSetGUI {open : {public ShapeDetectionLevelSetBase}
         }
         Fl_Value_Input shapeDetectionIterationsValueInput {
           label Iterations
-          callback {m_ShapeDetectionFilter->SetMaximumIterations( static_cast<unsigned int>( o->value() ) );}
+          callback {m_ShapeDetectionFilter->SetNumberOfIterations( static_cast<unsigned int>( o->value() ) );}
           xywh {455 43 39 23} labelsize 12 maximum 5000 step 1 value 100 textsize 12
         }
         Fl_Value_Input fastMarchingStoppingValueInput {

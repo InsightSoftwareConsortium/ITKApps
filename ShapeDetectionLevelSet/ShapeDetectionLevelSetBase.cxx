@@ -59,7 +59,7 @@ ShapeDetectionLevelSetBase
   m_ShapeDetectionFilter->SetFeatureImage(   m_SigmoidFilter->GetOutput() );
 
   m_ShapeDetectionFilter->SetMaximumRMSError( 0.02 );
-  m_ShapeDetectionFilter->SetMaximumIterations( 100 );
+  m_ShapeDetectionFilter->SetNumberOfIterations( 100 );
 
   m_ThresholdFilter = ThresholdFilterType::New();
   m_ThresholdFilter->SetInput( m_ShapeDetectionFilter->GetOutput() );
