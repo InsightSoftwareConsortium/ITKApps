@@ -144,6 +144,7 @@ SegmenterConsole
     }
   
   m_Reader->SetFileName( filename );
+  m_Reader->Modified();
   try
     {
     // Trigger a complete execution of the pipeline up to the smoothing
