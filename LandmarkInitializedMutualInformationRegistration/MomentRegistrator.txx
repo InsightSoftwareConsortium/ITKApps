@@ -1,0 +1,175 @@
+#ifndef __MomentRegistrator_txx
+#define __MomentRegistrator_txx
+
+#include "MomentRegistrator.h"
+
+template< class TImage >
+MomentRegistrator< TImage >
+::MomentRegistrator()
+:ImageRegistrationMethod<TImage, TImage>()
+  {
+  this->SetTransform(TransformType::New());
+  this->GetTypedTransform()->SetIdentity();
+  this->SetInitialTransformParameters(
+                  this->GetTypedTransform()->GetParameters());
+
+  m_NumberOfMoments = 0 ;
+  }
+
+template< class TImage >
+MomentRegistrator< TImage >
+::~MomentRegistrator()
+  {
+  }
+
+template< class TImage >
+void
+MomentRegistrator< TImage >
+::Initialize() throw (ExceptionObject)
+  {
+  try
+    {
+    // Don't call superclass initilization since optimizer, etc aren't used
+    //Superclass::Initialize();
+    }
+  catch(ExceptionObject e)
+    {
+    throw(e);
+    }
+  }
+
+template< class TImage >
+void
+MomentRegistrator< TImage >
+::StartRegistration()
+  {
+  try
+    {   
+    // Don't call superclass startRegistration since optimizer, etc isn't used
+    //Superclass::StartRegistration();
+    MomentsCalculatorType::AffineTransformType::Pointer newTransform;
+    newTransform = MomentsCalculatorType::AffineTransformType::New();
+    newTransform->SetIdentity();
+
+    if(m_NumberOfMoments == 0)
+      {
+      typename TImage::SizeType size;
+      typename TImage::IndexType fixedCenterIndex;
+      Point<double, 3> fixedCenterPoint;
+      size = this->GetFixedImage()->GetLargestPossibleRegion().GetSize();
+      fixedCenterIndex[0] = size[0]/2;
+      fixedCenterIndex[1] = size[1]/2;
+      fixedCenterIndex[2] = size[2]/2;
+      this->GetFixedImage()->TransformIndexToPhysicalPoint(fixedCenterIndex,
+                                                           fixedCenterPoint);
+
+      typename TImage::IndexType movingCenterIndex;
+      Point<double, 3> movingCenterPoint;
+      size = this->GetMovingImage()->GetLargestPossibleRegion().GetSize();
+      movingCenterIndex[0] = size[0]/2;
+      movingCenterIndex[1] = size[1]/2;
+      movingCenterIndex[2] = size[2]/2;
+      this->GetMovingImage()->TransformIndexToPhysicalPoint(movingCenterIndex,
+                                                            movingCenterPoint);
+
+      TransformType::OffsetType offset;
+      offset = fixedCenterPoint - movingCenterPoint;
+
+      newTransform->SetCenter(movingCenterPoint);
+      newTransform->SetTranslation(offset);
+      }
+    else 
+      {
+      MomentsCalculatorType::Pointer momCalc;
+      momCalc = MomentsCalculatorType::New();
+  
+      momCalc->SetImage(this->GetFixedImage());
+      momCalc->Compute();
+      MomentsCalculatorType::AffineTransformType::Pointer 
+            fixedImageAxesTransform;
+      fixedImageAxesTransform = 
+            momCalc->GetPhysicalAxesToPrincipalAxesTransform();
+      TransformType::InputPointType fixedImageCenterOfMass;
+      for(int i=0; i<ImageDimension; i++)
+        {
+        fixedImageCenterOfMass[i] = momCalc->GetCenterOfGravity()[i];
+        }
+  
+      momCalc->SetImage(this->GetMovingImage());
+      momCalc->Compute();
+      MomentsCalculatorType::AffineTransformType::Pointer 
+            movingImageAxesTransform;
+      movingImageAxesTransform = 
+            momCalc->GetPrincipalAxesToPhysicalAxesTransform();
+      TransformType::InputPointType movingImageCenterOfMass;
+      for(int i=0; i<ImageDimension; i++)
+        {
+        movingImageCenterOfMass[i] = momCalc->GetCenterOfGravity()[i];
+        }
+  
+      TransformType::OffsetType offset;
+      offset = fixedImageCenterOfMass - movingImageCenterOfMass;
+      
+      if(m_NumberOfMoments == 1) // Centers of mass
+        {
+        newTransform->SetCenter(movingImageCenterOfMass);
+        newTransform->SetTranslation(offset);
+        }
+      else  // m_NumberOfMoments == 2 // Principle axes
+        {
+        newTransform->SetCenter(movingImageCenterOfMass);
+        newTransform->SetMatrix(movingImageAxesTransform->GetMatrix());
+        newTransform->SetOffset(movingImageAxesTransform->GetOffset());
+        newTransform->Compose(fixedImageAxesTransform, true);
+        }
+      }
+
+    this->SetTransform(newTransform);
+
+    }
+  catch(ExceptionObject &e)
+    {
+    this->PrintError(e) ;
+    }
+  catch(...)
+    {
+    this->PrintUncaughtError() ;
+    }
+  }
+
+template< class TImage >
+void
+MomentRegistrator< TImage >
+::PrintUncaughtError()
+{
+  std::cout << "-------------------------------------------------" 
+            << std::endl;
+  std::cout << "Exception caught in MomentRegistrator:" << std::endl;
+  std::cout << "unknown exception caught !!!" << std::endl;
+  std::cout << "-------------------------------------------------" 
+            << std::endl;
+}
+
+template< class TImage >
+void
+MomentRegistrator< TImage >
+::PrintError(ExceptionObject &e)
+{
+  std::cout << "-------------------------------------------------" 
+            << std::endl;
+  std::cout << "Exception caught in MomentRegistrator:" << std::endl;
+  std::cout << e << std::endl;
+  std::cout << "-------------------------------------------------" 
+            << std::endl;
+}
+
+template< class TImage >
+void
+MomentRegistrator< TImage >
+::PrintSelf(std::ostream & os, Indent indent) const
+{
+  Superclass::PrintSelf(os, indent);
+  os << indent << "Number of moments = " << m_NumberOfMoments << std::endl;
+}
+
+#endif //__MomentRegistrator_txx

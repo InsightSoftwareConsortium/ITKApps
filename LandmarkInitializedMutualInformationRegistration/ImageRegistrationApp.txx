@@ -3,11 +3,7 @@
 
 #include "ImageRegistrationApp.h"
 
-#include "itkImageRegistrationMethod.h"
-#include "itkVersorRigid3DTransform.h"
-#include "itkMutualInformationImageToImageMetric.h"
-#include "itkOnePlusOneEvolutionaryOptimizer.h"
-#include "itkGradientDescentOptimizer.h"
+#include "itkVersor.h"
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkResampleImageFilter.h"
 
@@ -16,6 +12,30 @@ template< class TImage >
 ImageRegistrationApp< TImage >
 ::ImageRegistrationApp()
   {
+  m_NoneRegTransform = NoneRegTransformType::New();
+  m_NoneRegTransform->SetIdentity();
+  m_NoneAffineTransform = AffineTransformType::New();
+  m_NoneAffineTransform->SetIdentity();
+  m_NoneRegValid = false;
+
+  m_CenterRegTransform = CenterRegTransformType::New();
+  m_CenterRegTransform->SetIdentity();
+  m_CenterAffineTransform = AffineTransformType::New();
+  m_CenterAffineTransform->SetIdentity();
+  m_CenterRegValid = false;
+
+  m_MassRegTransform = MassRegTransformType::New();
+  m_MassRegTransform->SetIdentity();
+  m_MassAffineTransform = AffineTransformType::New();
+  m_MassAffineTransform->SetIdentity();
+  m_MassRegValid = false;
+
+  m_MomentRegTransform = MomentRegTransformType::New();
+  m_MomentRegTransform->SetIdentity();
+  m_MomentAffineTransform = AffineTransformType::New();
+  m_MomentAffineTransform->SetIdentity();
+  m_MomentRegValid = false;
+
   m_LandmarkScales.set_size(6) ; 
   m_LandmarkScales[0] = 200;
   m_LandmarkScales[1] = 200;
@@ -71,6 +91,9 @@ ImageRegistrationApp< TImage >
 
   m_FixedImage = NULL;
   m_MovingImage = NULL;
+
+  m_PriorRegistrationMethod = NONE;
+  m_OptimizerMethod = GRADIENT;
   }
 
 template< class TImage >
@@ -85,9 +108,13 @@ ImageRegistrationApp< TImage >
 ::SetFixedImage(TImage * image)
   {
   m_FixedImage = image;
+  m_MassRegValid = false;
+  m_MomentRegValid = false;
   m_LandmarkRegValid = false;
   m_RigidRegValid = false;
   m_AffineRegValid = false;
+  m_PriorRegistrationMethod = NONE;
+  m_OptimizerMethod = ONEPLUSONE;
   }
 
 template< class TImage >
@@ -96,10 +123,300 @@ ImageRegistrationApp< TImage >
 ::SetMovingImage(TImage * image)
   {
   m_MovingImage = image;
+  m_MassRegValid = false;
+  m_MomentRegValid = false;
   m_LandmarkRegValid = false;
   m_RigidRegValid = false;
   m_AffineRegValid = false;
+  m_PriorRegistrationMethod = NONE;
+  m_OptimizerMethod = ONEPLUSONE;
   }
+
+
+template< class TImage >
+void
+ImageRegistrationApp< TImage >
+::InitRigidParameters(RigidParametersType & p, itk::Point<double, 3> & center)
+  {
+  p.Fill(0);
+  center.Fill(0);
+
+  switch(m_PriorRegistrationMethod)
+    {
+    default:
+    case NONE:
+      {
+      if(m_NoneRegValid)
+        {
+        center = m_NoneRegTransform->GetCenter();
+        }
+      break;
+      }
+    case CENTER:
+      {
+      if(m_CenterRegValid)
+        {
+        p[3] = m_CenterRegTransform->GetTranslation()[0];
+        p[4] = m_CenterRegTransform->GetTranslation()[1];
+        p[5] = m_CenterRegTransform->GetTranslation()[2];
+        center = m_CenterRegTransform->GetCenter();
+        }
+      break;
+      }
+    case MASS:
+      {
+      if(m_MassRegValid)
+        {
+        p[3] = m_MassRegTransform->GetTranslation()[0];
+        p[4] = m_MassRegTransform->GetTranslation()[1];
+        p[5] = m_MassRegTransform->GetTranslation()[2];
+        center = m_MassRegTransform->GetCenter();
+        }
+      break;
+      }
+    case MOMENT:
+      {
+      if(m_MomentRegValid)
+        {
+        itk::Versor<double> v;
+        v.Set(m_MomentRegTransform->GetMatrix());
+        p[0] = v.GetX();
+        p[1] = v.GetY();
+        p[2] = v.GetZ();
+        p[3] = m_MomentRegTransform->GetTranslation()[0];
+        p[4] = m_MomentRegTransform->GetTranslation()[1];
+        p[5] = m_MomentRegTransform->GetTranslation()[2];
+        center = m_MomentRegTransform->GetCenter();
+        }
+      break;
+      }
+    case LANDMARK:
+      {
+      if(m_LandmarkRegValid)
+        {
+        LandmarkParametersType lmkParams;
+        lmkParams = m_LandmarkRegTransform->GetParameters();
+        p[0] = lmkParams[0];
+        p[1] = lmkParams[1];
+        p[2] = lmkParams[2];
+        p[3] = lmkParams[3];
+        p[4] = lmkParams[4];
+        p[5] = lmkParams[5];
+        center = m_LandmarkRegTransform->GetCenter();
+        }
+      break;
+      }
+    case RIGID:
+      {
+      if(m_RigidRegValid)
+        {
+        RigidParametersType rigidParams;
+        rigidParams = m_RigidRegTransform->GetParameters();
+        p[0] = rigidParams[0];
+        p[1] = rigidParams[1];
+        p[2] = rigidParams[2];
+        p[3] = rigidParams[3];
+        p[4] = rigidParams[4];
+        p[5] = rigidParams[5];
+        center = m_RigidRegTransform->GetCenter();
+        }
+      break;
+      }
+    }
+  }
+
+template< class TImage >
+void
+ImageRegistrationApp< TImage >
+::SetOptimizerToOnePlusOne()
+  {
+  m_OptimizerMethod = ONEPLUSONE;
+  }
+
+template< class TImage >
+void
+ImageRegistrationApp< TImage >
+::SetOptimizerToGradient()
+  {
+  m_OptimizerMethod = GRADIENT;
+  }
+
+template< class TImage >
+void
+ImageRegistrationApp< TImage >
+::SetOptimizerToRegularGradient()
+  {
+  m_OptimizerMethod = REGULARGRADIENT;
+  }
+
+template< class TImage >
+void
+ImageRegistrationApp< TImage >
+::SetOptimizerToConjugateGradient()
+  {
+  m_OptimizerMethod = CONJUGATEGRADIENT;
+  }
+
+template< class TImage >
+void
+ImageRegistrationApp< TImage >
+::RegisterUsingNone()
+  {
+  typename NoneRegistratorType::Pointer registrator = 
+                                            NoneRegistratorType::New();
+
+  registrator->SetMovingImage(m_MovingImage) ; // Unlike Rigid and Affine
+  registrator->SetFixedImage( m_FixedImage ) ; // Isa moving to fixed transform
+  registrator->SetNumberOfMoments(0);
+
+  m_PriorRegistrationMethod = NONE;
+
+  try
+    {
+    registrator->StartRegistration();
+    }
+  catch( ExceptionObject &e )
+    {
+    this->PrintError(e) ;
+    }
+  catch(...)
+    {
+    this->PrintUncaughtError() ;
+    }
+  
+  m_NoneRegValid = true;
+  m_NoneRegTransform = registrator->GetTypedTransform() ;
+  m_NoneAffineTransform->SetIdentity();
+  m_NoneAffineTransform->SetCenter(m_NoneRegTransform->GetCenter());
+  m_FinalTransform = m_NoneAffineTransform;
+  m_PriorRegistrationMethod = NONE;
+
+  std::cout << "DEBUG: None: FINAL affine transform: "
+            << std::endl
+            << m_FinalTransform->GetParameters() << std::endl << std::endl;
+  }
+
+template< class TImage >
+void
+ImageRegistrationApp< TImage >
+::RegisterUsingCenters()
+  {
+  typename CenterRegistratorType::Pointer registrator = 
+                                            CenterRegistratorType::New();
+
+  registrator->SetMovingImage(m_MovingImage) ; // Unlike Rigid and Affine
+  registrator->SetFixedImage( m_FixedImage ) ; // Isa moving to fixed transform
+  registrator->SetNumberOfMoments(0);
+
+  m_PriorRegistrationMethod = NONE;
+
+  try
+    {
+    registrator->StartRegistration();
+    }
+  catch( ExceptionObject &e )
+    {
+    this->PrintError(e) ;
+    }
+  catch(...)
+    {
+    this->PrintUncaughtError() ;
+    }
+  
+  m_CenterRegValid = true;
+  m_CenterRegTransform = registrator->GetTypedTransform() ;
+  m_CenterAffineTransform->SetIdentity();
+  m_CenterAffineTransform->SetCenter(m_CenterRegTransform->GetCenter());
+  m_CenterAffineTransform->SetOffset(m_CenterRegTransform->GetOffset());
+  m_FinalTransform = m_CenterAffineTransform;
+  m_PriorRegistrationMethod = CENTER;
+
+  std::cout << "DEBUG: Center: FINAL affine transform: "
+            << std::endl
+            << m_FinalTransform->GetParameters() << std::endl << std::endl;
+  }
+
+template< class TImage >
+void
+ImageRegistrationApp< TImage >
+::RegisterUsingMass()
+  {
+  typename MassRegistratorType::Pointer registrator = 
+                                            MassRegistratorType::New();
+
+  registrator->SetMovingImage(m_MovingImage) ; // Unlike Rigid and Affine
+  registrator->SetFixedImage( m_FixedImage ) ; // Isa moving to fixed transform
+  registrator->SetNumberOfMoments(1);
+
+  m_PriorRegistrationMethod = NONE;
+
+  try
+    {
+    registrator->StartRegistration();
+    }
+  catch( ExceptionObject &e )
+    {
+    this->PrintError(e) ;
+    }
+  catch(...)
+    {
+    this->PrintUncaughtError() ;
+    }
+  
+  m_MassRegValid = true;
+  m_MassRegTransform = registrator->GetTypedTransform() ;
+  m_MassAffineTransform->SetIdentity();
+  m_MassAffineTransform->SetCenter(m_MassRegTransform->GetCenter());
+  m_MassAffineTransform->SetOffset(m_MassRegTransform->GetOffset());
+  m_FinalTransform = m_MassAffineTransform;
+  m_PriorRegistrationMethod = MASS;
+
+  std::cout << "DEBUG: Mass: FINAL affine transform: "
+            << std::endl
+            << m_FinalTransform->GetParameters() << std::endl << std::endl;
+  }
+
+template< class TImage >
+void
+ImageRegistrationApp< TImage >
+::RegisterUsingMoments()
+  {
+  typename MomentRegistratorType::Pointer registrator = 
+                                            MomentRegistratorType::New();
+
+  registrator->SetMovingImage(m_MovingImage) ; // Unlike Rigid & Affine
+  registrator->SetFixedImage( m_FixedImage ) ; // isa moving to fixed transform
+  registrator->SetNumberOfMoments(2);
+
+  m_PriorRegistrationMethod = NONE;
+
+  try
+    {
+    registrator->StartRegistration();
+    }
+  catch( ExceptionObject &e )
+    {
+    this->PrintError(e) ;
+    }
+  catch(...)
+    {
+    this->PrintUncaughtError() ;
+    }
+  
+  m_MomentRegValid = true;
+  m_MomentRegTransform = registrator->GetTypedTransform() ;
+  m_MomentAffineTransform->SetIdentity();
+  m_MomentAffineTransform->SetCenter(m_MomentRegTransform->GetCenter());
+  m_MomentAffineTransform->SetMatrix(m_MomentRegTransform->GetMatrix());
+  m_MomentAffineTransform->SetOffset(m_MomentRegTransform->GetOffset());
+  m_FinalTransform = m_MomentAffineTransform;
+  m_PriorRegistrationMethod = MOMENT;
+
+  std::cout << "DEBUG: Moment: FINAL affine transform: "
+            << std::endl
+            << m_FinalTransform->GetParameters() << std::endl;
+  }
+
 
 template< class TImage >
 void
@@ -114,6 +431,9 @@ ImageRegistrationApp< TImage >
   registrator->SetMovingLandmarkSet( movingImageLandmarks );
   registrator->SetOptimizerScales( m_LandmarkScales );
   registrator->SetOptimizerNumberOfIterations( m_LandmarkNumberOfIterations );
+
+
+  m_PriorRegistrationMethod = NONE;
 
   try
     {
@@ -131,24 +451,23 @@ ImageRegistrationApp< TImage >
   m_LandmarkRegValid = true;
   m_LandmarkRegTransform = registrator->GetTypedTransform() ;
   m_LandmarkAffineTransform->SetIdentity();
+  m_LandmarkAffineTransform->SetCenter(m_LandmarkRegTransform->GetCenter());
   m_LandmarkAffineTransform->SetMatrix(
                                    m_LandmarkRegTransform->GetRotationMatrix());
   m_LandmarkAffineTransform->SetOffset(m_LandmarkRegTransform->GetOffset());
   m_FinalTransform = m_LandmarkAffineTransform;
+  m_PriorRegistrationMethod = LANDMARK;
 
-  std::cout << "DEBUG: Landmark registration FINAL centered versor transform: "
+  std::cout << "DEBUG: Landmark: FINAL affine transform: "
             << std::endl
-            << m_LandmarkRegTransform->GetParameters() << std::endl ;
-  std::cout << "DEBUG: Landmark registration FINAL affine transform: "
-            << std::endl
-            << m_FinalTransform->GetParameters() << std::endl  << std::endl;
+            << m_FinalTransform->GetParameters() << std::endl;
   }
 
 
 template< class TImage >
 void
 ImageRegistrationApp< TImage >
-::RegisterUsingRigidMethod()
+::RegisterUsingRigid()
   {
   typename RigidRegistratorType::Pointer registrator = 
                                          RigidRegistratorType::New();
@@ -158,45 +477,37 @@ ImageRegistrationApp< TImage >
   registrator->SetFixedImageRegion( m_MovingImageRegion ) ;
   registrator->SetOptimizerScales( m_RigidScales );
   registrator->SetOptimizerNumberOfIterations(m_RigidNumberOfIterations);
-
-  if(m_LandmarkRegValid)
+  switch(m_OptimizerMethod)
     {
-    registrator->SetInitialTransformParameters 
-                 ( m_LandmarkRegTransform->GetParameters() );
-    registrator->GetTypedTransform()
-               ->SetCenter(m_LandmarkRegTransform->GetCenter());
-    }
-   else
-    {
-    typename TImage::SizeType size;
-    typename TImage::IndexType fixedCenterIndex;
-    Point<double, 3> fixedCenterPoint;
-    size = m_FixedImage->GetLargestPossibleRegion().GetSize();
-    fixedCenterIndex[0] = size[0]/2;
-    fixedCenterIndex[1] = size[1]/2;
-    fixedCenterIndex[2] = size[2]/2;
-    m_FixedImage->TransformIndexToPhysicalPoint(fixedCenterIndex,
-                                                fixedCenterPoint);
-    typename TImage::IndexType movingCenterIndex;
-    Point<double, 3> movingCenterPoint;
-    size = m_MovingImage->GetLargestPossibleRegion().GetSize();
-    movingCenterIndex[0] = size[0]/2;
-    movingCenterIndex[1] = size[1]/2;
-    movingCenterIndex[2] = size[2]/2;
-    m_MovingImage->TransformIndexToPhysicalPoint(movingCenterIndex,
-                                                movingCenterPoint);
-    RigidParametersType params;
-    params.set_size(6);
-    params.Fill(0);
-    params[3] = movingCenterPoint[0] - fixedCenterPoint[0];  // fixed/moving
-    params[4] = movingCenterPoint[1] - fixedCenterPoint[1];  //   swapped
-    params[5] = movingCenterPoint[2] - fixedCenterPoint[2];
-    registrator->SetInitialTransformParameters ( params );
-    registrator->GetTypedTransform()
-               ->SetCenter(fixedCenterPoint); // actually moving
+    case ONEPLUSONE:
+      {
+      registrator->SetOptimizerToOnePlusOne();
+      break;
+      }
+    case GRADIENT:
+      {
+      registrator->SetOptimizerToGradient();
+      break;
+      }
+    case REGULARGRADIENT:
+      {
+      registrator->SetOptimizerToRegularGradient();
+      break;
+      }
+    case CONJUGATEGRADIENT:
+      {
+      registrator->SetOptimizerToConjugateGradient();
+      break;
+      }
     }
 
-  std::cout << "DEBUG: rigid registration INITIAL centered versor transform: "
+  RigidParametersType params = m_RigidRegTransform->GetParameters();
+  itk::Point<double, 3> center;
+  this->InitRigidParameters(params, center);
+  registrator->GetTypedTransform()->SetCenter(center);
+  registrator->SetInitialTransformParameters(params);
+
+  std::cout << "DEBUG: Rigid: INITIAL versor transform: "
             << std::endl
             << registrator->GetInitialTransformParameters() << std::endl ;
 
@@ -215,14 +526,14 @@ ImageRegistrationApp< TImage >
 
   m_RigidRegValid = true;
   m_RigidRegTransform  = registrator->GetTypedTransform();
+  m_RigidAffineTransform->SetIdentity();
+  m_RigidAffineTransform->SetCenter(m_RigidRegTransform->GetCenter());
   m_RigidAffineTransform->SetMatrix( m_RigidRegTransform->GetRotationMatrix());
   m_RigidAffineTransform->SetOffset(m_RigidRegTransform->GetOffset());
   m_FinalTransform = m_RigidAffineTransform;
+  m_PriorRegistrationMethod = RIGID;
 
-  std::cout << "DEBUG: Rigid registration FINAL centered versor transform: " 
-            << std::endl 
-            << m_RigidRegTransform->GetParameters() << std::endl ;
-  std::cout << "DEBUG: Rigid registration FINAL affine transform: "  
+  std::cout << "DEBUG: Rigid: FINAL affine transform: "  
             << std::endl
             << m_FinalTransform->GetParameters() << std::endl  << std::endl;
   }
@@ -231,7 +542,7 @@ ImageRegistrationApp< TImage >
 template< class TImage >
 void
 ImageRegistrationApp< TImage >
-::RegisterUsingAffineMethod()
+::RegisterUsingAffine()
   {
   typename AffineRegistratorType::Pointer registrator = 
                                          AffineRegistratorType::New();
@@ -241,67 +552,42 @@ ImageRegistrationApp< TImage >
   registrator->SetFixedImageRegion( m_MovingImageRegion ) ;
   registrator->SetOptimizerScales( m_AffineScales );
   registrator->SetOptimizerNumberOfIterations(m_AffineNumberOfIterations);
+  /*
+  switch(m_OptimizerMethod)
+    {
+    case ONEPLUSONE:
+      {
+      registrator->SetOptimizerToOnePlusOne();
+      break;
+      }
+    case GRADIENT:
+      {
+      registrator->SetOptimizerToGradient();
+      break;
+      }
+    case REGULARGRADIENT:
+      {
+      registrator->SetOptimizerToRegularGradient();
+      break;
+      }
+    case CONJUGATEGRADIENT:
+      {
+      registrator->SetOptimizerToConjugateGradient();
+      break;
+      }
+    }
+  */
 
-  if(m_RigidRegValid)
-    {
-    m_AffineRegTransform->SetIdentity();
-    AffineParametersType params = m_AffineRegTransform->GetParameters();
-    RigidParametersType rigidParams = m_RigidRegTransform->GetParameters();
-    params[0] = rigidParams[0];
-    params[1] = rigidParams[1];
-    params[2] = rigidParams[2];
-    params[3] = rigidParams[3];
-    params[4] = rigidParams[4];
-    params[5] = rigidParams[5];
-    registrator->SetInitialTransformParameters( params );
-    registrator->GetTypedTransform()
-               ->SetCenter(m_RigidRegTransform->GetCenter());
-    }
-  else if(m_LandmarkRegValid)
-    {
-    m_AffineRegTransform->SetIdentity();
-    AffineParametersType params = m_AffineRegTransform->GetParameters();
-    LandmarkParametersType lmkParams = m_LandmarkRegTransform->GetParameters();
-    params[0] = lmkParams[0];
-    params[1] = lmkParams[1];
-    params[2] = lmkParams[2];
-    params[3] = lmkParams[3];
-    params[4] = lmkParams[4];
-    params[5] = lmkParams[5];
-    registrator->SetInitialTransformParameters( params );
-    registrator->GetTypedTransform()
-               ->SetCenter(m_LandmarkRegTransform->GetCenter());
-    }
-  else
-    {
-    typename TImage::SizeType size;
-    typename TImage::IndexType fixedCenterIndex;
-    Point<double, 3> fixedCenterPoint;
-    size = m_FixedImage->GetLargestPossibleRegion().GetSize();
-    fixedCenterIndex[0] = size[0]/2;
-    fixedCenterIndex[1] = size[1]/2;
-    fixedCenterIndex[2] = size[2]/2;
-    m_FixedImage->TransformIndexToPhysicalPoint(fixedCenterIndex,
-                                                fixedCenterPoint);
-    typename TImage::IndexType movingCenterIndex;
-    Point<double, 3> movingCenterPoint;
-    size = m_MovingImage->GetLargestPossibleRegion().GetSize();
-    movingCenterIndex[0] = size[0]/2;
-    movingCenterIndex[1] = size[1]/2;
-    movingCenterIndex[2] = size[2]/2;
-    m_MovingImage->TransformIndexToPhysicalPoint(movingCenterIndex,
-                                                movingCenterPoint);
-    m_AffineRegTransform->SetIdentity();
-    AffineParametersType params = m_AffineRegTransform->GetParameters();
-    params[3] = fixedCenterPoint[0] - movingCenterPoint[0];
-    params[4] = fixedCenterPoint[1] - movingCenterPoint[1];
-    params[5] = fixedCenterPoint[2] - movingCenterPoint[2];
-    registrator->SetInitialTransformParameters ( params );
-    registrator->GetTypedTransform()
-               ->SetCenter(movingCenterPoint);
-    }
+  AffineParametersType params = m_AffineRegTransform->GetParameters();
+  itk::Point<double, 3> center;
+  this->InitRigidParameters(params, center);
+  params[6] = 1;
+  params[7] = 1;
+  params[8] = 1;
+  registrator->GetTypedTransform()->SetCenter(center);
+  registrator->SetInitialTransformParameters(params);
 
-  std::cout << "DEBUG: affine registration INITIAL centered versor transform: "
+  std::cout << "DEBUG: Affine: INITIAL versor/offset/scale/skew transform: "
             << std::endl 
             << registrator->GetInitialTransformParameters() << std::endl ;
 
@@ -319,16 +605,52 @@ ImageRegistrationApp< TImage >
     }
 
   m_AffineRegTransform = registrator->GetTypedTransform() ;
-  m_AffineAffineTransform->SetMatrix( m_AffineRegTransform->GetRotationMatrix());
+  m_AffineAffineTransform->SetIdentity();
+  m_AffineAffineTransform->SetCenter(m_AffineRegTransform->GetCenter());
+  m_AffineAffineTransform->SetMatrix(m_AffineRegTransform->GetMatrix());
   m_AffineAffineTransform->SetOffset(m_AffineRegTransform->GetOffset());
   m_FinalTransform = m_AffineAffineTransform;
+  m_PriorRegistrationMethod = AFFINE;
 
-  std::cout << "DEBUG: Affine registration FINAL centered affine transform: " 
-            << std::endl
-            << m_AffineRegTransform->GetParameters() << std::endl ;
-  std::cout << "DEBUG: Affine registration FINAL affine transform: "  
+  std::cout << "DEBUG: Affine: FINAL affine transform: "  
             << std::endl
             << m_FinalTransform->GetParameters() << std::endl  << std::endl;
+  }
+
+template< class TImage >
+typename ImageRegistrationApp< TImage >::ImagePointer
+ImageRegistrationApp< TImage >
+::GetNoneRegisteredMovingImage()
+  {
+  return m_ResampleUsingTransform(this->GetNoneAffineTransform(),
+                                  m_MovingImage, m_FixedImage);
+  }
+
+template< class TImage >
+typename ImageRegistrationApp< TImage >::ImagePointer
+ImageRegistrationApp< TImage >
+::GetCenterRegisteredMovingImage()
+  {
+  return m_ResampleUsingTransform(this->GetCenterAffineTransform(),
+                                  m_MovingImage, m_FixedImage);
+  }
+
+template< class TImage >
+typename ImageRegistrationApp< TImage >::ImagePointer
+ImageRegistrationApp< TImage >
+::GetMassRegisteredMovingImage()
+  {
+  return m_ResampleUsingTransform(this->GetMassAffineTransform(),
+                                  m_MovingImage, m_FixedImage);
+  }
+
+template< class TImage >
+typename ImageRegistrationApp< TImage >::ImagePointer
+ImageRegistrationApp< TImage >
+::GetMomentRegisteredMovingImage()
+  {
+  return m_ResampleUsingTransform(this->GetMomentAffineTransform(),
+                                  m_MovingImage, m_FixedImage);
   }
 
 template< class TImage >
@@ -405,7 +727,7 @@ ImageRegistrationApp< TImage >
           InterpolatorType;
 
   typename InterpolatorType::Pointer interpolator = 
-    InterpolatorType::New();
+      InterpolatorType::New();
   interpolator->SetInputImage(input);
   
   typename ResampleImageFilterType::Pointer resample = 

@@ -1,6 +1,7 @@
 #include "guiMainImplementation.h"
 
 #include <ITKFlFileWriter.h>
+#include <time.h>
  
 guiMainImplementation
 ::guiMainImplementation()
@@ -14,26 +15,20 @@ guiMainImplementation
 
   m_FixedImage = NULL;
   m_MovingImage = NULL;
-  m_LandmarkRegisteredMovingImage = NULL;
+  m_InitializedMovingImage = NULL; //ImageType::New();
   m_RegisteredMovingImage = NULL; //ImageType::New();
 
   m_FixedLandmarkSpatialObject = LandmarkSpatialObjectType::New();
-  m_MovingLandmarkSpatialObject = 
-                                 LandmarkSpatialObjectType::New();
-  m_LandmarkRegisteredMovingLandmarkSpatialObject = 
+  m_MovingLandmarkSpatialObject = LandmarkSpatialObjectType::New();
+  m_InitializedMovingLandmarkSpatialObject = 
                                  LandmarkSpatialObjectType::New();
   m_RegisteredMovingLandmarkSpatialObject = 
                                  LandmarkSpatialObjectType::New();
 
-  m_RigidUseLargestRegion = true;
-  m_RigidUseUserRegion = false;
-  m_RigidUseLandmarkRegion = false;
-  m_RigidRegionScale = 1.0;
-
-  m_AffineUseLargestRegion = true;
-  m_AffineUseUserRegion = false;
-  m_AffineUseLandmarkRegion = false;
-  m_AffineRegionScale = 1.0;
+  m_RegionUseLargestRegion = true;
+  m_RegionUseUserRegion = false;
+  m_RegionUseLandmarkRegion = false;
+  m_RegionScale = 1.0;
 
   m_ImageRegistrationApp = ImageRegistrationAppType::New();
 
@@ -179,7 +174,7 @@ guiMainImplementation
   tkResultImageViewer->redraw();
   tkResultImageViewer->activate();
 
-  tkLandmarkRegisteredView->deactivate();
+  tkInitializationView->deactivate();
   tkRegisteredView->deactivate();
   this->SelectImageSet(0);
   this->SetViewAxis(2);
@@ -219,53 +214,11 @@ guiMainImplementation
 
 void
 guiMainImplementation
-::SaveLandmarkRegisteredImage()
-  {
-  itkFlFileWriter< ImageType >( m_LandmarkRegisteredMovingImage.GetPointer(), "Save pre-registered image file...", "*.mh?", "", 0 );
-/*
-  const char * filename = fl_file_chooser("Save pre-registered image file...",
-                                          "*.mh?","");
-
-  if( filename )
-    {
-    ImageWriterType::Pointer writer = 
-      ImageWriterType::New();
-    writer->SetFileName( filename );
-    writer->SetInput( m_LandmarkRegisteredMovingImage.GetPointer() );
-    try
-      {
-      writer->Update();
-      }
-    catch( itk::ExceptionObject &e )
-      {
-      std::cout<<e<<std::endl;
-      }
-    }*/
-  }
-
-void
-guiMainImplementation
 ::SaveFinalRegisteredImage()
   {
-  itkFlFileWriter< ImageType >( m_RegisteredMovingImage.GetPointer(), "Save registered image file...", "*.mh?", "", 0 );
-/*
-  const char * filename = fl_file_chooser("Save registered image file...","*.mh?","");
-
-  if( filename )
-    {
-    ImageWriterType::Pointer writer = 
-      ImageWriterType::New();
-    writer->SetFileName( filename );
-    writer->SetInput( m_RegisteredMovingImage.GetPointer() );
-    try
-      {
-      writer->Update();
-      }
-    catch( itk::ExceptionObject &e )
-      {
-      std::cout<<e<<std::endl;
-      }
-    }*/
+  itkFlFileWriter< ImageType >( m_RegisteredMovingImage.GetPointer(),
+                                "Save registered image file...",
+                                "*.mh?", "", 0 );
   }
 
 /////////////////////////////////////////////////
@@ -342,12 +295,12 @@ guiMainImplementation
     }
   else if ( i == 1)
     {
-    if ( m_LandmarkRegisteredMovingImage != 0 )
+    if ( m_RegisteredMovingImage != 0 )
       {
-      tkResultImageViewer->SetSecondInputImage(m_LandmarkRegisteredMovingImage);
+      tkResultImageViewer->SetSecondInputImage(m_InitializedMovingImage);
       }
     }
-  else if ( i == 2 )
+  else if ( i == 2)
     {
     if ( m_RegisteredMovingImage != 0 )
       {
@@ -488,6 +441,7 @@ guiMainImplementation
       m_MovingImage->TransformPhysicalPointToIndex(landmark.GetPosition(),
                                                    index);
       tkMovingSliceValuator->value(index[m_ViewAxis]);
+
       if( m_FixedImage->TransformPhysicalPointToIndex(landmark.GetPosition(),
                                                   index))
         {
@@ -505,6 +459,7 @@ guiMainImplementation
                                                   index);
       tkFixedSliceValuator->value(index[m_ViewAxis]);
       tkSliceValuator->value(index[m_ViewAxis]);
+
       if( m_MovingImage->TransformPhysicalPointToIndex(landmark.GetPosition(),
                                                        index))
         {
@@ -909,42 +864,47 @@ guiMainImplementation
   tkAdvancedOptionsWindow->show();
 
   // set landmark advance option values
-  tkLandmarkRotationScale->value(m_ImageRegistrationApp->GetLandmarkScales()[0]);
-  tkLandmarkTranslationScale->value(m_ImageRegistrationApp->GetLandmarkScales()[3]);
-  tkLandmarkNumberOfIterations->value(m_ImageRegistrationApp->GetLandmarkNumberOfIterations());
+  tkLandmarkRotationScale->value(
+      m_ImageRegistrationApp->GetLandmarkScales()[0]);
+  tkLandmarkTranslationScale->value(
+      m_ImageRegistrationApp->GetLandmarkScales()[3]);
+  tkLandmarkNumberOfIterations->value(
+      m_ImageRegistrationApp->GetLandmarkNumberOfIterations());
 
   // set rigid advance option values
-  tkRigidRotationScale->value(m_ImageRegistrationApp->GetRigidScales()[0]);
-  tkRigidTranslationScale->value(m_ImageRegistrationApp->GetRigidScales()[3]);
-  tkRigidNumberOfIterations->value(m_ImageRegistrationApp->GetRigidNumberOfIterations());
-  tkRigidNumberOfSpatialSamples->value
-    (m_ImageRegistrationApp->GetRigidNumberOfSpatialSamples());
+  tkRigidRotationScale->value(
+      m_ImageRegistrationApp->GetRigidScales()[0]);
+  tkRigidTranslationScale->value(
+      m_ImageRegistrationApp->GetRigidScales()[3]);
+  tkRigidNumberOfIterations->value(
+      m_ImageRegistrationApp->GetRigidNumberOfIterations());
+  tkRigidNumberOfSpatialSamples->value(
+      m_ImageRegistrationApp->GetRigidNumberOfSpatialSamples());
   
-  tkRigidUseLargestRegion->value(m_RigidUseLargestRegion);
-  tkRigidUseUserRegion->value(m_RigidUseUserRegion);
-  tkRigidUseLandmarkRegion->value(m_RigidUseLandmarkRegion);
-  tkRigidRegionScale->value(m_RigidRegionScale);
+  tkRegionUseLargestRegion->value(m_RegionUseLargestRegion);
+  tkRegionUseUserRegion->value(m_RegionUseUserRegion);
+  tkRegionUseLandmarkRegion->value(m_RegionUseLandmarkRegion);
+  tkRegionScale->value(m_RegionScale);
 
   // set affine advance option values
-  tkAffineRotationScale->value(m_ImageRegistrationApp->GetAffineScales()[0]);
-  tkAffineTranslationScale->value(m_ImageRegistrationApp->GetAffineScales()[3]);
-  tkAffineScaleScale->value(m_ImageRegistrationApp->GetAffineScales()[6]);
-  tkAffineSkewScale->value(m_ImageRegistrationApp->GetAffineScales()[9]);
-  tkAffineNumberOfIterations->value(m_ImageRegistrationApp->GetAffineNumberOfIterations());
-  tkAffineNumberOfSpatialSamples->value
-    (m_ImageRegistrationApp->GetAffineNumberOfSpatialSamples());
-
-  tkAffineUseLargestRegion->value(m_AffineUseLargestRegion);
-  tkAffineUseUserRegion->value(m_AffineUseUserRegion);
-  tkAffineUseLandmarkRegion->value(m_AffineUseLandmarkRegion);
-  tkAffineRegionScale->value(m_AffineRegionScale);
+  tkAffineRotationScale->value(
+      m_ImageRegistrationApp->GetAffineScales()[0]);
+  tkAffineTranslationScale->value(
+      m_ImageRegistrationApp->GetAffineScales()[3]);
+  tkAffineScaleScale->value(
+      m_ImageRegistrationApp->GetAffineScales()[6]);
+  tkAffineSkewScale->value(
+      m_ImageRegistrationApp->GetAffineScales()[9]);
+  tkAffineNumberOfIterations->value(
+      m_ImageRegistrationApp->GetAffineNumberOfIterations());
+  tkAffineNumberOfSpatialSamples->value(
+      m_ImageRegistrationApp->GetAffineNumberOfSpatialSamples());
   }
 
 void
 guiMainImplementation
 ::ApplyAdvancedOptions()
   {
-
   // set landmark advance option values
   ImageRegistrationAppType::RigidScalesType landmarkScales;
   landmarkScales.set_size(6);
@@ -973,10 +933,10 @@ guiMainImplementation
   m_ImageRegistrationApp->SetRigidNumberOfSpatialSamples
     ((unsigned int) tkRigidNumberOfSpatialSamples->value());
 
-  m_RigidUseLargestRegion = tkRigidUseLargestRegion->value();
-  m_RigidUseUserRegion = tkRigidUseUserRegion->value();
-  m_RigidUseLandmarkRegion = tkRigidUseLandmarkRegion->value();
-  m_RigidRegionScale = tkRigidRegionScale->value();
+  m_RegionUseLargestRegion = tkRegionUseLargestRegion->value();
+  m_RegionUseUserRegion = tkRegionUseUserRegion->value();
+  m_RegionUseLandmarkRegion = tkRegionUseLandmarkRegion->value();
+  m_RegionScale = tkRegionScale->value();
 
   // set affine advance option values
   ImageRegistrationAppType::AffineScalesType affineScales;
@@ -1001,11 +961,6 @@ guiMainImplementation
                (unsigned int) tkAffineNumberOfIterations->value());
   m_ImageRegistrationApp->SetAffineNumberOfSpatialSamples
     ((unsigned int) tkAffineNumberOfSpatialSamples->value());
-
-  m_AffineUseLargestRegion = tkAffineUseLargestRegion->value();
-  m_AffineUseUserRegion = tkAffineUseUserRegion->value();
-  m_AffineUseLandmarkRegion = tkAffineUseLandmarkRegion->value();
-  m_AffineRegionScale = tkAffineRegionScale->value();
 
   tkAdvancedOptionsWindow->hide();
   }
@@ -1033,7 +988,7 @@ guiMainImplementation
   
   // landmark
   ImageRegistrationAppType::RigidScalesType landmarkScales = 
-    m_ImageRegistrationApp->GetLandmarkScales();
+      m_ImageRegistrationApp->GetLandmarkScales();
   for ( unsigned int i = 0; i < landmarkScales.Size(); ++i )
     {
     outputFile << "LandmarkScales_" << i << " " 
@@ -1041,11 +996,22 @@ guiMainImplementation
     }
   
   outputFile << "LandmarkNumberOfIterations " 
-             << m_ImageRegistrationApp->GetLandmarkNumberOfIterations() << std::endl;
+             << m_ImageRegistrationApp->GetLandmarkNumberOfIterations() 
+             << std::endl;
+
+  // ROI
+  outputFile << "RegionUseLargestRegion " << m_RegionUseLargestRegion 
+             << std::endl;
+  outputFile << "RegionUseUserRegion " << m_RegionUseUserRegion 
+             << std::endl;
+  outputFile << "RegionUserLandmarkRegion " << m_RegionUseLandmarkRegion
+             << std::endl;
+  outputFile << "RegionScale " << m_RegionScale 
+             << std::endl;
 
   // rigid
   ImageRegistrationAppType::RigidScalesType rigidScales = 
-    m_ImageRegistrationApp->GetRigidScales();
+      m_ImageRegistrationApp->GetRigidScales();
   for ( unsigned int i = 0; i < rigidScales.Size(); ++i )
     {
     outputFile << "RigidScales_" << i << " " 
@@ -1053,23 +1019,16 @@ guiMainImplementation
     }
   
   outputFile << "RigidNumberOfIterations " 
-             << m_ImageRegistrationApp->GetRigidNumberOfIterations() << std::endl;
+             << m_ImageRegistrationApp->GetRigidNumberOfIterations() 
+             << std::endl;
   
   outputFile << "RigidNumberOfSpatialSamples " 
-             << m_ImageRegistrationApp->GetRigidNumberOfSpatialSamples() << std::endl;
+             << m_ImageRegistrationApp->GetRigidNumberOfSpatialSamples() 
+             << std::endl;
   
-  outputFile << "RigidUseLargestRegion " << m_RigidUseLargestRegion 
-             << std::endl;
-  outputFile << "RigidUseUserRegion " << m_RigidUseUserRegion 
-             << std::endl;
-  outputFile << "RigidUserLandmarkRegion " << m_RigidUseLandmarkRegion
-             << std::endl;
-  outputFile << "RigidRegionScale " << m_RigidRegionScale 
-             << std::endl;
-
   // set affine advance option values
   ImageRegistrationAppType::AffineScalesType affineScales = 
-    m_ImageRegistrationApp->GetAffineScales();
+      m_ImageRegistrationApp->GetAffineScales();
   for ( unsigned int i = 0; i < affineScales.Size(); ++i )
     {
     outputFile << "AffineScales_" << i << " " 
@@ -1077,18 +1036,11 @@ guiMainImplementation
     }
   
   outputFile << "AffineNumberOfIterations " 
-             << m_ImageRegistrationApp->GetAffineNumberOfIterations() << std::endl;
+             << m_ImageRegistrationApp->GetAffineNumberOfIterations() 
+             << std::endl;
   
   outputFile << "AffineNumberOfSpatialSamples " 
-             << m_ImageRegistrationApp->GetAffineNumberOfSpatialSamples() << std::endl;
-
-  outputFile << "AffineUseLargestRegion " << m_AffineUseLargestRegion 
-             << std::endl;
-  outputFile << "AffineUseUserRegion " << m_AffineUseUserRegion 
-             << std::endl;
-  outputFile << "AffineUseLandmarkRegion " << m_AffineUseLandmarkRegion
-             << std::endl;
-  outputFile << "AffineRegionScale " << m_AffineRegionScale 
+             << m_ImageRegistrationApp->GetAffineNumberOfSpatialSamples() 
              << std::endl;
   }
 
@@ -1129,7 +1081,7 @@ guiMainImplementation
 
   // landmark
   ImageRegistrationAppType::RigidScalesType landmarkScales = 
-    m_ImageRegistrationApp->GetLandmarkScales();
+      m_ImageRegistrationApp->GetLandmarkScales();
   for ( unsigned int i = 0; i < landmarkScales.Size(); ++i )
     {
     itk::OStringStream temp;
@@ -1137,10 +1089,18 @@ guiMainImplementation
     landmarkScales[i] = options[temp.str()];
     }
   m_ImageRegistrationApp->SetLandmarkScales(landmarkScales);
-  m_ImageRegistrationApp->SetLandmarkNumberOfIterations((unsigned int)options["LandmarkNumberOfIterations"]);
+  m_ImageRegistrationApp->SetLandmarkNumberOfIterations(
+      (unsigned int)options["LandmarkNumberOfIterations"]);
 
+  // ROI
+  m_RegionUseLargestRegion = (bool) options["RegionUseLargestRegion"];
+  m_RegionUseUserRegion = (bool) options["RegionUseUserRegion"];
+  m_RegionUseLandmarkRegion = (bool) options["RegionUseLandmarkRegion"];
+  m_RegionScale = options["RegionScale"];
+  
   // rigid
-  ImageRegistrationAppType::RigidScalesType rigidScales = m_ImageRegistrationApp->GetRigidScales();
+  ImageRegistrationAppType::RigidScalesType rigidScales = 
+      m_ImageRegistrationApp->GetRigidScales();
   for ( unsigned int i = 0; i < rigidScales.Size(); ++i )
     {
     itk::OStringStream temp;
@@ -1148,17 +1108,14 @@ guiMainImplementation
     rigidScales[i] = options[temp.str()];
     }
   m_ImageRegistrationApp->SetRigidScales(rigidScales);
-  m_ImageRegistrationApp->SetRigidNumberOfIterations((unsigned int)options["RigidNumberOfIterations"]);
-  m_ImageRegistrationApp->SetRigidNumberOfSpatialSamples((unsigned int)options["RigidNumberOfSpatialSamples"]);
+  m_ImageRegistrationApp->SetRigidNumberOfIterations(
+      (unsigned int)options["RigidNumberOfIterations"]);
+  m_ImageRegistrationApp->SetRigidNumberOfSpatialSamples(
+      (unsigned int)options["RigidNumberOfSpatialSamples"]);
 
-  m_RigidUseLargestRegion = (bool) options["RigidUseLargestRegion"];
-  m_RigidUseUserRegion = (bool) options["RigidUseUserRegion"];
-  m_RigidUseLandmarkRegion = (bool) options["RigidUseLandmarkRegion"];
-  m_RigidRegionScale = options["RigidRegionScale"];
-  
   // affine
   ImageRegistrationAppType::AffineScalesType affineScales = 
-    m_ImageRegistrationApp->GetAffineScales();
+      m_ImageRegistrationApp->GetAffineScales();
   for ( unsigned int i = 0; i < affineScales.Size(); ++i )
     {
     itk::OStringStream temp;
@@ -1166,13 +1123,10 @@ guiMainImplementation
     affineScales[i] = options[temp.str()];
     }
   m_ImageRegistrationApp->SetAffineScales(affineScales);
-  m_ImageRegistrationApp->SetAffineNumberOfIterations((unsigned int)options["AffineNumberOfIterations"]);
-  m_ImageRegistrationApp->SetAffineNumberOfSpatialSamples((unsigned int)options["AffineNumberOfSpatialSamples"]);
-
-  m_AffineUseLargestRegion = (bool) options["AffineUseLargestRegion"];
-  m_AffineUseUserRegion = (bool) options["AffineUseUserRegion"];
-  m_AffineUseLandmarkRegion = (bool) options["AffineUseLandmarkRegion"];
-  m_AffineRegionScale = options["AffineRegionScale"];
+  m_ImageRegistrationApp->SetAffineNumberOfIterations(
+      (unsigned int)options["AffineNumberOfIterations"]);
+  m_ImageRegistrationApp->SetAffineNumberOfSpatialSamples(
+      (unsigned int)options["AffineNumberOfSpatialSamples"]);
   }
 
 /////////////////////////////////////////////////
@@ -1198,7 +1152,8 @@ guiMainImplementation
       
     GroupType::Pointer grp = GroupType::New();
     TransformType::Pointer transform = TransformType::New();
-    transform->SetParameters( m_ImageRegistrationApp->GetFinalTransform()->GetParameters() );
+    transform->SetParameters( m_ImageRegistrationApp->GetFinalTransform()
+                                                    ->GetParameters() );
     grp->SetObjectToParentTransform( transform.GetPointer() );
     writer->SetInput( grp );
     writer->Update();
@@ -1210,113 +1165,143 @@ guiMainImplementation
 ::Register()
   {
   this->ChangeStatusDisplay("Registration begins.");
+
   fl_cursor(Fl_Cursor(FL_CURSOR_WAIT), (Fl_Color) 56, (Fl_Color) 255);
   
   m_ImageRegistrationApp->SetFixedImage(m_FixedImage.GetPointer());
   m_ImageRegistrationApp->SetMovingImage(m_MovingImage.GetPointer());
+
   m_FixedLandmarkSpatialObject->SetPoints( 
                                 tkFixedImageViewer->GetLandmarkList() );
   m_MovingLandmarkSpatialObject->SetPoints( 
                                  tkMovingImageViewer->GetLandmarkList() );
-  bool newResult = false;
-  if( m_FixedLandmarkSpatialObject->GetPoints().size() == 4 &&
-      m_MovingLandmarkSpatialObject->GetPoints().size() == 4)
+
+  clock_t timeStart = clock();
+  switch(tkInitializationMethodChoice->value())
     {
-    newResult = true;
-    this->ChangeStatusDisplay("Register using landmarks");
-
-    m_ImageRegistrationApp->RegisterUsingLandmarks ( 
-                            m_FixedLandmarkSpatialObject.GetPointer(),
-                            m_MovingLandmarkSpatialObject.GetPointer() );
-
-    //this->ChangeStatusDisplay("Transforming the landmarks...");
-
-    //this->TransformLandmarks( 
-          //& m_MovingLandmarkSpatialObject->GetPoints(),
-          //& m_LandmarkRegisteredMovingLandmarkSpatialObject->GetPoints(),
-          //m_ImageRegistrationApp->GetLandmarkAffineTransform() );
-    this->ChangeStatusDisplay("Resampling registered moving image...");
-    m_LandmarkRegisteredMovingImage = m_ImageRegistrationApp->
-          GetLandmarkRegisteredMovingImage();
+    default: // UNDEFINED
+      {
+      break;
+      }
+    case 0: // NONE
+      {
+      this->ChangeStatusDisplay("Register using image none");
+      m_ImageRegistrationApp->RegisterUsingNone();
+      break;
+      }
+    case 1: // CENTERS
+      {
+      this->ChangeStatusDisplay("Register using image centers");
+      m_ImageRegistrationApp->RegisterUsingCenters();
+      break;
+      }
+    case 2: // LANDMARKS
+      {
+      if( m_FixedLandmarkSpatialObject->GetPoints().size() == 4 &&
+          m_MovingLandmarkSpatialObject->GetPoints().size() == 4)
+        {
+        this->ChangeStatusDisplay("Register using landmarks");
     
-    tkLandmarkRegisteredView->activate();
-    }
-  else
-    {
-    tkLandmarkRegisteredView->deactivate();
-    }
-  
-  if( tkRegistrationMethodChoice->value() > 0 ) // also do rigid
-    {
-    newResult = true;
-    this->ChangeStatusDisplay("Registering using the rigid method...");
-
-    RegionType region;
-    region = m_MovingImage->GetLargestPossibleRegion();
-  
-    if ( tkRigidUseUserRegion->value() == 1
-          && tkMovingImageViewer->IsRegionOfInterestAvailable() )
-      {
-      std::cout << "Rigid registration using user roi." << std::endl;
-      region = tkMovingImageViewer->GetRegionOfInterest();
+        m_ImageRegistrationApp->RegisterUsingLandmarks ( 
+                                m_FixedLandmarkSpatialObject.GetPointer(),
+                                m_MovingLandmarkSpatialObject.GetPointer() );
+        }
+      break;
       }
-    else if ( tkRigidUseLandmarkRegion->value() == 1 
-              && tkMovingImageViewer->GetNumberOfLandmarks() == 4 
-              && tkFixedImageViewer->GetNumberOfLandmarks() == 4)
+    case 3: // MASS
       {
-      std::cout << "Rigid registration using landmark roi." << std::endl;
-      region = tkMovingImageViewer->ComputeLandmarkRegion
-        (tkRigidRegionScale->value());
+      this->ChangeStatusDisplay("Register using center of mass");
+      m_ImageRegistrationApp->RegisterUsingMass();
+      break;
       }
-  
-    m_ImageRegistrationApp->SetMovingImageRegion(region);
-    m_ImageRegistrationApp->RegisterUsingRigidMethod();
+    case 4: // MOMENTS
+      {
+      this->ChangeStatusDisplay("Register using moments");
+      m_ImageRegistrationApp->RegisterUsingMoments();
+      break;
+      }
     }
+  clock_t timeInitDone = clock();
 
-  if( tkRegistrationMethodChoice->value() > 1 ) // also do affine
+  this->ChangeStatusDisplay("Resampling the initialized moving image...");
+  m_InitializedMovingImage = 
+    m_ImageRegistrationApp->GetFinalRegisteredMovingImage();
+
+  tkInitializationView->activate();
+  
+  tkDisplayMovingImageChoice->value(1);
+  this->SelectImageSet(1);
+  this->ChangeStatusDisplay("Registration initialization done");
+
+  RegionType region;
+  region = m_MovingImage->GetLargestPossibleRegion();
+  if ( tkRegionUseUserRegion->value() == 1
+        && tkMovingImageViewer->IsRegionOfInterestAvailable() )
     {
-    newResult = true;
-    this->ChangeStatusDisplay("Registering using the affine method...");
-
-    RegionType region;
-    region = m_MovingImage->GetLargestPossibleRegion();
-
-    if ( tkAffineUseUserRegion->value() == 1
-          && tkMovingImageViewer->IsRegionOfInterestAvailable() )
-      {
-      std::cout << "Affine registration using user roi." << std::endl;
-      region = tkMovingImageViewer->GetRegionOfInterest();
-      }
-    else if ( tkAffineUseLandmarkRegion->value() == 1 
-              && tkFixedImageViewer->GetNumberOfLandmarks() == 4 
-              && tkMovingImageViewer->GetNumberOfLandmarks() == 4)
-      {
-      std::cout << "Affine registration using landmark roi." << std::endl;
-      region = tkMovingImageViewer->ComputeLandmarkRegion
-        (tkAffineRegionScale->value());
-      }
-
-    m_ImageRegistrationApp->SetMovingImageRegion(region);
-    m_ImageRegistrationApp->RegisterUsingAffineMethod();
+    std::cout << "Registration using user roi." << std::endl;
+    region = tkMovingImageViewer->GetRegionOfInterest();
     }
-  
-  //this->TransformLandmarks( & m_MovingLandmarkSpatialObject->GetPoints(),
-                        //& m_RegisteredMovingLandmarkSpatialObject->GetPoints(),
-                        //m_ImageRegistrationApp->GetFinalTransform() );
-  
-  if(newResult)
+  else if ( tkRegionUseLandmarkRegion->value() == 1 
+            && tkMovingImageViewer->GetNumberOfLandmarks() == 4 
+            && tkFixedImageViewer->GetNumberOfLandmarks() == 4)
     {
-    this->ChangeStatusDisplay("Resampling the moving image...");
-    m_RegisteredMovingImage = 
-      m_ImageRegistrationApp->GetFinalRegisteredMovingImage();
-
-    tkRegisteredView->activate();
-    
-    tkDisplayMovingImageChoice->value(2);
-    this->SelectImageSet(2);
-    this->ChangeStatusDisplay("Registration done");
+    std::cout << "Registration using landmark roi." << std::endl;
+    region = tkMovingImageViewer->ComputeLandmarkRegion(
+                                  tkRegionScale->value());
     }
+  m_ImageRegistrationApp->SetMovingImageRegion(region);
+
+  clock_t timeRegStart = clock();
+  switch(tkRegistrationMethodChoice->value())
+    {
+    default:
+      {
+      break;
+      }
+    case 0: // NONE
+      {
+      break;
+      }
+    case 1: // RIGID
+      {
+      this->ChangeStatusDisplay("Registering using the rigid method...");
+      m_ImageRegistrationApp->RegisterUsingRigid();
+      break;
+      }
+    case 2: // AFFINE
+      {
+      this->ChangeStatusDisplay("Registering using the affine method...");
+      m_ImageRegistrationApp->RegisterUsingAffine();
+      break;
+      }
+    case 3: // RIGID + AFFINE
+      {
+      this->ChangeStatusDisplay("Registering using the rigid method...");
+      m_ImageRegistrationApp->RegisterUsingRigid();
+      this->ChangeStatusDisplay("Registering using the affine method...");
+      m_ImageRegistrationApp->RegisterUsingAffine();
+      break;
+      }
+    }
+  clock_t timeEnd = clock();
+
   
+  this->ChangeStatusDisplay("Resampling the moving image...");
+  m_RegisteredMovingImage = 
+    m_ImageRegistrationApp->GetFinalRegisteredMovingImage();
+
+  tkRegisteredView->activate();
+  
+  tkDisplayMovingImageChoice->value(2);
+  this->SelectImageSet(2);
+  this->ChangeStatusDisplay("Registration done");
+  
+  std::cout << "Time for initialization = " 
+            << timeInitDone - timeStart << std::endl;
+  std::cout << "Time for registration = " 
+            << timeEnd - timeRegStart << std::endl;
+  std::cout << "Time total = " << timeEnd - timeStart << std::endl;
+
   fl_cursor(Fl_Cursor(FL_CURSOR_DEFAULT), (Fl_Color) 56, (Fl_Color) 255);
   }
 

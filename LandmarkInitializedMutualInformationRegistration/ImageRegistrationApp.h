@@ -4,10 +4,13 @@
 #include "itkImage.h"
 
 #include "LandmarkRegistrator.h"
+#include "MomentRegistrator.h"
 #include "RigidRegistrator.h"
 #include "AffineRegistrator.h"
 
 #include "itkAffineTransform.h"
+
+#include "itkVersor.h"
 
 // including all the type of transform that could possibly be used
 // as templated type.
@@ -33,6 +36,23 @@ class ImageRegistrationApp : public Object
     typedef typename TImage::RegionType   RegionType ;
     typedef typename TImage::OffsetType   OffsetType ;
   
+    typedef MomentRegistrator< TImage >               NoneRegistratorType;
+    typedef typename NoneRegistratorType::TransformType 
+                                                      NoneRegTransformType;
+
+    typedef MomentRegistrator< TImage >               MassRegistratorType;
+    typedef MomentRegistrator< TImage >               CenterRegistratorType;
+    typedef typename CenterRegistratorType::TransformType 
+                                                      CenterRegTransformType;
+
+    typedef MomentRegistrator< TImage >               MassRegistratorType;
+    typedef typename MassRegistratorType::TransformType  
+                                                      MassRegTransformType;
+
+    typedef MomentRegistrator< TImage >               MomentRegistratorType;
+    typedef typename MomentRegistratorType::TransformType  
+                                                      MomentRegTransformType;
+
     typedef LandmarkRegistrator                       LandmarkRegistratorType;
     typedef LandmarkRegistratorType::LandmarkType     LandmarkType;
     typedef LandmarkRegistratorType::LandmarkSetType  LandmarkSetType;
@@ -45,26 +65,46 @@ class ImageRegistrationApp : public Object
     typedef typename RigidRegistratorType::ScalesType     RigidScalesType;
     typedef typename RigidRegistratorType::TransformType  RigidRegTransformType;
   
-    typedef AffineRegistrator< TImage >                   AffineRegistratorType;
+    typedef AffineRegistrator< TImage >                 AffineRegistratorType;
     typedef typename AffineRegistratorType::ParametersType 
-                                                          AffineParametersType;
-    typedef typename AffineRegistratorType::ScalesType    AffineScalesType;
+                                                        AffineParametersType;
+    typedef typename AffineRegistratorType::ScalesType  AffineScalesType;
     typedef typename AffineRegistratorType::TransformType 
-                                            AffineRegTransformType;
+                                                        AffineRegTransformType;
   
-    typedef AffineTransform<double, 3>                    AffineTransformType;
+    typedef AffineTransform<double, 3>                  AffineTransformType;
   
+    void SetOptimizerToOnePlusOne();
+
+    void SetOptimizerToGradient();
+
+    void SetOptimizerToRegularGradient();
+
+    void SetOptimizerToConjugateGradient();
+
+    void RegisterUsingNone();
+
+    void RegisterUsingCenters();
+
+    void RegisterUsingMass();
+
+    void RegisterUsingMoments();
+
     void RegisterUsingLandmarks(LandmarkSetType* fixedImageLandmarks,
                                 LandmarkSetType* movingImageLandmarks) ;
   
-    void RegisterUsingRigidMethod() ;
+    void RegisterUsingRigid() ;
   
-    void RegisterUsingAffineMethod() ;
+    void RegisterUsingAffine() ;
   
     void SetFixedImage(TImage* image);
     
     void SetMovingImage(TImage* image);
   
+    itkGetObjectMacro(NoneRegTransform, NoneRegTransformType) ;
+    itkGetObjectMacro(CenterRegTransform, CenterRegTransformType) ;
+    itkGetObjectMacro(MassRegTransform, MassRegTransformType) ;
+    itkGetObjectMacro(MomentRegTransform, MomentRegTransformType) ;
     itkGetObjectMacro(LandmarkRegTransform, LandmarkRegTransformType) ;
     itkGetObjectMacro(RigidRegTransform, RigidRegTransformType) ;
     itkGetObjectMacro(AffineRegTransform, AffineRegTransformType) ;
@@ -103,6 +143,10 @@ class ImageRegistrationApp : public Object
     itkSetMacro(MovingImageRegion, RegionType) ;
     itkGetConstMacro(MovingImageRegion, RegionType) ;
   
+    ImagePointer GetNoneRegisteredMovingImage();
+    ImagePointer GetCenterRegisteredMovingImage();
+    ImagePointer GetMassRegisteredMovingImage();
+    ImagePointer GetMomentRegisteredMovingImage();
     ImagePointer GetLandmarkRegisteredMovingImage();
     ImagePointer GetRigidRegisteredMovingImage();
     ImagePointer GetAffineRegisteredMovingImage();
@@ -111,12 +155,32 @@ class ImageRegistrationApp : public Object
   protected:
     ImageRegistrationApp() ;
     virtual ~ImageRegistrationApp() ;
+
+    void InitRigidParameters(RigidParametersType & p,
+                             Point<double, 3> & center);
   
     void PrintUncaughtError() ;
   
     void PrintError(ExceptionObject &e) ;
   
   private:
+    typedef enum { NONE, CENTER, MASS, MOMENT, LANDMARK, RIGID, AFFINE }
+                 PriorRegistrationMethodType;
+
+    typedef enum { ONEPLUSONE,
+                   GRADIENT,
+                   REGULARGRADIENT,
+                   CONJUGATEGRADIENT
+                 } OptimizerMethodType;
+
+    typename NoneRegTransformType::Pointer       m_NoneRegTransform ;
+    typename AffineTransformType::Pointer        m_NoneAffineTransform ;
+    typename CenterRegTransformType::Pointer     m_CenterRegTransform ;
+    typename AffineTransformType::Pointer        m_CenterAffineTransform ;
+    typename MassRegTransformType::Pointer       m_MassRegTransform ;
+    typename AffineTransformType::Pointer        m_MassAffineTransform ;
+    typename MomentRegTransformType::Pointer     m_MomentRegTransform ;
+    typename AffineTransformType::Pointer        m_MomentAffineTransform ;
     typename LandmarkRegTransformType::Pointer   m_LandmarkRegTransform ;
     typename AffineTransformType::Pointer        m_LandmarkAffineTransform ;
     typename RigidRegTransformType::Pointer      m_RigidRegTransform ;
@@ -130,6 +194,18 @@ class ImageRegistrationApp : public Object
     
     RegionType          m_MovingImageRegion ;
   
+    PriorRegistrationMethodType   m_PriorRegistrationMethod;
+
+    OptimizerMethodType        m_OptimizerMethod;
+
+    bool                m_NoneRegValid;
+
+    bool                m_CenterRegValid;
+
+    bool                m_MassRegValid;
+
+    bool                m_MomentRegValid;
+
     unsigned int        m_LandmarkNumberOfIterations ;
     LandmarkScalesType  m_LandmarkScales ;
     bool                m_LandmarkRegValid;

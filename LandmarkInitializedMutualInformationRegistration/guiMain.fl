@@ -8,7 +8,7 @@ class guiMain {open
   } {
     Fl_Window tkWindow {
       label {Landmarkd Initialized Mutual Information 3D Registration Tool } open
-      xywh {223 422 1060 705} type Double box PLASTIC_UP_BOX color 159 resizable visible
+      xywh {206 158 1060 705} type Double box PLASTIC_UP_BOX color 159 resizable visible
     } {
       Fl_Group tkMainGroup {open
         xywh {0 30 1050 710} resizable
@@ -20,17 +20,17 @@ class guiMain {open
         Fl_Choice tkDisplayMovingImageChoice {
           label {Currently Displayed Moving Image:}
           callback {SetDisplayMovingImage();} open
-          xywh {794 31 249 15} box PLASTIC_UP_BOX down_box BORDER_BOX color 255 selection_color 255 labelsize 10 when 1 textsize 10
+          xywh {885 31 158 15} box PLASTIC_UP_BOX down_box BORDER_BOX color 255 selection_color 255 labelsize 10 when 1 textsize 10
         } {
           menuitem tkUnregisteredView {
             label {Unregistered Images}
             callback {SelectImageSet(0) ;}
             xywh {5 5 100 20} labelsize 10
           }
-          menuitem tkLandmarkRegisteredView {
-            label {Landmark Registered Images}
+          menuitem tkInitializationView {
+            label Initialization
             callback {SelectImageSet(1) ;}
-            xywh {15 15 100 20} labelsize 10 deactivate
+            xywh {15 15 100 20} labelsize 10
           }
           menuitem tkRegisteredView {
             label {Registered Images}
@@ -38,10 +38,51 @@ class guiMain {open
             xywh {25 25 100 20} labelsize 10 deactivate
           }
         }
-        Fl_Button {} {
-          label Quit
-          callback {Quit();}
-          xywh {910 665 135 20} box PLASTIC_UP_BOX color 1 labelsize 10
+        Fl_Choice tkInitializationMethodChoice {
+          label {Initialization:} open
+          xywh {410 666 100 19} box PLASTIC_UP_BOX down_box BORDER_BOX color 255 selection_color 255 labelsize 10 align 36 when 1 textsize 10
+        } {
+          menuitem tkInitNoneMethod {
+            label None selected
+            xywh {45 45 100 34} labelsize 10
+          }
+          menuitem tkInitCentersMethod {
+            label {Image Centers}
+            xywh {55 55 100 34} labelsize 10
+          }
+          menuitem tkInitLandmarkMethod {
+            label Landmark
+            xywh {35 35 100 34} labelsize 10
+          }
+          menuitem tkInitMassMethod {
+            label Mass
+            xywh {45 45 100 34} labelsize 10
+          }
+          menuitem tkInitMomentsMethod {
+            label Moments
+            xywh {55 55 100 34} labelsize 10
+          }
+        }
+        Fl_Choice tkRegistrationMethodChoice {
+          label {Registration:} open
+          xywh {590 666 100 19} box PLASTIC_UP_BOX down_box BORDER_BOX color 255 selection_color 255 labelsize 10 align 36 when 1 textsize 10
+        } {
+          menuitem tkRegNoneMethod {
+            label None
+            xywh {35 35 100 34} labelsize 10
+          }
+          menuitem tkRegRigidMethod {
+            label Rigid
+            xywh {25 25 100 34} labelsize 10
+          }
+          menuitem tkRegAffineMethod {
+            label Affine
+            xywh {25 25 100 34} labelsize 10
+          }
+          menuitem tkRegRigidAffineMethod {
+            label {Rigid + Affine}
+            xywh {35 35 100 34} labelsize 10
+          }
         }
         Fl_Button tkRegisterButton {
           label Register
@@ -49,22 +90,10 @@ class guiMain {open
 Register();}
           xywh {740 666 155 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 63 selection_color 63 labelsize 10
         }
-        Fl_Choice tkRegistrationMethodChoice {
-          label {Registration Method:} open selected
-          xywh {640 666 90 19} box PLASTIC_UP_BOX down_box BORDER_BOX color 255 selection_color 255 labelsize 10 align 36 when 1 textsize 10
-        } {
-          menuitem tkLandmarkMethod {
-            label Landmark
-            xywh {25 25 100 34} labelsize 10
-          }
-          menuitem tkRigidMethod {
-            label Rigid
-            xywh {15 15 100 34} labelsize 10
-          }
-          menuitem tkAffineMethod {
-            label Affine
-            xywh {15 15 100 34} labelsize 10
-          }
+        Fl_Button {} {
+          label Quit
+          callback {Quit();}
+          xywh {910 665 135 20} box PLASTIC_UP_BOX color 1 labelsize 10
         }
         Fl_Box tkResultImageViewer {
           label label
@@ -72,7 +101,7 @@ Register();}
           code0 {\#include <GLTwoImageSliceView.h>}
           class {GLTwoImageSliceView< short, unsigned char >}
         }
-        Fl_Group tkSubGroup {open
+        Fl_Group tkSubGroup {
           xywh {5 51 424 609}
         } {
           Fl_Button tkSelectFixedImageButton {
@@ -91,7 +120,7 @@ Register();}
           Fl_Output tkFixedImageFile {
             xywh {149 56 275 15} box PLASTIC_DOWN_BOX color 247 labeltype NO_LABEL labelsize 10 textsize 9
           }
-          Fl_Group tkFixedImageLandmarkGroup {open
+          Fl_Group tkFixedImageLandmarkGroup {
             xywh {9 95 131 179} deactivate
           } {
             Fl_Button tkFixedImageLandmarksClearButton {
@@ -150,7 +179,7 @@ Register();}
               xywh {10 157 85 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 3
             }
           }
-          Fl_Group tkMovingImageLandmarkGroup {open
+          Fl_Group tkMovingImageLandmarkGroup {
             xywh {10 400 130 225} deactivate
           } {
             Fl_Button tkMovingImageLandmarksClearButton {
@@ -214,7 +243,7 @@ Register();}
               xywh {10 608 130 17} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 71 labelsize 9
             }
             Fl_Button tkMovingImageLandmarksUpdateSpacingButton {
-              label {Update spacing...}
+              label {Rescale using landmarks...}
               callback {UpdateMovingImageSpacing();}
               tooltip {Use landmarks to determine isotropic voxel spacing} xywh {10 560 130 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9
             }
@@ -232,7 +261,7 @@ Register();}
           }
         }
         Fl_Group tkViewAxisGroup {
-          label {View axis:} open
+          label {View axis:}
           xywh {220 30 210 20} labelsize 10 align 4
         } {
           Fl_Round_Button tkViewAxisX {
@@ -256,7 +285,7 @@ Register();}
         }
         Fl_Output tkStatusDisplay {
           label Status
-          xywh {43 667 383 20} labelsize 10 textsize 10
+          xywh {43 667 257 20} labelsize 10 textsize 10
         }
         Fl_Value_Slider tkMovingSliceValuator {
           callback {UpdateMovingSliceNumber();}
@@ -267,18 +296,13 @@ Register();}
           xywh {430 72 16 278} type {Vert Fill} box PLASTIC_DOWN_BOX color 247 selection_color 247 labelsize 8 step 1
         }
       }
-      Fl_Menu_Bar {} {open
+      Fl_Menu_Bar {} {
         xywh {1 0 1060 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 selection_color 247 labelsize 9 textsize 9
       } {
         submenu {} {
           label File open
           xywh {0 0 100 20} labelsize 10
         } {
-          menuitem {} {
-            label {Save landmark registered moving image...}
-            callback {SaveLandmarkRegisteredImage();}
-            xywh {0 0 100 20} labelsize 10
-          }
           menuitem {} {
             label {Save registered final moving image...}
             callback {SaveFinalRegisteredImage();}
@@ -465,59 +489,35 @@ tkMovingImageViewer->DrawRegionOfInterest() ;}
       label {Advanced Registration Options} open
       xywh {1191 158 405 520} type Double box PLASTIC_UP_BOX color 159 labelsize 10 resizable visible
     } {
-      Fl_Tabs {} {open
+      Fl_Tabs {} {
         xywh {15 15 385 465} labelsize 12
       } {
         Fl_Group {} {
           label Region
-          xywh {25 50 365 430} hide
+          xywh {25 50 365 430}
         } {
           Fl_Box {} {
-            label {Rigid }
+            label {Rigid / Affine}
             xywh {35 75 345 110} box THIN_DOWN_BOX labeltype EMBOSSED_LABEL align 5
           }
-          Fl_Box {} {
-            label Affine
-            xywh {35 215 345 110} box THIN_DOWN_BOX labeltype EMBOSSED_LABEL align 5
-          }
-          Fl_Value_Input tkRigidRegionScale {
+          Fl_Value_Input tkRegionScale {
             label {Lanmark region scale:}
             xywh {320 152 40 25} minimum 0.1 maximum 4 step 0.01 value 1
           }
-          Fl_Group tkRigidRegionChoiceGroup {open
+          Fl_Group tkRegionChoiceGroup {open
             xywh {50 80 315 70}
           } {
-            Fl_Round_Button tkRigidUseLandmarkRegion {
+            Fl_Round_Button tkRegionUseLandmarkRegion {
               label {Use the region determined by the landmarks}
-              xywh {55 125 25 25} type Radio down_box ROUND_DOWN_BOX
+              xywh {55 125 300 25} type Radio down_box ROUND_DOWN_BOX
             }
-            Fl_Round_Button tkRigidUseLargestRegion {
+            Fl_Round_Button tkRegionUseLargestRegion {
               label {Use the whole image}
-              xywh {55 85 25 25} type Radio down_box ROUND_DOWN_BOX value 1
+              xywh {55 85 150 25} type Radio down_box ROUND_DOWN_BOX value 1
             }
-            Fl_Round_Button tkRigidUseUserRegion {
+            Fl_Round_Button tkRegionUseUserRegion {
               label {Use the user specified region}
-              xywh {55 105 25 25} type Radio down_box ROUND_DOWN_BOX
-            }
-          }
-          Fl_Value_Input tkAffineRegionScale {
-            label {Landmark region scale:}
-            xywh {320 290 40 25} minimum 0.1 maximum 4 step 0.01 value 1
-          }
-          Fl_Group tkAffineRegionChoiceGroup {open
-            xywh {45 215 320 75}
-          } {
-            Fl_Round_Button tkAffineUseLandmarkRegion {
-              label {Use the region determined by the landmarks}
-              xywh {55 265 25 25} type Radio down_box ROUND_DOWN_BOX
-            }
-            Fl_Round_Button tkAffineUseLargestRegion {
-              label {Use the whole image}
-              xywh {55 225 25 25} type Radio down_box ROUND_DOWN_BOX value 1
-            }
-            Fl_Round_Button tkAffineUseUserRegion {
-              label {Use the user specified region}
-              xywh {55 245 25 25} type Radio down_box ROUND_DOWN_BOX
+              xywh {55 105 205 25} type Radio down_box ROUND_DOWN_BOX
             }
           }
         }
@@ -569,7 +569,7 @@ tkMovingImageViewer->DrawRegionOfInterest() ;}
         }
         Fl_Group {} {
           label Affine
-          xywh {15 40 375 430}
+          xywh {15 40 375 430} hide
         } {
           Fl_Value_Input tkAffineNumberOfIterations {
             label {Number of Iterations:}
@@ -634,8 +634,6 @@ tkMovingImageViewer->DrawRegionOfInterest() ;}
   Function {LoadLandmarks( bool moving )} {open return_type {virtual void}
   } {}
   Function {SaveFinalRegisteredImage()} {open return_type {virtual void}
-  } {}
-  Function {SaveLandmarkRegisteredImage()} {open return_type {virtual void}
   } {}
   Function {ApplyAdvancedOptions()} {open return_type {virtual void}
   } {}

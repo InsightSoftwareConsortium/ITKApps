@@ -6,9 +6,14 @@
 #include "itkImageRegistrationMethod.h"
 #include "itkVersorRigid3DTransform.h"
 #include "itkMattesMutualInformationImageToImageMetric.h"
+
 #include "itkOnePlusOneEvolutionaryOptimizer.h"
-#include "itkLinearInterpolateImageFunction.h"
 #include "itkNormalVariateGenerator.h"
+#include "itkGradientDescentOptimizer.h"
+#include "itkConjugateGradientOptimizer.h"
+#include "itkRegularStepGradientDescentOptimizer.h"
+
+#include "itkLinearInterpolateImageFunction.h"
 #include "itkStatisticsImageFilter.h"
 #include "itkRegionOfInterestImageFilter.h"
 
@@ -32,15 +37,22 @@ class RigidRegistrator : public ImageRegistrationMethod < TImage, TImage >
     typedef typename TImage::RegionType RegionType ;
 
     /** preprocessing related typedefs */
-    typedef VersorRigid3DTransform<double> TransformType ;
-    typedef OnePlusOneEvolutionaryOptimizer OptimizerType ;
+    typedef VersorRigid3DTransform<double>      TransformType ;
+
+    typedef enum { ONEPLUSONE, GRADIENT, REGULARGRADIENT, CONJUGATEGRADIENT }
+                                                OptimizerMethodType;
+
+    typedef OnePlusOneEvolutionaryOptimizer     OnePlusOneOptimizerType ;
+    typedef GradientDescentOptimizer            GradientOptimizerType ;
+    typedef RegularStepGradientDescentOptimizer RegularGradientOptimizerType;
+    typedef ConjugateGradientOptimizer          ConjugateGradientOptimizerType;
     typedef Statistics::NormalVariateGenerator  OptimizerNormalGeneratorType;
-    typedef TransformType::ParametersType ParametersType ;
-    typedef TransformType::ParametersType ScalesType ;
+    typedef TransformType::ParametersType       ParametersType ;
+    typedef TransformType::ParametersType       ScalesType ;
     typedef LinearInterpolateImageFunction< TImage, double > 
-                 InterpolatorType ;
-    typedef MattesMutualInformationImageToImageMetric< 
-                 TImage, TImage > MetricType ;
+                                                InterpolatorType ;
+    typedef MattesMutualInformationImageToImageMetric< TImage, TImage >
+                                                MetricType ;
 
     void StartRegistration() ;
 
@@ -49,10 +61,10 @@ class RigidRegistrator : public ImageRegistrationMethod < TImage, TImage >
       return static_cast<TransformType *>(Superclass::GetTransform());
       }
 
-    OptimizerType * GetTypedOptimizer(void)
-      {
-      return static_cast<OptimizerType *>(Superclass::GetOptimizer());
-      }
+    void SetOptimizerToOnePlusOne();
+    void SetOptimizerToGradient();
+    void SetOptimizerToRegularGradient();
+    void SetOptimizerToConjugateGradient();
 
     itkSetMacro(OptimizerNumberOfIterations, unsigned int) ;
     itkGetConstMacro(OptimizerNumberOfIterations, unsigned int) ;
@@ -78,11 +90,15 @@ class RigidRegistrator : public ImageRegistrationMethod < TImage, TImage >
 
     void PrintError(ExceptionObject &e) ;
 
+
   private:
-    unsigned int  m_OptimizerNumberOfIterations;
-    ScalesType    m_OptimizerScales;
+    OptimizerMethodType     m_OptimizerMethod;
+    unsigned int            m_OptimizerNumberOfIterations;
+    ScalesType              m_OptimizerScales;
 
     unsigned int  m_MetricNumberOfSpatialSamples;
+
+
 
   } ; // end of class
 

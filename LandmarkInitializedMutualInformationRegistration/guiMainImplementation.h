@@ -72,7 +72,6 @@ class guiMainImplementation : public guiMain
     void SelectMovingImage() ;
     void HandleInputImageChange(std::string & fileName, bool isFixedImage) ;
     ImagePointer LoadImage( const char * filename );
-    void SaveLandmarkRegisteredImage();
     void SaveFinalRegisteredImage();
 
     /////////////////////////////////////////////////
@@ -135,7 +134,9 @@ class guiMainImplementation : public guiMain
 
   private:
     ImageRegistrationAppType::Pointer m_ImageRegistrationApp ;
+
     unsigned int m_ViewAxis ;
+
     SizeType m_FixedImageSize ;
     SizeType m_MovingImageSize ;
 
@@ -147,28 +148,23 @@ class guiMainImplementation : public guiMain
     LandmarkSpatialObjectType::Pointer 
                               m_MovingLandmarkSpatialObject ;
     LandmarkSpatialObjectType::Pointer 
-                              m_LandmarkRegisteredMovingLandmarkSpatialObject ;
+                              m_InitializedMovingLandmarkSpatialObject ;
     LandmarkSpatialObjectType::Pointer 
                               m_RegisteredMovingLandmarkSpatialObject ;
 
     ImageType::Pointer m_FixedImage ;
     ImageType::Pointer m_MovingImage ;
-    ImageType::Pointer m_LandmarkRegisteredMovingImage ;
+    ImageType::Pointer m_InitializedMovingImage ;
     ImageType::Pointer m_RegisteredMovingImage ;
 
     std::string m_LastLoadedImagePath;
     bool m_FixedImageLoaded;
     bool m_MovingImageLoaded;
 
-    bool m_RigidUseLargestRegion ;
-    bool m_RigidUseUserRegion ;
-    bool m_RigidUseLandmarkRegion ;
-    double m_RigidRegionScale ;
-
-    bool m_AffineUseLargestRegion ;
-    bool m_AffineUseUserRegion ;
-    bool m_AffineUseLandmarkRegion ;
-    double m_AffineRegionScale ;
+    bool m_RegionUseLargestRegion ;
+    bool m_RegionUseUserRegion ;
+    bool m_RegionUseLandmarkRegion ;
+    double m_RegionScale ;
 
   };
 

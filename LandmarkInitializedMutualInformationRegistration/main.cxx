@@ -1,6 +1,7 @@
 #include "itkWin32Header.h"
 #include "guiMainImplementation.h"
 #include "ImageRegistrationApp.h"
+#include <time.h>
 
 int usage()
   {
@@ -8,13 +9,24 @@ int usage()
     << "limir [options] fixedImage movingImage outputResampledMovingImage" 
     << std::endl;
   std::cout << "Options:" << std::endl;
-  std::cout << "  -A : perform affine registration" << std::endl;
-  std::cout << "  -L fixedLandmarks movingLandmarks" << std::endl;
-  std::cout << "  -R <x y z> <x y z>: use ROI" << std::endl;
-  std::cout << "  -l <filename> : save landmark registered image" << std::endl;
-  std::cout << "  -r <filename> : save rigid registered image" << std::endl;
-  std::cout << "  -1 <filename> : save landmark transform" << std::endl;
-  std::cout << "  -2 <filename> : save rigid transform" << std::endl;
+  std::cout << "  -I <method#> : Registration initialization" << std::endl;
+  std::cout << "        0 - NONE" << std::endl;
+  std::cout << "        1 - Image Centers" << std::endl;
+  std::cout << "        2 - Centers of Mass [default]" << std::endl;
+  std::cout << "        3 - Moments" << std::endl;
+  std::cout << "        4 - Landmarks" << std::endl;
+  std::cout << "  -R <method#>: Registration Method" << std::endl;
+  std::cout << "        0 - NONE" << std::endl;
+  std::cout << "        1 - Rigid [default]" << std::endl;
+  std::cout << "        2 - Affine" << std::endl;
+  std::cout << "        3 - Rigid + Affine" << std::endl;
+  std::cout << "  -O <method#>" << std::endl;
+  std::cout << "        0 - One plus one evolutionary [default]" << std::endl;
+  std::cout << "        1 - Gradient" << std::endl;
+  std::cout << "        2 - Regular step gradient" << std::endl;
+  std::cout << "        3 - Conjugate gradient" << std::endl;
+  std::cout << "  -L <fixedLandmarksfile> <movingLandmarksfile>" << std::endl;
+  std::cout << "  -T <filename> : save registration transform" << std::endl;
   return 1;
   }
 
@@ -27,7 +39,9 @@ int main(int argc, char **argv)
       return usage();
       }
 
-    bool affineRegistration = false;
+    int initializationMethod = 2;
+    int registrationMethod = 1;
+    int optimizationMethod = 0;
 
     char fixedImageFilename[255];
     char movingImageFilename[255];
@@ -38,51 +52,34 @@ int main(int argc, char **argv)
     char movingLandmarksFilename[255];
     movingLandmarksFilename[0] = '\0';
 
-    char outputLandmarksImageFilename[255];
-    outputLandmarksImageFilename[0] = '\0';
-
-    char outputRigidImageFilename[255];
-    outputRigidImageFilename[0] = '\0';
-
-    char outputLandmarksTransformFilename[255];
-    outputLandmarksTransformFilename[0] = '\0';
-
-    char outputRigidTransformFilename[255];
-    outputRigidTransformFilename[0] = '\0';
-
     char outputTransformFilename[255];
     outputTransformFilename[0] = '\0';
-
 
     int argNum = 1;
     while (argNum < argc-3 && argv[argNum][0] == '-')
       {
       switch(argv[argNum][1])
         {
-        case 'A':
+        case 'I':
           argNum++;
-          affineRegistration = true;
+          initializationMethod = (int)atof(argv[argNum++]);
+          break;
+        case 'R':
+          argNum++;
+          registrationMethod = (int)atof(argv[argNum++]);
           break;
         case 'L':
           argNum++;
           strcpy(fixedLandmarksFilename, argv[argNum++]);
           strcpy(movingLandmarksFilename, argv[argNum++]);
           break;
-        case 'l':
+        case 'T':
           argNum++;
-          strcpy(outputLandmarksImageFilename, argv[argNum++]);
+          strcpy(outputTransformFilename, argv[argNum++]);
           break;
-        case 'r':
+        case 'O':
           argNum++;
-          strcpy(outputRigidImageFilename, argv[argNum++]);
-          break;
-        case '1':
-          argNum++;
-          strcpy(outputLandmarksTransformFilename, argv[argNum++]);
-          break;
-        case '2':
-          argNum++;
-          strcpy(outputRigidTransformFilename, argv[argNum++]);
+          optimizationMethod = (int)atof(argv[argNum++]);
           break;
         default:
           return usage();
@@ -105,7 +102,7 @@ int main(int argc, char **argv)
     typedef itk::ImageFileWriter<ImageType> ImageWriterType;
     typedef itk::SpatialObjectReader<>      LandmarkReaderType;
     typedef LandmarkReaderType::GroupType   GroupType;
-    typedef itk::SpatialObjectWriter<>      LandmarkWriterType;
+    typedef itk::SpatialObjectWriter<>      GroupWriterType;
     typedef itk::AffineTransform<double, 3> TransformType;
 
     ImageType::Pointer fixedImage;
@@ -174,23 +171,85 @@ int main(int argc, char **argv)
         ImageRegistrationAppType::New();
     imageRegistrationApp->SetFixedImage( fixedImage.GetPointer() );
     imageRegistrationApp->SetMovingImage( movingImage.GetPointer() );
-
-    if( strlen( movingLandmarksFilename ) > 1 )
-      {
-      imageRegistrationApp->RegisterUsingLandmarks( fixedLandmarks.GetPointer(),
-                                                  movingLandmarks.GetPointer());
-      }
-
     imageRegistrationApp->SetMovingImageRegion( 
-        movingImage->GetLargestPossibleRegion() );
+         movingImage->GetLargestPossibleRegion() );
 
-    imageRegistrationApp->RegisterUsingRigidMethod();
 
-    if( affineRegistration )
+    switch(optimizationMethod)
       {
-      imageRegistrationApp->RegisterUsingAffineMethod();
+      default:
+        std::cout << "Error: Optimization method unknown!" << std::endl;
+        break;
+      case 0:
+        imageRegistrationApp->SetOptimizerToOnePlusOne();
+        break;
+      case 1:
+        imageRegistrationApp->SetOptimizerToGradient();
+        break;
+      case 2:
+        imageRegistrationApp->SetOptimizerToRegularGradient();
+        break;
+      case 3:
+        imageRegistrationApp->SetOptimizerToConjugateGradient();
+        break;
       }
 
+    clock_t timeStart = clock();
+    switch(initializationMethod)
+      {
+      default:
+        std::cout << "Error: Initialization method unknown!" << std::endl;
+        break;
+      case 0:
+        imageRegistrationApp->RegisterUsingNone();
+        break;
+      case 1:
+        imageRegistrationApp->RegisterUsingCenters();
+        break;
+      case 2:
+        imageRegistrationApp->RegisterUsingMass();
+        break;
+      case 3:
+        imageRegistrationApp->RegisterUsingMoments();
+        break;
+      case 4:
+        if( strlen( movingLandmarksFilename ) > 1 )
+          {
+          imageRegistrationApp->RegisterUsingLandmarks( 
+                                      fixedLandmarks.GetPointer(),
+                                      movingLandmarks.GetPointer());
+          }
+        break;
+      }
+    clock_t timeInitEnd = clock();
+
+    switch(registrationMethod)
+      {
+      default:
+        std::cout << "Error: Image registration method unknown!" << std::endl;
+        break;
+      case 0:
+        break;
+      case 1:
+        imageRegistrationApp->RegisterUsingRigid();
+        break;
+      case 2:
+        imageRegistrationApp->RegisterUsingAffine();
+        break;
+      case 3:
+        imageRegistrationApp->RegisterUsingRigid();
+        imageRegistrationApp->RegisterUsingAffine();
+        break;
+      }
+    clock_t timeRegEnd = clock();
+
+    std::cout << "Time for initialization = " 
+              << timeInitEnd - timeStart << std::endl;
+    std::cout << "Time for registration = " 
+              << timeRegEnd - timeInitEnd << std::endl;
+    std::cout << "Time total = " 
+              << timeRegEnd - timeStart << std::endl;
+    
     ImageWriterType::Pointer imageWriter = ImageWriterType::New();
     imageWriter->SetFileName( outputImageFilename );
     imageWriter->SetInput( 
@@ -204,29 +263,10 @@ int main(int argc, char **argv)
       std::cout << e << std::endl;
       }
 
-    if( strlen( outputLandmarksImageFilename ) > 1)
+    if( strlen( outputTransformFilename ) > 1)
       {
-      }
-
-    if( strlen( outputLandmarksTransformFilename ) > 1)
-      {
-      LandmarkWriterType::Pointer landmarkWriter = LandmarkWriterType::New();
-      landmarkWriter->SetFullFileName(outputLandmarksTransformFilename);
-      GroupType::Pointer group = GroupType::New();
-      itk::SpatialObject<3>::TransformType::Pointer transform =
-          itk::SpatialObject<3>::TransformType::New();
-      transform->SetMatrix(imageRegistrationApp
-                             ->GetLandmarkAffineTransform()->GetMatrix());
-      transform->SetOffset(imageRegistrationApp
-                            ->GetLandmarkAffineTransform()->GetOffset());
-      group->SetObjectToParentTransform( transform.GetPointer() );
-      landmarkWriter->SetInput( group );
-      landmarkWriter->Update();
-      }
-    if( strlen( outputRigidTransformFilename ) > 1)
-      {
-      LandmarkWriterType::Pointer landmarkWriter = LandmarkWriterType::New();
-      landmarkWriter->SetFullFileName(outputRigidTransformFilename);
+      GroupWriterType::Pointer transformWriter = GroupWriterType::New();
+      transformWriter->SetFullFileName(outputTransformFilename);
       GroupType::Pointer group = GroupType::New();
       itk::SpatialObject<3>::TransformType::Pointer transform =
           itk::SpatialObject<3>::TransformType::New();
@@ -235,8 +275,8 @@ int main(int argc, char **argv)
       transform->SetOffset(imageRegistrationApp
                             ->GetRigidAffineTransform()->GetOffset());
       group->SetObjectToParentTransform( transform.GetPointer() );
-      landmarkWriter->SetInput( group );
-      landmarkWriter->Update();
+      transformWriter->SetInput( group );
+      transformWriter->Update();
       }
 
     return 0;
