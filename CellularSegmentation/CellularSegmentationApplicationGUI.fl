@@ -7,7 +7,7 @@ class CellularSegmentationApplicationGUI {open : {public CellularSegmentationApp
   Function {CellularSegmentationApplicationGUI()} {open
   } {
     Fl_Window mainWindow {
-      label CellularSegmentationApplication open selected
+      label CellularSegmentationApplication open
       xywh {195 100 870 850} type Double resizable
       code0 {\#include "CellularSegmentationApplicationBase.h"} visible
     } {
@@ -29,22 +29,30 @@ class CellularSegmentationApplicationGUI {open : {public CellularSegmentationApp
       Fl_Button runButton {
         label {@+5>}
         callback {this->Run();}
-        xywh {190 795 75 40} align 128 deactivate
+        xywh {106 795 75 40} align 128 deactivate
       }
       Fl_Button stopButton {
         label {@square}
         callback {this->Stop();}
-        xywh {280 795 75 40} align 128 deactivate
+        xywh {196 795 75 40} align 128 deactivate
       }
       Fl_Choice displayChoice {
         label {Display:}
         callback {this->SetDisplayOption();} open
-        xywh {574 799 135 30} down_box BORDER_BOX
+        xywh {431 800 135 30} down_box BORDER_BOX
       } {}
       Fl_Button clearButton {
         label {@+51+}
         callback {this->Clear();}
-        xywh {369 795 75 40} align 128 deactivate
+        xywh {285 795 75 40} align 128 deactivate
+      }
+      Fl_Value_Input highThresholdValueInput {
+        label {High : }
+        xywh {685 789 55 25} step 1 value 255
+      }
+      Fl_Value_Input lowThresholdValueInput {
+        label {Low : } selected
+        xywh {685 815 55 25} step 1 value 200
       }
     }
   }

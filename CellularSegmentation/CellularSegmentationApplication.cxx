@@ -143,18 +143,25 @@ CellularSegmentationApplication
   ::CreateEgg( void )
 {
   CellType * egg = CellType::CreateEgg();
+
+  egg->SetChemoAttractantLowThreshold( lowThresholdValueInput->value() );
+  egg->SetChemoAttractantHighThreshold( highThresholdValueInput->value() );
+
   CellType::PointType position;
   const unsigned int spaceDimension = CellType::GetDimension();
   for(unsigned int i=0; i<spaceDimension; i++)
     {
     position[i] = m_SeedPoint[i];
     }
+  
   m_CellularAggregate->SetEgg( egg, position );
 
   runButton->activate();
   stopButton->deactivate();
   clearButton->deactivate();
   loadImageButton->deactivate();
+  lowThresholdValueInput->deactivate();
+  highThresholdValueInput->deactivate();
 }
 
 
@@ -203,6 +210,8 @@ CellularSegmentationApplication
   runButton->activate();
   clearButton->activate();
   stopButton->deactivate();
+  lowThresholdValueInput->activate();
+  highThresholdValueInput->activate();
 }
 
 
