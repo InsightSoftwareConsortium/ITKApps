@@ -162,6 +162,12 @@ public:
 
     m_Info->UpdateProgress(m_Info, progress, m_UpdateMessage.c_str()); 
 
+    // Test whether during the GUI update, the Abort button was pressed
+    int abort = atoi( m_Info->GetProperty( m_Info, VVP_ABORT_PROCESSING ) );
+    if( abort )
+      {
+      process->SetAbortGenerateData(true);
+      }
   }
 
 

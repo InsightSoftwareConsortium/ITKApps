@@ -142,7 +142,15 @@ public:
     m_Filter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
 
     // Execute the filter
-    m_Filter->Update();
+    try
+      {
+      m_Filter->Update();
+      }
+    catch( itk::ProcessAborted & excp )
+      {
+      return;
+      }
+
 
     // Copy the data (with casting) to the output buffer provided by the Plug In API
     typename OutputImageType::ConstPointer outputImage =
