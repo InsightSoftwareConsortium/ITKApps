@@ -11,7 +11,7 @@ class EditorConsoleGUI {open : {public EditorConsoleBase}
     Fl_Window consoleWindow {
       label {Segmentation Editor} open
       xywh {173 313 807 378} color 206 labeltype NORMAL_LABEL labelfont 1 resizable
-      code0 {\#include <EditorConsoleBase.h>}
+      code0 {\#include "EditorConsoleBase.h"}
       code1 {\#include <fltkLightButton.h>} visible
     } {
       Fl_Button {} {
@@ -219,7 +219,7 @@ class EditorConsoleGUI {open : {public EditorConsoleBase}
       Fl_Box segmentedWin {
         label label selected
         xywh {0 0 256 256} labeltype NO_LABEL
-        code0 {\#include <SegmentedViewer.h>}
+        code0 {\#include "SegmentedViewer.h"}
         class SegmentedViewer
       }
     }
@@ -230,7 +230,7 @@ class EditorConsoleGUI {open : {public EditorConsoleBase}
       Fl_Box sourceWin {
         label label
         xywh {1 1 256 256} labeltype NO_LABEL
-        code0 {\#include <SourceViewer.h>}
+        code0 {\#include "SourceViewer.h"}
         class SourceViewer
       }
       Fl_Round_Button flipX {
@@ -256,7 +256,7 @@ class EditorConsoleGUI {open : {public EditorConsoleBase}
       Fl_Box binaryWin {
         label label
         xywh {0 0 25 25} labeltype NO_LABEL
-        code0 {\#include <BinaryViewer.h>}
+        code0 {\#include "BinaryViewer.h"}
         class BinaryViewer
       }
     }

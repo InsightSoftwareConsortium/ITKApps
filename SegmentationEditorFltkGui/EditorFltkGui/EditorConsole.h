@@ -18,7 +18,7 @@
 #define EDITORCONSOLE
 
 
-#include <EditorConsoleGUI.h>
+#include "EditorConsoleGUI.h"
 
 
 class EditorConsole : public EditorConsoleGUI {

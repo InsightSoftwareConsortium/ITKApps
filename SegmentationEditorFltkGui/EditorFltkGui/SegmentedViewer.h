@@ -29,11 +29,11 @@
 
 #include <FL/Fl.H>
 #include <FL/Fl_Gl_Window.H>
-#include <vtkFlImageViewer.h>
+#include "vtkFlImageViewer.h"
 
 #include <vtkImageResample.h>
-#include <vtkPatchedImageReader.h>
-#include <vtkWSLookupTableManager.h>
+#include "vtkPatchedImageReader.h"
+#include "vtkWSLookupTableManager.h"
 
 class SourceViewer;
 

@@ -33,14 +33,14 @@
 // FLTK
 #include <FL/x.H>
 // vtk
-#include <vtkImageViewer.h>
+#include "vtkImageViewer.h"
 
 #include <vtkInteractorStyle.h>
 #include <vtkVersion.h>
 #include <vtkCommand.h>
 
-#include <BinaryViewer.h>
-#include <SegmentedViewer.h>
+#include "BinaryViewer.h"
+#include "SegmentedViewer.h"
 
 //---------------------------------------------------------------------------
 SourceViewer::SourceViewer() : 

@@ -29,7 +29,7 @@
 
 #include <FL/Fl.H>
 #include <FL/Fl_Gl_Window.H>
-#include <vtkFlImageViewer.h>
+#include "vtkFlImageViewer.h"
 
 class BinaryViewer : public vtkFlImageViewer {
  public:

@@ -16,7 +16,7 @@
 =========================================================================*/
 
 
-#include <EditorConsoleBase.h>
+#include "EditorConsoleBase.h"
 #include <vtkProperty.h>
 
 

@@ -23,19 +23,19 @@
 #include "itkUnaryFunctorImageFilter.h"
 #include "itkScalarToRGBPixelFunctor.h"
 
-#include <vtkPatchedImageReader.h>
+#include "vtkPatchedImageReader.h"
 #include <vtkImageResample.h>
-#include <vtkWSLookupTableManager.h>
+#include "vtkWSLookupTableManager.h"
 #include <vtkColorTransferFunction.h>
 #include <vtkImageMapToColors.h>
-#include <vtkWSBoundingBoxManager.h>
-#include <vtkBinaryVolume.h>
+#include "vtkWSBoundingBoxManager.h"
+#include "vtkBinaryVolume.h"
 #include <vtkLookupTable.h>
 #include <vtkImageMapper.h>
 #include <vtkActor2D.h>
 #include <vtkRenderer.h>
 #include <vtkFlRenderWindowInteractor.h>
-#include <vtkBinaryVolumeLogic.h>
+#include "vtkBinaryVolumeLogic.h"
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkImageThreshold.h>
