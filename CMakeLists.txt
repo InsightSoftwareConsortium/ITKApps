@@ -228,7 +228,9 @@ SUBDIRS(MetaImageImporter)
 SUBDIRS(MetaImageReadWrite)
 
 # Test the conditions for building the MRIBiasCorrection example
+IF(NOT BORLAND)
 SUBDIRS(MRIBiasCorrection)
+ENDIF(NOT BORLAND)
 
 # Add an option to build FEM applications
 SUBDIRS(FEM)
