@@ -57,7 +57,7 @@ DeformableModelApplication
 
   const float alpha = 0.2;
   const float beta  = 0.1;
-  const float kappa = 0.0;
+  const float kappa = 0.5;
 
   m_InternalForceValueInput->value( alpha );
   m_ExternalForceValueInput->value( beta );

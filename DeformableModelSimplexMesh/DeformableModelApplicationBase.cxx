@@ -21,7 +21,7 @@ DeformableModelApplicationBase
   center.Fill(0);
  
   VectorType sphereRadius;
-  sphereRadius.Fill( 35.0 );
+  sphereRadius.Fill( 5.0 );
 
   m_SphereMeshSource->SetCenter(center);
   m_SphereMeshSource->SetScale( sphereRadius );
@@ -37,6 +37,13 @@ DeformableModelApplicationBase
 
   m_GradientFilter->SetInput( m_VolumeReader->GetOutput() );
   m_GradientFilter->SetSigma( 5.0 );
+
+  m_IterationObserver = IterationObserverType::New();
+  m_IterationObserver->SetCallbackFunction( this, & DeformableModelApplicationBase::IterationCallback );
+
+  m_DeformFilter->AddObserver( itk::IterationEvent(), m_IterationObserver );
+  m_DeformFilter->AddObserver( itk::ProgressEvent(), m_IterationObserver );
+
 }
 
 
@@ -69,4 +76,10 @@ DeformableModelApplicationBase::GetSeedPoint(double data[3])
   }
 }
 
+
+void 
+DeformableModelApplicationBase::IterationCallback()
+{
+  std::cout << "Iteration " << m_DeformFilter->GetProgress() << std::endl;
+}
 

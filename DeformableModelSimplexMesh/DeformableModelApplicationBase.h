@@ -13,6 +13,7 @@
 #include "itkTriangleMeshToSimplexMeshFilter.h"
 #include "itkVertexCell.h"
 #include "itkCellInterfaceVisitor.h"
+#include "itkCommand.h"
 
 #include "itkDeformableSimplexMesh3DBalloonForceFilter.h"
 #include "itkGradientRecursiveGaussianImageFilter.h"
@@ -93,6 +94,8 @@ public:
 
    typedef itk::GradientRecursiveGaussianImageFilter<VolumeType,GradientImageType> GradientFilterType;
 
+   typedef itk::SimpleMemberCommand< DeformableModelApplicationBase >         IterationObserverType;
+
 public:
   
   DeformableModelApplicationBase();
@@ -103,7 +106,7 @@ public:
   
   virtual void  GetSeedPoint(double data[3]); 
   
-  
+  virtual void  IterationCallback(); 
   
 protected:
   
@@ -127,6 +130,7 @@ protected:
 
   GradientFilterType::Pointer             m_GradientFilter;
   
+  IterationObserverType::Pointer          m_IterationObserver;
 };
 
 
