@@ -53,6 +53,7 @@ vtkFlImageViewer()
 SourceViewer::SourceViewer( int x, int y, int w, int h, const char *l ) : 
 vtkFlImageViewer(x,y,w,h)
 {
+  binaryVolume = 0;
 }
 //---------------------------------------------------------------------------
 SourceViewer::~SourceViewer()
@@ -245,6 +246,9 @@ void SourceViewer::UnpaintPixels(int x, int y) {
 
 //---------------------------------------------------------------------------
 void SourceViewer::SetPaintRadius(double r) {
+  if(binaryVolume == 0) 
+    return;
+
   binaryVolume->SetPaintRadius((int)r);
 }
 //---------------------------------------------------------------------------
