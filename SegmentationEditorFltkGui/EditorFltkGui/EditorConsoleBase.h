@@ -148,7 +148,7 @@ protected:
   
   vtkRenderer* ren1;
 
-  vtkFlRenderWindowInteractor* interactor;
+  //vtkFlRenderWindowInteractor* interactor;
 
 
 

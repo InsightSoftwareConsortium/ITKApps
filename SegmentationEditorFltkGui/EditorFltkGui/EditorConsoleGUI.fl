@@ -326,7 +326,7 @@ class EditorConsoleGUI {open : {public EditorConsoleBase}
       } {
         Fl_Round_Button paint1 {
           label Red
-          callback {ChangePaintValue(1);} selected
+          callback {ChangePaintValue(1);}
           xywh {1026 160 49 28} type Radio down_box ROUND_DOWN_BOX value 1
         }
         Fl_Round_Button paint2 {
@@ -430,6 +430,17 @@ class EditorConsoleGUI {open : {public EditorConsoleBase}
         callback {helpWin->hide();}
         xywh {200 330 100 30}
       }
+    }
+    Fl_Window renderConsole {
+      label Renderer open
+      xywh {264 243 256 256} labeltype NORMAL_LABEL resizable visible
+    } {
+      Fl_Box interactor {
+        label label selected
+        xywh {0 0 256 256} labeltype NO_LABEL visible
+        code0 {\#include <vtkFlRenderWindowInteractor.h>}
+        class vtkFlRenderWindowInteractor
+      } 
     }
   }
   Function {~EditorConsoleGUI()} {return_type virtual

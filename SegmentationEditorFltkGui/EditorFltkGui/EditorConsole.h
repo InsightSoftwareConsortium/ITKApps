@@ -85,6 +85,7 @@ private:
   int window_Y;
   int console_X;
   int console_Y;
+  bool first_render;
 };
 
 

@@ -109,13 +109,13 @@ EditorConsoleBase
   ren1 = vtkRenderer::New();
   ren1->SetViewport(0, 0, 1, 1);
 
-  interactor = vtkFlRenderWindowInteractor::New();
-  interactor->SetRenderWindow( renWin );
-  interactor->Initialize();
+  //interactor = vtkFlRenderWindowInteractor::New();
+  //interactor->SetRenderWindow( renWin );
+  //interactor->Initialize();
 
   has_data[0] = has_data[1] = has_data[2] = has_data[3] = false;
 
-  AddSurfaceRenderer(1, 0.5, 0.5, 0.0); 
+  AddSurfaceRenderer(1, 0.5, 0.0, 0.0); 
 
   for(int i=0; i<4; i++) {
     vtk_antialiaser[i] = vtkWindowedSincPolyDataFilter::New();
@@ -187,9 +187,9 @@ EditorConsoleBase
   if(ren1) {
     ren1->Delete();
   }
-  if(interactor) {
-    interactor->Delete();
-  }
+  //  if(interactor) {
+  //    interactor->Delete();
+  //}
   for(int i=1; i<4; i++) {
     if(has_data[i]) {
       thresher[i]->Delete();

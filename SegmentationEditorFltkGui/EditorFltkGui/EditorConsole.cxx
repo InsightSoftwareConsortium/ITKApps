@@ -50,6 +50,10 @@ EditorConsole
 
   (sourceWin->GetRenderer())->AddActor2D(overlayActor);
 
+  interactor->SetRenderWindow( renWin );
+  interactor->Initialize();
+  first_render = true;
+
   helpOut->value("SEGMENTATION EDITOR MODULE:
 
 This module allows you to manipulate the output
@@ -301,8 +305,6 @@ void EditorConsole
   segmentedConsole->show();
   sourceConsole->show();
   binaryConsole->show();
-
-
 }
 
 /************************************
@@ -314,10 +316,11 @@ void EditorConsole
 ::Hide()
 {
   consoleWindow->hide();
-  interactor->hide();
+  //interactor->hide();
   segmentedConsole->hide();
   sourceConsole->hide();
   binaryConsole->hide();
+  renderConsole->hide();
 }
 
 /************************************
@@ -547,6 +550,10 @@ void EditorConsole::UndoLastMerge() {
  *
  ************************************/
 void EditorConsole::ToggleAntialiasing() {
+  if(first_render) {
+    renderConsole->show();
+    first_render = false;
+  }
 
   if(vtk_antialiasing->value()) {
     for(int i=1; i<4; i++) {
@@ -712,11 +719,20 @@ void EditorConsole::AddSurfaceRenderer(int isovalue, float r, float g, float b) 
  ***********************************/
 void EditorConsole::AddRenderer(int isovalue) 
 {
-  float r = 0.5;
-  float g = 0.2;
-  float b = 0.3;
+  switch(isovalue) {
+  case 1:
+    EditorConsoleBase::AddSurfaceRenderer(isovalue, 0.5, 0.0, 0.0);
+    break;
+  case 2:
+    EditorConsoleBase::AddSurfaceRenderer(isovalue, 0.0, 0.25, 0.0);
+    break;
+  case 3:
+    EditorConsoleBase::AddSurfaceRenderer(isovalue, 0.0, 0.0, 0.3);
+    break;
+  default:
+    EditorConsoleBase::AddSurfaceRenderer(isovalue, 1.0, 1.0, 1.0);
+  }
 
-  EditorConsoleBase::AddSurfaceRenderer(isovalue, r, g, b);
 
   thresher[isovalue]->SetInput(binaryVolume);
   marcher[isovalue]->SetInput(thresher[isovalue]->GetOutput());
