@@ -73,6 +73,9 @@ Cell
   m_Radius      = DefaultRadius;
   m_Color       = DefaultColor;
   
+  m_Pressure  = 0.0f;
+  m_Force.Fill( 0.0f );
+
   m_ParentIdentifier = 0;    // Parent cell has to write here
 
   // The first Cell is numbered as 1
