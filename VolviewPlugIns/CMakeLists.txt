@@ -56,6 +56,7 @@ SET (PLUGINS
   vvITKMedian
   vvITKSigmoid
   vvITKShapeDetectionModule
+  vvITKSurfaceSpline
   vvITKThresholdSegmentationLevelSet
   vvITKVectorConfidenceConnected
   vvITKWatershedModule
