@@ -420,7 +420,7 @@ SNAPLevelSetDriver
 
 void 
 SNAPLevelSetDriver
-::AssignParametersToPhi(const SnakeParameters &p, bool firstTime)
+::AssignParametersToPhi(const SnakeParameters &p, bool irisNotUsed(firstTime))
 {
   // Set up the level set function
   m_LevelSetFunction->SetAdvectionWeight(p.GetAdvectionWeight());

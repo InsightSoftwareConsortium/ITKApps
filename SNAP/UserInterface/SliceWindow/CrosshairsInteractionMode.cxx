@@ -54,7 +54,7 @@ CrosshairsInteractionMode
 
 int
 CrosshairsInteractionMode
-::OnMouseWheel(const FLTKEvent &event)
+::OnMouseWheel(const FLTKEvent &irisNotUsed(event))
 {
   // Get the amount of the scroll
   float scroll = (float) Fl::event_dy();

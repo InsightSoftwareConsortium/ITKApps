@@ -827,7 +827,7 @@ TestCompareLevelSets
 
 void 
 TestCompareLevelSets
-::IterationCallback(itk::Object *object, const itk::EventObject &event)
+::IterationCallback(itk::Object *object, const itk::EventObject &irisNotUsed(event))
 {
   static clock_t lastTime = clock();
   clock_t currentTime = clock();

@@ -119,8 +119,8 @@ public:
     return GetValueWithDefault(m_String,m_Null,defaultValue);
   }
 
-  template <class T, int VSize> vnl_vector_fixed<T,VSize>
-    operator[](const vnl_vector_fixed<T,VSize> &defaultValue) 
+  template <class T, int VSize> iris_vector_fixed<T,VSize>
+    operator[](const iris_vector_fixed<T,VSize> &defaultValue) 
   {
     return GetValueWithDefault(m_String,m_Null,defaultValue);
   }

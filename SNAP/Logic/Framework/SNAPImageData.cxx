@@ -380,49 +380,6 @@ SNAPImageData
   // Crop by the largest possible region
   regInitialization.Crop(imgBubbles->GetLargestPossibleRegion());
 
-  /*
-  // 3. Create the inverse of the bubble image
-  typedef UnaryFunctorImageFilter<BubbleImageType,BubbleImageType,
-    InvertFunctor> InvertFilterType;
-  InvertFilterType::Pointer fltInvert = InvertFilterType::New();
-  fltInvert->SetInput(imgBubbles);
-  fltInvert->ReleaseDataFlagOn();
-
-  // 4. Compute the signed distance function from the bubble image
-  typedef DanielssonDistanceMapImageFilter
-    <BubbleImageType,FloatImageType> DistanceFilterType;
-  DistanceFilterType::Pointer fltDistanceOutside = DistanceFilterType::New();
-  fltDistanceOutside->SetInput(imgBubbles);
-  fltDistanceOutside->SetInputIsBinary(true);
-  fltDistanceOutside->GetOutput()->SetRequestedRegion(regInitialization);
-  fltDistanceOutside->ReleaseDataFlagOn();  
-  
-  // 5. Compute the second distance function
-  DistanceFilterType::Pointer fltDistanceInside = DistanceFilterType::New();
-  fltDistanceInside->SetInput(fltInvert->GetOutput());
-  fltDistanceInside->SetInputIsBinary(true);
-  fltDistanceInside->GetOutput()->SetRequestedRegion(regInitialization);
-  fltDistanceInside->ReleaseDataFlagOn();
-
-  // Compute the distance transforms
-  fltDistanceOutside->Update();
-  fltDistanceInside->Update(); 
-
-  // 6. Subtract the inside from the outside, forming a signed distance map
-  typedef SubtractImageFilter<FloatImageType,
-    FloatImageType,FloatImageType> SubtractFilterType;
-  SubtractFilterType::Pointer fltSubtract = SubtractFilterType::New();
-  fltSubtract->SetInput1(fltDistanceOutside->GetDistanceMap());
-  fltSubtract->SetInput2(fltDistanceInside->GetDistanceMap());
-
-  // Make sure the update only applies to a region of the image
-  FloatImageType::Pointer imgDistance = fltSubtract->GetOutput();
-  imgDistance->SetRequestedRegion(regInitialization);
-
-  // Update this filter.  Now we have a distance transform image
-  fltSubtract->Update();
-  */
-
   // Construct and run the signed distance filter
   typedef SignedDistanceFilter<BubbleImageType,FloatImageType> DistanceFilterType;
   DistanceFilterType::Pointer fltDistance = DistanceFilterType::New();
@@ -691,6 +648,7 @@ SNAPImageData
   
   // Call the driver's begin method with our intermediate callback
   m_LevelSetDriver->BeginUpdate(terminatingCallback);
+  m_LevelSetDriver->RequestIterations(nIterations);
 }
 
 void

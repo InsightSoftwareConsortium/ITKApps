@@ -667,7 +667,7 @@ PreprocessingUILogic
 
 void 
 PreprocessingUILogic
-::OnEdgeProgress(itk::Object *object, const itk::EventObject &event)
+::OnEdgeProgress(itk::Object *object, const itk::EventObject &irisNotUsed(event))
 {
   // Get the value of the progress
   float progress = reinterpret_cast<ProcessObject *>(object)->GetProgress();
@@ -681,7 +681,7 @@ PreprocessingUILogic
 
 void 
 PreprocessingUILogic
-::OnThresholdProgress(itk::Object *object, const itk::EventObject &event)
+::OnThresholdProgress(itk::Object *object, const itk::EventObject &irisNotUsed(event))
 {
   // Get the value of the progress
   float progress = reinterpret_cast<ProcessObject *>(object)->GetProgress();

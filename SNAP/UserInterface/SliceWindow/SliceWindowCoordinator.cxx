@@ -101,7 +101,7 @@ SliceWindowCoordinator
 
 void
 SliceWindowCoordinator
-::OnZoomUpdateInWindow(unsigned int window, float zoom)
+::OnZoomUpdateInWindow(unsigned int irisNotUsed(window), float zoom)
 {
   // Only if initialized
   assert(m_WindowsRegistered);

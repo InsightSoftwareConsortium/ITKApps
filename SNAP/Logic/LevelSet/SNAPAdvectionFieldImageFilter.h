@@ -36,7 +36,7 @@ class SNAPAdvectionFieldImageFilter:
 public:
   /** Image dimension. */
   itkStaticConstMacro(ImageDimension, unsigned int,
-                      InputImageType::ImageDimension);    
+                      TInputImage::ImageDimension);    
   
   /** Input image types */
   typedef TInputImage                                          InputImageType;

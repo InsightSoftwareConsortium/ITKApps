@@ -195,7 +195,7 @@ SnakeParametersPreviewBox::Interactor
 
 int
 SnakeParametersPreviewBox::Interactor
-::OnMouseRelease(const FLTKEvent &event, const FLTKEvent &pressEvent)
+::OnMouseRelease(const FLTKEvent &event, const FLTKEvent &irisNotUsed(pressEvent))
 {
   if(m_ControlPicked)
     {
@@ -212,7 +212,7 @@ SnakeParametersPreviewBox::Interactor
 
 int
 SnakeParametersPreviewBox::Interactor
-::OnMouseDrag(const FLTKEvent &event, const FLTKEvent &pressEvent)
+::OnMouseDrag(const FLTKEvent &event, const FLTKEvent &irisNotUsed(pressEvent))
 {
   if(m_ControlPicked)
     {
