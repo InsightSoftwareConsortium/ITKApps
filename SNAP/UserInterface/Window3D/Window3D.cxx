@@ -866,7 +866,7 @@ Window3D
 }
 
 // Get a copy of the viewport/m_Modelview/projection matrices OpenGL uses
-void Window3D::ComputeMatricies( int *vport, double *mview, double *proj )
+void Window3D::ComputeMatricies( GLint *vport, double *mview, double *proj )
 {
   // Compute the center of rotation  
   Vector3ui crosshair = m_GlobalState->GetCrosshairsPosition();
@@ -892,7 +892,7 @@ void Window3D::ComputeMatricies( int *vport, double *mview, double *proj )
 }
 
 void Window3D::ComputeRay( int x, int y, double *mvmatrix, double *projmatrix,
-                           int *viewport, Vector3d &v, Vector3d &r )
+                           GLint *viewport, Vector3d &v, Vector3d &r )
 {
   int val;
   val = gluUnProject( (GLdouble) x, (GLdouble) y, 0.0,
@@ -1306,6 +1306,9 @@ void Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.13  2004/01/27 17:34:00  pauly
+ *FIX: Compiling on Mac OSX, issue with GLU include file
+ *
  *Revision 1.12  2003/11/25 23:32:48  pauly
  *FIX: Snake evolution did not work in multiprocessor mode
  *

@@ -218,9 +218,9 @@ private:
   void MouseCutPressFunc(int button);
   void SetupModelView();
   void SetupProjection();
-  void ComputeMatricies( int *vport, double *mview, double *proj );
+  void ComputeMatricies( GLint *vport, double *mview, double *proj );
   void ComputeRay( int x, int y, double *mvmatrix, double *projmat,
-                   int *viewport, Vector3d &v, Vector3d &r );
+                   GLint *viewport, Vector3d &v, Vector3d &r );
 
   /** Try to compute cut plane.  Return false if the points coincide */
   bool ComputeCutPlane(int wx1, int wy1, int wx2, int wy2);
@@ -243,6 +243,9 @@ private:
 
 /*
  *Log: Window3D.h
+ *Revision 1.6  2004/01/27 17:34:00  pauly
+ *FIX: Compiling on Mac OSX, issue with GLU include file
+ *
  *Revision 1.5  2003/10/09 22:45:15  pauly
  *EMH: Improvements in 3D functionality and snake parameter preview
  *

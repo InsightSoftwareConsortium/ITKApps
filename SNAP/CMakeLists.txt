@@ -188,7 +188,6 @@ SET(APPLICATION_CXX
 
 # The source code for SNAP testing project
 SET(TESTING_CXX
-  Testing/Compatibility/SnakeWrapper.cxx
   Testing/SNAPTestDriver.cxx
   Testing/TestCompareLevelSets.cxx
   Testing/TestMain.cxx
@@ -205,7 +204,6 @@ SET(TESTING_HEADERS
   Testing/TestBase.h
   Testing/TestCompareLevelSets.h
   Testing/TestImageWrapper.h
-  Testing/Compatibility/SnakeWrapper.h
 )
 
 # The FL files for SNAP
@@ -399,9 +397,6 @@ INCLUDE_DIRECTORIES(
   ${MY_SOURCE_DIR}/Logic/Preprocessing
   ${MY_SOURCE_DIR}/Logic/Slicing
   ${MY_SOURCE_DIR}/Testing
-  ${MY_SOURCE_DIR}/Testing/Compatibility
-  ${MY_SOURCE_DIR}/Testing/Compatibility/CVS
-  ${MY_SOURCE_DIR}/UserInterface
   ${MY_SOURCE_DIR}/UserInterface/BasicComponents
   ${MY_SOURCE_DIR}/UserInterface/Common
   ${MY_SOURCE_DIR}/UserInterface/ImageIOWizard
