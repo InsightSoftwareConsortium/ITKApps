@@ -193,8 +193,19 @@ WatershedModule<TInputPixelType>
   m_GradientMagnitudeFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
   m_WatershedFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
 
+  m_GradientMagnitudeFilter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
+  m_WatershedFilter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
+
+  m_GradientMagnitudeFilter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
+  m_WatershedFilter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
+
   // Execute the filters and progressively remove temporary memory
+  this->SetCurrentFilterProgressWeight( 0.2 );
+  this->SetUpdateMessage("Preprocessing with gradient magnitude...");
   m_GradientMagnitudeFilter->Update();
+
+  this->SetCurrentFilterProgressWeight( 0.8 );
+  this->SetUpdateMessage("Computing watersheds...");
   m_WatershedFilter->Update();
 
   if( m_PerformPostprocessing )
@@ -216,6 +227,8 @@ void
 WatershedModule<TInputPixelType>
 ::PostProcessData( const vtkVVProcessDataStruct * pds )
 {
+
+  this->SetUpdateMessage("Extracting basin of the seed point...");
 
   // Copy the data (with casting) to the output buffer provided by the Plug In API
   typedef typename WatershedFilterType::OutputImageType   LabeledImageType;
