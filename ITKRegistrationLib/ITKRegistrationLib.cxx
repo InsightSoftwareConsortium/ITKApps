@@ -19,6 +19,7 @@
 #include "itkImage.h"
 #include "itkArray.h"
 #include "itkPoint.h"
+#include "vnl/vnl_vector.txx"
 
 #include "itkImageRegionIterator.h"
 #include "itkStatisticsImageFilter.h"
