@@ -97,30 +97,30 @@ public:
   // Description:
   // Set/Unset/Get use of Mattes Mutual Information 
   void MattesOn()
-    { UseMattes = true; }
+    { UseMattes = true;  UseViolaWells = false; }
   void MattesOff()
-    { UseMattes = false; }
+    { UseMattes = false; UseViolaWells = true; }
   bool GetMattes()
     { return UseMattes; }
 
   // Description:
   // Set/Unset/Get use of Viola-Wells Mutual Information 
   void ViolaWellsOn()
-    { UseViolaWells = true; }
+    { UseViolaWells = true; UseMattes = false; }
   void ViolaWellsOff()
-    { UseViolaWells = false; }
+    { UseViolaWells = false; UseMattes = true; }
   bool GetViolaWells()
     { return UseViolaWells; }
 
   // Description:
   // Set the transform to Affine
   void SetModeToAffine()
-    { AffineMode = true; }
+    { AffineMode = true;  QuaternionRigidMode = false; }
 
   // Description:
   // Set the transform to Quaternion Rigid
   void SetModeToQuaternionRigid()
-    { QuaternionRigidMode = true; }
+    { QuaternionRigidMode = true;  AffineMode = false; }
 
   // Description:
   // Set the number of iterations
