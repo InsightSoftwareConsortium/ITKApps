@@ -1,0 +1,256 @@
+<html>
+
+<body>
+
+<p>3D Registration Tool Help<br>
+
+</p>
+
+<hr>
+
+<p>Overview</p>
+
+<ol>
+
+  <li><a href="#Introduction">Introduction</a></li>
+
+  <li><a href="#Use">How to use the software</a></li>
+
+  <li><a href="#Save">How to save your work</a></li>
+
+  <li><a href="#Load">How to load your previous work</a></li>
+
+  <li><a href="#AdvancedOptions">How to use the 'Advanced Options'</a></li>
+
+  <li><a href="#Questions">More questions ???</a></li>
+
+</ol>
+
+<hr>
+
+<ol>
+
+  <li>Introduction<a name="Introduction"></a> <a href="#"> </a><a href="#">=&gt; 
+
+    back to top</a></li>
+
+  <p>This tool has been created in order to rigidly register different modalities 
+
+    images. The method is made of two steps:</p>
+
+  <ul>
+
+    <li> pre-registration step, which is a landmark-based registration technique. 
+
+      That method minimize the square distances between the landmarks.</li>
+
+    <li>registration step, which uses the mutual information registration technique 
+
+      implemented in the Insight Toolkit (www.itk.org)</li>
+
+  </ul>
+
+  <br>
+
+  <li>How to use the software<a name="Use"></a> <a href="#">=&gt; back to top</a></li>
+
+  <p>Is that the first time you use this tool ??? well, here is the steps to follow 
+
+    in order to register images.</p>
+
+  <p>1) Select a reference image by clicking on the &quot;Select Reference image...&quot; 
+
+    button (upper left corner of the interface). Once you click on that button, 
+
+    a file browser window will appear. Select the file you want to use as a fixed 
+
+    image, and click &quot;OK&quot; when you are ready to go on.</p>
+
+  <p>2) Select an image to register with the reference image you have previously 
+
+    selected by clicking on the &quot;Select Moving image...&quot; button (left 
+
+    side of the interface). Proceed like the previous step with the file browser.</p>
+
+  <p>At that point, you have two different options. If you want to run the <i><b><font color="#FF0000">registration 
+
+    only</font></b></i>, without previous pre-registration, follow the following 
+
+    step.</p>
+
+  <p>3) If you want to register the images, without running the pre-registration, 
+
+    just click now on the register button, located in the lower part of the interface.</p>
+
+  <p>If you need to run the <i><font color="#FF0000"><b>pre-registration</b></font></i> 
+
+    on your images first, and <i><b><font color="#FF0000">then</font></b></i> 
+
+    apply the<i><b><font color="#FF0000"> registration</font></b></i> on the pre-registered 
+
+    data, follow the instructions below:</p>
+
+  <p>3) If you want to pre-register the images before running the registration 
+
+    method, you have to select four landmarks on both the reference, and the moving 
+
+    image. To do so, click on one of the button labelled 'Landmark x', then click 
+
+    on the image viewer on the rigth side of the button at the spot where you 
+
+    want to place the landmark x. Once a landmark is set up, it will be checked 
+
+    in the inferface. Follow the same protocol for each of the landmarks. The 
+
+    'Go to...' button located on the right side of each landmark button allows 
+
+    you to jump to the slice where the corresponding landmarks has been placed. 
+
+    Once all the landmarks are checked (selected), you can click the 'Pre-Register' 
+
+    button which is in the lower part of the interface. </p>
+
+  <p>4) Run the registration by clicking the 'Register' button right below the 
+
+    'Pre-Register' button.</p>
+
+  <p>&nbsp;</p>
+
+  <li>How to save your work <a name="Save"></a> <a href="#">=&gt; back to top</a> 
+
+    <ul>
+
+      <li>Saving the pre-registered image <br>
+
+        To save the pre-registered image, go to the'File' menu, and select 'Save 
+
+        pre-registered moving image...'. A file browser window will show up, and 
+
+        allow you to select the directory in which you want to save the pre-registered 
+
+        image. You can type in the name of the file in the 'Filename' field located 
+
+        at the bottom of the file browser. Click 'OK' and the file will be saved. 
+
+      </li>
+
+    </ul>
+
+    <ul>
+
+      <li>Saving the registered image <br>
+
+        To save the registered image, go to the 'File' menu, and select 'Save 
+
+        registered moving image...'. Then follow the instructions already mentioned 
+
+        above for the pre-registered image. </li>
+
+    </ul>
+
+    <ul>
+
+      <li>Saving your study <br>
+
+        You can also save your current study, which means the images selected, 
+
+        the landmarks, and the pre-registration as well as the registration. In 
+
+        order to save the study in progress, go to the 'File' menu, click on 'Save 
+
+        study...', and then follow the instructions provided above. </li>
+
+    </ul>
+
+    <p>&nbsp;</p>
+
+  <li>How to load your previous work<a name="Load"></a> </li>
+
+  <a href="#">=&gt; back to top</a> 
+
+  <ul>
+
+    <li>Loading a study <br>
+
+      Go to the 'File' menu, click on 'Load study...' and select the study you 
+
+      want to load up using the file browser that shows up. Click 'Ok' to confirm 
+
+      your choise, and wait a few seconds for the study to load into the program. 
+
+    </li>
+
+  </ul>
+
+  <ul>
+
+    <li>Loading landmarks <br>
+
+      To load landmarks for an image, click on the 'Load landmarks...' button 
+
+      located on the left side of the window where the image is displayed. Select 
+
+      the file you want to load up using the file browser, and click 'OK' to confirm 
+
+      your choice. The landmarks loaded appear in the corresponding display. </li>
+
+  </ul>
+
+  <p>&nbsp;</p>
+
+  <li>How to use the 'Advanced Options' <a name="AdvancedOptions"></a> <a href="#">=&gt; 
+
+    back to top</a> </li>
+
+  <ul>
+
+    <li>Selecting the region to register</li>
+
+    <br>
+
+    Click <a href="RegionSelectionHelp.html">&lt;here&gt;</a> to go to the 'region 
+
+    selection' help pages. 
+
+  </ul>
+
+  <ul>
+
+    <li>Setting the movement parameters, the number of iterations, and the learning 
+
+      rate<br>
+
+      Click <a href="RegistrationParametersHelp.html">&lt;here&gt;</a> to go to 
+
+      the 'registration parameter' help pages. </li>
+
+  </ul>
+
+  <p>&nbsp;</p>
+
+  <li>More questions ???<a name="Questions"></a> <a href="#">=&gt; back to top</a> 
+
+  </li>
+
+  <p>If you have further questions about this tool, need more help, or find a 
+
+    bug in the program, feel free to contact us at the following email address: 
+
+    <a href="%20">piloo@unc.edu</a>.<br>
+
+    Any comments are very welcome, and thank you for your interest in our work.</p>
+
+  <p>&nbsp;</p>
+
+  <p align="left">Computer Aided Display and Diagnosis Laboratories<br>
+
+    University of North Carolina at Chapel Hill<br>
+
+    Check out our website at: <a href="http://caddlab.rad.unc.edu">http://caddlab.rad.unc.edu</a></p>
+
+</ol>
+
+</body>
+
+</html>
+
