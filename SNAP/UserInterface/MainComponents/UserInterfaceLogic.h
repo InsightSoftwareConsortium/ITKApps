@@ -760,11 +760,6 @@ private:
    */
   void SyncSnakeToIRIS();
 
-  /** Snake callback, called repeatedly while we are on the step 3 of the 
-   * SNAP wizard */
-  void OnSnakeVCRUpdateCallback();
-  void OnSnakeVCRIdleCallback();
-
   /** Common code for cancelling and accepting the segmentation */
   void CloseSegmentationCommon();
 
@@ -784,6 +779,9 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.20  2004/08/26 18:29:19  pauly
+ *ENH: New user interface for configuring the UI options
+ *
  *Revision 1.19  2004/08/03 23:26:32  ibanez
  *ENH: Modification for building in multple platforms. By Julien Jomier.
  *

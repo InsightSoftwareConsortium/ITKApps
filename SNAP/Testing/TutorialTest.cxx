@@ -28,18 +28,6 @@
 #include "vtkPolyDataWriter.h"
 
 /** 
- * This class is used to drive the interactive segmentation pipeline in SNAP. 
- * It defines callbacks that interact with the pipeline and simulate user 
- * interaction with SNAP */
-class TutorialTestSegmentationInteractor 
-{
-public:
-  SNAPImageData *snapData;
-  void IdleCallback();
-  void UpdateCallback();
-};
-
-/** 
  * This function is designed to serve as a tutorial through the classes 
  * that form the logical framework of SNAP. In this test, the student will
  * be able to load images, perform preprocessing, initialize and run segmentation,
@@ -305,46 +293,20 @@ int main(int argc, char *argv[])
   /* We can now initialize the segmentation pipeline. In addition to the 
    * snake parameters and the bubbles, we need to specify the color label to 
    * be used for the snake-based segmentation */
-  snapData->InitializeSegmentationPipeline(
+  snapData->InitializeSegmentation(
     parameters,bubbles,2,application.GetGlobalState()->GetDrawingColorLabel());
 
-  /* Now the pipeline is initialized and ready to run. There are two ways to 
-   * start the segmentation in SNAP. The first is to perform 'non-interactive' 
-   * segmentation, where the snake is evolved over some iterations and then the
-   * method returns control to the caller. This is illustrated here: */
-  // snapData->RunNonInteractiveSegmentation(250);
+  /* Now the pipeline is initialized and ready to run. Run 250 iterations */
+  snapData->RunSegmentation(250);
 
-  /* The alternative is to have an interactive, stop-and-go segmentation. In this
-   * mode, a pair of callbacks must be specified. After each iteration in the 
-   * segmentation loop, the updateCallback() method is called once. Afterwards,
-   * the idleCallback is called repeatedly, until the callback method issues a 
-   * command to proceed to the next iteration or to abort segmentation. This 
-   * interactive approach allows SNAP to implement a VCR-style control for snake
-   * propagation. We illustrate this approach here.
-   *
-   * First, we create Command objects pointing to a callback functions, which
-   * are defined in the class at the bottom of this file.
-   */
-  TutorialTestSegmentationInteractor testInteractor;
-  testInteractor.snapData = snapData;
+  /* We can also rewind the segmentation */
+  snapData->RestartSegmentation();
 
-  typedef itk::SimpleMemberCommand<TutorialTestSegmentationInteractor>
-    CallbackCommandType;
-  CallbackCommandType::Pointer idleCommand = CallbackCommandType::New();
-  CallbackCommandType::Pointer updateCommand = CallbackCommandType::New();
-  idleCommand->SetCallbackFunction(
-    &testInteractor,&TutorialTestSegmentationInteractor::IdleCallback);  
-  updateCommand->SetCallbackFunction(
-    &testInteractor,&TutorialTestSegmentationInteractor::UpdateCallback);
-  
-  /* Now we start the segmentation pipeline. This call will not return until 
-   * the segmentation pipeline finishes executing. Instead, the control will 
-   * be passed on to the callback methods */
-  snapData->StartSegmentationPipeline(idleCommand,updateCommand);
-
-  /* The callback returns only once segmentation is complete. At this point, we
-   * must release the resources associated with the pipeline */
-  // snapData->ReleaseSegmentationPipeline();
+  /* And we can change the parameters on the fly */
+  snapData->RunSegmentation(100);
+  parameters.SetAdvectionWeight(3.0);
+  snapData->SetSegmentationParameters(parameters);
+  snapData->RunSegmentation(200);
 
   /* Now the segmentation is done. The Snake image wrapper contains a floating
    * point image whose positive voxels correspond to the pixels outside of the
@@ -405,46 +367,6 @@ int main(int argc, char *argv[])
 
   /* Thank you for reading this tutorial! */
   return 0;
-}
-
-
-void TutorialTestSegmentationInteractor
-::IdleCallback()
-{
-  /* Normally, this method would be called repeatedly while the program is
-   * waiting for the user to initiate the next step in the segmentation 
-   * pipeline or to stop or rewind the segmentation. Since in this tutorial
-   * there is no user interaction, this method will do nothing */
-}
-
-void 
-TutorialTestSegmentationInteractor
-::UpdateCallback()
-{
-  /* The control comes here after initialization and each iteration of the
-   * segmentation pipeline */
-  static unsigned int count = 0;
-
-  /* Normally, this method would wait for the user to interact with the 
-   * program somehow. However, since in this example there is no user, we 
-   * will simply ask for another iteration until the iteration count reaches
-   * 250, at which point we will ask for it to stop */
-  if (++count % 500 != 0)
-    {
-    /* Here we are asking for another iteration, after which the control will
-     * return to the top of this method. Note that the Request... methods 
-     * return immediately, and the segmentation iteration is performed only 
-     * after this UpdateCallback() method itself returns */
-    snapData->RequestSegmentationStep(1);
-    cout << ".";
-    }
-  else
-    {
-    /* We are asking for a stop to segmentation. The control will return to
-     * the main program, following the call to StartSegmentationPipeline */
-    snapData->RequestSegmentationPipelineTermination();
-    cout << endl;
-    }      
 }
 
 // A global variable required for linkage

@@ -142,6 +142,7 @@ ImageWrapper<TPixel>
   m_Initialized = true;
 }
 
+/*
 template <class TPixel> 
 void 
 ImageWrapper<TPixel>
@@ -158,21 +159,46 @@ ImageWrapper<TPixel>
 
   UpdateImagePointer(newImage);
 }
+*/
 
 template <class TPixel>
 void 
 ImageWrapper<TPixel>
-::InitializeToImage(itk::ImageBase<3> *source) 
+::InitializeToWrapper(const ImageWrapperBase *source, ImageType *image) 
 {
-  itk::Size<3> size = source->GetLargestPossibleRegion().GetSize();
+  // Call the common update method
+  UpdateImagePointer(image);
+
+  // Update the slice index
+  SetSliceIndex(source->GetSliceIndex());
+
+  // Update the image-display transforms
+  for(unsigned int d=0;d<3;d++)
+    SetImageToDisplayTransform(d,source->GetImageToDisplayTransform(d));
+}
+
+template <class TPixel>
+void 
+ImageWrapper<TPixel>
+::InitializeToWrapper(const ImageWrapperBase *source, const TPixel &value) 
+{
+  // Allocate the image
   ImagePointer newImage = ImageType::New();
-  newImage->SetRegions(size);
+  newImage->SetRegions(source->GetImageBase()->GetBufferedRegion().GetSize());
   newImage->Allocate();
+  newImage->FillBuffer(value);
+  newImage->SetOrigin(source->GetImageBase()->GetOrigin());
+  newImage->SetSpacing(source->GetImageBase()->GetSpacing());
 
-  newImage->SetOrigin(source->GetOrigin());
-  newImage->SetSpacing(source->GetSpacing());
-
+  // Call the common update method
   UpdateImagePointer(newImage);
+
+  // Update the slice index
+  SetSliceIndex(source->GetSliceIndex());
+
+  // Update the image-display transforms
+  for(unsigned int d=0;d<3;d++)
+    SetImageToDisplayTransform(d,source->GetImageToDisplayTransform(d));
 }
 
 template <class TPixel>
@@ -473,6 +499,14 @@ ImageWrapper<TPixel>
 }
 
 template <class TPixel>    
+Vector3ui
+ImageWrapper<TPixel>
+::GetSliceIndex() const
+{
+  return m_SliceIndex;
+}
+
+template <class TPixel>    
 void 
 ImageWrapper<TPixel>
 ::SetSliceIndex(const Vector3ui &cursor)
@@ -505,6 +539,14 @@ ImageWrapper<TPixel>
   SetImageToDisplayTransform(2,id[2]);
 }
 
+
+template <class TPixel>    
+const ImageCoordinateTransform&
+ImageWrapper<TPixel>
+::GetImageToDisplayTransform(unsigned int iSlice) const 
+{
+  return m_ImageToDisplayTransform[iSlice];
+}
 
 template <class TPixel>    
 void 
@@ -542,14 +584,6 @@ ImageWrapper<TPixel>
 ::GetDisplaySliceImageAxis(unsigned int iSlice)
 {
   return m_Slicer[iSlice]->GetSliceDirectionImageAxis();
-}
-
-template <class TPixel>    
-Vector3ui
-ImageWrapper<TPixel>
-::GetSliceIndex() const
-{
-  return m_SliceIndex;
 }
 
 template <class TPixel>

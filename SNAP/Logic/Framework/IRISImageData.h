@@ -42,7 +42,7 @@ public:
   typedef itk::ImageRegion<3> RegionType;
 
   IRISImageData();
-  virtual ~IRISImageData();
+  virtual ~IRISImageData() {};
 
   /**
    * Returns a reference to color label at specified index.
@@ -84,26 +84,26 @@ public:
   /**
    * Access the greyscale image (read only access is allowed)
    */
-  GreyImageWrapper* GetGrey() const {
-    assert(m_GreyWrapper);
-    return m_GreyWrapper;
+  GreyImageWrapper* GetGrey() {
+    assert(m_GreyWrapper.IsInitialized());
+    return &m_GreyWrapper;
   }
 
   /**
    * Access the segmentation image (read only access allowed 
    * to preserve state)
    */
-  LabelImageWrapper* GetSegmentation() const {
-    assert(m_GreyWrapper && m_LabelWrapper);
-    return m_LabelWrapper;
+  LabelImageWrapper* GetSegmentation() {
+    assert(m_GreyWrapper.IsInitialized() && m_LabelWrapper.IsInitialized());
+    return &m_LabelWrapper;
   }
 
   /** 
    * Get the extents of the image volume
    */
   Vector3ui GetVolumeExtents() const {
-    assert(m_GreyWrapper != NULL);
-    assert(m_GreyWrapper->GetSize() == m_Size);
+    assert(m_GreyWrapper.IsInitialized());
+    assert(m_GreyWrapper.GetSize() == m_Size);
     return m_Size;
   }
 
@@ -192,10 +192,14 @@ public:
 
 protected:
   // Wrapper around the grey-scale image
-  GreyImageWrapper *m_GreyWrapper;
+  GreyImageWrapper m_GreyWrapper;
 
   // Wrapper around the segmentatoin image
-  LabelImageWrapper *m_LabelWrapper;
+  LabelImageWrapper m_LabelWrapper;
+
+  // A list of linked wrappers, whose cursor position and image geometry
+  // are updated concurrently
+  std::list<ImageWrapperBase *> m_LinkedWrappers;
 
   // A table of color labels
   ColorLabel m_ColorLabels[MAX_COLOR_LABELS];

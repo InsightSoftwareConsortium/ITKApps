@@ -77,7 +77,8 @@ public:
   /**
    * Clear the preprocessed (speed) image (discard data, etc)
    */
-  void ClearSpeed();
+  void ClearSpeed()
+    { m_SpeedWrapper.Reset(); }
 
   /**
    * Check the preprocessed image for validity
@@ -90,7 +91,8 @@ public:
   /**
    * Clear the current snake (discard data, etc)
    */
-  void ClearSnake();
+  void ClearSnake()
+    { m_SnakeWrapper.Reset(); }
 
   /**
    * Check the current snake for validity
@@ -122,58 +124,29 @@ public:
    * segmentation image with the bubbles, false will be returned and 
    * initialization will not be completed.  Otherwise, true will be returned.
    */
-  bool InitializeSegmentationPipeline(
+  bool InitializeSegmentation(
     const SnakeParameters &parameters,Bubble *bubbles, 
     unsigned int nBubbles, unsigned int labelColor);
 
-  /** Begin level set pipeline execution.  This method is somewhat peculiar,
-   * because it does not return until the pipeline has finished executing.  In
-   * the mean time, it communicates with the caller by the means of two callback
-   * commands, idleCallback and updateCallback, which it calls after some 
-   * iterations are executed.  Remember, do not put any code that deals with
-   * the segmentation pipeline after calling StartSegmentationPipeline! */
-  void StartSegmentationPipeline(
-    itk::Command *idleCallback,itk::Command *updateCallback);
+  /** Run the segmentation for a fixed number of iterations */
+  void RunSegmentation(unsigned int nIterations);
 
-  /** Request that the pipeline execute a number of iterations.  This method
-   * must be called from the idle or update callbacks passed in to the 
-   * StartSegmentationPipeline method.  After running the iterations, the
-   * pipeline will resume calling idleCallback continuously.  This method
-   * schedules a step and returns immideately */
-  void RequestSegmentationStep(unsigned int nIterations);
-
-  /** Request that the pipeline be restarted (brought back to the beginning).  
-   * This method will schedule the restart and will return immideately */
-  void RequestSegmentationRestart();
-
-  /** Request that the pipeline be shut down.  This method will return 
-   * immideately, but will schedule an exit from the pipeline mechanism.  If
-   * everything goes well, control will return to the point where 
-   * StartSegmentationPipeline was called */
-  void RequestSegmentationPipelineTermination();
+  /** Revert the segmentation to the beginning */
+  void RestartSegmentation();
 
   /** Update the segmentation parameters, can be done either from the 
    * segmentation pipeline callback or on the fly.  This method is smart enough 
    * to reinitialize the level set driver if the Solver parameter changes */
   void SetSegmentationParameters(const SnakeParameters &parameters);
 
+  /** Check if the segmentation is active */
+  bool IsSegmentationActive() const
+    { return m_LevelSetDriver != NULL; }
+
   /** Release the resources associated with the level set segmentation.  This 
    * method must be called once the segmentation pipeline has terminated, or 
    * else it would create a nasty crash */
-  void ReleaseSegmentationPipeline();
-
-  /** This method is an alternative to using the segmentation pipeline with 
-   * callbacks.  It will simply run nIterations of the solver and return with
-   * an updated SnakeWrapper.  Call this method after calling 
-   * InitializeSegmentationPipeline() */
-  void RunNonInteractiveSegmentation(int nIterations);
-
-  /** Check if the segmentation pipeline has been initialized */
-  bool IsSegmentationPipelineInitialized();
-
-  /** Check if the segmentation pipeline is actively running, i.e., the 
-   * stack frame contains the Update method of the segmentation filter */
-  bool IsSegmentationPipelineRunning();
+  void TerminateSegmentation();
 
   /** ====================================================================== */
   
@@ -182,16 +155,6 @@ public:
    * IRIS image data object.
    */
   void MergeSnakeWithIRIS(IRISImageData *target) const;
-
-  /**
-   * Set the cross-hairs position
-   */
-  void SetCrosshairs(const Vector3ui &crosshairs);
-
-  /**
-   * Set the image coordinate geometry
-   */
-  void SetImageGeometry(const ImageCoordinateGeometry &geometry);
 
   /**
    * Get the level set image currently being evolved
@@ -239,20 +202,20 @@ private:
   LevelSetImageWrapper* GetSnakeInitialization();
 
   /** Clear the snake initialization image (discard data, etc) */
-  void ClearSnakeInitialization();
+  void ClearSnakeInitialization()
+    { m_SnakeInitializationWrapper.Reset(); }
 
   /** Check the snake initialization image for validity */
   bool IsSnakeInitializationLoaded();
 
   // Speed image adata
-  SpeedImageWrapper *m_SpeedWrapper;
+  SpeedImageWrapper m_SpeedWrapper;
 
   // Wrapper around the level set image
-  LevelSetImageWrapper *m_SnakeWrapper;
+  LevelSetImageWrapper m_SnakeWrapper;
   
   // Snake initialization data (initial distance transform
-  LevelSetImageWrapper *m_SnakeInitializationWrapper;
-
+  LevelSetImageWrapper m_SnakeInitializationWrapper;
 
   // Snake driver
   SNAPLevelSetDriver<3> *m_LevelSetDriver;

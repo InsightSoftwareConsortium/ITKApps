@@ -373,7 +373,7 @@ AppearanceDialogUILogic
   e.ActiveColor[2] = (float) m_InColorActive->b();
   e.LineThickness = (float) m_InLineThickness->value();
   e.DashSpacing = (float) m_InDashSpacing->value();
-  e.FontSize = (float) m_InFontSize->value();
+  e.FontSize = (int) m_InFontSize->value();
   e.AlphaBlending = m_InAlphaBlending->value() != 0;
   e.Visible = m_InVisible->value() != 0;
   

@@ -23,6 +23,7 @@
 #include "UnaryFunctorCache.h"
 #include "itkRGBAPixel.h"
 #include "IRISSlicer.h"
+#include <list>
 
 /** Borland compiler is very lazy so we need to instantiate the template
  *  by hand */
@@ -88,12 +89,12 @@ IRISImageData
   Entry data[MAX_COLOR_LABELS];
 
   // Create an iterator for parsing the segmentation image
-  typedef ImageRegionConstIterator<LabelImageType> LabelIteratorType;
-  LabelIteratorType itLabel(m_LabelWrapper->GetImage(),this->GetImageRegion());
+  LabelImageWrapper::ConstIterator itLabel = 
+    m_LabelWrapper.GetImageConstIterator();
 
   // Another iterator for accessing the grey image
-  typedef ImageRegionConstIterator<GreyImageType> GreyIteratorType;
-  GreyIteratorType itGrey(m_GreyWrapper->GetImage(),this->GetImageRegion());
+  GreyImageWrapper::ConstIterator itGrey = 
+    m_GreyWrapper.GetImageConstIterator();
 
   // Compute the number, sum and sum of squares of grey intensities for each 
   // label
@@ -123,7 +124,7 @@ IRISImageData
     }
   
   // Compute the size of a voxel, in mm^3
-  const double *spacing = m_GreyWrapper->GetImage()->GetSpacing().GetDataPointer();
+  const double *spacing = m_GreyWrapper.GetImage()->GetSpacing().GetDataPointer();
   double volVoxel = spacing[0] * spacing[1] * spacing[2];
 
   // Open the selected file for writing
@@ -174,10 +175,10 @@ IRISImageData
 ::SetSegmentationVoxel(const Vector3ui &index, LabelType value)
 {
   // Make sure that the grey data and the segmentation data exist
-  assert(m_GreyWrapper && m_LabelWrapper);
+  assert(m_GreyWrapper.IsInitialized() && m_LabelWrapper.IsInitialized());
 
   // Store the voxel
-  m_LabelWrapper->GetVoxelForUpdate(index) = value;
+  m_LabelWrapper.GetVoxelForUpdate(index) = value;
 
   // Make sure this label is set as valid
   if (!m_ColorLabels[value].IsValid())
@@ -187,36 +188,27 @@ IRISImageData
     }
 
   // Mark the image as modified
-  m_LabelWrapper->GetImage()->Modified();
+  m_LabelWrapper.GetImage()->Modified();
 }
 
 IRISImageData
 ::IRISImageData() 
 {
-  m_GreyWrapper = NULL;
-  m_LabelWrapper = NULL;
+  // Populate the array of linked wrappers
+  m_LinkedWrappers.push_back(&m_GreyWrapper);
+  m_LinkedWrappers.push_back(&m_LabelWrapper);
 
+  // Initialize the color labels
   InitializeColorLabels();
 }
 
-
-IRISImageData
-::~IRISImageData() 
-{
-  if (m_LabelWrapper)
-    delete m_LabelWrapper;
-  if (m_GreyWrapper)
-    delete m_GreyWrapper;
-}
-
-// TODO: Clean up this code
 void 
 IRISImageData
 ::RelabelSegmentationWithCutPlane(const Vector3d &normal, double intercept,
                                   GlobalState *state) 
 {
   typedef ImageRegionIteratorWithIndex<LabelImageType> IteratorType;
-  IteratorType it(m_LabelWrapper->GetImage(),this->GetImageRegion());
+  IteratorType it(m_LabelWrapper.GetImage(), GetImageRegion());
 
   // Compute a label mapping table based on the color labels
   LabelType table[MAX_COLOR_LABELS];
@@ -253,26 +245,7 @@ IRISImageData
     }
   
   // Register that the image has been updated
-  m_LabelWrapper->GetImage()->Modified();
-}
-
-
-// TODO: Stick this somewhere
-int normalize(double* x, double* y, double* z)
-{
-  double x1 = *x;
-  double y1 = *y;
-  double z1 = *z;
-  double div = sqrt(x1*x1 + y1*y1 + z1*z1);
-
-  if (div == 0)
-    return 0;
-
-  *x = x1/div;
-  *y = y1/div;
-  *z = z1/div;
-
-  return 1;
+  m_LabelWrapper.GetImage()->Modified();
 }
 
 int 
@@ -280,7 +253,7 @@ IRISImageData
 ::GetRayIntersectionWithSegmentation(const Vector3d &point, 
                                      const Vector3d &ray, Vector3i &hit) const
 {
-  assert(m_LabelWrapper && m_LabelWrapper->GetImage());
+  assert(m_LabelWrapper.IsInitialized());
 
   Vector3ui lIndex;
   double delta[3][3], dratio[3];
@@ -290,15 +263,15 @@ IRISImageData
   double ry = ray[1];
   double rz = ray[2];
 
-  if ( (normalize(&rx, &ry, &rz)) < 0 )
-    return -1;
+  double rlen = rx*rx+ry*ry+rz*rz;
+  if(rlen == 0) return -1;
 
-  if (rx >=0) signrx = 1;
-  else signrx = -1;
-  if (ry >=0) signry = 1;
-  else signry = -1;
-  if (rz >=0) signrz = 1;
-  else signrz = -1;
+  double rfac = 1.0 / sqrt(rlen);
+  rx *= rfac; ry *= rfac; rz *= rfac;
+
+  if (rx >=0) signrx = 1; else signrx = -1;
+  if (ry >=0) signry = 1; else signry = -1;
+  if (rz >=0) signrz = 1; else signrz = -1;
 
   // offset everything by (.5, .5) [becuz samples are at center of voxels]
   // this offset will put borders of voxels at integer values
@@ -336,7 +309,7 @@ IRISImageData
     lIndex[1] = (int)py;
     lIndex[2] = (int)pz;
 
-    LabelType hitlabel = m_LabelWrapper->GetVoxel(lIndex);
+    LabelType hitlabel = m_LabelWrapper.GetVoxel(lIndex);
     const ColorLabel &cl = GetColorLabel(hitlabel);
 
     if (cl.IsValid() && cl.IsVisible())
@@ -417,7 +390,7 @@ Vector3f
 IRISImageData
 ::GetVoxelScaleFactor() 
 {
-  const double *spacing = this->m_GreyWrapper->GetImage()->GetSpacing().GetDataPointer();
+  const double *spacing = this->m_GreyWrapper.GetImage()->GetSpacing().GetDataPointer();
   Vector3f rtn;
   rtn[0]=(float)spacing[0];
   rtn[1]=(float)spacing[1];
@@ -431,28 +404,17 @@ IRISImageData
 ::SetGreyImage(GreyImageType *newGreyImage,
                const ImageCoordinateGeometry &newGeometry) 
 {
-  // Dispose of the old wrapper
-  if (m_GreyWrapper)
-    delete m_GreyWrapper;
-
-  // Dispose of the old segmentation wrapper
-  if (m_LabelWrapper)
-    delete m_LabelWrapper;
-
-  // Make a new wrapper
-  m_GreyWrapper = new GreyImageWrapper;
-  m_GreyWrapper->SetImage(newGreyImage);
+  // Make a new grey wrapper
+  m_GreyWrapper.SetImage(newGreyImage);
 
   // Clear the segmentation data to zeros
-  m_LabelWrapper = new LabelImageWrapper;
-  m_LabelWrapper->InitializeToImage(newGreyImage);
-  m_LabelWrapper->GetImage()->FillBuffer(0);
+  m_LabelWrapper.InitializeToWrapper(&m_GreyWrapper, (LabelType) 0);
 
   // The segmentation wrapper needs the label colors
-  m_LabelWrapper->SetLabelColorTable(m_ColorLabels);
+  m_LabelWrapper.SetLabelColorTable(m_ColorLabels);
 
   // Store the image size info
-  m_Size = m_GreyWrapper->GetSize();
+  m_Size = m_GreyWrapper.GetSize();
 
   // Pass the coordinate transform to the wrappers
   SetImageGeometry(newGeometry);
@@ -463,17 +425,19 @@ IRISImageData
 ::SetSegmentationImage(LabelImageType *newLabelImage) 
 {
   // Check that the image matches the size of the grey image
-  assert(m_GreyWrapper->GetImage()->GetBufferedRegion() == 
+  assert(m_GreyWrapper.IsInitialized() &&
+    m_GreyWrapper.GetImage()->GetBufferedRegion() == 
          newLabelImage->GetBufferedRegion());
 
   // Pass the image to the segmentation wrapper
-  m_LabelWrapper->SetImage(newLabelImage);
+  m_LabelWrapper.SetImage(newLabelImage);
 
   // Sync up spacing between the grey and label image
-  newLabelImage->SetSpacing(m_GreyWrapper->GetImage()->GetSpacing());
+  newLabelImage->SetSpacing(m_GreyWrapper.GetImage()->GetSpacing());
+  newLabelImage->SetOrigin(m_GreyWrapper.GetImage()->GetOrigin());
 
   // Update the validity of the labels
-  LabelImageWrapper::ConstIterator it = m_LabelWrapper->GetImageConstIterator();
+  LabelImageWrapper::ConstIterator it = m_LabelWrapper.GetImageConstIterator();
   while(!it.IsAtEnd())
     {
     if (!m_ColorLabels[it.Get()].IsValid())
@@ -492,14 +456,14 @@ bool
 IRISImageData
 ::IsGreyLoaded() 
 {
-  return(m_GreyWrapper != NULL);
+  return m_GreyWrapper.IsInitialized();
 }
 
 bool 
 IRISImageData
 ::IsSegmentationLoaded() 
 {
-  return(m_LabelWrapper != NULL);
+  return m_LabelWrapper.IsInitialized();
 }    
 
 void 
@@ -568,9 +532,13 @@ void
 IRISImageData
 ::SetCrosshairs(const Vector3ui &crosshairs)
 {
-  assert(m_GreyWrapper && m_LabelWrapper);  
-  m_GreyWrapper->SetSliceIndex(crosshairs);
-  m_LabelWrapper->SetSliceIndex(crosshairs);
+  std::list<ImageWrapperBase *>::iterator it = m_LinkedWrappers.begin();
+  while(it != m_LinkedWrappers.end())
+    {
+    ImageWrapperBase *wrapper = *it++;
+    if(wrapper->IsInitialized())
+      wrapper->SetSliceIndex(crosshairs);
+    }
 }
 
 
@@ -578,8 +546,8 @@ IRISImageData::RegionType
 IRISImageData
 ::GetImageRegion() const
 {
-  assert(m_GreyWrapper != NULL);
-  return m_GreyWrapper->GetImage()->GetLargestPossibleRegion();
+  assert(m_GreyWrapper.IsInitialized());
+  return m_GreyWrapper.GetImage()->GetBufferedRegion();
 }
 
 void
@@ -596,7 +564,7 @@ IRISImageData
   m_ColorLabels[index] = label;
 
   // Propagate the change to the label wrapper
-  m_LabelWrapper->SetLabelColorTable(m_ColorLabels);
+  m_LabelWrapper.SetLabelColorTable(m_ColorLabels);
 }                                                                                 
 
 void 
@@ -607,14 +575,18 @@ IRISImageData
   m_ImageGeometry = geometry;
 
   // Propagate the geometry to the image wrappers
-  for(unsigned int iSlice = 0;iSlice < 3;iSlice ++)
+  std::list<ImageWrapperBase *>::iterator it = m_LinkedWrappers.begin();
+  while(it != m_LinkedWrappers.end())
     {
-    if(m_GreyWrapper)
-      m_GreyWrapper->SetImageToDisplayTransform(
-        iSlice,m_ImageGeometry.GetImageToDisplayTransform(iSlice));
-
-    if(m_LabelWrapper)
-      m_LabelWrapper->SetImageToDisplayTransform(
-        iSlice,m_ImageGeometry.GetImageToDisplayTransform(iSlice));
+    ImageWrapperBase *wrapper = *it++;
+    if(wrapper->IsInitialized())
+      {
+      // Update the geometry for each slice
+      for(unsigned int iSlice = 0;iSlice < 3;iSlice ++)
+        {
+        wrapper->SetImageToDisplayTransform(
+          iSlice,m_ImageGeometry.GetImageToDisplayTransform(iSlice));
+        }
+      }
     }
 }

@@ -25,6 +25,25 @@
 template <class TPixel> class IRISSlicer;
 class SNAPSegmentationROISettings;
 
+
+/**
+ * \class ImageWrapper
+ * \brief Abstract parent class for all image wrappers
+ * \see ImageWrapper
+ */
+class ImageWrapperBase
+{
+public:
+  virtual const ImageCoordinateTransform &GetImageToDisplayTransform(
+    unsigned int) const = 0;
+  virtual void SetImageToDisplayTransform(
+    unsigned int, const ImageCoordinateTransform &) = 0;
+  virtual Vector3ui GetSliceIndex() const = 0;
+  virtual void SetSliceIndex(const Vector3ui &) = 0;
+  virtual itk::ImageBase<3> *GetImageBase() const = 0;
+  virtual bool IsInitialized() const = 0;
+};
+
 /**
  * \class ImageWrapper
  * \brief A wrapper around an itk::Image and related pipelines.
@@ -33,7 +52,7 @@ class SNAPSegmentationROISettings;
  * is used to unify the treatment of different kinds of images in
  * SNaP.  
  */
-template<class TPixel> class ImageWrapper 
+template<class TPixel> class ImageWrapper : public ImageWrapperBase
 {
 public:
 
@@ -73,15 +92,25 @@ public:
   virtual ~ImageWrapper();
 
   /**
-   * Initialize the internal image to a blank image of size x,y,z.
+   * Initialize the image wrapper to match another image wrapper, setting the
+   * image pixels to a default value. The slice indices and the transforms will
+   * all be updated to match the source
    */
-  virtual void InitializeToSize(unsigned int x, unsigned int y,unsigned int z);
+  virtual void InitializeToWrapper(
+    const ImageWrapperBase *source, const TPixel &value);
+
+  /** 
+   * Initialize the image wrapper with a combination of another image wrapper and
+   * an actual image. This will update the indices and transforms from the 
+   * source wrapper, otherwise, it's equivalent to SetImage()
+   */ 
+  virtual void InitializeToWrapper(
+    const ImageWrapperBase *source, ImageType *image);
 
   /**
-   * Initialize the image to match another image but with constant zero 
-   * intensity
+   * Initialize the internal image to a blank image of size x,y,z.
    */
-  virtual void InitializeToImage(itk::ImageBase<3> *source);
+  // virtual void InitializeToSize(unsigned int x, unsigned int y,unsigned int z);
 
   /**
    * Clear the data associated with storing an image
@@ -111,6 +140,11 @@ public:
 
   virtual const TPixel &GetVoxel(const Vector3ui &index) const;
 
+  /** Return some image info independently of pixel type */
+  virtual itk::ImageBase<3> *GetImageBase() const
+  {
+    return m_Image.GetPointer();
+  }
 
   /** 
    * Return the pointed to the ITK image encapsulated by this wrapper.
@@ -153,6 +187,9 @@ public:
    */
   virtual void RemapIntensityToMaximumRange();
 
+  /** Get the current slice index */
+  virtual Vector3ui GetSliceIndex() const;
+
   /**
    * Set the current slice index in all three dimensions.  The index should
    * be specified in the image coordinates, the slices will be generated
@@ -167,17 +204,16 @@ public:
   virtual void SetImageToDisplayTransform(
     unsigned int iSlice,const ImageCoordinateTransform &transform);
 
+  /** Get the coordinate transform for each display slice */
+  virtual const ImageCoordinateTransform &GetImageToDisplayTransform(
+    unsigned int iSlice) const;
+
   /**
    * Use a default image-slice transformation, the first slice is along z,
    * the second along y, the third, along x, all directions of traversal are 
    * positive.
    */
   virtual void SetImageToDisplayTransformsToDefault();
-
-  /**
-   * Return the current slice index
-   */
-  virtual Vector3ui GetSliceIndex() const;
 
   /**
    * Get a slice of the image in a given direction

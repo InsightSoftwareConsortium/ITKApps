@@ -535,8 +535,8 @@ TestCompareLevelSets
   typedef LevelSetExtensionFilter<NarrowFilterType> NarrowExtensionFilter;
 
   // Pull out the finite difference function
-  snap->InitializeSegmentationPipeline(parameters,NULL,0,
-                           app->GetGlobalState()->GetDrawingColorLabel());
+  snap->InitializeSegmentation(
+    parameters,NULL,0,app->GetGlobalState()->GetDrawingColorLabel());
   SNAPLevelSetFunction<FloatImageType> *phi = snap->GetLevelSetFunction();
 
   // Decide on a number of iterations
@@ -761,12 +761,12 @@ TestCompareLevelSets
   if(parmUseEdgeSnake)
     {
     snap->DoEdgePreprocessing(parmPreprocessEdge);
-    snap->InitializeSegmentationPipeline(parmSnakeEdge,&bubble,1,255);
+    snap->InitializeSegmentation(parmSnakeEdge,&bubble,1,255);
     }    
   else
     {
     snap->DoInOutPreprocessing(parmPreprocessInOut);
-    snap->InitializeSegmentationPipeline(parmSnakeEdge,&bubble,1,255);
+    snap->InitializeSegmentation(parmSnakeEdge,&bubble,1,255);
     }
     
   // Now, we have a speed image and a level set image.  We are ready to

@@ -685,7 +685,7 @@ UserInterfaceLogic
   fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
 
   // Merge bubbles with the segmentation image and initialize the snake
-  bool rc = snapData->InitializeSegmentationPipeline(
+  bool rc = snapData->InitializeSegmentation(
     m_GlobalState->GetSnakeParameters(),bubbles, numbubbles,
     m_GlobalState->GetDrawingColorLabel());
 
@@ -734,41 +734,6 @@ UserInterfaceLogic
   m_OutMessage->value("Snake initialized successfully");
 
   m_GlobalState->SetSnakeActive(true);
-
-  // This is unconventional code.  At this point, the filter contained in
-  // the LevelSetDriver is going to enter and execute its Update() code.  After
-  // initializing, it is going to call the callback method that we construct 
-  // here, and it will keep calling it, until we use the RequestEnd() method 
-  // in the LevelSetDriver, which will return the control to this point in the
-  // code.  That's why the snake deinitialization code is also here
-
-  // Create the idle callback command
-  SimpleCommandType::Pointer commandIdle = SimpleCommandType::New();
-  commandIdle->SetCallbackFunction(
-    this,&UserInterfaceLogic::OnSnakeVCRIdleCallback);
-
-  // Create the update callback command
-  SimpleCommandType::Pointer commandUpdate = SimpleCommandType::New();
-  commandUpdate->SetCallbackFunction(
-    this,&UserInterfaceLogic::OnSnakeVCRUpdateCallback);
-
-  // Clear the post-snake command (command used to tell this method whom to
-  // call back after it's done
-  m_PostSnakeCommand = NULL;
-
-  // TODO: Progress bar is needed here
-  fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
-  
-  // Next, enter the update loop
-  m_Driver->GetSNAPImageData()->StartSegmentationPipeline(
-    commandIdle,commandUpdate);
-
-  // When we end up here, it means that the update loop has finished, which 
-  // means that we've either gone back one page, or finished, or accepted the
-  // segmentation.  The command pointed to by m_PostSnakeCommand will point to
-  // the function that the user interface needs to execute now
-  if(m_PostSnakeCommand)
-    m_PostSnakeCommand->Execute((const itk::Object *) 0,itk::NoEvent());
 }
 
 
@@ -806,44 +771,36 @@ void
 UserInterfaceLogic
 ::OnRestartInitializationAction()
 {
-  // This callback has double functionality, depending on whether the 
-  // level set update loop is active or not
-  if(m_Driver->GetSNAPImageData()->IsSegmentationPipelineRunning())
+  // If the segmentation pipeline is active, deactivate it
+  if(m_Driver->GetSNAPImageData()->IsSegmentationActive())
     {
     // Tell the update loop to terminate
-    m_Driver->GetSNAPImageData()->RequestSegmentationPipelineTermination();
-
-    // Set the post-update callback to right here
-    m_PostSnakeCommand = SimpleCommandType::New();
-    m_PostSnakeCommand->SetCallbackFunction(
-      this,&UserInterfaceLogic::OnRestartInitializationAction);
+    m_Driver->GetSNAPImageData()->TerminateSegmentation();
     }
-  else
-    {
-    m_SnakeIsRunning = 0;
-    m_GlobalState->SetSnakeActive(false);
-    m_GrpSnakeControl->deactivate();
-    m_BtnPreprocess->activate();
-    m_GrpSnakeChoiceRadio->activate();
-    m_GrpSNAPStepInitialize->activate();
-    m_MenuLoadPreprocessed->activate();
-    m_MenuLoadAdvection->activate();
-    m_BtnRestartInitialization->hide();
-    m_BtnAcceptInitialization->show();
-    m_ChkContinuousView3DUpdate->value(0);
-    m_ChkContinuousView3DUpdate->deactivate();
-    m_BtnSNAPMeshUpdate->deactivate();
-    m_BtnAcceptSegmentation->deactivate();
 
-    m_SNAPWindow3D->ClearScreen(); // reset Mesh object in Window3D_s
-    m_SNAPWindow3D->ResetView();   // reset cursor
-    RedrawWindows();
+  m_SnakeIsRunning = 0;
+  m_GlobalState->SetSnakeActive(false);
+  m_GrpSnakeControl->deactivate();
+  m_BtnPreprocess->activate();
+  m_GrpSnakeChoiceRadio->activate();
+  m_GrpSNAPStepInitialize->activate();
+  m_MenuLoadPreprocessed->activate();
+  m_MenuLoadAdvection->activate();
+  m_BtnRestartInitialization->hide();
+  m_BtnAcceptInitialization->show();
+  m_ChkContinuousView3DUpdate->value(0);
+  m_ChkContinuousView3DUpdate->deactivate();
+  m_BtnSNAPMeshUpdate->deactivate();
+  m_BtnAcceptSegmentation->deactivate();
 
-    m_OutMessage->value("Snake initialization restarted");
+  m_SNAPWindow3D->ClearScreen(); // reset Mesh object in Window3D_s
+  m_SNAPWindow3D->ResetView();   // reset cursor
+  RedrawWindows();
 
-    // Flip to the second page
-    SetActiveSegmentationPipelinePage(1);
-    }
+  m_OutMessage->value("Snake initialization restarted");
+
+  // Flip to the second page
+  SetActiveSegmentationPipelinePage(1);
 }
 
 void
@@ -895,7 +852,7 @@ UserInterfaceLogic
       m_GlobalState->SetSnakeParameters(pNew);
 
       // Update the running snake
-      if (m_Driver->GetSNAPImageData()->IsSegmentationPipelineInitialized()) 
+      if (m_Driver->GetSNAPImageData()->IsSegmentationActive()) 
         {
         m_Driver->GetSNAPImageData()->SetSegmentationParameters(pNew);
         }
@@ -927,7 +884,7 @@ UserInterfaceLogic
   m_SnakeIteration = 0;
 
   // Basically, we tell the level set driver that we want a restart
-  m_Driver->GetSNAPImageData()->RequestSegmentationRestart();
+  m_Driver->GetSNAPImageData()->RestartSegmentation();
 }
 
 void 
@@ -940,69 +897,17 @@ UserInterfaceLogic
 
 void 
 UserInterfaceLogic
-::OnSnakeVCRUpdateCallback()
-{
-  // This function is called from the level set driver after an iteration has
-  // been performed or after reinitialization 
-
-  // Display the current iteration (start with 0)
-  UpdateIterationOutput();
-
-  // Update the snake mesh if continuous update is on
-  if (m_ChkContinuousView3DUpdate->value())
-    m_SNAPWindow3D->UpdateMesh();
-
-  // Restore the cursor to normal
-  fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
-
-  // Redraw the 2D windows
-  RedrawWindows();
-
-  // Increment the number of iterations
-  m_SnakeIteration++;
-}
-
-void 
-UserInterfaceLogic
-::OnSnakeVCRIdleCallback()
-{
-  // If the run button is depressed, we continuously schedule runs in
-  // this idle callback
-  if(m_SnakeIsRunning)
-    {
-    // We're in run mode (run button is down).  Request more iterations
-    m_Driver->GetSNAPImageData()->RequestSegmentationStep(m_SnakeStepSize);
-
-    // Let Fltk refresh as needed
-    Fl::check();
-    }
-  else 
-    {
-    // The snake is not contnuously running, so we just call Fl::wait()
-    Fl::wait();    
-    }  
-}
-
-
-void 
-UserInterfaceLogic
 ::OnSnakePlayAction()
 {
   if (!m_GlobalState->GetSnakeActive()) return;
-
-  // Make sure the callback function is actively requesting more iterations
-  m_SnakeIsRunning = 1;
 }
 
 void 
 UserInterfaceLogic
 ::OnSnakeStepAction()
 {
-  // Stop the play button, if it's on
-  m_SnakeIsRunning = 0;
-
   // Request that the desired number of iterations be executed
-  m_Driver->GetSNAPImageData()->RequestSegmentationStep(m_SnakeStepSize);
+  m_Driver->GetSNAPImageData()->RunSegmentation(m_SnakeStepSize);
 }
 
 void 
@@ -1125,29 +1030,21 @@ void
 UserInterfaceLogic
 ::OnAcceptSegmentationAction()
 {
-  // This callback has double functionality, depending on whether the 
-  // level set update loop is active or not
-  if(m_Driver->GetSNAPImageData()->IsSegmentationPipelineRunning())
+  // Turn off segmentation if it's active
+  if(m_Driver->GetSNAPImageData()->IsSegmentationActive())
     {
     // Tell the update loop to terminate
-    m_Driver->GetSNAPImageData()->RequestSegmentationPipelineTermination();
-
-    // Set the post-update callback to right here
-    m_PostSnakeCommand = SimpleCommandType::New();
-    m_PostSnakeCommand->SetCallbackFunction(
-      this,&UserInterfaceLogic::OnAcceptSegmentationAction);
+    m_Driver->GetSNAPImageData()->TerminateSegmentation();
     }
-  else
-    {
-    // Get data from SNAP back into IRIS
-    m_Driver->UpdateIRISWithSnapImageData(m_ProgressCommand);
 
-    // Close up SNAP
-    this->CloseSegmentationCommon();
+  // Get data from SNAP back into IRIS
+  m_Driver->UpdateIRISWithSnapImageData(m_ProgressCommand);
 
-    // Message to the user
-    m_OutMessage->value("Accepted snake segmentation");
-    }  
+  // Close up SNAP
+  this->CloseSegmentationCommon();
+
+  // Message to the user
+  m_OutMessage->value("Accepted snake segmentation");
 }
 
 void 
@@ -1183,24 +1080,17 @@ UserInterfaceLogic
 {
   // This callback has double functionality, depending on whether the 
   // level set update loop is active or not
-  if(m_Driver->GetSNAPImageData()->IsSegmentationPipelineRunning())
+  if(m_Driver->GetSNAPImageData()->IsSegmentationActive())
     {
     // Tell the update loop to terminate
-    m_Driver->GetSNAPImageData()->RequestSegmentationPipelineTermination();
-
-    // Set the post-update callback to right here
-    m_PostSnakeCommand = SimpleCommandType::New();
-    m_PostSnakeCommand->SetCallbackFunction(
-      this,&UserInterfaceLogic::OnCancelSegmentationAction);
+    m_Driver->GetSNAPImageData()->TerminateSegmentation();
     }
-  else
-    {
-    // Clean up SNAP image data
-    this->CloseSegmentationCommon();
 
-    // Message to the user
-    m_OutMessage->value("Snake segmentation cancelled");
-    }
+  // Clean up SNAP image data
+  this->CloseSegmentationCommon();
+
+  // Message to the user
+  m_OutMessage->value("Snake segmentation cancelled");
 }
 
 void 
@@ -1217,41 +1107,25 @@ UserInterfaceLogic
   // We don't want to just exit when users press escape
   if(Fl::event_key() == FL_Escape) return;
 
-  // Make sure that if the segmentation pipeline is currently running that we
-  // terminate it before closing the application
-  if(m_GlobalState->GetSNAPActive() &&
-     m_Driver->GetSNAPImageData()->IsSegmentationPipelineRunning())
+  // Associate the current state with the current image
+  OnGreyImageUnload();
+
+  // Create an array of open windows
+  vector<Fl_Window *> openWindows;
+  openWindows.push_back(Fl::first_window());
+
+  // Add all the open windows to the list
+  while(true)
     {
-    // Tell the update loop to terminate
-    m_Driver->GetSNAPImageData()->RequestSegmentationPipelineTermination();
-
-    // Set the post-update callback to right here
-    m_PostSnakeCommand = SimpleCommandType::New();
-    m_PostSnakeCommand->SetCallbackFunction(
-      this,&UserInterfaceLogic::OnMainWindowCloseAction);
+    Fl_Window *win = Fl::next_window(openWindows.back());
+    if(win && win != openWindows.front())
+      openWindows.push_back(win);
+    else break;
     }
-  else
-    {
-    // Associate the current state with the current image
-    OnGreyImageUnload();
 
-    // Create an array of open windows
-    vector<Fl_Window *> openWindows;
-    openWindows.push_back(Fl::first_window());
-
-    // Add all the open windows to the list
-    while(true)
-      {
-      Fl_Window *win = Fl::next_window(openWindows.back());
-      if(win && win != openWindows.front())
-        openWindows.push_back(win);
-      else break;
-      }
-
-    // Close all the windows
-    for(unsigned int i=0;i<openWindows.size();i++)
-      openWindows[i]->hide();
-    }
+  // Close all the windows
+  for(unsigned int i=0;i<openWindows.size();i++)
+    openWindows[i]->hide();
 }
 
 void 
@@ -2981,6 +2855,9 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.27  2004/08/26 19:43:27  pauly
+ *ENH: Moved the Borland code into Common folder
+ *
  *Revision 1.26  2004/08/26 18:29:19  pauly
  *ENH: New user interface for configuring the UI options
  *
