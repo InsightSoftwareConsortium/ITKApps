@@ -416,13 +416,12 @@ INCLUDE_DIRECTORIES(
 
 # Link libraries
 SET(MY_GRAPHICS_LIBS
+  ${FLTK_LIBRARIES} 
   vtkCommon
   vtkFiltering
   vtkGraphics
- # vtkHybrid
   vtkImaging
   vtkRendering
-  ${FLTK_LIBRARIES} 
   ${OPENGL_glu_LIBRARY}
   ${OPENGL_LIBRARIES}
 )

@@ -196,17 +196,25 @@ MeshObject
     vtkIdType ntris = 0;
     vtkIdType npts;
     vtkIdType *pts;
-    for ( triStrips->InitTraversal(); triStrips->GetNextCell(npts,pts); ) {
+    for ( triStrips->InitTraversal(); triStrips->GetNextCell(npts,pts); ) 
+      {
       ntris += npts-2;
       glBegin( GL_TRIANGLE_STRIP );
-      for (vtkIdType j = 0; j < npts; j++) {
-#ifndef vtkFloatingPointType
-        glNormal3fv( norms->GetTuple( pts[j] ) ); // Specify normal.
-        glVertex3fv( verts->GetPoint ( pts[j] ) );  // Specify vertex.
-#else
-        glNormal3dv( norms->GetTuple( pts[j] ) ); // Specify normal.
-        glVertex3dv( verts->GetPoint ( pts[j] ) );  // Specify vertex.
-#endif
+      for (vtkIdType j = 0; j < npts; j++) 
+        {
+        // Some ugly code to ensure VTK version compatibility
+        double vx = verts->GetPoint(pts[j])[0];
+        double vy = verts->GetPoint(pts[j])[1];
+        double vz = verts->GetPoint(pts[j])[2];
+        double nx = norms->GetTuple(pts[j])[0];
+        double ny = norms->GetTuple(pts[j])[1];
+        double nz = norms->GetTuple(pts[j])[2];
+        
+        // Specify normal.
+        glNormal3d(nx, ny, nz);
+
+        // Specify vertex.
+        glVertex3d(vx, vy, vz);
       }
       glEnd();
     }
@@ -320,6 +328,9 @@ MeshObject
 
 /*
  *Log: MeshObject.cxx
+ *Revision 1.9  2004/01/17 18:39:07  lorensen
+ *ENH: changes to accomodate VTK api changes.
+ *
  *Revision 1.8  2003/10/09 22:45:13  pauly
  *EMH: Improvements in 3D functionality and snake parameter preview
  *

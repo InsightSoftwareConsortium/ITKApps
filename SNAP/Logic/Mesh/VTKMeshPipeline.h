@@ -35,10 +35,6 @@
 #include <vtkSmoothPolyDataFilter.h>
 #include <vtkStripper.h>
 
-#ifndef vtkFloatingPointType
-#define vtkFloatingPointType float
-#endif
-
 // Optional selection of patented or non-patented algorithms
 #ifdef USE_VTK_PATENTED
   #include <vtkImageMarchingCubes.h>
