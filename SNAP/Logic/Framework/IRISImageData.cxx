@@ -390,14 +390,14 @@ Vector3d
 IRISImageData
 ::GetImageSpacing() 
 {
-  return m_GreyWrapper.GetImage()->GetSpacing().Get_vnl_vector();
+  return m_GreyWrapper.GetImage()->GetSpacing().GetVnlVector();
 }
 
 Vector3d 
 IRISImageData
 ::GetImageOrigin() 
 {
-  return m_GreyWrapper.GetImage()->GetOrigin().Get_vnl_vector();
+  return m_GreyWrapper.GetImage()->GetOrigin().GetVnlVector();
 }
 
 void 

@@ -90,12 +90,12 @@ LandmarkRegistrator
     {
     for( unsigned int i=0; i<m_MovingLandmarkSet->GetNumberOfPoints(); i++)
       {
-      v1 = (m_MovingLandmarkSet->GetPoint(i)->GetPosition().Get_vnl_vector()
-            - movingCenter.Get_vnl_vector());
+      v1 = (m_MovingLandmarkSet->GetPoint(i)->GetPosition().GetVnlVector()
+            - movingCenter.GetVnlVector());
       v1.normalize();
       
-      v2 = (m_FixedLandmarkSet->GetPoint(i)->GetPosition().Get_vnl_vector()
-            - fixedCenter.Get_vnl_vector());
+      v2 = (m_FixedLandmarkSet->GetPoint(i)->GetPosition().GetVnlVector()
+            - fixedCenter.GetVnlVector());
       v2.normalize();
       
       vTemp = m * v1;
@@ -123,12 +123,12 @@ LandmarkRegistrator
   std::cout << "Landmark quality :" << std::endl;
   for( unsigned int i=0; i<m_MovingLandmarkSet->GetNumberOfPoints(); i++)
     {
-    v1 = (m_MovingLandmarkSet->GetPoint(i)->GetPosition().Get_vnl_vector()
-          - movingCenter.Get_vnl_vector());
+    v1 = (m_MovingLandmarkSet->GetPoint(i)->GetPosition().GetVnlVector()
+          - movingCenter.GetVnlVector());
     v1.normalize();
     
-    v2 = (m_FixedLandmarkSet->GetPoint(i)->GetPosition().Get_vnl_vector()
-          - fixedCenter.Get_vnl_vector());
+    v2 = (m_FixedLandmarkSet->GetPoint(i)->GetPosition().GetVnlVector()
+          - fixedCenter.GetVnlVector());
     v2.normalize();
 
     vTemp = vsr.Transform(v1);
