@@ -43,6 +43,7 @@ SET (PLUGINS
   vvITKCurvatureAnisotropicDiffusion
   vvITKCurvatureFlow 
   vvITKDeformableModelModule
+  vvITKDanielssonDistanceMap
   vvITKFastMarching
   vvITKFastMarchingModule
   vvITKGeodesicActiveContour
@@ -53,6 +54,7 @@ SET (PLUGINS
   vvITKImageRegistration
   vvITKIntensityWindowing
   vvITKIsolatedConnected
+  vvITKIsotropicFourthOrderLevelSet
   vvITKMedian
   vvITKSigmoid
   vvITKShapeDetectionModule
