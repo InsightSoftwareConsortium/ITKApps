@@ -197,7 +197,7 @@ ImageViewer<ImagePixelType,OverlayPixelType>
 template <class ImagePixelType, class OverlayPixelType>
 void 
 ImageViewer<ImagePixelType,OverlayPixelType>
-::SelectSlice(unsigned int num)
+::SelectSlice(unsigned int)
 {
   //sliceNumberSlider->value(num);
   //glSliceView->sliceNum((int)sliceNumberSlider->value());

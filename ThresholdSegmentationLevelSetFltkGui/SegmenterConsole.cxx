@@ -424,7 +424,6 @@ SegmenterConsole::ShowSpeedImage()
       std::cerr << excep << std::endl;
       }  
     float a_max = m_minMax->GetMaximum();
-    float a_min = m_minMax->GetMinimum();
     
     m_speedThresh->SetOutsideValue(6);
     m_speedThresh->SetInsideValue(1);
@@ -961,7 +960,6 @@ void SegmenterConsole::SaveBinaryMask()
     std::cerr << excep << std::endl;
     return;
     }  
-  float a_max = m_minMax->GetMaximum();
   float a_min = m_minMax->GetMinimum();
   
   m_maskThresh->SetInput(m_thresholdSegmentation->GetOutput());
