@@ -115,8 +115,8 @@ RegionGrowingSegmentationBase2D
   calculator->ComputeMaximum();
   const float maximumValue = calculator->GetMaximum();
   const float factor = 1.1;
-  const float replacementValue = maximumValue * factor;
-
+  OutputPixelType replacementValue = static_cast<OutputPixelType>(maximumValue * factor);
+  
   m_ConnectedThresholdImageFilter->SetReplaceValue( replacementValue );
   m_ConfidenceConnectedImageFilter->SetReplaceValue( replacementValue );
 
