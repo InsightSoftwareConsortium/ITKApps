@@ -23,6 +23,7 @@
 
 #include "vtkImageSource.h"
 #include <vector>
+#include <string>
 
 class VTK_EXPORT vtkITKArchetypeImageSeriesReader : public vtkImageSource
 {
