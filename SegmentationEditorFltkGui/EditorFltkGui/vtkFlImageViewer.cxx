@@ -101,10 +101,6 @@ void vtkFlImageViewer::resize( int x, int y, int w, int h ) {
 //---------------------------------------------------------------------------
 // main FLTK event handler
 int vtkFlImageViewer::handle( int event ) {
-  int x = Fl::event_x();
-  int y = Fl::event_y();
-  int slice;
-
   std::cerr << "vtkFlImageViewer HANDLE\n";
 
     switch( event ) 

@@ -184,7 +184,7 @@ namespace itk
   template< class TTransform >
   void
   LeastSquareDistanceCostFunction<TTransform>
-  ::GetDerivative( const ParametersType &parameters, DerivativeType &derivative ) const
+  ::GetDerivative( const ParametersType &, DerivativeType & ) const
   {
     // not implemented yet
   }

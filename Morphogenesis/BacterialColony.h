@@ -68,8 +68,8 @@ public:
 protected:
   BacterialColony();
   virtual ~BacterialColony();
-  BacterialColony( const Self & ) {}
-  void operator=(const Self&) {}
+  BacterialColony( const Self & );
+  void operator=(const Self&);
   void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
   

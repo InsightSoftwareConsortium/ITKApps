@@ -42,7 +42,7 @@ OutputEvaluator< TImage >
 {
   m_NumberOfClasses = size ;
   m_ClassificationMatrix.resize(m_NumberOfClasses) ;
-  for ( int i = 0 ; i < m_NumberOfClasses ; i++ )
+  for ( unsigned int i = 0 ; i < m_NumberOfClasses ; i++ )
     {
       m_ClassificationMatrix[i].resize(m_NumberOfClasses) ;
     }
@@ -53,7 +53,7 @@ void
 OutputEvaluator< TImage >
 ::GenerateData()
 {
-  for ( int i = 0 ; i < m_NumberOfClasses ; i++ )
+  for ( unsigned int i = 0 ; i < m_NumberOfClasses ; i++ )
     {
       std::fill(m_ClassificationMatrix[i].begin(), 
                 m_ClassificationMatrix[i].end(), 0) ;

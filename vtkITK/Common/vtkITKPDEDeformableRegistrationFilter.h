@@ -90,7 +90,7 @@ class VTK_EXPORT vtkITKPDEDeformableRegistrationFilter : public vtkITKImageToIma
   
   
   // If we don't set an input, this filter uses a blank filter
-  virtual void SetInput(vtkImageData *Input)
+  virtual void SetInput(vtkImageData *)
   {
     std::cout << "Doing nothing!!!" << std::endl;
     return;
@@ -175,7 +175,7 @@ private:
   
 };
 
-vtkCxxRevisionMacro(vtkITKPDEDeformableRegistrationFilter, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkITKPDEDeformableRegistrationFilter, "$Revision: 1.4 $");
 vtkStandardNewMacro(vtkITKPDEDeformableRegistrationFilter);
 
 #endif

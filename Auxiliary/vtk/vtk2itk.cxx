@@ -198,14 +198,14 @@ public:
       m_TypeArray = i;
     }
   // Visit a triangle and create the VTK_TRIANGLE cell 
-  void Visit(unsigned long cellId, floatTriangleCell* t)
+  void Visit(unsigned long, floatTriangleCell* t)
     {
       m_Cells->InsertNextCell(3,  (vtkIdType*)t->PointIdsBegin());
       m_TypeArray[*m_LastCell] = VTK_TRIANGLE;
       (*m_LastCell)++;
     }
   // Visit a triangle and create the VTK_QUAD cell 
-  void Visit(unsigned long cellId, floatQuadrilateralCell* t)
+  void Visit(unsigned long, floatQuadrilateralCell* t)
     {
       m_Cells->InsertNextCell(4,  (vtkIdType*)t->PointIdsBegin());
       m_TypeArray[*m_LastCell] = VTK_QUAD;

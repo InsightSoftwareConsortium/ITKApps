@@ -47,7 +47,7 @@ vtkFlImageViewer()
   this->end();
 }
 //---------------------------------------------------------------------------
-SegmentedViewer::SegmentedViewer( int x, int y, int w, int h, const char *l ) : 
+SegmentedViewer::SegmentedViewer( int x, int y, int w, int h, const char *l) : 
 vtkFlImageViewer(x,y,w,h)
 {
 }
@@ -73,13 +73,8 @@ SegmentedViewer * SegmentedViewer::New()
 int SegmentedViewer::handle( int event ) {
   int x = Fl::event_x();
   int y = Fl::event_y();
-  int w = Fl_Gl_Window::w();
-  int h = Fl_Gl_Window::h();
-
-  int slice;
 
   int button = Fl::event_button();
-  int key;
 
     switch( event ) 
     {
@@ -171,7 +166,6 @@ void SegmentedViewer::SelectRegion(int x, int y) {
     y = (int)(y/magY);
   }
 
-  float val = (dataReader->GetOutput())->GetScalarComponentAsFloat(x, y, z, 0);
   WSmanager->CompileEquivalenciesFor( x, y, z, dataReader->GetOutput() );
   WSmanager->ClearHighlightedValuesToSameColor();
   WSmanager->HighlightComputedEquivalencyList();
@@ -218,7 +212,6 @@ void SegmentedViewer::AppendRegion(int x, int y) {
     y = (int)(y/magY);
   }
 
-  float val = (dataReader->GetOutput())->GetScalarComponentAsFloat(x, y, z, 0);
   WSmanager->AppendEquivalenciesFor( x, y, z, dataReader->GetOutput() );
   WSmanager->ClearHighlightedValuesToSameColor();
   WSmanager->HighlightComputedEquivalencyList();

@@ -28,7 +28,7 @@ public:
   static vtkBoundingBox *New();
 
   vtkTypeMacro(vtkBoundingBox,vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) {}
+  void PrintSelf(ostream&, vtkIndent) {}
 
   const int *GetExtent() const
     {

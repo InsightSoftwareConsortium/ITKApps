@@ -33,7 +33,7 @@ public:
   typedef itk::VoronoiSegmentationImageFilter<FloatImage2D,BinImage2D> VDFilter;
 
   VDSegGrayRun();
-  ~VDSegGrayRun();
+  virtual ~VDSegGrayRun();
 
 protected:
   virtual bool LoadImage (void);

@@ -140,8 +140,8 @@ public:
 protected:
   CellularAggregate();
   virtual ~CellularAggregate();
-  CellularAggregate( const Self & ) {}
-  void operator=(const Self&) {}
+  CellularAggregate( const Self & );
+  void operator=(const Self&);
   void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
   virtual void ComputeForces(void);

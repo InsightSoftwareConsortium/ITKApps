@@ -256,7 +256,7 @@ void EditorConsoleBase::ViewBinary()
  *  ViewSlice
  *
  ***********************************/
-void EditorConsoleBase::SelectSlice(unsigned int s)
+void EditorConsoleBase::SelectSlice(unsigned int)
 {
 
 }
@@ -286,7 +286,7 @@ void EditorConsoleBase::SubtractSelectedRegion()
  * SetMerge
  *
  ***********************************/
-void EditorConsoleBase::SetMerge(double scale) {
+void EditorConsoleBase::SetMerge(double) {
 
 }
 
@@ -295,7 +295,7 @@ void EditorConsoleBase::SetMerge(double scale) {
  * SetMergeResolution
  *
  ***********************************/
-void EditorConsoleBase::SetMergeResolution(double res) {
+void EditorConsoleBase::SetMergeResolution(double) {
 
 }
 
@@ -334,7 +334,7 @@ void EditorConsoleBase::ToggleAntialiasing() {
  * ChangePaintValue
  *
  ***********************************/
-void EditorConsoleBase::ChangePaintValue(int p) {
+void EditorConsoleBase::ChangePaintValue(int) {
 
 }
 
@@ -386,7 +386,7 @@ void EditorConsoleBase::ChangeWindowLevel() {
  * ScaleZoom
  *
  ***********************************/
-void EditorConsoleBase::ScaleZoom(double mag) {
+void EditorConsoleBase::ScaleZoom(double) {
 }
 
 
@@ -451,7 +451,7 @@ void EditorConsoleBase::AddSurfaceRenderer(int isovalue, float r, float g, float
  * AddRenderer
  *
  **********************************/
-void EditorConsoleBase::AddRenderer(int isovalue) 
+void EditorConsoleBase::AddRenderer(int) 
 {
 }
 

@@ -125,7 +125,7 @@ int vtkBinaryVolume::ReadFromDisk(const char *fn)
 void vtkBinaryVolume::SetWithRadius(int x, int y, int z)
 {
   const int *c = this->GetExtent();
-  int xpos, ypos, xx, yy, x_tem, y_tem, r, r2;
+  int xpos, ypos, xx, yy, x_tem, y_tem, r2;
 
   if (paint_radius == 0)    { this->Set(x,y,z); }
  

@@ -206,7 +206,7 @@ guiMainImplementation
 
     tkFixedImageLandmarkGroup->activate();
     Fl_Group* grp = tkFixedImageLandmarkGroup ;
-    for(unsigned int i=0; i < grp->children(); i++)
+    for(int i=0; i < grp->children(); i++)
       {
       ((Fl_Button *)grp->child(i))->clear();
       ((Fl_Button *)grp->child(i))->activate();
@@ -214,7 +214,7 @@ guiMainImplementation
 
     tkMovingImageLandmarkGroup->activate();
     grp = tkMovingImageLandmarkGroup ;
-    for(unsigned int i=0; i < grp->children(); i++)
+    for(int i=0; i < grp->children(); i++)
       {
       ((Fl_Button *)grp->child(i))->clear();
       ((Fl_Button *)grp->child(i))->activate();
@@ -341,13 +341,11 @@ guiMainImplementation
 {
   this->ChangeStatusDisplay("CalculateMaximumSize begins") ;
 
-  bool identicalSpacing = true ;
   const double* fixedSpacing = m_FixedImage->GetSpacing() ;
   const double* movingSpacing = m_MovingImage->GetSpacing() ;
   bool fixedImageSpacingChanged = false ;
   bool movingImageSpacingChanged = false ;
 
-  bool identicalSize = true ;
   ImageType::SizeType fixedSize = 
     m_FixedImage->GetLargestPossibleRegion().GetSize() ;
   ImageType::SizeType movingSize = 
@@ -594,7 +592,7 @@ guiMainImplementation
   if (imageIndex == 0)
     {
     Fl_Group* grp = tkMovingImageLandmarkGroup ;
-    for(unsigned int i=0; i < grp->children(); i++)
+    for(int i=0; i < grp->children(); i++)
       {
       ((Fl_Button *)grp->child(i))->activate() ;
       }   
@@ -781,7 +779,7 @@ guiMainImplementation
     view = tkMovingImageViewer ;
     }
   
-  for ( unsigned int i = 0 ; i < parent->children() ; ++i )
+  for ( int i = 0 ; i < parent->children() ; ++i )
     {
     Fl_Button* button = (Fl_Button*)(parent->child(i)) ;
   
@@ -832,7 +830,7 @@ guiMainImplementation
       tkFixedImageViewer->SetSpatialPoints( landmarks->GetPoints() ) ;
 
       Fl_Group* grp = tkFixedImageLandmarkGroup ;
-      for(unsigned int i=0; i < grp->children(); i++)
+      for(int i=0; i < grp->children(); i++)
         {
         ((Fl_Button*)grp->child(i))->activate();
         }   

@@ -47,7 +47,7 @@ BinaryViewer::BinaryViewer() :
   this->end();
 }
 //---------------------------------------------------------------------------
-BinaryViewer::BinaryViewer( int x, int y, int w, int h, const char *l ) : 
+BinaryViewer::BinaryViewer( int x, int y, int w, int h, const char * ) : 
   vtkFlImageViewer(x,y,w,h)
 {
 }
@@ -71,11 +71,6 @@ BinaryViewer * BinaryViewer::New()
 //---------------------------------------------------------------------------
 // main FLTK event handler
 int BinaryViewer::handle( int event ) {
-  int x = Fl::event_x();
-  int y = Fl::event_y();
-  int slice;
-
-
     switch( event ) 
     {
       case FL_FOCUS:

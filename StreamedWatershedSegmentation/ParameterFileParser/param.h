@@ -146,6 +146,7 @@ class Parameter : public std::vector<GenericValue *>
   }
   
 public:
+  typedef std::vector<GenericValue *> Superclass;
   Parameter(bool b) { m_Valid = b; }
   Parameter() : m_Valid(true) { }
   ~Parameter() { this->Clear(); }
@@ -156,7 +157,7 @@ public:
       { this->PushBack(*it); }
     return *this;
   }
-  Parameter(const Parameter& p) { *this = p; }
+  Parameter(const Parameter& p): Superclass() { *this = p; }
   GenericValue *operator[]( std::vector<GenericValue *>::size_type n) const
     {
       if (this->valid() == false) return &m_InvalidValue;

@@ -59,7 +59,7 @@ public:
     Execute( (const itk::Object *)caller, event);
   }
 
-  void Execute(const itk::Object *caller, const itk::EventObject & event)
+  void Execute(const itk::Object *, const itk::EventObject & event)
   {
     if( !m_Browser )
       {

@@ -572,7 +572,7 @@ void EditorConsole::ToggleOverlay() {
  * AddSurfaceRenderer
  *
  ***********************************/
-void EditorConsole::AddSurfaceRenderer(int isovalue, float r, float g, float b) {
+void EditorConsole::AddSurfaceRenderer(int, float, float, float) {
 }
 
 

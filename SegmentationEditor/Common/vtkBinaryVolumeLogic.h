@@ -31,7 +31,7 @@ public:
   static vtkBinaryVolumeLogic *New();
 
   vtkTypeMacro(vtkBinaryVolumeLogic,vtkImageData);
-  void PrintSelf(ostream& os, vtkIndent indent) {}
+  void PrintSelf(ostream&, vtkIndent) {}
 
   // Searches a bounding box in the SourceVolume for indicies whose pixels
   // match the value parameter.  Turns ON corresponding indicies in the

@@ -29,7 +29,7 @@ public:
   static vtkBinaryVolume *New();
 
   vtkTypeMacro(vtkBinaryVolume,vtkImageData);
-  void PrintSelf(ostream& os, vtkIndent indent) {}
+  void PrintSelf(ostream&, vtkIndent) {}
 
   void Clear();
 

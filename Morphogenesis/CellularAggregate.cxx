@@ -171,7 +171,7 @@ CellularAggregate
 
 void
 CellularAggregate
-::ExportXFIG(const char * filename) const
+::ExportXFIG(const char *) const
 {
 
   /*
@@ -227,7 +227,7 @@ CellularAggregate
 
 void
 CellularAggregate
-::ExportDrawing(const char * filename) const
+::ExportDrawing(const char *) const
 {
   /*
   std::ofstream output;

@@ -321,8 +321,8 @@ void
 LandmarkSliceViewer<TImagePixel>
 ::DrawLandmark(VisualLandmark& landmark) 
 {
-  unsigned int    x;
-  unsigned int    y;
+  int    x;
+  int    y;
   SizeType        size; 
   IndexType       modifiedIndex;
   
@@ -342,7 +342,7 @@ LandmarkSliceViewer<TImagePixel>
       x = 0;
       }
     
-    if( x >= size[0] )
+    if( x >= static_cast<int>(size[0]) )
       {
       x = size[0];
       }
@@ -364,7 +364,7 @@ LandmarkSliceViewer<TImagePixel>
       y = 0;
       }
 
-    if( y >= size[1] )
+    if( y >= static_cast<int>(size[1]) )
       {
       y = size[1];
       }

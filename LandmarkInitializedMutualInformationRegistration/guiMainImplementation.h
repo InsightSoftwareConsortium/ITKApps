@@ -66,7 +66,7 @@ public:
   InterpolatorType ;
   
   guiMainImplementation();
-  ~guiMainImplementation();
+  virtual ~guiMainImplementation();
 
   ////////////////////////////////////
   // Initializations & Terminations

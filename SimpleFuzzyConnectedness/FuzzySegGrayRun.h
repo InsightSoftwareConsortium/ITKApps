@@ -14,7 +14,7 @@ public:
   typedef itk::SimpleFuzzyConnectednessScalarImageFilter<FloatImage,OutputImage> FuzzyFilter;
 
   FuzzySegGrayRun();
-  ~FuzzySegGrayRun();
+  virtual ~FuzzySegGrayRun();
 
 protected:
   virtual bool LoadImage (void);

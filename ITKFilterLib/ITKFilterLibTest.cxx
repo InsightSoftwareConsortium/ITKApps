@@ -25,7 +25,7 @@
  *   so that they can be easily called from outside of itk (even
  *   from ANIS C).
  **/
-int main(int argc, char ** argv)
+int main(int, char **)
   {
 
   //

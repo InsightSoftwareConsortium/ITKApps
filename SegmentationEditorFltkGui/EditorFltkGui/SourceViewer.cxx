@@ -50,7 +50,7 @@ vtkFlImageViewer()
   this->end();
 }
 //---------------------------------------------------------------------------
-SourceViewer::SourceViewer( int x, int y, int w, int h, const char *l ) : 
+SourceViewer::SourceViewer( int x, int y, int w, int h, const char * ) : 
 vtkFlImageViewer(x,y,w,h)
 {
   binaryVolume = 0;
@@ -77,7 +77,6 @@ SourceViewer * SourceViewer::New()
 int SourceViewer::handle( int event ) {
   int x = Fl::event_x();
   int y = Fl::event_y();
-  int slice;
 
   int button = Fl::event_button();
 
@@ -177,11 +176,11 @@ void SourceViewer::PaintPixels(int x, int y) {
   }
 
   if( magX != 0 ) {
-    x = x/magX;
+    x = static_cast<int>(x/magX);
   }
 
   if( magY != 0 ) {
-    y = y/magY;
+    y = static_cast<int>(y/magY);
   }
 
   binaryVolume->SetWithRadius(x, y, z);
@@ -224,11 +223,11 @@ void SourceViewer::UnpaintPixels(int x, int y) {
   }
 
   if( magX != 0 ) {
-    x = x/magX;
+    x = static_cast<int>(x/magX);
   }
 
   if( magY != 0 ) {
-    y = y/magY;
+    y = static_cast<int>(y/magY);
   }
 
   int paintRadiusValue = binaryVolume->GetPaintRadius();

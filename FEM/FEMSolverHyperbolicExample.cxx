@@ -442,8 +442,6 @@ for (unsigned int n=0; n < (*ee)->GetNumberOfNodes(); n++) {
       locPt.resize(2);
       solVec.resize(2);
 
-      bool inside;
-
       fieldIter.GoToBegin();
       for (; !fieldIter.IsAtEnd(); ++fieldIter) {
         index = fieldIter.GetIndex();
