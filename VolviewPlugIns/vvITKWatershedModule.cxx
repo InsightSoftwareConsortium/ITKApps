@@ -186,7 +186,7 @@ void VV_PLUGIN_EXPORT vvITKWatershedModuleInit(vtkVVPluginInfo *info)
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
                                     "Watershed Module");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,
-    "This module applies a Watershed method for segmenting a volume. All the necessary  preprocessing is packaged in this module. This makes it a good choice when you are already familiar with the parameters settings requires for you particular data set. When you are applying Watershed to a new data set, you may want to rather go step by step using each one the individual filters.");
+    "This module applies a Watershed method for segmenting a volume. Before running this filter you must set one 3D marker on the region that you want to segment. This marker will be used to select the water basin to be binarized in order to produce the output binary mask at the end of the processing. All the necessary  preprocessing is packaged in this module. This makes it a good choice when you are already familiar with the parameters settings requires for you particular data set. When you are applying Watershed to a new data set, you may want to rather go step by step using each one the individual filters.");
 
   info->SetProperty(info, VVP_SUPPORTS_IN_PLACE_PROCESSING, "0");
   info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "0");
