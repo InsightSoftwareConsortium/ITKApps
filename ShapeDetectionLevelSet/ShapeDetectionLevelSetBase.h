@@ -17,8 +17,6 @@
 #ifndef SHAPEDETECTIONLEVELSETSBASE
 #define SHAPEDETECTIONLEVELSETSBASE
 
-#include "itkImageFileReader.h"
-#include "itkImageFileWriter.h"
 
 #include "itkImage.h"
 #include "itkCastImageFilter.h"
@@ -27,6 +25,8 @@
 #include "itkGradientMagnitudeRecursiveGaussianImageFilter.h"
 #include "itkSigmoidImageFilter.h"
 #include "itkBinaryThresholdImageFilter.h"
+#include "itkImageFileReader.h"
+#include "itkImageFileWriter.h"
 
 
 /**
