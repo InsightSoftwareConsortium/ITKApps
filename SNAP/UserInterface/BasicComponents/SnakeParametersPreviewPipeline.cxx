@@ -80,7 +80,7 @@ private:
   typedef SNAPLevelSetFunction<FloatImageType> LevelSetFunctionType;
 
   // Exporter
-  typedef itk::VTKImageExport<FloatImageType,vtkFloatingPointType> ExporterType;
+  typedef itk::VTKImageExport<FloatImageType> ExporterType;
 
   // A level set function used to compute the forces
   itk::SmartPointer<LevelSetFunctionType> m_Phi;
@@ -131,7 +131,7 @@ LevelSetPreviewPipeline2D
   m_Filter->SetNumberOfLayers(3);
   m_Filter->SetIsoSurfaceValue(0.0f);
 
-  m_VTKExporter = itk::VTKImageExport<FloatImageType,vtkFloatingPointType>::New();
+  m_VTKExporter = itk::VTKImageExport<FloatImageType>::New();
   m_VTKExporter->SetInput(m_Filter->GetOutput());
 
   // Initialize the VTK Importer

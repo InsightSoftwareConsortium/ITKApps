@@ -81,7 +81,7 @@ public:
 private:
   
   // VTK-ITK Connection typedefs
-  typedef itk::VTKImageExport<ImageType,vtkFloatingPointType> VTKExportType;
+  typedef itk::VTKImageExport<ImageType> VTKExportType;
   typedef itk::SmartPointer<VTKExportType> VTKExportPointer;
   
   // Current set of mesh options
