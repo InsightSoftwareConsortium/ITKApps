@@ -1277,7 +1277,10 @@ guiMainImplementation
     {
     newResult = true;
     this->ChangeStatusDisplay("Registering using the affine method...");
+
     RegionType region;
+    region = m_MovingImage->GetLargestPossibleRegion();
+
     if ( tkAffineUseUserRegion->value() == 1
           && tkMovingImageViewer->IsRegionOfInterestAvailable() )
       {
@@ -1292,6 +1295,7 @@ guiMainImplementation
       region = tkMovingImageViewer->ComputeLandmarkRegion
         (tkAffineRegionScale->value());
       }
+
     m_ImageRegistrationApp->SetMovingImageRegion(region);
     m_ImageRegistrationApp->RegisterUsingAffineMethod();
     }
