@@ -4,41 +4,37 @@
 
 #include "itkConfidenceConnectedImageFilter.h"
 
-static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
-{
 
-  vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
-  const unsigned int Dimension = 3;
-
-  const unsigned int numberOfIterations = atoi( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
-  const float        multiplier         = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
-  const int          replaceValue       = atoi( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ) );
-  const unsigned int initialRadius      = atoi( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ) );
-  const bool         compositeOutput    = atoi( info->GetGUIProperty(info, 4, VVP_GUI_VALUE ) );
-  
-  if( info->NumberOfMarkers < 1 )
-    {
-    info->SetProperty( info, VVP_ERROR, "Please select a seed point using the 3D Markers in the Annotation menu" ); 
-    return -1;
-    }
-
-  itk::Index<Dimension> seed;
-  VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, 0, seed );
-
-  try 
+template <class InputPixelType>
+class ConfidenceConnectedRunner
   {
-  switch( info->InputVolumeScalarType )
+  public:
+    itkStaticConstMacro( Dimension, unsigned int, 3);
+    typedef  itk::Image< InputPixelType, Dimension >  InputImageType; 
+    typedef  unsigned char                            OutputPixelType;
+    typedef  itk::Image< OutputPixelType, Dimension > OutputImageType; 
+    typedef  InputImageType::IndexType                IndexType;
+    typedef  itk::ConfidenceConnectedImageFilter< InputImageType,  
+                                                OutputImageType >   FilterType;
+  public:
+    ConfidenceConnectedRunner( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
     {
-    case VTK_UNSIGNED_CHAR:
-      {
-      typedef  unsigned char                            InputPixelType;
-      typedef  itk::Image< InputPixelType, Dimension >  InputImageType; 
-      typedef  unsigned char                            OutputPixelType;
-      typedef  itk::Image< OutputPixelType, Dimension > OutputImageType; 
-      typedef  InputImageType::IndexType            IndexType;
-      typedef  itk::ConfidenceConnectedImageFilter< InputImageType,  
-                                                    OutputImageType >   FilterType;
+      const unsigned int numberOfIterations = atoi( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
+      const float        multiplier         = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
+      const int          replaceValue       = atoi( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ) );
+      const unsigned int initialRadius      = atoi( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ) );
+      const bool         compositeOutput    = atoi( info->GetGUIProperty(info, 4, VVP_GUI_VALUE ) );
+
+      if( info->NumberOfMarkers < 1 )
+        {
+        info->SetProperty( info, VVP_ERROR, "Please select a seed point using the 3D Markers in the Annotation menu" ); 
+        return;
+        }
+
+      itk::Index<Dimension> seed;
+      VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, 0, seed );
+
       VolView::PlugIn::FilterModuleDoubleOutput< FilterType > module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Confidence Connected Region Growing...");
@@ -51,29 +47,68 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.SetProduceDoubleOutput( compositeOutput          );
       // Execute the filter
       module.ProcessData( pds  );
+    }
+  };
+
+
+
+static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
+{
+
+  vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
+
+  try 
+  {
+  switch( info->InputVolumeScalarType )
+    {
+    case VTK_CHAR:
+      {
+      ConfidenceConnectedRunner<signed char> runner( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_CHAR:
+      {
+      ConfidenceConnectedRunner<unsigned char> runner( info, pds );
+      break; 
+      }
+    case VTK_SHORT:
+      {
+      ConfidenceConnectedRunner<signed short> runner( info, pds );
       break; 
       }
     case VTK_UNSIGNED_SHORT:
       {
-      typedef  unsigned short                            InputPixelType;
-      typedef  itk::Image< InputPixelType, Dimension >   InputImageType; 
-      typedef  unsigned char                             OutputPixelType;
-      typedef  itk::Image< OutputPixelType, Dimension >  OutputImageType; 
-      typedef  InputImageType::IndexType            IndexType;
-      typedef  itk::ConfidenceConnectedImageFilter< InputImageType,  
-                                                    OutputImageType >   FilterType;
-      VolView::PlugIn::FilterModuleDoubleOutput< FilterType > module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Confidence Connected Region Growing...");
-      // Set the parameters on it
-      module.GetFilter()->SetNumberOfIterations(        numberOfIterations );
-      module.GetFilter()->SetMultiplier(                multiplier         );
-      module.GetFilter()->SetReplaceValue(              replaceValue       );
-      module.GetFilter()->SetInitialNeighborhoodRadius( initialRadius      );
-      module.GetFilter()->SetSeed(                      seed               );
-      module.SetProduceDoubleOutput( compositeOutput          );
-      // Execute the filter
-      module.ProcessData( pds );
+      ConfidenceConnectedRunner<unsigned short> runner( info, pds );
+      break; 
+      }
+    case VTK_INT:
+      {
+      ConfidenceConnectedRunner<signed int> runner( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_INT:
+      {
+      ConfidenceConnectedRunner<unsigned int> runner( info, pds );
+      break; 
+      }
+    case VTK_LONG:
+      {
+      ConfidenceConnectedRunner<signed long> runner( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_LONG:
+      {
+      ConfidenceConnectedRunner<unsigned long> runner( info, pds );
+      break; 
+      }
+    case VTK_FLOAT:
+      {
+      ConfidenceConnectedRunner<float> runner( info, pds );
+      break; 
+      }
+    case VTK_DOUBLE:
+      {
+      ConfidenceConnectedRunner<double> runner( info, pds );
       break; 
       }
     }
