@@ -55,6 +55,7 @@ SET (PLUGINS
   vvITKConnectedThreshold
   vvITKCurvatureAnisotropicDiffusion
   vvITKCurvatureFlow 
+  vvITKDeformableModelModule
   vvITKFastMarching
   vvITKFastMarchingModule
   vvITKGeodesicActiveContourModule
