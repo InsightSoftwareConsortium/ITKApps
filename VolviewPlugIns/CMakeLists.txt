@@ -57,6 +57,7 @@ SET (PLUGINS
   vvITKIsotropicFourthOrderLevelSet
   vvITKMedian
   vvITKLandmarkWarping
+  vvITKRescaleIntensityTo8Bits
   vvITKSigmoid
   vvITKShapeDetectionModule
   vvITKSurfaceSpline
