@@ -150,13 +150,13 @@ static int UpdateGUI(void *inf)
   info->SetGUIProperty(info, 1, VVP_GUI_TYPE, VVP_GUI_SCALE);
   info->SetGUIProperty(info, 1, VVP_GUI_DEFAULT, "0.01");
   info->SetGUIProperty(info, 1, VVP_GUI_HELP, "The lowest value of water level for which basins will be computed. This prevents to spend time in computing micro basins at the lowest levels.");
-  info->SetGUIProperty(info, 1, VVP_GUI_HINTS , "0.01 1.0 0.01");
+  info->SetGUIProperty(info, 1, VVP_GUI_HINTS , "0.001 0.1 0.001");
 
   info->SetGUIProperty(info, 2, VVP_GUI_LABEL, "Water Level.");
   info->SetGUIProperty(info, 2, VVP_GUI_TYPE, VVP_GUI_SCALE);
   info->SetGUIProperty(info, 2, VVP_GUI_DEFAULT, "0.1");
   info->SetGUIProperty(info, 2, VVP_GUI_HELP, "The level of water at which the basins will be identified. It is expressed as a fraction of the maximum possible level.");
-  info->SetGUIProperty(info, 2, VVP_GUI_HINTS , "0.01 1.0 0.01");
+  info->SetGUIProperty(info, 2, VVP_GUI_HINTS , "0.01 0.5 0.01");
 
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, "0");
   
