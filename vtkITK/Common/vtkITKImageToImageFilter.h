@@ -56,7 +56,7 @@ public:
   // during a pipeline update.  Setting the
   // ReleaseDataBeforeUpdateFlag can minimize peak memory utilization
   // during a pipeline update.
-  virtual void SetReleaseDataBeforeUpdateFlag(int i) {};
+  virtual void SetReleaseDataBeforeUpdateFlag(int ) {};
   virtual int GetReleaseDataBeforeUpdateFlag() {return 0;};
   vtkBooleanMacro(ReleaseDataBeforeUpdateFlag, int);
   
