@@ -2,15 +2,6 @@ ADD_EXECUTABLE(itk3DIsotropicFourthOrderLevelSetImageFilter itk3DIsotropicFourth
 ADD_EXECUTABLE(itk3DAnisotropicFourthOrderLevelSetImageFilter itk3DAnisotropicFourthOrderLevelSetImageFilter.cxx)
 ADD_EXECUTABLE(itk3DUnsharpMaskLevelSetImageFilter itk3DUnsharpMaskLevelSetImageFilter.cxx)
 
-TARGET_LINK_LIBRARIES (itk3DIsotropicFourthOrderLevelSetImageFilter ITKAlgorithms ITKBasicFilters ITKCommon ITKIO)
-
-TARGET_LINK_LIBRARIES (itk3DAnisotropicFourthOrderLevelSetImageFilter ITKAlgorithms ITKBasicFilters ITKCommon ITKIO)
-
-TARGET_LINK_LIBRARIES (itk3DUnsharpMaskLevelSetImageFilter ITKAlgorithms ITKBasicFilters ITKCommon ITKIO)
-
-
-
-
-
-
-
+TARGET_LINK_LIBRARIES (itk3DIsotropicFourthOrderLevelSetImageFilter ITKAlgorithms ITKBasicFilters ITKCommon ITKNumerics ITKIO ITKMetaIO itkzlib pthread m dl )
+TARGET_LINK_LIBRARIES (itk3DAnisotropicFourthOrderLevelSetImageFilter ITKAlgorithms ITKBasicFilters ITKCommon ITKNumerics ITKIO ITKMetaIO itkzlib pthread m dl)
+TARGET_LINK_LIBRARIES (itk3DUnsharpMaskLevelSetImageFilter ITKAlgorithms ITKBasicFilters ITKCommon ITKIO ITKNumerics ITKIO ITKMetaIO itkzlib pthread m dl)
