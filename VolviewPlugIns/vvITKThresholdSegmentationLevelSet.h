@@ -103,8 +103,8 @@ public:
     filter->SetNumberOfIterations( maximumNumberOfIterations );
     filter->SetEdgeWeight( edgeWeight );
 
-    InputToFloatFilterType::Pointer     inputCaster   = InputToFloatFilterType::New();
-    FeatureToFloatFilterType::Pointer   featureCaster = FeatureToFloatFilterType::New();
+    typename InputToFloatFilterType::Pointer     inputCaster   = InputToFloatFilterType::New();
+    typename FeatureToFloatFilterType::Pointer   featureCaster = FeatureToFloatFilterType::New();
    
     inputCaster->SetInput(    this->GetInput1()  );
     featureCaster->SetInput(  this->GetInput2()  );

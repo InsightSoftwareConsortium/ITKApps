@@ -271,7 +271,7 @@ Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
 {
   m_Info = info;
   m_Optimizer->SetNumberOfIterations(
-    atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE )));
+    atoi( info->GetGUIProperty(info, 0, VVP_GUI_VALUE )));
   
   this->ImportPixelBuffer( info, pds );  
   
@@ -281,8 +281,8 @@ Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
 
   
   // first do it on reduced resolution images
-  ShrinkFilterType::Pointer shrink1 = ShrinkFilterType::New();
-  ShrinkFilterType::Pointer shrink2 = ShrinkFilterType::New();
+  typename ShrinkFilterType::Pointer shrink1 = ShrinkFilterType::New();
+  typename ShrinkFilterType::Pointer shrink2 = ShrinkFilterType::New();
   
   shrink1->SetInput( m_ImportFilter->GetOutput() );
   shrink1->SetShrinkFactors(4);
@@ -295,7 +295,7 @@ Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
   m_Registration->SetMovingImage( shrink2->GetOutput() );
 
   // setup the initializer
-  TransformInitializerType::Pointer initializer = 
+  typename TransformInitializerType::Pointer initializer = 
     TransformInitializerType::New();  
   
   m_Transform->SetIdentity();
@@ -305,12 +305,13 @@ Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
   initializer->MomentsOn();
   initializer->InitializeTransform();
   
-  RegistrationType::ParametersType initParams = 
-    m_Transform->GetParameters();      
+  typename RegistrationType::ParametersType initParams = 
+                                    m_Transform->GetParameters();      
+
   m_Registration->SetInitialTransformParameters( initParams );
 
-  OptimizerType::ScalesType optimizerScales(
-    m_Transform->GetNumberOfParameters());
+  typename OptimizerType::ScalesType optimizerScales(
+                            m_Transform->GetNumberOfParameters());
 
   optimizerScales[0] = 1.0;
   optimizerScales[1] = 1.0;
@@ -355,8 +356,8 @@ Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
     m_Optimizer->SetMaximumStepLength(0.2);
     m_Optimizer->SetMinimumStepLength(0.002);
     m_Optimizer->SetNumberOfIterations( 
-      atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE )) - 
-      m_Optimizer->GetCurrentIteration());
+            atoi( info->GetGUIProperty(info, 0, VVP_GUI_VALUE )) - 
+            m_Optimizer->GetCurrentIteration());
     try
       {
       m_Registration->StartRegistration();
@@ -369,10 +370,10 @@ Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
     }
   
   // now get the resulting parameters
-  RegistrationType::ParametersType finalParameters = 
+  typename RegistrationType::ParametersType finalParameters = 
     m_Registration->GetLastTransformParameters();
   
-  TransformType::Pointer finalTransform = TransformType::New();
+  typename TransformType::Pointer finalTransform = TransformType::New();
   finalTransform->SetParameters( finalParameters );
   finalTransform->SetCenter(m_Transform->GetCenter());
   
