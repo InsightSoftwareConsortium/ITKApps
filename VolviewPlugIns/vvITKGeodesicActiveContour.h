@@ -69,15 +69,15 @@ public:
     m_RescaleLevelSetFilter = RescaleLeveSetFilterType::New();
     m_SmoothingFilter       = SmoothingFilterType::New();
 
-    m_RescaleSpeedFilter->SetInput( this->GetSecondInput() );
+    m_RescaleSpeedFilter->SetInput( this->GetInput2() );
     m_RescaleSpeedFilter->SetOutputMaximum( 1.0 );
     m_RescaleSpeedFilter->SetOutputMinimum( 0.0 );
 
-    m_SmoothingFilter->SetInput( this->GetInput() );
+    m_SmoothingFilter->SetInput( this->GetInput1() );
     
     m_RescaleLevelSetFilter->SetInput( m_SmoothingFilter->GetOutput() );
-    m_RescaleSpeedFilter->SetOutputMaximum(  0.5 );
-    m_RescaleSpeedFilter->SetOutputMinimum( -0.5 );
+    m_RescaleLevelSetFilter->SetOutputMaximum(  0.5 );
+    m_RescaleLevelSetFilter->SetOutputMinimum( -0.5 );
 
     m_RescaleSpeedFilter->ReleaseDataFlagOn();
     m_RescaleLevelSetFilter->ReleaseDataFlagOn();
@@ -99,6 +99,8 @@ public:
   void 
   ProcessData( const vtkVVProcessDataStruct * pds )
   {
+    // Let superclass perform initial connections
+    this->Superclass::ProcessData( pds );
 
     GeodesicActiveContourFilterType * filter = this->GetFilter();
 
@@ -126,10 +128,34 @@ public:
     filter->SetInput(         m_RescaleLevelSetFilter->GetOutput()  );
     filter->SetFeatureImage(  m_RescaleSpeedFilter->GetOutput()     );
 
-    // Now let the base class do the rest.
-    this->Superclass::ProcessData( pds );
-    
-   
+    // Execute the filter
+    try
+      {
+      filter->Update();
+      }
+    catch( itk::ProcessAborted & )
+      {
+      return;
+      }
+
+    // Copy the data (with casting) to the output buffer provided by the PlugIn API
+    OutputImageType::ConstPointer outputImage =
+                                         filter->GetOutput();
+
+    typedef itk::ImageRegionConstIterator< OutputImageType >  OutputIteratorType;
+
+    OutputIteratorType ot( outputImage, outputImage->GetBufferedRegion() );
+
+    OutputPixelType * outData = (OutputPixelType *)(pds->outData);
+
+    ot.GoToBegin(); 
+    while( !ot.IsAtEnd() )
+      {
+      *outData = ot.Get();
+      ++ot;
+      ++outData;
+      }
+
   } // end of ProcessData
 
 
