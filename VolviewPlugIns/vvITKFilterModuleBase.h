@@ -10,11 +10,13 @@
 #include "itkCommand.h"
 #include "itkProcessObject.h"
 #include "itkImageRegion.h"
+#include "itkSize.h"
+#include "itkIndex.h"
 
 
 #include <string.h>
 #include <stdlib.h>
-
+#include <stdio.h>
 
 namespace VolView
 {
@@ -30,8 +32,8 @@ public:
 
   // Type used by most algorithms. These types depend only on dimension.
   typedef itk::ImageRegion<3>     RegionType;
-  typedef RegionType::IndexType   IndexType;
-  typedef RegionType::SizeType    SizeType;
+  typedef itk::Index<3>           IndexType;
+  typedef itk::Size<3>            SizeType;
 
 public:
 

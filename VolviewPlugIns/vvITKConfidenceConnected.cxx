@@ -69,51 +69,61 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     case VTK_CHAR:
       {
       ConfidenceConnectedRunner<signed char> runner( info, pds );
+      (void)runner;
       break; 
       }
     case VTK_UNSIGNED_CHAR:
       {
       ConfidenceConnectedRunner<unsigned char> runner( info, pds );
+      (void)runner;
       break; 
       }
     case VTK_SHORT:
       {
       ConfidenceConnectedRunner<signed short> runner( info, pds );
+      (void)runner;
       break; 
       }
     case VTK_UNSIGNED_SHORT:
       {
       ConfidenceConnectedRunner<unsigned short> runner( info, pds );
+      (void)runner;
       break; 
       }
     case VTK_INT:
       {
       ConfidenceConnectedRunner<signed int> runner( info, pds );
+      (void)runner;
       break; 
       }
     case VTK_UNSIGNED_INT:
       {
       ConfidenceConnectedRunner<unsigned int> runner( info, pds );
+      (void)runner;
       break; 
       }
     case VTK_LONG:
       {
       ConfidenceConnectedRunner<signed long> runner( info, pds );
+      (void)runner;
       break; 
       }
     case VTK_UNSIGNED_LONG:
       {
       ConfidenceConnectedRunner<unsigned long> runner( info, pds );
+      (void)runner;
       break; 
       }
     case VTK_FLOAT:
       {
       ConfidenceConnectedRunner<float> runner( info, pds );
+      (void)runner;
       break; 
       }
     case VTK_DOUBLE:
       {
       ConfidenceConnectedRunner<double> runner( info, pds );
+      (void)runner;
       break; 
       }
     }

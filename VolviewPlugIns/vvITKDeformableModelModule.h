@@ -46,9 +46,9 @@ public:
                                   Dimension       > ImportFilterType;
 
   
-  typedef ImportFilterType::RegionType    RegionType;
-  typedef RegionType::SizeType            SizeType;
-  typedef RegionType::IndexType           IndexType;
+  typedef typename ImportFilterType::RegionType    RegionType;
+  typedef typename RegionType::SizeType            SizeType;
+  typedef typename RegionType::IndexType           IndexType;
 
 
   // Instantiate the GradientMagnitude filter.  This filter is the first stage

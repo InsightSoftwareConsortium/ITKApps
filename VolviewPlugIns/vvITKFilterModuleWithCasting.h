@@ -58,10 +58,6 @@ public:
                                 InternalImageType > CastFilterType;
 
 
-  // Instantiate the filter type
-  typedef TFilterType           FilterType;
-
-
 public:
 
   /**  Constructor */

@@ -209,7 +209,8 @@ DeformableModelModule<TInputPixelType>
   float * points = new float[ numberOfPoints * 3 ];
   opds->MeshPoints = points;
   float * outputPointsItr = points;
-  typedef typename MeshType::PointsContainer::ConstIterator PointIterator;
+  typedef typename MeshType::PointsContainer      PointsContainer;
+  typedef typename PointsContainer::ConstIterator PointIterator;
   PointIterator pointItr  = mesh->GetPoints()->Begin();
   PointIterator pointsEnd = mesh->GetPoints()->End();
 
@@ -226,7 +227,8 @@ DeformableModelModule<TInputPixelType>
   opds->NumberOfMeshCells = mesh->GetNumberOfCells();
   unsigned int numEntries = 0;
   
-  typedef typename MeshType::CellsContainer::ConstIterator CellIterator;
+  typedef typename MeshType::CellsContainer         CellsContainer;
+  typedef typename CellsContainer::ConstIterator    CellIterator;
   CellIterator cellItr = mesh->GetCells()->Begin();
   CellIterator cellEnd = mesh->GetCells()->End();
 
