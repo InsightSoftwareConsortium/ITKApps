@@ -274,8 +274,13 @@ SET(PROGRAM_DATA_FILES
   ProgramData/HTMLHelp/Artwork/ttManualSegmentSaveWizard.gif
   ProgramData/HTMLHelp/Artwork/ttManualSegmentSaveWizardFilled.gif
   ProgramData/HTMLHelp/Artwork/ttManualSegmentToolbarManual.gif
+  ProgramData/HTMLHelp/Artwork/ttRegion3DImaginaryLine.gif
+  ProgramData/HTMLHelp/Artwork/ttRegion3DScalpelLine.gif
+  ProgramData/HTMLHelp/Artwork/ttRegion3DScalpelResult.gif
+  ProgramData/HTMLHelp/Artwork/ttRegion3DTools.gif
   ProgramData/HTMLHelp/Artwork/ttRegionAddBubble01.gif
   ProgramData/HTMLHelp/Artwork/ttRegionAddBubble02.gif
+  ProgramData/HTMLHelp/Artwork/ttRegionFunctionForVentricles.gif
   ProgramData/HTMLHelp/Artwork/ttRegionNewInterface.gif
   ProgramData/HTMLHelp/Artwork/ttRegionParameterWindow.gif
   ProgramData/HTMLHelp/Artwork/ttRegionPreprocessor01.gif
@@ -284,7 +289,9 @@ SET(PROGRAM_DATA_FILES
   ProgramData/HTMLHelp/Artwork/ttRegionROISelection01.gif
   ProgramData/HTMLHelp/Artwork/ttRegionROISelection02.gif
   ProgramData/HTMLHelp/Artwork/ttRegionROISelectionFinal.gif
+  ProgramData/HTMLHelp/Artwork/ttRegionScalpelLabels.gif
   ProgramData/HTMLHelp/Artwork/ttRegionToolbar.gif
+  ProgramData/HTMLHelp/Artwork/ttRegionVentricleResult.gif
   ProgramData/HTMLHelp/Artwork/ttRegionWizard02.gif
   ProgramData/HTMLHelp/Artwork/ttRegionWizard03.gif
   ProgramData/HTMLHelp/Artwork/ttViewImageControlPanel.gif
