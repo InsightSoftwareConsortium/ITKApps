@@ -67,9 +67,6 @@ public:
     m_CastFilter         = CastFilterType::New();
     m_Filter             = FilterType::New();
 
-    m_CastFilter->ReleaseDataFlagOn();
-    m_Filter->ReleaseDataFlagOn();
-
     m_Filter->SetInput( m_CastFilter->GetOutput() );
 
     // Set the Observer for updating progress in the GUI
