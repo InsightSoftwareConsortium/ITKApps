@@ -495,7 +495,7 @@ ImageRegistrationApp< TImage, TRealImage >
                                   m_FixedImageOffset, m_MovingImageOffset) ;
 
   std::cout << "DEBUG: full affine registration result transform: " << m_AffineTransform << std::endl ;
-  std::cout << "DEBUG: final metric value = " << metric->GetValue(finalParameters) << std::endl ;
+//  std::cout << "DEBUG: final metric value = " << metric->GetValue(finalParameters) << std::endl ;
 }
 
 template< class TImage, class TRealImage >
