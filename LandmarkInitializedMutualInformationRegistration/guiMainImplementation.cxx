@@ -568,7 +568,7 @@ guiMainImplementation
     ReaderType::GroupPointer group = reader->GetGroup();
     ReaderType::GroupType::ChildrenListType* children = group->GetChildren();
     LandmarkSpatialObjectType::Pointer landmarks = 
-      dynamic_cast< LandmarkSpatialObjectType* >(*(children->begin()));
+      dynamic_cast< LandmarkSpatialObjectType* >((*(children->begin())).GetPointer());
 
     if (moving)
       {
