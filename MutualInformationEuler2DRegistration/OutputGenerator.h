@@ -59,10 +59,10 @@ public:
   typedef TImage ImageType;
 
   /** Image dimension enumeration. */
-  enum { ImageDimension = TImage::ImageDimension };
+  itkStaticConstMacro(ImageDimension, unsigned int,ImageType::ImageDimension);
 
   /** Affine transform type. */
-  typedef itk::AffineTransform<double,ImageDimension> AffineTransformType;
+  typedef itk::AffineTransform<double,itkGetStaticConstMacro(ImageDimension)> AffineTransformType;
   typedef typename AffineTransformType::Pointer AffineTransformPointer;
 
   /** Set the fixed image. */

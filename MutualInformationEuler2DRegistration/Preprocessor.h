@@ -79,10 +79,10 @@ public:
   typedef TOutputImage OutputImageType;
 
   /** Image dimension enumeration. */
-  enum { ImageDimension = TInputImage::ImageDimension };
+  itkStaticConstMacro(ImageDimension, unsigned int,InputImageType::ImageDimension);
 
   /** Affine transform type. */
-  typedef itk::AffineTransform<double,ImageDimension>   AffineTransformType;
+  typedef itk::AffineTransform<double,itkGetStaticConstMacro(ImageDimension)>   AffineTransformType;
   typedef typename AffineTransformType::Pointer AffineTransformPointer;
 
   /** Axes permuter type. */
