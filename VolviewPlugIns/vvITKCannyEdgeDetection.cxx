@@ -4,37 +4,39 @@
 
 #include "itkCannyEdgeDetectionImageFilter.h"
 
-static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
-{
-
-  vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
-
-  const unsigned int Dimension = 3;
-
-  typedef   float            InternalPixelType;
-  typedef   float            OutputPixelType;
-
-  typedef   itk::Image< InternalPixelType, Dimension > InternalImageType; 
-  typedef   itk::Image< OutputPixelType,   Dimension > OutputImageType; 
-
-  typedef   itk::CannyEdgeDetectionImageFilter< 
-                                InternalImageType,  
-                                OutputImageType >   FilterType;
- 
-  const float        variance           = atof(  info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
-  const float        maximumError       = atof(  info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
-  const float        threshold          = atof(  info->GetGUIProperty(info, 2, VVP_GUI_VALUE ) );
 
 
-  try 
+
+template <class InputPixelType>
+class CannyEdgeDetectionRunner
   {
-  switch( info->InputVolumeScalarType )
-    {
-    case VTK_UNSIGNED_CHAR:
-      {
-      VolView::PlugIn::FilterModuleWithCasting< unsigned char, 
+  public:
+      typedef  InputPixelType                       PixelType;
+      typedef  itk::Image< PixelType, 3 >           ImageType; 
+
+      typedef   float       InternalPixelType;
+      typedef   itk::Image< InternalPixelType,3 > InternalImageType; 
+
+      typedef   itk::CannyEdgeDetectionImageFilter< 
+                                    InternalImageType,  
+                                    InternalImageType >   FilterType;
+     
+      typedef  unsigned char                    OutputPixelType;
+
+      typedef  VolView::PlugIn::FilterModuleWithCasting< 
+                                                InputPixelType,
                                                 FilterType,
-                                                unsigned char  > module;
+                                                OutputPixelType > ModuleType;
+
+  public:
+    CannyEdgeDetectionRunner() {}
+    void Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
+    {
+      const float        variance           = atof(  info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
+      const float        maximumError       = atof(  info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
+      const float        threshold          = atof(  info->GetGUIProperty(info, 2, VVP_GUI_VALUE ) );
+
+      ModuleType  module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Canny edge detection...");
       // Set the parameters on it
@@ -43,24 +45,89 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.GetFilter()->SetThreshold( threshold );
       // Execute the filter
       module.ProcessData( pds  );
+    }
+  };
+
+
+
+
+
+static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
+{
+
+  vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
+
+
+  try 
+  {
+  switch( info->InputVolumeScalarType )
+    {
+    case VTK_CHAR:
+      {
+      CannyEdgeDetectionRunner<signed char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_CHAR:
+      {
+      CannyEdgeDetectionRunner<unsigned char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_SHORT:
+      {
+      CannyEdgeDetectionRunner<signed short> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_SHORT:
       {
-      VolView::PlugIn::FilterModuleWithCasting< unsigned short,
-                                                FilterType,
-                                                unsigned char  > module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Canny edge detection...");
-      // Set the parameters on it
-      module.GetFilter()->SetVariance( variance );
-      module.GetFilter()->SetMaximumError( maximumError );
-      module.GetFilter()->SetThreshold( threshold );
-      // Execute the filter
-      module.ProcessData( pds );
+      CannyEdgeDetectionRunner<unsigned short> runner;
+      runner.Execute( info, pds );
       break; 
       }
+    case VTK_INT:
+      {
+      CannyEdgeDetectionRunner<signed int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_INT:
+      {
+      CannyEdgeDetectionRunner<unsigned int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_LONG:
+      {
+      CannyEdgeDetectionRunner<signed long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_LONG:
+      {
+      CannyEdgeDetectionRunner<unsigned long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_FLOAT:
+      {
+      CannyEdgeDetectionRunner<float> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_DOUBLE:
+      {
+      CannyEdgeDetectionRunner<double> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    default:
+      info->SetProperty( info, VVP_ERROR, "Pixel Type Unknown for this filter" ); 
+      return -1;
+      break;
     }
+
   }
   catch( itk::ExceptionObject & except )
   {
