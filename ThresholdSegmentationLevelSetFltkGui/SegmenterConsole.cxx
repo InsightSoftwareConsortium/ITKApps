@@ -398,7 +398,8 @@ SegmenterConsole::ShowSpeedImage()
     this->ResetAllParameters();
     
     // Only run one iteration
-    m_thresholdSegmentation->SetMaximumIterations( 0 );
+    //m_thresholdSegmentation->SetMaximumIterations( 0 ); 
+    m_thresholdSegmentation->SetNumberOfIterations( 0 );
 
     // Give an input guaranteed to be intialized
     m_thresholdSegmentation->SetInput( m_guessImage );
@@ -473,7 +474,8 @@ SegmenterConsole::ResetAllParameters()
   m_thresholdSegmentation->SetPropagationScaling( propagation->value() );
   m_thresholdSegmentation->SetEdgeWeight( edge->value() );
   m_thresholdSegmentation->SetMaximumRMSError( RMSError->value() );
-  m_thresholdSegmentation->SetMaximumIterations( (unsigned int)maxIterations->value() );
+  //m_thresholdSegmentation->SetMaximumIterations( (unsigned int)maxIterations->value() );
+  m_thresholdSegmentation->SetNumberOfIterations( (unsigned int)maxIterations->value() );
   m_thresholdSegmentation->SetMaximumCurvatureTimeStep( maxCurvatureTimeStep->value() );
   m_thresholdSegmentation->SetMaximumPropagationTimeStep( maxPropagationTimeStep->value() );  
   m_thresholdSegmentation->SetSmoothingIterations( (unsigned int)threshIterations->value() );
@@ -693,6 +695,7 @@ void SegmenterConsole::GetClickPoints(float x, float y)
 {
   WriteImageType3D::IndexType pixelIndex1;
   WriteImageType::IndexType pixelIndex2;
+  WriteImageType::PixelType initialValue2 = 255;
 
   switch(m_drawCase)
     {
@@ -702,13 +705,15 @@ void SegmenterConsole::GetClickPoints(float x, float y)
       
       pixelIndex1[2] = 0;
       
-      for(int i=-2; i< 2; i++) {
-      for(int j=-2; j< 2; j++) {
-      pixelIndex1[0] = (int)x+i;
-      pixelIndex1[1] = (int)y+j;
-      m_thresh->SetPixel(pixelIndex1, 5);
-      }
-      }
+      for(int i=-2; i< 2; i++) 
+        {
+        for(int j=-2; j< 2; j++) 
+          {
+          pixelIndex1[0] = (int)x+i;
+          pixelIndex1[1] = (int)y+j;
+          m_thresh->SetPixel(pixelIndex1, 5);
+          }
+        }
       m_InputViewer->Update();
       break;
     case 2: // setting x and y seed points
@@ -722,17 +727,36 @@ void SegmenterConsole::GetClickPoints(float x, float y)
       
       pixelIndex1[2] = 0;
       
-      for(int i=-guessRadius; i< guessRadius; i++) {
-      for(int j=-guessRadius; j< guessRadius; j++) {
-      pixelIndex1[0] = (int)x+i;
-      pixelIndex1[1] = (int)y+j;
-      m_image->SetPixel(pixelIndex1, 2);
-      
-      pixelIndex2[0] = (int)x+i;
-      pixelIndex2[1] = (int)y+j;
-      m_guessImage->SetPixel(pixelIndex2, 0);
-      }
-      }
+      for(int i=-guessRadius; i< guessRadius; i++) 
+        {
+        for(int j=-guessRadius; j< guessRadius; j++) 
+          {
+          pixelIndex1[0] = (int)x+i;
+          pixelIndex1[1] = (int)y+j;
+
+        
+          if (eraseGuess->value() < 1)
+            {
+            m_image->SetPixel(pixelIndex1, 2);
+            }
+          else
+            {
+            m_image->SetPixel(pixelIndex1, 0);
+            }
+          
+          pixelIndex2[0] = (int)x+i;
+          pixelIndex2[1] = (int)y+j;
+
+          if (eraseGuess->value() < 1)
+            {
+            m_guessImage->SetPixel(pixelIndex2, 0);
+            }
+          else
+            {
+            m_guessImage->SetPixel(pixelIndex2, initialValue2);
+            }
+          }
+        }
       m_InputViewer->Update();
       break;
     default:

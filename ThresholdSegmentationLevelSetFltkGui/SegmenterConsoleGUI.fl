@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0103
+version 1.0104 
 header_name {.h} 
 code_name {.cxx}
 class SegmenterConsoleGUI {open : {public SegmenterConsoleBase}
@@ -8,7 +8,7 @@ class SegmenterConsoleGUI {open : {public SegmenterConsoleBase}
   } {
     Fl_Window consoleWindow {
       label {Level-Set Segmenter } open
-      xywh {408 202 665 400} box DOWN_BOX color 0 labelsize 10 labelcolor 0
+      xywh {184 116 665 400} box DOWN_BOX color 0 labelsize 10 labelcolor 0
       code0 {\#include <SegmenterConsoleBase.h>}
       code1 {\#include <fltkLightButton.h>} visible
     } {
@@ -80,7 +80,7 @@ class SegmenterConsoleGUI {open : {public SegmenterConsoleBase}
           xywh {320 197 35 18} box PLASTIC_DOWN_BOX labelsize 10 labelcolor 0 textsize 10
         }
       }
-      Fl_Group Case3Group {
+      Fl_Group Case3Group {open
         xywh {270 205 256 95} labeltype NO_LABEL deactivate
       } {
         Fl_Box {} {
@@ -95,7 +95,11 @@ class SegmenterConsoleGUI {open : {public SegmenterConsoleBase}
         Fl_Button {} {
           label Clear
           callback {ClearGuess();}
-          xywh {275 258 80 22} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX labelsize 10
+          xywh {275 258 31 22} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX labelsize 10
+        }
+        Fl_Check_Button eraseGuess {
+          label Erase
+          xywh {308 258 50 22} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX labelsize 10
         }
       }
       Fl_Group radioGroup {
