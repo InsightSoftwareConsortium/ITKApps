@@ -55,6 +55,23 @@ class VTK_EXPORT vtkITKCurvatureAnisotropicDiffusionImageFilterSS : public vtkIT
     DelegateITKInputMacro ( SetConductanceParameter, value );
   };
 
+  void SetUseImageSpacing ( int value )
+  {
+    DelegateITKInputMacro ( SetUseImageSpacing, (bool) value );
+  }
+  void UseImageSpacingOn()
+  {
+    this->SetUseImageSpacing (true);
+  }
+  void UseImageSpacingOff()
+  {
+    this->SetUseImageSpacing (false);
+  }
+  int GetUseImageSpacing()
+  {
+    DelegateITKOutputMacro ( GetUseImageSpacing );
+  }
+
 protected:
   //BTX
   typedef itk::CurvatureAnisotropicDiffusionImageFilter<Superclass::InputImageType,Superclass::OutputImageType> ImageFilterType;
@@ -69,7 +86,7 @@ private:
   void operator=(const vtkITKCurvatureAnisotropicDiffusionImageFilterSS&);  // Not implemented.
 };
 
-vtkCxxRevisionMacro(vtkITKCurvatureAnisotropicDiffusionImageFilterSS, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkITKCurvatureAnisotropicDiffusionImageFilterSS, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkITKCurvatureAnisotropicDiffusionImageFilterSS);
 
 #endif
