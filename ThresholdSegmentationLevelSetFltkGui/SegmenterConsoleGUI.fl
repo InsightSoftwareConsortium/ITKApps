@@ -8,7 +8,7 @@ class SegmenterConsoleGUI {open : {public SegmenterConsoleBase}
   } {
     Fl_Window consoleWindow {
       label {Segmenter } open
-      xywh {398 190 906 345} labelsize 12 labelcolor 0 resizable
+      xywh {302 198 905 345} labelsize 12 labelcolor 0 resizable
       code0 {\#include <SegmenterConsoleBase.h>}
       code1 {\#include <fltkLightButton.h>} visible
     } {
@@ -18,7 +18,7 @@ class SegmenterConsoleGUI {open : {public SegmenterConsoleBase}
       }
       Fl_Light_Button ShowInputButton {
         label {Load Input Image}
-        callback {Load();} selected
+        callback {Load();}
         xywh {11 8 134 30} type Normal box ROUND_UP_BOX down_box EMBOSSED_BOX value 1 selection_color 121 labelsize 12 align 16
         class {fltk::LightButton}
       }
@@ -109,12 +109,12 @@ class SegmenterConsoleGUI {open : {public SegmenterConsoleBase}
           xywh {704 102 45 25} labelsize 12 when 4 textsize 12
         }
         Fl_Value_Input edge {
-          label {LaPlacian Weight:}
+          label {Laplacian Term Weight:}
           callback {SetThresholdFilterToModified();}
           xywh {705 132 45 25} labelsize 12 when 4 textsize 12
         }
         Fl_Value_Input maxIterations {
-          label {Max Iterations:}
+          label {Maximum Iterations:}
           callback {SetThresholdFilterToModified();}
           xywh {705 162 45 25} labelsize 12 when 4 textsize 12
         }
@@ -129,17 +129,17 @@ class SegmenterConsoleGUI {open : {public SegmenterConsoleBase}
           xywh {735 219 25 27} down_box DOWN_BOX labelsize 12 align 4 when 1
         }
         Fl_Value_Input threshIterations {
-          label {Smoothing Iterations:}
+          label {Laplacian Smoothing Iterations:}
           callback {SetThresholdFilterToModified();}
           xywh {706 250 45 25} labelsize 12 when 4 textsize 12
         }
         Fl_Value_Input threshConductance {
-          label {Smoothing Conductance:}
+          label {Laplacian Smoothing Conductance:}
           callback {SetThresholdFilterToModified();}
           xywh {706 279 45 25} labelsize 12 when 4 textsize 12
         }
         Fl_Value_Input threshTimeStep {
-          label {Smoothing Time Step:}
+          label {Laplacian Smoothing Time Step:}
           callback {SetThresholdFilterToModified();}
           xywh {706 308 45 25} labelsize 12 when 4 textsize 12
         }
@@ -176,7 +176,15 @@ class SegmenterConsoleGUI {open : {public SegmenterConsoleBase}
         }
         Fl_Button stopSeg {
           label Stop
-          xywh {809 142 52 25} box ROUND_UP_BOX
+          xywh {809 142 52 25} box ROUND_UP_BOX deactivate
+        }
+        Fl_Value_Input lastRMSChange {
+          label {Last RMS Change}
+          xywh {775 275 100 25} color 93 labelsize 12 align 5 when 4 textsize 12 deactivate
+        }
+        Fl_Value_Input elapsedIterations {
+          label {Elapsed Iterations} selected
+          xywh {775 315 100 25} color 93 labelsize 12 align 5 when 4 textsize 12 deactivate
         }
       }
       Fl_Button {} {
@@ -345,7 +353,7 @@ class SegmenterConsoleGUI {open : {public SegmenterConsoleBase}
     }
     Fl_Window helpWin {
       label Help open
-      xywh {547 741 343 306} resizable visible
+      xywh {368 624 340 305} resizable visible
     } {
       Fl_Output helpText {
         xywh {6 5 330 265} type Multiline labeltype NO_LABEL labelsize 12 textsize 12 resizable

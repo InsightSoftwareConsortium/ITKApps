@@ -396,7 +396,7 @@ SegmenterConsole::ShowSpeedImage()
     m_thresholdSegmentation->SetMaximumRMSError( RMSError->value() );
     m_thresholdSegmentation->SetMaximumIterations( 0 );
 
-    m_thresholdSegmentation->SetSmoothingIterations( threshIterations->value() );
+    m_thresholdSegmentation->SetSmoothingIterations( (unsigned int)threshIterations->value() );
     m_thresholdSegmentation->SetSmoothingConductance( threshConductance->value() );
     m_thresholdSegmentation->SetSmoothingTimeStep( threshTimeStep->value() );
     
@@ -468,7 +468,7 @@ SegmenterConsole::ShowSegmentedImage(void)
   m_thresholdSegmentation->SetMaximumRMSError( RMSError->value() );
   m_thresholdSegmentation->SetMaximumIterations( (unsigned int)maxIterations->value() );
   
-  m_thresholdSegmentation->SetSmoothingIterations( threshIterations->value() );
+  m_thresholdSegmentation->SetSmoothingIterations( (unsigned int)threshIterations->value() );
   m_thresholdSegmentation->SetSmoothingConductance( threshConductance->value() );
   m_thresholdSegmentation->SetSmoothingTimeStep( threshTimeStep->value() );
   
@@ -809,9 +809,10 @@ void SegmenterConsole::UpdateViewerAfterIteration()
   
   static unsigned int iterationCounter = 0;
 
-  if( (iterationCounter%((int)updateIterations->value()) == 0) && (iterationCounter != 0) ) {
-  //if( (iterationCounter != 0) ) {
-
+  if( (iterationCounter%((int)updateIterations->value()) == 0) && (iterationCounter != 0) )
+    {
+    //if( (iterationCounter != 0) ) {
+    
     // Move the pixel container and image information of the image we are working
     // on into a temporary image to  use as the input to the mini-pipeline.  This
     // avoids a complete copy of the image.
@@ -841,6 +842,9 @@ void SegmenterConsole::UpdateViewerAfterIteration()
     m_InputViewer->SetOverlayOpacity(1.0);
     m_InputViewer->Update();
     Fl::check();
+
+    elapsedIterations->value(m_thresholdSegmentation->GetElapsedIterations());
+    lastRMSChange->value(m_thresholdSegmentation->GetRMSChange());
 
   }
   iterationCounter++;
