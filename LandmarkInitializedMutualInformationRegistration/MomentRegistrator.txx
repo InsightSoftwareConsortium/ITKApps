@@ -47,7 +47,7 @@ MomentRegistrator< TImage >
     {   
     // Don't call superclass startRegistration since optimizer, etc isn't used
     //Superclass::StartRegistration();
-    MomentsCalculatorType::AffineTransformType::Pointer newTransform;
+    typename MomentsCalculatorType::AffineTransformType::Pointer newTransform;
     newTransform = MomentsCalculatorType::AffineTransformType::New();
     newTransform->SetIdentity();
 
@@ -72,7 +72,7 @@ MomentRegistrator< TImage >
       this->GetMovingImage()->TransformIndexToPhysicalPoint(movingCenterIndex,
                                                             movingCenterPoint);
 
-      TransformType::OffsetType offset;
+      typename TransformType::OffsetType offset;
       offset = fixedCenterPoint - movingCenterPoint;
 
       newTransform->SetCenter(movingCenterPoint);
@@ -80,16 +80,16 @@ MomentRegistrator< TImage >
       }
     else 
       {
-      MomentsCalculatorType::Pointer momCalc;
+      typename MomentsCalculatorType::Pointer momCalc;
       momCalc = MomentsCalculatorType::New();
   
       momCalc->SetImage(this->GetFixedImage());
       momCalc->Compute();
-      MomentsCalculatorType::AffineTransformType::Pointer 
+      typename MomentsCalculatorType::AffineTransformType::Pointer 
             fixedImageAxesTransform;
       fixedImageAxesTransform = 
             momCalc->GetPhysicalAxesToPrincipalAxesTransform();
-      TransformType::InputPointType fixedImageCenterOfMass;
+      typename TransformType::InputPointType fixedImageCenterOfMass;
       for(int i=0; i<ImageDimension; i++)
         {
         fixedImageCenterOfMass[i] = momCalc->GetCenterOfGravity()[i];
@@ -97,17 +97,17 @@ MomentRegistrator< TImage >
   
       momCalc->SetImage(this->GetMovingImage());
       momCalc->Compute();
-      MomentsCalculatorType::AffineTransformType::Pointer 
+      typename MomentsCalculatorType::AffineTransformType::Pointer 
             movingImageAxesTransform;
       movingImageAxesTransform = 
             momCalc->GetPrincipalAxesToPhysicalAxesTransform();
-      TransformType::InputPointType movingImageCenterOfMass;
+      typename TransformType::InputPointType movingImageCenterOfMass;
       for(int i=0; i<ImageDimension; i++)
         {
         movingImageCenterOfMass[i] = momCalc->GetCenterOfGravity()[i];
         }
   
-      TransformType::OffsetType offset;
+      typename TransformType::OffsetType offset;
       offset = fixedImageCenterOfMass - movingImageCenterOfMass;
       
       if(m_NumberOfMoments == 1) // Centers of mass
