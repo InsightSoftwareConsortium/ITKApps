@@ -7,6 +7,7 @@
 #include <FL/Fl_Check_Button.H>
 #include <time.h>
 #include <itkCastImageFilter.h>
+#include <itkImageFileWriter.h>
 
 template<class ImageType>
 class ITKFlFileWriter : public Fl_File_ChooserModified
@@ -22,17 +23,7 @@ protected:
   static void cb_okButton(Fl_Return_Button *o, void *d);
 };
 
-
-
-template <class ImageType>
-ITKFlFileWriter<ImageType>::
-ITKFlFileWriter(ImageType * imP, const char *d, const char *p, int t, const char *title)
-:Fl_File_ChooserModified(d, p, t, title)
-  { 
-  okButton -> label( "Save" );
-
-  Fl_Choice* o = guiITKPixelType = new Fl_Choice(85, 345, 105, 25, "Pixel Type:");
-  Fl_Menu_Item menu_guiITKPixelType[] = {
+ Fl_Menu_Item  menu_guiITKPixelType[] = {
  {"char", 0,  0, 0, 0, 0, 0, 11, 56},
  {"unsigned char", 0,  0, 0, 0, 0, 0, 11, 56},
  {"short", 0,  0, 0, 0, 0, 0, 11, 56},
@@ -43,6 +34,16 @@ ITKFlFileWriter(ImageType * imP, const char *d, const char *p, int t, const char
  {"double", 0,  0, 0, 0, 0, 0, 11, 56},
  {0}
   };
+
+
+template <class ImageType>
+ITKFlFileWriter<ImageType>::
+ITKFlFileWriter(ImageType * imP, const char *d, const char *p, int t, const char *title)
+:Fl_File_ChooserModified(d, p, t, title)
+  { 
+  okButton -> label( "Save" );
+
+  Fl_Choice* o = guiITKPixelType = new Fl_Choice(85, 345, 105, 25, "Pixel Type:");
 
   o -> box(FL_PLASTIC_UP_BOX);
   o -> down_box(FL_BORDER_BOX);
@@ -80,13 +81,20 @@ GetITKPixelType()
 
 
 
+template <class TImage, class TPixelType>
+class itkFlWriteFile
+{
+public:
+
+  typedef itkFlWriteFile Self;
+  typedef TImage ImageType;
+  typedef TPixelType PixelType;
+  itkStaticConstMacro(ImageDimension,unsigned int, ImageType::ImageDimension);
+  
 template <class ImageType, class PixelType>
-void
 itkFlWriteFile( ImageType * img, PixelType val, char * filename )
   {
-
-  itkStaticConstMacro(ImageDimension,unsigned int, ImageType::ImageDimension);
-  typedef itk::Image< PixelType,  itkGetStaticConstMacro(ImageDimension)>  SavedImageType;
+  typedef itk::Image< PixelType, itkGetStaticConstMacro(ImageDimension)>  SavedImageType;
   typedef itk::ImageFileWriter< SavedImageType  >             WriterType;
   typename WriterType::Pointer writer = WriterType::New();
 
@@ -112,7 +120,9 @@ itkFlWriteFile( ImageType * img, PixelType val, char * filename )
     }
   }
 
+  ~itkFlWriteFile(){};
 
+};
 
 
 template <class ImageType>                                 
