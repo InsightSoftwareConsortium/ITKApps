@@ -9,6 +9,7 @@ ${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer
 ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
 ${InsightApplications_SOURCE_DIR}/Auxiliary/VtkFltk
 ${InsightApplications_BINARY_DIR}/Auxiliary/VtkFltk
+${InsightApplications_SOURCE_DIR}/Auxiliary/vtk
 ${VTK_SOURCE_DIR}/Common
 ${VTK_SOURCE_DIR}/Filtering
 ${VTK_SOURCE_DIR}/Imaging
@@ -27,6 +28,7 @@ ${ITK_BINARY_DIR}/Code/Algorithms
 ${ITK_BINARY_DIR}/Code/IO
 ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
 ${InsightApplications_BINARY_DIR}/Auxiliary/VtkFltk
+${InsightApplications_BINARY_DIR}/Auxiliary/vtk
 ${VTK_BINARY_DIR}/Common
 ${VTK_BINARY_DIR}/Filtering
 ${VTK_BINARY_DIR}/Imaging
