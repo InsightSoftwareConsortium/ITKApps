@@ -197,9 +197,9 @@ MeshObject
     // Build display list
     glNewList(m_DisplayListIndex + dl,GL_COMPILE);
 
-    int ntris=0;
-    int npts;
-    int *pts;
+    vtkIdType ntris = 0;
+    vtkIdType npts;
+    vtkIdType *pts;
     for ( triStrips->InitTraversal(); triStrips->GetNextCell(npts,pts); ) {
       ntris += npts-2;
       glBegin( GL_TRIANGLE_STRIP );
@@ -311,6 +311,9 @@ MeshObject
 }
 
 /*Log: MeshObject.cxx
+/*Revision 1.1  2003/07/12 04:52:25  pauly
+/*Initial checkin of SNAP application  to the InsightApplications tree
+/*
 /*Revision 1.2  2003/07/12 01:34:18  pauly
 /*More final changes before ITK checkin
 /*
