@@ -1,19 +1,11 @@
 #ifndef __RigidRegistrator_h
 #define __RigidRegistrator_h
 
-// MUST CALL IN ORDER (especially first 3)
-// SetFixedImage
-// SetMovingImage
-// SetLearningRate and other parameters
-// SetFixedImageRegion()
-// StartRegistration()
-// GetTransform()
-
 #include "itkImage.h"
 
 #include "itkImageRegistrationMethod.h"
 #include "itkVersorRigid3DTransform.h"
-#include "itkMutualInformationImageToImageMetric.h"
+#include "itkMattesMutualInformationImageToImageMetric.h"
 #include "itkOnePlusOneEvolutionaryOptimizer.h"
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkNormalVariateGenerator.h"
@@ -42,7 +34,7 @@ class RigidRegistrator : public itk::ImageRegistrationMethod < TImage, TImage >
     typedef TransformType::ParametersType ScalesType ;
     typedef itk::LinearInterpolateImageFunction< TImage, double > 
                  InterpolatorType ;
-    typedef itk::MutualInformationImageToImageMetric< 
+    typedef itk::MattesMutualInformationImageToImageMetric< 
                  TImage, TImage > MetricType ;
 
     void StartRegistration() ;
@@ -76,11 +68,6 @@ class RigidRegistrator : public itk::ImageRegistrationMethod < TImage, TImage >
     itkGetMacro(MovingImageRegionDefined, bool);
     itkSetMacro(MovingImageRegionDefined, bool);
 
-    itkSetMacro(MetricMovingImageStandardDeviation, double);
-    itkGetMacro(MetricMovingImageStandardDeviation, double);
-    itkSetMacro(MetricFixedImageStandardDeviation, double);
-    itkGetMacro(MetricFixedImageStandardDeviation, double);
-
   protected:
     RigidRegistrator() ;
     virtual ~RigidRegistrator() ;
@@ -92,21 +79,10 @@ class RigidRegistrator : public itk::ImageRegistrationMethod < TImage, TImage >
     void PrintError(itk::ExceptionObject &e) ;
 
   private:
-    // Base Class Defines
-    // TImage *      m_FixedImage ;
-    // TImage *      m_MovingImage ;
-
-    // typename MetricType::Pointer m_Metric ;
-    // typename OptimizerType::Pointer m_Optimizer ;
-    // typename TransformType::Pointer m_Transform ;
-    // typename InterpolatorType::Pointer m_Interpolator ;
-
     unsigned int  m_OptimizerNumberOfIterations;
     ScalesType    m_OptimizerScales;
 
     unsigned int  m_MetricNumberOfSpatialSamples;
-    double        m_MetricMovingImageStandardDeviation;
-    double        m_MetricFixedImageStandardDeviation;
 
     bool          m_MovingImageRegionDefined;
     RegionType    m_MovingImageRegion;

@@ -18,31 +18,23 @@ RigidRegistrator< TImage >
   this->SetInterpolator(InterpolatorType::New());
 
   this->SetOptimizer(OptimizerType::New());
-  this->GetTypedOptimizer()->MaximizeOn();
-  m_OptimizerNumberOfIterations = 1000 ;
+  m_OptimizerNumberOfIterations = 100 ;
   m_OptimizerScales.resize(9) ; 
-  m_OptimizerScales[0] = 500; // rotations
-  m_OptimizerScales[1] = 500;
-  m_OptimizerScales[2] = 500;
-  m_OptimizerScales[3] = 200;  // center of rotation
-  m_OptimizerScales[4] = 200;
-  m_OptimizerScales[5] = 200;
-  m_OptimizerScales[6] = 10;  // offset
-  m_OptimizerScales[7] = 10;
-  m_OptimizerScales[8] = 10;
+  m_OptimizerScales[0] = 200; // rotations
+  m_OptimizerScales[1] = 200;
+  m_OptimizerScales[2] = 200;
+  m_OptimizerScales[3] = 10;  // center of rotation
+  m_OptimizerScales[4] = 10;
+  m_OptimizerScales[5] = 10;
+  m_OptimizerScales[6] = 1;  // offset
+  m_OptimizerScales[7] = 1;
+  m_OptimizerScales[8] = 1;
   this->GetTypedOptimizer()->SetNormalVariateGenerator(
                 OptimizerNormalGeneratorType::New());
 
-  typename MetricType::Pointer newMetric = MetricType::New();
-  this->SetMetric(newMetric);
-  m_MetricNumberOfSpatialSamples = 50 ;
-  m_MetricMovingImageStandardDeviation = 0.4;
-  m_MetricFixedImageStandardDeviation = 0.4;
+  this->SetMetric(MetricType::New());
+  m_MetricNumberOfSpatialSamples = 20000 ;
 
-  // Base class handles
-  //m_FixedImage = NULL;
-  //m_MovingImage = NULL;
-  //m_FixedImageRegionDefined = false;
   m_MovingImageRegionDefined = false;
   }
 
@@ -66,6 +58,16 @@ void
 RigidRegistrator< TImage >
 ::Initialize() throw (ExceptionObject)
   {
+  this->GetInterpolator()->SetInputImage(this->GetMovingImage()) ;
+
+  this->GetTypedMetric()->SetNumberOfSpatialSamples( 
+                          m_MetricNumberOfSpatialSamples );
+
+  this->GetTypedOptimizer()->SetScales( m_OptimizerScales );
+  this->GetTypedOptimizer()->SetMaximumIteration(m_OptimizerNumberOfIterations);
+  this->GetTypedOptimizer()->Initialize(1.01); // Initial search radius
+  this->GetTypedOptimizer()->SetEpsilon(0.0000000000001);
+
   try
     {
     Superclass::Initialize();
@@ -74,50 +76,6 @@ RigidRegistrator< TImage >
     {
     throw(e);
     }
-  
-  // Base class handles
-  // m_Interpolator->SetInputImage(m_MovingImage) ;
-
-  this->GetTypedOptimizer()->SetScales( m_OptimizerScales );
-  this->GetTypedOptimizer()->SetMaximumIteration(m_OptimizerNumberOfIterations);
-  this->GetTypedOptimizer()->Initialize(4.0, 1.1, 0.9); // Initial search radius
-  this->GetTypedOptimizer()->SetEpsilon(0.00000001);
-  
-  this->GetTypedMetric()->SetNumberOfSpatialSamples( 
-                          m_MetricNumberOfSpatialSamples );
-  
-  typedef itk::StatisticsImageFilter< TImage > StatsFilterType;
-  typename StatsFilterType::Pointer statsFilter = StatsFilterType::New();
-  typedef itk::RegionOfInterestImageFilter<TImage, TImage> ROIFilterType;
-  typename ROIFilterType::Pointer roiFilter = ROIFilterType::New();
-  if(this->GetMovingImageRegionDefined())
-    {
-    roiFilter->SetInput(this->GetMovingImage());
-    roiFilter->SetRegionOfInterest(this->GetMovingImageRegion());
-    statsFilter->SetInput(roiFilter->GetOutput());
-    }
-  else
-    {
-    statsFilter->SetInput(this->GetMovingImage());
-    }
-  statsFilter->Update();
-  double stdDev;
-  stdDev = m_MetricMovingImageStandardDeviation * statsFilter->GetSigma();
-  this->GetTypedMetric()->SetMovingImageStandardDeviation( stdDev );
-
-  if(this->GetFixedImageRegionDefined())
-    {
-    roiFilter->SetInput(this->GetFixedImage());
-    roiFilter->SetRegionOfInterest(this->GetFixedImageRegion());
-    statsFilter->SetInput(roiFilter->GetOutput());
-    }
-  else
-    {
-    statsFilter->SetInput(this->GetFixedImage());
-    }
-  statsFilter->Update();
-  stdDev = m_MetricFixedImageStandardDeviation * statsFilter->GetSigma();
-  this->GetTypedMetric()->SetFixedImageStandardDeviation( stdDev );
   }
 
 template< class TImage >

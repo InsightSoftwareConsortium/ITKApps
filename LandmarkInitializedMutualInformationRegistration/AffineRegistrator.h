@@ -12,8 +12,8 @@
 #include "itkImage.h"
 
 #include "itkImageRegistrationMethod.h"
-#include "itkCenteredAffineTransform.h"
-#include "itkMutualInformationImageToImageMetric.h"
+#include "itkScaleSkewVersor3DTransform.h"
+#include "itkMattesMutualInformationImageToImageMetric.h"
 #include "itkOnePlusOneEvolutionaryOptimizer.h"
 #include "itkNormalVariateGenerator.h"
 #include "itkLinearInterpolateImageFunction.h"
@@ -34,19 +34,17 @@ class AffineRegistrator : public itk::ImageRegistrationMethod < TImage, TImage >
     typedef typename TImage::PixelType PixelType ;
     typedef typename TImage::RegionType RegionType ;
 
-    /** preprocessing related typedefs */
-    typedef itk::CenteredAffineTransform<double> TransformType ;
+    typedef itk::ScaleSkewVersor3DTransform<double> TransformType ;
     typedef itk::OnePlusOneEvolutionaryOptimizer OptimizerType ;
     typedef itk::Statistics::NormalVariateGenerator  OptimizerNormalGeneratorType;
     typedef OptimizerType::ParametersType ParametersType ;
     typedef typename OptimizerType::ScalesType ScalesType ;
     typedef itk::LinearInterpolateImageFunction< TImage, double > 
                  InterpolatorType ;
-    typedef itk::MutualInformationImageToImageMetric< 
+    typedef itk::MattesMutualInformationImageToImageMetric< 
                  TImage, TImage > MetricType ;
 
     void StartRegistration() ;
-
 
     TransformType * GetTypedTransform(void)
       {
@@ -76,11 +74,6 @@ class AffineRegistrator : public itk::ImageRegistrationMethod < TImage, TImage >
     itkGetMacro(MovingImageRegionDefined, bool);
     itkSetMacro(MovingImageRegionDefined, bool);
 
-    itkSetMacro(MetricMovingImageStandardDeviation, double);
-    itkGetMacro(MetricMovingImageStandardDeviation, double);
-    itkSetMacro(MetricFixedImageStandardDeviation, double);
-    itkGetMacro(MetricFixedImageStandardDeviation, double);
-
   protected:
     AffineRegistrator() ;
     virtual ~AffineRegistrator() ;
@@ -92,22 +85,11 @@ class AffineRegistrator : public itk::ImageRegistrationMethod < TImage, TImage >
     void PrintError(itk::ExceptionObject &e) ;
 
   private:
-    // Base Class Defines
-    // TImage *      m_FixedImage ;
-    // TImage *      m_MovingImage ;
-
-    // typename MetricType::Pointer m_Metric ;
-    // typename OptimizerType::Pointer m_Optimizer ;
-    // typename TransformType::Pointer m_Transform ;
-    // typename InterpolatorType::Pointer m_Interpolator ;
 
     unsigned int  m_OptimizerNumberOfIterations;
-    double        m_OptimizerLearningRate;
     ScalesType    m_OptimizerScales;
 
     unsigned int  m_MetricNumberOfSpatialSamples;
-    double        m_MetricMovingImageStandardDeviation;
-    double        m_MetricFixedImageStandardDeviation;
 
     bool          m_MovingImageRegionDefined;
     RegionType    m_MovingImageRegion;

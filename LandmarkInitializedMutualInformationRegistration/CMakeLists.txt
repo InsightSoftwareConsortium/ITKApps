@@ -22,6 +22,7 @@ INCLUDE_DIRECTORIES(
 ADD_EXECUTABLE(LandmarkInitializedMutualInformationRegistration
   guiMainImplementation.cxx
   LandmarkRegistrator.cxx
+  itkTranslationVersorTransformOptimizer.cxx
   main.cxx
 )
 

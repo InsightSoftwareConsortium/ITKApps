@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0103 
+version 1.0104 
 header_name {.h} 
 code_name {.cxx}
 class guiMain {open
@@ -330,7 +330,7 @@ Register();}
       }
     }
     Fl_Window tkRegionOfInterestWindow {
-      label {Region of Interest} selected
+      label {Region of Interest}
       xywh {810 292 350 321} type Double box PLASTIC_UP_BOX color 159 visible
     } {
       Fl_Group {} {
@@ -464,226 +464,8 @@ tkMovingImageViewer->DrawRegionOfInterest() ;}
         xywh {15 15 385 465} labelsize 12
       } {
         Fl_Group {} {
-          label Rigid open
-          xywh {15 40 375 430} align 2 hide
-        } {
-          Fl_Box {} {
-            label {Rotation Scales}
-            xywh {35 60 155 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
-          }
-          Fl_Value_Input tkRigidRotationScaleX {
-            label {X:}
-            xywh {110 70 65 25} labelsize 12 maximum 1e+009 step 1 value 100
-          }
-          Fl_Value_Input tkRigidRotationScaleY {
-            label {Y:}
-            xywh {110 100 65 25} labelsize 12 maximum 1e+009 step 1 value 100
-          }
-          Fl_Value_Input tkRigidRotationScaleZ {
-            label {Z:}
-            xywh {110 130 65 25} labelsize 12 maximum 1e+009 step 1 value 100
-          }
-          Fl_Box tkRigidCoRScale {
-            label {Center of Rotation Scales}
-            xywh {210 60 160 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
-          }
-          Fl_Value_Input tkRigidTranslationScaleCoRX {
-            label {X:}
-            xywh {290 70 65 25} labelsize 12 maximum 1e+009 step 0.1 value 2
-          }
-          Fl_Value_Input tkRigidTranslationScaleCoRY {
-            label {Y:}
-            xywh {290 100 65 25} labelsize 12 maximum 1e+009 step 0.1 value 2
-          }
-          Fl_Value_Input tkRigidTranslationScaleCoRZ {
-            label {Z:}
-            xywh {290 130 65 25} labelsize 12 maximum 1e+009 step 0.1 value 2
-          }
-          Fl_Value_Input tkRigidNumberOfIterations {
-            label {Number of Iterations:}
-            xywh {305 310 65 25} labeltype EMBOSSED_LABEL labelsize 12 value 200
-          }
-          Fl_Value_Input tkRigidFixedImageStdDev {
-            label {Fixed Image Standard Deviation:}
-            xywh {305 370 65 25} labeltype EMBOSSED_LABEL labelsize 12 value 0.4
-          }
-          Fl_Value_Input tkRigidMovingImageStdDev {
-            label {Moving Image Standard Deviation:}
-            xywh {305 400 65 25} labeltype EMBOSSED_LABEL labelsize 12 value 0.4
-          }
-          Fl_Value_Input tkRigidNumberOfSpatialSamples {
-            label {Number of Spatial Samples}
-            xywh {305 430 65 25} labeltype EMBOSSED_LABEL labelsize 12 maximum 10000 value 50
-          }
-          Fl_Box {} {
-            label {Translation Scales}
-            xywh {130 185 160 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
-          }
-          Fl_Value_Input tkRigidTranslationScaleX {
-            label {X:}
-            xywh {210 195 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
-          }
-          Fl_Value_Input tkRigidTranslationScaleY {
-            label {Y:}
-            xywh {210 225 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
-          }
-          Fl_Value_Input tkRigidTranslationScaleZ {
-            label {Z:}
-            xywh {210 255 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
-          }
-        }
-        Fl_Group {} {
-          label Affine open
-          xywh {15 40 375 430} hide
-        } {
-          Fl_Box {} {
-            label {Matrix Scales}
-            xywh {30 65 345 125} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
-          }
-          Fl_Value_Input tkAffineMatrixScale0 {
-            xywh {115 95 65 25} labelsize 12 maximum 1e+009 step 1 value 100
-          }
-          Fl_Value_Input tkAffineMatrixScale1 {
-            xywh {185 95 65 25} labelsize 12 maximum 1e+009 step 1 value 75
-          }
-          Fl_Value_Input tkAffineMatrixScale2 {
-            xywh {255 95 65 25} labelsize 12 maximum 1e+009 step 1 value 75
-          }
-          Fl_Box {} {
-            label 1
-            xywh {130 70 35 25}
-          }
-          Fl_Box {} {
-            label 2
-            xywh {200 70 35 25}
-          }
-          Fl_Box {} {
-            label 3
-            xywh {270 70 35 25}
-          }
-          Fl_Box {} {
-            label 1
-            xywh {85 95 30 25}
-          }
-          Fl_Box {} {
-            label 2
-            xywh {85 125 30 25}
-          }
-          Fl_Box {} {
-            label 3
-            xywh {85 160 30 25}
-          }
-          Fl_Value_Input tkAffineMatrixScale3 {
-            xywh {115 125 65 25} labelsize 12 maximum 1e+009 step 1 value 75
-          }
-          Fl_Value_Input tkAffineMatrixScale4 {
-            xywh {185 125 65 25} labelsize 12 maximum 1e+009 step 1 value 100
-          }
-          Fl_Value_Input tkAffineMatrixScale5 {
-            xywh {255 125 65 25} labelsize 12 maximum 1e+009 step 1 value 75
-          }
-          Fl_Value_Input tkAffineMatrixScale6 {
-            xywh {115 160 65 25} labelsize 12 maximum 1e+009 step 1 value 75
-          }
-          Fl_Value_Input tkAffineMatrixScale7 {
-            xywh {185 160 65 25} labelsize 12 maximum 1e+009 step 1 value 75
-          }
-          Fl_Value_Input tkAffineMatrixScale8 {
-            xywh {255 160 65 25} labelsize 12 maximum 1e+009 step 1 value 100
-          }
-          Fl_Box {} {
-            label {Translation Scales}
-            xywh {30 210 345 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
-          }
-          Fl_Value_Input tkAffineTranslationScaleX {
-            label {X:}
-            xywh {185 215 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
-          }
-          Fl_Value_Input tkAffineTranslationScaleY {
-            label {Y:}
-            xywh {185 245 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
-          }
-          Fl_Value_Input tkAffineTranslationScaleZ {
-            label {Z:}
-            xywh {185 275 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
-          }
-          Fl_Value_Input tkAffineNumberOfIterations {
-            label {Number of Iterations:}
-            xywh {310 315 65 25} labeltype EMBOSSED_LABEL labelsize 12 maximum 10000 value 200
-          }
-          Fl_Value_Input tkAffineFixedImageStdDev {
-            label {Fixed Image Standard Deviation:}
-            xywh {310 375 65 25} labeltype EMBOSSED_LABEL labelsize 12 value 0.4
-          }
-          Fl_Value_Input tkAffineMovingImageStdDev {
-            label {Moving Image Standard Deviation:}
-            xywh {310 405 65 25} labeltype EMBOSSED_LABEL labelsize 12 value 0.4
-          }
-          Fl_Value_Input tkAffineNumberOfSpatialSamples {
-            label {Number of Spatial Samples:}
-            xywh {310 435 65 25} labeltype EMBOSSED_LABEL labelsize 12 maximum 10000 value 50
-          }
-        }
-        Fl_Group {} {
-          label Landmark open
-          xywh {15 40 370 430} hide
-        } {
-          Fl_Box {} {
-            label {Rotation Scales}
-            xywh {40 70 155 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
-          }
-          Fl_Box {} {
-            label {Center of Rotation Scales}
-            xywh {40 195 155 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
-          }
-          Fl_Value_Input tkLandmarkNumberOfIterations {
-            label {Number of Iterations:}
-            xywh {275 210 45 25} labeltype EMBOSSED_LABEL labelsize 12 align 1 value 200
-          }
-          Fl_Value_Input tkLandmarkRotationScaleY {
-            label {Y:}
-            xywh {115 80 65 25} labelsize 12 maximum 1e+009 step 1 value 100
-          }
-          Fl_Value_Input tkLandmarkRotationScaleZ {
-            label {Z:}
-            xywh {115 107 65 25} labelsize 12 maximum 1e+009 step 1 value 100
-          }
-          Fl_Value_Input tkLandmarkTranslationScaleCoRX {
-            label {X:}
-            xywh {115 203 65 25} labelsize 12 maximum 1e+009 step 1 value 2
-          }
-          Fl_Value_Input tkLandmarkTranslationScaleCoRY {
-            label {Y:}
-            xywh {115 233 65 25} labelsize 12 maximum 1e+009 step 1 value 2
-          }
-          Fl_Value_Input tkLandmarkTranslationScaleCoRZ {
-            label {Z:}
-            xywh {115 263 65 25} labelsize 12 maximum 1e+009 step 1 value 2
-          }
-          Fl_Value_Input tkLandmarkRotationScaleX {
-            label {X:}
-            xywh {115 135 65 25} labelsize 12 maximum 1e+009 step 1 value 100
-          }
-          Fl_Box {} {
-            label {Translation Scales}
-            xywh {40 325 155 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
-          }
-          Fl_Value_Input tkLandmarkTranslationScaleX {
-            label {X:}
-            xywh {115 333 65 25} labelsize 12 maximum 1e+009 step 1 value 1
-          }
-          Fl_Value_Input tkLandmarkTranslationScaleY {
-            label {Y:}
-            xywh {115 363 65 25} labelsize 12 maximum 1e+009 step 1 value 1
-          }
-          Fl_Value_Input tkLandmarkTranslationScaleZ {
-            label {Z:}
-            xywh {115 393 65 25} labelsize 12 maximum 1e+009 step 1 value 1
-          }
-        }
-        Fl_Group {} {
-          label Region open
-          xywh {25 50 365 430}
+          label Region
+          xywh {25 50 365 430} hide
         } {
           Fl_Box {} {
             label {Rigid }
@@ -732,6 +514,97 @@ tkMovingImageViewer->DrawRegionOfInterest() ;}
               label {Use the user specified region}
               xywh {55 245 25 25} type Radio down_box ROUND_DOWN_BOX
             }
+          }
+        }
+        Fl_Group {} {
+          label Landmark
+          xywh {15 40 370 430} hide
+        } {
+          Fl_Value_Input tkLandmarkNumberOfIterations {
+            label {Number of Iterations:}
+            xywh {300 310 65 25} labeltype EMBOSSED_LABEL labelsize 12 value 200
+          }
+          Fl_Box {} {
+            label Scales
+            xywh {110 85 205 125} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 1
+          }
+          Fl_Value_Input tkLandmarkRotationScale {
+            label Rotation
+            xywh {235 100 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+          }
+          Fl_Value_Input tkLandmarkCenterOfRotationScale {
+            label {Center of Rotation}
+            xywh {235 135 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+          }
+          Fl_Value_Input tkLandmarkTranslationScale {
+            label Translation
+            xywh {235 170 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+          }
+        }
+        Fl_Group {} {
+          label Rigid
+          xywh {15 40 375 430} align 2 hide
+        } {
+          Fl_Value_Input tkRigidNumberOfIterations {
+            label {Number of Iterations:}
+            xywh {300 310 65 25} labeltype EMBOSSED_LABEL labelsize 12 value 200
+          }
+          Fl_Value_Input tkRigidNumberOfSpatialSamples {
+            label {Number of Spatial Samples:}
+            xywh {300 350 65 25} labeltype EMBOSSED_LABEL labelsize 12 maximum 10000 value 50
+          }
+          Fl_Box {} {
+            label Scales
+            xywh {110 85 205 125} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 1
+          }
+          Fl_Value_Input tkRigidRotationScale {
+            label Rotation
+            xywh {235 100 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+          }
+          Fl_Value_Input tkRigidCenterOfRotationScale {
+            label {Center of Rotation}
+            xywh {235 135 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+          }
+          Fl_Value_Input tkRigidTranslationScale {
+            label Translation
+            xywh {235 170 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+          }
+        }
+        Fl_Group {} {
+          label Affine selected
+          xywh {15 40 375 430}
+        } {
+          Fl_Value_Input tkAffineNumberOfIterations {
+            label {Number of Iterations:}
+            xywh {300 310 65 25} labeltype EMBOSSED_LABEL labelsize 12 maximum 10000 value 200
+          }
+          Fl_Value_Input tkAffineNumberOfSpatialSamples {
+            label {Number of Spatial Samples:}
+            xywh {300 350 65 25} labeltype EMBOSSED_LABEL labelsize 12 maximum 10000 value 50
+          }
+          Fl_Box {} {
+            label Scales
+            xywh {110 85 205 195} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 1
+          }
+          Fl_Value_Input tkAffineRotationScale {
+            label Rotation
+            xywh {235 100 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+          }
+          Fl_Value_Input tkAffineCenterOfRotationScale {
+            label {Center of Rotation}
+            xywh {235 135 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+          }
+          Fl_Value_Input tkAffineTranslationScale {
+            label Translation
+            xywh {235 170 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+          }
+          Fl_Value_Input tkAffineScaleScale {
+            label Scale
+            xywh {235 205 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+          }
+          Fl_Value_Input tkAffineSkewScale {
+            label Skew
+            xywh {235 240 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
           }
         }
       }

@@ -15,15 +15,15 @@ LandmarkRegistrator::LandmarkRegistrator()
   m_OptimizerNumberOfIterations = 5000;
 
   m_OptimizerScales.resize(9);
-  m_OptimizerScales[0] = 500; // rotation
-  m_OptimizerScales[1] = 500;
-  m_OptimizerScales[2] = 500;
-  m_OptimizerScales[3] = 200; // center of rotation
-  m_OptimizerScales[4] = 200;
-  m_OptimizerScales[5] = 200;
-  m_OptimizerScales[6] = 10;   // offset
-  m_OptimizerScales[7] = 10;
-  m_OptimizerScales[8] = 10;
+  m_OptimizerScales[0] = 200; // rotation
+  m_OptimizerScales[1] = 200;
+  m_OptimizerScales[2] = 200;
+  m_OptimizerScales[3] = 10; // center of rotation
+  m_OptimizerScales[4] = 10;
+  m_OptimizerScales[5] = 10;
+  m_OptimizerScales[6] = 1;   // offset
+  m_OptimizerScales[7] = 1;
+  m_OptimizerScales[8] = 1;
   }
 
 LandmarkRegistrator

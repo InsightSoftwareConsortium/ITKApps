@@ -15,7 +15,6 @@
 #include "itkMutualInformationImageToImageMetric.h"
 #include "itkOnePlusOneEvolutionaryOptimizer.h"
 #include "itkGradientDescentOptimizer.h"
-#include "itkAffineTransform.h"
 #include "itkLinearInterpolateImageFunction.h"
 
 #include "itkImageFileWriter.h"

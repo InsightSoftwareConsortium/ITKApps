@@ -809,32 +809,16 @@ guiMainImplementation
   tkAdvancedOptionsWindow->show();
 
   // set landmark advance option values
-  tkLandmarkRotationScaleX->value(m_ImageRegistrationApp->GetLandmarkScales()[0]);
-  tkLandmarkRotationScaleY->value(m_ImageRegistrationApp->GetLandmarkScales()[1]);
-  tkLandmarkRotationScaleZ->value(m_ImageRegistrationApp->GetLandmarkScales()[2]);
-  tkLandmarkTranslationScaleCoRX->value(m_ImageRegistrationApp->GetLandmarkScales()[3]);
-  tkLandmarkTranslationScaleCoRY->value(m_ImageRegistrationApp->GetLandmarkScales()[4]);
-  tkLandmarkTranslationScaleCoRZ->value(m_ImageRegistrationApp->GetLandmarkScales()[5]);
-  tkLandmarkTranslationScaleX->value(m_ImageRegistrationApp->GetLandmarkScales()[6]);
-  tkLandmarkTranslationScaleY->value(m_ImageRegistrationApp->GetLandmarkScales()[7]);
-  tkLandmarkTranslationScaleZ->value(m_ImageRegistrationApp->GetLandmarkScales()[8]);
+  tkLandmarkRotationScale->value(m_ImageRegistrationApp->GetLandmarkScales()[0]);
+  tkLandmarkCenterOfRotationScale->value(m_ImageRegistrationApp->GetLandmarkScales()[3]);
+  tkLandmarkTranslationScale->value(m_ImageRegistrationApp->GetLandmarkScales()[6]);
   tkLandmarkNumberOfIterations->value(m_ImageRegistrationApp->GetLandmarkNumberOfIterations());
 
   // set rigid advance option values
-  tkRigidRotationScaleX->value(m_ImageRegistrationApp->GetRigidScales()[0]);
-  tkRigidRotationScaleY->value(m_ImageRegistrationApp->GetRigidScales()[1]);
-  tkRigidRotationScaleZ->value(m_ImageRegistrationApp->GetRigidScales()[2]);
-  tkRigidTranslationScaleCoRX->value(m_ImageRegistrationApp->GetRigidScales()[3]);
-  tkRigidTranslationScaleCoRY->value(m_ImageRegistrationApp->GetRigidScales()[4]);
-  tkRigidTranslationScaleCoRZ->value(m_ImageRegistrationApp->GetRigidScales()[5]);
-  tkRigidTranslationScaleX->value(m_ImageRegistrationApp->GetRigidScales()[6]);
-  tkRigidTranslationScaleY->value(m_ImageRegistrationApp->GetRigidScales()[7]);
-  tkRigidTranslationScaleZ->value(m_ImageRegistrationApp->GetRigidScales()[8]);
+  tkRigidRotationScale->value(m_ImageRegistrationApp->GetRigidScales()[0]);
+  tkRigidCenterOfRotationScale->value(m_ImageRegistrationApp->GetRigidScales()[3]);
+  tkRigidTranslationScale->value(m_ImageRegistrationApp->GetRigidScales()[6]);
   tkRigidNumberOfIterations->value(m_ImageRegistrationApp->GetRigidNumberOfIterations());
-  tkRigidFixedImageStdDev->value
-    (m_ImageRegistrationApp->GetRigidFixedImageStandardDeviation());
-  tkRigidMovingImageStdDev->value
-    (m_ImageRegistrationApp->GetRigidMovingImageStandardDeviation());
   tkRigidNumberOfSpatialSamples->value
     (m_ImageRegistrationApp->GetRigidNumberOfSpatialSamples());
   
@@ -844,23 +828,12 @@ guiMainImplementation
   tkRigidRegionScale->value(m_RigidRegionScale);
 
   // set affine advance option values
-  tkAffineMatrixScale0->value(m_ImageRegistrationApp->GetAffineScales()[0]);
-  tkAffineMatrixScale1->value(m_ImageRegistrationApp->GetAffineScales()[1]);
-  tkAffineMatrixScale2->value(m_ImageRegistrationApp->GetAffineScales()[2]);
-  tkAffineMatrixScale3->value(m_ImageRegistrationApp->GetAffineScales()[3]);
-  tkAffineMatrixScale4->value(m_ImageRegistrationApp->GetAffineScales()[4]);
-  tkAffineMatrixScale5->value(m_ImageRegistrationApp->GetAffineScales()[5]);
-  tkAffineMatrixScale6->value(m_ImageRegistrationApp->GetAffineScales()[6]);
-  tkAffineMatrixScale7->value(m_ImageRegistrationApp->GetAffineScales()[7]);
-  tkAffineMatrixScale8->value(m_ImageRegistrationApp->GetAffineScales()[8]);
-  tkAffineTranslationScaleX->value(m_ImageRegistrationApp->GetAffineScales()[9]);
-  tkAffineTranslationScaleY->value(m_ImageRegistrationApp->GetAffineScales()[10]);
-  tkAffineTranslationScaleZ->value(m_ImageRegistrationApp->GetAffineScales()[11]);
+  tkAffineRotationScale->value(m_ImageRegistrationApp->GetAffineScales()[0]);
+  tkAffineCenterOfRotationScale->value(m_ImageRegistrationApp->GetAffineScales()[3]);
+  tkAffineTranslationScale->value(m_ImageRegistrationApp->GetAffineScales()[6]);
+  tkAffineScaleScale->value(m_ImageRegistrationApp->GetAffineScales()[9]);
+  tkAffineSkewScale->value(m_ImageRegistrationApp->GetAffineScales()[12]);
   tkAffineNumberOfIterations->value(m_ImageRegistrationApp->GetAffineNumberOfIterations());
-  tkAffineFixedImageStdDev->value
-    (m_ImageRegistrationApp->GetAffineFixedImageStandardDeviation());
-  tkAffineMovingImageStdDev->value
-    (m_ImageRegistrationApp->GetAffineMovingImageStandardDeviation());
   tkAffineNumberOfSpatialSamples->value
     (m_ImageRegistrationApp->GetAffineNumberOfSpatialSamples());
 
@@ -878,15 +851,15 @@ guiMainImplementation
   // set landmark advance option values
   ImageRegistrationAppType::RigidScalesType landmarkScales = 
         m_ImageRegistrationApp->GetLandmarkScales();
-  landmarkScales[0] = tkLandmarkRotationScaleX->value();
-  landmarkScales[1] = tkLandmarkRotationScaleY->value();
-  landmarkScales[2] = tkLandmarkRotationScaleZ->value();
-  landmarkScales[3] = tkLandmarkTranslationScaleCoRX->value();
-  landmarkScales[4] = tkLandmarkTranslationScaleCoRY->value();
-  landmarkScales[5] = tkLandmarkTranslationScaleCoRZ->value();
-  landmarkScales[6] = tkLandmarkTranslationScaleX->value();
-  landmarkScales[7] = tkLandmarkTranslationScaleY->value();
-  landmarkScales[8] = tkLandmarkTranslationScaleZ->value();
+  landmarkScales[0] = tkLandmarkRotationScale->value();
+  landmarkScales[1] = tkLandmarkRotationScale->value();
+  landmarkScales[2] = tkLandmarkRotationScale->value();
+  landmarkScales[3] = tkLandmarkCenterOfRotationScale->value();
+  landmarkScales[4] = tkLandmarkCenterOfRotationScale->value();
+  landmarkScales[5] = tkLandmarkCenterOfRotationScale->value();
+  landmarkScales[6] = tkLandmarkTranslationScale->value();
+  landmarkScales[7] = tkLandmarkTranslationScale->value();
+  landmarkScales[8] = tkLandmarkTranslationScale->value();
   m_ImageRegistrationApp->SetLandmarkScales(landmarkScales);
   m_ImageRegistrationApp->SetLandmarkNumberOfIterations(
                (unsigned int) tkLandmarkNumberOfIterations->value());
@@ -894,22 +867,18 @@ guiMainImplementation
   // set rigid advance option values
   ImageRegistrationAppType::RigidScalesType rigidScales = 
           m_ImageRegistrationApp->GetRigidScales();
-  rigidScales[0] = tkRigidRotationScaleX->value();
-  rigidScales[1] = tkRigidRotationScaleY->value();
-  rigidScales[2] = tkRigidRotationScaleZ->value();
-  rigidScales[3] = tkRigidTranslationScaleCoRX->value();
-  rigidScales[4] = tkRigidTranslationScaleCoRY->value();
-  rigidScales[5] = tkRigidTranslationScaleCoRZ->value();
-  rigidScales[6] = tkRigidTranslationScaleX->value();
-  rigidScales[7] = tkRigidTranslationScaleY->value();
-  rigidScales[8] = tkRigidTranslationScaleZ->value();
+  rigidScales[0] = tkRigidRotationScale->value();
+  rigidScales[1] = tkRigidRotationScale->value();
+  rigidScales[2] = tkRigidRotationScale->value();
+  rigidScales[3] = tkRigidCenterOfRotationScale->value();
+  rigidScales[4] = tkRigidCenterOfRotationScale->value();
+  rigidScales[5] = tkRigidCenterOfRotationScale->value();
+  rigidScales[6] = tkRigidTranslationScale->value();
+  rigidScales[7] = tkRigidTranslationScale->value();
+  rigidScales[8] = tkRigidTranslationScale->value();
   m_ImageRegistrationApp->SetRigidScales(rigidScales);
   m_ImageRegistrationApp->SetRigidNumberOfIterations(
                (unsigned int) tkRigidNumberOfIterations->value());
-  m_ImageRegistrationApp->SetRigidFixedImageStandardDeviation
-    (tkRigidFixedImageStdDev->value());
-  m_ImageRegistrationApp->SetRigidMovingImageStandardDeviation
-    (tkRigidMovingImageStdDev->value());
   m_ImageRegistrationApp->SetRigidNumberOfSpatialSamples
     ((unsigned int) tkRigidNumberOfSpatialSamples->value());
 
@@ -921,25 +890,28 @@ guiMainImplementation
   // set affine advance option values
   ImageRegistrationAppType::AffineScalesType affineScales = 
         m_ImageRegistrationApp->GetAffineScales();
-  affineScales[0] = tkAffineMatrixScale0->value();
-  affineScales[1] = tkAffineMatrixScale1->value();
-  affineScales[2] = tkAffineMatrixScale2->value();
-  affineScales[3] = tkAffineMatrixScale3->value();
-  affineScales[4] = tkAffineMatrixScale4->value();
-  affineScales[5] = tkAffineMatrixScale5->value();
-  affineScales[6] = tkAffineMatrixScale6->value();
-  affineScales[7] = tkAffineMatrixScale7->value();
-  affineScales[8] = tkAffineMatrixScale8->value();
-  affineScales[9] = tkAffineTranslationScaleX->value();
-  affineScales[10] = tkAffineTranslationScaleY->value();
-  affineScales[11] = tkAffineTranslationScaleZ->value();
+  affineScales[0] = tkAffineRotationScale->value();
+  affineScales[1] = tkAffineRotationScale->value();
+  affineScales[2] = tkAffineRotationScale->value();
+  affineScales[3] = tkAffineCenterOfRotationScale->value();
+  affineScales[4] = tkAffineCenterOfRotationScale->value();
+  affineScales[5] = tkAffineCenterOfRotationScale->value();
+  affineScales[6] = tkAffineTranslationScale->value();
+  affineScales[7] = tkAffineTranslationScale->value();
+  affineScales[8] = tkAffineTranslationScale->value();
+  affineScales[9] = tkAffineScaleScale->value();
+  affineScales[10] = tkAffineScaleScale->value();
+  affineScales[11] = tkAffineScaleScale->value();
+  affineScales[12] = tkAffineSkewScale->value();
+  affineScales[13] = tkAffineSkewScale->value();
+  affineScales[14] = tkAffineSkewScale->value();
+  affineScales[15] = tkAffineSkewScale->value();
+  affineScales[16] = tkAffineSkewScale->value();
+  affineScales[17] = tkAffineSkewScale->value();
+  affineScales[18] = tkAffineSkewScale->value();
   m_ImageRegistrationApp->SetAffineScales(affineScales);
   m_ImageRegistrationApp->SetAffineNumberOfIterations(
                (unsigned int) tkAffineNumberOfIterations->value());
-  m_ImageRegistrationApp->SetAffineFixedImageStandardDeviation
-    (tkAffineFixedImageStdDev->value());
-  m_ImageRegistrationApp->SetAffineMovingImageStandardDeviation
-    (tkAffineMovingImageStdDev->value());
   m_ImageRegistrationApp->SetAffineNumberOfSpatialSamples
     ((unsigned int) tkAffineNumberOfSpatialSamples->value());
 
@@ -996,11 +968,6 @@ guiMainImplementation
   outputFile << "RigidNumberOfIterations " 
              << m_ImageRegistrationApp->GetRigidNumberOfIterations() << std::endl;
   
-  outputFile << "RigidFixedImageStandardDeviation " 
-             << m_ImageRegistrationApp->GetRigidFixedImageStandardDeviation() << std::endl;
-  outputFile << "RigidMovingImageStandardDeviation " 
-             << m_ImageRegistrationApp->GetRigidMovingImageStandardDeviation() 
-             << std::endl;
   outputFile << "RigidNumberOfSpatialSamples " 
              << m_ImageRegistrationApp->GetRigidNumberOfSpatialSamples() << std::endl;
   
@@ -1025,12 +992,6 @@ guiMainImplementation
   outputFile << "AffineNumberOfIterations " 
              << m_ImageRegistrationApp->GetAffineNumberOfIterations() << std::endl;
   
-  outputFile << "AffineFixedImageStandardDeviation " 
-             << m_ImageRegistrationApp->GetAffineFixedImageStandardDeviation() 
-             << std::endl;
-  outputFile << "AffineMovingImageStandardDeviation " 
-             << m_ImageRegistrationApp->GetAffineMovingImageStandardDeviation() 
-             << std::endl;
   outputFile << "AffineNumberOfSpatialSamples " 
              << m_ImageRegistrationApp->GetAffineNumberOfSpatialSamples() << std::endl;
 
@@ -1101,8 +1062,6 @@ guiMainImplementation
     }
   m_ImageRegistrationApp->SetRigidScales(rigidScales);
   m_ImageRegistrationApp->SetRigidNumberOfIterations((unsigned int)options["RigidNumberOfIterations"]);
-  m_ImageRegistrationApp->SetRigidFixedImageStandardDeviation(options["RigidFixedImageStandardDeviation"]);
-  m_ImageRegistrationApp->SetRigidMovingImageStandardDeviation(options["RigidMovingImageStandardDeviation"]); 
   m_ImageRegistrationApp->SetRigidNumberOfSpatialSamples((unsigned int)options["RigidNumberOfSpatialSamples"]);
 
   m_RigidUseLargestRegion = (bool) options["RigidUseLargestRegion"];
@@ -1121,8 +1080,6 @@ guiMainImplementation
     }
   m_ImageRegistrationApp->SetAffineScales(affineScales);
   m_ImageRegistrationApp->SetAffineNumberOfIterations((unsigned int)options["AffineNumberOfIterations"]);
-  m_ImageRegistrationApp->SetAffineFixedImageStandardDeviation(options["AffineFixedImageStandardDeviation"]);
-  m_ImageRegistrationApp->SetAffineMovingImageStandardDeviation(options["AffineMovingImageStandardDeviation"]); 
   m_ImageRegistrationApp->SetAffineNumberOfSpatialSamples((unsigned int)options["AffineNumberOfSpatialSamples"]);
 
   m_AffineUseLargestRegion = (bool) options["AffineUseLargestRegion"];
