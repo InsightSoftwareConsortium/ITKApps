@@ -77,6 +77,10 @@ public:
     m_Filter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
     m_Filter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
 
+    m_CastFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
+    m_CastFilter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
+    m_CastFilter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
+
 
     }
 
@@ -137,8 +141,6 @@ public:
   CopyOutputData( unsigned int component, const vtkVVProcessDataStruct * pds )
   {
 
-    this->SetUpdateMessage("Transferring results from plugin...");
-
     // Copy the data (with casting) to the output buffer provided by the PlugIn API
     typename OutputImageType::ConstPointer outputImage =
                                                m_Filter->GetOutput();
@@ -169,8 +171,6 @@ public:
   ImportPixelBuffer( unsigned int component, const vtkVVProcessDataStruct * pds )
   {
 
-    this->SetUpdateMessage("Transferring data to plugin...");
-    
     SizeType   size;
     IndexType  start;
 
