@@ -1,12 +1,6 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
-  Module:    vtkVVPluginAPI.h
-  Language:  C++
-  Date:      $Date$
-  Version:   $Revision$
-
-Copyright (c) 1998-1999 Kitware Inc. 469 Clifton Corporate Parkway,
+Copyright (c) 1998-2003 Kitware Inc. 469 Clifton Corporate Parkway,
 Clifton Park, NY, 12065, USA.
 
 All rights reserved. No part of this software may be reproduced, distributed,
@@ -302,3 +296,4 @@ gets passed into the ProcessData function.
         break
 
 #endif
+
