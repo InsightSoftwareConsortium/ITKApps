@@ -27,6 +27,13 @@ class IsolatedConnectedRunner
       const int   replaceValue    = atoi( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ) );
       const bool  compositeOutput = atoi( info->GetGUIProperty(info, 4, VVP_GUI_VALUE ) );
 
+      if( static_cast<InputPixelType>(upperTolerance) == itk::NumericTraits<InputPixelType>::Zero )
+        { 
+        itk::ExceptionObject excp;
+        excp.SetDescription(" The current tolerance is truncated to zero. Please select a larger tolerance value." );
+        excp.SetLocation("");
+        throw excp;
+        }
 
       itk::Index<Dimension> seed1;
       itk::Index<Dimension> seed2;
@@ -171,7 +178,7 @@ static int UpdateGUI(void *inf)
   info->SetGUIProperty(info, 2, VVP_GUI_TYPE, VVP_GUI_SCALE);
   info->SetGUIProperty(info, 2, VVP_GUI_DEFAULT, "1.0");
   info->SetGUIProperty(info, 2, VVP_GUI_HELP, "Precision required for the upper threshold that will separate the two seeds. The upper threshold is found using a bipartition algorithm, this tolerance defines the stopping criterion for the bipartition.");
-  info->SetGUIProperty(info, 2, VVP_GUI_HINTS , VolView::PlugIn::FilterModuleBase::GetInputVolumeScalarRange( info ) );
+  info->SetGUIProperty(info, 2, VVP_GUI_HINTS , VolView::PlugIn::FilterModuleBase::GetInputVolumeScalarRangeFraction( info, 0.001, 100 ) );
 
   info->SetGUIProperty(info, 3, VVP_GUI_LABEL, "Replace Value");
   info->SetGUIProperty(info, 3, VVP_GUI_TYPE, VVP_GUI_SCALE);
