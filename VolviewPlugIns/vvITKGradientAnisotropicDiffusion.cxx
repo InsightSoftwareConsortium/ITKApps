@@ -20,7 +20,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
  
   const unsigned int numberOfIterations = atoi( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
   const float        timeStep           = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
-  const float        conductance        = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
+  const float        conductance        = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ) );
 
   try 
   {
