@@ -113,7 +113,7 @@ int vtkBinaryVolume::ReadFromDisk(const char *fn)
   
   in.read((char *)this->GetScalarPointer(), volume_size_in_bytes);
 
-  if (in.gcount() != volume_size_in_bytes) return -3;
+  if (static_cast<long>(in.gcount()) != static_cast<long>(volume_size_in_bytes)) return -3;
 
   in.close();
   delete [] e;

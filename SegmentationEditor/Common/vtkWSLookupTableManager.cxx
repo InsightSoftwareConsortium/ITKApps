@@ -286,7 +286,7 @@ void vtkWSLookupTableManager::LoadTreeFile(const char* fn)
   // now read the data
   in.read((char *)(this->MergeList + 1), listsz * sizeof(merge_t));
 
-  if (in.gcount() != listsz *sizeof(merge_t))
+  if (static_cast<long>(in.gcount()) != static_cast<long>(listsz *sizeof(merge_t)))
     {
       vtkErrorMacro(<<"Error reading " << fn << ". File size does not match header size.");
       exit(-1);
