@@ -67,7 +67,6 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 
 static int UpdateGUI(void *inf)
 {
-  char tmp[1024];
   vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
   info->SetGUIProperty(info, 0, VVP_GUI_LABEL, "Window Minimum");
