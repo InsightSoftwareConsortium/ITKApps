@@ -50,6 +50,7 @@ SET (PLUGINS
   vvITKGradientAnisotropicDiffusion
   vvITKGradientMagnitude
   vvITKGradientMagnitudeRecursiveGaussian
+  vvITKImageRegistration
   vvITKIntensityWindowing
   vvITKIsolatedConnected
   vvITKMedian
