@@ -257,7 +257,7 @@ ShowResult()
 {
   if(m_AskScene){
     itk::ImageRegionIteratorWithIndex<FloatImage> iit(m_ViewResultImage, m_ImageRegion);
-    itk::ImageRegionIteratorWithIndex<FuzzySceneImage> iit2(m_Segmenter->GetFuzzyScene(), m_ImageRegion);
+    itk::ImageRegionConstIteratorWithIndex<FuzzySceneImage> iit2(m_Segmenter->GetFuzzyScene(), m_ImageRegion);
     while (!iit.IsAtEnd()){
        iit.Set(iit2.Get());
        ++iit;++iit2;  
@@ -265,7 +265,7 @@ ShowResult()
   }
   else{
     itk::ImageRegionIteratorWithIndex<FloatImage> iit(m_ViewResultImage, m_ImageRegion);
-    itk::ImageRegionIteratorWithIndex<OutputImage> iit2(m_Segmenter->GetOutput(), m_ImageRegion);
+    itk::ImageRegionConstIteratorWithIndex<OutputImage> iit2(m_Segmenter->GetOutput(), m_ImageRegion);
     while (!iit.IsAtEnd()){
        iit.Set(iit2.Get());
        ++iit;++iit2;  
