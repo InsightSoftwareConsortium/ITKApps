@@ -331,7 +331,7 @@ SET(MY_GRAPHICS_LIBS
   vtkCommon
   vtkFiltering
   vtkGraphics
-  vtkHybrid
+ # vtkHybrid
   vtkImaging
   vtkRendering
   ${FLTK_LIBRARIES} 
