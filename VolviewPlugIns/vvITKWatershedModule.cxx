@@ -6,17 +6,53 @@
 #include "vvITKWatershedModule.txx"
 
 
+template <class InputPixelType>
+class WatershedModuleRunner
+  {
+  public:
+      typedef VolView::PlugIn::WatershedModule< InputPixelType >   ModuleType;
+
+  public:
+    WatershedModuleRunner() {}
+    void Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
+    {
+      const float sigma          = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
+      const float threshold      = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
+      const float waterLevel     = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ));
+
+      const unsigned int numberOfSeeds = info->NumberOfMarkers;
+
+      ModuleType  module;
+      module.SetPluginInfo( info );
+      module.SetUpdateMessage("Computing Watershed Module...");
+      module.SetSigma( sigma );
+      module.SetThreshold( threshold );
+      module.SetWaterLevel( waterLevel ); 
+      itk::Index<3> seedPosition;
+      for(unsigned int i=0; i< numberOfSeeds; i++)
+        {
+        VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, i, seedPosition );
+        module.AddSeed( seedPosition );
+        }
+      // Execute the filter
+      module.ProcessData( pds  );
+    }
+  };
+
+
+
 static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 {
 
   vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
-  const float sigma          = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
-  const float threshold      = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
-  const float waterLevel     = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ));
-
-  const unsigned int numberOfSeeds = info->NumberOfMarkers;
-  if( numberOfSeeds < 1 )
+  if( info->InputVolumeNumberOfComponents != 1 )
+    {
+    info->SetProperty( info, VVP_ERROR, "This filter requires a single-component data set as input" ); 
+    return -1;
+    }
+  
+  if( info->NumberOfMarkers < 1 )
     {
     info->SetProperty( info, VVP_ERROR, "Please select points using the 3D Markers in the Annotation menu" ); 
     return -1;
@@ -28,46 +64,66 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
   {
   switch( info->InputVolumeScalarType )
     {
+    case VTK_CHAR:
+      {
+      WatershedModuleRunner<signed char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
     case VTK_UNSIGNED_CHAR:
       {
-      typedef  unsigned char                              PixelType;
-      typedef VolView::PlugIn::WatershedModule< 
-                                            PixelType >   ModuleType;
-      ModuleType  module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Computing Watershed Module...");
-      module.SetSigma( sigma );
-      module.SetThreshold( threshold );
-      module.SetWaterLevel( waterLevel ); 
-      for(unsigned int i=0; i< numberOfSeeds; i++)
-        {
-        VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, i, seedPosition );
-        module.AddSeed( seedPosition );
-        }
-      // Execute the filter
-      module.ProcessData( pds  );
+      WatershedModuleRunner<unsigned char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_SHORT:
+      {
+      WatershedModuleRunner<signed short> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_SHORT:
       {
-      typedef  unsigned short                             PixelType;
-      typedef VolView::PlugIn::WatershedModule< 
-                                            PixelType >   ModuleType;
-      ModuleType  module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Computing Watershed Module...");
-      module.SetSigma( sigma );
-      module.SetThreshold( threshold );
-      module.SetWaterLevel( waterLevel ); 
-      for(unsigned int i=0; i< numberOfSeeds; i++)
-        {
-        VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, i, seedPosition );
-        module.AddSeed( seedPosition );
-        }
-      // Execute the filter
-      module.ProcessData( pds  );
+      WatershedModuleRunner<unsigned short> runner;
+      runner.Execute( info, pds );
       break; 
-      } 
+      }
+    case VTK_INT:
+      {
+      WatershedModuleRunner<signed int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_INT:
+      {
+      WatershedModuleRunner<unsigned int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_LONG:
+      {
+      WatershedModuleRunner<signed long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_LONG:
+      {
+      WatershedModuleRunner<unsigned long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_FLOAT:
+      {
+      WatershedModuleRunner<float> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_DOUBLE:
+      {
+      WatershedModuleRunner<double> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
     }
   }
   catch( itk::ExceptionObject & except )
@@ -77,6 +133,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
   }
   return 0;
 }
+
 
 
 static int UpdateGUI(void *inf)
