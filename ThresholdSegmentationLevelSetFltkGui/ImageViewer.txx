@@ -132,6 +132,7 @@ ImageViewer<ImagePixelType,OverlayPixelType>
   iviewWindow->hide();
   clickedPointsWindow->hide();
   overlayOpacityControlWindow->hide();
+  imageInfo->hide();
 }
 
 
