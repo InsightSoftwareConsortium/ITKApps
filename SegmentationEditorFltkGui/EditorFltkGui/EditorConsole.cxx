@@ -19,7 +19,7 @@
 #include <EditorConsole.h>
 #include <vtkProperty.h>
 #include <stdio.h>
-#include <fstream.h>
+#include <fstream>
 #include <FL/fl_file_chooser.H>
 
 /************************************
@@ -50,10 +50,14 @@ EditorConsole
 
   (sourceWin->GetRenderer())->AddActor2D(overlayActor);
 
+  helpOut->value("Help Text To Be Updated Soon");
+ 
   interactor->SetRenderWindow( renWin );
   interactor->Initialize();
   first_render = true;
 
+  clearText->value("Warning! This will clear your binary volume.\n\n            Do you wish to continue?");
+/*
   helpOut->value("SEGMENTATION EDITOR MODULE:
 
 This module allows you to manipulate the output
@@ -196,6 +200,7 @@ Re-colorizing when deselecting multiple regions.  When multiple
 regions are deselected all at once, the distinct regions will 
 sometimes remain the same color.  You can press the Randomize 
 Colors button to recolor these regions.");
+*/
 }
 
 
@@ -369,6 +374,7 @@ void EditorConsole::ViewImages()
  ***********************************/
 void EditorConsole::ViewSegmented()
 {
+
   segmentedWin->Render();
 }
 
@@ -385,7 +391,7 @@ void EditorConsole::ViewSource()
 
 /************************************
  *
- *  ViewSource
+ *  ViewBinary
  *
  ***********************************/
 void EditorConsole::ViewBinary()
@@ -980,7 +986,7 @@ void EditorConsole::LoadSession() {
   {
     return;
   }
-  ifstream data_in;
+  std::ifstream data_in;
   data_in.open(filename); 
   int temp;
   std::string buffer;

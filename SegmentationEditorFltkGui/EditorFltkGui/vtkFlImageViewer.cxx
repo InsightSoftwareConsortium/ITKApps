@@ -85,8 +85,10 @@ void vtkFlImageViewer::flush(void)
 //---------------------------------------------------------------------------
 void vtkFlImageViewer::draw(void){
   //UpdateSize( this->w(), this->h() );
-  SetWindowId( (void*)fl_xid( this ) );
-  SetDisplayId( fl_display );
+        SetWindowId( (void*)fl_xid( this ) );
+#if !defined(WIN32)
+        SetDisplayId( fl_display );
+#endif
   Render();
 }
 //---------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0102 
+version 1.0103 
 header_name {.h} 
 code_name {.cxx}
 class EditorConsoleGUI {open : {public EditorConsoleBase}
@@ -295,7 +295,7 @@ class EditorConsoleGUI {open : {public EditorConsoleBase}
       }
       Fl_Button {} {
         label {Clear All}
-        callback {ClearAll();}
+        callback {clearPrompt->show();}
         xywh {793 408 140 30}
       }
       Fl_Value_Input colormapMin {
@@ -387,7 +387,7 @@ class EditorConsoleGUI {open : {public EditorConsoleBase}
     }
     Fl_Window segmentedConsole {
       label {Segmented Image} open
-      xywh {786 50 256 256} labeltype NORMAL_LABEL visible
+      xywh {786 50 256 256} visible
     } {
       Fl_Box segmentedWin {
         label label
@@ -398,7 +398,7 @@ class EditorConsoleGUI {open : {public EditorConsoleBase}
     }
     Fl_Window sourceConsole {
       label {Source Image} open
-      xywh {784 116 256 256} labeltype NORMAL_LABEL visible
+      xywh {784 116 256 256} visible
     } {
       Fl_Box sourceWin {
         label label
@@ -409,7 +409,7 @@ class EditorConsoleGUI {open : {public EditorConsoleBase}
     }
     Fl_Window binaryConsole {
       label {Binary Image} open
-      xywh {833 71 256 256} labeltype NORMAL_LABEL visible
+      xywh {833 71 256 256} visible
     } {
       Fl_Box binaryWin {
         label label
@@ -433,14 +433,32 @@ class EditorConsoleGUI {open : {public EditorConsoleBase}
     }
     Fl_Window renderConsole {
       label Renderer open
-      xywh {264 243 256 256} labeltype NORMAL_LABEL resizable visible
+      xywh {264 243 256 256} resizable visible
     } {
       Fl_Box interactor {
-        label label selected
-        xywh {0 0 256 256} labeltype NO_LABEL visible
+        label label
+        xywh {0 0 256 256} labeltype NO_LABEL
         code0 {\#include <vtkFlRenderWindowInteractor.h>}
         class vtkFlRenderWindowInteractor
-      } 
+      }
+    }
+    Fl_Window clearPrompt {open
+      xywh {507 331 329 132} visible
+    } {
+      Fl_Output clearText {
+        label {output:} selected
+        xywh {15 6 300 75} box NO_BOX type Multiline labeltype NO_LABEL textfont 1
+      }
+      Fl_Button {} {
+        label Ok
+        callback {ClearAll(); clearPrompt->hide();}
+        xywh {72 95 75 30}
+      }
+      Fl_Button {} {
+        label Cancel
+        callback {clearPrompt->hide();}
+        xywh {192 95 75 30}
+      }
     }
   }
   Function {~EditorConsoleGUI()} {return_type virtual
