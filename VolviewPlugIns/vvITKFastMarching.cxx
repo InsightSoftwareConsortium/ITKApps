@@ -53,7 +53,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.GetFilter()->SetStoppingValue(  stoppingValue );
       module.GetFilter()->SetNormalizationFactor( normalizationFactor );
       NodeType node;
-      node.SetValue( seedValue );
+      node.SetValue( static_cast< NodeType::PixelType >( seedValue ) );
       for(unsigned int i=0; i< numberOfSeeds; i++)
         {
         VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, i, seedPosition );
@@ -84,7 +84,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.GetFilter()->SetStoppingValue(  stoppingValue );
       module.GetFilter()->SetNormalizationFactor( normalizationFactor );
       NodeType node;
-      node.SetValue( seedValue );
+      node.SetValue( static_cast< NodeType::PixelType >( seedValue ) );
       for(unsigned int i=0; i< numberOfSeeds; i++)
         {
         VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, i, seedPosition );
