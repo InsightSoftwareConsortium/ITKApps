@@ -444,7 +444,7 @@ void VV_PLUGIN_EXPORT vvITKLandmarkWarpingInit(vtkVVPluginInfo *info)
     "This filter takes two volumes and a set of landmark pairs. The landmarks are used for computing a deformation field interpolated with KernelSplines. One of the images is mapped through the deformation field into the space of the other image.");
   info->SetProperty(info, VVP_SUPPORTS_IN_PLACE_PROCESSING, "0");
   info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "0");
-  info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "2");
+  info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "1");
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP,           "0");
   info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "0"); 
   info->SetProperty(info, VVP_REQUIRES_SECOND_INPUT,        "1");
