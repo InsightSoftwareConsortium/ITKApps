@@ -68,7 +68,7 @@ void RegisterWindow::LoadMovingImage(void)
       return;
     }
 
-  if (m_FixedImage != 0 && m_MovingImage != 0)
+  if (m_FixedImage && m_MovingImage )
     {
       buStartRegistration->activate() ;
     }
@@ -121,7 +121,7 @@ void RegisterWindow::LoadFixedImage(void)
   lsDisplay->activate() ;
   buShowDisplay->activate() ;
   menuFixedImageDisplay->activate() ;
-  if (m_FixedImage != 0 && m_MovingImage != 0)
+  if (m_FixedImage && m_MovingImage )
     {
       buStartRegistration->activate() ;
     }
@@ -176,7 +176,7 @@ void RegisterWindow::ShowMovingImage(void)
   m_MovingImageViewer->SetImage( m_MovingImage );
   m_MovingImageViewer->Show();
 
-  if (m_FixedImage != 0)
+  if (m_FixedImage )
     {
       m_TempBox.X1 = (int) outSelectedRegionBeginX->value() ;
       m_TempBox.Y1 = (int) outSelectedRegionBeginY->value() ;
