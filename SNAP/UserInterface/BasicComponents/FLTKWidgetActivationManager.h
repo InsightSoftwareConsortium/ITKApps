@@ -214,7 +214,7 @@ protected:
    * or deactivate depending on the state 
    */
   template<class TWidget>
-  class GenericWidgetWrapper : public WidgetWrapper {
+    class GenericWidgetWrapper : public WidgetActivationManager<TFlag>::WidgetWrapper {
   public:
     
     // State change method
