@@ -113,7 +113,7 @@ int vtkBinaryVolume::ReadFromDisk(const char *fn)
   
   in.read((char *)this->GetScalarPointer(), volume_size_in_bytes);
 
-  if (in.gcount() != volume_size_in_bytes) return -3;
+  if (static_cast<long>(in.gcount()) != static_cast<long>(volume_size_in_bytes)) return -3;
 
   in.close();
   delete [] e;
@@ -171,7 +171,7 @@ void vtkBinaryVolume::SetWithRadius(int x, int y, int z)
 void vtkBinaryVolume::UnsetWithRadius(int x, int y, int z)
 {
   const int *c = this->GetExtent();
-  int xpos, ypos, xx, yy, x_tem, y_tem, r, r2;
+  int xpos, ypos, xx, yy, x_tem, y_tem, r2;
 
   if (paint_radius == 0)    { this->Unset(x,y,z); }
 
