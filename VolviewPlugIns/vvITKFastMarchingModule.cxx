@@ -22,7 +22,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
                                             PixelType >   ModuleType;
       ModuleType  module;
 
-      module.SetPlugInfo( info );
+      module.SetPluginInfo( info );
       module.SetStoppingValue(  atof( info->GUIItems[ 0 ].CurrentValue) );
       module.AddSeed( atof( info->GUIItems[ 1 ].CurrentValue),
                       atof( info->GUIItems[ 2 ].CurrentValue),

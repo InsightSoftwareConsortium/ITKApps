@@ -29,7 +29,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       const double seedValue = 0.0;
       ImageType::IndexType seedPosition;
       VolView::PlugIn::FilterModule< FilterType > module;
-      module.SetPlugInfo( info );
+      module.SetPluginInfo( info );
       module.SetUpdateMessage("Computing Fast Marching...");
       // Set the parameters on it
       module.GetFilter()->SetStoppingValue(  atof( info->GUIItems[ 0 ].CurrentValue) );
@@ -63,7 +63,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       const double seedValue = 0.0;
       ImageType::IndexType seedPosition;
       VolView::PlugIn::FilterModule< FilterType > module;
-      module.SetPlugInfo( info );
+      module.SetPluginInfo( info );
       module.SetUpdateMessage("Computing Fast Marching...");
       // Set the parameters on it
       module.GetFilter()->SetStoppingValue(  atof( info->GUIItems[ 0 ].CurrentValue) );

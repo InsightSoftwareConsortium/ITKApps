@@ -111,7 +111,7 @@ public:
 
     void ProcessData( const vtkVVProcessDataStruct * pds );
     void ProgressUpdate( itk::Object * caller, const itk::EventObject & event );
-    void SetPlugInfo( vtkVVPluginInfo * info );
+    void SetPluginInfo( vtkVVPluginInfo * info );
 
 private:
     typename ImportFilterType::Pointer              m_ImportFilter;

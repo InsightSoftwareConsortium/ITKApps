@@ -127,7 +127,7 @@ FastMarchingModule<TInputPixelType>
 template <class TInputPixelType >
 void 
 FastMarchingModule<TInputPixelType>
-::SetPlugInfo( vtkVVPluginInfo * info )
+::SetPluginInfo( vtkVVPluginInfo * info )
 {
   m_Info = info;
 }
