@@ -173,10 +173,6 @@ void VV_PLUGIN_EXPORT vvITKRescaleIntensityTo8BitsInit(vtkVVPluginInfo *info)
   info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "2");
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP,           "0");
   info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "0"); 
-  info->SetProperty(info, VVP_REQUIRES_SERIES_INPUT,        "0");
-  info->SetProperty(info, VVP_SUPPORTS_PROCESSING_SERIES_BY_VOLUMES, "0");
-  info->SetProperty(info, VVP_PRODUCES_OUTPUT_SERIES, "0");
-  info->SetProperty(info, VVP_PRODUCES_PLOTTING_OUTPUT, "0");
 }
 
 }
