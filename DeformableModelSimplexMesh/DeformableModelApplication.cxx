@@ -211,8 +211,15 @@ DeformableModelApplication
     {
 
     vtkFloatingPointType * apoint = vtkpoints->GetPoint( p );
-    
-    m_TriangleMesh->SetPoint( p, TriangleMeshType::PointType( apoint ));
+
+    // Need to convert the point to PoinType
+    TriangleMeshType::PointType pt;
+    for(unsigned int i=0;i<3; i++)
+      {
+      pt[i] = apoint[i];
+      }
+
+    m_TriangleMesh->SetPoint( p, pt);
     
     }
 
