@@ -54,7 +54,7 @@ DeformableModelModule<TInputPixelType>
 template <class TInputPixelType >
 void 
 DeformableModelModule<TInputPixelType>
-::SetSphereCenter( const PointType & center )
+::SetEllipsoidCenter( const PointType & center )
 {
   m_MeshSource->SetCenter( center );
 }
@@ -67,8 +67,12 @@ DeformableModelModule<TInputPixelType>
 template <class TInputPixelType >
 void 
 DeformableModelModule<TInputPixelType>
-::SetSphereRadius( float radius )
+::SetEllipsoidRadius( float rx, float ry, float rz )
 {
+  PointType radius;
+  radius[0] = rx;
+  radius[1] = ry;
+  radius[2] = rz;
   m_MeshSource->SetScale( radius );
 }
 

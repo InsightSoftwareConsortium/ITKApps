@@ -11,12 +11,15 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 
   vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
-  const float sigma                 = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
+  const float radiusX               = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
+  const float radiusY               = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
+  const float radiusZ               = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ));
+  const float sigma                 = atof( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ));
 
   const unsigned int numberOfSeeds = info->NumberOfMarkers;
   if( numberOfSeeds < 1 )
     {
-    info->SetProperty( info, VVP_ERROR, "Please select points using the 3D Markers in the Annotation menu" ); 
+    info->SetProperty( info, VVP_ERROR, "Please select the center of the initial spherical model using the 3D Markers in the Annotation menu" ); 
     return -1;
     }
 
@@ -31,7 +34,8 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
                                             PixelType >   ModuleType;
       ModuleType  module;
       module.SetPluginInfo( info );
-      module.SetUpdateMessage("Computing Fast Marching Module...");
+      module.SetUpdateMessage("Computing Deformable Model...");
+      module.SetEllipsoidRadius( radiusX, radiusY, radiusZ );
       module.SetSigma( sigma );
       // Execute the filter
       module.ProcessData( pds  );
@@ -44,7 +48,8 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
                                             PixelType >   ModuleType;
       ModuleType  module;
       module.SetPluginInfo( info );
-      module.SetUpdateMessage("Computing Fast Marching Module...");
+      module.SetUpdateMessage("Computing Deformable Model...");
+      module.SetEllipsoidRadius( radiusX, radiusY, radiusZ );
       module.SetSigma( sigma );
       // Execute the filter
       module.ProcessData( pds  );
@@ -65,12 +70,29 @@ static int UpdateGUI(void *inf)
 {
   vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
-  info->SetGUIProperty(info, 0, VVP_GUI_LABEL, "Sigma for gradient magnitude.");
+  info->SetGUIProperty(info, 0, VVP_GUI_LABEL, "Radius X");
   info->SetGUIProperty(info, 0, VVP_GUI_TYPE, VVP_GUI_SCALE);
   info->SetGUIProperty(info, 0, VVP_GUI_DEFAULT, "1.0");
-  info->SetGUIProperty(info, 0, VVP_GUI_HELP, "The input image is smoothed with a Gaussian during the computation of the Gradient Magnitude. This sigma value should be large enough to attenuate image noise, but not as large as to prevent the level set front from getting close to the edges of objects in the image.");
-  info->SetGUIProperty(info, 0, VVP_GUI_HINTS , "0.1 10.0 0.1");
+  info->SetGUIProperty(info, 0, VVP_GUI_HELP, "Radius along X of the ellipsoide surface used to initialize the deformable model");
+  info->SetGUIProperty(info, 0, VVP_GUI_HINTS , "0.5 20.0 0.5");
 
+  info->SetGUIProperty(info, 1, VVP_GUI_LABEL, "Radius Y");
+  info->SetGUIProperty(info, 1, VVP_GUI_TYPE, VVP_GUI_SCALE);
+  info->SetGUIProperty(info, 1, VVP_GUI_DEFAULT, "1.0");
+  info->SetGUIProperty(info, 1, VVP_GUI_HELP, "Radius along Y of the ellipsoide surface used to initialize the deformable model");
+  info->SetGUIProperty(info, 1, VVP_GUI_HINTS , "0.5 20.0 0.5");
+
+  info->SetGUIProperty(info, 2, VVP_GUI_LABEL, "Radius Z");
+  info->SetGUIProperty(info, 2, VVP_GUI_TYPE, VVP_GUI_SCALE);
+  info->SetGUIProperty(info, 2, VVP_GUI_DEFAULT, "1.0");
+  info->SetGUIProperty(info, 2, VVP_GUI_HELP, "Radius along Z of the ellipsoide surface used to initialize the deformable model");
+  info->SetGUIProperty(info, 2, VVP_GUI_HINTS , "0.5 20.0 0.5");
+
+  info->SetGUIProperty(info, 3, VVP_GUI_LABEL, "Sigma for gradient magnitude.");
+  info->SetGUIProperty(info, 3, VVP_GUI_TYPE, VVP_GUI_SCALE);
+  info->SetGUIProperty(info, 3, VVP_GUI_DEFAULT, "1.0");
+  info->SetGUIProperty(info, 3, VVP_GUI_HELP, "External forces applied on the deformable model are computed as the gradient of the gradient magnitude from the input image. This sigma value is used in both gradient computations.");
+  info->SetGUIProperty(info, 3, VVP_GUI_HINTS , "0.1 10.0 0.1");
   
   return 1;
 }
@@ -84,7 +106,7 @@ void VV_PLUGIN_EXPORT vvITKDeformableModelModuleInit(vtkVVPluginInfo *info)
   info->ProcessData = ProcessData;
   info->UpdateGUI   = UpdateGUI;
   info->SetProperty(info, VVP_NAME, "Deformable Model (ITK)");
-  info->SetProperty(info, VVP_GROUP, "Segmentation");
+  info->SetProperty(info, VVP_GROUP, "Segmentation - Models");
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
                                     "Deformable Model Module");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,
@@ -92,7 +114,7 @@ void VV_PLUGIN_EXPORT vvITKDeformableModelModuleInit(vtkVVPluginInfo *info)
 
   info->SetProperty(info, VVP_SUPPORTS_IN_PLACE_PROCESSING, "0");
   info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "0");
-  info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "1");
+  info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "4");
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP,           "0");
   info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,   "16");
   info->SetProperty(info, VVP_PRODUCES_MESH_ONLY,           "1");

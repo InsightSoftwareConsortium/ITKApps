@@ -94,8 +94,8 @@ public:
     DeformableModelModule();
    ~DeformableModelModule();
 
-    void SetSphereCenter( const PointType & center );
-    void SetSphereRadius( float radius );
+    void SetEllipsoidCenter( const PointType & center );
+    void SetEllipsoidRadius( float rx, float ry, float rz );
 
     void SetSigma( float value );
 
