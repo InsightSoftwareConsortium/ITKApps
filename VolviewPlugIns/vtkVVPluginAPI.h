@@ -39,6 +39,10 @@ The following are the different types of parameters that the plugin API
   
 VVP_ERROR 
 
+VVP_GROUP 
+  what group in the GUI should this plugin be listed under, if this is not
+  set it will fall under miscelaneous
+
 VVP_NAME - a short name for the plugin to be used in the menu to select it 
 
 VVP_TERSE_DOCUMENTATION - a short one sentence description of the plugin 
@@ -72,6 +76,12 @@ VVP_PER_VOXEL_MEMORY_REQUIRED
 VVP_ABORT_PROCESSING  
   a flag indicating that the plugin should abort processing
 
+VVP_REPORT_TEXT
+  a stirng to be displayed in the GUI. This string can be used to provide
+  information on the execution of the plugin. Exmaples of output include
+  factors such as run time, number of polygons produced, number of iterations
+  run, resulting error etc.
+  
 =========================================================================*/
 
   
@@ -112,6 +122,8 @@ VVP_ABORT_PROCESSING
 #define VVP_REQUIRED_Z_OVERLAP            8
 #define VVP_PER_VOXEL_MEMORY_REQUIRED     9
 #define VVP_ABORT_PROCESSING             10  
+#define VVP_REPORT_TEXT                  11
+#define VVP_GROUP                        12
   
 #define VVP_GUI_LABEL   0
 #define VVP_GUI_TYPE    1
