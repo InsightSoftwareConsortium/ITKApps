@@ -23,17 +23,13 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     return -1;
     }
 
-  // Take the first marker as the seed point
-  const float * seedCoordinates = info->Markers;
+  const double seedValue = 0.0;
+  itk::Index<Dimension> seedPosition;
 
   itk::Size<3> size;
   size[0] = info->OutputVolumeDimensions[0];
   size[1] = info->OutputVolumeDimensions[1];
   size[2] = info->OutputVolumeDimensions[2];
-
-  const double seedValue = 0.0;
-
-  itk::Index<Dimension> seedPosition;
 
   try 
   {
@@ -60,12 +56,9 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       node.SetValue( seedValue );
       for(unsigned int i=0; i< numberOfSeeds; i++)
         {
-        seedPosition[0] =  static_cast< int >( seedCoordinates[0] );
-        seedPosition[1] =  static_cast< int >( seedCoordinates[1] );
-        seedPosition[2] =  static_cast< int >( seedCoordinates[2] );
+        VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, i, seedPosition );
         node.SetIndex( seedPosition );
         seeds->InsertElement( i, node );
-        seedCoordinates += 3; // pass to next point
         }
       module.GetFilter()->SetTrialPoints( seeds );
       module.GetFilter()->SetOutputSize( size );
@@ -94,12 +87,9 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       node.SetValue( seedValue );
       for(unsigned int i=0; i< numberOfSeeds; i++)
         {
-        seedPosition[0] =  static_cast< int >( seedCoordinates[0] );
-        seedPosition[1] =  static_cast< int >( seedCoordinates[1] );
-        seedPosition[2] =  static_cast< int >( seedCoordinates[2] );
+        VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, i, seedPosition );
         node.SetIndex( seedPosition );
         seeds->InsertElement( i, node );
-        seedCoordinates += 3; // pass to next point
         }
       module.GetFilter()->SetTrialPoints( seeds );
       module.GetFilter()->SetOutputSize( size );

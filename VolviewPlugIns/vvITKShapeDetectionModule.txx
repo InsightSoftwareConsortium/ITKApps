@@ -60,9 +60,9 @@ ShapeDetectionModule<TInputPixelType>
 template <class TInputPixelType >
 void 
 ShapeDetectionModule<TInputPixelType>
-::AddSeed( float x, float y, float z )
+::AddSeed( const IndexType & seedPosition )
 {
-  m_FastMarchingModule.AddSeed( x, y, z );
+  m_FastMarchingModule.AddSeed( seedPosition );
 }
 
 

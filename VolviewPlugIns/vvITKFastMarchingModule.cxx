@@ -23,8 +23,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     return -1;
     }
 
-  // Take the first marker as the seed point
-  const float * seedCoordinates = info->Markers;
+  itk::Index<3> seedPosition;
 
   try 
   {
@@ -44,11 +43,8 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.SetLowestBorderValue( lowestBorderValue );
       for(unsigned int i=0; i< numberOfSeeds; i++)
         {
-        const float seedx =  static_cast< int >( seedCoordinates[0] );
-        const float seedy =  static_cast< int >( seedCoordinates[1] );
-        const float seedz =  static_cast< int >( seedCoordinates[2] );
-        module.AddSeed( seedx, seedy, seedz );
-        seedCoordinates += 3; // pass to next point
+        VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, i, seedPosition );
+        module.AddSeed( seedPosition );
         }
       // Execute the filter
       module.ProcessData( pds  );
@@ -68,11 +64,8 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.SetLowestBorderValue( lowestBorderValue );
       for(unsigned int i=0; i< numberOfSeeds; i++)
         {
-        const float seedx =  static_cast< int >( seedCoordinates[0] );
-        const float seedy =  static_cast< int >( seedCoordinates[1] );
-        const float seedz =  static_cast< int >( seedCoordinates[2] );
-        module.AddSeed( seedx, seedy, seedz );
-        seedCoordinates += 3; // pass to next point
+        VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, i, seedPosition );
+        module.AddSeed( seedPosition );
         }
       // Execute the filter
       module.ProcessData( pds  );

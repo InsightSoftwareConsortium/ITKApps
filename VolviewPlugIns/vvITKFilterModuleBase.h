@@ -9,6 +9,8 @@
 
 #include "itkCommand.h"
 #include "itkProcessObject.h"
+#include "itkIndex.h"
+
 
 #include <string.h>
 #include <stdlib.h>
@@ -26,6 +28,9 @@ public:
   // Command/Observer intended to update the progress
   typedef itk::MemberCommand< FilterModuleBase >  CommandType;
 
+  // Index type used by algorithms requiring seed points.
+  typedef itk::Index<3>   IndexType;
+
 public:
 
   /**  Constructor */
@@ -42,6 +47,20 @@ public:
   ~FilterModuleBase() 
     {
     }
+
+
+  static 
+  void Convert3DMarkerToIndex( const vtkVVPluginInfo  * info,
+                               unsigned int markerId, IndexType & index )
+  {
+    const float * coordinates = info->Markers + 3 * markerId;
+    for(unsigned int i=0; i<3; i++)
+      { 
+      index[i] =  static_cast< int >( 
+         ( coordinates[i] - info->InputVolumeOrigin[i]   ) / 
+                            info->InputVolumeSpacing[i]     );
+      }
+  }
 
 
   static 

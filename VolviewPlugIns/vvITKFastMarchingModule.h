@@ -102,7 +102,7 @@ public:
    ~FastMarchingModule();
 
     void ClearSeeds();
-    void AddSeed( float x, float y, float z );
+    void AddSeed( const IndexType & seedPosition );
     void SetStoppingValue( float value );
     void SetSigma( float value );
     void SetLowestBorderValue( float value );

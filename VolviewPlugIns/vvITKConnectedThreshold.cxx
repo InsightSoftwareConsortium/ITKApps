@@ -21,14 +21,8 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     return -1;
     }
 
-  // Take the first marker as the seed point
-  const float * seedCoordinates = info->Markers;
-
   itk::Index<Dimension> seed;
-  seed[0] =  static_cast< int >( seedCoordinates[0] );
-  seed[1] =  static_cast< int >( seedCoordinates[1] );
-  seed[2] =  static_cast< int >( seedCoordinates[2] );
-
+  VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, 0, seed );
 
   try 
   {

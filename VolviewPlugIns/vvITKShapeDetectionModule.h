@@ -54,7 +54,7 @@ public:
    ~ShapeDetectionModule();
 
     void ClearSeeds();
-    void AddSeed( float x, float y, float z );
+    void AddSeed( const IndexType & seedPosition );
     void SetLowestBorderValue( float value );
     void SetLowestBasinValue(  float value );
     void SetDistanceFromSeeds( float value );
