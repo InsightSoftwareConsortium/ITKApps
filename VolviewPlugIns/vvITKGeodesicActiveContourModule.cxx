@@ -43,7 +43,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
                                             PixelType >   ModuleType;
       ModuleType  module;
       module.SetPluginInfo( info );
-      module.SetUpdateMessage("Computing Shape Detection Module...");
+      module.SetUpdateMessage("Computing Geodesic Active Contour Module...");
       module.SetDistanceFromSeeds( distanceFromSeeds );
       module.SetSigma( gaussianSigma );
       module.SetLowestBasinValue( lowestBasinValue ); 
@@ -74,7 +74,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.SetPluginInfo( info );
       module.SetDistanceFromSeeds( distanceFromSeeds );
       module.SetSigma( gaussianSigma );
-      module.SetUpdateMessage("Computing Shape Detection Module...");
+      module.SetUpdateMessage("Computing Geodesic Active Contour Module...");
       module.SetLowestBasinValue( lowestBasinValue ); 
       module.SetLowestBorderValue( lowestBorderValue );
       module.SetCurvatureScaling( curvatureScaling );
@@ -102,7 +102,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     return -1;
   }
 
-  info->UpdateProgress( info, 1.0, "Shape Detection Done !");
+  info->UpdateProgress( info, 1.0, "Geodesic Active Contour LevelSet Done !");
 
   return 0;
 }
