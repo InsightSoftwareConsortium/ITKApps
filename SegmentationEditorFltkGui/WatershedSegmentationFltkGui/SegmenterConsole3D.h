@@ -58,6 +58,7 @@ public:
   virtual void ShowSegmentedImage(void);
   virtual void SaveSegmentedData(void);
   virtual void Flip(int);
+  virtual void ShowHelp();
 
 private:
   InputImageViewerType*      m_InputViewer;

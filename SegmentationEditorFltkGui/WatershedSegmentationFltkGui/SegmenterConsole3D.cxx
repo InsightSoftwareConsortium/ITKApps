@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <fstream>
 
+#include<fltkUtils.h>
+
 
 /************************************
  *
@@ -47,8 +49,6 @@ SegmenterConsole3D
 
   loadButton->Observe( m_Reader.GetPointer() );
 
-  inputButton->Observe( m_Reader.GetPointer() );
-
   GradientButton->Observe( m_FilterGauss.GetPointer() );
 
   SegmentButton->Observe( m_FilterW.GetPointer() );
@@ -60,56 +60,6 @@ SegmenterConsole3D
   axes[2] = false;
 
   this->ShowStatus("Let's start by loading an image...");
-
-  instructTextOutput->value("Please read the README");
-  /*
-  instructTextOutput->value( 
-"This module runs data through the actual watershed segmentation algorithm.  
-The output is a labeled image of unsiged long integers which represents the 
-basic, oversegmented image, and a tree of merges among segments which allow 
-for real-time resegmentation at different scales.  First choose the source 
-data you want to use (MetaImage).  In most cases you will want a gradient 
-volume which has been preprocessed. 
-
-The next step is to choose the parameters for the segmentation.  
-The \"Max Flood Level\" parameter specifies to what extent the tree of 
-segment merges is calculated.  Usually you will only be interested in a 
-certain range of merges among segments.  For example, say you are looking 
-for very fine-grained structures in an image. Merging to a high scale level 
-in this case would be wasted effort since the structures you are interested 
-are probably obscured after a very low scale level.  All the continuous 
-scale levels up to the \"Max Flood Level\" you specify will be available 
-in your final output. 
-
-It is important to note that the generation of the scale levels is the most 
-time consuming part of the segmentation process, so it is wise to be 
-conservative in setting this parameter, especially with large data sets.  
-The parameter is expressed at a range from 0.0 to 1.0, which 1.0 being the 
-full scale of merges.  A good value to start with is about 10%, or 0.10. 
-
-The Lower Threshold is a preprocessing step which thresholds small values 
-out of the image.  This is useful for further suppression of background 
-noise and is very important in reducing the amount of oversegmentation 
-in the basic segmentation of the image, which reduces the complexity of the 
-merging hierarchy and increases the speed of the segmentation. Lower 
-Threshold is expressed as a value from 0.0 to 1.0, i.e. no thresholding 
-at all up to 100% of the height of the image.  Lower values are recommended 
-to start.  Start with about a 1% threshold level (0.01) and work up or 
-down from there. 
-
-To write out the segmented data and the merge tree, simply click on the 
-buttons \"Image Filename\" and \"Tree Filename\" and specify filenames.  
-Then click on the \"Show Watershed Segmentation Image\" to re-execute the 
-filter and write out the files. Merely changing the filenames won't require 
-the original execution time.
-
-A NOTE ON PROCESSING TIMES The time the algorithm takes to run is very 
-sensitive to the amount of complexity in the image.  A small difference in the
-Lower Threshold value, for example, could change execution time from a minute 
-or two into several hours for a large volume.  As a general rule, eliminate 
-as much detail in the image as you can afford to, either through more smoothing 
-or by using a higher threshold value.\n\n" );
-*/
 
 }
 
@@ -178,7 +128,7 @@ SegmenterConsole3D
 
   controlsGroup->activate();
 
-
+  ShowInputImage();
 }
 
    
@@ -215,8 +165,6 @@ SegmenterConsole3D
 
   m_SegmentViewer->Hide();
   
-  helpWin->hide();
-
 }
 
 
@@ -449,4 +397,49 @@ void SegmenterConsole3D::Flip(int a)
 
   m_Flip->SetFlipAxes(axes);
   ShowInputImage();
+}
+
+/***********************************
+ *
+ * ShowHelp
+ *
+ **********************************/
+void SegmenterConsole3D::ShowHelp( void ) 
+{
+  ifuShowText(
+"This application runs data through the watershed segmentation algorithm.\n \
+The output is a labeled image of unsiged longs which represents the basic,\n\
+oversegmented image, and a tree of merges among segments which allow\n \
+for real-time resegmentation at different scales.  First choose the source \n \
+data you want to use (MetaImage).  In most cases you will want a gradient \n \
+volume which has been preprocessed. \n \
+\n \
+Next choose the parameters for the segmentation. The \"Max Flood Level\" \n \
+parameter specifies to what extent the tree of segment merges is calculated.\n \
+Usually you will only be interested in a certain range of merges among \n \
+segments. All the continuous scale levels up to the \"Max Flood Level\" you \n \
+specify will be available in your final output. \n \
+\n \
+Generation of the scale levels is the most time consuming part of the \n \
+segmentation process, so be conservative in setting this parameter,\n \
+especially with large data sets. The parameter ranges from 0.0 to 1.0, \n \
+which 1.0 being the full scale of merges.  A good value to start with is\n \
+ about 10%, or 0.10. \n \
+\n \
+The Lower Threshold thresholds small values out of the image. This is\n \
+useful for further suppression of background noise in reducing the amount\n \
+of oversegmentation in the basic segmentation of the image, which reduces\n \
+the complexity of the merging hierarchy and increases the speed of the\n \
+segmentation. Lower Threshold is expressed as a value from 0.0 to 1.0,\n \
+i.e. no thresholding at all up to 100% of the height of the image.  Lower\n \
+values are recommended to start. Start with about a 1% threshold level (0.01)\n \
+and work up or down from there. \n \
+\n \
+To save the segmented data and the merge tree, click on  \"Save\" and\n \
+specify a session. This will save a raw file and a tree file with that name.\n \
+\n \
+The time the algorithm takes to run is very sensitive to the amount of\n\
+complexity in the image. As a general rule, eliminate as much detail\n \
+in the image as you can afford to, either through more smoothing or by\n \
+using a higher threshold value.\n\n");
 }

@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0102 
+version 1.0104 
 header_name {.h} 
 code_name {.cxx}
 class SegmenterConsole3DGUI {open : {public SegmenterConsole3DBase}
@@ -15,12 +15,6 @@ class SegmenterConsole3DGUI {open : {public SegmenterConsole3DBase}
       Fl_Group controlsGroup {open selected
         xywh {0 1 880 362} color 29 deactivate
       } {
-        Fl_Light_Button inputButton {
-          label {Show Input Image}
-          callback {ShowInputImage();}
-          xywh {25 70 150 30} type Normal value 1 selection_color 121 align 16
-          class {fltk::LightButton}
-        }
         Fl_Light_Button GradientButton {
           label {Show Gradient Image}
           callback {ShowGradientImage();}
@@ -32,17 +26,6 @@ class SegmenterConsole3DGUI {open : {public SegmenterConsole3DBase}
           callback {ShowSegmentedImage();}
           xywh {425 20 280 24} selection_color 121 align 16
           class {fltk::LightButton}
-        }
-        Fl_Box {} {
-          xywh {91 49 10 20} box THIN_UP_BOX color 12 labeltype NO_LABEL
-        }
-        Fl_Box {} {
-          label label
-          xywh {175 78 20 10} box THIN_UP_BOX color 12 labeltype NO_LABEL
-        }
-        Fl_Box {} {
-          label label
-          xywh {194 28 10 60} box THIN_UP_BOX color 12 labeltype NO_LABEL
         }
         Fl_Box {} {
           label label
@@ -75,6 +58,21 @@ class SegmenterConsole3DGUI {open : {public SegmenterConsole3DBase}
           callback {Flip(3);}
           xywh {241 116 90 20} down_box ROUND_DOWN_BOX
         }
+        Fl_Value_Input SmoothingVariance {
+          label {Smoothing Variance}
+          callback {SetVariance( o->value() );}
+          xywh {280 67 50 25} align 1 maximum 100
+        }
+        Fl_Value_Input MaxFlood {
+          label {Max Flood Level}
+          callback {SetMaxFlood( o->value() );}
+          xywh {545 58 50 25} step 0.001 value 0.1
+        }
+        Fl_Value_Input Threshold {
+          label {Lower Threshold}
+          callback {SetThreshold( o->value() );}
+          xywh {711 57 50 25} align 132 step 0.001 value 0.01
+        }
       }
       Fl_Output statusTextOutput {
         xywh {8 149 575 25}
@@ -90,42 +88,14 @@ class SegmenterConsole3DGUI {open : {public SegmenterConsole3DBase}
         callback {Quit();}
         xywh {698 112 80 35}
       }
-      Fl_Value_Input SmoothingVariance {
-        label {Smoothing Variance}
-        callback {SetVariance( o->value() );}
-        xywh {280 67 50 25} align 1 maximum 100
-      }
       Fl_Box {} {
         label label
-        xywh {204 28 18 10} box THIN_UP_BOX color 12 labeltype NO_LABEL
-      }
-      Fl_Value_Input MaxFlood {
-        label {Max Flood Level}
-        callback {SetMaxFlood( o->value() );}
-        xywh {545 58 50 25} step 0.001 value 0.1
-      }
-      Fl_Value_Input Threshold {
-        label {Lower Threshold}
-        callback {SetThreshold( o->value() );}
-        xywh {711 57 50 25} align 132 step 0.001 value 0.01
+        xywh {175 28 47 10} box THIN_UP_BOX color 12 labeltype NO_LABEL
       }
       Fl_Button {} {
         label {Show Help}
-        callback {helpWin->show();}
+        callback {ShowHelp();}
         xywh {603 112 80 35}
-      }
-    }
-    Fl_Window helpWin {
-      label Help open
-      xywh {499 497 525 365} labeltype NORMAL_LABEL resizable visible
-    } {
-      Fl_Output instructTextOutput {
-        xywh {10 10 520 295} type Multiline labeltype NO_LABEL resizable
-      }
-      Fl_Button {} {
-        label Close
-        callback {helpWin->hide();}
-        xywh {208 320 105 35}
       }
     }
   }
@@ -135,12 +105,12 @@ class SegmenterConsole3DGUI {open : {public SegmenterConsole3DBase}
   } {}
   Function {Load( void )} {return_type {virtual void}
   } {}
-  Function {ShowInputImage( void )} {return_type {virtual void}
-  } {}
   Function {ShowGradientImage( void )} {return_type {virtual void}
   } {}
   Function {ShowSegmentedImage( void )} {return_type {virtual void}
   } {}
   Function {Flip( int )} {return_type {virtual void}
+  } {}
+  Function {ShowHelp( void )} {return_type {virtual void}
   } {}
 } 
