@@ -63,7 +63,7 @@ class AffineRegistrator : public itk::ImageRegistrationMethod < TImage, TImage >
     itkSetMacro(OptimizerScales, ScalesType) ;
     itkGetConstMacro(OptimizerScales, ScalesType) ;
 
-    typename MetricType * GetTypedMetric(void)
+    MetricType * GetTypedMetric(void)
       {
       return static_cast<MetricType *>(Superclass::GetMetric());
       }
