@@ -287,8 +287,8 @@ protected:
                                     int outIncr[3]);
 
   int DataDimensions[3];
-  vtkFloatingPointType DataSpacing[3];
-  vtkFloatingPointType DataOrigin[3];
+  double DataSpacing[3];
+  double DataOrigin[3];
   int DataVOI[6];
   
   void ExecuteInformation();
