@@ -4,33 +4,32 @@
 
 #include "itkCurvatureAnisotropicDiffusionImageFilter.h"
 
-static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
-{
 
-  vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
-
-  const unsigned int Dimension = 3;
-
-  typedef   float       InternalPixelType;
-  typedef   itk::Image< InternalPixelType,Dimension > InternalImageType; 
-
-  typedef   itk::CurvatureAnisotropicDiffusionImageFilter< 
-                                InternalImageType,  
-                                InternalImageType >   FilterType;
- 
-  const unsigned int numberOfIterations = atoi( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
-  const float        timeStep           = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
-  const float        conductance        = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ) );
-
-  try 
+template <class InputPixelType>
+class CurvatureAnisotropicDiffusionRunner
   {
-  switch( info->InputVolumeScalarType )
+  public:
+      typedef   float       InternalPixelType;
+      typedef   itk::Image< InternalPixelType, 3 > InternalImageType; 
+
+      typedef   itk::CurvatureAnisotropicDiffusionImageFilter< 
+                                    InternalImageType,  
+                                    InternalImageType >   FilterType;
+     
+      typedef  InputPixelType                            OutputPixelType;                                          
+
+      typedef  VolView::PlugIn::FilterModuleWithCasting< InputPixelType, 
+                                                         FilterType,
+                                                         OutputPixelType > ModuleType;
+  public:
+    CurvatureAnisotropicDiffusionRunner() {}
+    void Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
     {
-    case VTK_UNSIGNED_CHAR:
-      {
-      VolView::PlugIn::FilterModuleWithCasting< unsigned char,
-                                                FilterType,
-                                                unsigned char  > module;
+      const unsigned int numberOfIterations = atoi( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
+      const float        timeStep           = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
+      const float        conductance        = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ) );
+
+      ModuleType  module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Smoothing with Curvature Anisotropic Diffusion...");
       // Set the parameters on it
@@ -39,21 +38,79 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.GetFilter()->SetConductanceParameter(   conductance        );
       // Execute the filter
       module.ProcessData( pds  );
+    }
+  };
+
+
+
+
+static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
+{
+
+  vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
+
+  try 
+  {
+  switch( info->InputVolumeScalarType )
+    {
+    case VTK_CHAR:
+      {
+      CurvatureAnisotropicDiffusionRunner<signed char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_CHAR:
+      {
+      CurvatureAnisotropicDiffusionRunner<unsigned char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_SHORT:
+      {
+      CurvatureAnisotropicDiffusionRunner<signed short> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_SHORT:
       {
-      VolView::PlugIn::FilterModuleWithCasting< unsigned short, 
-                                                FilterType,
-                                                unsigned short  > module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Smoothing with Curvature Anisotropic Diffusion...");
-      // Set the parameters on it
-      module.GetFilter()->SetNumberOfIterations(     numberOfIterations );
-      module.GetFilter()->SetTimeStep(               timeStep           );
-      module.GetFilter()->SetConductanceParameter(   conductance        );
-      // Execute the filter
-      module.ProcessData( pds );
+      CurvatureAnisotropicDiffusionRunner<unsigned short> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_INT:
+      {
+      CurvatureAnisotropicDiffusionRunner<signed int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_INT:
+      {
+      CurvatureAnisotropicDiffusionRunner<unsigned int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_LONG:
+      {
+      CurvatureAnisotropicDiffusionRunner<signed long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_LONG:
+      {
+      CurvatureAnisotropicDiffusionRunner<unsigned long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_FLOAT:
+      {
+      CurvatureAnisotropicDiffusionRunner<float> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_DOUBLE:
+      {
+      CurvatureAnisotropicDiffusionRunner<double> runner;
+      runner.Execute( info, pds );
       break; 
       }
     }

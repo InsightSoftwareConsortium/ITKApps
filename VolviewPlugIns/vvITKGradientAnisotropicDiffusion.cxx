@@ -4,33 +4,33 @@
 
 #include "itkGradientAnisotropicDiffusionImageFilter.h"
 
-static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
-{
 
-  vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
-  const unsigned int Dimension = 3;
-
-  typedef   float       InternalPixelType;
-  typedef   itk::Image< InternalPixelType,Dimension > InternalImageType; 
-
-  typedef   itk::GradientAnisotropicDiffusionImageFilter< 
-                                InternalImageType,  
-                                InternalImageType >   FilterType;
- 
-  const unsigned int numberOfIterations = atoi( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
-  const float        timeStep           = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
-  const float        conductance        = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ) );
-
-  try 
+template <class InputPixelType>
+class GradientAnisotropicDiffusionRunner
   {
-  switch( info->InputVolumeScalarType )
+  public:
+      typedef   float       InternalPixelType;
+      typedef   itk::Image< InternalPixelType, 3 > InternalImageType; 
+
+      typedef   itk::GradientAnisotropicDiffusionImageFilter< 
+                                    InternalImageType,  
+                                    InternalImageType >   FilterType;
+     
+      typedef  InputPixelType                            OutputPixelType;                                          
+
+      typedef  VolView::PlugIn::FilterModuleWithCasting< InputPixelType, 
+                                                         FilterType,
+                                                         OutputPixelType > ModuleType;
+  public:
+    GradientAnisotropicDiffusionRunner() {}
+    void Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
     {
-    case VTK_UNSIGNED_CHAR:
-      {
-      VolView::PlugIn::FilterModuleWithCasting< unsigned char, 
-                                                FilterType,
-                                                unsigned char > module;
+      const unsigned int numberOfIterations = atoi( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
+      const float        timeStep           = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
+      const float        conductance        = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ) );
+
+      ModuleType  module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Smoothing with Gradient Anisotropic Diffusion...");
       // Set the parameters on it
@@ -39,24 +39,83 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.GetFilter()->SetConductanceParameter(   conductance        );
       // Execute the filter
       module.ProcessData( pds  );
+    }
+  };
+
+
+
+
+static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
+{
+
+  vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
+
+  try 
+  {
+  switch( info->InputVolumeScalarType )
+    {
+    case VTK_CHAR:
+      {
+      GradientAnisotropicDiffusionRunner<signed char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_CHAR:
+      {
+      GradientAnisotropicDiffusionRunner<unsigned char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_SHORT:
+      {
+      GradientAnisotropicDiffusionRunner<signed short> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_SHORT:
       {
-      VolView::PlugIn::FilterModuleWithCasting< unsigned short, 
-                                                FilterType,
-                                                unsigned short > module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Smoothing with Gradient Anisotropic Diffusion...");
-      // Set the parameters on it
-      module.GetFilter()->SetNumberOfIterations(     numberOfIterations );
-      module.GetFilter()->SetTimeStep(               timeStep           );
-      module.GetFilter()->SetConductanceParameter(   conductance        );
-      // Execute the filter
-      module.ProcessData( pds );
+      GradientAnisotropicDiffusionRunner<unsigned short> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_INT:
+      {
+      GradientAnisotropicDiffusionRunner<signed int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_INT:
+      {
+      GradientAnisotropicDiffusionRunner<unsigned int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_LONG:
+      {
+      GradientAnisotropicDiffusionRunner<signed long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_LONG:
+      {
+      GradientAnisotropicDiffusionRunner<unsigned long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_FLOAT:
+      {
+      GradientAnisotropicDiffusionRunner<float> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_DOUBLE:
+      {
+      GradientAnisotropicDiffusionRunner<double> runner;
+      runner.Execute( info, pds );
       break; 
       }
     }
+
   }
   catch( itk::ExceptionObject & except )
   {
