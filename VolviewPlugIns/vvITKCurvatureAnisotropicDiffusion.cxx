@@ -20,7 +20,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
  
   const unsigned int numberOfIterations = atoi( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
   const float        timeStep           = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
-  const float        conductance        = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
+  const float        conductance        = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ) );
 
   try 
   {
@@ -75,7 +75,7 @@ static int UpdateGUI(void *inf)
 
   info->SetGUIProperty(info, 1, VVP_GUI_LABEL, "Time Step");
   info->SetGUIProperty(info, 1, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 1, VVP_GUI_DEFAULT, "0.0625");
+  info->SetGUIProperty(info, 1, VVP_GUI_DEFAULT, "0.05");
   info->SetGUIProperty(info, 1, VVP_GUI_HELP, "Discretization of time for approximating the diffusion process.");
   info->SetGUIProperty(info, 1, VVP_GUI_HINTS , "0.01 1.0 0.005");
 
