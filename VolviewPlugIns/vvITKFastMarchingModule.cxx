@@ -13,7 +13,8 @@ class FastMarchingModuleRunner
     typedef VolView::PlugIn::FastMarchingModule< 
                                             InputPixelType >   ModuleType;
   public:
-    FastMarchingModuleRunner( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
+    FastMarchingModuleRunner() {}
+    void Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
     {
       const float stoppingValue         = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
       const float sigma                 = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
@@ -63,52 +64,62 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     {
     case VTK_CHAR:
       {
-      FastMarchingModuleRunner<signed char> runner( info, pds );
+      FastMarchingModuleRunner<signed char> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_CHAR:
       {
-      FastMarchingModuleRunner<unsigned char> runner( info, pds );
+      FastMarchingModuleRunner<unsigned char> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_SHORT:
       {
-      FastMarchingModuleRunner<signed short> runner( info, pds );
+      FastMarchingModuleRunner<signed short> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_SHORT:
       {
-      FastMarchingModuleRunner<unsigned short> runner( info, pds );
+      FastMarchingModuleRunner<unsigned short> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_INT:
       {
-      FastMarchingModuleRunner<signed int> runner( info, pds );
+      FastMarchingModuleRunner<signed int> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_INT:
       {
-      FastMarchingModuleRunner<unsigned int> runner( info, pds );
+      FastMarchingModuleRunner<unsigned int> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_LONG:
       {
-      FastMarchingModuleRunner<signed long> runner( info, pds );
+      FastMarchingModuleRunner<signed long> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_LONG:
       {
-      FastMarchingModuleRunner<unsigned long> runner( info, pds );
+      FastMarchingModuleRunner<unsigned long> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_FLOAT:
       {
-      FastMarchingModuleRunner<float> runner( info, pds );
+      FastMarchingModuleRunner<float> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_DOUBLE:
       {
-      FastMarchingModuleRunner<double> runner( info, pds );
+      FastMarchingModuleRunner<double> runner;
+      runner.Execute( info, pds );
       break; 
       }
     }

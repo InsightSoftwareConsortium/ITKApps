@@ -18,7 +18,8 @@ class IsolatedConnectedRunner
     typedef  itk::IsolatedConnectedImageFilter< InputImageType,  
                                                 OutputImageType >   FilterType;
   public:
-    IsolatedConnectedRunner( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
+    IsolatedConnectedRunner() {}
+    void Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
     {
       const float lower           = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
       const float upperLimit      = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
@@ -73,52 +74,62 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       {
       case VTK_CHAR:
         {
-        IsolatedConnectedRunner<char> runner( info, pds );
+        IsolatedConnectedRunner<char> runner;
+        runner.Execute( info, pds );
         break; 
         }
       case VTK_UNSIGNED_CHAR:
         {
-        IsolatedConnectedRunner<unsigned char> runner( info, pds );
+        IsolatedConnectedRunner<unsigned char> runner;
+        runner.Execute( info, pds );
         break; 
         }
       case VTK_SHORT:
         {
-        IsolatedConnectedRunner<signed short> runner( info, pds );
+        IsolatedConnectedRunner<signed short> runner;
+        runner.Execute( info, pds );
         break; 
         }
       case VTK_UNSIGNED_SHORT:
         {
-        IsolatedConnectedRunner<unsigned short> runner( info, pds );
+        IsolatedConnectedRunner<unsigned short> runner;
+        runner.Execute( info, pds );
         break; 
         }
       case VTK_INT:
         {
-        IsolatedConnectedRunner<signed int> runner( info, pds );
+        IsolatedConnectedRunner<signed int> runner;
+        runner.Execute( info, pds );
         break; 
         }
       case VTK_UNSIGNED_INT:
         {
-        IsolatedConnectedRunner<unsigned int> runner( info, pds );
+        IsolatedConnectedRunner<unsigned int> runner;
+        runner.Execute( info, pds );
         break; 
         }
       case VTK_LONG:
         {
-        IsolatedConnectedRunner<signed long> runner( info, pds );
+        IsolatedConnectedRunner<signed long> runner;
+        runner.Execute( info, pds );
         break; 
         }
       case VTK_UNSIGNED_LONG:
         {
-        IsolatedConnectedRunner<unsigned long> runner( info, pds );
+        IsolatedConnectedRunner<unsigned long> runner;
+        runner.Execute( info, pds );
         break; 
         }
       case VTK_FLOAT:
         {
-        IsolatedConnectedRunner<float> runner( info, pds );
+        IsolatedConnectedRunner<float> runner;
+        runner.Execute( info, pds );
         break; 
         }
       case VTK_DOUBLE:
         {
-        IsolatedConnectedRunner<double> runner( info, pds );
+        IsolatedConnectedRunner<double> runner;
+        runner.Execute( info, pds );
         break; 
         }
       }

@@ -18,7 +18,8 @@ class ConfidenceConnectedRunner
     typedef  itk::ConfidenceConnectedImageFilter< InputImageType,  
                                                 OutputImageType >   FilterType;
   public:
-    ConfidenceConnectedRunner( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
+    ConfidenceConnectedRunner() {}
+    void Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
     {
       const unsigned int numberOfIterations = atoi( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
       const float        multiplier         = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
@@ -68,62 +69,62 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     {
     case VTK_CHAR:
       {
-      ConfidenceConnectedRunner<signed char> runner( info, pds );
-      (void)runner;
+      ConfidenceConnectedRunner<signed char> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_CHAR:
       {
-      ConfidenceConnectedRunner<unsigned char> runner( info, pds );
-      (void)runner;
+      ConfidenceConnectedRunner<unsigned char> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_SHORT:
       {
-      ConfidenceConnectedRunner<signed short> runner( info, pds );
-      (void)runner;
+      ConfidenceConnectedRunner<signed short> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_SHORT:
       {
-      ConfidenceConnectedRunner<unsigned short> runner( info, pds );
-      (void)runner;
+      ConfidenceConnectedRunner<unsigned short> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_INT:
       {
-      ConfidenceConnectedRunner<signed int> runner( info, pds );
-      (void)runner;
+      ConfidenceConnectedRunner<signed int> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_INT:
       {
-      ConfidenceConnectedRunner<unsigned int> runner( info, pds );
-      (void)runner;
+      ConfidenceConnectedRunner<unsigned int> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_LONG:
       {
-      ConfidenceConnectedRunner<signed long> runner( info, pds );
-      (void)runner;
+      ConfidenceConnectedRunner<signed long> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_LONG:
       {
-      ConfidenceConnectedRunner<unsigned long> runner( info, pds );
-      (void)runner;
+      ConfidenceConnectedRunner<unsigned long> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_FLOAT:
       {
-      ConfidenceConnectedRunner<float> runner( info, pds );
-      (void)runner;
+      ConfidenceConnectedRunner<float> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_DOUBLE:
       {
-      ConfidenceConnectedRunner<double> runner( info, pds );
-      (void)runner;
+      ConfidenceConnectedRunner<double> runner;
+      runner.Execute( info, pds );
       break; 
       }
     }
