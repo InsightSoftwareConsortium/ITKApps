@@ -8,6 +8,25 @@ DeformableModelApplicationBase
 ::DeformableModelApplicationBase()
 {
   m_VolumeReader      = VolumeReaderType::New();
+
+  m_CastImage         = CastImageType::New();
+
+  m_AnisotropicImage  = AnisotropicImageType::New();
+
+  m_GradientAnisotropicImage  = GradientAnisotropicImageType::New();
+
+  m_GradientMagnitude = GradientMagnitudeType::New();
+
+  m_SigmoidImage = SigmoidImageType::New();
+
+  m_VectorRescale = VectorRescaleIntensity::New();
+
+  m_ImageCalculator   = ImageCalculatorType::New();
+
+  m_BinaryMask = BinaryMaskType::New();
+
+  //m_ShiftScale        = ShiftScaleType::New();
+
   m_RescaleIntensity  = RescaleIntensityFilterType::New();
 
   m_ITK2VTKAdaptor    = ITK2VTKAdaptorFilterType::New();
@@ -21,11 +40,15 @@ DeformableModelApplicationBase
   center.Fill(0);
  
   VectorType sphereRadius;
-  sphereRadius.Fill( 5.0 );
+  sphereRadius.Fill( 25.0 );
 
   m_SphereMeshSource->SetCenter(center);
   m_SphereMeshSource->SetScale( sphereRadius );
-  m_SphereMeshSource->SetResolution(3); 
+  m_SphereMeshSource->SetResolution(2); 
+
+  m_VTKImageExport = VTKImageExportType::New();
+
+  m_ImageToVTKImage = ImageToVTKImageType::New();
 
   m_SimplexFilter  = SimplexFilterType::New();
   m_SimplexFilter->SetInput( m_SphereMeshSource->GetOutput() );
@@ -33,10 +56,19 @@ DeformableModelApplicationBase
   //deformation stuff
   m_DeformFilter = DeformFilterType::New();
 
-  m_GradientFilter = GradientFilterType::New();
+  m_TriangleMesh = TriangleMeshType::New();
 
-  m_GradientFilter->SetInput( m_VolumeReader->GetOutput() );
-  m_GradientFilter->SetSigma( 5.0 );
+  m_SimplexMeshFilter  = SimplexFilterType::New();
+  //m_SimplexMeshFilter->SetInput( m_SphereMeshSource->GetOutput() );
+  
+  m_EdgeFilter = EdgeFilterType::New();
+  //m_EdgeFilter->SetInput( m_VolumeReader->GetOutput() );
+
+  m_GradientFilter = GradientFilterType::New();
+  //m_GradientFilter->SetInput( m_VolumeReader->GetOutput() );
+  //m_GradientFilter->SetInput( m_EdgeFilter->GetOutput() );
+  //m_GradientFilter->SetSigma( 5.0 );
+   m_VectorGradientMagnitude = VectorGradientMagnitudeType::New();
 
   m_IterationObserver = IterationObserverType::New();
   m_IterationObserver->SetCallbackFunction( this, & DeformableModelApplicationBase::IterationCallback );

@@ -1,4 +1,4 @@
-PROJECT( DeformableModels )
+PROJECT( DeformableModelSimplexMesh )
 
 #
 #  Define the list of source files
@@ -17,6 +17,7 @@ SET(APPLICATION_SOURCES
   DeformableModelApplicationBase.cxx
   DeformableModelApplication.cxx
   ImageSliceViewer.cxx
+  ImageSurfaceViewer.cxx
   InteractorObserver.cxx
   main.cxx
   )
@@ -65,7 +66,7 @@ INCLUDE_DIRECTORIES(
 TARGET_LINK_LIBRARIES( DeformableModelSimplexMesh 
 	ITKAlgorithms ITKBasicFilters ITKCommon ITKIO ITKNumerics ITKIO 
 	ITKFltkImageViewer ITKVtkFltk
-	vtkRendering vtkGraphics vtkHybrid vtkImaging vtkIO vtkFiltering vtkCommon 
+	vtkRendering vtkGraphics vtkHybrid vtkImaging vtkIO vtkFiltering vtkCommon vtkPatented 
 	${FLTK_LIBRARIES}
   )
 

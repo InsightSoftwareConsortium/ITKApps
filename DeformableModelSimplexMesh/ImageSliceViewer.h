@@ -106,6 +106,8 @@ public:
   virtual void SetZoomFactor( double factor );
 
   void SetSimplexMesh(vtkPolyData * mesh);
+
+  vtkPolyData* GetSimplexMesh();
   
 
 protected:

@@ -4,9 +4,10 @@
 
 #include "DeformableModelApplicationGUI.h"
 #include "ImageSliceViewer.h"
+#include "ImageSurfaceViewer.h"
 #include "itkVertexCell.h"
 #include "itkLineCell.h"
-//#include <itkTriangleCell.h>
+#include <itkTriangleCell.h>
 //#include <itkPolygonCell.h>
 //#include <itkQuadrilateralCell.h>
 #include <itkCellInterface.h>
@@ -85,7 +86,9 @@ public:
    virtual void Show();
    virtual void Hide();
    virtual void Quit();
+   virtual void SaveMesh();
    virtual void LoadMesh();
+   virtual void CreateMesh();
    virtual void RefreshMeshVisualization();
    virtual void DeformMesh();
    virtual void ComputeInternalForces();
@@ -97,6 +100,7 @@ public:
    virtual void ProcessAxialViewInteraction( void );
    virtual void ProcessCoronalViewInteraction( void );
    virtual void ProcessSagittalViewInteraction( void );
+   virtual void ProcessSurfaceViewInteraction( void );
   
    virtual void SyncAllViews(void);
    virtual void IterationCallback();
@@ -111,7 +115,7 @@ private:
   ImageSliceViewer  m_AxialViewer;
   ImageSliceViewer  m_CoronalViewer;
   ImageSliceViewer  m_SagittalViewer;
-  ImageSliceViewer  m_SimplexMeshViewer;
+  ImageSurfaceViewer  m_SimplexMeshViewer;
   ImageSliceViewer  m_Dummy;
 
   vtkImageShiftScale    * m_ShiftScaleImageFilter;

@@ -380,3 +380,9 @@ ImageSliceViewer
   m_Renderer->AddActor( m_SurfaceActor );
 }
 
+vtkPolyData*
+ImageSliceViewer
+::GetSimplexMesh()
+{
+  return m_SurfaceMapper->GetInput();
+}

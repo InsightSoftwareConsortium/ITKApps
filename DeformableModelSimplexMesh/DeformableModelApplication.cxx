@@ -9,8 +9,16 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkPolyData.h"
 #include "vtkPoints.h"
+#include "vtkImageMarchingCubes.h"
+#include "vtkDecimate.h"
 
-#include "vtkLine.h"
+#include "vtkImageImport.h"
+#include "vtkPolyDataWriter.h"
+#include "vtkPolyDataReader.h"
+#include "vtkCellArray.h"
+//#include "itkVTKImageToImageFilter.h"
+
+//#include "vtkLine.h"
 #include "ClickedPointEvent.h"
 
 #include "itkImageFileWriter.h"
@@ -26,7 +34,7 @@ DeformableModelApplication
   m_AxialViewer.SetOrientation(    ImageSliceViewer::Axial    );
   m_CoronalViewer.SetOrientation(  ImageSliceViewer::Coronal  );
   m_SagittalViewer.SetOrientation( ImageSliceViewer::Sagittal );
-  m_SimplexMeshViewer.SetOrientation( ImageSliceViewer::Axial );
+  //m_SimplexMeshViewer.SetOrientation( ImageSliceViewer::Axial );
 
   m_Dummy.SetOrientation(ImageSliceViewer::Axial);
 
@@ -51,25 +59,29 @@ DeformableModelApplication
   m_SagittalViewer.AddObserver(ClickedPointEvent(), m_SagittalViewerCommand);
 
   
-  m_SurfaceViewerCommand = itk::SimpleMemberCommand<DeformableModelApplication>::New();
-  m_SurfaceViewerCommand->SetCallbackFunction(this, &DeformableModelApplication::ProcessAxialViewInteraction);
+   m_SurfaceViewerCommand = itk::SimpleMemberCommand<DeformableModelApplication>::New();
+  m_SurfaceViewerCommand->SetCallbackFunction(this, &DeformableModelApplication::ProcessSurfaceViewInteraction);
   m_SimplexMeshViewer.AddObserver(ClickedPointEvent(), m_SurfaceViewerCommand);
 
-  const float alpha = 0.2;
-  const float beta  = 0.1;
+  const float alpha = 0.1;
+  const float beta  = 1.0;
   const float kappa = 0.5;
+  const float gamma = 0.1;
 
   m_InternalForceValueInput->value( alpha );
   m_ExternalForceValueInput->value( beta );
-  m_BalloonForceValueInput->value( kappa );
+  //m_BalloonForceValueInput->value( kappa );
+  m_GammaForceValueInput->value( gamma );
 
   m_DeformFilter->SetAlpha( alpha );
   m_DeformFilter->SetBeta( beta );
-  m_DeformFilter->SetKappa( kappa );
+  //m_DeformFilter->SetKappa( kappa );
+  m_DeformFilter->SetGamma (gamma);
 
   m_DeformFilter->SetRigidity( 1 );
  
   m_InternalForcesComputed = false;
+
 }
 
 
@@ -95,12 +107,12 @@ DeformableModelApplication
   coronalView->show();
   sagittalView->show();
   surfaceView->show();
-
+  
   m_AxialViewer.SetInteractor( axialView );
   m_CoronalViewer.SetInteractor( coronalView );
   m_SagittalViewer.SetInteractor( sagittalView );
   m_SimplexMeshViewer.SetInteractor( surfaceView );
-
+ 
   axialView->Initialize();
   coronalView->Initialize();
   sagittalView->Initialize();
@@ -126,11 +138,199 @@ DeformableModelApplication
   this->Hide();
 }
 
+void 
+DeformableModelApplication
+::LoadMesh()
+{
 
+  const char * filename = fl_file_chooser("Mesh filename","*.*","");
+ 
+  if( !filename  || strlen(filename) == 0 )
+    {
+    return;
+    }
+  
+  typedef itk::ImageFileReader< MeshPixelType > ReaderType;
+  
+  ReaderType::Pointer meshReader = ReaderType::New();
+  meshReader->SetFileName(filename);
+  meshReader->Update();
+ 
+  
+  m_ImageToVTKImage->SetInput(meshReader->GetOutput());
+  m_ImageToVTKImage->Update();
+
+  //vtkImageImport* vimageimport = vtkImageImport::New();
+  //vimageimport->SetInput(m_VTKImageExport->GetInput());
+  
+  // now send it to marching cubes to create a vtk mesh
+  vtkImageMarchingCubes*  vmarchingcubes = vtkImageMarchingCubes::New();
+  vmarchingcubes->SetInput(m_ImageToVTKImage->GetOutput());
+  vmarchingcubes->SetValue(0, 0.5);
+  vmarchingcubes->ComputeScalarsOff();
+  vmarchingcubes->SetInputMemoryLimit(1000);
+  vmarchingcubes->Update();
+
+  vtkDecimate* vdecimate = vtkDecimate::New(); 
+  vdecimate->SetInput(vmarchingcubes->GetOutput()); 
+  vdecimate->SetTargetReduction(0.90); //compression factor (number closer to 1 higher compression)
+  vdecimate->SetAspectRatio(20);
+  vdecimate->SetInitialError(0.02); //control decimate criterion initially set
+  vdecimate->SetErrorIncrement(0.05); //decimation criterion is incremented by this at each iteration
+  vdecimate->SetMaximumIterations(6); 
+  vdecimate->SetInitialFeatureAngle(35); //to compute feature edges smaller angle ->more surface detail
+  vdecimate->Update();
+
+  vtkPolyDataWriter* vpoly = vtkPolyDataWriter::New();
+  vpoly->SetInput(vdecimate->GetOutput());
+  vpoly->SetFileName("original.vtk");
+  vpoly->Write();
+  
+  
+  // vtkPolyDataReader* vreader = vtkPolyDataReader::New();
+  // vreader->SetFileName(filename);
+  // vreader->Update();
+
+  //
+  // Transfer the points from the vtkPolyData into the itk::Mesh
+  //
+  const unsigned int numberOfPoints = vdecimate->GetOutput()->GetNumberOfPoints();
+  
+  vtkPoints * vtkpoints = vdecimate->GetOutput()->GetPoints();
+  
+  //const unsigned int numberOfPoints = vreader->GetOutput()->GetNumberOfPoints();
+  // vtkPoints * vtkpoints = vreader->GetOutput()->GetPoints();
+  m_TriangleMesh->GetPoints()->Reserve( numberOfPoints );
+
+  for(int p =0; p < numberOfPoints; p++)
+    {
+
+    vtkDoubleType * apoint = vtkpoints->GetPoint( p );
+    
+    m_TriangleMesh->SetPoint( p, TriangleMeshType::PointType( apoint ));
+    
+    }
+
+  //
+  // Transfer the cells from the vtkPolyData into the itk::Mesh
+  //
+  vtkCellArray * triangleStrips = vdecimate->GetOutput()->GetStrips();
+  //vtkCellArray * triangleStrips = vreader->GetOutput()->GetStrips();
+
+  vtkIdType  * cellPoints;
+  vtkIdType    numberOfCellPoints;
+ //
+  // First count the total number of triangles from all the triangle strips.
+  //
+  unsigned int numberOfTriangles = 0;
+
+  triangleStrips->InitTraversal();
+   while( triangleStrips->GetNextCell( numberOfCellPoints, cellPoints ) )
+    {
+    numberOfTriangles += numberOfCellPoints-2;
+    }
+
+
+   vtkCellArray * polygons = vdecimate->GetOutput()->GetPolys();
+  
+   //vtkCellArray * polygons = vreader->GetOutput()->GetPolys();
+  polygons->InitTraversal();
+
+  while( polygons->GetNextCell( numberOfCellPoints, cellPoints ) )
+    {
+    if( numberOfCellPoints == 3 )
+      {
+      numberOfTriangles ++;
+      }
+    }
+
+   //
+  // Reserve memory in the itk::Mesh for all those triangles
+  //
+  m_TriangleMesh->GetCells()->Reserve( numberOfTriangles );
+
+  // 
+  // Copy the triangles from vtkPolyData into the itk::Mesh
+  //
+  //
+
+  typedef TriangleMeshType::CellType   CellType;
+
+  typedef itk::TriangleCell< CellType > TriangleCellType;
+
+  int cellId = 0;
+
+  // first copy the triangle strips
+  triangleStrips->InitTraversal();
+  while( triangleStrips->GetNextCell( numberOfCellPoints, cellPoints ) )
+    {
+    
+    unsigned int numberOfTrianglesInStrip = numberOfCellPoints - 2;
+
+    unsigned long pointIds[3];
+    pointIds[0] = cellPoints[0];
+    pointIds[1] = cellPoints[1];
+    pointIds[2] = cellPoints[2];
+
+    for( unsigned int t=0; t < numberOfTrianglesInStrip; t++ )
+      {
+      TriangleMeshType::CellAutoPointer c;
+      TriangleCellType * tcell = new TriangleCellType;
+      tcell->SetPointIds( pointIds );
+      c.TakeOwnership( tcell );
+      m_TriangleMesh->SetCell( cellId, c );
+      cellId++;
+      pointIds[0] = pointIds[1];
+      pointIds[1] = pointIds[2];
+      pointIds[2] = cellPoints[t+3];
+      }
+
+    
+    }
+
+   // then copy the normal triangles
+  polygons->InitTraversal();
+  while( polygons->GetNextCell( numberOfCellPoints, cellPoints ) )
+    {
+    if( numberOfCellPoints !=3 ) // skip any non-triangle.
+      {
+      continue;
+      }
+    TriangleMeshType::CellAutoPointer c;
+    TriangleCellType * t = new TriangleCellType;
+    t->SetPointIds( (unsigned long*)cellPoints );
+    c.TakeOwnership( t );
+    m_TriangleMesh->SetCell( cellId, c );
+    cellId++;
+    }
+  
+  std::cout << "Number of Points =   " << m_TriangleMesh->GetNumberOfPoints() << std::endl;
+  std::cout << "Number of Cells  =   " << m_TriangleMesh->GetNumberOfCells()  << std::endl;
+ 
+  m_SimplexMeshFilter->SetInput( m_TriangleMesh);
+ m_SimplexMeshFilter->Update();
+  
+  
+  m_SimplexMesh = m_SimplexMeshFilter->GetOutput();
+
+  m_SimplexMeshToShow = m_SimplexMesh;
+
+  this->RefreshMeshVisualization();
+   
+  // force a redraw
+  axialView->redraw();
+  coronalView->redraw();
+  sagittalView->redraw();
+  surfaceView->redraw();
+
+  Fl::check(); 
+
+  
+}
 
 void
 DeformableModelApplication
-::LoadMesh()
+::CreateMesh()
 {
   m_SphereMeshSource->SetCenter(m_SeedPoint);
   m_SimplexFilter->Update();
@@ -247,16 +447,62 @@ void
 DeformableModelApplication
 ::ComputeInternalForces()
 {
-  m_GradientFilter->SetSigma( 1.0);
+
+  
+  m_CastImage->SetInput( m_VolumeReader->GetOutput() );
+  m_CastImage->Update();
+  std::cout << "Casting Image is DONE!" << std::endl;
+
+  // CurvatureAnisotropicDifussionImageFilter
+  /*
+  m_AnisotropicImage->SetInput( m_CastImage->GetOutput());
+  m_AnisotropicImage->SetNumberOfIterations(5);
+  m_AnisotropicImage->SetTimeStep(0.0625);
+  m_AnisotropicImage->SetConductanceParameter(3);
+  */
+  m_GradientAnisotropicImage->SetInput( m_CastImage->GetOutput());
+  m_GradientAnisotropicImage->SetNumberOfIterations(5);
+  m_GradientAnisotropicImage->SetTimeStep(0.0625);
+  m_GradientAnisotropicImage->SetConductanceParameter(3);
+  std::cout << "GradientAnisotropicDiffusion is DONE!" << std::endl;
+ 
+  m_GradientMagnitude->SetInput( m_GradientAnisotropicImage->GetOutput() );
+  m_GradientMagnitude->SetSigma(0.5);
+  std::cout << "GradientMagnitude is DONE!" << std::endl;
+  /*
+  typedef itk::ImageFileWriter< CastType > WriterType;
+  WriterType::Pointer gradientWriter = WriterType::New();
+  gradientWriter->SetInput( m_GradientMagnitude->GetOutput() );
+  gradientWriter->SetFileName("gradmag.mhd");
+  gradientWriter->Update();
+  */
+  m_SigmoidImage->SetInput( m_GradientMagnitude->GetOutput());
+  m_SigmoidImage->SetOutputMinimum(0);
+  m_SigmoidImage->SetOutputMaximum(1);
+  m_SigmoidImage->SetAlpha(-200);
+  m_SigmoidImage->SetBeta(1350);
+  std::cout << "gradient mag is DONE!" << std::endl;
+  
+  m_GradientFilter->SetInput( m_SigmoidImage->GetOutput());
+  m_GradientFilter->SetSigma( 0.5);
   m_GradientFilter->Update();
+  std::cout << "Gradient is DONE!" << std::endl;
+
+  
+  std::cout << "Saving the Sigmoid Image!" << std::endl;
+
+  
+  typedef itk::ImageFileWriter< CastType > WriterType;
+  WriterType::Pointer gradientWriter = WriterType::New();
+  gradientWriter->SetInput( m_SigmoidImage->GetOutput() );
+  gradientWriter->SetFileName("sigmoid.mhd");
+  gradientWriter->Update();
+
   m_DeformFilter->SetGradient( m_GradientFilter->GetOutput() );
   m_InternalForcesComputed = true;
 
-  typedef itk::ImageFileWriter< GradientImageType > WriterType;
-  WriterType::Pointer gradientWriter = WriterType::New();
-  gradientWriter->SetInput( m_GradientFilter->GetOutput() );
-  gradientWriter->SetFileName("GradientImage.mhd");
-  gradientWriter->Update();
+  std::cout << " Computed Image Force" << std::endl;
+ 
 }
 
 
@@ -270,6 +516,25 @@ DeformableModelApplication::IterationCallback()
   // this->DeformableModelApplicationBase::IterationCallback();
   //
 }
+void
+DeformableModelApplication
+::SaveMesh()
+{
+ 
+  const char * filename = fl_file_chooser("Save Mesh As","*.vtk","");
+ 
+  if( !filename  || strlen(filename) == 0 )
+    {
+    return;
+    }
+  std::cout << "implement saving mesh" << filename << std::endl;
+
+  vtkPolyDataWriter *vpolywriter = vtkPolyDataWriter::New();
+  vpolywriter->SetInput(m_SimplexMeshViewer.GetSimplexMesh());
+  vpolywriter->SetFileName(filename);
+  vpolywriter->Write();
+
+}
 
 void 
 DeformableModelApplication
@@ -281,7 +546,7 @@ DeformableModelApplication
     }
  
   const unsigned int numberOfIterationsToGo = (unsigned int)(m_IterationsValueInput->value());
-  
+  std::cout << " Please Wait ..." << std::endl;
   for( unsigned int i=0; i<numberOfIterationsToGo; i++ )
     {
     m_SimplexMesh->DisconnectPipeline();
@@ -305,6 +570,8 @@ DeformableModelApplication
 
     Fl::check(); 
     }
+
+  std::cout << " Done Deformation " << std::endl;
 }
    
 
@@ -351,10 +618,12 @@ DeformableModelApplication
     return;
     }
 
+  
   // of type ImageSliceViewer
   m_AxialViewer.SetInput(    m_ShiftScaleImageFilter->GetOutput() );
   m_CoronalViewer.SetInput(  m_ShiftScaleImageFilter->GetOutput() );
   m_SagittalViewer.SetInput( m_ShiftScaleImageFilter->GetOutput() );
+  m_SimplexMeshViewer.SetInput( m_ShiftScaleImageFilter->GetOutput() );
 
   const unsigned int numberOfZslices = m_LoadedVolume->GetBufferedRegion().GetSize()[2];
   const unsigned int numberOfYslices = m_LoadedVolume->GetBufferedRegion().GetSize()[1];
@@ -442,6 +711,14 @@ DeformableModelApplication
   this->SyncAllViews();
 }
 
+void
+DeformableModelApplication
+::ProcessSurfaceViewInteraction( void )
+{
+  
+  //m_SagittalViewer.GetSelectPoint( m_SeedPoint );
+  //this->SyncAllViews();
+}
 
 void 
 DeformableModelApplication
