@@ -176,8 +176,8 @@ IF(FLTK_FOUND)
     SUBDIRS(ShapeDetectionLevelSet)
     SUBDIRS(GeodesicActiveContour)
   ENDIF(VTK_FOUND)
-  SUBDIRS(MetaImageViewer)
-  SUBDIRS(MetaImageColorViewer)
+  SUBDIRS(ImageViewer)
+  SUBDIRS(ImageColorViewer)
 ENDIF(FLTK_FOUND)
 
 # MetaImage Utilities
