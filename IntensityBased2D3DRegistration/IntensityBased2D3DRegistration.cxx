@@ -248,8 +248,6 @@ int main( int argc, char *argv[] )
   bool verbose = false;
   bool debug = false;
 
-  int i;
-
   int nScales = 2;
   int maxScale = 1;
 
@@ -630,7 +628,7 @@ int main( int argc, char *argv[] )
   // Initialise the transform
   // ~~~~~~~~~~~~~~~~~~~~~~~~
 
-  transform->ComputeZYX(true);
+  transform->SetComputeZYX(true);
 
   // Software Guide : BeginLatex
   //
@@ -1007,7 +1005,7 @@ int main( int argc, char *argv[] )
 
   if (verbose)
     {
-    optimizer->Print( cout );
+    optimizer->Print( std::cout );
     }
 
 
