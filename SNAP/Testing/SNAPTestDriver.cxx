@@ -132,8 +132,8 @@ SNAPTestDriver
   else if(parms.IsOptionPresent("list"))
     {
     // Print out a header
-    std::cout << std::setw(20) << std::left << "Test Name";
-    std::cout << std::setw(12) << std::left << "Templated";
+    std::cout << std::setw(20) << std::ios::left << "Test Name";
+    std::cout << std::setw(12) << std::ios::left << "Templated";
     std::cout << "Description" << std::endl;
     
     // Go through the list of known tests
@@ -144,8 +144,8 @@ SNAPTestDriver
       if(test) 
         {
         // Print out test info
-        std::cout << std::setw(20) << std::left << m_TestNames[i];
-        std::cout << std::setw(12) << std::left << m_TestTemplated[i] ? "Yes" : "No";
+        std::cout << std::setw(20) << std::ios::left << m_TestNames[i];
+        std::cout << std::setw(12) << std::ios::left << m_TestTemplated[i] ? "Yes" : "No";
         std::cout << test->GetDescription() << std::endl;
         }
       }

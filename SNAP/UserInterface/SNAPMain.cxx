@@ -35,7 +35,7 @@
 
 #include <itksys/SystemTools.hxx>
 
-#include <limits>
+//#include <limits>
 
 using namespace std;
 
@@ -345,6 +345,9 @@ int main(int argc, char **argv)
 
 /*
  *Log: SNAPMain.cxx
+ *Revision 1.10  2004/08/26 19:43:27  pauly
+ *ENH: Moved the Borland code into Common folder
+ *
  *Revision 1.9  2004/08/03 23:26:32  ibanez
  *ENH: Modification for building in multple platforms. By Julien Jomier.
  *

@@ -15,6 +15,12 @@
 #ifndef __SNAPOpenGL_h_
 #define __SNAPOpenGL_h_
 
+#ifndef _WIN32
+#ifndef GLU_VERSION_1_2
+#define GLU_VERSION_1_2
+#endif
+#endif
+
 #include "IRISVectorTypes.h"
 
 // Include OpenGL headers according to the platform
