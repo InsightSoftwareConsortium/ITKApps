@@ -7,7 +7,7 @@ class guiMain {open
   Function {guiMain()} {open
   } {
     Fl_Window tkWindow {
-      label {3D Registration Tool ====> downloadable on http://caddlab.rad.unc.edu <=====} open
+      label {Landmarkd Initialized Mutual Information 3D Registration Tool } open
       xywh {284 225 1060 705} type Double box PLASTIC_UP_BOX color 159 resizable
       code0 {itk::ImageRegion< 3 > tempRegion ;} visible
     } {
@@ -78,13 +78,13 @@ Register();}
           xywh {5 51 424 609}
         } {
           Fl_Button tkSelectFixedImageButton {
-            label {Select Reference Image...}
+            label {Select Fixed Image...}
             callback {SelectFixedImage();}
             xywh {9 54 131 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 selection_color 247 labelsize 10
           }
           Fl_Button tkSelectMovingImageButton {
-            label {Select Compared Image...}
-            callback {SelectMovingImage();}
+            label {Select Moving Image...}
+            callback {SelectMovingImage();} selected
             xywh {9 361 131 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 selection_color 247 labelsize 10
           }
           Fl_Output tkMovingImageFile {
@@ -452,7 +452,7 @@ tkFixedImageViewer->DrawRegionOfInterest() ;}
       }
     }
     Fl_Window tkAdvancedOptionsWindow {
-      label {Advanced Registration Options} open selected
+      label {Advanced Registration Options} open
       xywh {1342 158 405 520} type Double box PLASTIC_UP_BOX color 159 labeltype NORMAL_LABEL labelsize 10 resizable visible
     } {
       Fl_Tabs {} {open
