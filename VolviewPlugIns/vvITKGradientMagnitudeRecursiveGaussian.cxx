@@ -93,7 +93,7 @@ void VV_PLUGIN_EXPORT vvITKGradientMagnitudeRecursiveGaussianInit(vtkVVPluginInf
   info->ProcessData = ProcessData;
   info->UpdateGUI = UpdateGUI;
   info->SetProperty(info, VVP_NAME, "Gradient Magnitude IIR (ITK)");
-  info->SetProperty(info, VVP_GROUP, "Utilities");
+  info->SetProperty(info, VVP_GROUP, "Utility");
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
                                 "Gradient Magnitude Gaussian IIR");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,
