@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0103 
+version 1.0103
 header_name {.h} 
 code_name {.cxx}
 class SegmenterConsoleGUI {open : {public SegmenterConsoleBase}
@@ -142,7 +142,7 @@ class SegmenterConsoleGUI {open : {public SegmenterConsoleBase}
         }
         Fl_Value_Input maxThresh2 {
           callback {ChangeMaxThresh(o->value());}
-          xywh {475 72 40 18} box PLASTIC_DOWN_BOX color 60 labeltype NO_LABEL labelsize 10 when 4 textsize 12
+          xywh {475 72 40 18} box PLASTIC_DOWN_BOX color 60 labeltype NO_LABEL labelsize 10 when 4 textsize 10
         }
         Fl_Slider minThresh {
           label {Lower Threshold}
@@ -211,7 +211,7 @@ class SegmenterConsoleGUI {open : {public SegmenterConsoleBase}
         }
         Fl_Button stopSeg {
           label Stop
-          callback {m_thresholdSegmentation->AbortGenerateDataOn();} selected
+          callback {m_thresholdSegmentation->AbortGenerateDataOn();}
           xywh {350 315 60 55} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 1
         }
         Fl_Value_Slider updateIterations {
@@ -247,7 +247,7 @@ class SegmenterConsoleGUI {open : {public SegmenterConsoleBase}
           xywh {185 347 75 18} box PLASTIC_THIN_UP_BOX color 93 labelsize 10 when 4 textsize 10 deactivate
         }
       }
-      Fl_Group diffusionGroup {
+      Fl_Group diffusionGroup {open selected
         xywh {5 47 915 383} labelfont 1 labelsize 10 align 21 deactivate
       } {
         Fl_Value_Input diffusionIterations {
