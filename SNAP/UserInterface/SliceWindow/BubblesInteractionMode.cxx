@@ -19,7 +19,7 @@
 #include "UserInterfaceLogic.h"
 #include "IRISImageData.h"
 
-#include <cassert>
+#include <assert.h>
 #include <cmath>
 
 BubblesInteractionMode

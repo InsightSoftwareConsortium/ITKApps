@@ -21,7 +21,7 @@
 #include <winbase.h>
 #endif
 
-#include <cassert>
+#include <assert.h>
 #include <string>
 #include <vector>
 

@@ -17,7 +17,7 @@
 #include "GreyImageWrapper.h"
 #include "itkImageRegionConstIterator.h"
 
-#include <cassert>
+#include <assert.h>
 #include <cstdio>
 #include <iostream>
 

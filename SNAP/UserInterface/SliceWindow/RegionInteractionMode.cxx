@@ -21,7 +21,7 @@
 #include "IRISVectorTypesToITKConversion.h"
 #include "SNAPAppearanceSettings.h"
 
-#include <cassert>
+#include <assert.h>
 #include <cmath>
 
 // The click detection radius (delta)

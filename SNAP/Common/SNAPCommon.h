@@ -19,7 +19,7 @@
 
 // Some standard library things are used so commonly that there is no need
 // to have them included every time
-#include <cassert>
+#include <assert.h>
 #include <iostream>
 
 // Make standard streams available to all

@@ -14,7 +14,7 @@
 =========================================================================*/
 #include "CommandLineArgumentParser.h"
 
-#include <cassert>
+#include <assert.h>
 #include <iostream>
 
 using namespace std;

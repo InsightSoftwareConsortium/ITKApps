@@ -15,7 +15,7 @@
 #include "IntensityCurveVTK.h"
 
 #include "SNAPCommon.h"
-#include <cassert>
+#include <assert.h>
 
 using namespace std;
 

@@ -25,7 +25,7 @@
 #include "ZoomPanInteractionMode.h"
 #include "ThumbnailInteractionMode.h"
 
-#include <cassert>
+#include <assert.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>

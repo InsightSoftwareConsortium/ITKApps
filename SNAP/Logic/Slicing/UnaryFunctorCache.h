@@ -15,7 +15,7 @@
 #ifndef __UnaryFunctorCache_h_
 #define __UnaryFunctorCache_h_
 
-#include <cassert>
+#include <assert.h>
 #include <cstdio>
 
 #include "SNAPCommon.h"
