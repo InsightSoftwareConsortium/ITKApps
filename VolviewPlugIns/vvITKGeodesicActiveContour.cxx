@@ -10,11 +10,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 
   vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
-
   char tmp[1024];
-  const unsigned int Dimension = 3;
-
-  itk::Index<3> seedPosition;
 
   try 
   {
