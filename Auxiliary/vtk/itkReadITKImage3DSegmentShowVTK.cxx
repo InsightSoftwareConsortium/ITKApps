@@ -41,8 +41,6 @@
 #include "vtkCellPicker.h"
 #include "vtkPolyDataWriter.h"
 
-#include <iostream>
-
 
 /**
  * This function will connect the given itk::VTKImageExport filter to
@@ -108,7 +106,7 @@ int main(int argc, char * argv [] )
   if( argc < 2 )
     {
     std::cerr << "Missing parameters" << std::endl;
-    std::cerr << "Usage: " << argv[0] << " inputImageFilename [seedX seedY seedZ]" << std::endl;
+    std::cerr << "Usage: " << argv[0] << " inputImageFilename [seedX seedY seedZ] [output.vtk]" << std::endl;
     return 1;
     }
   
@@ -134,10 +132,18 @@ int main(int argc, char * argv [] )
     filter->SetReplaceValue(255);
     filter->SetMultiplier(2.5);
 
+
+    // Obtain center index of the image
+    // 
+    ImageType::Pointer inputImage = reader->GetOutput();
+    ImageType::SizeType  size  = inputImage->GetBufferedRegion().GetSize();
+    ImageType::IndexType start = inputImage->GetBufferedRegion().GetIndex();
+
+    // set a seed by default in the center of the image.
     ImageType::IndexType seed;
-    seed[0] = 100;
-    seed[1] = 100;
-    seed[2] = 100;
+    seed[0] = start[0] + size[0] / 2;
+    seed[1] = start[1] + size[1] / 2;
+    seed[2] = start[2] + size[2] / 2;
 
     if( argc >= 4 )
       {
@@ -145,8 +151,6 @@ int main(int argc, char * argv [] )
       seed[1] = atoi( argv[3] );
       seed[2] = atoi( argv[4] );
       }
-
-    std::cout << "Seed point = " << seed << std::endl;
 
     filter->SetSeed( seed );
       
@@ -167,11 +171,7 @@ int main(int argc, char * argv [] )
     ConnectPipelines(itkExporter2, vtkImporter2);
     
 
-    // Obtain center index of the image
-    // 
-    ImageType::Pointer inputImage = reader->GetOutput();
-    ImageType::SizeType  size  = inputImage->GetBufferedRegion().GetSize();
-      
+     
     //------------------------------------------------------------------------
     // VTK pipeline.
     //------------------------------------------------------------------------
@@ -262,14 +262,6 @@ int main(int argc, char * argv [] )
 
     polyActor->SetMapper( polyMapper );
     polyMapper->SetInput( contour->GetOutput() );
-    
-    contour->Update();
-    contour->GetOutput()->Print( std::cout );
-
-    vtkPolyDataWriter * writer = vtkPolyDataWriter::New();
-    writer->SetFileName("Contour.vtk");
-    writer->SetInput( contour->GetOutput() );
-    writer->Write();
 
     vtkProperty * property = vtkProperty::New();
     property->SetAmbient(0.1);
@@ -282,7 +274,15 @@ int main(int argc, char * argv [] )
     polyActor->SetProperty( property );
   
     renderer->AddActor( polyActor );
-
+    
+    if( argc >=5 )
+      {
+      vtkPolyDataWriter * writer = vtkPolyDataWriter::New();
+      writer->SetFileName(argv[5]);
+      writer->SetInput( contour->GetOutput() );
+      writer->Write();
+      }
+ 
     // Bring up the render window and begin interaction.
     renWin->Render();
     iren->Start();
