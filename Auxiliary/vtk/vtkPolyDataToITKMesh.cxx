@@ -109,7 +109,7 @@ int main( int argc, char * argv [] )
 
   mesh->GetPoints()->Reserve( numberOfPoints );
   
-  for(int p =0; p < numberOfPoints; p++)
+  for(unsigned int p =0; p < numberOfPoints; p++)
     {
 
     vtkFloatingPointType * apoint = vtkpoints->GetPoint( p );
