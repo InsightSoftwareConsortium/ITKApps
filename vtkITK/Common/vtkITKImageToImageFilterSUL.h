@@ -57,7 +57,7 @@ protected:
     // Set up the filter pipeline
     m_Filter->SetInput ( this->itkImporter->GetOutput() );
     this->itkExporter->SetInput ( m_Filter->GetOutput() );
-    this->vtkCast->SetOutputScalarTypeToUnsignedShort();
+    this->vtkCast->SetOutputScalarTypeToShort();
   };
 
   ~vtkITKImageToImageFilterSUL()
