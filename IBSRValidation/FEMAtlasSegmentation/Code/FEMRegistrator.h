@@ -77,8 +77,10 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
+  typedef itk::fem::Element3DC0LinearHexahedronMembrane   ElementType;
+
   /** Label Image Type */
-  typedef Image<unsigned char,3> LabelImageType;
+  typedef itk::Image<unsigned char,3> LabelImageType;
 
   /** Fixed Image Type. */
   typedef TFixedImage FixedImageType;
@@ -87,13 +89,13 @@ public:
   typedef TMovingImage MovingImageType;
 
   /** Image dimension enumeration. */
-  itkStaticConstMacro(ImageDimension, unsigned int, TFixedImage::ImageDimension);
+  itkStaticConstMacro(ImageDimension, unsigned int,3);
 
   /** Deformation field value type. */
   typedef TFieldValue FieldValueType;
 
   /** Deformation field pixel type. */
-  typedef Vector<FieldValueType,itkGetStaticConstMacro(ImageDimension)> FieldPixelType;
+  typedef itk::Vector<FieldValueType,itkGetStaticConstMacro(ImageDimension)> FieldPixelType;
 
   /** Deformation field type. */
   typedef Image<FieldPixelType,itkGetStaticConstMacro(ImageDimension)> DeformationFieldType;
@@ -109,7 +111,7 @@ public:
                                     MovingImageType  >   MovingImagePyramidType;
 
   /** Registration Method. */
-  typedef fem::FEMRegistrationFilter<MovingImageType,FixedImageType> RegistrationType; 
+  typedef itk::fem::FEMRegistrationFilter<MovingImageType,FixedImageType> RegistrationType; 
 
   /** Set the fixed image. */
   itkSetObjectMacro( FixedImage, FixedImageType );
