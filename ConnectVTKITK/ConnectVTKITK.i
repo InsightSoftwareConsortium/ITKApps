@@ -25,7 +25,7 @@
 %}
 
 %typemap(in) vtkImageExport* {
-  int cerror;
+  int cerror=0;
   $1 = NULL;
   $1 = (vtkImageExport*) vtkTclGetPointerFromObject(Tcl_GetString($input),
                                                     "vtkImageExport", interp, 
@@ -34,7 +34,7 @@
 }
 
 %typemap(in) vtkImageImport* {
-  int cerror;
+  int cerror=0;
   $1 = NULL;
   $1 = (vtkImageImport*) vtkTclGetPointerFromObject(Tcl_GetString($input), 
                                                     "vtkImageImport", interp, 
