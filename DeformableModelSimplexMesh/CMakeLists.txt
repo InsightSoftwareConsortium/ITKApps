@@ -4,6 +4,7 @@ PROJECT( DeformableModelSimplexMesh )
 #  Define the list of source files
 #
 INCLUDE_DIRECTORIES(
+${DeformableModelSimplexMesh_SOURCE_DIR}
 ${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer
 ${InsightApplications_SOURCE_DIR}/Auxiliary/VtkFltk
 ${InsightApplications_SOURCE_DIR}/Auxiliary/vtk
@@ -64,6 +65,17 @@ INCLUDE_DIRECTORIES(
 
 
 TARGET_LINK_LIBRARIES( DeformableModelSimplexMesh 
-	ITKAlgorithms ITKBasicFilters ITKCommon ITKIO ITKNumerics ITKFltkImageViewer ITKVtkFltk vtkRendering vtkGraphics vtkHybrid vtkImaging vtkIO vtkFiltering vtkCommon vtkPatented 	${FLTK_LIBRARIES} )
+	ITKAlgorithms ITKBasicFilters ITKCommon ITKIO ITKNumerics ITKIO 
+	ITKFltkImageViewer ITKVtkFltk
+  vtkPatented 
+  vtkCommon
+  vtkFiltering
+  vtkGraphics
+  vtkImaging
+  vtkIO
+  vtkHybrid 
+  vtkRendering
+	${FLTK_LIBRARIES}
+  )
 
 
