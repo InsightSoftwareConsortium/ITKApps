@@ -180,6 +180,8 @@ extern "C" {
   
 void VV_PLUGIN_EXPORT vvITKShapeDetectionModuleInit(vtkVVPluginInfo *info)
 {
+  vvPluginVersionCheck();
+
   // setup information that never changes
   info->ProcessData = ProcessData;
   info->UpdateGUI   = UpdateGUI;

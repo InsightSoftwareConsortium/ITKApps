@@ -144,6 +144,8 @@ extern "C" {
   
 void VV_PLUGIN_EXPORT vvITKFastMarchingInit(vtkVVPluginInfo *info)
 {
+  vvPluginVersionCheck();
+
   // setup information that never changes
   info->ProcessData = ProcessData;
   info->UpdateGUI = UpdateGUI;
