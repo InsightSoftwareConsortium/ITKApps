@@ -22,11 +22,11 @@ will cause this application to build:
 
 2. To run this application:
 
- cd INSIGHT_SOURCE/Applications/SegmentationEditor/Scripts
- INSIGHT_BUILD/bin/WSTITK Main.tcl
+ cd InsightApplications_SOURCE/SegmentationEditor/Scripts
+ InsightApplications_BUILD/bin/WSTITK Main.tcl
 
- where "INSIGHT_SOURCE" is the path to your Insight source tree and
- "INSIGHT_BUILD" is the path to your Insight build.
+ where "InsightApplications_SOURCE" is the path to your InsightApplications
+ source tree and "InsightApplications_BUILD" is the path to your Insight build.
 
 
 3. The rest of the documentation you will need is displayed by the program
