@@ -148,7 +148,7 @@ typedef itk::RGBAPixel<unsigned char> ColorPixel;
 namespace itk {
 
 template<>
-class itk::NumericTraits<ColorPixel>
+class NumericTraits<ColorPixel>
 {
 public:
   typedef ColorPixel ValueType;
