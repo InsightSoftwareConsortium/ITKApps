@@ -144,12 +144,13 @@ GradientEatingBacteria
 
   bool here = false;
 
-  if( m_ChemoAttractantLevel < ChemoAttractantLowThreshold )
+  if( m_ChemoAttractantLevel < ChemoAttractantLowThreshold  ||
+      m_ChemoAttractantLevel > ChemoAttractantHighThreshold    )
     {
-    here = true;
+    // here = true;
     }
 
-  return ( super && here );
+  return ( super || here );
 
 }
 
@@ -176,7 +177,8 @@ GradientEatingBacteria
   if( !m_ScheduleApoptosis )
     {
 
-    if( m_ChemoAttractantLevel > ChemoAttractantLowThreshold )
+    if( m_ChemoAttractantLevel > ChemoAttractantLowThreshold  &&
+        m_ChemoAttractantLevel < ChemoAttractantHighThreshold    )
       {
       here = true;
       }
@@ -195,7 +197,8 @@ void
 GradientEatingBacteria
 ::AddForce( const VectorType & force )
 {
-  if( m_ChemoAttractantLevel > ChemoAttractantLowThreshold )
+  if( m_ChemoAttractantLevel > ChemoAttractantLowThreshold &&
+      m_ChemoAttractantLevel < ChemoAttractantHighThreshold   )
     {
     SuperClass::AddForce( force );
     }
@@ -245,21 +248,49 @@ GradientEatingBacteria
   
   m_ChemoAttractantLevel = substrate0;
 
+}
+ 
+
+
+/**
+ *   Compute the Gene Network
+ *   This method update the level of expression of 
+ *   all the genes in the cell's genome.
+ *   see: http://www.ingeneue.org  for details
+ */ 
+void
+GradientEatingBacteria
+::ComputeGeneNetwork(void) 
+{
+  // Color the bacteria acording to substrate.
+  // This is done by generating pigments.
+
   if( m_ChemoAttractantLevel > ChemoAttractantHighThreshold )
     {
-    m_Color = WellNourishedColor;
+    m_Genome->SetExpressionLevel( RedGene,   WellNourishedColor.GetRed() );
+    m_Genome->SetExpressionLevel( GreenGene, WellNourishedColor.GetGreen() );
+    m_Genome->SetExpressionLevel( BlueGene,  WellNourishedColor.GetBlue() );
     }
   else if( m_ChemoAttractantLevel > ChemoAttractantLowThreshold )
     {
-    m_Color = HopefullColor;
+    m_Genome->SetExpressionLevel( RedGene,   HopefullColor.GetRed() );
+    m_Genome->SetExpressionLevel( GreenGene, HopefullColor.GetGreen() );
+    m_Genome->SetExpressionLevel( BlueGene,  HopefullColor.GetBlue() );
     }
   else
     {
-    m_ScheduleApoptosis    = true;
-    m_Color = StarvingColor;
+    m_Genome->SetExpressionLevel( RedGene,   StarvingColor.GetRed() );
+    m_Genome->SetExpressionLevel( GreenGene, StarvingColor.GetGreen() );
+    m_Genome->SetExpressionLevel( BlueGene,  StarvingColor.GetBlue() );
     }
+
+  const double cdk2E = 0.9;  // by now, it is always ready to replicate. 
+                             // this must be link to radius growth.
+  m_Genome->SetExpressionLevel( Cdk2E, cdk2E );
+
 }
- 
+
+
 
 
 
