@@ -55,7 +55,7 @@
 #include "itkDICOMImageIO2.h"
 #include <itksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.4 $");
 vtkStandardNewMacro(vtkITKArchetypeImageSeriesReader);
 
 //----------------------------------------------------------------------------
@@ -145,7 +145,7 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
       }
     inputImageFileGenerator->SetDirectory( fileNamePath );
     std::vector <std::string> seriesUIDs = inputImageFileGenerator->GetSeriesUIDs();
-    inputImageFileGenerator->SetFileNameSortingOrderToSortBySliceLocation();
+    inputImageFileGenerator->SetFileNameSortingOrderToSortByImagePositionPatient();
     int archetypeSeries = -1;
     for (int s = 0; s < seriesUIDs.size(); s++)
       {
@@ -178,19 +178,19 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
     }
 
   // Reduce the selection of filenames
-  int maximumCount;
+  int lastFile;
   if (this->FileNameSliceCount == 0)
     {
-    maximumCount = candidateFiles.size();
+    lastFile = candidateFiles.size();
     }
   else
     {
-    maximumCount = this->FileNameSliceCount;
+    lastFile = this->FileNameSliceCount;
     }
 
   this->FileNames.resize(0);
   for (int f = this->FileNameSliceOffset;
-       f < maximumCount;
+       f < lastFile;
        f += this->FileNameSliceSpacing)
     {
     this->FileNames.push_back(candidateFiles[f]);
@@ -199,29 +199,6 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
   vtkFloatingPointType spacing[3];
   vtkFloatingPointType origin[3];
   
-#define vtkITKOutputInformationFromSeries(typeN, type) \
-    case typeN: \
-    {\
-      typedef itk::Image<type,3> image##typeN;\
-      itk::ImageSeriesReader<image##typeN>::Pointer reader##typeN = \
-            itk::ImageSeriesReader<image##typeN>::New(); \
-      reader##typeN->SetFileNames(this->FileNames); \
-      reader##typeN->GenerateOutputInformation(); \
-      for (int i = 0; i < 3; i++) \
-        { \
-        spacing[i] = reader##typeN->GetOutput()->GetSpacing()[i]; \
-        origin[i] = reader##typeN->GetOutput()->GetOrigin()[i]; \
-        } \
-      itk::ImageRegion<3> region##typeN = reader##typeN->GetOutput()->GetLargestPossibleRegion();\
-      extent[0] = region##typeN.GetIndex()[0];\
-      extent[1] = region##typeN.GetIndex()[0] + region##typeN.GetSize()[0] - 1;\
-      extent[2] = region##typeN.GetIndex()[1];\
-      extent[3] = region##typeN.GetIndex()[1] + region##typeN.GetSize()[1] - 1;\
-      extent[4] = region##typeN.GetIndex()[2];\
-      extent[5] = region##typeN.GetIndex()[2] + region##typeN.GetSize()[2] - 1;\
-    }\
-    break
-
 #define vtkITKOutputInformationFromFile(typeN, type) \
     case typeN: \
     {\
@@ -245,43 +222,51 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
     }\
     break
 
+  // Since we only need origin, spacing and extents, we can use one
+  // image type.
+  typedef itk::Image<float,3> ImageType;
+  itk::ImageRegion<3> region;
+
   // If there is only one file in the series, just use an image file reader
   if (this->FileNames.size() == 1)
     {
-    switch (this->OutputScalarType)
+    itk::ImageFileReader<ImageType>::Pointer imageReader =
+      itk::ImageFileReader<ImageType>::New();
+    imageReader->SetFileName(this->FileNames[0].c_str());
+    imageReader->GenerateOutputInformation();
+    for (int i = 0; i < 3; i++)
       {
-      vtkITKOutputInformationFromFile(VTK_DOUBLE, double);
-      vtkITKOutputInformationFromFile(VTK_FLOAT, float);
-      vtkITKOutputInformationFromFile(VTK_LONG, long);
-      vtkITKOutputInformationFromFile(VTK_UNSIGNED_LONG, unsigned long);
-      vtkITKOutputInformationFromFile(VTK_INT, int);
-      vtkITKOutputInformationFromFile(VTK_UNSIGNED_INT, unsigned int);
-      vtkITKOutputInformationFromFile(VTK_SHORT, short);
-      vtkITKOutputInformationFromFile(VTK_UNSIGNED_SHORT, unsigned short);
-      vtkITKOutputInformationFromFile(VTK_CHAR, char);
-      vtkITKOutputInformationFromFile(VTK_UNSIGNED_CHAR, unsigned char);
-      default:
-        vtkErrorMacro(<< "UpdateFromFile: Unknown data type");
+      spacing[i] = imageReader->GetOutput()->GetSpacing()[i];
+      origin[i] = imageReader->GetOutput()->GetOrigin()[i];
       }
+    region = imageReader->GetOutput()->GetLargestPossibleRegion();
+    extent[0] = region.GetIndex()[0];
+    extent[1] = region.GetIndex()[0] + region.GetSize()[0] - 1;
+    extent[2] = region.GetIndex()[1];
+    extent[3] = region.GetIndex()[1] + region.GetSize()[1] - 1;
+    extent[4] = region.GetIndex()[2];
+    extent[5] = region.GetIndex()[2] + region.GetSize()[2] - 1;
     }
   else
     {
-    switch (this->OutputScalarType)
+    itk::ImageSeriesReader<ImageType>::Pointer seriesReader =
+      itk::ImageSeriesReader<ImageType>::New();
+    seriesReader->SetFileNames(this->FileNames);
+    seriesReader->GenerateOutputInformation();
+    for (int i = 0; i < 3; i++)
       {
-      vtkITKOutputInformationFromSeries(VTK_DOUBLE, double);
-      vtkITKOutputInformationFromSeries(VTK_FLOAT, float);
-      vtkITKOutputInformationFromSeries(VTK_LONG, long);
-      vtkITKOutputInformationFromSeries(VTK_UNSIGNED_LONG, unsigned long);
-      vtkITKOutputInformationFromSeries(VTK_INT, int);
-      vtkITKOutputInformationFromSeries(VTK_UNSIGNED_INT, unsigned int);
-      vtkITKOutputInformationFromSeries(VTK_SHORT, short);
-      vtkITKOutputInformationFromSeries(VTK_UNSIGNED_SHORT, unsigned short);
-      vtkITKOutputInformationFromSeries(VTK_CHAR, char);
-      vtkITKOutputInformationFromSeries(VTK_UNSIGNED_CHAR, unsigned char);
-      default:
-        vtkErrorMacro(<< "UpdateFromFile: Unknown data type");
+      spacing[i] = seriesReader->GetOutput()->GetSpacing()[i];
+      origin[i] = seriesReader->GetOutput()->GetOrigin()[i];
       }
+    region = seriesReader->GetOutput()->GetLargestPossibleRegion();
+    extent[0] = region.GetIndex()[0];
+    extent[1] = region.GetIndex()[0] + region.GetSize()[0] - 1;
+    extent[2] = region.GetIndex()[1];
+    extent[3] = region.GetIndex()[1] + region.GetSize()[1] - 1;
+    extent[4] = region.GetIndex()[2];
+    extent[5] = region.GetIndex()[2] + region.GetSize()[2] - 1;
     }
+
   // If it looks like the reader did not provide the spacing and
   // origin, modify the spacing and origin with the defaults
   for (int j = 0; j < 3; j++)
@@ -321,6 +306,7 @@ void vtkITKArchetypeImageSeriesReader::ExecuteData(vtkDataObject *output)
   data->SetExtent(0,0,0,0,0,0);
   data->AllocateScalars();
   data->SetExtent(data->GetWholeExtent());
+
 #define vtkITKExecuteDataFromSeries(typeN, type) \
     case typeN: \
     {\
