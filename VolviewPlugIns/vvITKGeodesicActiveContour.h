@@ -13,6 +13,8 @@
 #include "vvITKFilterModuleTwoInputs.h"
 #include "itkGeodesicActiveContourLevelSetImageFilter.h"
 #include "itkRescaleIntensityImageFilter.h"
+#include "itkSmoothingRecursiveGaussianImageFilter.h"
+
 
 namespace VolView
 {
@@ -46,14 +48,40 @@ public:
   typedef  itk::RescaleIntensityImageFilter< 
                       InputSpeedImageType,
                       InternalSpeedImageType 
-                               > RescaleIntensityFilterType;
+                               > RescaleSpeedFilterType;
 
+  typedef  itk::RescaleIntensityImageFilter< 
+                      InternalSpeedImageType,
+                      InternalSpeedImageType 
+                               > RescaleLeveSetFilterType;
+
+  typedef  itk::SmoothingRecursiveGaussianImageFilter<
+                      BinaryMaskImageType,
+                      InternalSpeedImageType 
+                               > SmoothingFilterType;
 
 public:
 
   /**  Constructor */
   GeodesicActiveContour() 
     {
+    m_RescaleSpeedFilter    = RescaleSpeedFilterType::New();
+    m_RescaleLevelSetFilter = RescaleLeveSetFilterType::New();
+    m_SmoothingFilter       = SmoothingFilterType::New();
+
+    m_RescaleSpeedFilter->SetInput( this->GetSecondInput() );
+    m_RescaleSpeedFilter->SetOutputMaximum( 1.0 );
+    m_RescaleSpeedFilter->SetOutputMinimum( 0.0 );
+
+    m_SmoothingFilter->SetInput( this->GetInput() );
+    
+    m_RescaleLevelSetFilter->SetInput( m_SmoothingFilter->GetOutput() );
+    m_RescaleSpeedFilter->SetOutputMaximum(  0.5 );
+    m_RescaleSpeedFilter->SetOutputMinimum( -0.5 );
+
+    m_RescaleSpeedFilter->ReleaseDataFlagOn();
+    m_RescaleLevelSetFilter->ReleaseDataFlagOn();
+    m_SmoothingFilter->ReleaseDataFlagOn();
     }
 
 
@@ -85,7 +113,6 @@ public:
 
     const unsigned int maximumNumberOfIterations = atoi( info->GetGUIProperty(info, 6, VVP_GUI_VALUE ));
 
-    m_RescaleIntensityFilter->SetInput( this->GetSecondInput() );
 
     filter->SetDerivativeSigma( gaussianSigma );
     filter->SetCurvatureScaling( curvatureScaling );
@@ -93,7 +120,11 @@ public:
     filter->SetAdvectionScaling( advectionScaling );
     filter->SetMaximumRMSError( maximumRMSError );
     filter->SetMaximumIterations( maximumNumberOfIterations );
-    filter->SetFeatureImage( m_RescaleIntensityFilter->GetOutput() );
+
+    m_SmoothingFilter->SetSigma( gaussianSigma );
+
+    filter->SetInput(         m_RescaleLevelSetFilter->GetOutput()  );
+    filter->SetFeatureImage(  m_RescaleSpeedFilter->GetOutput()     );
 
     // Now let the base class do the rest.
     this->Superclass::ProcessData( pds );
@@ -105,8 +136,9 @@ public:
 
 private:
 
-  // Add here the RescaleIntensity filter and the reinitialize filter.
-  RescaleIntensityFilterType::Pointer   m_RescaleIntensityFilter;
+  SmoothingFilterType::Pointer          m_SmoothingFilter;
+  RescaleLeveSetFilterType::Pointer     m_RescaleLevelSetFilter;
+  RescaleSpeedFilterType::Pointer       m_RescaleSpeedFilter;
 
 };
 
