@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
    * has voxels of type GreyType and the segmentation image of type LabelType */
   cout << "Image Dimensions: " << 
     to_int(irisData->GetVolumeExtents()) << endl;       // Ignore the to_int!
-  cout << "Voxel Size      : " << irisData->GetVoxelScaleFactor() << endl;
+//  cout << "Voxel Size      : " << irisData->GetVoxelScaleFactor() << endl;
 
   /* IRISImageData also handles segmentation labels. We can get the number of 
    * active labels, and inquire about each label. */
