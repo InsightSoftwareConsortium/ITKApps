@@ -41,9 +41,9 @@ public:
   typedef itk::ImportImageFilter< InputPixelType, 
                                   Dimension       > ImportFilterType;
 
-  typedef ImportFilterType::SizeType      SizeType;
-  typedef ImportFilterType::IndexType     IndexType;
-  typedef ImportFilterType::RegionType    RegionType;
+  typedef typename ImportFilterType::SizeType      SizeType;
+  typedef typename ImportFilterType::IndexType     IndexType;
+  typedef typename ImportFilterType::RegionType    RegionType;
 
 
 
