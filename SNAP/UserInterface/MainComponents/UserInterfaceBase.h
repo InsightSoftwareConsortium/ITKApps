@@ -50,6 +50,7 @@ public:
   virtual void OnMenuSavePreprocessed() = 0; 
   virtual void OnMenuLoadLabels() = 0;
   virtual void OnMenuSaveLabels() = 0;
+  virtual void OnMenuLoadAdvection() = 0;
   virtual void OnMenuWriteVoxelCounts() = 0;
   virtual void OnMenuIntensityCurve() = 0;  
   virtual void OnMenuShowDisplayOptions() = 0;

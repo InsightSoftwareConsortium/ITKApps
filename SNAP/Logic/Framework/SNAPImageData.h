@@ -44,7 +44,8 @@ class SNAPImageData : public IRISImageData
 public:
 
   // The type of the internal level set image
-  typedef itk::Image<float,3> LevelSetImageType;
+  typedef itk::Image<float,3> FloatImageType;
+  typedef FloatImageType LevelSetImageType;
 
   // Command type for callbacks 
   typedef itk::SmartPointer<itk::Command> CommandPointer;
@@ -95,6 +96,17 @@ public:
    */
   bool IsSnakeLoaded();
 
+  /**
+   * This optional method allows us to load an external advection
+   * field. This field can be used when image data includes some
+   * directional components, i.e., DTI 
+   */
+  void SetExternalAdvectionField( FloatImageType *imgX, 
+    FloatImageType *imgY, FloatImageType *imgZ);
+
+  /** This method reverts back to using gradient based advection fields */
+  void RemoveExternalAdvectionField()
+    { m_ExternalAdvectionField = NULL; }
 
   /** =========== Methods dealing with the segmentation pipeline ============ */
 
@@ -241,6 +253,14 @@ private:
 
   // Current value of snake parameters
   SnakeParameters m_CurrentSnakeParameters;       
+
+  // Typedefs for defining the advection image that can be loaded externally
+  typedef itk::FixedArray<float, 3> VectorType;
+  typedef itk::Image< VectorType, 3> VectorImageType;
+  typedef itk::SmartPointer<VectorImageType> VectorImagePointer;
+
+  // The advection image
+  VectorImagePointer m_ExternalAdvectionField;
 };
 
 

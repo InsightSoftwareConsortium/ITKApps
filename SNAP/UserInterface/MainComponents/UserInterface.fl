@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0102 
+version 1.0104 
 header_name {.h} 
 code_name {.cxx}
 decl {\#include <stdio.h>} {public
@@ -38,10 +38,10 @@ class UserInterface {open : {public UserInterfaceBase}
     Fl_Window m_WinMain {
       label {SnAP: IRIS}
       callback {OnMainWindowCloseAction();} open
-      xywh {270 120 878 710} type Double align 0 resizable
+      xywh {387 207 875 710} type Double align 0 resizable
       code0 {\#include "UserInterfaceBase.h"} visible
     } {
-      Fl_Menu_Bar m_MenubarMain {
+      Fl_Menu_Bar m_MenubarMain {open selected
         xywh {0 0 146 25} labelsize 12 textsize 12
       } {
         submenu {} {
@@ -66,6 +66,11 @@ class UserInterface {open : {public UserInterfaceBase}
               label {&Preprocessed Image}
               callback {this->OnLoadPreprocessedImageAction();}
               xywh {15 15 100 20} shortcut 0x40070 labelsize 12 deactivate divider
+            }
+            menuitem m_MenuLoadAdvection {
+              label {&Advection Field (Advanced)}
+              callback {this->OnMenuLoadAdvection();}
+              xywh {35 35 100 20} labelsize 12 deactivate divider
             }
             menuitem m_MenuLoadLabels {
               label {&Label Descriptions}
@@ -688,7 +693,7 @@ this->OnSNAPLabelOpacityChange();}
           xywh {0 704 145 5} color 53 labeltype NO_LABEL resizable
         } {}
       }
-      Fl_Wizard m_WizWindows {
+      Fl_Wizard m_WizWindows {open
         xywh {147 -5 730 715} resizable
       } {
         Fl_Group m_GrpIRISWindows {
@@ -887,7 +892,7 @@ m_IRISWindow3D->redraw();}
             }
           }
         }
-        Fl_Group m_GrpSNAPWindows {open
+        Fl_Group m_GrpSNAPWindows {
           xywh {147 0 730 710} hide
         } {
           Fl_Group m_GrpSNAPAxial {
@@ -1439,7 +1444,7 @@ RedrawWindows();}
         xywh {15 130 375 30} labeltype ENGRAVED_LABEL align 16
       } {}
       Fl_Group m_OutSplashMessage {
-        label {Loading progress} open selected
+        label {Loading progress} open
         xywh {15 175 380 25} box BORDER_BOX color 55 labelsize 11 align 20
       } {}
       Fl_Group {} {open
@@ -1448,7 +1453,7 @@ RedrawWindows();}
     }
     Fl_Window m_WinProgress {
       label {SNAP Progress Meter} open
-      xywh {434 461 488 70} type Double box BORDER_BOX color 53 modal noborder visible
+      xywh {434 461 485 70} type Double box BORDER_BOX color 53 modal noborder visible
     } {
       Fl_Group {} {
         label {Working... Please Wait!} open

@@ -49,14 +49,18 @@ public:
 
   /** Type definition for the level set function */
   typedef SNAPLevelSetFunction<FloatImageType> LevelSetFunctionType;
+  typedef LevelSetFunctionType::VectorImageType VectorImageType;
 
   /** Initialize the level set driver.  Note that the type of snake (in/out
    * or edge) is determined entirely by the speed image and by the values
    * of the parameters.  Moreover, the type of solver used is specified in
-   * the parameters as well */
+   * the parameters as well. The last parameter is the optional external 
+   * advection field, that can be used instead of the default advection
+   * field that is based on the image gradient */
   SNAPLevelSetDriver(FloatImageType *initialLevelSet,
                      FloatImageType *speed,
-                     const SnakeParameters &parms);
+                     const SnakeParameters &parms,
+                     VectorImageType *externalAdvection = NULL);
 
   /** Virtual destructor */
   virtual ~SNAPLevelSetDriver() {}

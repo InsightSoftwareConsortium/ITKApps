@@ -331,6 +331,7 @@ UserInterfaceLogic
   m_MenuSaveLabels->deactivate();
   m_MenuSavePreprocessed->deactivate();
   m_MenuLoadPreprocessed->activate();
+  m_MenuLoadAdvection->activate();
   m_MenuSaveVoxelCounts->deactivate();
 
 
@@ -640,6 +641,7 @@ UserInterfaceLogic
   m_GrpSnakeChoiceRadio->deactivate();
   m_GrpSNAPStepInitialize->deactivate();
   m_MenuLoadPreprocessed->deactivate();
+  m_MenuLoadAdvection->deactivate();
 
   m_PreprocessingUI->HidePreprocessingWindows();
 
@@ -797,6 +799,7 @@ UserInterfaceLogic
     m_GrpSnakeChoiceRadio->activate();
     m_GrpSNAPStepInitialize->activate();
     m_MenuLoadPreprocessed->activate();
+    m_MenuLoadAdvection->activate();
     m_BtnRestartInitialization->hide();
     m_BtnAcceptInitialization->show();
     m_ChkContinuousView3DUpdate->value(0);
@@ -1080,6 +1083,7 @@ UserInterfaceLogic
   m_MenuSaveLabels->activate();
   m_MenuSavePreprocessed->deactivate();
   m_MenuLoadPreprocessed->deactivate();
+  m_MenuLoadAdvection->deactivate();
   m_MenuSaveVoxelCounts->activate();
   
   // Show IRIS window, Hide the snake window
@@ -2683,6 +2687,62 @@ UserInterfaceLogic
   this->OnLoadPreprocessedImageAction();
 }
 
+void
+UserInterfaceLogic
+::OnMenuLoadAdvection()
+{
+  typedef itk::Image<float, 3> AdvectionImage;
+  AdvectionImage::Pointer imgAdvection[3];
+  
+  // Preprocessing image can only be loaded in SNAP mode
+  assert(m_GlobalState->GetSNAPActive());
+  
+  // Set up the input wizard with the grey image
+  m_WizPreprocessingIO->SetGreyImage(
+    m_Driver->GetCurrentImageData()->GetGrey()->GetImage());
+
+  // Load the three advection images as floating point
+  bool flagLoadCompleted = true;
+  for(unsigned int i=0;i<3;i++)
+    {
+    // Set the history for the input wizard
+    m_WizPreprocessingIO->SetHistory(
+      m_SystemInterface->GetHistory("AdvectionImage"));
+
+    // Show the input wizard
+    m_WizPreprocessingIO->DisplayInputWizard(
+      m_GlobalState->GetAdvectionFileName(i));
+
+    // If the load operation was successful, populate the data and GUI with the
+    // new image
+    if(m_WizPreprocessingIO->IsImageLoaded()) 
+      {
+      // Update the system's history list
+      m_SystemInterface->UpdateHistory(
+        "AdvectionImage",m_WizPreprocessingIO->GetFileName());
+
+      // Update the application with the new speed image
+      imgAdvection[i] = m_WizPreprocessingIO->GetLoadedImage();
+
+      // Save the segmentation file name
+      m_GlobalState->SetAdvectionFileName(i, m_WizPreprocessingIO->GetFileName());
+      }
+    else
+      {
+      flagLoadCompleted = false;
+      break;
+      }
+    }
+  
+  // Disconnect the input wizard from the grey image
+  m_WizPreprocessingIO->SetGreyImage(NULL);
+
+  // Add the advection image to SNAP
+  if(flagLoadCompleted)
+    m_Driver->GetSNAPImageData()->SetExternalAdvectionField(
+      imgAdvection[0],imgAdvection[1],imgAdvection[2]);
+}
+
 void 
 UserInterfaceLogic
 ::OnLoadPreprocessedImageAction() 
@@ -3016,6 +3076,9 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.19  2004/01/24 18:21:00  king
+ *ERR: Merged warning fixes from ITK 1.6 branch.
+ *
  *Revision 1.18.2.1  2004/01/24 18:16:50  king
  *ERR: Fixed warnings.
  *

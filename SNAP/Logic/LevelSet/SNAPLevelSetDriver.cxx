@@ -39,7 +39,8 @@ public:
 
 SNAPLevelSetDriver
 ::SNAPLevelSetDriver(FloatImageType *init, FloatImageType *speed,
-                     const SnakeParameters &sparms)
+                     const SnakeParameters &sparms,
+                     VectorImageType *externalAdvection)
 {
   // Create the level set function
   m_LevelSetFunction = LevelSetFunctionType::New();
@@ -47,6 +48,10 @@ SNAPLevelSetDriver
 
   // Pass the speed image to the function
   m_LevelSetFunction->SetSpeedImage(speed);  
+
+  // Set the external advection if any
+  if(externalAdvection)
+    m_LevelSetFunction->SetAdvectionField(externalAdvection);
 
   // Remember the input and output images for later initialization
   m_InitializationImage = init;

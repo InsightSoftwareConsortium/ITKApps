@@ -469,6 +469,46 @@ SNAPImageData
   return true;
 }
 
+void
+SNAPImageData
+::SetExternalAdvectionField( FloatImageType *imgX, 
+  FloatImageType *imgY, FloatImageType *imgZ)
+{
+  m_ExternalAdvectionField = VectorImageType::New();
+  m_ExternalAdvectionField->SetRegions(
+    m_SpeedWrapper->GetImage()->GetBufferedRegion());
+  m_ExternalAdvectionField->Allocate();
+  m_ExternalAdvectionField->SetSpacing(
+    m_GreyWrapper->GetImage()->GetSpacing());
+  m_ExternalAdvectionField->SetOrigin(
+    m_GreyWrapper->GetImage()->GetOrigin());
+
+  typedef itk::ImageRegionConstIterator<FloatImageType> Iterator;
+  Iterator itX(imgX,imgX->GetBufferedRegion());
+  Iterator itY(imgY,imgY->GetBufferedRegion());
+  Iterator itZ(imgZ,imgZ->GetBufferedRegion());
+
+  typedef itk::ImageRegionIterator<VectorImageType> Vectorator;
+  Vectorator itTarget(
+    m_ExternalAdvectionField,
+    m_ExternalAdvectionField->GetBufferedRegion());
+
+  while(!itTarget.IsAtEnd())
+    {
+    VectorType v;
+    
+    v[0] = itX.Get();
+    v[1] = itY.Get();
+    v[2] = itZ.Get();
+
+    itTarget.Set(v);
+    
+    ++itTarget; 
+    ++itX; ++itY; ++itZ;
+    }
+}
+  
+
 void 
 SNAPImageData
 ::InitalizeSnakeDriver(const SnakeParameters &p) 
@@ -509,7 +549,8 @@ SNAPImageData
   m_LevelSetDriver = 
     new SNAPLevelSetDriver(m_SnakeInitializationWrapper->GetImage(),
                            m_SpeedWrapper->GetImage(),
-                           m_CurrentSnakeParameters);
+                           m_CurrentSnakeParameters,
+                           m_ExternalAdvectionField);
 
   // Initialize the level set wrapper with the image from the level set 
   // driver

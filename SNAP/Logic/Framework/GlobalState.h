@@ -284,6 +284,14 @@ public:
   /** Get the preprocessing image file name */
   irisGetStringMacro(PreprocessingFileName);
 
+  /** Set the advection file name */
+  void SetAdvectionFileName(unsigned int i, const char *name)
+    { m_AdvectionFileName[i] = name; }
+
+  /** Get the advection file name */
+  const char *GetAdvectionFileName(unsigned int i)
+    { return m_AdvectionFileName[i].c_str(); }
+
 private:
   /** Color label used to draw polygons */
   unsigned char m_DrawingColorLabel;
@@ -381,12 +389,18 @@ private:
 
   // File name of the current preprocessing file
   std::string m_PreprocessingFileName;
+
+  // File names for advection images
+  std::string m_AdvectionFileName[3];
 };
 
 #endif // __GlobalState_h_
 
 /*
  *Log: GlobalState.h
+ *Revision 1.6  2003/12/07 19:48:41  pauly
+ *ENH: Resampling, multiresolution
+ *
  *Revision 1.5  2003/10/09 22:45:12  pauly
  *EMH: Improvements in 3D functionality and snake parameter preview
  *

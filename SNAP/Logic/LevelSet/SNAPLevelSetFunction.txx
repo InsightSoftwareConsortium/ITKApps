@@ -55,7 +55,16 @@ SNAPLevelSetFunction<TImageType>
   m_SpeedImage = pointer;
   m_AdvectionFilter->SetInput(m_SpeedImage);
 }
-
+/*
+template<class TImageType>
+void
+SNAPLevelSetFunction<TImageType>
+::SetAdvectionField(VectorImageType *pointer)
+{
+  m_UseExternalAdvectionField = true;
+  m_AdvectionField = pointer;
+}
+*/
 
 
 template<class TImageType>
@@ -150,9 +159,15 @@ SNAPLevelSetFunction<TImageType>
   
   // There is still the business of the advection image to attend to
   // Compute \f$ \nabla g() \f$ (will be cached from run to run)
-  assert(m_AdvectionSpeedExponent >= 0);
-  m_AdvectionFilter->SetExponent((unsigned int)m_AdvectionSpeedExponent);
-  m_AdvectionFilter->Update();
+  if(!m_UseExternalAdvectionField)
+    {
+    assert(m_AdvectionSpeedExponent >= 0);
+    m_AdvectionFilter->SetExponent((unsigned int)m_AdvectionSpeedExponent);
+    m_AdvectionFilter->Update();
+    m_AdvectionField = 
+      reinterpret_cast< VectorImageType* > (
+        m_AdvectionFilter->GetOutput());
+    }
 
 /*
   // Allocate the advection image
@@ -220,14 +235,8 @@ SNAPLevelSetFunction<TImageType>
       m_LaplacianSmoothingSpeedImage);
 
   // Set up the advection interpolator
-  if(m_AdvectionSpeedExponent != 0)
-    m_AdvectionFieldInterpolator->SetInputImage(m_AdvectionField);
-
-  
-  // Set up the advection interpolator
   // if(m_AdvectionSpeedExponent != 0)
-  m_AdvectionFieldInterpolator->SetInputImage(
-    reinterpret_cast<VectorImageType *>(m_AdvectionFilter->GetOutput()));
+  m_AdvectionFieldInterpolator->SetInputImage(m_AdvectionField);
 }
 
 

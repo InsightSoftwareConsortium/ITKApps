@@ -90,7 +90,7 @@ public:
   typedef typename Superclass::FloatOffsetType FloatOffsetType;
   
   typedef typename Superclass::VectorType VectorType;
-  typedef itk::Image<VectorType,ImageDimension> VectorImageType;
+  typedef itk::Image<VectorType, 3> VectorImageType;
   typedef typename VectorImageType::Pointer VectorImagePointer;
 
   typedef typename Superclass::TimeStepType TimeStepType;
@@ -121,6 +121,16 @@ public:
     {
     return m_SpeedImage;
     }
+
+  /** Set the external advection image (optional). This is only 
+   * needed if your advection image is not the gradient of the
+   * speed image. We use this for DTI segmentation */
+  virtual void SetAdvectionField(VectorImageType *pointer)
+    {
+    m_UseExternalAdvectionField = true;
+    m_AdvectionField = pointer;
+    }
+
   
   /** Compute speed and advection images from feature image. */
   virtual void CalculateInternalImages();
@@ -261,6 +271,9 @@ private:
 
   /** The advection field (possibly scaled by speed image g() */
   VectorImagePointer m_AdvectionField;
+
+  /** Flag, specifyting that the advection image is loaded externally */
+  bool m_UseExternalAdvectionField;
 
   /** Gradient filter used to produce the advection field */
   typedef SNAPAdvectionFieldImageFilter<TImageType,float> AdvectionFilterType;

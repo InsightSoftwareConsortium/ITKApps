@@ -631,6 +631,7 @@ protected:
   void OnMenuLoadPreprocessed();  
   void OnMenuSavePreprocessed();  
   void OnLoadPreprocessedImageAction();
+  void OnMenuLoadAdvection();
 
   // Display options callbacks
   void OnMenuShowDisplayOptions();
@@ -770,6 +771,9 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.13  2004/01/19 22:17:52  pauly
+ *ENH: Final touches before the 1.0 release
+ *
  *Revision 1.12  2003/12/07 19:48:41  pauly
  *ENH: Resampling, multiresolution
  *
