@@ -183,7 +183,7 @@ static int UpdateGUI(void *inf)
 
 extern "C" {
   
-void VV_PLUGIN_EXPORT vvITKAntiAlias(vtkVVPluginInfo *info)
+void VV_PLUGIN_EXPORT vvITKAntiAliasInit(vtkVVPluginInfo *info)
 {
   vvPluginVersionCheck();
 
