@@ -269,14 +269,7 @@ WatershedModule<TInputPixelType>
       ++label;
       }
 
-    if( found )
-      { 
-      *outData = 0;
-      }
-    else
-      {
-      *outData = 255;
-      }
+    *outData = found ? 255 : 0;
     
     ++ot;
     ++outData;
