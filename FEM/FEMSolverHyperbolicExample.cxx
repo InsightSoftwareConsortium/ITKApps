@@ -344,7 +344,7 @@ int main(int ac, char** av)
       reader->Update(); 
       imgread = true;
     }
-    catch (itk::ExceptionObject &e) { std::cout << "No input image read\n"; }
+    catch (itk::ExceptionObject &) { std::cout << "No input image read\n"; }
 
     RescaleFilterType::Pointer rescalefilter;
     FloatImageType::Pointer img, wimg;
