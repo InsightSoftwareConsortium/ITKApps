@@ -47,7 +47,7 @@ vtkFlImageViewer()
   this->end();
 }
 //---------------------------------------------------------------------------
-SegmentedViewer::SegmentedViewer( int x, int y, int w, int h, const char *l) : 
+SegmentedViewer::SegmentedViewer( int x, int y, int w, int h, const char *) : 
 vtkFlImageViewer(x,y,w,h)
 {
 }
