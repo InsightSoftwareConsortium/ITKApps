@@ -331,6 +331,9 @@ SnakeParametersPreviewPipeline
   m_QuickUpdate = false;
   m_Updating = false;
 
+  // Initialize the parameters
+  m_Parameters = SnakeParameters::GetDefaultEdgeParameters();
+
 #ifdef SNAKE_PREVIEW_ADVANCED
   
   // The flood fill image

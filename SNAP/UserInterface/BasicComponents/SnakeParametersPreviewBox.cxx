@@ -193,11 +193,11 @@ SnakeParametersPreviewBox
   // Draw the interactor
   m_Interactor.OnDraw();
   
-  // Restore the attribute state
-  glPopAttrib();
-
   // Pop the matrix
   glPopMatrix();
+  
+  // Restore the attribute state
+  glPopAttrib();
 }
 
 SnakeParametersPreviewBox::Interactor
