@@ -661,8 +661,8 @@ void
 guiMainImplementation
 ::ShowRegionOfInterestWindow()
   {
-  tkFixedImageViewer->HideLandmarks();
-  tkFixedImageViewer->ShowRegionOfInterest();
+  tkMovingImageViewer->HideLandmarks();
+  tkMovingImageViewer->ShowRegionOfInterest();
 
   tkROIViewAxisX->value(tkViewAxisX->value());
   tkROIViewAxisY->value(tkViewAxisY->value());
@@ -675,9 +675,9 @@ void
 guiMainImplementation
 ::ApplyRegionOfInterest()
   {
-  tkFixedImageViewer->ApplyRegionOfInterest();
-  tkFixedImageViewer->HideRegionOfInterest();
-  tkFixedImageViewer->ShowLandmarks();
+  tkMovingImageViewer->ApplyRegionOfInterest();
+  tkMovingImageViewer->HideRegionOfInterest();
+  tkMovingImageViewer->ShowLandmarks();
   tkRegionOfInterestWindow->hide();
   }
 
@@ -685,8 +685,8 @@ void
 guiMainImplementation
 ::CancelRegionOfInterest()
   {
-  tkFixedImageViewer->HideRegionOfInterest();
-  tkFixedImageViewer->ShowLandmarks();
+  tkMovingImageViewer->HideRegionOfInterest();
+  tkMovingImageViewer->ShowLandmarks();
   tkRegionOfInterestWindow->hide();
   }
 
@@ -741,7 +741,7 @@ guiMainImplementation
     step = -1 * (int) tkROIStep->value();
     }
   
-  tkFixedImageViewer->MoveRegionOfInterest(axis, step);
+  tkMovingImageViewer->MoveRegionOfInterest(axis, step);
   }
 
 void 
@@ -795,7 +795,7 @@ guiMainImplementation
     step = (int) tkROIStep->value();
     }
   
-  tkFixedImageViewer->ResizeRegionOfInterest(axis, step);
+  tkMovingImageViewer->ResizeRegionOfInterest(axis, step);
   }
 
 /////////////////////////////////////////////////
@@ -1244,7 +1244,7 @@ guiMainImplementation
     }
   
   RegionType region;
-  region = m_FixedImage->GetLargestPossibleRegion();
+  region = m_MovingImage->GetLargestPossibleRegion();
     
   switch( tkRegistrationMethodChoice->value() )
     {
@@ -1253,18 +1253,19 @@ guiMainImplementation
       this->ChangeStatusDisplay("Registering using the rigid method...");
     
       if ( tkRigidUseUserRegion->value() == 1
-           && tkFixedImageViewer->IsRegionOfInterestAvailable() )
+           && tkMovingImageViewer->IsRegionOfInterestAvailable() )
         {
-        region = tkFixedImageViewer->GetRegionOfInterest();
+        region = tkMovingImageViewer->GetRegionOfInterest();
         }
       else if ( tkRigidUseLandmarkRegion->value() == 1 
-                && tkFixedImageViewer->GetNumberOfLandmarks() == 4 )
+                && tkMovingImageViewer->GetNumberOfLandmarks() == 4 
+                && tkFixedImageViewer->GetNumberOfLandmarks() == 4)
         {
-        region = tkFixedImageViewer->ComputeLandmarkRegion
+        region = tkMovingImageViewer->ComputeLandmarkRegion
           (tkRigidRegionScale->value());
         }
   
-      m_ImageRegistrationApp->SetFixedImageRegion(region);
+      m_ImageRegistrationApp->SetFixedImageRegion(region); // actually moving image region
       m_ImageRegistrationApp->RegisterUsingRigidMethod();
       break;
       }
@@ -1272,17 +1273,18 @@ guiMainImplementation
       {
       this->ChangeStatusDisplay("Registering using the affine method...");
       if ( tkAffineUseUserRegion->value() == 1
-           && tkFixedImageViewer->IsRegionOfInterestAvailable() )
+           && tkMovingImageViewer->IsRegionOfInterestAvailable() )
         {
-        region = tkFixedImageViewer->GetRegionOfInterest();
+        region = tkMovingImageViewer->GetRegionOfInterest();
         }
       else if ( tkAffineUseLandmarkRegion->value() == 1 
-                && tkFixedImageViewer->GetNumberOfLandmarks() == 4 )
+                && tkFixedImageViewer->GetNumberOfLandmarks() == 4 
+                && tkMovingImageViewer->GetNumberOfLandmarks() == 4)
         {
-        region = tkFixedImageViewer->ComputeLandmarkRegion
+        region = tkMovingImageViewer->ComputeLandmarkRegion
           (tkAffineRegionScale->value());
         }
-      m_ImageRegistrationApp->SetFixedImageRegion(region);
+      m_ImageRegistrationApp->SetFixedImageRegion(region); // actually moving image region
       m_ImageRegistrationApp->RegisterUsingAffineMethod();
       break;
       }

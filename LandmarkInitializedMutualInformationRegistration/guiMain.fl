@@ -149,14 +149,9 @@ Register();}
               callback {UpdateLandmark(o->parent(), 3);}
               xywh {10 157 85 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 3
             }
-            Fl_Button {} {
-              label {Region of interest...}
-              callback {ShowRegionOfInterestWindow() ;}
-              xywh {10 255 130 17} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 248 labelsize 9
-            }
           }
           Fl_Group tkMovingImageLandmarkGroup {open
-            xywh {10 400 130 145} deactivate
+            xywh {10 400 130 195} deactivate
           } {
             Fl_Button tkMovingImageLandmarksClearButton {
               label {clear landmarks}
@@ -210,8 +205,13 @@ Register();}
             }
             Fl_Round_Button tkMovingImageLandmark4Button {
               label {Landmark 4}
-              callback {UpdateLandmark(o->parent(), 3);} selected
+              callback {UpdateLandmark(o->parent(), 3);}
               xywh {10 464 83 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 3
+            }
+            Fl_Button {} {
+              label {Region of interest...}
+              callback {ShowRegionOfInterestWindow() ;}
+              xywh {10 568 130 17} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 248 labelsize 9
             }
           }
           Fl_Box tkMovingImageViewer {
@@ -330,57 +330,57 @@ Register();}
       }
     }
     Fl_Window tkRegionOfInterestWindow {
-      label {Region of Interest}
-      xywh {810 292 350 280} type Double box PLASTIC_UP_BOX color 159 visible
+      label {Region of Interest} selected
+      xywh {810 292 350 321} type Double box PLASTIC_UP_BOX color 159 visible
     } {
       Fl_Group {} {
         label Move open
-        xywh {76 52 253 43} box PLASTIC_DOWN_BOX labeltype EMBOSSED_LABEL labelsize 12 align 4
+        xywh {27 76 135 100} box PLASTIC_DOWN_BOX labeltype EMBOSSED_LABEL labelsize 12
       } {
         Fl_Button {} {
           label Left
           callback {MoveRegionOfInterest(0) ;}
-          xywh {86 62 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
+          xywh {37 115 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
         }
         Fl_Button {} {
           label Right
           callback {MoveRegionOfInterest(1) ;}
-          xywh {146 62 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
+          xywh {97 115 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
         }
         Fl_Button {} {
           label Up
           callback {MoveRegionOfInterest(2) ;}
-          xywh {206 62 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
+          xywh {67 87 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
         }
         Fl_Button {} {
           label Down
           callback {MoveRegionOfInterest(3) ;}
-          xywh {266 62 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
+          xywh {67 142 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
         }
       }
       Fl_Group {} {
         label Resize open
-        xywh {76 103 253 43} box PLASTIC_DOWN_BOX labeltype EMBOSSED_LABEL labelsize 12 align 4
+        xywh {187 76 135 100} box PLASTIC_DOWN_BOX labeltype EMBOSSED_LABEL labelsize 12
       } {
         Fl_Button {} {
           label {Hor. -}
           callback {ResizeRegionOfInterest(0) ;}
-          xywh {86 113 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
+          xywh {198 114 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
         }
         Fl_Button {} {
           label {Hor. +}
           callback {ResizeRegionOfInterest(1) ;}
-          xywh {146 113 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
+          xywh {258 114 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
         }
         Fl_Button {} {
           label {Vert. -}
           callback {ResizeRegionOfInterest(2) ;}
-          xywh {206 113 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
+          xywh {229 142 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
         }
         Fl_Button {} {
           label {Vert. +}
           callback {ResizeRegionOfInterest(3) ;}
-          xywh {266 113 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
+          xywh {229 87 55 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
         }
       }
       Fl_Group tkROIViewAxisGroup {
@@ -422,37 +422,37 @@ tkViewAxisZ->value(1) ;}
       Fl_Button tkROIOkButton {
         label OK
         callback {ApplyRegionOfInterest();}
-        xywh {40 237 125 29} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 63
+        xywh {39 277 125 29} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 63
       }
       Fl_Button tkROICancelButton {
         label Cancel
         callback {CancelRegionOfInterest() ;}
-        xywh {190 237 125 29} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 88
+        xywh {189 277 125 29} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 88
       }
       Fl_Group {} {
         label {Region by landmarks} open
-        xywh {149 152 178 38} box PLASTIC_DOWN_BOX labeltype EMBOSSED_LABEL labelsize 12 align 4
+        xywh {143 189 178 38} box PLASTIC_DOWN_BOX labeltype EMBOSSED_LABEL labelsize 12 align 4
       } {
         Fl_Button {} {
           label Reset
-          callback {tkFixedImageViewer->InitializeRegionOfInterestWithLandmarks( tkROIScale->value() ) ;
-tkFixedImageViewer->DrawRegionOfInterest() ;}
-          xywh {261 159 58 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
+          callback {tkMovingImageViewer->InitializeRegionOfInterestWithLandmarks( tkROIScale->value() ) ;
+tkMovingImageViewer->DrawRegionOfInterest() ;}
+          xywh {255 196 58 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
         }
         Fl_Value_Input tkROIScale {
           label Scale
-          xywh {202 159 39 25} maximum 10 step 0.1 value 1
+          xywh {196 196 39 25} maximum 10 step 0.1 value 1
         }
       }
       Fl_Group {} {
         label {Largest possible region} open
-        xywh {150 192 178 38} box PLASTIC_DOWN_BOX labeltype EMBOSSED_LABEL labelsize 12 align 4
+        xywh {144 229 178 38} box PLASTIC_DOWN_BOX labeltype EMBOSSED_LABEL labelsize 12 align 4
       } {
         Fl_Button {} {
           label Reset
-          callback {tkFixedImageViewer->InitializeRegionOfInterestWithLargestPossibleRegion() ;
-tkFixedImageViewer->DrawRegionOfInterest() ;}
-          xywh {262 199 58 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
+          callback {tkMovingImageViewer->InitializeRegionOfInterestWithLargestPossibleRegion() ;
+tkMovingImageViewer->DrawRegionOfInterest() ;}
+          xywh {256 236 58 23} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
         }
       }
     }
