@@ -4,6 +4,7 @@ PROJECT( DeformableModelSimplexMesh )
 #  Define the list of source files
 #
 INCLUDE_DIRECTORIES(
+${DeformableModelSimplexMesh_SOURCE_DIR}
 ${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer
 ${InsightApplications_SOURCE_DIR}/Auxiliary/VtkFltk
 ${InsightApplications_SOURCE_DIR}/Auxiliary/vtk
