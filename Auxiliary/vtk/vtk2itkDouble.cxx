@@ -33,6 +33,10 @@
 #include "vtkDataSet.h"
 #include "vtkCellArray.h"
 
+#ifndef vtkFloatingPointType
+#define vtkFloatingPointType float
+#endif
+
 typedef itk::Mesh<double, 3,
   itk::DefaultStaticMeshTraits< double, 3, 3, double, double > > doubleMesh;
 
@@ -96,7 +100,7 @@ doubleMesh::Pointer MeshFromUnstructuredGrid(vtkUnstructuredGrid* grid)
   mesh->SetPoints(points);
   for(int i =0; i < numPoints; i++)
     {
-    float* apoint = vtkpoints->GetPoint(i);
+    vtkFloatingPointType* apoint = vtkpoints->GetPoint(i);
     doubleMesh::PointType p;
     p[0] = apoint[0];
     p[1] = apoint[1];
@@ -257,7 +261,7 @@ vtkUnstructuredGrid* MeshToUnstructuredGrid(doubleMesh* mesh)
     // itk returns a const pointer, but vtk is not const correct, so
     // we have to use a const cast to get rid of the const
     doubleMesh::PointType & pp = i->Value();
-    float pcoordinates[3]; 
+    vtkFloatingPointType pcoordinates[3]; 
     pcoordinates[0] = pp[0];
     pcoordinates[1] = pp[1];
     pcoordinates[2] = pp[2];

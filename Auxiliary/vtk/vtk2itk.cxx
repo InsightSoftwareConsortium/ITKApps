@@ -33,8 +33,12 @@
 #include "vtkDataSet.h"
 #include "vtkCellArray.h"
 
-typedef itk::Mesh<float, 3,
-  itk::DefaultStaticMeshTraits< float, 3, 3, float, float > > floatMesh;
+#ifndef vtkFloatingPointType
+#define vtkFloatingPointType float
+#endif
+
+typedef itk::Mesh<vtkFloatingPointType, 3,
+  itk::DefaultStaticMeshTraits< vtkFloatingPointType, 3, 3, vtkFloatingPointType, vtkFloatingPointType > > floatMesh;
 
 void Display(vtkUnstructuredGrid* itkgrid, vtkUnstructuredGrid* vtkgrid)
 {
@@ -96,7 +100,7 @@ floatMesh::Pointer MeshFromUnstructuredGrid(vtkUnstructuredGrid* grid)
   mesh->SetPoints(points);
   for(int i =0; i < numPoints; i++)
     {
-    float* apoint = vtkpoints->GetPoint(i);
+    vtkFloatingPointType* apoint = vtkpoints->GetPoint(i);
     mesh->SetPoint(i, floatMesh::PointType(apoint));
     }
   vtkCellArray* vtkcells = grid->GetCells();
@@ -122,7 +126,7 @@ floatMesh::Pointer MeshFromUnstructuredGrid(vtkUnstructuredGrid* grid)
       {
       case VTK_TRIANGLE:
         {
-        typedef itk::CellInterface<float, floatMesh::CellTraits> CellInterfaceType;
+        typedef itk::CellInterface<vtkFloatingPointType, floatMesh::CellTraits> CellInterfaceType;
         typedef itk::TriangleCell<CellInterfaceType> TriangleCellType;
         TriangleCellType * t = new TriangleCellType;
         t->SetPointIds((unsigned long*)pts);
@@ -131,7 +135,7 @@ floatMesh::Pointer MeshFromUnstructuredGrid(vtkUnstructuredGrid* grid)
         }  
       case VTK_QUAD:
         {
-        typedef itk::CellInterface<float, floatMesh::CellTraits> CellInterfaceType;
+        typedef itk::CellInterface<vtkFloatingPointType, floatMesh::CellTraits> CellInterfaceType;
         typedef itk::QuadrilateralCell<CellInterfaceType> QuadrilateralCellType;
         QuadrilateralCellType * t = new QuadrilateralCellType;
         t->SetPointIds((unsigned long*)pts);
@@ -214,13 +218,13 @@ public:
 };
   
 typedef itk::CellInterfaceVisitorImplementation<
-float, floatMesh::CellTraits,
+vtkFloatingPointType, floatMesh::CellTraits,
   itk::TriangleCell< itk::CellInterface<floatMesh::PixelType, floatMesh::CellTraits > >, 
   VistVTKCellsClass> TriangleVisitor;
 
 
 typedef itk::CellInterfaceVisitorImplementation<
-float, floatMesh::CellTraits,
+vtkFloatingPointType, floatMesh::CellTraits,
   itk::QuadrilateralCell< itk::CellInterface<floatMesh::PixelType, floatMesh::CellTraits > >, 
   VistVTKCellsClass> QuadrilateralVisitor;
 
@@ -252,7 +256,7 @@ vtkUnstructuredGrid* MeshToUnstructuredGrid(floatMesh* mesh)
     // Set the vtk point at the index with the the coord array from itk
     // itk returns a const pointer, but vtk is not const correct, so
     // we have to use a const cast to get rid of the const
-    vpoints->SetPoint(idx, const_cast<float*>(i->Value().GetDataPointer()));
+    vpoints->SetPoint(idx, const_cast<vtkFloatingPointType*>(i->Value().GetDataPointer()));
     }
   // Set the points on the vtk grid
   vgrid->SetPoints(vpoints);
