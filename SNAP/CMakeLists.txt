@@ -218,11 +218,9 @@ SET(APPLICATION_FLUIDS
 # All program files
 SET(PROGRAM_DATA_FILES
   ProgramData/SNAPProgramDataDirectory.txt
-  ProgramData/Images2D/EdgeForcesExample.png
-  ProgramData/Images2D/RegionForcesExample.png
-  ProgramData/Presets/SnakeParameterPreviewCurve.txt
   ProgramData/HTMLHelp/Credits.html
   ProgramData/HTMLHelp/Tutorial.html
+  ProgramData/HTMLHelp/TutorialSectionEdgeBasedSegmentation.html
   ProgramData/HTMLHelp/TutorialSectionIntroduction.html
   ProgramData/HTMLHelp/TutorialSectionIntroductionToAutomatic.html
   ProgramData/HTMLHelp/TutorialSectionLoadingImages.html
@@ -254,6 +252,13 @@ SET(PROGRAM_DATA_FILES
   ProgramData/HTMLHelp/Artwork/ttAutoIntroSnakeMerge04.gif
   ProgramData/HTMLHelp/Artwork/ttAutoIntroSnakeVelocities.gif
   ProgramData/HTMLHelp/Artwork/ttAutoIntroSnakeVelocitiesMotion01.gif
+  ProgramData/HTMLHelp/Artwork/ttEdgeBubbles.gif
+  ProgramData/HTMLHelp/Artwork/ttEdgeFeatureImage.gif
+  ProgramData/HTMLHelp/Artwork/ttEdgeFilterBox.gif
+  ProgramData/HTMLHelp/Artwork/ttEdgeLeaky.gif
+  ProgramData/HTMLHelp/Artwork/ttEdgeNoLeaks.gif
+  ProgramData/HTMLHelp/Artwork/ttEdgeParameters1.gif
+  ProgramData/HTMLHelp/Artwork/ttEdgePipeline1.gif
   ProgramData/HTMLHelp/Artwork/ttIconAction.gif
   ProgramData/HTMLHelp/Artwork/ttIconAttention.gif
   ProgramData/HTMLHelp/Artwork/ttIconExpert.gif
@@ -301,6 +306,12 @@ SET(PROGRAM_DATA_FILES
   ProgramData/HTMLHelp/Artwork/ttRegionVentricleResult.gif
   ProgramData/HTMLHelp/Artwork/ttRegionWizard02.gif
   ProgramData/HTMLHelp/Artwork/ttRegionWizard03.gif
+  ProgramData/HTMLHelp/Artwork/ttSprayPaintCross.gif
+  ProgramData/HTMLHelp/Artwork/ttSprayPaintTool.gif
+  ProgramData/HTMLHelp/Artwork/ttTipsAdvanced.gif
+  ProgramData/HTMLHelp/Artwork/ttTipsResample1.gif
+  ProgramData/HTMLHelp/Artwork/ttTipsResample2.gif
+  ProgramData/HTMLHelp/Artwork/ttTipsResample3.gif
   ProgramData/HTMLHelp/Artwork/ttViewImageControlPanel.gif
   ProgramData/HTMLHelp/Artwork/ttViewImageControlPanelToolbox01.gif
   ProgramData/HTMLHelp/Artwork/ttViewImageControlPanelToolbox02.gif
@@ -312,6 +323,9 @@ SET(PROGRAM_DATA_FILES
   ProgramData/HTMLHelp/Artwork/ttViewImageIntensityDialogWindowingCurve.gif
   ProgramData/HTMLHelp/Artwork/ttViewImageSliceWindowClick.gif
   ProgramData/HTMLHelp/Artwork/ttViewImageSliceWindowZoom.gif
+  ProgramData/Images2D/EdgeForcesExample.png
+  ProgramData/Images2D/RegionForcesExample.png
+  ProgramData/Presets/SnakeParameterPreviewCurve.txt
 )
 
 # The sources needed to build the SNAP logic library
