@@ -224,13 +224,13 @@ Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
 
   if( numberOfMarkers == 0 )
     {
-    info->SetProperty( info, VVP_ERROR, "This plugins requires the user to provide a set of 3D markers pairs"); 
+    info->SetProperty( info, VVP_ERROR, "You must provide a set of 3D markers pairs."); 
     return -1;
     }
 
   if( ( numberOfMarkers & 1 ) == 1 )
     {
-    info->SetProperty( info, VVP_ERROR, "The number of 3D markers must be even. They should form pairs"); 
+    info->SetProperty( info, VVP_ERROR, "The 3D markers must form pairs."); 
     return -1;
     }
 
