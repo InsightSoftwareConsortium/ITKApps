@@ -70,7 +70,7 @@ public:
     }
 
 
-  /** Give access to the second input image */
+  /** Give access to the input image */
   const InputImageType * GetInput() 
     {  return m_ImportFilter->GetOutput(); }
 
