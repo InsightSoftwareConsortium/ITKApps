@@ -46,6 +46,11 @@ public:
  */
 int main(int argc, char *argv[]) 
 {
+  if(argc < 3)
+    {
+    cerr << "Must specify two arguments." << endl;
+    return 1;
+    }
   /* =======================================================================
    * Section 1. Starting the Application and Loading an Image
    * ====================================================================== */
