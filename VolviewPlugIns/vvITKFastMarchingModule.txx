@@ -321,12 +321,12 @@ FastMarchingModule<TInputPixelType>
 
   OutputIteratorType ot( outputImage, outputImage->GetBufferedRegion() );
 
-  InputPixelType * outData = (InputPixelType *)(pds->outData);
+  OutputPixelType * outData = (OutputPixelType *)(pds->outData);
 
   ot.GoToBegin(); 
   while( !ot.IsAtEnd() )
     {
-    *outData = static_cast< InputPixelType >( ot.Get() );
+    *outData = static_cast< OutputPixelType >( ot.Get() );
     ++ot;
     ++outData;
     }
