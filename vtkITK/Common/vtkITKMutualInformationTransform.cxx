@@ -58,7 +58,7 @@
 #define vtkFloatingPointType float
 #endif
 
-vtkCxxRevisionMacro(vtkITKMutualInformationTransform, "$Revision: 1.15 $");
+vtkCxxRevisionMacro(vtkITKMutualInformationTransform, "$Revision: 1.16 $");
 vtkStandardNewMacro(vtkITKMutualInformationTransform);
 
 //----------------------------------------------------------------------------
@@ -263,28 +263,62 @@ void vtkITKMutualInformationTransform::InternalUpdate()
     return;
     }
 
-  if (this->SourceImage->GetScalarType() != VTK_FLOAT)
-    {
-    vtkErrorMacro (<< "Source type " << this->SourceImage->GetScalarType()
-                   << " must be float");
-    this->Matrix->Identity();
-    return;
-    }
+  // Make sure inputs are up to date
+  this->SourceImage->UpdateInformation();
+  this->TargetImage->UpdateInformation();
 
-  if (this->TargetImage->GetScalarType() != VTK_FLOAT)
+  // Handle float and double for now
+  switch (this->SourceImage->GetScalarType())
     {
-    vtkErrorMacro (<< "Target type " << this->TargetImage->GetScalarType()
-                   << " must be float");
-    this->Matrix->Identity();
-    return;
+    case VTK_FLOAT:
+      {
+      if (this->TargetImage->GetScalarType() != VTK_FLOAT)
+        { 
+        vtkErrorMacro (<< "Target type " << this->TargetImage->GetScalarType()
+                       << " must be match Source type "
+                       << this->SourceImage->GetScalarType());
+        this->Matrix->Identity();
+        return;
+        }
+      
+      float dummy = 0.0;
+      vtkITKMutualInformationExecute(this,
+                                     this->SourceImage,
+                                     this->TargetImage,
+                                     this->Matrix,
+                                     dummy);
+      break;
+      }
+    case VTK_DOUBLE:
+      {
+      if (this->TargetImage->GetScalarType() != VTK_SHORT)
+        { 
+        vtkErrorMacro (<< "Target type " << this->TargetImage->GetScalarType()
+                       << " must be match Source type "
+                       << this->SourceImage->GetScalarType());
+        this->Matrix->Identity();
+        return;
+        }
+      
+      double dummy = 0.0;
+      vtkITKMutualInformationExecute(this,
+                                     this->SourceImage,
+                                     this->TargetImage,
+                                     this->Matrix,
+                                     dummy);
+      break;
+      }
+    default:
+      {
+      if (this->SourceImage->GetScalarType() != VTK_FLOAT)
+        {
+        vtkErrorMacro (<< "Source type " << this->SourceImage->GetScalarType()
+                       << " must be float OR double");
+        this->Matrix->Identity();
+        return;
+        }
+      }
     }
-
-  float dummy = 0.0;
-  vtkITKMutualInformationExecute(this,
-                                 this->SourceImage,
-                                 this->TargetImage,
-                                 this->Matrix,
-                                 dummy);
 }
 
 //------------------------------------------------------------------------
