@@ -95,7 +95,7 @@ public:
   typedef typename TFixedImage::RegionType FixedImageRegionType ;
 
   /** Image dimension enumeration. */
-  enum { ImageDimension = TFixedImage::ImageDimension };
+  itkStaticConstMacro(ImageDimension, unsigned int,FixedImageType::ImageDimension);
 
   /** Transform Type. */
   typedef itk::Euler2DTransform< double > TransformType;
@@ -127,10 +127,10 @@ public:
   typedef itk::Array<unsigned int> UnsignedIntArray;
 
   /** ShrinkFactorsArray type. */
-  typedef itk::FixedArray<unsigned int,ImageDimension> ShrinkFactorsArray;
+  typedef itk::FixedArray<unsigned int, itkGetStaticConstMacro(ImageDimension)> ShrinkFactorsArray;
 
   /** Affine transform type. */
-  typedef itk::AffineTransform< double, ImageDimension >   AffineTransformType;
+  typedef itk::AffineTransform< double, itkGetStaticConstMacro(ImageDimension)>   AffineTransformType;
   typedef typename AffineTransformType::Pointer AffineTransformPointer;
 
   /** Set the fixed image. */
