@@ -542,7 +542,7 @@ SNAPLevelSetDriver
 
   // Tell the method that called Update that it needs to call DoRestart()
   m_CommandAfterUpdate = SelfCommandType::New();
-  m_CommandAfterUpdate->SetCallbackFunction(this,SNAPLevelSetDriver::DoRestart);
+  m_CommandAfterUpdate->SetCallbackFunction(this,&SNAPLevelSetDriver::DoRestart);
 }
 
 void
@@ -679,7 +679,7 @@ SNAPLevelSetDriver
       // Schedule a subsequent call to create a new filter
       m_CommandAfterUpdate = SelfCommandType::New();
       m_CommandAfterUpdate->SetCallbackFunction(
-        this,SNAPLevelSetDriver::DoCreateLevelSetFilter);
+        this,&SNAPLevelSetDriver::DoCreateLevelSetFilter);
       }
     else
       {

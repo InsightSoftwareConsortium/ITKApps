@@ -19,6 +19,9 @@
 #include "ImageIORoutines.h"
 #include "itkImage.h"
 
+/** Exception when needed parameters are omitted */
+class TestUsageException : public itk::ExceptionObject {};
+
 class TestBase
 {
 public:
@@ -61,7 +64,7 @@ class TestBaseOneImage : public TestBase
 public:
   // Type definitions
   typedef itk::Image<TPixel,3> ImageType;
-  typedef ImageType::Pointer ImagePointer;
+  typedef typename ImageType::Pointer ImagePointer;
 
   // Print how to use this test
   virtual void PrintUsage()
@@ -80,7 +83,7 @@ public:
   {
     // Check if the image option is present
     if(!m_Command.IsOptionPresent("image"))
-      throw new TestUsageException;
+      throw new TestUsageException();
 
     // Load the image - will throw an exception if something fails
     LoadImageFromFile(m_Command.GetOptionParameter("image"),m_Image);
@@ -93,8 +96,5 @@ protected:
   // The loaded image
   ImagePointer m_Image;
 };
-
-/** Exception when needed parameters are omitted */
-class TestUsageException : public itk::ExceptionObject {};
 
 #endif //__TestBase_h_

@@ -699,12 +699,12 @@ UserInterfaceLogic
   // Create the idle callback command
   SimpleCommandType::Pointer commandIdle = SimpleCommandType::New();
   commandIdle->SetCallbackFunction(
-    this,UserInterfaceLogic::OnSnakeVCRIdleCallback);
+    this,&UserInterfaceLogic::OnSnakeVCRIdleCallback);
 
   // Create the update callback command
   SimpleCommandType::Pointer commandUpdate = SimpleCommandType::New();
   commandUpdate->SetCallbackFunction(
-    this,UserInterfaceLogic::OnSnakeVCRUpdateCallback);
+    this,&UserInterfaceLogic::OnSnakeVCRUpdateCallback);
 
   // Clear the post-snake command (command used to tell this method whom to
   // call back after it's done
@@ -773,7 +773,7 @@ UserInterfaceLogic
     // Set the post-update callback to right here
     m_PostSnakeCommand = SimpleCommandType::New();
     m_PostSnakeCommand->SetCallbackFunction(
-      this,UserInterfaceLogic::OnRestartInitializationAction);
+      this,&UserInterfaceLogic::OnRestartInitializationAction);
     }
   else
     {
@@ -1389,7 +1389,7 @@ UserInterfaceLogic
     // Set the post-update callback to right here
     m_PostSnakeCommand = SimpleCommandType::New();
     m_PostSnakeCommand->SetCallbackFunction(
-      this,UserInterfaceLogic::OnAcceptSegmentationAction);
+      this,&UserInterfaceLogic::OnAcceptSegmentationAction);
     }
   else
     {
@@ -1418,7 +1418,7 @@ UserInterfaceLogic
     // Set the post-update callback to right here
     m_PostSnakeCommand = SimpleCommandType::New();
     m_PostSnakeCommand->SetCallbackFunction(
-      this,UserInterfaceLogic::OnCancelSegmentationAction);
+      this,&UserInterfaceLogic::OnCancelSegmentationAction);
     }
   else
     {
@@ -1456,7 +1456,7 @@ UserInterfaceLogic
     // Set the post-update callback to right here
     m_PostSnakeCommand = SimpleCommandType::New();
     m_PostSnakeCommand->SetCallbackFunction(
-      this,UserInterfaceLogic::OnMainWindowCloseAction);
+      this,&UserInterfaceLogic::OnMainWindowCloseAction);
     }
   else
     {
@@ -2406,7 +2406,7 @@ UserInterfaceLogic
 ::FillSliceLayoutOptions() 
 {
   // Hack
-  if(!m_OutDisplayOptionsPanel[0]->value()==NULL ||
+  if(!m_OutDisplayOptionsPanel[0]->value() ||
      strlen(m_OutDisplayOptionsPanel[0]->value()) == 0)
     {
     OnSliceAnatomyOptionsChange(0);
@@ -2722,9 +2722,6 @@ UserInterfaceLogic
   m_MenuSaveVoxelCounts->activate(); 
   m_MenuIntensityCurve->activate();
 
-  // Reinitialize the point of view
-  Vector3ui dims = m_Driver->GetCurrentImageData()->GetVolumeExtents();
-  
   // Image geometry has changed
   OnImageGeometryUpdate();
 
@@ -3278,6 +3275,9 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.7  2003/10/02 18:43:47  pauly
+ *FIX: Fixed crashes with using vtkContourFilter
+ *
  *Revision 1.6  2003/10/02 14:55:52  pauly
  *ENH: Development during the September code freeze
  *

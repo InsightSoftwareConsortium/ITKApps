@@ -376,7 +376,7 @@ SnakeParametersPreviewPipeline
   glScaled(1.0 / size[0],1.0 / size[1],1.0);
 
   // Set up the viewport
-  glViewport(0,0,(float)size[0],(float)size[1]);
+  glViewport(0,0,size[0],size[1]);
 
 
   // Paint in black

@@ -358,9 +358,6 @@ void
 ImageWrapper<TPixel>
 ::RemapIntensityToMaximumRange()
 {
-  // Only allowed on integer data types, o/w makes no sense!
-  assert(itk::NumericTraits<TPixel>::is_integer);
-
   RemapIntensityToRange(itk::NumericTraits<TPixel>::min(),
                         itk::NumericTraits<TPixel>::max());
 }
@@ -446,7 +443,7 @@ ImageWrapper<TPixel>
 }
 
 template <class TPixel>
-ImageWrapper<TPixel>::SliceType*
+typename ImageWrapper<TPixel>::SliceType*
 ImageWrapper<TPixel>
 ::GetSlice(unsigned int dimension)
 {

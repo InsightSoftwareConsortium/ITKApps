@@ -37,7 +37,7 @@ class SnakeParametersPreviewPipeline
 {
 public:
   SnakeParametersPreviewPipeline();
-  ~SnakeParametersPreviewPipeline();
+  virtual ~SnakeParametersPreviewPipeline();
 
   // Images used by this class (internally and externally)
   typedef itk::Image<unsigned char, 2> CharImageType;

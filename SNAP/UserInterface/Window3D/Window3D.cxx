@@ -208,7 +208,7 @@ Window3D
   unsigned int maxdim = 0;
   for (int i=0; i<3; i++)
     {
-    float len = m_ImageSize[i];
+    unsigned int len = m_ImageSize[i];
     m_Center[i] = len / 2.0;
     if (maxdim < len) 
       maxdim = len;
@@ -963,6 +963,9 @@ void Window3D::DrawCutPlane() {
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.5  2003/10/02 14:55:53  pauly
+ *ENH: Development during the September code freeze
+ *
  *Revision 1.2  2003/09/11 19:23:29  pauly
  *FIX: Code compiles and runs on UNIX platform
  *

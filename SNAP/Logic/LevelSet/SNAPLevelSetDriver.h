@@ -24,7 +24,7 @@ template <class TFilter> class LevelSetExtensionFilter;
 class LevelSetExtensionFilterInterface;
  
 namespace itk {
-  template <class TInputImage> class ImageToImageFilter;
+  template <class TInputImage, class TOutputImage> class ImageToImageFilter;
   template <class TOwner> class SimpleMemberCommand;
   template <class TOwner> class MemberCommand;
   class Command;
@@ -57,6 +57,9 @@ public:
   SNAPLevelSetDriver(FloatImageType *initialLevelSet,
                      FloatImageType *speed,
                      const SnakeParameters &parms);
+
+  /** Virtual destructor */
+  virtual ~SNAPLevelSetDriver() {}
 
   /** Set snake parameters */
   void SetSnakeParameters(const SnakeParameters &parms);

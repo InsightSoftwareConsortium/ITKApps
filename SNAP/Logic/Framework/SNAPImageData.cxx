@@ -607,7 +607,7 @@ SNAPImageData
   typedef itk::MemberCommand<SNAPImageData> CommandType;
   CommandType::Pointer intermediateCallback = CommandType::New();
   intermediateCallback->SetCallbackFunction(
-    this,SNAPImageData::IntermediatePauseCallback);
+    this,&SNAPImageData::IntermediatePauseCallback);
   
   // Call the driver's begin method with our intermediate callback
   m_LevelSetDriver->BeginUpdate(intermediateCallback);
@@ -687,7 +687,7 @@ SNAPImageData
   typedef itk::SimpleMemberCommand<SNAPImageData> CommandType;
   CommandType::Pointer terminatingCallback = CommandType::New();
   terminatingCallback->SetCallbackFunction(
-    this,SNAPImageData::TerminatingPauseCallback);
+    this,&SNAPImageData::TerminatingPauseCallback);
   
   // Call the driver's begin method with our intermediate callback
   m_LevelSetDriver->BeginUpdate(terminatingCallback);

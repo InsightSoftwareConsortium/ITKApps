@@ -111,7 +111,7 @@ private:
   unsigned int     m_NumberOfIterations;
 };
 
-
+#ifdef _USE_FastLevelSetFunction_
 class FastSNAPLevelSetFunction : 
   public SNAPLevelSetFunction<itk::Image<float, 3> >
 {
@@ -343,6 +343,7 @@ FastSNAPLevelSetFunction
   return curvature_term - propagation_term - advection_term - laplacian_term;
 }
 
+#endif //  _USE_FastLevelSetFunction_
 
 /** Used to report on each iteration */
 class IterationReporter {
@@ -352,26 +353,23 @@ public:
   typedef itk::ImageToImageFilter<ImageType,ImageType> FilterType;
 
   IterationReporter(FilterType *source,ofstream &fout)
-  : m_Out(fout), m_Source(source), m_Iteration(0)
+  : m_Iteration(0), m_Out(fout), m_Source(source) 
   {
     m_Command = CommandType::New();
-    m_Command->SetCallbackFunction(this,IterationReporter::Callback);
+    m_Command->SetCallbackFunction(this,&IterationReporter::Callback);
     source->AddObserver(itk::IterationEvent(),m_Command);    
-    m_LastClock = GetTickCount();
+    m_LastClock = clock();
   }
 
   void Callback(itk::Object *object, const itk::EventObject &event)
   {
     // Record the time
-    double currentClock = GetTickCount();
+    clock_t currentClock = clock();
     double delta = (currentClock - m_LastClock);
     m_Iteration++;
 
     // Write data
     m_Out << m_Iteration << "\t" << delta << /* "\t" << CountInterfaceVoxels() << */ endl;
-
-    // Reset the clock
-    // m_LastClock = GetTickCount();
   }
 
   unsigned long CountInterfaceVoxels()
@@ -390,7 +388,7 @@ public:
 
 private:
   int m_Iteration;
-  long m_LastClock;
+  clock_t m_LastClock;
   ofstream &m_Out;
 
   typedef itk::MemberCommand<IterationReporter> CommandType;
@@ -734,7 +732,7 @@ TestCompareLevelSets
   // Create an initialization bubble
   Bubble bubble;
   bubble.center = to_int(parmBubbleCenter);
-  bubble.radius = parmBubbleRadius;
+  bubble.radius = (int) parmBubbleRadius;
 
   // Preprocess the image and initialize the level set image
   if(parmUseEdgeSnake)
@@ -771,7 +769,7 @@ TestCompareLevelSets
   // Create a callback object
   typedef itk::MemberCommand<TestCompareLevelSets> CommandType;
   CommandType::Pointer callback = CommandType::New();
-  callback->SetCallbackFunction(this,TestCompareLevelSets::IterationCallback);
+  callback->SetCallbackFunction(this,&TestCompareLevelSets::IterationCallback);
 
   // Set up the dense filter
   DenseExtensionFilter::Pointer fltDense = DenseExtensionFilter::New();

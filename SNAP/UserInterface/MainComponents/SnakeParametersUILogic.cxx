@@ -37,7 +37,7 @@ void
 SnakeParametersUILogic
 ::OnAdvectionExponentChange(Fl_Valuator *input)
 {
-  float clamped = input->clamp(input->value());
+  int clamped = (int) input->clamp(input->value());
   m_Parameters.SetAdvectionSpeedExponent(clamped);
   this->OnParameterUpdate();
 }
@@ -54,7 +54,7 @@ void
 SnakeParametersUILogic
 ::OnCurvatureExponentChange(Fl_Valuator *input)
 {
-  float clamped = input->clamp(input->value());
+  int clamped = (int) input->clamp(input->value());
   m_Parameters.SetCurvatureSpeedExponent(clamped);
   this->OnParameterUpdate();
 }
@@ -71,7 +71,7 @@ void
 SnakeParametersUILogic
 ::OnPropagationExponentChange(Fl_Valuator *input)
 {
-  float clamped = input->clamp(input->value());
+  int clamped = (int) input->clamp(input->value());
   m_Parameters.SetPropagationSpeedExponent(clamped);
   this->OnParameterUpdate();
 }

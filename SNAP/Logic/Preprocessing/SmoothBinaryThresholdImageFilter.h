@@ -59,17 +59,6 @@ public:
 
     // Compute the shift
     m_Shift = 1.0f - (m_FactorLower + m_FactorUpper);
-
-    // Compute the maximum using these parameters
-    //TInput zMax = (m_UpperThreshold + m_LowerThreshold) / 2;
-    //TInput fMax = (*this)(zMax) - m_Shift;
-
-    // Update the shift and scaling factors so that the function range becomes
-    // -1 to 1
-    //float fFactor = (m_FactorLower+m_FactorUpper) / fMax;
-    //m_FactorLower *= fFactor;
-    //m_FactorUpper *= fFactor;
-    double z = (*this)((m_LowerThreshold + m_UpperThreshold)/2);
   }
 
   /**

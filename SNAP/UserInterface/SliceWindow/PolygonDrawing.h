@@ -44,7 +44,7 @@ class PolygonDrawing
 
 public:
   PolygonDrawing();
-  ~PolygonDrawing();
+  virtual ~PolygonDrawing();
   PolygonState GetState();
   int  CachedPolygon(void);
   void AcceptPolygon(unsigned char *buffer, int width, int height);
@@ -91,6 +91,9 @@ private:
 
 /*
  *Log: PolygonDrawing.h
+ *Revision 1.4  2003/10/02 14:55:53  pauly
+ *ENH: Development during the September code freeze
+ *
  *Revision 1.1  2003/09/11 13:51:01  pauly
  *FIX: Enabled loading of images with different orientations
  *ENH: Implemented image save and load operations

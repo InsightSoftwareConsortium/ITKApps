@@ -14,7 +14,7 @@
 =========================================================================*/
 #include "ZoomPanInteractionMode.h"
 #include "UserInterfaceLogic.h"
-#include "SlicewindowCoordinator.h"
+#include "SliceWindowCoordinator.h"
 
 #include <cmath>
 #include <iostream>

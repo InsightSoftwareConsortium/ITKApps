@@ -733,11 +733,11 @@ m_IRISWindow3D->redraw();}
               }
               Fl_Button {} {
                 callback {SetToolbarMode(CROSSHAIRS_MODE);}
-                tooltip {Crosshairs tool: left clicking moves the cursor} image {C:/grant/app/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/littleNavigation.gif} xywh {155 682 25 25} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX shortcut 0x63 value 1 color 179 selection_color 94 align 16
+                tooltip {Crosshairs tool: left clicking moves the cursor} image {Artwork/littleNavigation.gif} xywh {155 682 25 25} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX shortcut 0x63 value 1 color 179 selection_color 94 align 16
               }
               Fl_Button {} {
                 callback {SetToolbarMode(CROSSHAIRS_MODE);}
-                tooltip {Crosshairs tool: left clicking moves the cursor} image {C:/grant/app/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/littleCrosshair.gif} xywh {185 682 25 25} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX shortcut 0x63 color 179 selection_color 94 align 16
+                tooltip {Crosshairs tool: left clicking moves the cursor} image {Artwork/littleCrosshair.gif} xywh {185 682 25 25} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX shortcut 0x63 color 179 selection_color 94 align 16
               }
             }
           }
@@ -866,11 +866,11 @@ m_SNAPWindow3D->redraw();}
             }
             Fl_Button {} {
               callback {SetToolbarMode(CROSSHAIRS_MODE);}
-              tooltip {Crosshairs tool: left clicking moves the cursor} image {C:/grant/app/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/littleNavigation.gif} xywh {155 682 25 25} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX shortcut 0x63 value 1 color 179 selection_color 94 align 16
+              tooltip {Crosshairs tool: left clicking moves the cursor} image {Artwork/littleNavigation.gif} xywh {155 682 25 25} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX shortcut 0x63 value 1 color 179 selection_color 94 align 16
             }
             Fl_Button m_BtnCrosshairsMode3D {
               callback {SetToolbarMode(CROSSHAIRS_MODE);}
-              tooltip {Crosshairs tool: left clicking moves the cursor} image {C:/grant/app/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/littleCrosshair.gif} xywh {185 682 25 25} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX shortcut 0x63 color 179 selection_color 94 align 16
+              tooltip {Crosshairs tool: left clicking moves the cursor} image {Artwork/littleCrosshair.gif} xywh {185 682 25 25} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX shortcut 0x63 color 179 selection_color 94 align 16
             }
           }
         }
