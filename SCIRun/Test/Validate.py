@@ -9,7 +9,7 @@
 
 
 # Set absolute path to InsightApplications/SCIRun
-$path_to_SCIRun = "/home/sci/darbyb/work/projects/SCIRunITK/InsightApplications_XMLVALIDATOR/InsightApplications/SCIRun";
+$path_to_SCIRun = "/scratch/darbyb/TEST/InsightApplications/SCIRun";
 
 $ITK_SRC = "/home/sci/darbyb/work/projects/SCIRunITK/InsightToolkit-1.4.0";
 $ITK_BIN = "/home/sci/darbyb/work/projects/SCIRunITK/InsightBin";
@@ -21,7 +21,7 @@ $xmlDir = "$path_to_SCIRun/ITK";
 opendir(DIR, $xmlDir) or die "can't opendir $xmlDir: $!";
 
 while (defined($oldFile = readdir(DIR))) {
-  if (($oldFile ne ".") && ($oldFile ne "..") && ($oldFile ne "itk_filter.dtd")) {
+  if (($oldFile ne ".") && ($oldFile ne "..") && ($oldFile ne "itk_filter.dtd") && ($oldFile ne "CVS")) {
   
   print "VALIDATING: $oldFile\n";
   
