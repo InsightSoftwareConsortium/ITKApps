@@ -56,6 +56,12 @@ EditorConsole
   interactor->Initialize();
   first_render = true;
 
+  SourceAxes[0] = false;
+  SourceAxes[1] = true;
+  SourceAxes[2] = false;
+  
+  flip->SetFlipAxes(SourceAxes);
+
   clearText->value("Warning! This will clear your binary volume.\n\n            Do you wish to continue?");
 /*
   helpOut->value("SEGMENTATION EDITOR MODULE:
@@ -110,7 +116,7 @@ There are three data windows, numbered below from the left
 side of the screen.  
 
 Segmented Window -- This window displays the segmentation 
-data at whichever scale is selected via the \"Scale\" slider.  
+data at whichever scale is selected via the \"Scale\" slider.   
 Left-Click will select one of the colored regions (after 
 selecting it will highlight in white).  Shift-Left-Click 
 allows you to select multiple regions at one time.
@@ -200,13 +206,13 @@ Re-colorizing when deselecting multiple regions.  When multiple
 regions are deselected all at once, the distinct regions will 
 sometimes remain the same color.  You can press the Randomize 
 Colors button to recolor these regions.");
-*/
+*/  
 }
 
 
 
 
-/************************************
+/************************************ 
  *
  *  Destructor
  *
@@ -216,18 +222,18 @@ EditorConsole
 {
 }
 
-/************************************
- *
- * StartEditor
- *
- ***********************************/
-void EditorConsole::StartEditor() {
-  // connect the pipeline
-  mapToRGBA->SetInput( resamplerSeg->GetOutput() );
-  mapToRGBA->SetLookupTable( manager->GetLookupTable() );
+/************************************  
+ * 
+ * StartEditor  
+ *  
+ ***********************************/  
+bool EditorConsole::StartEditor() { 
+  // connect the pipeline 
+  mapToRGBA->SetInput( resamplerSeg->GetOutput() ); 
+  mapToRGBA->SetLookupTable( manager->GetLookupTable() ); 
   
-  colorMapImg->SetLookupTable( lut );
-  colorMapImg->SetInput( resamplerCol->GetOutput() );
+  colorMapImg->SetLookupTable( lut ); 
+  colorMapImg->SetInput( resamplerCol->GetOutput() ); 
 
   colorMapBin->SetInput(resamplerBin->GetOutput());
   colorMapBin->SetLookupTable(lutBin);
@@ -241,21 +247,13 @@ void EditorConsole::StartEditor() {
   renWin->AddRenderer(ren1);
 
   // read the data
-  LoadSource();
-  LoadSegmented();
-
-  // configure the lookup table manager for colorizing
-  manager->Initialize();
-  manager->LoadTreeFile( treeSeg->value() );
-  manager->SetNumberOfLabels(labeledImgReader->GetMaximumUnsignedLongValue());
-  manager->GenerateColorTable();
+  if(!LoadSource() || !LoadSegmented()) {
+    return false;
+  }
 
   mapToRGBA->SetLookupTable( manager->GetLookupTable() );
 
   // configure the binary volume
-  int x = (int)XSeg->value();
-  int y = (int)YSeg->value();
-  int z = (int)ZSeg->value();
   binaryVolume->SetExtent(0, x, 0, y , 0, z);
   binaryVolume->SetUpdateExtent(0, x, 0, y, 0, z);
   binaryVolume->AllocateScalars();
@@ -267,7 +265,7 @@ void EditorConsole::StartEditor() {
   boundingBoxes->GenerateBoundingBoxes();
   
   // configure the viewer widgets
-  sliceNumberSlider->range(0, (int)ZSeg->value()-1);
+  sliceNumberSlider->range(0, z-1); 
   sliceNumberSlider->value(0);
 
   segmentedWin->SetZSlice(0);
@@ -295,6 +293,10 @@ void EditorConsole::StartEditor() {
   binaryWin->SetColorWindow(255.0);
   binaryWin->SetColorLevel(127.5);
   binaryWin->SetZSlice(0);
+  
+  sourceWin->SetPaintRadius(paintRadiusSlider->value());
+  
+  return true;
 }
 
 
@@ -321,7 +323,6 @@ void EditorConsole
 ::Hide()
 {
   consoleWindow->hide();
-  //interactor->hide();
   segmentedConsole->hide();
   sourceConsole->hide();
   binaryConsole->hide();
@@ -525,7 +526,7 @@ double EditorConsole::local_max(double a, double b) {
  ************************************/
 void EditorConsole::MergeSelected() {
   
-  scaleLevel = manager->MergeSelected(); // ??
+  scaleLevel = manager->MergeSelected(); 
   manager->ClearHighlightedValuesToSameColor();
   manager->RecompileEquivalencies();
   manager->HighlightComputedEquivalencyList();
@@ -751,14 +752,46 @@ void EditorConsole::AddRenderer(int isovalue)
 
 /************************************
  * 
+ * SpecifySegmentedFile
+ *
+ ***********************************/
+void EditorConsole::SpecifySegmentedFile()
+{
+  const char * filename = fl_file_chooser("Segmented Session","*.ws","");
+  if( !filename )
+  {
+    return;
+  }
+
+  fileSeg->value(filename);
+}
+
+/************************************
+ * 
+ * SpecifySourceFile
+ *
+ ***********************************/
+void EditorConsole::SpecifySourceFile()
+{
+  const char * filename = fl_file_chooser("Source File","*.mh[da]","");
+  if( !filename )
+  {
+    return;
+  }
+
+  fileSor->value(filename);
+}
+/************************************
+ * 
  * LoadImages
  *
  ***********************************/
 void EditorConsole::LoadImages() {
 
-  StartEditor();
-
-  ViewImages();
+  if(StartEditor())
+    ViewImages();
+  else
+    std::cerr << "IMAGES LOADED UNSUCCESSFULLY\n";
 }
 
 /************************************
@@ -766,83 +799,69 @@ void EditorConsole::LoadImages() {
  * LoadSegmented
  *
  ***********************************/
-void EditorConsole::LoadSegmented() {
-  if(littleSeg->value() == 1) { 
-    labeledImgReader->SetDataByteOrderToLittleEndian(); 
-  } else {
-    labeledImgReader->SetDataByteOrderToBigEndian();
+bool EditorConsole::LoadSegmented() {
+  std::string labeled_filename = fileSeg->value();
+  if(labeled_filename == "") {
+    std::cerr << "Error! Specify Segmented Session file\n";
+    return false;
   }
 
-  labeledImgReader->SetNumberOfScalarComponents((int)componentsSeg->value());
-
-  if(strcmp(dataTypeSeg->value(),"UnsignedChar")==0) {
-    labeledImgReader->SetDataScalarTypeToUnsignedChar();
-  }
-  else if(strcmp(dataTypeSeg->value(),"UnsignedLong")==0) {
-    labeledImgReader->SetDataScalarTypeToUnsignedLong();
-  }
-  else if(strcmp(dataTypeSeg->value(),"UnsignedShort")==0) {
-    labeledImgReader->SetDataScalarTypeToUnsignedShort();
-  }
-  else if(strcmp(dataTypeSeg->value(),"Short")==0) {
-    labeledImgReader->SetDataScalarTypeToShort();
-  }
-  else if(strcmp(dataTypeSeg->value(),"Int")==0) {
-    labeledImgReader->SetDataScalarTypeToInt();
-  }
-  else if(strcmp(dataTypeSeg->value(),"Float")==0) {
-    labeledImgReader->SetDataScalarTypeToFloat();
-  }
-  else {
-    std::cerr << "Error! No data type selected for Segmented.\n";
-    return;
+  std::string raw_file;
+  std::string tree_file;
+  std::ifstream in;
+  int x1, y1, z1;
+  in.open(labeled_filename.c_str());
+  if(!in) {
+    std::cerr << "Error! File " << labeled_filename << " does not exist!\n";
+    return false;
   }
 
-  labeledImgReader->SetDataExtent(0, (int)XSeg->value()-1, 0, (int)YSeg->value()-1, 0, (int)ZSeg->value()-1);
-
-  if((XSor->value() != XSeg->value()) || (YSor->value() != YSeg->value()) || (ZSor->value() != ZSeg->value()) )  {
+  in >> raw_file;
+  in >> tree_file;
+  in >> x1 >> y1 >> z1;
+  in.close();
+    
+  labeledImgReader->SetDataByteOrderToLittleEndian(); 
+  labeledImgReader->SetDataScalarTypeToUnsignedLong();
+  labeledImgReader->SetDataExtent(0, x1-1, 0, y1-1, 0, z1-1);
+  
+  if((x != x1) || (y != y1) || (z != z1) )  {
     std::cerr << "Error! Source Data does not match dimensions of Segmented Data\n";
-    return;
+    return false;
   }
+  
+  labeledImgReader->SetFileNameSliceOffset(0);
+  labeledImgReader->SetHeaderSize(0);
+  labeledImgReader->SetFileDimensionality(3);    
+  labeledImgReader->SetFileName(raw_file.c_str()); 
+  labeledImgReader->FileLowerLeftOn();
+  labeledImgReader->Modified();
+  labeledImgReader->Update();
+  (labeledImgReader->GetOutput())->SetUpdateExtentToWholeExtent();
+  labeledImgReader->Update();  
+
+  resamplerSeg->SetInput(labeledImgReader->GetOutput());
 
   // make 3 viewer windows size of images
-  window_X = XSeg->value();
-  window_Y = YSeg->value();
+  window_X = x;
+  window_Y = y;
 
-  segmentedConsole->size(window_X, window_Y);
   segmentedWin->size(window_X, window_Y);
 
-  sourceConsole->size(window_X, window_Y);
   sourceWin->size(window_X, window_Y);
 
   binaryConsole->size(window_X, window_Y);
   binaryWin->size(window_X, window_Y);
 
   renWin->SetSize(window_X, window_Y);
-  
 
-  labeledImgReader->SetFileNameSliceOffset((int)sliceSeg->value());
+  // configure the lookup table manager for colorizing
+  manager->Initialize();
+  manager->LoadTreeFile( tree_file.c_str() );
+  manager->SetNumberOfLabels(labeledImgReader->GetMaximumUnsignedLongValue());
+  manager->GenerateColorTable();
 
-  labeledImgReader->SetHeaderSize((int)headerSeg->value());
-
-  if(multFilesSeg->value()) {
-    labeledImgReader->SetFileDimensionality(2);
-    labeledImgReader->SetFilePrefix(fileSeg->value());
-    labeledImgReader->SetFilePattern(extSeg->value());
-  } 
-  else {
-    labeledImgReader->SetFileDimensionality(3);    
-    labeledImgReader->SetFileName(fileSeg->value() ); 
-  }
-
-  labeledImgReader->Modified();
-  labeledImgReader->Update();
-  (labeledImgReader->GetOutput())->SetUpdateExtentToWholeExtent();
-  labeledImgReader->Update();  
-
-
-  resamplerSeg->SetInput(labeledImgReader->GetOutput());
-
+  return true;
 }
 
 /************************************
@@ -850,64 +869,47 @@ void EditorConsole::LoadSegmented() {
  * LoadSource
  *
  ***********************************/
-void EditorConsole::LoadSource() {
-  // read in image
-  if(littleSor->value() == 1) { 
-    colorImgReader->SetDataByteOrderToLittleEndian(); 
-  } else {
-    colorImgReader->SetDataByteOrderToBigEndian();
+bool EditorConsole::LoadSource() {
+  std::string source_filename = fileSor->value();
+  if(source_filename == "") {
+    std::cerr << "Error! Specify Source File!\n";
+    return false;
   }
 
-  colorImgReader->SetNumberOfScalarComponents((int)componentsSor->value());
+  // read in source image
+  colorImgReader->SetFileName(source_filename.c_str());
 
-  if(strcmp(dataTypeSor->value(),"UnsignedChar")==0) {
-    colorImgReader->SetDataScalarTypeToUnsignedChar();
-  }
-  else if(strcmp(dataTypeSor->value(),"UnsignedShort")==0) {
-    colorImgReader->SetDataScalarTypeToUnsignedShort();
-  }
-  else if(strcmp(dataTypeSor->value(),"Short")==0) {
-    colorImgReader->SetDataScalarTypeToShort();
-  }
-  else if(strcmp(dataTypeSor->value(),"Int")==0) {
-    colorImgReader->SetDataScalarTypeToInt();
-  }
-  else if(strcmp(dataTypeSor->value(),"Float")==0) {
-    colorImgReader->SetDataScalarTypeToFloat();
-  }
-  else {
-    std::cerr << "Error! No data type selected for Source.\n";
-    return;
+  flip->SetInput(colorImgReader->GetOutput());
+
+  try {
+    flip->Update();
+  } catch (itk::ExceptionObject & err) {
+    std::cout << "Error! Exception caught\n";
+    std::cout << err << std::endl;
+    return false;
   }
 
-  colorImgReader->SetDataExtent(0, (int)XSor->value()-1, 0, (int)YSor->value()-1, 0, (int)ZSor->value()-1);
+  // execute converter
+  converter->SetInput(flip->GetOutput());
+  converter->GetExporter()->Update();
+  converter->GetImporter()->Update();
+  converter->Update();
 
+  resamplerCol->SetInput(converter->GetOutput());
+
+  // change colormap for source image
+  float range[2];
+  converter->GetOutput()->GetScalarRange(range);
+  colormapMin->value(range[0]);
+  colormapMax->value(range[1]);
+  ChangeColormap();
+
+
+  x = (colorImgReader->GetOutput()->GetLargestPossibleRegion()).GetSize()[0];
+  y = (colorImgReader->GetOutput()->GetLargestPossibleRegion()).GetSize()[1];
+  z = (colorImgReader->GetOutput()->GetLargestPossibleRegion()).GetSize()[2];
   
-  // set window size
-  window_X = (int)XSor->value();
-  window_Y = (int)YSor->value();
-
-  colorImgReader->SetFileNameSliceOffset((int)sliceSor->value());
-
-  colorImgReader->SetHeaderSize((int)headerSor->value());
-
-  if(multFilesSor->value()) {
-    colorImgReader->SetFileDimensionality(2);  
-    colorImgReader->SetFilePrefix(fileSor->value());
-    colorImgReader->SetFilePattern(extSor->value());
-  } 
-  else { 
-    colorImgReader->SetFileDimensionality(3);
-    colorImgReader->SetFileName(fileSor->value());
-  }
-
-  colorImgReader->Modified();
-  colorImgReader->Update();
-  (colorImgReader->GetOutput())->SetUpdateExtentToWholeExtent();
-  colorImgReader->Update();
-
-  resamplerCol->SetInput(colorImgReader->GetOutput());
-
+  return true;
 }
 
 /**********************************
@@ -957,31 +959,13 @@ void EditorConsole::ReadBinaryVolume() {
 
 /****************************
  * 
- * SetDataTypeSeg
- *
- ***********************************/
-void EditorConsole::SetDataTypeSeg(const char* type) {
-  dataTypeSeg->value(type);
-}
-
-/************************************
- * 
- * SetDataTypeSor
- *
- ***********************************/
-void EditorConsole::SetDataTypeSor(const char* type) {
-  dataTypeSor->value(type);
-}
-
-
-/****************************
- * 
  * LoadSession
  *
  ***********************************/
 void EditorConsole::LoadSession() {
+
   binaryVolume->Clear();
-  const char * filename = fl_file_chooser("Session Filename","*.ws","");
+  const char * filename = fl_file_chooser("Session Filename","*.ws_session","");
   if( !filename )
   {
     return;
@@ -989,94 +973,19 @@ void EditorConsole::LoadSession() {
   std::ifstream data_in;
   data_in.open(filename); 
   int temp;
-  std::string buffer;
-
+  std::string segmented_file;
+  std::string source_file;
 
   // read in segmented information
-  data_in >> buffer; // SEGMENTED
-  data_in >> buffer; // file 
-  fileSeg->value(buffer.c_str());
-  data_in >> buffer; // tree
-  treeSeg->value(buffer.c_str());
-  data_in >> buffer; // data type
-  dataTypeSeg->value(buffer.c_str());
-  data_in >> temp; // size x
-  XSeg->value(temp);
-  data_in >> temp; // size y
-  YSeg->value(temp);
-  data_in >> temp; // size z
-  ZSeg->value(temp);
-  data_in >> buffer; // Endianess
-  if(buffer == "Little") { 
-    littleSeg->value(1); 
-    bigSeg->value(0); 
-  } 
-  else { 
-    bigSeg->value(1); 
-    littleSeg->value(0); 
-  }
-  data_in >> buffer; // stored in mult files
-  bool mult = false;
-  if(buffer == "Yes") {
-    multFilesSeg->value(1); 
-    mult=true;
-  } 
-  else {
-    multFilesSeg->value(0);
-  }
-  data_in >> temp; // components
-  componentsSeg->value(temp);
-  if(mult) {
-    data_in >> buffer; // VTK file extension
-    extSeg->value(buffer.c_str());
-  }
-  data_in >> temp; // first slice
-  sliceSeg->value(temp);
-  data_in >> temp; // header to skip
-  headerSeg->value(temp);
-
-  // read in source information
-  data_in >> buffer; // SOURCE
-  data_in >> buffer; // file 
-  fileSor->value(buffer.c_str());
-  data_in >> buffer; // data type
-  dataTypeSor->value(buffer.c_str());
-  data_in >> temp; // size x
-  XSor->value(temp);
-  data_in >> temp; // size y
-  YSor->value(temp);
-  data_in >> temp; // size z
-  ZSor->value(temp);
-  data_in >> buffer; // Endianess
-  if(buffer=="Little") { 
-    littleSor->value(1); 
-    bigSor->value(0); 
-  } 
-  else { 
-    bigSor->value(1); 
-    littleSor->value(0); 
-  }
-  data_in >> buffer; // stored in mult files
-  mult = false;
-  if(buffer == "Yes") {
-    multFilesSor->value(1); 
-    mult=true;
-  } 
-  else {
-    multFilesSor->value(0);
-  }
-  data_in >> temp; // components
-  componentsSor->value(temp);
-  if(mult) {
-    data_in >> buffer; // VTK file extension
-    extSor->value(buffer.c_str());
-  }
-  data_in >> temp; // first slice
-  sliceSor->value(temp);
-  data_in >> temp; // header to skip
-  headerSor->value(temp); 
+  data_in >> segmented_file;
+  data_in >> source_file; 
+  data_in.close();
   
+  fileSeg->value(segmented_file.c_str());
+  fileSor->value(source_file.c_str());
+
   LoadImages();
+
 }
 
 /****************************
@@ -1085,40 +994,36 @@ void EditorConsole::LoadSession() {
  *
  ***********************************/
 void EditorConsole::SaveSession() {
-  const char * filename = fl_file_chooser("Session Filename","*.ws","");
+
+  const char * filename = fl_file_chooser("Session Filename","*.ws_session","");
   if( !filename )
   {
     return;
   }
-  ofstream data_out;
+  std::ofstream data_out;
   data_out.open(filename); 
 
   // output segmented information
-  data_out << "SEGMENTED " << fileSeg->value() << " " << treeSeg->value() << " " << dataTypeSeg->value() << " ";
-  data_out << XSeg->value() << " " <<  YSeg->value() << " " << ZSeg->value() << " ";
-
-  if(bigSeg->value() == 1) { data_out << "Big ";  }
-  else { data_out << "Little ";  }
-
-  if(multFilesSeg->value() == 1) { data_out << "Yes ";  }
-  else { data_out << "No "; }
-
-  data_out << componentsSeg->value() << " " << extSeg->value() << " ";
-  data_out << sliceSeg->value() << " " << headerSeg->value() << " ";
-
-
-  // output source information
-  data_out << "SOURCE " << fileSor->value() << " " << dataTypeSor->value() << " ";
-  data_out << XSor->value() << " " <<  YSor->value() << " " << ZSor->value() << " ";
-
-  if(bigSor->value() == 1) { data_out << "Big ";  }
-  else { data_out << "Little ";  }
-
-  if(multFilesSor->value() == 1) { data_out << "Yes ";  }
-  else { data_out << "No "; }
-
-  data_out << componentsSor->value() << " " << extSor->value() << " ";
-  data_out << sliceSor->value() << " " << headerSor->value() << " ";
-
+  data_out << fileSeg->value() << " " << fileSor->value();
   data_out.close();
+
+}
+
+
+/***************************************
+ *
+ * FlipSource
+ *
+ ***************************************/
+void EditorConsole::FlipSource(int a)
+{
+  if(SourceAxes[a]) {
+    SourceAxes[a] = false;
+  }
+  else {
+    SourceAxes[a] = true;
+  }
+
+  flip->SetFlipAxes(SourceAxes);
+  ViewSource();
 }

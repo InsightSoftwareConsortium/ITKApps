@@ -24,7 +24,6 @@
 #include "itkScalarToRGBPixelFunctor.h"
 
 #include <vtkPatchedImageReader.h>
-#include <vtkImageReader.h>
 #include <vtkImageResample.h>
 #include <vtkWSLookupTableManager.h>
 #include <vtkColorTransferFunction.h>
@@ -45,18 +44,21 @@
 #include <vtkActor.h>
 #include <vtkWindowedSincPolyDataFilter.h>
 #include <vtkImageCast.h>
-//#include <vtkITKAntiAliasBinaryImageFilter.h>
+
+#include <itkImageToVTKImageFilter.h>
+#include <itkFlipImageFilter.h>
 
 
 class EditorConsoleBase 
 {
 
 public:
+  typedef itk::Image<float, 3> SourceImageType;
   
   EditorConsoleBase();
   virtual ~EditorConsoleBase();
 
-  virtual void StartEditor();
+  virtual bool StartEditor();
   virtual void ViewImages();
   virtual void ViewSegmented();
   virtual void ViewSource();
@@ -84,18 +86,14 @@ public:
   virtual void AddRenderer(int);
 
   virtual void LoadImages();
-  virtual void LoadSegmented();
-  virtual void LoadSource();
+  virtual bool LoadSegmented();
+  virtual bool LoadSource();
   virtual void LoadSession();
   virtual void SaveSession();
   virtual void WriteBinaryVolume();
   virtual void ReadBinaryVolume();
-  virtual void SetDataTypeSeg(const char*);
-  virtual void SetDataTypeSor(const char*);
 
 protected:
-
-  itk::ImageFileReader<itk::Image<float,3> >::Pointer m_SourceReader;
 
   // segmented image reader
   vtkPatchedImageReader* labeledImgReader;
@@ -115,7 +113,9 @@ protected:
   bool segmented_initialized;
   
   // reader for the color data
-  vtkImageReader* colorImgReader;
+  itk::ImageFileReader<SourceImageType>::Pointer colorImgReader;
+  itk::ImageToVTKImageFilter<SourceImageType>::Pointer converter;
+  itk::FlipImageFilter<SourceImageType>::Pointer flip;
 
   vtkImageResample* resamplerCol;
   
@@ -148,10 +148,6 @@ protected:
   
   vtkRenderer* ren1;
 
-  //vtkFlRenderWindowInteractor* interactor;
-
-
-
   vtkImageThreshold* thresher[4];
 
   vtkMarchingCubes* marcher[4];
@@ -164,6 +160,8 @@ protected:
 
   // alternative vtk antialiasing filter - vtk_antialiaster
   vtkWindowedSincPolyDataFilter* vtk_antialiaser[4];
+
+  int x, y, z;
 
 };
 

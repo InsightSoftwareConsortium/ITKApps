@@ -19,9 +19,6 @@
 
 
 #include <EditorConsoleGUI.h>
-//#include "SegmentedViewer.h"
-//#include "SourceViewer.h"
-//#include "BinaryViewer.h"
 
 
 class EditorConsole : public EditorConsoleGUI {
@@ -31,7 +28,7 @@ public:
   EditorConsole();
   virtual ~EditorConsole();
 
-  virtual void StartEditor();
+  virtual bool StartEditor();
   virtual void Show(void);
   virtual void Hide(void);
   virtual void Quit(void);
@@ -56,6 +53,9 @@ public:
   virtual void DoRecolor();
   virtual void ChangeColormap();
   virtual void ChangeWindowLevel();
+  
+  virtual void SpecifySegmentedFile();
+  virtual void SpecifySourceFile();
 
   virtual void ClearAll();
 
@@ -63,14 +63,13 @@ public:
   virtual void AddRenderer(int);
 
   virtual void LoadImages();
-  virtual void LoadSegmented();
-  virtual void LoadSource();
+  virtual bool LoadSegmented();
+  virtual bool LoadSource();
   virtual void LoadSession();
   virtual void SaveSession();
   virtual void WriteBinaryVolume();
   virtual void ReadBinaryVolume();
-  virtual void SetDataTypeSeg(const char*);
-  virtual void SetDataTypeSor(const char*);
+  virtual void FlipSource(int);
 
   double local_max(double, double);
   double local_min(double, double);
@@ -86,6 +85,9 @@ private:
   int console_X;
   int console_Y;
   bool first_render;
+
+  bool SourceAxes[3];
+  
 };
 
 

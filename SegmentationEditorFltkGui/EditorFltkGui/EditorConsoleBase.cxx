@@ -28,8 +28,6 @@
 EditorConsoleBase 
 ::EditorConsoleBase()
 {
-  m_SourceReader = itk::ImageFileReader<itk::Image<float, 3> >::New();
-  
   // segmented
   segmented_initialized = false;
   
@@ -51,8 +49,10 @@ EditorConsoleBase
   boundingBoxes = vtkWSBoundingBoxManager::New();
 
   // source
-  source_initialized = false;  colorImgReader = vtkImageReader::New();
-  colorImgReader->SetHeaderSize(0);
+  source_initialized = false;  
+  colorImgReader = itk::ImageFileReader<SourceImageType>::New();
+  converter = itk::ImageToVTKImageFilter<SourceImageType>::New();
+  flip = itk::FlipImageFilter<SourceImageType>::New();
 
   resamplerCol = vtkImageResample::New();
   resamplerCol->InterpolateOff();
@@ -99,7 +99,6 @@ EditorConsoleBase
 
   overlayActor = vtkActor2D::New();
   overlayActor->SetMapper(overlayMapper);
-  //(sourceWin->GetRenderer())->AddActor2D(overlayActor);
   overlayActor->VisibilityOn();
 
   // 3D Renderer
@@ -108,10 +107,6 @@ EditorConsoleBase
 
   ren1 = vtkRenderer::New();
   ren1->SetViewport(0, 0, 1, 1);
-
-  //interactor = vtkFlRenderWindowInteractor::New();
-  //interactor->SetRenderWindow( renWin );
-  //interactor->Initialize();
 
   has_data[0] = has_data[1] = has_data[2] = has_data[3] = false;
 
@@ -122,7 +117,7 @@ EditorConsoleBase
     vtk_antialiaser[i]->SetNumberOfIterations(20);
   }
 
-
+  x = y = z = 0;
 }
 
 
@@ -147,9 +142,6 @@ EditorConsoleBase
   }
   if(boundingBoxes) {
     boundingBoxes->Delete();
-  }
-  if(colorImgReader) {
-    colorImgReader->Delete();
   }
   if(resamplerCol) {
     resamplerCol->Delete();
@@ -187,9 +179,6 @@ EditorConsoleBase
   if(ren1) {
     ren1->Delete();
   }
-  //  if(interactor) {
-  //    interactor->Delete();
-  //}
   for(int i=1; i<4; i++) {
     if(has_data[i]) {
       thresher[i]->Delete();
@@ -206,7 +195,7 @@ EditorConsoleBase
  * StartEditor
  *
  **********************************/
-void EditorConsoleBase::StartEditor() {
+bool EditorConsoleBase::StartEditor() {
 
 }
 
@@ -480,7 +469,7 @@ void EditorConsoleBase::LoadImages() {
  * LoadSegmented
  *
  ***********************************/
-void EditorConsoleBase::LoadSegmented() {
+bool EditorConsoleBase::LoadSegmented() {
 }
 
 /************************************
@@ -488,7 +477,7 @@ void EditorConsoleBase::LoadSegmented() {
  * LoadSource
  *
  ***********************************/
-void EditorConsoleBase::LoadSource() {
+bool EditorConsoleBase::LoadSource() {
 }
 
 /************************************
@@ -522,23 +511,6 @@ void EditorConsoleBase::WriteBinaryVolume() {
  *
  **********************************/
 void EditorConsoleBase::ReadBinaryVolume() {
-}
-
-
-/************************************
- * 
- * SetDataTypeSeg
- *
- ***********************************/
-void EditorConsoleBase::SetDataTypeSeg(const char* type) {
-}
-
-/************************************
- * 
- * SetDataTypeSor
- *
- ***********************************/
-void EditorConsoleBase::SetDataTypeSor(const char* type) {
 }
 
 
