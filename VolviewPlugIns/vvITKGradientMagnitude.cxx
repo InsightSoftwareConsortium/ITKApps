@@ -5,6 +5,33 @@
 #include "itkGradientMagnitudeImageFilter.h"
 
 
+template <class InputPixelType>
+class GradientMagnitudeRunner
+  {
+  public:
+      typedef  InputPixelType                       PixelType;
+      typedef  itk::Image< PixelType, 3 >           ImageType; 
+      
+      typedef  itk::GradientMagnitudeImageFilter< ImageType,  
+                                                  ImageType >    FilterType;
+
+      typedef  VolView::PlugIn::FilterModule< FilterType >       ModuleType;
+
+  public:
+    GradientMagnitudeRunner() {}
+    void Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
+    {
+      ModuleType  module;
+      module.SetPluginInfo( info );
+      module.SetUpdateMessage("Computing the gradient magnitude...");
+      // Execute the filter
+      module.ProcessData( pds  );
+    }
+  };
+
+
+
+
 static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 {
 
@@ -16,32 +43,64 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
   {
   switch( info->InputVolumeScalarType )
     {
+    case VTK_CHAR:
+      {
+      GradientMagnitudeRunner<signed char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
     case VTK_UNSIGNED_CHAR:
       {
-      typedef  unsigned char                        PixelType;
-      typedef  itk::Image< PixelType, Dimension >   ImageType; 
-      typedef  itk::GradientMagnitudeImageFilter< ImageType,  ImageType >   FilterType;
-      VolView::PlugIn::FilterModule< FilterType > module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Computing the gradient magnitude...");
-      // No parameters to set..
-
-      // Execute the filter
-      module.ProcessData( pds  );
+      GradientMagnitudeRunner<unsigned char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_SHORT:
+      {
+      GradientMagnitudeRunner<signed short> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_SHORT:
       {
-      typedef  unsigned short                       PixelType;
-      typedef  itk::Image< PixelType, Dimension >   ImageType; 
-      typedef  itk::GradientMagnitudeImageFilter< ImageType,  ImageType >   FilterType;
-      VolView::PlugIn::FilterModule< FilterType > module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Computing the gradient magnitude...");
-      // No parameters to set..
-
-      // Execute the filter
-      module.ProcessData( pds );
+      GradientMagnitudeRunner<unsigned short> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_INT:
+      {
+      GradientMagnitudeRunner<signed int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_INT:
+      {
+      GradientMagnitudeRunner<unsigned int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_LONG:
+      {
+      GradientMagnitudeRunner<signed long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_LONG:
+      {
+      GradientMagnitudeRunner<unsigned long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_FLOAT:
+      {
+      GradientMagnitudeRunner<float> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_DOUBLE:
+      {
+      GradientMagnitudeRunner<double> runner;
+      runner.Execute( info, pds );
       break; 
       }
     }
