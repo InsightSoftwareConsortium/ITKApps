@@ -179,6 +179,9 @@ SUBDIRS(DICOMApp)
 #Build the examples of various fourth-order level set PDEs 
 SUBDIRS (LevelSetSurfaceProcessing)
 
+# Build the Intensity based 2D-3D Registration application
+SUBDIRS(IntensityBased2D3DRegistration)
+
 # Applications requiring MetaImages and Fltk GUI 
 IF(FLTK_FOUND)
   IF(WIN32)
