@@ -113,7 +113,7 @@ void VV_PLUGIN_EXPORT vvITKMedianInit(vtkVVPluginInfo *info)
   info->ProcessData = ProcessData;
   info->UpdateGUI   = UpdateGUI;
   info->SetProperty(info, VVP_NAME, "Median (ITK)");
-  info->SetProperty(info, VVP_GROUP, "Noise Supression");
+  info->SetProperty(info, VVP_GROUP, "Noise Suppression");
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
           "Replace each voxel with the median of its neighborhood");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,

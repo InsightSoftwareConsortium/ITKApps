@@ -123,7 +123,7 @@ void VV_PLUGIN_EXPORT vvITKCurvatureAnisotropicDiffusionInit(vtkVVPluginInfo *in
   info->ProcessData = ProcessData;
   info->UpdateGUI = UpdateGUI;
   info->SetProperty(info, VVP_NAME, "Curvature Anisotropic Diffusion (ITK)");
-  info->SetProperty(info, VVP_GROUP, "Noise Supression");
+  info->SetProperty(info, VVP_GROUP, "Noise Suppression");
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
                                   "Anisotropic diffusion smoothing");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,
