@@ -3,8 +3,6 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    ImageRegistration2D.cxx
   Language:  C++
-  Date:      $Date$
-  Version:   $Revision$
 
   Copyright (c) 2002 Insight Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -16,7 +14,6 @@
 =========================================================================*/
 
 #include <ImageRegistration2D.h>
-
 
 int main()
 {

@@ -1,216 +1,329 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0011 
+version 1.0104 
 header_name {.h} 
-code_name {.cxx} 
-gridx 5 
-gridy 5 
-snap 3
+code_name {.cxx}
 class ImageRegistrationConsoleGUI {open : {public ImageRegistrationConsoleBase}
 } {
-  Function {ImageRegistrationConsoleGUI()} {} {
+  Function {ImageRegistrationConsoleGUI()} {open
+  } {
     Fl_Window consoleWindow {
-      label {Image Registration Console}
-      xywh {189 273 830 373}
+      label {Image Registration Console} open
+      xywh {111 42 906 620} type Double color 54
       code0 {\#include <ImageRegistrationConsoleBase.h>}
       code1 {\#include <fltkLightButton.h>} visible
     } {
       Fl_Group Connectors {
-        xywh {0 0 825 357}
+        xywh {-10 0 946 560}
       } {
         Fl_Box {} {
-          xywh {288 116 8 46} box UP_BOX color 4
+          xywh {90 20 100 10} box PLASTIC_UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {205 116 90 9} box UP_BOX color 4
+          xywh {225 36 10 35} box PLASTIC_UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {546 203 8 37} box UP_BOX color 4
+          xywh {225 89 10 35} box PLASTIC_UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {290 232 264 8} box UP_BOX color 4
+          xywh {225 144 10 31} box PLASTIC_UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {383 49 8 108} box UP_BOX color 4
+          xywh {225 166 265 10} box PLASTIC_UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {546 165 8 39} box UP_BOX color 4
+          xywh {224 187 10 31} box PLASTIC_UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {470 165 84 10} box UP_BOX color 4
+          xywh {225 187 265 10} box PLASTIC_UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {629 198 75 10} box UP_BOX color 4
+          xywh {90 535 100 10} box PLASTIC_UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {64 117 85 9} box UP_BOX color 4
+          xywh {224 498 10 35} box PLASTIC_UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {64 214 85 9} box UP_BOX color 4
+          xywh {224 447 10 35} box PLASTIC_UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {735 212 8 60} box UP_BOX color 4
+          xywh {226 392 10 42} box PLASTIC_UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {504 43 8 39} box UP_BOX color 4
+          xywh {226 390 222 10} box PLASTIC_UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {404 72 108 10} box UP_BOX color 4
+          xywh {480 284 10 104} box PLASTIC_UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {404 72 8 87} box UP_BOX color 4
+          xywh {267 279 182 10} box PLASTIC_UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {606 45 8 58} box UP_BOX color 4
+          xywh {224 234 10 42} box PLASTIC_UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {428 93 186 10} box UP_BOX color 4
+          xywh {659 174 100 10} box PLASTIC_UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {428 93 8 66} box UP_BOX color 4
+          xywh {674 98 84 10} box PLASTIC_UP_BOX color 222
         }
         Fl_Box {} {
-          xywh {288 176 8 64} box UP_BOX color 4
+          xywh {672 98 10 62} box PLASTIC_UP_BOX color 222
         }
         Fl_Box {} {
-          xywh {205 214 90 9} box UP_BOX color 4
+          xywh {508 138 10 32} box PLASTIC_UP_BOX color 222
+        }
+        Fl_Box {} {
+          xywh {790 185 10 95} box PLASTIC_UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {720 271 10 67} box PLASTIC_UP_BOX color 3
+        }
+        Fl_Box {} {
+          xywh {284 223 481 10} box PLASTIC_UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {756 184 10 50} box PLASTIC_UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {97 281 100 10} box PLASTIC_UP_BOX color 222
+        }
+        Fl_Box {} {
+          xywh {540 346 124 10} box PLASTIC_UP_BOX color 222
+        }
+        Fl_Box {} {
+          xywh {538 434 118 10} box PLASTIC_UP_BOX color 222
+        }
+        Fl_Box {} {
+          xywh {538 346 10 98} box PLASTIC_UP_BOX color 222
+        }
+        Fl_Box {} {
+          xywh {732 276 106 10} box PLASTIC_UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {372 31 10 81} box PLASTIC_UP_BOX color 128
+        }
+        Fl_Box {} {
+          xywh {372 136 146 10} box PLASTIC_UP_BOX color 222
+        }
+        Fl_Box {} {
+          xywh {372 101 10 43} box PLASTIC_UP_BOX color 222
+        }
+        Fl_Box {} {
+          xywh {564 99 10 67} box PLASTIC_UP_BOX color 222
         }
       }
-      Fl_Group controlsGroup {
-        xywh {5 6 820 304}
+      Fl_Group controlsGroup {open
+        xywh {5 0 901 566} color 222
       } {
-        Fl_Light_Button fixedImageButton {
+        Fl_Light_Button inputFixedImageButton {
           label {Fixed Image}
-          callback {ShowFixedImage();}
-          xywh {129 110 109 25} type Normal value 1 selection_color 1 labelsize 12
+          callback {ShowInputFixedImage();}
+          xywh {184 13 109 25} type Normal box PLASTIC_UP_BOX value 1 selection_color 1 labelsize 12
           class {fltk::LightButton}
         }
         Fl_Button {} {
           label Quit
           callback {this->Quit();}
-          xywh {391 265 64 27} box ROUND_UP_BOX labelsize 12 align 128
+          xywh {823 516 64 27} box ROUND_UP_BOX labelsize 12 align 128
         }
         Fl_Light_Button registrationMethodButton {
           label {Registration Method}
-          xywh {279 142 205 56} type Normal value 1 selection_color 1 labelsize 12 align 148
+          xywh {484 152 205 56} type Normal box PLASTIC_UP_BOX value 1 selection_color 1 labelsize 12 align 148
           class {fltk::LightButton}
         }
         Fl_Button {} {
           label {Resample Filter}
           callback {this->GenerateRegisteredMovingImage();}
-          xywh {530 190 125 30} box ROUND_UP_BOX labelsize 12 align 128
+          xywh {738 164 125 30} box PLASTIC_DOWN_BOX labelsize 12 align 128
         }
         Fl_Light_Button registeredMovingImageButton {
           label {Registered Image}
-          callback {this->ShowRegisteredMovingImage();} selected
-          xywh {686 186 94 35} type Normal value 1 selection_color 1 labelsize 12 align 148
+          callback {this->ShowRegisteredMovingImage();}
+          xywh {678 263 94 35} type Normal box PLASTIC_UP_BOX value 1 selection_color 1 labelsize 12 align 148
           class {fltk::LightButton}
-        }
-        Fl_Choice {} {
-          label Metric
-          xywh {261 33 165 30} labelsize 12 align 1 textsize 12
-        } {
-          menuitem {} {
-            label {Mean Squares}
-            callback {this->SelectMetric( meanSquares );}
-            xywh {0 0 100 20} labelsize 12
-          }
-          menuitem {} {
-            label {Normalized Correlation}
-            callback {this->SelectMetric( normalizedCorrelation );}
-            xywh {10 10 100 20} labelsize 12
-          }
-          menuitem {} {
-            label {Pattern Intensity}
-            callback {this->SelectMetric( patternIntensity );}
-            xywh {20 20 100 20} labelsize 12
-          }
-          menuitem {} {
-            label {Mutual Information}
-            callback {this->SelectMetric( mutualInformation );}
-            xywh {30 30 100 20} labelsize 12
-          }
         }
         Fl_Button {} {
           label Stop
           callback {Stop();}
-          xywh {266 265 66 27} box ROUND_UP_BOX labelsize 12 align 128
+          xywh {698 516 66 27} box ROUND_UP_BOX labelsize 12 align 128
         }
-        Fl_Light_Button movingImageButton {
+        Fl_Light_Button inputMovingImageButton {
           label {Moving Image}
-          callback {this->ShowMovingImage();}
-          xywh {129 206 109 25} type Normal value 1 selection_color 1 labelsize 12
+          callback {this->ShowInputMovingImage();}
+          xywh {184 527 109 25} type Normal box PLASTIC_UP_BOX value 1 selection_color 1 labelsize 12
           class {fltk::LightButton}
         }
         Fl_Button {} {
           label Start
           callback {Execute();}
-          xywh {156 265 65 27} box ROUND_UP_BOX labelsize 12 align 128
+          xywh {588 516 65 27} box ROUND_UP_BOX labelsize 12 align 128
         }
-        Fl_Choice {} {
-          label Transform
-          xywh {470 34 99 30} labelsize 12 align 1 textsize 12
+        Fl_Button {} {
+          label {Normalize image}
+          callback {this->GenerateFixedImage();}
+          xywh {158 66 165 25} box PLASTIC_DOWN_BOX
+        }
+        Fl_Button {} {
+          label {Normalize Image}
+          callback {this->GenerateNormalizedInputMovingImage();}
+          xywh {158 480 165 25} box PLASTIC_DOWN_BOX
+        }
+        Fl_Light_Button fixedImageButton {
+          label {Fixed Image}
+          callback {ShowFixedImage();}
+          xywh {184 121 109 25} type Normal box PLASTIC_UP_BOX value 1 selection_color 1 labelsize 12
+          class {fltk::LightButton}
+        }
+        Fl_Light_Button normalizedInputMovingImageButton {
+          label {Moving Image}
+          callback {this->ShowNormalizedInputMovingImage();}
+          xywh {184 428 109 25} type Normal box PLASTIC_UP_BOX value 1 selection_color 1 labelsize 12
+          class {fltk::LightButton}
+        }
+        Fl_Light_Button transformedMovingImageButton {
+          label {Moving Image}
+          callback {this->ShowTransformedMovingImage();}
+          xywh {438 271 109 25} type Normal box PLASTIC_UP_BOX value 1 selection_color 1 labelsize 12
+          class {fltk::LightButton}
+        }
+        Fl_Group movingImageRotationParameter {
+          label Rotation open
+          xywh {588 328 80 42} box PLASTIC_UP_BOX color 222
         } {
-          menuitem {} {
-            label Translation
-            callback {this->SelectTransform( translationTransform );}
-            xywh {10 10 100 20} labelsize 12
-          }
-          menuitem {} {
-            label Scale
-            callback {this->SelectTransform( scaleTransform );}
-            xywh {20 20 100 20} labelsize 12
-          }
-          menuitem {} {
-            label Rigid
-            callback {this->SelectTransform( rigidTransform );}
-            xywh {30 30 100 20} labelsize 12
-          }
-          menuitem {} {
-            label Affine
-            callback {this->SelectTransform( affineTransform );}
-            xywh {40 40 100 20} labelsize 12
+          Fl_Value_Input movingImageRotationAngle {
+            label {A:}
+            xywh {614 338 25 25}
           }
         }
-        Fl_Choice {} {
-          label Interpolator
-          xywh {590 33 132 30} labelsize 12 align 1 textsize 12
+        Fl_Group movingImageTranslationParameters {
+          label Translation open
+          xywh {588 407 80 60} box PLASTIC_UP_BOX color 222
         } {
-          menuitem {} {
-            label {Nearest Neighbor}
-            callback {this->SelectInterpolator( nearestNeighborInterpolator );}
-            xywh {20 20 100 20} labelsize 12
+          Fl_Value_Input movingImageTranslationX {
+            label {X:}
+            xywh {616 414 25 25}
           }
-          menuitem {} {
-            label Linear
-            callback {this->SelectInterpolator( linearInterpolator );}
-            xywh {30 30 100 20} labelsize 12
+          Fl_Value_Input movingImageTranslationY {
+            label {Y:}
+            xywh {616 436 25 25}
+          }
+        }
+        Fl_Button {} {
+          label {Noise Addition}
+          callback {this->GenerateMovingImage();}
+          xywh {183 271 109 28} box PLASTIC_DOWN_BOX
+        }
+        Fl_Light_Button movingImageButton {
+          label {Moving Image}
+          callback {this->ShowMovingImage();}
+          xywh {183 215 109 25} type Normal box PLASTIC_UP_BOX value 1 selection_color 1 labelsize 12
+          class {fltk::LightButton}
+        }
+        Fl_Button {} {
+          label {Resample Filter}
+          callback {this->GenerateTransformedMovingImage();}
+          xywh {428 380 125 30} box PLASTIC_DOWN_BOX labelsize 12 align 128
+        }
+        Fl_Group movingImageNoiseParameters {
+          label {Noise Parameters} open
+          xywh {28 259 95 65} box PLASTIC_UP_BOX color 222 labelcolor 0
+        } {
+          Fl_Value_Input movingImageNoiseMean {
+            label {mean:}
+            xywh {81 266 25 25}
+          }
+          Fl_Value_Input movingImageNoiseStandardDeviation {
+            label {std:}
+            xywh {81 288 25 25}
+          }
+        }
+        Fl_Group optimizerParameters {
+          label Optimizer open
+          xywh {706 16 184 144} box PLASTIC_UP_BOX color 222
+        } {
+          Fl_Value_Input numberOfIterations {
+            label {No of Iterations:}
+            xywh {826 22 50 24} value 2000
+          }
+          Fl_Value_Input minimumStepLength {
+            label {Min. Step Length:}
+            xywh {826 44 50 24} value 0.001
+          }
+          Fl_Value_Input maximumStepLength {
+            label {Max. Step Length:}
+            xywh {826 67 50 24} value 0.1
+          }
+          Fl_Value_Input rotationScale {
+            label {Rotation Scale:}
+            xywh {826 90 50 22} value 1
+          }
+          Fl_Value_Input translationScale {
+            label {Translation Scale:}
+            xywh {826 111 50 24} value 0.001
+          }
+          Fl_Value_Input scalingScale {
+            label {Scaling Scale:}
+            xywh {826 134 50 24} maximum 100 value 10
+          }
+        }
+        Fl_Light_Button mixedChannelImageButton {
+          label {Mixed Channel Image}
+          callback {this->ShowMixedChannelImage();}
+          xywh {818 257 82 51} type Normal box PLASTIC_UP_BOX value 1 selection_color 1 labelsize 12 align 148
+          class {fltk::LightButton}
+        }
+        Fl_Group mutualInformationGroup {open
+          xywh {304 0 160 146}
+        } {
+          Fl_Button {} {
+            label {Mutual Information}
+            callback {this->SelectMutualInformationMetric();}
+            xywh {314 96 138 25} box PLASTIC_UP_BOX color 222
+          }
+          Fl_Group MutualInformationParameter {
+            label {Mutual Information} open
+            xywh {314 18 142 26} box PLASTIC_UP_BOX color 128
+          } {
+            Fl_Value_Input mutualInformationNumberOfBins {
+              label {Number of Bins:}
+              xywh {422 22 30 18} value 10
+            }
+          }
+        }
+        Fl_Group meanSquaresGroup {open
+          xywh {460 82 236 50}
+        } {
+          Fl_Button {} {
+            label {Mean Squares}
+            callback {this->SelectMeanSquaresMetric();}
+            xywh {502 95 144 25} box PLASTIC_UP_BOX color 222
           }
         }
       }
       Fl_Slider progressSlider {
-        xywh {10 318 810 15} type {Horz Fill} selection_color 2
+        xywh {10 560 880 15} type {Horz Fill} selection_color 2
         code0 {\#include <fltkProgressBar.h>}
         class {fltk::ProgressBar}
       }
       Fl_Output statusTextOutput {
-        xywh {10 339 810 25}
+        xywh {10 581 880 24}
       }
       Fl_Light_Button loadFixedImageButton {
         label Load
         callback {this->LoadFixedImage();}
-        xywh {29 109 65 25} type Normal value 1 selection_color 1 labelsize 12
+        xywh {29 13 65 25} type Normal box PLASTIC_UP_BOX value 1 selection_color 1 labelsize 12
         class {fltk::LightButton}
       }
       Fl_Light_Button loadMovingImageButton {
         label Load
         callback {this->LoadMovingImage();}
-        xywh {29 206 65 25} type Normal value 1 selection_color 1 labelsize 12
+        xywh {29 526 65 25} type Normal box PLASTIC_UP_BOX value 1 selection_color 1 labelsize 12
         class {fltk::LightButton}
       }
-      Fl_Light_Button saveMovingImageButton {
+      Fl_Light_Button saveRegisteredImageButton {
         label Save
-        callback {this->SaveRegisteredMovingImage();}
-        xywh {705 251 65 25} type Normal value 1 selection_color 1 labelsize 12
+        callback {this->SaveRegisteredImage();}
+        xywh {695 320 65 25} type Normal box PLASTIC_UP_BOX value 1 selection_color 1 labelsize 12
         class {fltk::LightButton}
       }
     }
@@ -228,5 +341,17 @@ class ImageRegistrationConsoleGUI {open : {public ImageRegistrationConsoleBase}
   Function {ShowMovingImage( void )} {return_type {virtual void}
   } {}
   Function {ShowRegisteredMovingImage( void )} {return_type {virtual void}
+  } {}
+  Function {ShowInputFixedImage( void )} {return_type {virtual void}
+  } {}
+  Function {ShowInputMovingImage( void )} {return_type {virtual void}
+  } {}
+  Function {ShowNormalizedInputMovingImage( void )} {selected return_type {virtual void}
+  } {}
+  Function {ShowTransformedMovingImage( void )} {return_type {virtual void}
+  } {}
+  Function {ShowMixedChannelImage( void )} {return_type {virtual void}
+  } {}
+  Function {SaveRegisteredImage( void )} {return_type {virtual void}
   } {}
 } 

@@ -14,33 +14,51 @@
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef liIMAGEREGISTRATIONCONSOLEBASE
-#define liIMAGEREGISTRATIONCONSOLEBASE
+#ifndef IMAGEREGISTRATIONCONSOLEBASE
+#define IMAGEREGISTRATIONCONSOLEBASE
 
 #include <itkImage.h>
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
+#include "itkCastImageFilter.h"
 #include <itkResampleImageFilter.h>
 #include <itkImageRegistrationMethod.h>
 
-#include <itkMutualInformationImageToImageMetric.h>
-#include <itkMeanSquaresImageToImageMetric.h>
-#include <itkNormalizedCorrelationImageToImageMetric.h>
-#include <itkMeanReciprocalSquareDifferenceImageToImageMetric.h>
+#include "itkImageToVTKImageFilter.h"  //file located in the directory
+                    // InsightApplications/Auxiliary/vtk
 
-#include <itkGradientDescentOptimizer.h>
+// 
+// files for vtk image processing
+//
+#include "vtkImageCast.h"
+
+#include "itkVTKImageToImageFilter.h"
+
+
+
+//
+// files for noise addition
+//
+#include "itkImageRegionConstIterator.h"
+#include "itkImageRegionIterator.h"
+#include "itkNormalVariateGenerator.h"
+
+
+#include "itkNormalizeImageFilter.h" 
+
+#include "itkNormalizedMutualInformationHistogramImageToImageMetric.h"
+#include "itkMeanSquaresImageToImageMetric.h"
+
 #include <itkRegularStepGradientDescentOptimizer.h>
-#include <itkConjugateGradientOptimizer.h>
 
 #include "itkLinearInterpolateImageFunction.h"
-#include "itkNearestNeighborInterpolateImageFunction.h"
 
-#include "itkTranslationTransform.h"
-#include "itkScaleTransform.h"
-#include "itkRigid2DTransform.h"
 #include "itkAffineTransform.h"
+#include "itkCenteredRigid2DTransform.h"
+#include "itkSimilarity2DTransform.h"
 
 
+#include "CommandIterationUpdate.h"
 /**
  * \brief ImageRegistrationConsoleBase class that instantiate
  * the elements required for a registration method without GUI
@@ -53,83 +71,92 @@ public:
  /** Identifiers for the different types of Metrics */
   typedef enum {
     mutualInformation,
-    normalizedCorrelation,
-    patternIntensity,
-    meanSquares
+  meanSquares
   } MetricIdentifier;
 
- /** Identifiers of the different types of Transforms */
- typedef enum {
-    translationTransform,
-    scaleTransform,
-    rigidTransform,
-    affineTransform
-  } TransformIdentifier;
-
- /** Identifiers of the different types of Interpolators */
- typedef enum {
-    linearInterpolator,
-    nearestNeighborInterpolator
-  } InterpolatorIdentifier;
-
-
-  /** Dimension of the images to be registered */ 
+   /** Dimension of the images to be registered */ 
   enum { ImageDimension = 2 };
 
   /** Pixel type to be used internally during registration */
-  typedef   unsigned char                         PixelType;
+  typedef   float                            InternalPixelType;
+  typedef   unsigned short              InputPixelType; 
+    //may need to change to float if too much degeneration in reading input image
+
+  typedef   unsigned char                         OutputPixelType;
+  
+
+  /** Type of Input Images*/
+  typedef   itk::Image<InputPixelType,ImageDimension>     InputImageType;
+
+  /** Type of the Internal image */
+  typedef   itk::Image<InternalPixelType,ImageDimension>  InternalImageType;
   
   /** Type of the Moving image */
-  typedef   itk::Image<PixelType,ImageDimension>  MovingImageType;
+  typedef   itk::Image<InternalPixelType,ImageDimension>  MovingImageType;
 
   /** Type of the Fixed image */
-  typedef   itk::Image<PixelType,ImageDimension>  FixedImageType;
- 
+  typedef   itk::Image<InternalPixelType,ImageDimension>  FixedImageType;
+
+  typedef itk::Image< OutputPixelType, ImageDimension >   OutputImageType;
+  
+  typedef itk::CastImageFilter< 
+                        InputImageType,
+                        OutputImageType > CastFilterType;
+                    
   /**  Registration methods to use */
   typedef   itk::ImageRegistrationMethod< MovingImageType,
                                           FixedImageType > 
                                                   ImageRegistrationMethodType;
 
-  typedef   itk::ImageFileReader< FixedImageType >    FixedImageReaderType;
-
-  typedef   itk::ImageFileReader< MovingImageType >   MovingImageReaderType;
-
-  typedef   itk::Transform< double,
-                            ImageDimension,
-                            ImageDimension >          TransformBaseType;
-
-  typedef   TransformBaseType::ParametersType         TransformParametersType;
+  typedef itk::CenteredRigid2DTransform< double > TransformType;
 
 
+  typedef   itk::ImageFileReader< InputImageType >    FixedImageReaderType;
+
+  typedef   itk::ImageFileReader< InputImageType >    MovingImageReaderType;
+
+  typedef  itk::ImageToVTKImageFilter<InputImageType>    ItkToVtkConnectorType;
+
+  typedef  itk::VTKImageToImageFilter<InternalImageType>    VtkToItkConnectorType;
+
+  typedef   itk::ImageFileWriter< OutputImageType >   ImageWriterType;
+  
   typedef   itk::AffineTransform< double,
                                   ImageDimension >    AffineTransformType;
 
+  typedef   itk::Statistics::NormalVariateGenerator   GeneratorType;
+  typedef   itk::ImageRegionConstIterator<InternalImageType>  ConstIteratorType;
+  typedef   itk::ImageRegionIterator<InternalImageType>       IteratorType;
 
-  typedef   itk::MutualInformationImageToImageMetric< 
+  typedef   itk::NormalizedMutualInformationHistogramImageToImageMetric< 
                                   FixedImageType,
                                   MovingImageType 
                                          > MutualInformationMetricType;
 
-  typedef   itk::MeanSquaresImageToImageMetric< 
-                                  FixedImageType,
-                                  MovingImageType 
-                                         > MeanSquaresMetricType;
 
-  typedef   itk::NormalizedCorrelationImageToImageMetric< 
-                                  FixedImageType,
-                                  MovingImageType 
-                                         > NormalizedCorrelationImageMetricType;
 
-  typedef   itk::MeanReciprocalSquareDifferenceImageToImageMetric< 
-                                  FixedImageType,
-                                  MovingImageType 
-                                         > MeanReciprocalSquareDifferenceImageMetricType;
+  typedef itk::MeanSquaresImageToImageMetric< 
+                                    FixedImageType, 
+                                    MovingImageType >    MeanSquaresMetricType;
 
-  typedef   itk::ResampleImageFilter< MovingImageType,
-                                      MovingImageType>  ResampleFilterType;
 
-  typedef   itk::ImageFileWriter< MovingImageType >  MovingImageWriterType;
 
+  typedef MutualInformationMetricType::ScalesType     ScalesType;
+
+
+  typedef   itk::ResampleImageFilter< InputImageType,
+                                      InputImageType>  ResampleFilterType;
+
+  typedef   itk::ResampleImageFilter< InternalImageType,
+                                      InternalImageType> InternalResampleFilterType;
+
+
+  typedef   itk::LinearInterpolateImageFunction< 
+                       InternalImageType, double >  InterpolatorType;
+
+  typedef   CommandIterationUpdate::OptimizerType   OptimizerType;
+  
+  typedef   itk::NormalizeImageFilter< InternalImageType, InternalImageType > NormalizeFilterType;
 
 public:
   ImageRegistrationConsoleBase();
@@ -139,9 +166,10 @@ public:
   virtual void LoadFixedImage(const char * filename);
   virtual void LoadMovingImage(void)=0;
   virtual void LoadMovingImage(const char * filename);
-  virtual void SaveRegisteredMovingImage(void)=0;
-  virtual void SaveRegisteredMovingImage(const char * filename);
-
+  
+  virtual void SaveRegisteredImage(void)=0;
+  virtual void SaveRegisteredImage(const char * filename);
+  
   virtual void ShowStatus(const char * text);
 
   virtual void Execute(void);
@@ -149,19 +177,53 @@ public:
 
   virtual void GenerateRegisteredMovingImage(void);
 
-  virtual void SelectMetric( MetricIdentifier metricType );
-  virtual void SelectInterpolator( InterpolatorIdentifier interpolatorType );
-  virtual void SelectTransform( TransformIdentifier transformType );
+  virtual void GenerateFixedImage(void);
+  virtual void GenerateNormalizedInputMovingImage(void);
+  virtual void GenerateTransformedMovingImage(void);
+  virtual void GenerateMovingImage(void);
 
+  virtual void SelectMutualInformationMetric(void);
+  virtual void SelectMeanSquaresMetric(void);
+    
 protected:
 
   FixedImageReaderType::Pointer           m_FixedImageReader;
 
   MovingImageReaderType::Pointer          m_MovingImageReader;
 
-  MovingImageWriterType::Pointer          m_MovingImageWriter;
+  ItkToVtkConnectorType::Pointer      m_FixedImageItkToVtkConnector;
+
+  ItkToVtkConnectorType::Pointer      m_MovingImageItkToVtkConnector;
+
+  VtkToItkConnectorType::Pointer      m_FixedImageVtkToItkConnector;
+
+  VtkToItkConnectorType::Pointer      m_MovingImageVtkToItkConnector;
+
+  CastFilterType::Pointer                 m_Caster;
+
+  ImageWriterType::Pointer                m_RegisteredImageWriter;
+
+  NormalizeFilterType::Pointer        m_NormalizedInputMovingImageNormalizeFilter;
+
+  NormalizeFilterType::Pointer        m_TransformedMovingImageNormalizeFilter;
+
+  NormalizeFilterType::Pointer        m_MovingImageNormalizeFilter;
+
+  NormalizeFilterType::Pointer        m_FixedImageNormalizeFilter;
 
   ResampleFilterType::Pointer             m_ResampleMovingImageFilter;
+
+  InternalResampleFilterType::Pointer     m_ResampleNormalizedInputMovingImageFilter;
+  
+  AffineTransformType::Pointer            m_InputTransform;
+
+  TransformType::Pointer          m_Transform;
+
+  InterpolatorType::Pointer               m_InputInterpolator;
+
+  InterpolatorType::Pointer               m_Interpolator;
+
+  OptimizerType::Pointer          m_Optimizer;
 
   ImageRegistrationMethodType::Pointer    m_ImageRegistrationMethod;
   
@@ -171,9 +233,21 @@ protected:
 
   MetricIdentifier                        m_SelectedMetric;
 
-  InterpolatorIdentifier                  m_SelectedInterpolator;
 
-  TransformIdentifier                     m_SelectedTransform;
+  AffineTransformType::OutputVectorType   m_Offset;
+  AffineTransformType::ScalarType         m_Angle;
+
+  float                    m_MovingImageNoiseMean;
+  float                    m_MovingImageNoiseStandardDeviation;
+
+  unsigned short              m_NumberOfIterations;
+  double                  m_MinimumStepLength;
+  double                  m_MaximumStepLength;
+  double                    m_RotationScale;
+  double                  m_TranslationScale;
+  double                  m_ScalingScale;
+  
+  unsigned int                m_MutualInformationNumberOfBins;
 
 };
 

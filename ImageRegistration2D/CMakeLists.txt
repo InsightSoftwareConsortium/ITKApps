@@ -23,6 +23,8 @@ ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 INCLUDE_DIRECTORIES(
   ${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer
   ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
+  ${InsightApplications_SOURCE_DIR}/Auxiliary/vtk
+  ${InsightApplications_BINARY_DIR}/Auxiliary/vtk
   ${InsightApplications_SOURCE_DIR}/ImageRegistration2D
   ${InsightApplications_BINARY_DIR}/ImageRegistration2D
 )
@@ -37,5 +39,9 @@ ADD_GUI_EXECUTABLE(ImageRegistration2D "${ImageRegistration2D_SRCS}")
 
 FLTK_WRAP_UI(ImageRegistration2D ImageRegistrationConsoleGUI.fl)
 ITK_DISABLE_FLTK_GENERATED_WARNINGS(ImageRegistrationConsoleGUI.fl)
+
 TARGET_LINK_LIBRARIES(ImageRegistration2D ITKFltkImageViewer ITKIO
-                      ITKNumerics ITKBasicFilters)
+                      ITKNumerics ITKBasicFilters ITKStatistics
+                      vtkRendering vtkGraphics vtkHybrid
+                      vtkImaging vtkIO vtkFiltering vtkCommon
+)
