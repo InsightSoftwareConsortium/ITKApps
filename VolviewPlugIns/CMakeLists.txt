@@ -53,8 +53,8 @@ SET (PLUGINS
   vvITKConnectedThreshold
   vvITKCurvatureAnisotropicDiffusion
   vvITKCurvatureFlow 
-#  vvITKFastMarching
-#  vvITKFastMarchingModule
+  vvITKFastMarching
+  vvITKFastMarchingModule
   vvITKGradientAnisotropicDiffusion
   vvITKGradientMagnitude
   vvITKGradientMagnitudeRecursiveGaussian
