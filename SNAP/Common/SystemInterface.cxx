@@ -158,6 +158,11 @@ SystemInterface
       SystemTools::GetFilenamePath(SystemTools::GetFilenamePath(sExeFullPath)) + 
       "/ProgramData");
 
+    // Also, for UNIX installations, look for ${INSTALL_PATH}/share/snap/ProgramData
+    vPathList.push_back(
+       SystemTools::GetFilenamePath(SystemTools::GetFilenamePath(sExeFullPath)) + 
+       "/share/snap/ProgramData");
+
     // Search for the token file in the path list
     StringType sFoundFile = 
       SystemTools::FindFile(GetProgramDataDirectoryTokenFileName(),vPathList);
