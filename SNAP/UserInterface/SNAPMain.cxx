@@ -313,9 +313,6 @@ int main(int argc, char **argv)
   // Show the splash screen
   ui->HideSplashScreen();
 
-  // Enable thread support in FLTK
-  Fl::lock();
-
   // Run the FL driver
   Fl::run();
 
@@ -341,6 +338,9 @@ int main(int argc, char **argv)
 
 /*
  *Log: SNAPMain.cxx
+ *Revision 1.6  2003/11/25 23:32:48  pauly
+ *FIX: Snake evolution did not work in multiprocessor mode
+ *
  *Revision 1.5  2003/10/06 12:30:01  pauly
  *ENH: Added history lists, remembering of settings, new snake parameter preview
  *
