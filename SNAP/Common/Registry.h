@@ -20,7 +20,6 @@
 #endif //_MSC_VER
 
 #include <cstdio>
-#include <cstring>
 #include <iostream>
 #include <list>
 #include <map>
