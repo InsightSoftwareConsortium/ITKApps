@@ -92,13 +92,14 @@ IRISSliceWindow
 
 void
 IRISSliceWindow
-::DrawOverlays()
+::DrawOverlays(bool inZoomLocator)
 {
   // Call the parent's version of this method
-  GenericSliceWindow::DrawOverlays();
+  GenericSliceWindow::DrawOverlays(inZoomLocator);
 
   // Draw the polygon
-  m_PolygonMode->OnDraw();
+  if(!inZoomLocator)
+    m_PolygonMode->OnDraw();
 
   // Draw the region of interest if selected
   if(GetTopInteractionMode() == m_RegionMode)

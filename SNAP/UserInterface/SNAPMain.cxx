@@ -38,6 +38,7 @@ ostream &verbose = cout;
 
 // MAX grey value - TODO find somewhere to stick this
 const GreyType MAXGREYVAL = itk::NumericTraits<GreyType>::max();
+const GreyType MINGREYVAL = itk::NumericTraits<GreyType>::min();
 
 #include "Registry.h"
 
@@ -338,6 +339,9 @@ int main(int argc, char **argv)
 
 /*
  *Log: SNAPMain.cxx
+ *Revision 1.7  2003/12/16 13:19:26  pauly
+ *FIX: Removed Fl::lock()
+ *
  *Revision 1.6  2003/11/25 23:32:48  pauly
  *FIX: Snake evolution did not work in multiprocessor mode
  *

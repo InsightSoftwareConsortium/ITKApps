@@ -24,6 +24,7 @@
 #include "itkResampleImageFilter.h"
 #include "itkNearestNeighborInterpolateImageFunction.h"
 #include "itkBSplineInterpolateImageFunction.h"
+#include "itkWindowedSincInterpolateImageFunction.h"
 #include "itkLinearInterpolateImageFunction.h"
 #include "IRISSlicer.h"
 #include "SNAPSegmentationROISettings.h"
@@ -250,6 +251,14 @@ ImageWrapper<TPixel>
     typedef itk::BSplineInterpolateImageFunction<
       ImageType,double> CubicInterpolatorType;
 
+    // More typedefs are needed for the sinc interpolator
+    const static unsigned int VRadius = 5;
+    typedef itk::Function::HammingWindowFunction<VRadius> WindowFunction;
+    typedef itk::ConstantBoundaryCondition<ImageType> Condition;
+    typedef itk::WindowedSincInterpolateImageFunction<
+      ImageType, VRadius, 
+      WindowFunction, Condition, double> SincInterpolatorType;
+
     // Choose the interpolator
     switch(roi.GetInterpolationMethod())
       {
@@ -263,6 +272,10 @@ ImageWrapper<TPixel>
 
       case SNAPSegmentationROISettings::TRICUBIC :
         fltSample->SetInterpolator(CubicInterpolatorType::New());
+        break;  
+
+      case SNAPSegmentationROISettings::SINC_WINDOW_05 :
+        fltSample->SetInterpolator(SincInterpolatorType::New());
         break;  
       };
 

@@ -242,17 +242,20 @@ protected:
   LabelTextureType *m_LabelTexture;
   
   // This method is called in draw() to paint the grey slice
-  virtual void DrawGreyTexture();
+  virtual void DrawGreyTexture(unsigned char r = 255, unsigned char g = 255, unsigned char b = 255);
 
   // This method is called in draw() to paint the segmentation slice
   virtual void DrawSegmentationTexture();
 
   // This method is called after the grey and segmentation images have
   // been drawn.  It calls the draw method of each of the interaction modes
-  virtual void DrawOverlays();
+  virtual void DrawOverlays(bool inZoomLocator);
 
   /** This method draws the RAI labels at the four sides of the slice */
   void DrawOrientationLabels();
+
+  /** Draw a window that shows where in the image the zoom region is located */
+  void DrawZoomLocator();
 };
 
 #endif // __GenericSliceWindow_h_

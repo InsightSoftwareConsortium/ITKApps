@@ -330,7 +330,10 @@ GenericSliceWindow
   DrawSegmentationTexture();
 
   // Draw the overlays
-  DrawOverlays();
+  DrawOverlays(false);
+
+  // Draw the zoom locator
+  DrawZoomLocator();
 
   // Clean up the GL state
   glPopMatrix();
@@ -342,13 +345,13 @@ GenericSliceWindow
 
 void 
 GenericSliceWindow
-::DrawGreyTexture() 
+::DrawGreyTexture(unsigned char r, unsigned char g, unsigned char b) 
 {
   // We should have a slice to return
   assert(m_ImageData->IsGreyLoaded() && m_ImageSliceIndex >= 0);
 
   // Paint the grey texture
-  m_GreyTexture->Draw();
+  m_GreyTexture->Draw(r, g, b);
 }
 
 void 
@@ -363,18 +366,75 @@ GenericSliceWindow
   m_LabelTexture->DrawTransparent(m_GlobalState->GetSegmentationAlpha());
 }
 
+void
+GenericSliceWindow
+::DrawZoomLocator()
+{
+  // Draw the little version of the image in the corner of the window
+  if(m_ViewZoom > m_OptimalZoom)
+    {
+    double w = m_SliceSize[0];
+    double h = m_SliceSize[1];
+
+    glPushMatrix();
+    glLoadIdentity();
+    glTranslated(5.0, 5.0, 0.0);
+
+    glScalef(0.334 * m_OptimalZoom,0.334 * m_OptimalZoom,1.0);
+    
+    glPushMatrix();
+    glScalef(m_SliceSpacing[0],m_SliceSpacing[1],1.0);
+    // glTranslated(w * 0.1111, h * 0.1111, 0.0);
+    
+    // Draw the grey scale image
+    DrawGreyTexture(255, 224, 32);
+
+    // Draw the crosshairs and stuff
+    DrawOverlays(true);
+
+    // Draw the line around the image
+    glColor3d(0.8, 0.8, 0.2);
+    glBegin(GL_LINE_LOOP);
+    glVertex2d(0,0);
+    glVertex2d(0,h);
+    glVertex2d(w,h);
+    glVertex2d(w,0);
+    glEnd();
+
+    // Draw a box representing the current zoom level
+    glPopMatrix();
+    glTranslated(m_ViewPosition[0],m_ViewPosition[1],0.0);
+    w = this->w() * 0.5 / m_ViewZoom;
+    h = this->h() * 0.5 / m_ViewZoom;
+
+
+    glColor3d(1.0, 1.0, 1.0);
+    glBegin(GL_LINE_LOOP);
+    glVertex2d(-w,-h);
+    glVertex2d(-w, h);
+    glVertex2d( w, h);
+    glVertex2d( w,-h);
+    glEnd();
+    
+    glPopMatrix();
+    }
+}
+
 void 
 GenericSliceWindow
-::DrawOverlays() 
+::DrawOverlays(bool inZoomLocator) 
 {
-  // Display the letters (RAI)
-  DrawOrientationLabels();
+  if(!inZoomLocator) 
+    {
+    // Display the letters (RAI)
+    DrawOrientationLabels();
   
+    // Draw the zoom mode (does't really draw, repaints a UI widget)
+    m_ZoomPanMode->OnDraw();
+    }
+
   // Draw the crosshairs
   m_CrosshairsMode->OnDraw(); 
-
-  // Draw the zoom mode (does't really draw, repaints a UI widget)
-  m_ZoomPanMode->OnDraw();
 }
 
 void 

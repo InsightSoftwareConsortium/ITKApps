@@ -670,7 +670,7 @@ ImageIOWizardLogic<TPixel>
       {
       // There actually is a type in the IO object
       m_OutSummaryPixelType->value(
-        m_ImageIO->GetComponentTypeInfo().name());
+        m_ImageIO->GetPixelTypeAsString(m_ImageIO->GetPixelType()).c_str());
       }
     else
       {

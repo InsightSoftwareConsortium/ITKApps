@@ -104,10 +104,16 @@ OpenGLSliceTexture<TPixel>
   glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
   
   // Pump the pixels into the texture
-  glTexImage2D(GL_TEXTURE_2D,0,m_GlComponents,
+  /* glTexImage2D(GL_TEXTURE_2D,0,m_GlComponents,
                m_TextureSize(0),m_TextureSize(1),
                0,m_GlFormat,m_GlType,
-               m_PadFilter->GetOutput()->GetBufferPointer());
+               m_PadFilter->GetOutput()->GetBufferPointer()); */
+  
+  gluBuild2DMipmaps(
+    GL_TEXTURE_2D, m_GlComponents, 
+    m_TextureSize(0), m_TextureSize(1),
+    m_GlFormat,m_GlType,
+    m_PadFilter->GetOutput()->GetBufferPointer());
 
   // Remember the image's timestamp
   m_UpdateTime = m_Image->GetPipelineMTime();
@@ -116,7 +122,7 @@ OpenGLSliceTexture<TPixel>
 template<class TPixel>
 void
 OpenGLSliceTexture<TPixel>
-::Draw()
+::Draw(unsigned char r, unsigned char g, unsigned char b)
 {
   // Update the texture
   Update();
@@ -132,18 +138,23 @@ OpenGLSliceTexture<TPixel>
   glBindTexture(GL_TEXTURE_2D,m_TextureIndex);
 
   // Set the color to white
-  glColor3ub(255,255,255);
+  glColor3ub(r,g,b);
+
+  int w = m_Image->GetBufferedRegion().GetSize()[0];
+  int h = m_Image->GetBufferedRegion().GetSize()[1];
+  double tx = w * 1.0 / m_TextureSize(0);
+  double ty = h * 1.0 / m_TextureSize(1);
     
   // Draw quad 
   glBegin(GL_QUADS);
   glTexCoord2d(0,0);
   glVertex2d(0,0);
-  glTexCoord2d(0,1);
-  glVertex2d(0,m_TextureSize(1));
-  glTexCoord2d(1,1);
-  glVertex2d(m_TextureSize(0),m_TextureSize(1));
-  glTexCoord2d(1,0);
-  glVertex2d(m_TextureSize(0),0);
+  glTexCoord2d(0,ty);
+  glVertex2d(0,h);
+  glTexCoord2d(tx,ty);
+  glVertex2d(w,h);
+  glTexCoord2d(tx,0);
+  glVertex2d(w,0);
   glEnd();
 
   glPopAttrib();

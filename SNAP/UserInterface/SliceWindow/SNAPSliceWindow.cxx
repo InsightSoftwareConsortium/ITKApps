@@ -76,7 +76,7 @@ SNAPSliceWindow
 }
 
 void SNAPSliceWindow
-::DrawGreyTexture()
+::DrawGreyTexture(unsigned char r, unsigned char g, unsigned char b)
 {
   // The preprocessing image is shown when the corresponding flag is set and 
   // the display mode is not set to overlay
@@ -90,11 +90,11 @@ void SNAPSliceWindow
     m_SpeedTexture->SetImage(m_ImageData->GetSpeed()->GetDisplaySlice(m_Id));
 
     // Paint the grey texture
-    m_SpeedTexture->Draw();
+    m_SpeedTexture->Draw(r, g, b);
     }
   else
     {
-    GenericSliceWindow::DrawGreyTexture();
+    GenericSliceWindow::DrawGreyTexture(r, g, b);
     }
 }
 
@@ -136,12 +136,13 @@ void SNAPSliceWindow
 }
 
 void SNAPSliceWindow
-::DrawOverlays()
+::DrawOverlays(bool inZoomLocator)
 {
   // Call the parent's code
-  GenericSliceWindow::DrawOverlays();
+  GenericSliceWindow::DrawOverlays(inZoomLocator);
 
   // Draw the bubbles
-  m_BubblesMode->OnDraw();
+  if(!inZoomLocator)
+    m_BubblesMode->OnDraw();
 }
 

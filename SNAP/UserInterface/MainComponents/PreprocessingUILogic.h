@@ -53,8 +53,8 @@ public:
 
   // Callbacks for the InOut snake preprocessing window
   void OnThresholdDirectionChange();
-  void OnThresholdLowerChange();
-  void OnThresholdUpperChange();
+  void OnThresholdLowerChange(double value);
+  void OnThresholdUpperChange(double value);
   void OnThresholdSettingsChange();
   void OnThresholdOk();
   void OnThresholdClose();
@@ -120,6 +120,11 @@ private:
   /** Common closing code for both preprocessors */
   void OnCloseCommon();
 
+  /** Code to set values in both controls used to show the upper threshold */
+  void SetUpperThresholdControlValue(double val);
+
+  /** Code to set values in both controls used to show the upper threshold */
+  void SetLowerThresholdControlValue(double val);
 };
 
 #endif // __PreprocessingUILogic_h_

@@ -1,10 +1,10 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0102 
+version 1.0105 
 header_name {.h} 
 code_name {.cxx}
 class ResizeRegionDialog {open : ResizeRegionDialogBase
 } {
-  Function {MakeWindow()} {open selected return_type {virtual void}
+  Function {MakeWindow()} {open return_type {virtual void}
   } {
     Fl_Window m_WinResample {
       label {Region Resampling} open
@@ -219,16 +219,20 @@ class ResizeRegionDialog {open : ResizeRegionDialogBase
           xywh {85 255 265 25} down_box BORDER_BOX labelsize 12 textsize 12
         } {
           menuitem {} {
-            label {Nearest Neighbor (fastest)}
+            label {Nearest Neighbor (fastest) } selected
             xywh {0 0 100 20} labelsize 12
           }
           menuitem {} {
-            label {Linear Interpolation}
+            label {Linear Interpolation (fast)}
             xywh {10 10 100 20} labelsize 12
           }
           menuitem {} {
-            label {Cubic Interpolation (best quality)}
+            label {Cubic Interpolation (high quality)}
             xywh {20 20 100 20} value 1 labelsize 12
+          }
+          menuitem {} {
+            label {Windowed Sinc Interpolation (best quality)}
+            xywh {30 30 100 20} labelsize 12
           }
         }
       }

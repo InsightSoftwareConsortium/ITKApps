@@ -83,6 +83,10 @@ ResizeRegionDialogLogic
       targetROI.SetInterpolationMethod(
         SNAPSegmentationROISettings::TRICUBIC);
       break;
+    case 3 : 
+      targetROI.SetInterpolationMethod(
+        SNAPSegmentationROISettings::SINC_WINDOW_05);
+      break;
     };
 
   // Return the accept flag

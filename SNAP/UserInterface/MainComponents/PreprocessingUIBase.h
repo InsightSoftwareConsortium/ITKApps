@@ -34,8 +34,8 @@ public:
 
   // Callbacks for the InOut snake preprocessing window
   virtual void OnThresholdDirectionChange() = 0;
-  virtual void OnThresholdLowerChange() = 0;
-  virtual void OnThresholdUpperChange() = 0;
+  virtual void OnThresholdLowerChange(double value) = 0;
+  virtual void OnThresholdUpperChange(double value) = 0;
   virtual void OnThresholdSettingsChange() = 0;
   virtual void OnThresholdOk() = 0;
   virtual void OnThresholdClose() = 0;

@@ -27,11 +27,11 @@ class GreyImageWrapper;
 class ThresholdSettings
 {
 public:
-  irisGetMacro(LowerThreshold,unsigned int);
-  irisSetMacro(LowerThreshold,unsigned int);
+  irisGetMacro(LowerThreshold, int);
+  irisSetMacro(LowerThreshold, int);
 
-  irisGetMacro(UpperThreshold,unsigned int);
-  irisSetMacro(UpperThreshold,unsigned int);
+  irisGetMacro(UpperThreshold, int);
+  irisSetMacro(UpperThreshold, int);
 
   irisGetMacro(Smoothness,float);
   irisSetMacro(Smoothness,float);
@@ -59,8 +59,8 @@ public:
   ThresholdSettings();
 
 private:
-  unsigned int m_LowerThreshold;
-  unsigned int m_UpperThreshold;
+  int m_LowerThreshold;
+  int m_UpperThreshold;
   float m_Smoothness;
   
   bool m_UpperThresholdEnabled;

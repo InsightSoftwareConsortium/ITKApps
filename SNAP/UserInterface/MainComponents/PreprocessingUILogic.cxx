@@ -110,10 +110,14 @@ PreprocessingUILogic
   GreyType iMax = m_Driver->GetCurrentImageData()->GetGrey()->GetImageMax();
 
   m_InLowerThreshold->minimum(iMin);
+  m_InLowerThresholdText->minimum(iMin);
   m_InLowerThreshold->maximum(iMax);
+  m_InLowerThresholdText->maximum(iMax);
 
   m_InUpperThreshold->minimum(iMin);
+  m_InUpperThresholdText->minimum(iMin);
   m_InUpperThreshold->maximum(iMax);
+  m_InUpperThresholdText->maximum(iMax);
 
   //m_InThresholdSteepness->minimum(1);
   //m_InThresholdSteepness->maximum(iMax-iMin);
@@ -122,8 +126,9 @@ PreprocessingUILogic
 
   // Make sure the current values of the upper and lower threshold are 
   // within the bounds (Nathan Moon)
-  m_InLowerThreshold->value(m_InLowerThreshold->clamp(lower));
-  m_InUpperThreshold->value(m_InUpperThreshold->clamp(upper));
+  SetLowerThresholdControlValue(m_InLowerThreshold->clamp(lower));
+  SetUpperThresholdControlValue(m_InUpperThreshold->clamp(upper));
+
   m_InThresholdSteepness->value(
     m_InThresholdSteepness->clamp(settings.GetSmoothness()));
 
@@ -195,35 +200,62 @@ PreprocessingUILogic
   if(m_RadioThresholdBoth->value())
     {
     m_InLowerThreshold->activate();
+    m_InLowerThresholdText->activate();
     m_InUpperThreshold->activate();
+    m_InUpperThresholdText->activate();
     }
   else if(m_RadioThresholdAbove->value())
     {
     m_InLowerThreshold->deactivate();
-      m_InLowerThreshold->value(
-          m_Driver->GetCurrentImageData()->GetGrey()->GetImageMin());
+    m_InLowerThresholdText->deactivate();
+
+    SetLowerThresholdControlValue(
+      m_Driver->GetCurrentImageData()->GetGrey()->GetImageMin());
+    
     m_InUpperThreshold->activate();
+    m_InUpperThresholdText->activate();
     }
   else
     {
     m_InLowerThreshold->activate();
+    m_InLowerThresholdText->activate();
+
+    SetUpperThresholdControlValue(
+      m_Driver->GetCurrentImageData()->GetGrey()->GetImageMax());
+
     m_InUpperThreshold->deactivate();
-        m_InUpperThreshold->value(
-          m_Driver->GetCurrentImageData()->GetGrey()->GetImageMax());
+    m_InUpperThresholdText->deactivate();
     }
 
   // The settings have changed, so call that method
   OnThresholdSettingsChange();
 }
 
+void PreprocessingUILogic
+::SetUpperThresholdControlValue(double val)
+{
+  m_InUpperThreshold->value(val);
+  m_InUpperThresholdText->value(val);
+}
+
+void PreprocessingUILogic
+::SetLowerThresholdControlValue(double val)
+{
+  m_InLowerThreshold->value(val);
+  m_InLowerThresholdText->value(val);
+}
+
 void 
 PreprocessingUILogic
-::OnThresholdLowerChange()
+::OnThresholdLowerChange(double value)
 {
+  // Propagate the value to all controls
+  SetLowerThresholdControlValue( value );
+
   // There may be a need to shift the upper bound
   if(m_InUpperThreshold->value() < m_InLowerThreshold->value())
     {
-    m_InUpperThreshold->value(m_InLowerThreshold->value());
+    SetUpperThresholdControlValue( m_InLowerThreshold->value() );
     }
 
   // Call the generic callback
@@ -232,12 +264,15 @@ PreprocessingUILogic
 
 void 
 PreprocessingUILogic
-::OnThresholdUpperChange()
+::OnThresholdUpperChange(double value)
 {
+  // Propagate the value to all controls
+  SetUpperThresholdControlValue( value );
+
   // There may be a need to shift the lower bound
   if( m_InUpperThreshold->value() < m_InLowerThreshold->value())
     {
-    m_InLowerThreshold->value(m_InUpperThreshold->value());
+    SetLowerThresholdControlValue( m_InUpperThreshold->value() );
     }
 
   // Call the generic callback
