@@ -30,6 +30,11 @@ IF(BUILD_TESTING)
   ENABLE_TESTING()
 ENDIF(BUILD_TESTING)
 
+#-----------------------------------------------------------------------------
+# ITK build patented algorithms
+OPTION(ITK_USE_PATENTED "Build algorithms that are covered with Patents. It is YOUR responsibility to obbtain a license from the patent holder in order to user these methods." OFF)
+MARK_AS_ADVANCED(ITK_USE_PATENTED)
+
 # Determine what packages are available
 # Add an option to use or not use VTK
 OPTION(USE_VTK "Use VTK (The Visualization Toolkit) (some applications need this)" OFF)
@@ -198,7 +203,9 @@ IF(FLTK_FOUND)
   SUBDIRS(LandmarkInitializedMutualInformationRegistration)
   SUBDIRS(RawImageReaderViewer)
   SUBDIRS(VoronoiSegmentation)
-  SUBDIRS(SimpleFuzzyConnectedness)
+  IF(ITK_USE_PATENTED)
+    SUBDIRS(SimpleFuzzyConnectedness)
+  ENDIF(ITK_USE_PATENTED)
   SUBDIRS(ThresholdSegmentationLevelSetFltkGui)
   IF(VTK_FOUND)
     SUBDIRS(RegionGrowingSegmentation)
@@ -227,7 +234,9 @@ SUBDIRS(MRIBiasCorrection)
 SUBDIRS(FEM)
 
 # Add an option to build or not build the FuzzyConnectedness example
-SUBDIRS(FuzzyConnectedness)
+IF(ITK_USE_PATENTED)
+  SUBDIRS(FuzzyConnectedness)
+ENDIF(ITK_USE_PATENTED)
 
 # Add an option to build or not build the
 # GaussianMinimumErrorClassifier example
