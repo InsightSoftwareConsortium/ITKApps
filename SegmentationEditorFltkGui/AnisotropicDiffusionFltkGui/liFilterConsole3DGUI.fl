@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0100 
+version 1.0104 
 header_name {.h} 
 code_name {.cxx}
 class liFilterConsole3DGUI {open : {public liFilterConsole3DBase}
@@ -12,15 +12,9 @@ class liFilterConsole3DGUI {open : {public liFilterConsole3DBase}
       code0 {\#include <liFilterConsole3DBase.h>}
       code1 {\#include <fltkLightButton.h>} visible
     } {
-      Fl_Group controlsGroup {open selected
+      Fl_Group controlsGroup {open
         xywh {0 1 582 304} deactivate
       } {
-        Fl_Light_Button inputButton {
-          label {Show Input Image}
-          callback {ShowInputImage();}
-          xywh {25 70 150 30} type Normal value 1 selection_color 121
-          class {fltk::LightButton}
-        }
         Fl_Light_Button GradientButton {
           label {Show Gradient Anisotripic Diffusion Image}
           callback {ShowGradientImage();}
@@ -74,6 +68,36 @@ class liFilterConsole3DGUI {open : {public liFilterConsole3DBase}
           callback {Flip(2);}
           xywh {47 161 90 20} down_box ROUND_DOWN_BOX
         }
+        Fl_Value_Input IterationsGradient {
+          label Iterations
+          callback {SetIterationsForGradient( o->value() );}
+          xywh {273 72 50 25} align 1 maximum 100 value 10
+        }
+        Fl_Value_Input ConductanceGradient {
+          label Conductance
+          callback {SetConductanceForGradient( o->value() );}
+          xywh {367 73 50 25} align 1 maximum 100 value 1
+        }
+        Fl_Value_Input IterationsCurvature {
+          label Iterations
+          callback {SetIterationsForCurvature( o->value() );}
+          xywh {272 163 50 25} align 1 maximum 100 value 10
+        }
+        Fl_Value_Input ConductanceCurvature {
+          label Conductance
+          callback {SetConductanceForCurvature( o->value() );}
+          xywh {369 163 50 25} align 1 maximum 100 value 1
+        }
+        Fl_Value_Input GradientTimeStep {
+          label {Time Step}
+          callback {SetTimeStepForGradient( o->value() );}
+          xywh {462 73 50 25} align 1 minimum 0.001 maximum 0.125 step 0.001 value 0.1
+        }
+        Fl_Value_Input CurvatureTimeStep {
+          label {Time Step}
+          callback {SetTimeStepForCurvature( o->value() );}
+          xywh {462 162 50 25} align 1 minimum 0.001 maximum 0.062 step 0.001 value 0.06
+        }
       }
       Fl_Slider progressSlider {
         xywh {10 200 570 15} type {Horz Fill} selection_color 5
@@ -85,8 +109,8 @@ class liFilterConsole3DGUI {open : {public liFilterConsole3DBase}
       }
       Fl_Light_Button loadButton {
         label {Load Source File}
-        callback {Load();}
-        xywh {25 20 150 30} type Normal value 1 selection_color 121
+        callback {Load();} selected
+        xywh {25 69 150 30} type Normal value 1 selection_color 121
         class {fltk::LightButton}
       }
       Fl_Button {} {
@@ -94,49 +118,15 @@ class liFilterConsole3DGUI {open : {public liFilterConsole3DBase}
         callback {Quit();}
         xywh {293 251 80 30}
       }
-      Fl_Value_Input IterationsGradient {
-        label Iterations
-        callback {SetIterationsForGradient( o->value() );}
-        xywh {273 72 50 25} align 1 maximum 100 value 10
-      }
-      Fl_Value_Input ConductanceGradient {
-        label Conductance
-        callback {SetConductanceForGradient( o->value() );}
-        xywh {367 73 50 25} align 1 maximum 100 value 1
-      }
-      Fl_Value_Input IterationsCurvature {
-        label Iterations
-        callback {SetIterationsForCurvature( o->value() );}
-        xywh {272 163 50 25} align 1 maximum 100 value 10
-      }
-      Fl_Value_Input ConductanceCurvature {
-        label Conductance
-        callback {SetConductanceForCurvature( o->value() );}
-        xywh {369 163 50 25} align 1 maximum 100 value 1
-      }
-      Fl_Box {} {
-        label label
-        xywh {87 50 10 20} box THIN_UP_BOX color 12 labeltype NO_LABEL
-      }
       Fl_Button {} {
         label {Show Help}
         callback {helpWin->show();}
         xywh {193 251 80 30}
       }
-      Fl_Value_Input GradientTimeStep {
-        label {Time Step}
-        callback {SetTimeStepForGradient( o->value() );}
-        xywh {462 73 50 25} align 1 minimum 0.001 maximum 0.125 step 0.001 value 0.1
-      }
-      Fl_Value_Input CurvatureTimeStep {
-        label {Time Step}
-        callback {SetTimeStepForCurvature( o->value() );} selected
-        xywh {462 162 50 25} align 1 minimum 0.001 maximum 0.062 step 0.001 value 0.06
-      }
     }
     Fl_Window helpWin {
       label Help open
-      xywh {181 519 315 355} labeltype NORMAL_LABEL resizable visible
+      xywh {184 640 315 355} resizable visible
     } {
       Fl_Output helpText {
         label {output:}
@@ -154,8 +144,6 @@ class liFilterConsole3DGUI {open : {public liFilterConsole3DBase}
   Function {Quit( void )} {return_type {virtual void}
   } {}
   Function {Load( void )} {return_type {virtual void}
-  } {}
-  Function {ShowInputImage( void )} {return_type {virtual void}
   } {}
   Function {ShowGradientImage( void )} {return_type {virtual void}
   } {}

@@ -50,7 +50,6 @@ liFilterConsole2D
   progressSlider->Observe( m_Writer.GetPointer() );
                               
   loadButton->Observe( m_Reader.GetPointer() );
-  inputButton->Observe( m_Reader.GetPointer() );
 
   GradientButton->Observe( m_FilterG.GetPointer() );
 
@@ -62,7 +61,7 @@ liFilterConsole2D
 
   this->ShowStatus("Let's start by loading an image...");
 
-  helpText->value( "This module performs smoothing by an\nedge-preserving anisotropic diffusion.\nIt will work on Meta Image data or PNG files.\n\nOnce you have successfully loaded the\nsource, the \"Noise reduction\" filters\nbecome available.  At this stage, the\ngoal is to minimize the presence of\nuninteresting image features.  What \n\"uninteresting\" means in this context\ndepends entirely on your data and the\nresult you want to achieve.  Some\nrecommended parameter settings to start\nwith are 10 iterations and a conductance\nof 1.0.\n\nThe gradient-based filter\npreserves areas of high gradient magnitude\nin the image.  The curvature-based filter\npreserves areas of high curvature.\nExperiment\nwith different parameter\nsettings until you get the results you want.\n\n" );
+  helpText->value( "This module performs smoothing by an\nedge-preserving anisotropic diffusion.\nIt will work on Meta Image data or PNG files.\n\nOnce you have successfully loaded the\nsource, the \"Noise reduction\" filters\nbecome available.  At this stage, the\ngoal is to minimize the presence of\nuninteresting image features.  What \n\"uninteresting\" means in this context\ndepends entirely on your data and the\nresult you want to achieve.  Some\nrecommended parameter settings to start\nwith are 10 iterations and a conductance\nof 1.0.\n\nThe gradient-based filter\npreserves areas of high gradient magnitude\nin the image.  The curvature-based filter\npreserves areas of high curvature.\nExperiment\nwith different parameter\nsettings until you get the results you want.\n\n\n\n" );
 
 }
 
@@ -117,7 +116,7 @@ liFilterConsole2D
 
   controlsGroup->activate();
 
-
+  ShowInputImage();
 }
 
    
