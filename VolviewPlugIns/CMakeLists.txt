@@ -58,6 +58,7 @@ SET (PLUGINS
   vvITKMedian
   vvITKLandmarkWarping
   vvITKRescaleIntensityTo8Bits
+  vvITKScalarImageKMeansClassifier
   vvITKSigmoid
   vvITKShapeDetectionModule
   vvITKSurfaceSpline
