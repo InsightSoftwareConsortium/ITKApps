@@ -84,7 +84,7 @@ private:
 
   float m_StartX, m_StartY;
 
-  struct GLUtesselatorObj *m_Tesselator;
+  struct GLUtesselator *m_Tesselator;
 
   void ComputeEditBox();
   void Add(float x, float y, int selected);
