@@ -21,6 +21,7 @@
 #include "itkObject.h"
 #include "itkFixedArray.h"
 #include "itkArray.h"
+#include "vnl/vnl_matrix.h"
 
 #include "itkImage.h"
 #include "itkImageRegionIterator.h"
