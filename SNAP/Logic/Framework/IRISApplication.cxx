@@ -63,9 +63,9 @@ IRISApplication
   m_ImageToAnatomyRAI = "RAI";
 
   // Initialize the display-anatomy transformation with RPI code
-  m_DisplayToAnatomyRAI[0] = "LPS";
-  m_DisplayToAnatomyRAI[1] = "AIL";
-  m_DisplayToAnatomyRAI[2] = "LIP";
+  m_DisplayToAnatomyRAI[0] = "RPS";
+  m_DisplayToAnatomyRAI[1] = "AIR";
+  m_DisplayToAnatomyRAI[2] = "RIP";
 }
 
 
