@@ -21,13 +21,6 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 
   const unsigned int maximumNumberOfIterations = atoi( info->GetGUIProperty(info, 6, VVP_GUI_VALUE ));
 
-  const unsigned int numberOfSeeds = info->NumberOfMarkers;
-  if( numberOfSeeds < 1 )
-    {
-    info->SetProperty( info, VVP_ERROR, "Please select points using the 3D Markers in the Annotation menu" ); 
-    return -1;
-    }
-
   char tmp[1024];
   const unsigned int Dimension = 3;
 
@@ -59,6 +52,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.GetFilter()->SetAdvectionScaling( advectionScaling );
       module.GetFilter()->SetMaximumRMSError( maximumRMSError );
       module.GetFilter()->SetMaximumIterations( maximumNumberOfIterations );
+      module.GetFilter()->SetFeatureImage( module.GetSecondInput() );
       // Execute the filter
       module.ProcessData( pds  );
       sprintf(tmp,"Total number of iterations = %d \n Final RMS error = %f",
@@ -89,6 +83,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.GetFilter()->SetAdvectionScaling( advectionScaling );
       module.GetFilter()->SetMaximumRMSError( maximumRMSError );
       module.GetFilter()->SetMaximumIterations( maximumNumberOfIterations );
+      module.GetFilter()->SetFeatureImage( module.GetSecondInput() );
       // Execute the filter
       module.ProcessData( pds  );
       sprintf(tmp,"Total number of iterations = %d \n Final RMS error = %f",
@@ -194,6 +189,7 @@ void VV_PLUGIN_EXPORT vvITKGeodesicActiveContourInit(vtkVVPluginInfo *info)
   info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "7");
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP,           "0");
   info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,   "16");
+  info->SetProperty(info, VVP_REQUIRES_SECOND_INPUT,        "1");
 
 }
 
