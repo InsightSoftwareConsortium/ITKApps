@@ -302,10 +302,13 @@ int main(int argc, char* argv[])
       meanCalculatorVector[i]->Update() ;
       
       covarianceCalculatorVector[i] = CovarianceCalculatorType::New() ;
-      covarianceCalculatorVector[i]->
-        SetInputSample(membershipSample->GetClassSample(classLabel)) ;
-      covarianceCalculatorVector[i]->
-        SetMean(meanCalculatorVector[i]->GetOutput()) ;
+      
+      covarianceCalculatorVector[i]->SetInputSample( 
+                             membershipSample->GetClassSample(classLabel) );
+
+      covarianceCalculatorVector[i]->SetMean(
+                             meanCalculatorVector[i]->GetOutput()) ;
+
       covarianceCalculatorVector[i]->Update() ;
       
       densityFunctions[i] = DensityFunctionType::New() ;
@@ -355,11 +358,12 @@ int main(int argc, char* argv[])
 
   ImageIteratorType i_iter(output, output->GetLargestPossibleRegion()) ;
   i_iter.GoToBegin() ;
-  ClassifierType::OutputType::Iterator m_iter = result->Begin() ;
+  ClassifierType::OutputType::ConstIterator m_iter = result->Begin() ;
 
   while (!i_iter.IsAtEnd())
     {
-      i_iter.Set((ImageType::PixelType)m_iter.GetClassLabel()) ;
+      i_iter.Set( 
+        static_cast<ImageType::PixelType>( m_iter.GetClassLabel() ) ) ;
       ++i_iter ;
       ++m_iter ;
     }
