@@ -55,9 +55,24 @@ class VTK_EXPORT vtkITKThresholdSegmentationLevelSetImageFilter : public vtkITKI
      DelegateITKInputMacro ( SetIsoSurfaceValue, value );
   };
   
-  void SetMaximumIterations ( int value )
+  void SetNumberOfIterations ( int value )
   {
-    DelegateITKInputMacro ( SetMaximumIterations, value );
+    DelegateITKInputMacro ( SetNumberOfIterations, value );
+  };
+
+  int GetNumberOfIterations ()
+  {
+    DelegateITKOutputMacro( GetNumberOfIterations );
+  };
+
+  void SetMaximumIterations( int value )
+  {
+    DelegateITKInputMacro( SetMaximumIterations, value );
+  };
+
+  int GetMaximumIterations( int value )
+  {
+    DelegateITKOutputMacro( GetMaximumIterations );
   };
 
   void SetMaximumRMSError ( float value )
@@ -65,9 +80,14 @@ class VTK_EXPORT vtkITKThresholdSegmentationLevelSetImageFilter : public vtkITKI
     DelegateITKInputMacro ( SetMaximumRMSError, value );
   };
 
-  void SetUseNegativeFeatures (int value )
+  void SetUseNegativeFeatures( int value )
   {
     DelegateITKInputMacro( SetUseNegativeFeatures, value);
+  };
+  
+  void SetReverseExpansionDirection (int value )
+  {
+    DelegateITKInputMacro( SetReverseExpansionDirection, value);
   }
   
   void SetFeatureImage ( vtkImageData *value)
@@ -86,6 +106,17 @@ class VTK_EXPORT vtkITKThresholdSegmentationLevelSetImageFilter : public vtkITKI
     DelegateITKInputMacro ( SetFeatureScaling, value );
   };
 
+  void SetCurvatureScaling ( float value )
+  {
+    DelegateITKInputMacro ( SetCurvatureScaling, value );
+  };
+
+  float GetCurvatureScaling ()
+  {
+    DelegateITKOutputMacro(GetCurvatureScaling) ;
+  };
+
+  
    float GetRMSChange ()
   {
     DelegateITKOutputMacro(GetRMSChange);
@@ -149,7 +180,7 @@ private:
   
 };
 
-vtkCxxRevisionMacro(vtkITKThresholdSegmentationLevelSetImageFilter, "$Revision: 1.8 $");
+vtkCxxRevisionMacro(vtkITKThresholdSegmentationLevelSetImageFilter, "$Revision: 1.9 $");
 vtkStandardNewMacro(vtkITKThresholdSegmentationLevelSetImageFilter);
 
 #endif

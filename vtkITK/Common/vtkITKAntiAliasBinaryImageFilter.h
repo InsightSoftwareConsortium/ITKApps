@@ -40,11 +40,26 @@ class VTK_EXPORT vtkITKAntiAliasBinaryImageFilter : public vtkITKImageToImageFil
     DelegateITKOutputMacro(GetIsoSurfaceValue) ;
   };
 
-  void SetMaximumIterations ( int value )
+  void SetNumberOfIterations ( int value )
+  {
+    DelegateITKInputMacro ( SetNumberOfIterations, value );
+  };
+
+  int GetNumberOfIterations( )
+  {
+    DelegateITKOutputMacro( GetNumberOfIterations );
+  };
+
+  void SetMaximumIterations( int value )
   {
     DelegateITKInputMacro ( SetMaximumIterations, value );
   };
 
+  int GetMaximumIterations( )
+  {
+    DelegateITKOutputMacro( GetMaximumIterations );
+  };
+  
   void SetMaximumRMSError ( float value )
   {
     DelegateITKInputMacro ( SetMaximumRMSError, value );
@@ -64,7 +79,7 @@ private:
   void operator=(const vtkITKAntiAliasBinaryImageFilter&);  // Not implemented.
 };
 
-vtkCxxRevisionMacro(vtkITKAntiAliasBinaryImageFilter, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkITKAntiAliasBinaryImageFilter, "$Revision: 1.4 $");
 vtkStandardNewMacro(vtkITKAntiAliasBinaryImageFilter);
 
 #endif

@@ -35,17 +35,37 @@ class VTK_EXPORT vtkITKLaplacianSegmentationLevelSetImageFilter : public vtkITKI
      DelegateITKInputMacro ( SetIsoSurfaceValue, value );
   };
   
-  void SetMaximumIterations ( int value )
+  void SetNumberOfIterations ( int value )
   {
-    DelegateITKInputMacro ( SetMaximumIterations, value );
+    DelegateITKInputMacro ( SetNumberOfIterations, value );
   };
 
+  int GetNumberOfIterations( int value )
+  {
+    DelegateITKOutputMacro ( GetNumberOfIterations );
+  };
+
+  void SetMaximumIterations( int value )
+  {
+    DelegateITKInputMacro( SetMaximumIterations, value );
+  };
+
+  int GetMaximumIterations()
+  {
+    DelegateITKOutputMacro( GetMaximumIterations );
+  };
+  
   void SetMaximumRMSError ( float value )
   {
     DelegateITKInputMacro ( SetMaximumRMSError, value );
   };
 
-  void SetUseNegativeFeatures (int value )
+  void SetReverseExpansionDirection (int value )
+  {
+    DelegateITKInputMacro( SetReverseExpansionDirection, value);
+  };
+
+  void SetUseNegativeFeatures( int value )
   {
     DelegateITKInputMacro( SetUseNegativeFeatures, value);
   };
@@ -139,7 +159,7 @@ private:
   
 };
 
-vtkCxxRevisionMacro(vtkITKLaplacianSegmentationLevelSetImageFilter, "$Revision: 1.7 $");
+vtkCxxRevisionMacro(vtkITKLaplacianSegmentationLevelSetImageFilter, "$Revision: 1.8 $");
 vtkStandardNewMacro(vtkITKLaplacianSegmentationLevelSetImageFilter);
 
 #endif
