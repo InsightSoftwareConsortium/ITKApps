@@ -50,7 +50,7 @@ ShapeDetectionLevelSet
   m_SigmoidFilter->SetBeta(  sigmoidBetaValueInput->value()  );
 
   this->SetZeroSetValue( zeroSetValueInput->value() );
-  m_ShapeDetectionFilter->SetMaximumIterations( 
+  m_ShapeDetectionFilter->SetNumberOfIterations( 
         static_cast<unsigned int>( shapeDetectionIterationsValueInput->value() ) );
 
   m_ShapeDetectionFilter->SetMaximumRMSError( 
