@@ -92,9 +92,9 @@ static int UpdateGUI(void *inf)
 
   info->SetGUIProperty(info, 2, VVP_GUI_LABEL, "Threshold");
   info->SetGUIProperty(info, 2, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 2, VVP_GUI_DEFAULT, "0.05");
+  info->SetGUIProperty(info, 2, VVP_GUI_DEFAULT, "1.0");
   info->SetGUIProperty(info, 2, VVP_GUI_HELP, "Threshold used to eliminate small local maxima.");
-  info->SetGUIProperty(info, 2, VVP_GUI_HINTS , "0.01 2.0 0.01");
+  info->SetGUIProperty(info, 2, VVP_GUI_HINTS , "0.1 20.0 0.1");
 
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, "0");
   
