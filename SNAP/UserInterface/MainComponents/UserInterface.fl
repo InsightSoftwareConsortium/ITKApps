@@ -41,7 +41,7 @@ class UserInterface {open : {public UserInterfaceBase}
       xywh {387 207 875 710} type Double align 0 resizable
       code0 {\#include "UserInterfaceBase.h"} visible
     } {
-      Fl_Menu_Bar m_MenubarMain {open selected
+      Fl_Menu_Bar m_MenubarMain {
         xywh {0 0 146 25} labelsize 12 textsize 12
       } {
         submenu {} {
@@ -696,8 +696,8 @@ this->OnSNAPLabelOpacityChange();}
       Fl_Wizard m_WizWindows {open
         xywh {147 -5 730 715} resizable
       } {
-        Fl_Group m_GrpIRISWindows {
-          xywh {147 -5 730 715} resizable
+        Fl_Group m_GrpIRISWindows {open
+          xywh {147 0 730 715} resizable
         } {
           Fl_Group m_GrpIRISAxial {
             xywh {147 0 365 355} box UP_BOX
@@ -750,6 +750,11 @@ this->OnSNAPLabelOpacityChange();}
               Fl_Group {} {
                 xywh {147 325 5 30} color 154 resizable
               } {}
+              Fl_Button {} {
+                label {...}
+                callback {OnIRISWindowFocus(0);}
+                xywh {155 330 20 20} box PLASTIC_UP_BOX color 177 labelfont 1 labelsize 12
+              }
             }
           }
           Fl_Group m_GrpIRISSagittal {
@@ -803,9 +808,14 @@ this->OnSNAPLabelOpacityChange();}
               Fl_Group {} {open
                 xywh {517 325 0 30} color 154 resizable
               } {}
+              Fl_Button {} {
+                label {...}
+                callback {OnIRISWindowFocus(1);}
+                xywh {520 330 20 20} box PLASTIC_UP_BOX color 177 labelfont 1 labelsize 12
+              }
             }
           }
-          Fl_Group m_GrpIRISCoronal {open
+          Fl_Group m_GrpIRISCoronal {
             xywh {512 355 365 355} box UP_BOX
           } {
             Fl_Scrollbar {m_InIRISSliceSlider[2]} {
@@ -856,9 +866,14 @@ this->OnSNAPLabelOpacityChange();}
               Fl_Group {} {open
                 xywh {512 680 5 30} color 154 resizable
               } {}
+              Fl_Button {} {
+                label {...}
+                callback {OnIRISWindowFocus(2);}
+                xywh {520 685 20 20} box PLASTIC_UP_BOX color 177 labelfont 1 labelsize 12
+              }
             }
           }
-          Fl_Group m_GrpIRISView3D {open
+          Fl_Group m_GrpIRISView3D {selected
             xywh {147 355 365 355} box UP_BOX
           } {
             Fl_Box m_IRISWindow3D {

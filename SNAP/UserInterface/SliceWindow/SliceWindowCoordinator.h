@@ -78,6 +78,10 @@ public:
   /** Constrain a zoom factor to reasonable limits */
   float ClampZoom(unsigned int window,float zoom);
 
+  /** Get the window number n */
+  GenericSliceWindow *GetWindow(unsigned int window)
+    { return m_Window[window]; }
+
 protected:
 
   /** Pointer to the application driver for this UI object */

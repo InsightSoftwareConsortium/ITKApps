@@ -113,6 +113,10 @@ UserInterfaceLogic
 
   // Initialize the slice window coordinator object
   m_SliceCoordinator = new SliceWindowCoordinator();
+  
+  // Group the three windows inside the window coordinator
+  m_SliceCoordinator->RegisterWindows(
+    reinterpret_cast<GenericSliceWindow **>(m_IRISWindow2D));    
 
   // Create a callback command for the snake loop
   m_PostSnakeCommand = SimpleCommandType::New();
@@ -2024,6 +2028,53 @@ UserInterfaceLogic
   ApplyRenderingOptions();
 }
 
+void
+UserInterfaceLogic
+::OnIRISWindowFocus(unsigned int i)
+{
+  Fl_Group *panels[] = { m_GrpIRISAxial, m_GrpIRISSagittal, m_GrpIRISCoronal, m_GrpIRISView3D };
+  Fl_Gl_Window *boxes[] = { m_IRISWindow2D[0], m_IRISWindow2D[1], m_IRISWindow2D[2], m_IRISWindow3D };
+
+  // The dimensions of the parent window
+  int x = m_GrpIRISWindows->x(), y = m_GrpIRISWindows->y();
+  int w = m_GrpIRISWindows->w(), h = m_GrpIRISWindows->h();
+
+  // Check if this is an expansion or a collapse operation
+  if( panels[i]->w() == w )
+    {
+    // Restore all panels to original configuration
+    panels[0]->resize(x, y, w >> 1, h >> 1);
+    panels[1]->resize(x + (w >> 1), y, w - (w >> 1), h >> 1);
+    panels[3]->resize(x, y + (h >> 1), w >> 1, h - (h >> 1));
+    panels[2]->resize(x + (w >> 1), y + (h >> 1), w - (w >> 1), h - (h >> 1));
+
+    // Show everything
+    for(unsigned int j = 0; j < 4; j++)
+      {
+      panels[j]->show();
+      boxes[j]->show();
+      }
+    }
+  else 
+    {
+    for(unsigned int j = 0; j < 4; j++)
+      {
+      if(i != j)
+        {
+        panels[j]->hide();
+        boxes[j]->hide();
+        //panels[j]->resize(
+        //  m_GrpIRISWindows->x(),m_GrpIRISWindows->y(),
+        //  0,0);
+        }
+      }
+
+    panels[i]->resize(
+      m_GrpIRISWindows->x(),m_GrpIRISWindows->y(),
+      m_GrpIRISWindows->w(),m_GrpIRISWindows->h());
+    panels[i]->redraw();
+    }
+}
 
 void 
 UserInterfaceLogic
@@ -3076,6 +3127,9 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.20  2004/03/19 00:54:48  pauly
+ *ENH: Added the ability to externally load the advection image
+ *
  *Revision 1.19  2004/01/24 18:21:00  king
  *ERR: Merged warning fixes from ITK 1.6 branch.
  *

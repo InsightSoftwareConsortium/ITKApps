@@ -240,6 +240,9 @@ protected:
 
   // Label texture object
   LabelTextureType *m_LabelTexture;
+
+  // Computes the zoom that gives the best fit for the window
+  void ComputeOptimalZoom();
   
   // This method is called in draw() to paint the grey slice
   virtual void DrawGreyTexture(unsigned char r = 255, unsigned char g = 255, unsigned char b = 255);
@@ -255,7 +258,10 @@ protected:
   void DrawOrientationLabels();
 
   /** Draw a window that shows where in the image the zoom region is located */
-  void DrawZoomLocator();
+  void DrawThumbnail();
+
+  /** Access the next window in the slice pipeline */
+  GenericSliceWindow *GetNextWindow();
 };
 
 #endif // __GenericSliceWindow_h_

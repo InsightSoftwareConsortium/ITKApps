@@ -657,6 +657,9 @@ protected:
   // Restoring settings
   void OnRestoreSettingsAction();
   void OnDoNotRestoreSettingsAction();
+
+  // Methods to tweak window positions
+  void OnIRISWindowFocus(unsigned int i);
   
   char *m_ChosedFile;
 
@@ -771,6 +774,9 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.14  2004/03/19 00:54:48  pauly
+ *ENH: Added the ability to externally load the advection image
+ *
  *Revision 1.13  2004/01/19 22:17:52  pauly
  *ENH: Final touches before the 1.0 release
  *

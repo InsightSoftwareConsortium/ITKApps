@@ -19,6 +19,7 @@
 #include "IRISApplication.h"
 #include "IRISImageData.h"
 #include "OpenGLSliceTexture.h"
+#include "SliceWindowCoordinator.h"
 #include "UserInterfaceLogic.h"
 #include "ZoomPanInteractionMode.h"
 
@@ -159,7 +160,7 @@ GenericSliceWindow
 
 void
 GenericSliceWindow
-::ResetViewToFit()
+::ComputeOptimalZoom()
 {
   // Should be fully initialized
   assert(m_IsRegistered && m_IsSliceInitialized);
@@ -182,7 +183,22 @@ GenericSliceWindow
 
   // The zoom factor is the bigger of these ratios, the number of pixels 
   // on the screen per millimeter in world space
-  m_OptimalZoom = m_ViewZoom = ratios.min_value();
+  m_OptimalZoom = ratios.min_value();
+}
+
+void
+GenericSliceWindow
+::ResetViewToFit()
+{
+  // Should be fully initialized
+  assert(m_IsRegistered && m_IsSliceInitialized);
+
+  // Compute slice size in spatial coordinates
+  ComputeOptimalZoom();
+
+  // The zoom factor is the bigger of these ratios, the number of pixels 
+  // on the screen per millimeter in world space
+  m_ViewZoom = m_OptimalZoom;
 
   // Cause a redraw of the window
   redraw();
@@ -288,6 +304,10 @@ GenericSliceWindow
     // Establish the model view matrix
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
+    // Compute the optimal zoom
+    if(m_IsRegistered && m_IsSliceInitialized)
+      ComputeOptimalZoom();
   }
 
   // Clear the display
@@ -333,7 +353,8 @@ GenericSliceWindow
   DrawOverlays(false);
 
   // Draw the zoom locator
-  DrawZoomLocator();
+  if(m_ViewZoom > m_OptimalZoom)
+    DrawThumbnail();
 
   // Clean up the GL state
   glPopMatrix();
@@ -368,67 +389,79 @@ GenericSliceWindow
 
 void
 GenericSliceWindow
-::DrawZoomLocator()
+::DrawThumbnail()
 {
+  // The dimensions of the canvas on which we are working, in pixels
+  Vector2i xCanvas( w(), h() );
+
+  // The thumbnail will occupy a specified fraction of the target canvas
+  float xFraction = 0.33f; // m_GlobalState->GetThumbnailFraction();
+
+  // But it must not exceed a predefined size in pixels in either dimension
+  float xThumbMax = 150.0f; // m_GlobalState->GetThumbnailMax();
+
+  // Recompute the fraction based on maximum size restriction
+  float xNewFraction = xFraction;
+  if( xCanvas[0] * xNewFraction > xThumbMax )
+    xNewFraction = xThumbMax * 1.0f / xCanvas[0];
+  if( xCanvas[1] * xNewFraction > xThumbMax )
+    xNewFraction = xThumbMax * 1.0f / xCanvas[1];
+
   // Draw the little version of the image in the corner of the window
-  if(m_ViewZoom > m_OptimalZoom)
-    {
-    double w = m_SliceSize[0];
-    double h = m_SliceSize[1];
+  double w = m_SliceSize[0];
+  double h = m_SliceSize[1];
 
-    glPushMatrix();
-    glLoadIdentity();
-    glTranslated(5.0, 5.0, 0.0);
+  glPushMatrix();
+  glLoadIdentity();
+  glTranslated(5.0, 5.0, 0.0);
 
-    glScalef(0.334 * m_OptimalZoom,0.334 * m_OptimalZoom,1.0);
-    
-    glPushMatrix();
-    glScalef(m_SliceSpacing[0],m_SliceSpacing[1],1.0);
-    // glTranslated(w * 0.1111, h * 0.1111, 0.0);
-    
-    // Draw the grey scale image
-    DrawGreyTexture(255, 224, 32);
+  glScalef(xNewFraction * m_OptimalZoom, xNewFraction * m_OptimalZoom, 1.0);
 
-    // Draw the crosshairs and stuff
-    DrawOverlays(true);
+  glPushMatrix();
+  glScalef(m_SliceSpacing[0],m_SliceSpacing[1],1.0);
+  // glTranslated(w * 0.1111, h * 0.1111, 0.0);
 
-    // Draw the line around the image
-    glColor3d(0.8, 0.8, 0.2);
-    glBegin(GL_LINE_LOOP);
-    glVertex2d(0,0);
-    glVertex2d(0,h);
-    glVertex2d(w,h);
-    glVertex2d(w,0);
-    glEnd();
+  // Draw the grey scale image
+  DrawGreyTexture(255, 224, 32);
 
-    // Draw a box representing the current zoom level
-    glPopMatrix();
-    glTranslated(m_ViewPosition[0],m_ViewPosition[1],0.0);
-    w = this->w() * 0.5 / m_ViewZoom;
-    h = this->h() * 0.5 / m_ViewZoom;
+  // Draw the crosshairs and stuff
+  DrawOverlays(true);
 
+  // Draw the line around the image
+  glColor3d(0.8, 0.8, 0.2);
+  glBegin(GL_LINE_LOOP);
+  glVertex2d(0,0);
+  glVertex2d(0,h);
+  glVertex2d(w,h);
+  glVertex2d(w,0);
+  glEnd();
 
-    glColor3d(1.0, 1.0, 1.0);
-    glBegin(GL_LINE_LOOP);
-    glVertex2d(-w,-h);
-    glVertex2d(-w, h);
-    glVertex2d( w, h);
-    glVertex2d( w,-h);
-    glEnd();
-    
-    glPopMatrix();
-    }
+  // Draw a box representing the current zoom level
+  glPopMatrix();
+  glTranslated(m_ViewPosition[0],m_ViewPosition[1],0.0);
+  w = this->w() * 0.5 / m_ViewZoom;
+  h = this->h() * 0.5 / m_ViewZoom;
+
+  glColor3d(1.0, 1.0, 1.0);
+  glBegin(GL_LINE_LOOP);
+  glVertex2d(-w,-h);
+  glVertex2d(-w, h);
+  glVertex2d( w, h);
+  glVertex2d( w,-h);
+  glEnd();
+
+  glPopMatrix();
 }
 
 void 
-GenericSliceWindow
+  GenericSliceWindow
 ::DrawOverlays(bool inZoomLocator) 
 {
   if(!inZoomLocator) 
     {
     // Display the letters (RAI)
     DrawOrientationLabels();
-  
+
     // Draw the zoom mode (does't really draw, repaints a UI widget)
     m_ZoomPanMode->OnDraw();
     }
@@ -438,7 +471,7 @@ GenericSliceWindow
 }
 
 void 
-GenericSliceWindow
+  GenericSliceWindow
 ::DrawOrientationLabels()
 {
   // The letter labels
@@ -470,7 +503,7 @@ GenericSliceWindow
 
   //glEnable(GL_LIGHTING);
   //glEnable(GL_DEPTH);
-/*
+  /*
   glBegin(GL_LINE_STRIP);
   glVertex2d(320,320);
   glVertex2d(320,100);
@@ -523,5 +556,11 @@ GenericSliceWindow
   redraw();
 }
 
-
+GenericSliceWindow *
+GenericSliceWindow
+::GetNextWindow()
+{
+  SliceWindowCoordinator *swc = m_ParentUI->GetSliceCoordinator();
+  return swc->GetWindow( (m_Id+1) % 3);
+}
 
