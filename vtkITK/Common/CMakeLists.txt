@@ -8,6 +8,7 @@ vtkITKDanielssonDistanceMapImageFilter.cxx
 vtkITKDiscreteGaussianImageFilter.h
 vtkITKGradientAnisotropicDiffusionImageFilter.h
 vtkITKGradientMagnitudeImageFilter.h
+vtkITKGrayscaleFillholeImageFilter.h
 vtkITKImageToImageFilter.h
 vtkITKImageToImageFilter2DFF.h
 vtkITKImageToImageFilterFF.h
