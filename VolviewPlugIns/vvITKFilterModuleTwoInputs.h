@@ -59,8 +59,8 @@ public:
   // Note that the importer for the first image type is inherited
   // from the base class FilterModule. We only add the importer for
   // the second input image here.
-  typedef itk::ImportImage2Filter< Input2PixelType, 
-                                   Dimension       > ImportFilter2Type;
+  typedef itk::ImportImageFilter< Input2PixelType, 
+                                  Dimension       > ImportFilter2Type;
 
   typedef typename Superclass::SizeType      SizeType;
   typedef typename Superclass::IndexType     IndexType;
@@ -79,7 +79,7 @@ public:
 
 
   /**  Destructor */
-  ~FilterModule() 
+  virtual ~FilterModuleTwoInputs() 
     {
     }
 
