@@ -58,7 +58,10 @@ FastMarchingModule<TInputPixelType>
     // Allow progressive release of memory as the pipeline is executed
     m_GradientMagnitudeFilter->ReleaseDataFlagOn();
     m_SigmoidFilter->ReleaseDataFlagOn();
-    m_FastMarchingFilter->ReleaseDataFlagOn();
+    if( m_PerformPostprocessing )
+      {
+      m_FastMarchingFilter->ReleaseDataFlagOn();
+      }
     m_IntensityWindowingFilter->ReleaseDataFlagOn();
 }
 
@@ -218,12 +221,20 @@ FastMarchingModule<TInputPixelType>
 ::SetPerformPostProcessing( bool value )
 {
   m_PerformPostprocessing = value;
+  if( m_PerformPostprocessing )
+    {
+    m_FastMarchingFilter->ReleaseDataFlagOn();
+    }
+  else 
+    {
+    m_FastMarchingFilter->ReleaseDataFlagOff();
+    }
 }
 
 
 
 /*
- *  Get LevelSet (returns the time-crossing map
+ *  Get LevelSet (returns the time-crossing map)
  */
 template <class TInputPixelType >
 const FastMarchingModule<TInputPixelType>::RealImageType *
@@ -232,6 +243,25 @@ FastMarchingModule<TInputPixelType>
 {
    return m_FastMarchingFilter->GetOutput();
 }
+
+
+
+
+/*
+ *  Get Speed Image returns the output of the sigmoid
+ *  filter. This is the image used as a speed field.
+ *  This output is provided to facilitate the use of 
+ *  this module from other LevelSet modules like the
+ *  ShapeDetection one.
+ */
+template <class TInputPixelType >
+const FastMarchingModule<TInputPixelType>::SpeedImageType *
+FastMarchingModule<TInputPixelType>
+::GetSpeedImage()
+{
+   return m_SigmoidFilter->GetOutput();
+}
+
 
 
 

@@ -18,6 +18,7 @@
 #include "itkImageRegionConstIterator.h"
 #include "itkCommand.h"
 
+
 namespace VolView 
 {
 
@@ -32,7 +33,7 @@ public:
    // Pixel type of the input buffer
   typedef TInputPixelType                InputPixelType;
   typedef float                          RealPixelType;
-  typedef unsigned char                  SpeedPixelType;
+  typedef float                          SpeedPixelType;
   typedef unsigned char                  OutputPixelType;
 
   itkStaticConstMacro( Dimension, unsigned int, 3 );
@@ -78,6 +79,8 @@ public:
   typedef itk::FastMarchingImageFilter< RealImageType,
                                         SpeedImageType >  FastMarchingFilterType;
 
+
+
    // Instantiation of the Intensity windowing filter.
    // This filter is used to remove infinite times from the non-visited
    // pixels of the time-crossing map. This pixels are set to the stopping value.
@@ -119,7 +122,21 @@ public:
         this module is used for initializing other level set methods */
     void SetPerformPostProcessing( bool value );
     
-    const RealImageType * GetLevelSet();
+    /*
+     *  Get LevelSet (returns the time-crossing map). This method
+     *  is provided to facilitate the use of this module for initializing
+     *  other level set modules like the ShapeDetection level set module.
+     */
+    const RealImageType  * GetLevelSet();
+
+    /*
+     *  Get Speed Image returns the output of the sigmoid
+     *  filter. This is the image used as a speed field.
+     *  This output is provided to facilitate the use of 
+     *  this module from other LevelSet modules like the
+     *  ShapeDetection one.
+     */
+    const SpeedImageType * GetSpeedImage();
 
 private:
     typename ImportFilterType::Pointer              m_ImportFilter;
