@@ -26,12 +26,6 @@ class MedianRunner
       radius[1] = atoi( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
       radius[2] = atoi( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ) );
 
-      if( info->NumberOfMarkers < 1 )
-        {
-        info->SetProperty( info, VVP_ERROR, "Please select seed points using the 3D Markers in the Annotation menu" ); 
-        return;
-        }
-
       ModuleType  module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Transforming intensities with a Median filter...");

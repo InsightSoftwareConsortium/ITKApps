@@ -24,12 +24,6 @@ class IntensityWindowingRunner
       const float outputMinimum  = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ) );
       const float outputMaximum  = atof( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ) );
 
-      if( info->NumberOfMarkers < 1 )
-        {
-        info->SetProperty( info, VVP_ERROR, "Please select seed points using the 3D Markers in the Annotation menu" ); 
-        return;
-        }
-
       ModuleType  module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Transforming intensities with a IntensityWindowing function...");
