@@ -116,7 +116,7 @@ static int UpdateGUI(void *inf)
   info->SetGUIProperty(info, 0, VVP_GUI_TYPE, VVP_GUI_SCALE);
   info->SetGUIProperty(info, 0, VVP_GUI_DEFAULT, "50.0");
   info->SetGUIProperty(info, 0, VVP_GUI_HELP, "Defines a stopping value for the time up to which the front propagation will be computed.");
-  info->SetGUIProperty(info, 0, VVP_GUI_HINTS , "1 100 1");
+  info->SetGUIProperty(info, 0, VVP_GUI_HINTS , "1 1000 1");
 
   info->SetGUIProperty(info, 1, VVP_GUI_LABEL, "Speed image normalization factor");
   info->SetGUIProperty(info, 1, VVP_GUI_TYPE, VVP_GUI_SCALE);
