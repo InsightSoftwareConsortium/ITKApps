@@ -161,7 +161,9 @@ SUBDIRS(StreamedWatershedSegmentation/ParameterFileParser)
 SUBDIRS(AntiAliasBinaryImageFilter)
 
 # Build the SimpleLevelSetsExample
+IF(NOT BORLAND)
 SUBDIRS(SimpleLevelSetsExample)
+ENDIF(NOT BORLAND)
 
 # Build the FloodFilledSpatialFunctionExample
 SUBDIRS(FloodFilledSpatialFunction)
@@ -173,10 +175,14 @@ SUBDIRS(MultiResMIRegistration)
 SUBDIRS(MIValidation)
 
 # Build the IBSR Validation applications
+IF(NOT BORLAND)
 SUBDIRS(IBSRValidation)
+ENDIF(NOT BORLAND)
 
 # Build the multichannel tissue classification validation
+IF(NOT BORLAND)
 SUBDIRS(MultichannelTissueClassificationValidation)
+ENDIF(NOT BORLAND)
 
 # Build the DICOMApp example to output raw and png versions of DICOM file
 SUBDIRS(DICOMApp)
@@ -242,7 +248,9 @@ ENDIF(ITK_USE_PATENTED)
 
 # Add an option to build or not build the
 # GaussianMinimumErrorClassifier example
+IF(NOT BORLAND)
 SUBDIRS(GaussianMinimumErrorClassifier)
+ENDIF(NOT BORLAND)
 
 # Add an option to build or not build the EllipsoidInteriorExteriorSpatialFunction example
 SUBDIRS(EllipsoidInteriorExteriorSpatialFunction)
