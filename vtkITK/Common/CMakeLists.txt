@@ -4,6 +4,7 @@ vtkITKBilateralImageFilter.h
 vtkITKConfidenceConnectedImageFilter.h
 vtkITKConnectedThresholdImageFilter.h
 vtkITKCurvatureAnisotropicDiffusionImageFilter.h
+vtkITKCurvatureAnisotropicDiffusionImageFilterSS.h
 vtkITKDanielssonDistanceMapImageFilter.h
 vtkITKDiscreteGaussianImageFilter.h
 vtkITKGradientAnisotropicDiffusionImageFilter.h
@@ -14,6 +15,7 @@ vtkITKImageToImageFilter2DFF.h
 vtkITKImageToImageFilterFF.h
 vtkITKImageToImageFilterFUL.h
 vtkITKImageToImageFilterULUL.h
+vtkITKImageToImageFilterSF.h
 vtkITKImageToImageFilterSUL.h
 vtkITKImageToImageFilterUSUL.h
 vtkITKImageToImageFilterUSUS.h
@@ -22,6 +24,7 @@ vtkITKIsolatedConnectedImageFilter.h
 vtkITKLaplacianSegmentationLevelSetImageFilter.h
 vtkITKMutualInformationTransform.cxx
 vtkITKNeighborhoodConnectedImageFilter.h
+vtkITKNormalizeImageFilterSF.h
 vtkITKNormalizeImageFilter.h
 vtkITKPDEDeformableRegistrationFilter.h
 vtkITKSmoothingRecursiveGaussianImageFilterSS.h
@@ -37,8 +40,12 @@ SET_SOURCE_FILES_PROPERTIES (
 vtkITKImageToImageFilter.h
 vtkITKImageToImageFilter2DFF.h
 vtkITKImageToImageFilterFF.h
+vtkITKImageToImageFilterF2F.h
+vtkITKImageToImageFilterF2F2.h
+vtkITKImageToImageFilterF3F3.h
 vtkITKImageToImageFilterFUL.h
 vtkITKImageToImageFilterULUL.h
+vtkITKImageToImageFilterSF.h
 vtkITKImageToImageFilterSUL.h
 vtkITKImageToImageFilterUSUL.h
 vtkITKImageToImageFilterUSUS.h
