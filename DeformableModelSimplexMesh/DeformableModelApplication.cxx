@@ -102,6 +102,7 @@ void
 DeformableModelApplication
 ::Show()
 {
+  creditsWindow->show();
   mainWindow->show();
   axialView->show();
   coronalView->show();
