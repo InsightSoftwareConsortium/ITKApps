@@ -4,6 +4,48 @@
 
 #include "itkAntiAliasBinaryImageFilter.h"
 
+
+
+template <class InputPixelType>
+class AntiAliasRunner
+  {
+  public:
+      typedef  InputPixelType                       PixelType;
+      typedef  itk::Image< PixelType, 3 >           ImageType; 
+
+      typedef   float       InternalPixelType;
+      typedef   itk::Image< InternalPixelType,3 > InternalImageType; 
+
+      typedef   itk::AntiAliasBinaryImageFilter< 
+                                    InternalImageType,  
+                                    InternalImageType >   FilterType;
+     
+      typedef  InputPixelType                        OutputPixelType;
+
+      typedef  VolView::PlugIn::FilterModuleWithCasting< 
+                                                InputPixelType,
+                                                FilterType,
+                                                OutputPixelType > ModuleType;
+
+  public:
+    AntiAliasRunner() {}
+    void Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
+    {
+      const unsigned int maxNumberOfIterations = atoi( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
+      const float        maximumRMSError       = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
+
+      ModuleType  module;
+      module.SetPluginInfo( info );
+      module.SetUpdateMessage("Reducing aliasing effects...");
+      // Set the parameters on it
+      module.GetFilter()->SetMaximumIterations(     maxNumberOfIterations );
+      module.GetFilter()->SetMaximumRMSError(       maximumRMSError    );
+      // Execute the filter
+      module.ProcessData( pds  );
+    }
+  };
+
+
 static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 {
 
@@ -17,53 +59,73 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     return -1;
     }
   
-  const unsigned int Dimension = 3;
-
-  typedef   float       InternalPixelType;
-  typedef   itk::Image< InternalPixelType,Dimension > InternalImageType; 
-
-  typedef   itk::AntiAliasBinaryImageFilter< 
-                                InternalImageType,  
-                                InternalImageType >   FilterType;
- 
-  const unsigned int maxNumberOfIterations = atoi( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
-  const float        maximumRMSError       = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
 
   try 
   {
   switch( info->InputVolumeScalarType )
     {
+    case VTK_CHAR:
+      {
+      AntiAliasRunner<signed char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
     case VTK_UNSIGNED_CHAR:
       {
-      VolView::PlugIn::FilterModuleWithCasting< unsigned char,
-                                                FilterType,
-                                                unsigned char  > module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Reducing aliasing effects...");
-      // Set the parameters on it
-      module.GetFilter()->SetMaximumIterations(     maxNumberOfIterations );
-      module.GetFilter()->SetMaximumRMSError(       maximumRMSError    );
-      // Execute the filter
-      module.ProcessData( pds  );
+      AntiAliasRunner<unsigned char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_SHORT:
+      {
+      AntiAliasRunner<signed short> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_SHORT:
       {
-      VolView::PlugIn::FilterModuleWithCasting< unsigned short, 
-                                                FilterType,
-                                                unsigned short  > module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Reducing aliasing effects...");
-      // Set the parameters on it
-      module.GetFilter()->SetMaximumIterations(     maxNumberOfIterations );
-      module.GetFilter()->SetMaximumRMSError(       maximumRMSError    );
-      // Execute the filter
-      module.ProcessData( pds );
+      AntiAliasRunner<unsigned short> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_INT:
+      {
+      AntiAliasRunner<signed int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_INT:
+      {
+      AntiAliasRunner<unsigned int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_LONG:
+      {
+      AntiAliasRunner<signed long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_LONG:
+      {
+      AntiAliasRunner<unsigned long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_FLOAT:
+      {
+      AntiAliasRunner<float> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_DOUBLE:
+      {
+      AntiAliasRunner<double> runner;
+      runner.Execute( info, pds );
       break; 
       }
     default:
-      info->SetProperty( info, VVP_ERROR, 
-                         "The AntiAlias filter only works with unsigned char and unsigned short data" ); 
+      info->SetProperty( info, VVP_ERROR, "Pixel Type Unknown for the AntiAlias filter" ); 
       return -1;
       break;
     }
