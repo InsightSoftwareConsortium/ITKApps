@@ -3,6 +3,8 @@
    the speed image and the initial level set as inputs. */
 
 #include "vvITKFilterModuleTwoInputs.h"
+#include "itkGeodesicActiveContourLevelSetImageFilter.h"
+#include "itkImage.h"
 
 
 static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
@@ -27,6 +29,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     }
 
   char tmp[1024];
+  const unsigned int Dimension = 3;
 
   itk::Index<3> seedPosition;
 
@@ -36,14 +39,21 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     {
     case VTK_UNSIGNED_CHAR:
       {
-      typedef  unsigned char                              PixelType;
-      typedef VolView::PlugIn::GeodesicActiveContourModule< 
-                                            PixelType >   ModuleType;
+      typedef unsigned char                               InputPixelType;
+      typedef float                                       InternalPixelType;
+      typedef itk::Image< InputPixelType, Dimension >     InputImageType; 
+      typedef itk::Image< InternalPixelType, Dimension >  InternalImageType;
+      typedef itk::GeodesicActiveContourLevelSetImageFilter<
+                                              InternalImageType,
+                                              InternalImageType> FilterType;
+      typedef VolView::PlugIn::FilterModuleTwoInputs< 
+                                              FilterType, 
+                                              InternalImageType, 
+                                              InternalImageType >   ModuleType;
       ModuleType  module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Computing Geodesic Active Contour...");
-      module.SetDistanceFromSeeds( distanceFromSeeds );
-      module.GetFilter()->SetSigma( gaussianSigma );
+      module.GetFilter()->SetDerivativeSigma( gaussianSigma );
       module.GetFilter()->SetCurvatureScaling( curvatureScaling );
       module.GetFilter()->SetPropagationScaling( propagationScaling );
       module.GetFilter()->SetAdvectionScaling( advectionScaling );
@@ -52,21 +62,28 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       // Execute the filter
       module.ProcessData( pds  );
       sprintf(tmp,"Total number of iterations = %d \n Final RMS error = %f",
-                         module.GetElapsedIterations(),
-                         module.GetRMSChange());
+                         module.GetFilter()->GetElapsedIterations(),
+                         module.GetFilter()->GetRMSChange());
       info->SetProperty( info, VVP_REPORT_TEXT, tmp );
       break; 
       }
     case VTK_UNSIGNED_SHORT:
       {
-      typedef  unsigned short                             PixelType;
-      typedef VolView::PlugIn::GeodesicActiveContourModule< 
-                                            PixelType >   ModuleType;
+      typedef unsigned short                              InputPixelType;
+      typedef float                                       InternalPixelType;
+      typedef itk::Image< InputPixelType, Dimension >     InputImageType; 
+      typedef itk::Image< InternalPixelType, Dimension >  InternalImageType;
+      typedef itk::GeodesicActiveContourLevelSetImageFilter<
+                                              InternalImageType,
+                                              InternalImageType> FilterType;
+      typedef VolView::PlugIn::FilterModuleTwoInputs< 
+                                              FilterType, 
+                                              InternalImageType, 
+                                              InternalImageType >   ModuleType;
       ModuleType  module;
       module.SetPluginInfo( info );
-      module.SetDistanceFromSeeds( distanceFromSeeds );
-      module.GetFilter()->SetSigma( gaussianSigma );
-      module.GetFilter()->SetUpdateMessage("Computing Geodesic Active Contour...");
+      module.SetUpdateMessage("Computing Geodesic Active Contour...");
+      module.GetFilter()->SetDerivativeSigma( gaussianSigma );
       module.GetFilter()->SetCurvatureScaling( curvatureScaling );
       module.GetFilter()->SetPropagationScaling( propagationScaling );
       module.GetFilter()->SetAdvectionScaling( advectionScaling );
@@ -75,8 +92,8 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       // Execute the filter
       module.ProcessData( pds  );
       sprintf(tmp,"Total number of iterations = %d \n Final RMS error = %f",
-                         module.GetElapsedIterations(),
-                         module.GetRMSChange());
+                         module.GetFilter()->GetElapsedIterations(),
+                         module.GetFilter()->GetRMSChange());
       info->SetProperty( info, VVP_REPORT_TEXT, tmp );
       break; 
       } 
