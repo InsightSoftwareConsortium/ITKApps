@@ -171,7 +171,8 @@ void
 DistanceMapFilterBase
 ::Save(const char * filename) const
 {
-  
+  std::cout << "Cannot save file: " << filename;
+  std::cout << " function Save() is not implemented" << std::endl; 
 }
 
 
