@@ -124,7 +124,7 @@ public:
     // Execute the filter
     m_Filter->Update();
 
-    // Copy the data (with casting) to the output buffer provided by the Plug In API
+    // Copy the data (with casting) to the output buffer provided by the PlugIn API
     typename OutputImageType::ConstPointer outputImage =
                                                m_Filter->GetOutput();
 

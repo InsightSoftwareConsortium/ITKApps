@@ -36,16 +36,19 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     {
     case VTK_UNSIGNED_CHAR:
       {
-      typedef  unsigned char                        PixelType;
-      typedef  itk::Image< PixelType, Dimension >   ImageType; 
-      typedef  ImageType::IndexType                 IndexType;
-      typedef  itk::ConnectedThresholdImageFilter<  ImageType,  ImageType >   FilterType;
+      typedef  unsigned char                             InputPixelType;
+      typedef  itk::Image< InputPixelType, Dimension >   InputImageType; 
+      typedef  unsigned char                             OutputPixelType;
+      typedef  itk::Image< OutputPixelType, Dimension >  OutputImageType; 
+      typedef  InputImageType::IndexType                 IndexType;
+      typedef  itk::ConnectedThresholdImageFilter< InputImageType,  
+                                                    OutputImageType >   FilterType;
       VolView::PlugIn::FilterModule< FilterType > module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Threshold Connected Region Growing...");
       // Set the parameters on it
-      module.GetFilter()->SetUpper( static_cast<PixelType>( upper  ) );
-      module.GetFilter()->SetLower( static_cast<PixelType>( lower ) );
+      module.GetFilter()->SetUpper( static_cast<InputPixelType>( upper  ) );
+      module.GetFilter()->SetLower( static_cast<InputPixelType>( lower ) );
       module.GetFilter()->SetReplaceValue( replaceValue );
       module.GetFilter()->SetSeed( seed );
       // Execute the filter
@@ -54,16 +57,19 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       }
     case VTK_UNSIGNED_SHORT:
       {
-      typedef  unsigned short                       PixelType;
-      typedef  itk::Image< PixelType, Dimension >   ImageType; 
-      typedef  ImageType::IndexType                 IndexType;
-      typedef  itk::ConnectedThresholdImageFilter< ImageType,  ImageType >   FilterType;
+      typedef  unsigned short                            InputPixelType;
+      typedef  itk::Image< InputPixelType, Dimension >   InputImageType; 
+      typedef  unsigned char                             OutputPixelType;
+      typedef  itk::Image< OutputPixelType, Dimension >  OutputImageType; 
+      typedef  InputImageType::IndexType                 IndexType;
+      typedef  itk::ConnectedThresholdImageFilter<  InputImageType,  
+                                                    OutputImageType >   FilterType;
       VolView::PlugIn::FilterModule< FilterType > module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Threshold Connected Region Growing...");
       // Set the parameters on it
-      module.GetFilter()->SetUpper( static_cast<PixelType>( upper  ) );
-      module.GetFilter()->SetLower( static_cast<PixelType>( lower ) );
+      module.GetFilter()->SetUpper( static_cast<InputPixelType>( upper  ) );
+      module.GetFilter()->SetLower( static_cast<InputPixelType>( lower ) );
       module.GetFilter()->SetReplaceValue( replaceValue );
       module.GetFilter()->SetSeed( seed );
       // Execute the filter

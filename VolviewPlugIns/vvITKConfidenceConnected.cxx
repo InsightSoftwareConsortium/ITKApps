@@ -38,10 +38,13 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     {
     case VTK_UNSIGNED_CHAR:
       {
-      typedef  unsigned char                        PixelType;
-      typedef  itk::Image< PixelType, Dimension >   ImageType; 
-      typedef  ImageType::IndexType                 IndexType;
-      typedef  itk::ConfidenceConnectedImageFilter< ImageType,  ImageType >   FilterType;
+      typedef  unsigned char                            InputPixelType;
+      typedef  itk::Image< InputPixelType, Dimension >  InputImageType; 
+      typedef  unsigned char                            OutputPixelType;
+      typedef  itk::Image< OutputPixelType, Dimension > OutputImageType; 
+      typedef  InputImageType::IndexType            IndexType;
+      typedef  itk::ConfidenceConnectedImageFilter< InputImageType,  
+                                                    OutputImageType >   FilterType;
       VolView::PlugIn::FilterModule< FilterType > module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Confidence Connected Region Growing...");
@@ -57,10 +60,13 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       }
     case VTK_UNSIGNED_SHORT:
       {
-      typedef  unsigned short                       PixelType;
-      typedef  itk::Image< PixelType, Dimension >   ImageType; 
-      typedef  ImageType::IndexType                 IndexType;
-      typedef  itk::ConfidenceConnectedImageFilter< ImageType,  ImageType >   FilterType;
+      typedef  unsigned short                            InputPixelType;
+      typedef  itk::Image< InputPixelType, Dimension >   InputImageType; 
+      typedef  unsigned char                             OutputPixelType;
+      typedef  itk::Image< OutputPixelType, Dimension >  OutputImageType; 
+      typedef  InputImageType::IndexType            IndexType;
+      typedef  itk::ConfidenceConnectedImageFilter< InputImageType,  
+                                                    OutputImageType >   FilterType;
       VolView::PlugIn::FilterModule< FilterType > module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Confidence Connected Region Growing...");
