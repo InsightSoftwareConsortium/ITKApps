@@ -111,6 +111,14 @@ public:
       delete *(itWidget++);
     }
 
+  /**
+   * A class used to control the state of an FLTK widget
+   */
+  class WidgetWrapper {
+  public:
+    virtual void OnStateChange(bool newState) = 0;
+  };
+
 protected:
 
   /** 
@@ -126,14 +134,6 @@ protected:
 
     // A constructor
     Rule(TFlag target, bool value) : Target(target), Value(value) {}
-  };
-
-  /**
-   * A class used to control the state of an FLTK widget
-   */
-  class WidgetWrapper {
-  public:
-    virtual void OnStateChange(bool newState) = 0;
   };
 
   /**
