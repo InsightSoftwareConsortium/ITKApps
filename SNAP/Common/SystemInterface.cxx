@@ -16,8 +16,8 @@
 #include "IRISApplication.h"
 #include "GlobalState.h"
 #include "SNAPRegistryIO.h"
-#include "FL/Fl_Preferences.h"
-#include "FL/filename.h"
+#include "FL/Fl_Preferences.H"
+#include "FL/filename.H"
 #include <itksys/SystemTools.hxx>
 #include <algorithm>
 #include <ctime>
