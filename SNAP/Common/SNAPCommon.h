@@ -50,7 +50,7 @@ static const char SNAPVersionShort[] = "$Name:  $";
 static const char SNAPVersion[] = "@(#) Id";
 
 // Non-cvs version
-static const char SNAPSoftVersion[] = "ITK-SnAP 1.0 beta [2003.11.03]";
+static const char SNAPSoftVersion[] = "ITK-SnAP 1.0 beta [2003.11.26]";
 
 /**
  * Bubble structure

@@ -362,7 +362,7 @@ OnDrawOverLabelUpdate();} open
             } {}
             Fl_Group {} {
               label {Version 1.0 beta
-11.09.2003} open
+11.26.2003} open
               xywh {5 225 135 35} labelsize 12 align 145
             } {}
             Fl_Group {} {
