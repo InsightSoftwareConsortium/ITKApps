@@ -28,6 +28,10 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
+#ifndef vtkFloatingPointType
+#define vtkFloatingPointType float
+#endif
+
 /**
  * This will be setup as a callback for a progress event on an ITK
  * filter.
@@ -92,7 +96,7 @@ int main()
   typedef itk::Image<float, 2> ImageType;
   typedef itk::RandomImageSource<ImageType> ImageSourceType;
   typedef itk::CurvatureFlowImageFilter<ImageType, ImageType> DenoiserType;
-  typedef itk::VTKImageExport<ImageType> ImageExportType;  
+  typedef itk::VTKImageExport<ImageType,vtkFloatingPointType> ImageExportType;  
   
   // Create the itk::RandomImageSource.
   unsigned long size[2] = {256, 256};

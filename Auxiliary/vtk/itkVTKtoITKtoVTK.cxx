@@ -106,6 +106,9 @@ void ConnectPipelines(VTK_Exporter* exporter, ITK_Importer importer)
  * will re-execute and cause the VTK pipeline to update properly as
  * well.
  */
+#ifndef vtkFloatingPointType
+#define vtkFloatingPointType float
+#endif
 int main()
 {  
   //------------------------------------------------------------------------
@@ -125,7 +128,7 @@ int main()
   //------------------------------------------------------------------------
   
   typedef itk::Image<float, 2> ImageType;
-  typedef itk::VTKImageImport<ImageType> ImageImportType;
+  typedef itk::VTKImageImport<ImageType,vtkFloatingPointType> ImageImportType;
   ImageImportType::Pointer itkImporter = ImageImportType::New();
   ConnectPipelines(vtkExporter, itkImporter);
   
@@ -156,7 +159,7 @@ int main()
   // ITK to VTK pipeline connection.
   //------------------------------------------------------------------------
   
-  typedef itk::VTKImageExport<ImageType> ImageExportType;
+  typedef itk::VTKImageExport<ImageType,vtkFloatingPointType> ImageExportType;
   
   // Create the itk::VTKImageExport instance and connect it to the
   // itk::CurvatureFlowImageFilter.

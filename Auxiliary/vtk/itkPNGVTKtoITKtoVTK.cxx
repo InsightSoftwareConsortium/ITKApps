@@ -32,6 +32,10 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
+#ifndef vtkFloatingPointType
+#define vtkFloatingPointType float
+#endif
+
 /**
  * This will be setup as a callback for a progress event on an ITK
  * filter.
@@ -132,7 +136,7 @@ int main()
   //------------------------------------------------------------------------
   
   typedef itk::Image<unsigned short, 2> ImageType; //AZUCAR
-  typedef itk::VTKImageImport<ImageType> ImageImportType;
+  typedef itk::VTKImageImport<ImageType,vtkFloatingPointType> ImageImportType;
   ImageImportType::Pointer itkImporter = ImageImportType::New();
   ConnectPipelines(vtkExporter, itkImporter);
   
@@ -169,7 +173,7 @@ int main()
   // ITK to VTK pipeline connection.
   //------------------------------------------------------------------------
   
-  typedef itk::VTKImageExport<DoubleImageType> ImageExportType;
+  typedef itk::VTKImageExport<DoubleImageType,vtkFloatingPointType> ImageExportType;
   
   // Create the itk::VTKImageExport instance and connect it to the
   // itk::CurvatureFlowImageFilter.
