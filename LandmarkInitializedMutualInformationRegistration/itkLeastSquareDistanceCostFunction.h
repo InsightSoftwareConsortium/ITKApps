@@ -5,7 +5,7 @@
 #include <itkPoint.h>
 #include <itkArray.h>
 #include <itkVectorContainer.h>
-#include <itkQuaternionRigidTransform.h>
+#include <itkVersorRigid3DTransform.h>
 
 namespace itk
 {
@@ -13,17 +13,10 @@ namespace itk
 /**
  *
  * This class calculate the sum of of the distances between two set of points.
- * Regarding the parameters, it is based on quaternions, so the array of parameters
- * contains four values, which are respectively the following:
- *
- * x => rotation along the x axis
- * y => rotation along the y axis
- * z => rotation along the z axis
- * w => ??? ( check what that means... cause I forgot :os )
  *
  */
 
-  template< class TTransform = itk::QuaternionRigidTransform<double> >
+  template< class TTransform = itk::VersorRigid3DTransform<double> >
   class LeastSquareDistanceCostFunction
   : public SingleValuedCostFunction
   {
@@ -42,7 +35,7 @@ namespace itk
     typedef TTransform                            TransformType;
     typedef typename TransformType::Pointer       TransformPointer;
 
-    typedef Superclass::MeasureType               MeasureType;
+    typedef double                                MeasureType;
 
     itkNewMacro(Self);
 
@@ -52,7 +45,7 @@ namespace itk
 
     void SetMovingPointSet( PointSetPointer movingPointSet );
 
-    MeasureType GetValue( const ParametersType &parameters ) const;
+    double GetValue( const ParametersType &parameters ) const;
 
     void GetDerivative( const ParametersType &parameters, DerivativeType &derivative ) const;
 

@@ -1,5 +1,5 @@
-#ifndef __RegToolGUIImplementation_h
-#define __RegToolGUIImplementation_h
+#ifndef __RegToolGUIMAINImplementation_h
+#define __RegToolGUIMAINImplementation_h
 
 #include <string>
 
@@ -8,8 +8,8 @@
 #include <FL/fl_file_chooser.H>
 
 // ITK related includes....
+#include <itkAffineTransform.h>
 #include <itkExceptionObject.h>
-#include <itkRGBPixel.h>
 #include <itkResampleImageFilter.h>
 #include <itkImageRegionIterator.h>
 #include <itkImageIOFactory.h>
@@ -24,46 +24,43 @@
 class guiMainImplementation : public guiMain
 {
 public:
-  typedef itk::Image<ImagePixelType,3> ImageType;
-  typedef itk::Image< RealImagePixelType,3 > RealImageType;
-  typedef ImageType::Pointer ImagePointer ;
-  typedef unsigned char OverlayImagePixelType;
-  typedef itk::RGBAPixel< OverlayImagePixelType > OverlayPixelType;
+  typedef short                         ImagePixelType;
+  typedef itk::Image<ImagePixelType,3>  ImageType;
+  typedef ImageType::Pointer            ImagePointer ;
 
-  typedef itk::RGBPixel< RealImagePixelType > RGBPixelType;
-  typedef itk::Image<RGBPixelType,3> RGBImageType;
-  typedef RGBImageType::Pointer RGBImagePointer ;
+  typedef ImageType::RegionType         RegionType;
+  typedef ImageType::IndexType          IndexType;
+  typedef RegionType::SizeType          SizeType;
+  typedef itk::Point<double,3>          PointType;
 
-  typedef ImageType::RegionType RegionType;
-  typedef ImageType::IndexType IndexType;
-  typedef RegionType::SizeType SizeType;
-  typedef itk::Point<double,3> PointType;
-
-  typedef itk::ImageFileReader<ImageType> ImageReaderType;
-  typedef itk::ImageFileWriter<ImageType> ImageWriterType;
+  typedef itk::ImageFileReader<ImageType>     ImageReaderType;
+  typedef itk::ImageFileWriter<ImageType>     ImageWriterType;
 
   typedef LandmarkSliceViewer<ImagePixelType> SliceViewType;
-  typedef itk::LandmarkSpatialObject< 3 > LandmarksType ;
+  typedef SliceViewType::LandmarkSpatialObjectType 
+                                              LandmarkSpatialObjectType ;
+  typedef SliceViewType::LandmarkPointType        
+                                              LandmarkPointType ;
+  typedef SliceViewType::LandmarkPointListType    
+                                              LandmarkPointListType ;
 
-  typedef SliceViewType::OverlayImageType OverlayImageType ;
-  typedef itk::GLColorSliceView<ImagePixelType,OverlayImagePixelType> 
-  ColorSliceViewType;
+  typedef SliceViewType::OverlayImageType       OverlayImageType ;
+  typedef SliceViewType::OverlayPixelType       OverlayPixelType ;
+  typedef itk::GLTwoImageSliceView<ImagePixelType,OverlayPixelType> 
+                                                TwoImageSliceViewType;
+
   typedef itk::ResampleImageFilter<ImageType,ImageType> 
-  ResampleImageFilterType;
+                                              ResampleImageFilterType;
   typedef itk::ResampleImageFilter<OverlayImageType,OverlayImageType> 
-  ResampleOverlayImageFilterType;
+                                              ResampleOverlayImageFilterType;
 
   typedef itk::ImageRegionIterator<ImageType> ImageRegionIteratorType;
-  typedef itk::ImageRegionIterator<RGBImageType> RGBImageRegionIteratorType;
   
-  typedef ImageRegistrationApp< ImageType, RealImageType > 
-  RegistrationAppType ;
+  typedef ImageRegistrationApp< ImageType >   ImageRegistrationAppType ;
 
-  typedef RegistrationAppType::AffineTransformType AffineTransformType ;
-  typedef AffineTransformType::OffsetType OffsetType ;
-  typedef RegistrationAppType::RigidTransformType RigidTransformType ;
+  typedef itk::AffineTransform<double, 3>     AffineTransformType ;
   typedef itk::LinearInterpolateImageFunction< ImageType, double > 
-  InterpolatorType ;
+                                              InterpolatorType ;
   
   guiMainImplementation();
   virtual ~guiMainImplementation();
@@ -71,7 +68,6 @@ public:
   ////////////////////////////////////
   // Initializations & Terminations
   ////////////////////////////////////
-  void Initialize();
   void Quit();
 
   /////////////////////////////////////////////////
@@ -88,17 +84,11 @@ public:
   // Image view functions
   /////////////////////////////////////////////////
   void Show();
-  void CalculateMaximumSize() ;
-  ImagePointer ResampleUsingResolution( ImageType * image ) const;
-  RGBImagePointer MakeRGBImage(ImageType * redImage, ImageType * greenImage );
-  void ModifySliceViewInputImage( SliceViewType * sliceview, 
-                                  ImageType * image );
-  void ModifySliceViewInputImage( ColorSliceViewType * sliceview,
-                                  RGBImageType * image );
   void SetViewAxis(unsigned int axis) ;
   void SelectImageSet(unsigned int i) ;
   void UpdateSliceNumber();
-  void ShowMovingLandmarks(unsigned int i) ;
+  void UpdateFixedSliceNumber();
+  void UpdateMovingSliceNumber();
 
   /////////////////////////////////////////////////
   // Application status functions
@@ -112,26 +102,11 @@ public:
   void LoadLandmarks( bool moving );
   void SaveLandmarks( bool moving );
   void UpdateLandmark( Fl_Group* parent, unsigned int index );
-
-  static void MovingImageViewerLandmarkChangeEventHandlerWrapper(void* prtSelf)
-  {
-    guiMainImplementation* self = (guiMainImplementation*) prtSelf ;
-    self->MovingImageViewerLandmarkChangeEventHandler() ;
-  }
-
-  void MovingImageViewerLandmarkChangeEventHandler()
-  {
-    m_NonRegisteredMovingLandmarks->SetPoints
-      (tkMovingImageViewer->GetSpatialPoints()) ;
-    std::cout << "DEBUG: handler: " 
-              << m_NonRegisteredMovingLandmarks->GetPoints().size() 
-              << std::endl ;
-  }
     
   void ClearLandmarks(Fl_Group* parent);
-  void TransformLandmarks(LandmarksType* source,
-                          LandmarksType* target,
-                          AffineTransformType* transform) ;
+  void TransformLandmarks(LandmarkPointListType * source,
+                          LandmarkPointListType * target,
+                          AffineTransformType * transform) ;
 
 
   /////////////////////////////////////////////////
@@ -155,8 +130,8 @@ public:
   // Registartion related functions
   /////////////////////////////////////////////////
   void SaveTransform() ;
-  ImagePointer ResampleUsingTransform(AffineTransformType* finalTransform, 
-                                      ImageType* input) ;
+  ImagePointer ResampleUsingTransform(AffineTransformType * finalTransform, 
+                                      ImageType* input, ImageType* output) ;
   void Register();
 
   /////////////////////////////////////////////////
@@ -165,34 +140,27 @@ public:
   void ShowHelp( const char * file );
 
 private:
-  SizeType m_MaximumSize ;
-  double m_MinimumSpacing[ImageType::ImageDimension] ;
-  RegistrationAppType* m_App ;
+  ImageRegistrationAppType::Pointer m_ImageRegistrationApp ;
   unsigned int m_ViewAxis ;
-  bool m_FixedImageResamplingNeeded ;
-  bool m_MovingImageResamplingNeeded ;
+  SizeType m_FixedImageSize ;
+  SizeType m_MovingImageSize ;
 
   std::string m_FixedImageFileName ;
   std::string m_MovingImageFileName ;
 
-  RGBImageType::Pointer m_ViewRegisteredImage ;
-  RGBImageType::Pointer m_ViewLandmarkRegisteredImage ;
-  RGBImageType::Pointer m_ViewNonRegisteredImage ;
-
-  unsigned int m_NumberOfActiveMovingLandmarks ;
-  LandmarksType::Pointer m_RegisteredMovingLandmarks ;
-  LandmarksType::Pointer m_LandmarkRegisteredMovingLandmarks ;
-  LandmarksType::Pointer m_NonRegisteredMovingLandmarks ;
-  OverlayPixelType m_DefaultColor[4];
+  LandmarkSpatialObjectType::Pointer 
+                             m_FixedLandmarkSpatialObject ;
+  LandmarkSpatialObjectType::Pointer 
+                             m_MovingLandmarkSpatialObject ;
+  LandmarkSpatialObjectType::Pointer 
+                             m_LandmarkRegisteredMovingLandmarkSpatialObject ;
+  LandmarkSpatialObjectType::Pointer 
+                             m_RegisteredMovingLandmarkSpatialObject ;
 
   ImageType::Pointer m_FixedImage ;
   ImageType::Pointer m_MovingImage ;
   ImageType::Pointer m_LandmarkRegisteredMovingImage ;
   ImageType::Pointer m_RegisteredMovingImage ;
-  ImageType::Pointer m_ViewFixedImage ;
-  ImageType::Pointer m_ViewMovingImage ;
-  ImageType::Pointer m_ViewLandmarkRegisteredMovingImage ;
-  ImageType::Pointer m_ViewRegisteredMovingImage ;
 
   std::string m_LastLoadedImagePath;
   bool m_FixedImageLoaded;
@@ -208,7 +176,6 @@ private:
   bool m_AffineUseLandmarkRegion ;
   double m_AffineRegionScale ;
 
-  RegistrationAppType::LandmarkScalesType m_Scales;
 };
 
 #endif //__guiMainImplementation_h

@@ -21,6 +21,7 @@ INCLUDE_DIRECTORIES(
 
 ADD_EXECUTABLE(LandmarkInitializedMutualInformationRegistration
   guiMainImplementation.cxx
+  LandmarkRegistrator.cxx
   main.cxx
 )
 
@@ -28,5 +29,6 @@ FLTK_WRAP_UI(LandmarkInitializedMutualInformationRegistration guiMain.fl)
 ITK_DISABLE_FLTK_GENERATED_WARNINGS(guiMain.fl)
 
 TARGET_LINK_LIBRARIES (LandmarkInitializedMutualInformationRegistration
-                       ITKIO ITKMetaIO ITKBasicFilters ITKStatistics ITKFltkImageViewer)
+                       ITKIO ITKMetaIO ITKBasicFilters ITKStatistics
+ITKFltkImageViewer ${OPENGL_LIBRARY})
 

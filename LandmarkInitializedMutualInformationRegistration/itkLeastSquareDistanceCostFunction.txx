@@ -144,31 +144,39 @@ namespace itk
    */
 
   template< class TTransform >
-  typename LeastSquareDistanceCostFunction<TTransform>::MeasureType 
+  double
   LeastSquareDistanceCostFunction<TTransform>
   ::GetValue( const ParametersType &parameters ) const
   {
     if( m_Valid )
       {
-      MeasureType   squareEuclideanDistance = 0.0;
+      double   squareEuclideanDistance = 0.0;
       PointType     transformedPoint;
       unsigned int  pointSetSize = m_FixedPointSet->Size();
 
       m_Transform->SetParameters(parameters);
-
+      
       for( unsigned int i=0; i<pointSetSize; i++)
         {
-        transformedPoint = m_Transform->TransformPoint(m_MovingPointSet->ElementAt(i));
-        squareEuclideanDistance += transformedPoint.SquaredEuclideanDistanceTo(m_FixedPointSet->ElementAt(i));
+        transformedPoint = m_Transform->TransformPoint(
+                                              m_MovingPointSet->ElementAt(i));
+        for( unsigned int j=0; j<3; j++)
+          {
+          double tf = (m_FixedPointSet->ElementAt(i)[j] -
+                                      transformedPoint[j]);
+          squareEuclideanDistance += tf * tf;
+          }
+        //std::cout << "f[" << i << "] = " << m_FixedPointSet->ElementAt(i) << std::endl;
+        //std::cout << "m = " << transformedPoint << std::endl;
         }
-
+      //std::cout << std::endl;
       return squareEuclideanDistance;
       }
     else
       {
       itk::ExceptionObject e("itkLeastSquareDistanceCostFunction.txx",169);
       e.SetLocation("itk::LeastSquareDistanceCostFunction::GetValue()");
-      e.SetDescription("cannot calculate a value for two point sets which does not have the same number of elements");
+      e.SetDescription("Point sets do not have the same number of elements");
       throw(e);
       }
   }

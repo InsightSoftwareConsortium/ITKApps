@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0103 
+version 1.0104 
 header_name {.h} 
 code_name {.cxx}
 class guiMain {open
@@ -8,15 +8,14 @@ class guiMain {open
   } {
     Fl_Window tkWindow {
       label {Landmarkd Initialized Mutual Information 3D Registration Tool } open
-      xywh {187 318 1060 705} type Double box PLASTIC_UP_BOX color 159 resizable
-      code0 {itk::ImageRegion< 3 > tempRegion ;} visible
+      xywh {223 436 1060 705} type Single box PLASTIC_UP_BOX color 159 resizable visible
     } {
       Fl_Group tkMainGroup {open
         xywh {0 30 1050 710} resizable
       } {
         Fl_Value_Slider tkSliceValuator {
           callback {UpdateSliceNumber();}
-          xywh {430 52 16 603} type {Vert Fill} box PLASTIC_DOWN_BOX color 247 selection_color 247 labelsize 8 step 1
+          xywh {456 54 16 603} type {Vert Fill} box PLASTIC_DOWN_BOX color 247 selection_color 247 labelsize 8 step 1
         }
         Fl_Choice tkDisplayMovingImageChoice {
           label {Currently Displayed Moving Image:}
@@ -69,10 +68,9 @@ Register();}
         }
         Fl_Box tkResultImageViewer {
           label label
-          xywh {448 56 600 601} box FLAT_BOX color 42 deactivate resizable
-          code0 {\#include <GLColorSliceView.h>}
-          code1 {typedef float RealImagePixelType ;}
-          class {GLColorSliceView< RealImagePixelType, unsigned char >}
+          xywh {475 56 573 601} box FLAT_BOX color 42 deactivate resizable
+          code0 {\#include <GLTwoImageSliceView.h>}
+          class {GLTwoImageSliceView< short, unsigned char >}
         }
         Fl_Group tkSubGroup {open
           xywh {5 51 424 609}
@@ -80,7 +78,7 @@ Register();}
           Fl_Button tkSelectFixedImageButton {
             label {Select Fixed Image...}
             callback {SelectFixedImage();}
-            xywh {9 54 131 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 selection_color 247 labelsize 10
+            xywh {9 56 131 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 selection_color 247 labelsize 10
           }
           Fl_Button tkSelectMovingImageButton {
             label {Select Moving Image...}
@@ -91,7 +89,7 @@ Register();}
             xywh {149 361 275 15} box PLASTIC_DOWN_BOX color 247 labeltype NO_LABEL labelsize 10 textsize 9
           }
           Fl_Output tkFixedImageFile {
-            xywh {149 54 275 15} box PLASTIC_DOWN_BOX color 247 labeltype NO_LABEL labelsize 10 textsize 9
+            xywh {149 56 275 15} box PLASTIC_DOWN_BOX color 247 labeltype NO_LABEL labelsize 10 textsize 9
           }
           Fl_Group tkFixedImageLandmarkGroup {open
             xywh {9 95 131 179} deactivate
@@ -218,15 +216,14 @@ Register();}
           }
           Fl_Box tkMovingImageViewer {
             label label
-            xywh {150 380 275 275} box FLAT_BOX color 42 deactivate
-            class {LandmarkSliceViewer< ImagePixelType >}
+            xywh {154 380 275 275} box FLAT_BOX color 42 deactivate
+            class {LandmarkSliceViewer< short >}
           }
           Fl_Box tkFixedImageViewer {
             label label
-            xywh {154 79 275 275} box FLAT_BOX color 42 deactivate
+            xywh {154 74 275 275} box FLAT_BOX color 42 deactivate
             code0 {\#include <LandmarkSliceViewer.h>}
-            code1 {typedef short ImagePixelType ;}
-            class {LandmarkSliceViewer< ImagePixelType >}
+            class {LandmarkSliceViewer< short >}
           }
         }
         Fl_Group tkViewAxisGroup {
@@ -248,13 +245,21 @@ Register();}
           Fl_Round_Button tkViewAxisZ {
             label Z
             user_data 2
-            callback {SetViewAxis(2) ;} selected
+            callback {SetViewAxis(2) ;}
             xywh {345 30 25 20} type Radio down_box ROUND_DOWN_BOX value 1 labelsize 10
           }
         }
         Fl_Output tkStatusDisplay {
           label Status
           xywh {43 667 383 20} labelsize 10 textsize 10
+        }
+        Fl_Value_Slider tkMovingSliceValuator {
+          callback {UpdateMovingSliceNumber();}
+          xywh {430 377 16 278} type {Vert Fill} box PLASTIC_DOWN_BOX color 247 selection_color 247 labelsize 8 step 1
+        }
+        Fl_Value_Slider tkFixedSliceValuator {
+          callback {UpdateFixedSliceNumber();}
+          xywh {430 72 16 278} type {Vert Fill} box PLASTIC_DOWN_BOX color 247 selection_color 247 labelsize 8 step 1
         }
       }
       Fl_Menu_Bar {} {open
@@ -453,7 +458,7 @@ tkFixedImageViewer->DrawRegionOfInterest() ;}
     }
     Fl_Window tkAdvancedOptionsWindow {
       label {Advanced Registration Options} open
-      xywh {1342 158 405 520} type Double box PLASTIC_UP_BOX color 159 labelsize 10 resizable visible
+      xywh {1191 158 405 520} type Double box PLASTIC_UP_BOX color 159 labelsize 10 resizable visible
     } {
       Fl_Tabs {} {open
         xywh {15 15 385 465} labelsize 12
@@ -464,55 +469,67 @@ tkFixedImageViewer->DrawRegionOfInterest() ;}
         } {
           Fl_Box {} {
             label {Rotation Scales}
-            xywh {35 140 155 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
+            xywh {35 60 155 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
           }
           Fl_Value_Input tkRigidRotationScaleX {
             label {X:}
-            xywh {110 150 65 25} labelsize 12 maximum 1e+09 value 1
+            xywh {110 70 65 25} labelsize 12 maximum 1e+009 step 1 value 100
           }
           Fl_Value_Input tkRigidRotationScaleY {
             label {Y:}
-            xywh {110 180 65 25} labelsize 12 maximum 1e+09 value 1
+            xywh {110 100 65 25} labelsize 12 maximum 1e+009 step 1 value 100
           }
           Fl_Value_Input tkRigidRotationScaleZ {
             label {Z:}
-            xywh {110 210 65 25} labelsize 12 maximum 1e+09 value 1
+            xywh {110 130 65 25} labelsize 12 maximum 1e+009 step 1 value 100
           }
-          Fl_Box {} {
-            label {Translation Scales}
-            xywh {210 140 160 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
+          Fl_Box tkRigidCoRScale {
+            label {Center of Rotation Scales}
+            xywh {210 60 160 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
           }
-          Fl_Value_Input tkRigidTranslationScaleX {
+          Fl_Value_Input tkRigidTranslationScaleCoRX {
             label {X:}
-            xywh {290 150 65 25} labelsize 12 maximum 1e+09 value 100
+            xywh {290 70 65 25} labelsize 12 maximum 1e+009 step 0.1 value 2
           }
-          Fl_Value_Input tkRigidTranslationScaleY {
+          Fl_Value_Input tkRigidTranslationScaleCoRY {
             label {Y:}
-            xywh {290 180 65 25} labelsize 12 maximum 1e+09 value 100
+            xywh {290 100 65 25} labelsize 12 maximum 1e+009 step 0.1 value 2
           }
-          Fl_Value_Input tkRigidTranslationScaleZ {
+          Fl_Value_Input tkRigidTranslationScaleCoRZ {
             label {Z:}
-            xywh {290 210 65 25} labelsize 12 maximum 1e+09 value 100
+            xywh {290 130 65 25} labelsize 12 maximum 1e+009 step 0.1 value 2
           }
           Fl_Value_Input tkRigidNumberOfIterations {
             label {Number of Iterations:}
-            xywh {305 255 65 25} labeltype EMBOSSED_LABEL labelsize 12 value 200
-          }
-          Fl_Value_Input tkRigidLearningRate {
-            label {Learning Rate:}
-            xywh {305 285 65 25} labeltype EMBOSSED_LABEL labelsize 12 minimum 1e-10 value 0.0001
+            xywh {305 310 65 25} labeltype EMBOSSED_LABEL labelsize 12 value 200
           }
           Fl_Value_Input tkRigidFixedImageStdDev {
             label {Fixed Image Standard Deviation:}
-            xywh {305 315 65 25} labeltype EMBOSSED_LABEL labelsize 12 value 0.4
+            xywh {305 370 65 25} labeltype EMBOSSED_LABEL labelsize 12 value 0.4
           }
           Fl_Value_Input tkRigidMovingImageStdDev {
             label {Moving Image Standard Deviation:}
-            xywh {305 345 65 25} labeltype EMBOSSED_LABEL labelsize 12 value 0.4
+            xywh {305 400 65 25} labeltype EMBOSSED_LABEL labelsize 12 value 0.4
           }
           Fl_Value_Input tkRigidNumberOfSpatialSamples {
             label {Number of Spatial Samples}
-            xywh {305 375 65 25} labeltype EMBOSSED_LABEL labelsize 12 maximum 10000 value 50
+            xywh {305 430 65 25} labeltype EMBOSSED_LABEL labelsize 12 maximum 10000 value 50
+          }
+          Fl_Box {} {
+            label {Translation Scales}
+            xywh {130 185 160 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
+          }
+          Fl_Value_Input tkRigidTranslationScaleX {
+            label {X:}
+            xywh {210 195 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+          }
+          Fl_Value_Input tkRigidTranslationScaleY {
+            label {Y:}
+            xywh {210 225 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+          }
+          Fl_Value_Input tkRigidTranslationScaleZ {
+            label {Z:}
+            xywh {210 255 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
           }
         }
         Fl_Group {} {
@@ -524,13 +541,13 @@ tkFixedImageViewer->DrawRegionOfInterest() ;}
             xywh {30 65 345 125} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
           }
           Fl_Value_Input tkAffineMatrixScale0 {
-            xywh {115 95 65 25} labelsize 12 maximum 1e+09 value 1
+            xywh {115 95 65 25} labelsize 12 maximum 1e+009 step 1 value 100
           }
           Fl_Value_Input tkAffineMatrixScale1 {
-            xywh {185 95 65 25} labelsize 12 maximum 1e+09 value 1
+            xywh {185 95 65 25} labelsize 12 maximum 1e+009 step 1 value 75
           }
           Fl_Value_Input tkAffineMatrixScale2 {
-            xywh {255 95 65 25} labelsize 12 maximum 1e+09 value 1
+            xywh {255 95 65 25} labelsize 12 maximum 1e+009 step 1 value 75
           }
           Fl_Box {} {
             label 1
@@ -557,22 +574,22 @@ tkFixedImageViewer->DrawRegionOfInterest() ;}
             xywh {85 160 30 25}
           }
           Fl_Value_Input tkAffineMatrixScale3 {
-            xywh {115 125 65 25} labelsize 12 maximum 1e+09 value 1
+            xywh {115 125 65 25} labelsize 12 maximum 1e+009 step 1 value 75
           }
           Fl_Value_Input tkAffineMatrixScale4 {
-            xywh {185 125 65 25} labelsize 12 maximum 1e+09 value 1
+            xywh {185 125 65 25} labelsize 12 maximum 1e+009 step 1 value 100
           }
           Fl_Value_Input tkAffineMatrixScale5 {
-            xywh {255 125 65 25} labelsize 12 maximum 1e+09 value 1
+            xywh {255 125 65 25} labelsize 12 maximum 1e+009 step 1 value 75
           }
           Fl_Value_Input tkAffineMatrixScale6 {
-            xywh {115 160 65 25} labelsize 12 maximum 1e+09 value 1
+            xywh {115 160 65 25} labelsize 12 maximum 1e+009 step 1 value 75
           }
           Fl_Value_Input tkAffineMatrixScale7 {
-            xywh {185 160 65 25} labelsize 12 maximum 1e+09 value 1
+            xywh {185 160 65 25} labelsize 12 maximum 1e+009 step 1 value 75
           }
           Fl_Value_Input tkAffineMatrixScale8 {
-            xywh {255 160 65 25} labelsize 12 maximum 1e+09 value 1
+            xywh {255 160 65 25} labelsize 12 maximum 1e+009 step 1 value 100
           }
           Fl_Box {} {
             label {Translation Scales}
@@ -580,23 +597,19 @@ tkFixedImageViewer->DrawRegionOfInterest() ;}
           }
           Fl_Value_Input tkAffineTranslationScaleX {
             label {X:}
-            xywh {185 215 65 25} labelsize 12 maximum 1e+09 value 0.0001
+            xywh {185 215 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
           }
           Fl_Value_Input tkAffineTranslationScaleY {
             label {Y:}
-            xywh {185 245 65 25} labelsize 12 maximum 1e+09 value 0.0001
+            xywh {185 245 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
           }
           Fl_Value_Input tkAffineTranslationScaleZ {
             label {Z:}
-            xywh {185 275 65 25} labelsize 12 maximum 1e+09 value 0.0001
+            xywh {185 275 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
           }
           Fl_Value_Input tkAffineNumberOfIterations {
             label {Number of Iterations:}
             xywh {310 315 65 25} labeltype EMBOSSED_LABEL labelsize 12 maximum 10000 value 200
-          }
-          Fl_Value_Input tkAffineLearningRate {
-            label {Learning Rate:}
-            xywh {310 345 65 25} labeltype EMBOSSED_LABEL labelsize 12 value 0.0001
           }
           Fl_Value_Input tkAffineFixedImageStdDev {
             label {Fixed Image Standard Deviation:}
@@ -617,43 +630,59 @@ tkFixedImageViewer->DrawRegionOfInterest() ;}
         } {
           Fl_Box {} {
             label {Rotation Scales}
-            xywh {40 95 155 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
+            xywh {40 70 155 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
           }
           Fl_Box {} {
-            label {Translation Scales}
-            xywh {215 95 155 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
+            label {Center of Rotation Scales}
+            xywh {40 195 155 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
           }
           Fl_Value_Input tkLandmarkNumberOfIterations {
             label {Number of Iterations:}
-            xywh {300 225 45 25} labeltype EMBOSSED_LABEL labelsize 12 value 200
+            xywh {275 210 45 25} labeltype EMBOSSED_LABEL labelsize 12 align 1 value 200
           }
           Fl_Value_Input tkLandmarkRotationScaleY {
             label {Y:}
-            xywh {115 105 65 25} labelsize 12 maximum 1e+09 value 1
+            xywh {115 80 65 25} labelsize 12 maximum 1e+009 step 1 value 100
           }
           Fl_Value_Input tkLandmarkRotationScaleZ {
             label {Z:}
-            xywh {115 132 65 25} labelsize 12 maximum 1e+09 value 1
+            xywh {115 107 65 25} labelsize 12 maximum 1e+009 step 1 value 100
           }
-          Fl_Value_Input tkLandmarkTranslationScaleX {
+          Fl_Value_Input tkLandmarkTranslationScaleCoRX {
             label {X:}
-            xywh {295 105 65 25} labelsize 12 maximum 1e+09 value 100
+            xywh {115 203 65 25} labelsize 12 maximum 1e+009 step 1 value 2
           }
-          Fl_Value_Input tkLandmarkTranslationScaleY {
+          Fl_Value_Input tkLandmarkTranslationScaleCoRY {
             label {Y:}
-            xywh {295 135 65 25} labelsize 12 maximum 1e+09 value 100
+            xywh {115 233 65 25} labelsize 12 maximum 1e+009 step 1 value 2
           }
-          Fl_Value_Input tkLandmarkTranslationScaleZ {
+          Fl_Value_Input tkLandmarkTranslationScaleCoRZ {
             label {Z:}
-            xywh {295 165 65 25} labelsize 12 maximum 1e+09 value 100
+            xywh {115 263 65 25} labelsize 12 maximum 1e+009 step 1 value 2
           }
           Fl_Value_Input tkLandmarkRotationScaleX {
             label {X:}
-            xywh {115 160 65 25} labelsize 12 maximum 1e+09 value 1
+            xywh {115 135 65 25} labelsize 12 maximum 1e+009 step 1 value 100
+          }
+          Fl_Box {} {
+            label {Translation Scales}
+            xywh {40 325 155 100} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 5
+          }
+          Fl_Value_Input tkLandmarkTranslationScaleX {
+            label {X:}
+            xywh {115 333 65 25} labelsize 12 maximum 1e+009 step 1 value 1
+          }
+          Fl_Value_Input tkLandmarkTranslationScaleY {
+            label {Y:}
+            xywh {115 363 65 25} labelsize 12 maximum 1e+009 step 1 value 1
+          }
+          Fl_Value_Input tkLandmarkTranslationScaleZ {
+            label {Z:}
+            xywh {115 393 65 25} labelsize 12 maximum 1e+009 step 1 value 1
           }
         }
         Fl_Group {} {
-          label Region open
+          label Region open selected
           xywh {25 50 365 430}
         } {
           Fl_Box {} {
@@ -722,7 +751,7 @@ tkFixedImageViewer->DrawRegionOfInterest() ;}
   } {}
   Function {SelectMovingImage()} {open return_type {virtual void}
   } {}
-  Function {UpdateSliceNumber()} {return_type {virtual void}
+  Function {UpdateSliceNumber()} {open return_type {virtual void}
   } {}
   Function {Register()} {open return_type {virtual void}
   } {}
@@ -781,5 +810,9 @@ tkFixedImageViewer->DrawRegionOfInterest() ;}
   Function {CancelRegionOfInterest()} {open return_type {virtual void}
   } {}
   Function {ShowRegionOfInterestWindow()} {open return_type {virtual void}
+  } {}
+  Function {UpdateMovingSliceNumber()} {open return_type {virtual void}
+  } {}
+  Function {UpdateFixedSliceNumber()} {open return_type {virtual void}
   } {}
 } 
