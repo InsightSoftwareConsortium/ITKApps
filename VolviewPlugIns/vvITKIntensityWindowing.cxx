@@ -164,8 +164,7 @@ static int UpdateGUI(void *inf)
   // if multi component we have 1 scalar for input and 1 scalar for output
   if (info->InputVolumeNumberOfComponents > 1)
     {
-    int sizeReq = 2*info->InputVolumeScalarSize*
-      info->InputVolumeNumberOfComponents;
+    int sizeReq = 2*info->InputVolumeScalarSize;
     char tmps[500];
     sprintf(tmps,"%i",sizeReq);
     info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED, tmps); 

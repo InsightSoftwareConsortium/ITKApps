@@ -169,6 +169,18 @@ static int UpdateGUI(void *inf)
   memcpy(info->OutputVolumeOrigin,info->InputVolumeOrigin,
          3*sizeof(float));
 
+  // provide accurate estimate of memory required
+  // always requires 2 floats per voxel
+  int sizeReq = 2*sizeof(float);
+  // if multicomponent also requires one scalar more
+  if (info->InputVolumeNumberOfComponents > 1)
+    {
+    sizeReq += info->InputVolumeScalarSize;
+    }
+  char tmps[500];
+  sprintf(tmps,"%i",sizeReq);
+  info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED, tmps); 
+
   return 1;
 }
 
