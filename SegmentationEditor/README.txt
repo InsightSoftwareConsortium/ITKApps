@@ -1,45 +1,35 @@
-Last update Oct 2003:
+Last update Feb 2004:
 
-WINDOWS USERS: This application is supported on MS Windows, but you'll
-need to pay close attention to the instructions below.
+This file tells how to configure, build, and run the application.  For more
+information see the Tutorial.pdf document in this directory.
+
+WINDOWS USERS: This application is supported on MS Windows.  Please see the
+special instructions in step 3.
 
 1. To build this application:
+   
+   * You will need a recent version of VTK installed on your machine with 
+   the options VTK_USE_PATENTED, and VTK_WRAP_TCL set to "On".  This
+   application was last tested with VTK 4.2 and VTK 4.4.
 
- You will need a recent version of VTK installed on your machine.  I
-  suggest getting the latest release.
-
- In your VTK build, make sure you include the Patented classes and Tcl
-  wrapping.  You will need the Wrapping/Tcl directories from the VTK
-  source tree.
-
- WINDOWS USERS: The precompiled VTK distribution for Windows not built
-  with USE_ANSI_STDLIB option enabled, which is required for
-  compatibility with ITK.
-
- You will need to download the VTK source and build with
-  USE_ANSI_STDLIB turned "On".
-
- When you configure InsightApplications with CMake, turn the following
-  option "On"
-
-   USE_VTK 
-
- Check the VTK paths in CMake by clicking the View Advanced Settings
-  box.
+   * Configure and build InsightApplications with USE_VTK set to "On".
 
 2. To run this application:
+   
+   cd <InsightApplications-source>/SegmentationEditor/Scripts/
 
- cd <Insight Applications SOURCE>/SegmentationEditor/Scripts
- <Insight Applications BUILD>/bin/WSTITK Main.tcl
+    where <InsightApplications-source> is the source directory of your build
+    (the source code that you downloaded).
 
- where "Insight Applications SOURCE" is the path to your
-  InsightApplications source tree and "Insight Applications BUILD" is
-  the path to your InsightApplications build tree.
+   <InsightApplications-build>/SegmentationEditor/Wrapping/Tcl/WSTITK Main.tcl
+
+    where <InsightApplications-build> is the directory where you built
+    InsightApplications.  Note that WSTITK will be found in EXECUTABLE_OUTPUT_PATH
+    instead if one was specified during the CMake configuration process.
 
 3. When you run the application for the first time, a window will pop
-    up asking for the paths to your VTK source and your SegmentationEditor
-    source.  These paths are the directories to the source code, not to the 
-    build tree.
+   up asking for the paths to your VTK BUILD tree and your SegmentationEditor
+   SOURCE tree.
 
    WINDOWS USERS: When specifying paths use double backslashes
     (i.e. c:\\path\\to\\VTK).  Tcl is picky about this and the application
@@ -47,7 +37,7 @@ need to pay close attention to the instructions below.
 
 4. The rest of the documentation you will need is displayed by the program
     itself.  Also see the documentation in the Applications section of the
-    www.itk.org website.
+    www.itk.org website and the file SegmentationEditor.pdf in this directory.
 
 5. Report any problems to the Insight-users list (see www.itk.org).
 
@@ -62,6 +52,6 @@ KNOWN BUGS:
 2. "Cannot find package vtkinteraction ... " on startup.
 
  See instruction number 3.  It is likely that you have supplied an
- incorrect path to the VTK or SegmentationEditor source.  If you are 
- running on Windows, make sure that you have used double backslashes 
- in your path specification.
+ incorrect path to the VTK build tree or to the SegmentationEditor source.  If
+ you are running on Windows, make sure that you have used double backslashes 
+ in your path specification. 
