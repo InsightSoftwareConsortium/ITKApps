@@ -191,6 +191,7 @@ void VV_PLUGIN_EXPORT vvITKCannySegmentationLevelSetModuleInit(vtkVVPluginInfo *
   info->ProcessData = ProcessData;
   info->UpdateGUI   = UpdateGUI;
   info->SetProperty(info, VVP_NAME, "Canny Segmentation LevelSet Module (ITK)");
+  info->SetProperty(info, VVP_GROUP, "Segmentation - Level Sets");
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
                                     "Canny Segmentation LevelSet Module");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,

@@ -119,6 +119,7 @@ void VV_PLUGIN_EXPORT vvITKCannyEdgeDetectionInit(vtkVVPluginInfo *info)
   info->ProcessData = ProcessData;
   info->UpdateGUI = UpdateGUI;
   info->SetProperty(info, VVP_NAME, "Canny Edge Detection (ITK)");
+  info->SetProperty(info, VVP_GROUP, "Edge Detection");
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
                                  "Edge detection using the Canny filter");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,

@@ -135,6 +135,7 @@ void VV_PLUGIN_EXPORT vvITKConfidenceConnectedInit(vtkVVPluginInfo *info)
   info->ProcessData = ProcessData;
   info->UpdateGUI = UpdateGUI;
   info->SetProperty(info, VVP_NAME, "Confidence Connected (ITK) ");
+  info->SetProperty(info, VVP_GROUP, "Segmentation - Region Growing");
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
                                 "Confidence Connected Segmentation");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,

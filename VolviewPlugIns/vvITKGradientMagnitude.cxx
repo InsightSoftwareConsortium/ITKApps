@@ -83,6 +83,7 @@ void VV_PLUGIN_EXPORT vvITKGradientMagnitudeInit(vtkVVPluginInfo *info)
   info->ProcessData = ProcessData;
   info->UpdateGUI = UpdateGUI;
   info->SetProperty(info, VVP_NAME, "Gradient Magnitude (ITK)");
+  info->SetProperty(info, VVP_GROUP, "Utilities");
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
                                 "Gradient Magnitude");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,

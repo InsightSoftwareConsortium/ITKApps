@@ -124,6 +124,7 @@ void VV_PLUGIN_EXPORT vvITKSigmoidInit(vtkVVPluginInfo *info)
   info->ProcessData = ProcessData;
   info->UpdateGUI   = UpdateGUI;
   info->SetProperty(info, VVP_NAME, "Sigmoid (ITK)");
+  info->SetProperty(info, VVP_GROUP, "Intensity Transformation");
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
                             "Simoid Intensity Transform");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,

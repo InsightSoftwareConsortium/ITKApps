@@ -184,6 +184,7 @@ void VV_PLUGIN_EXPORT vvITKShapeDetectionModuleInit(vtkVVPluginInfo *info)
   info->ProcessData = ProcessData;
   info->UpdateGUI   = UpdateGUI;
   info->SetProperty(info, VVP_NAME, "Shape Detection Module (ITK)");
+  info->SetProperty(info, VVP_GROUP, "Segmentation - Level Sets");
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
                                     "Shape Detection Module");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,

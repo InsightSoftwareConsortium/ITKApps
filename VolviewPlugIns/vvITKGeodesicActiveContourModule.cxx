@@ -193,6 +193,7 @@ void VV_PLUGIN_EXPORT vvITKGeodesicActiveContourModuleInit(vtkVVPluginInfo *info
   info->ProcessData = ProcessData;
   info->UpdateGUI   = UpdateGUI;
   info->SetProperty(info, VVP_NAME, "Geodesic Active Contour Module (ITK)");
+  info->SetProperty(info, VVP_GROUP, "Segmentation - Level Sets");
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
                                     "Geodesic Active Contour Module");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,

@@ -126,6 +126,7 @@ void VV_PLUGIN_EXPORT vvITKConnectedThresholdInit(vtkVVPluginInfo *info)
   info->ProcessData = ProcessData;
   info->UpdateGUI = UpdateGUI;
   info->SetProperty(info, VVP_NAME, "Connected Threshold (ITK) ");
+  info->SetProperty(info, VVP_GROUP, "Segmentation - Region Growing");
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
                                     "Connected Threshold Segmentation");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,

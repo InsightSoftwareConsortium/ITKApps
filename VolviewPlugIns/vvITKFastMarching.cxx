@@ -148,6 +148,7 @@ void VV_PLUGIN_EXPORT vvITKFastMarchingInit(vtkVVPluginInfo *info)
   info->ProcessData = ProcessData;
   info->UpdateGUI = UpdateGUI;
   info->SetProperty(info, VVP_NAME, "Fast Marching (ITK)");
+  info->SetProperty(info, VVP_GROUP, "Segmentation - Level Sets");
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
                                     "Fast Marching Level Set");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,
