@@ -43,6 +43,7 @@ class IsolatedConnectedRunner
       module.GetFilter()->SetReplaceValue( replaceValue );
       module.GetFilter()->SetSeed1( seed1 );
       module.GetFilter()->SetSeed2( seed2 );
+      module.SetProduceDoubleOutput( compositeOutput          );
       // Execute the filter
       module.ProcessData( pds  );
       const float isolatedValue = static_cast<float>( module.GetFilter()->GetIsolatedValue() );
@@ -191,7 +192,7 @@ static int UpdateGUI(void *inf)
 
   info->OutputVolumeScalarType = VTK_UNSIGNED_CHAR;
   info->OutputVolumeNumberOfComponents = 1;
-  info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "4");
+  info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "1");
 
   const char * compositeOutputProperty = info->GetGUIProperty(info, 4, VVP_GUI_VALUE ); 
 
@@ -204,7 +205,7 @@ static int UpdateGUI(void *inf)
       {
       info->OutputVolumeScalarType = info->InputVolumeScalarType;
       info->OutputVolumeNumberOfComponents = 2;
-      info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "8");
+      info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "2");
       }
     }
 
@@ -240,7 +241,11 @@ void VV_PLUGIN_EXPORT vvITKIsolatedConnectedInit(vtkVVPluginInfo *info)
   info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "0");
   info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "5");
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP,           "0");
-  info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "4");// It is actually dependent of the complexity of the shape to segment
+  info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "1");// It is actually dependent of the complexity of the shape to segment
+
+  info->OutputVolumeScalarType = VTK_UNSIGNED_CHAR;
+  info->OutputVolumeNumberOfComponents = 1;
+  info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "1");
 
 }
 
