@@ -54,7 +54,11 @@
 #include "itkNumericTraits.h"
 #include "vnl/vnl_math.h"
 
-vtkCxxRevisionMacro(vtkITKMutualInformationTransform, "$Revision: 1.11 $");
+#ifndef vtkFloatingPointType
+#define vtkFloatingPointType float
+#endif
+
+vtkCxxRevisionMacro(vtkITKMutualInformationTransform, "$Revision: 1.12 $");
 vtkStandardNewMacro(vtkITKMutualInformationTransform);
 
 //----------------------------------------------------------------------------
