@@ -22,6 +22,7 @@ class IRISApplication;
 class GlobalState;
 class IntensityCurveUILogic;
 class PreprocessingUILogic;
+class RestoreSettingsDialogLogic;
 class SnakeParametersUILogic;
 class SystemInterface;
 
@@ -29,6 +30,7 @@ class GreyImageIOWizardLogic;
 class SegmentationImageIOWizardLogic;
 class PreprocessingImageIOWizardLogic;
 class SliceWindowCoordinator;
+class SimpleFileDialogLogic;
 
 //template<class TPixel> class ImageIOWizardLogic;
 //class SegmentationImageIOWizardLogic;
@@ -61,63 +63,17 @@ class UserInterfaceLogic : public UserInterface
 {
 public:
 
-  /* 
-   * DESCRIPTION:
-   * constructor.  calls GUI constructor. calls init
-   *
-   * PRECONDITIONS:
-   *
-   * POSTCONDITIONS:
-   * - IRIS window is ready to be shown
-   */
+  /** Constructor, calls GUI constructor, calls init */
   UserInterfaceLogic(IRISApplication *iris,SystemInterface *system);
+
+  /** Destructor */
   virtual ~UserInterfaceLogic();
 
-  /**
-   * DESCRIPTION
-   * hides the snake window and shows the iris window
-   *
-   * PARAMETERS
-   *
-   * PRE
-   *
-   * POST
-   * iris window is shown
-   *
-   * RETURNS
-   */
+  /** Hides the snake window and shows the iris window */
   void ShowIRIS();
 
-  /**
-   * DESCRIPTION
-   * Resets the region of interest to contain the entire volume (full_data)
-   *
-   * PARAMETERS
-   *
-   * PRE
-   *
-   * POST
-   * global state region of interest is set to entire full_data volume
-   *
-   * RETURNS
-   */
+  /** Resets the region of interest to contain the entire volume */
   void OnResetROIAction();
-
-  /**
-   * DESCRIPTION
-   * Callback for the checkbox that shows or hides the region of interest in
-   * the 2D windows
-   *
-   * PARAMETERS
-   *
-   * PRE
-   *
-   * POST
-   * 2D windows are redrawn, showing the region of interest if box is checked
-   *
-   * RETURNS
-   */
-  void OnShowROISelect();
 
   /**
    *
@@ -439,7 +395,7 @@ public:
    * the Active Bubbles browser is returned
    * - returns NULL if Active Bubbles browser is empty
    */
-  Bubble* getBubbles();
+  Bubble* GetBubbles();
 
   /**
    *
@@ -454,7 +410,7 @@ public:
    * - the number of bubbles in the Active Bubbles browser is returned
    * - returns zero if the browser is empty
    */
-  int getNumberOfBubbles();
+  int GetNumberOfBubbles();
 
   /**
    * Pops up a dialog to choose a preprocessed data file
@@ -510,25 +466,10 @@ public:
    * - program will exit
    *
    */
-  void shutdown();
-
-  /**
-    *
-    * DESCRIPTION:
-    * this function fiddles with the ROI points
-    * so that pt1 has the smaller coordinates (upper left),
-    * and pt2 has the larger coordinates (lower right). Some
-    * methods depend on this being true for simplicity.
-    *
-    * PRECONDITIONS:
-    *
-    * POSTCONDITIONS:
-    *
-    */
-  void TweakROI(Vector3i &pt1, Vector3i &pt2);
+  void OnMenuQuit();
 
   // Color label callbacks
-  void InitColorMap();
+  void InitColorMap(bool resetCurrentAndDrawOverLabels = true);
   void UpdateColorChips();
   void OnDrawingLabelUpdate();
   void OnDrawOverLabelUpdate();
@@ -541,7 +482,6 @@ public:
   void Activate3DAccept(bool on);
   void UpdateEditLabelWindow();
   void UpdatePositionDisplay(int id);
-  int CheckOrient(const char *txt, Vector3i &RAI);
 
   /** Set the current interaction mode */
   void SetToolbarMode(ToolbarModeType mode);
@@ -555,11 +495,14 @@ public:
   /** Update the user interface after loading a new grey image  */
   void OnGreyImageUpdate();
 
+  /** Called before unloading a grey image, saves settings associated with it */
+  void OnGreyImageUnload();
+
   /** Update the user interface after loading a new segmentation image  */
   void OnSegmentationImageUpdate();
 
   /** Update the user interface after loading a new labels file  */
-  void OnSegmentationLabelsUpdate();
+  void OnSegmentationLabelsUpdate(bool resetCurrentAndDrawOverLabels);
 
   /** Update the user interface after loading a new preprocessing image  */
   void OnSpeedImageUpdate();
@@ -572,6 +515,7 @@ public:
   /** A utility to center one window inside another */
   static void CenterChildWindowInParentWindow(Fl_Window *childWindow,
                                               Fl_Window *parentWindow);
+  void CenterChildWindowInMainWindow(Fl_Window *childWindow);
 
   // Zoom/pan management callbacks
   void OnResetView2DAction(unsigned int window);
@@ -617,7 +561,7 @@ protected:
    * POSTCONDITIONS:
    * - the IRIS window can now be shown
    */
-  void init();
+  void InitializeUI();
 
   /**
    * UserInterfaceLogic::ShowSNAP
@@ -647,23 +591,27 @@ protected:
    */
   // int RunSnake();
 
-  // Label IO callbacks
-  void OnLoadLabelsBrowseAction();
-  void OnLoadLabelsCancelAction();
-  void OnLoadLabelsOkAction();
+  // Callbacks to the simple file dialog
+  void OnLoadLabelsAction();
+  void OnSaveLabelsAction();
+  void OnOpenProjectAction();
+  void OnSaveProjectAction();
+  void OnWriteVoxelCountsAction();
 
   void ChangeLabelsCallback();
   void OnSliceSliderChange(int id);
-  void SaveLabelsCallback();
-  void PrintVoxelCountsCallback();
 
   // Menu item callbacks
+  void OnMenuOpenProject();
+  void OnMenuSaveProject();
+  void OnMenuCloseProject();
   void OnMenuLoadGrey();
   void OnMenuLoadSegmentation();
   void OnMenuLoadLabels();
   void OnMenuSaveGreyROI();
   void OnMenuSaveSegmentation();
   void OnMenuSaveLabels();
+  void OnMenuWriteVoxelCounts();
   void OnMenuIntensityCurve();
   void OnMenuLoadPreprocessed();  
   void OnMenuSavePreprocessed();  
@@ -684,16 +632,15 @@ protected:
   void OnSNAPLabelOpacityChange();
   void OnIRISLabelOpacityChange();
 
-  // SNAP pipeline step buttons
-  void OnSNAPStepPreprocess();
-  void OnSNAPStepInitialize();
-  void OnSNAPStepSegment();
-
   // Help system callbacks
   void OnLaunchTutorialAction();
 
   // Set the active page in the segmentation pipeline
   void SetActiveSegmentationPipelinePage(unsigned int page);
+
+  // Restoring settings
+  void OnRestoreSettingsAction();
+  void OnDoNotRestoreSettingsAction();
   
   char *m_ChosedFile;
 
@@ -744,69 +691,36 @@ private:
   /** Parameter setting UI object */
   SnakeParametersUILogic *m_SnakeParametersUI;
 
+  /** A restore settings dialog */
+  RestoreSettingsDialogLogic *m_DlgRestoreSettings;
+
   /** A coordinator for the slice windows */
   SliceWindowCoordinator *m_SliceCoordinator;
 
-  // Splash screen timer
+  /** Splash screen timer */
   clock_t m_SplashScreenStartTime;
+
+  /** Save/load labels dialog */
+  SimpleFileDialogLogic *m_DlgLabelsIO;
+
+  /** Write voxels dialog */
+  SimpleFileDialogLogic *m_DlgVoxelCountsIO;
 
   // Intensity curve update callback (uses ITK event system)
   void OnIntensityCurveUpdate();
 
-  /**
-   * DESCRIPTION
-   * Not used.  It was an attempt to solve the problem of SnAP not exiting
-   * if the user clicks the X to quit rather than the quit menu option, when
-   * one of the "non-modal" dialogs is open.  It didn't work, but I left it
-   * anyway
-   *
-   * PARAMETERS
-   *
-   * PRE
-   *
-   * POST
-   *
-   * RETURNS
-   */
-  static void CloseCallback(Fl_Window*,void*);
-
-  /**
-   *
-   * DESCRIPTION:
-   * updates snake iteration output field
-   *
-   * PRECONDITIONS:
-   *
-   * POSTCONDITIONS:
-   *
-   */
+  /** Update snake iteration output field */
   void UpdateIterationOutput();
 
   /**
-   *
-   * DESCRIPTION:
-   * some GUI state is shared between the windows,
-   * like contrast/brightness settings, toolbar mode.
-   * these functions sync the two
-   *
-   * PRECONDITIONS:
-   *
-   * POSTCONDITIONS:
-   *
+   * Some GUI state is shared between the windows, like opacity settings, 
+   * toolbar mode. This function syncs the two.
    */
   void SyncIRISToSnake();
-
+  
   /**
-   *
-   * DESCRIPTION:
-   * some GUI state is shared between the windows,
-   * like contrast/brightness settings, toolbar mode.
-   * these functions sync the two
-   *
-   * PRECONDITIONS:
-   *
-   * POSTCONDITIONS:
-   *
+   * Some GUI state is shared between the windows, like opacity settings, 
+   * toolbar mode. This function syncs the two.
    */
   void SyncSnakeToIRIS();
 
@@ -827,6 +741,9 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.6  2003/10/02 14:55:52  pauly
+ *ENH: Development during the September code freeze
+ *
  *Revision 1.2  2003/09/13 15:18:01  pauly
  *FIX: Got SNAP to work properly with different image orientations
  *

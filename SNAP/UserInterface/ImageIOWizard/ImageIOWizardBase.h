@@ -26,6 +26,7 @@ public:
   virtual void OnFilePageBrowse() = 0;
   virtual void OnFilePageNext() = 0;
   virtual void OnFilePageFileInputChange() = 0;
+  virtual void OnFilePageFileHistoryChange() = 0;
   virtual void OnFilePageFileFormatChange() = 0;
   virtual void OnHeaderPageNext() = 0;
   virtual void OnHeaderPageBack() = 0;
@@ -41,6 +42,7 @@ public:
   // Save related functions
   virtual void OnSaveFilePageFileInputChange() = 0;
   virtual void OnSaveFilePageFileFormatChange() = 0;
+  virtual void OnSaveFilePageFileHistoryChange() = 0;
   virtual void OnSaveFilePageBrowse() = 0;
   virtual void OnSaveFilePageSave() = 0;
   virtual void OnSaveCancel() = 0;

@@ -36,7 +36,7 @@ BubblesInteractionMode
   if (m_GlobalState->GetSnakeActive() == false)
     {
     // draw bubbles
-    int numBubbles = m_ParentUI->getNumberOfBubbles();
+    int numBubbles = m_ParentUI->GetNumberOfBubbles();
     if (numBubbles > 0)
       {
       // Get the active color label 
@@ -54,7 +54,7 @@ BubblesInteractionMode
         cl.GetRGBVector(rgb);
 
         // Get the lust of bubbles
-        Bubble *bubbles = m_ParentUI->getBubbles();
+        Bubble *bubbles = m_ParentUI->GetBubbles();
         
         // Get the current crosshairs position
         Vector3ui cursorImage = m_GlobalState->GetCrosshairsPosition();

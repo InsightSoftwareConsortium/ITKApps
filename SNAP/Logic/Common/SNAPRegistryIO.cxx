@@ -13,6 +13,21 @@
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "SNAPRegistryIO.h"
+#include "IRISApplication.h"
+#include "IRISImageData.h"
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+SNAPRegistryIO
+::SNAPRegistryIO()
+{
+  // Set up the enum objects
+  m_EnumMapCoverage.AddPair(PAINT_OVER_ALL,"OverAll");
+  m_EnumMapCoverage.AddPair(PAINT_OVER_COLORS,"OverVisible");
+  m_EnumMapCoverage.AddPair(PAINT_OVER_ONE,"OverAll");
+}
 
 /** Read snake parameters from a registry */
 SnakeParameters 
@@ -243,3 +258,205 @@ SNAPRegistryIO
   registry["UpperThresholdEnabled"] << in.IsUpperThresholdEnabled();
 }
 
+
+void 
+SNAPRegistryIO
+::WriteImageAssociatedSettings(IRISApplication *app, Registry &registry)
+{
+  // Get the global state for this object
+  GlobalState *gs = app->GetGlobalState();
+
+  // Write snake parameters
+  WriteSnakeParameters(
+    gs->GetSnakeParameters(),
+    registry.Folder("SNAP.SnakeParameters"));
+
+  // Write the preprocessing settings
+  WriteEdgePreprocessingSettings(
+    gs->GetEdgePreprocessingSettings(),
+    registry.Folder("SNAP.Preprocessing.Edge"));
+  WriteThresholdSettings(
+    gs->GetThresholdSettings(),
+    registry.Folder("SNAP.Preprocessing.Region"));
+
+  // Write the mesh display options
+  WriteMeshOptions(
+    gs->GetMeshOptions(),
+    registry.Folder("IRIS.MeshOptions"));
+
+  // Write file related information
+  registry["Files.Segmentation.FileName"] << gs->GetSegmentationFileName();
+  registry["Files.Preprocessing.FileName"] << gs->GetPreprocessingFileName();
+  registry["Files.Grey.Orientation"] << app->GetImageToAnatomyRAI();
+  registry["Files.Grey.Dimensions"] << 
+    to_int(app->GetIRISImageData()->GetVolumeExtents());
+
+  // Write information about the current label state
+  registry["IRIS.LabelState.DrawingLabel"] << 
+    (int) gs->GetDrawingColorLabel();
+  registry["IRIS.LabelState.OverwriteLabel"] << 
+    (int) gs->GetOverWriteColorLabel();
+  registry["IRIS.LabelState.CoverageMode"].PutEnum(
+    m_EnumMapCoverage,gs->GetCoverageMode());
+  registry["IRIS.LabelState.PolygonInvert"] << gs->GetPolygonInvert();
+  registry["IRIS.LabelState.OverallAlpha"] << 
+    (int) gs->GetSegmentationAlpha();
+
+  // Write the labels themselves
+  unsigned int validLabels = 0;
+  for(unsigned int i=1;i < MAX_COLOR_LABELS; i++)
+    {
+    // Get the i-th color label
+    ColorLabel cl = app->GetCurrentImageData()->GetColorLabel(i);
+    
+    // Only write valid color labels (otherwise, what's the point?)
+    if(!cl.IsValid()) continue;
+    
+    // Create a folder for the color label
+    Registry &folder = 
+      registry.Folder(registry.Key("IRIS.LabelTable.Element[%d]",validLabels));    
+    
+    folder["Index"] << i;
+    folder["Alpha"] << (int) cl.GetAlpha();
+    folder["Label"] << cl.GetLabel();
+    folder["Color"] << Vector3i(cl.GetRGB(0),cl.GetRGB(1),cl.GetRGB(2));
+    folder["Flags"] << Vector2i(cl.IsDoMesh(),cl.IsVisible());
+
+    // Increment the valid label counter
+    validLabels++;
+    }
+
+  registry["IRIS.LabelTable.NumberOfElements"] << validLabels;
+}
+
+bool 
+SNAPRegistryIO
+::ReadImageAssociatedSettings(
+  Registry &registry, IRISApplication *app,
+  bool restoreLabels, bool restorePreprocessing,
+  bool restoreParameters, bool restoreDisplayOptions)
+{
+  // Get a pointer to the global state
+  GlobalState *gs = app->GetGlobalState();
+
+  // First of all, make sure that the image referred to in the association file
+  // matches the image currently loaded
+  Vector3i dims = registry["Files.Grey.Dimensions"][Vector3i(0)];
+  if(dims != to_int(app->GetIRISImageData()->GetVolumeExtents()))
+    return false;
+
+  // Read the snake parameters (TODO: expand the parameters to include 
+  // different settings for edge and in-out parameters)
+  if(restoreParameters)
+    {
+    gs->SetSnakeParameters(
+      SNAPRegistryIO::ReadSnakeParameters(
+        registry.Folder("SNAP.SnakeParameters"),
+        gs->GetSnakeParameters()));
+    }
+
+  // Read the preprocessing settings
+  if(restorePreprocessing)
+    {
+    // Read the edge preprocessing settings
+    gs->SetEdgePreprocessingSettings(
+      SNAPRegistryIO::ReadEdgePreprocessingSettings(
+        registry.Folder("SNAP.Preprocessing.Edge"),
+        gs->GetEdgePreprocessingSettings()));
+    
+    // Read the thresholding settings (note that since they depend on an image
+    // we have to use re-initialized defaults
+    gs->SetThresholdSettings(
+      SNAPRegistryIO::ReadThresholdSettings(
+        registry.Folder("SNAP.Preprocessing.Region"),
+        ThresholdSettings::MakeDefaultSettings(
+          app->GetIRISImageData()->GetGrey())));
+    }
+
+  // Read the display options
+  if(restoreDisplayOptions)
+    {
+    gs->SetMeshOptions(
+      SNAPRegistryIO::ReadMeshOptions(
+        registry.Folder("IRIS.MeshOptions"),
+        gs->GetMeshOptions()));
+    }
+
+  // Read the label info
+  if(restoreLabels) 
+    {
+    // Reset the color labels
+    app->GetCurrentImageData()->ResetColorLabelTable();
+
+    // Read the number of color labels
+    unsigned int nColorLabels = 
+      registry["IRIS.LabelTable.NumberOfElements"][0];
+
+    // Read each label (don't assign them yet)
+    for(unsigned int i=0;i<nColorLabels;i++) 
+      {
+      // Get the folder describing the label
+      Registry &folder = 
+        registry.Folder(registry.Key("IRIS.LabelTable.Element[%d]",i));
+
+      // Get the index
+      int index = folder["Index"][0];
+
+      // If index is valid, proceed to load the label
+      if(index > 0) 
+        {
+        // Get current color label 
+        ColorLabel cl = app->GetCurrentImageData()->GetColorLabel(i);
+
+        // Read the color label properties
+        cl.SetAlpha(folder["Alpha"][(int) cl.GetAlpha()]);
+        cl.SetLabel(folder["Label"][cl.GetLabel()]);
+        
+        // Read the color property
+        Vector3i color = 
+          folder["Color"][Vector3i(cl.GetRGB(0),cl.GetRGB(1),cl.GetRGB(2))];
+        cl.SetRGB((unsigned char)color[0],(unsigned char)color[1],
+                  (unsigned char)color[2]);
+        
+        // Read the flag property
+        Vector2i flags = folder["Flags"][Vector2i(0,0)];
+        cl.SetDoMesh(flags[0] > 0);
+        cl.SetVisible(flags[1] > 0);
+        cl.SetValid(true);
+
+        // Assign the color label
+        app->GetIRISImageData()->SetColorLabel(index,cl);
+        }
+      }
+
+    // Read the drawing color label
+    gs->SetDrawingColorLabel(
+      (LabelType)registry["IRIS.LabelState.DrawingLabel"][1]);
+
+    // Read the override color label
+    gs->SetOverWriteColorLabel(
+      (LabelType)registry["IRIS.LabelState.OverwriteLabel"][0]);
+    
+    // Read the coverage mode
+    gs->SetCoverageMode(
+      registry["IRIS.LabelState.CoverageMode"].GetEnum(
+        m_EnumMapCoverage,gs->GetCoverageMode()));      
+    
+    // Read the polygon inversion state
+    gs->SetPolygonInvert(
+      registry["IRIS.LabelState.PolygonInvert"][gs->GetPolygonInvert()]);
+    
+    // Read the segmentation alpha
+    gs->SetSegmentationAlpha(
+      registry["IRIS.LabelState.OverallAlpha"][gs->GetSegmentationAlpha()]);
+    } // If restore labels
+
+  // Read other settings
+  gs->SetSegmentationFileName(
+    registry["Files.Segmentation.FileName"][""]);  
+  gs->SetPreprocessingFileName(
+    registry["Files.Preprocessing.FileName"][""]);
+
+  // Done!
+  return true;
+}

@@ -33,7 +33,7 @@ public:
   typedef typename itk::SmartPointer<GreyImageType> GreyImagePointer;
 
   /** Some extra work is done before displaying the wizard in this method */
-  virtual bool DisplayInputWizard();
+  virtual bool DisplayInputWizard(const char *file);
 
   /** Set the grey image that provides some metadata for loading the 
    * segmentation image */

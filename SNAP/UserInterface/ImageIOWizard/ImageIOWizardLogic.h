@@ -17,6 +17,7 @@
 
 #include <cassert>
 #include <string>
+#include <vector>
 
 // #include "ImageWrapper.h"
 #include "ImageIOWizard.h"
@@ -58,6 +59,7 @@ public:
 
   // Other typedefs
   typedef std::string StringType;
+  typedef std::vector<StringType> HistoryType;
 
   /** A constructor */
   ImageIOWizardLogic();
@@ -71,6 +73,7 @@ public:
   virtual void OnFilePageNext();
   virtual void OnFilePageFileInputChange();
   virtual void OnFilePageFileFormatChange();
+  virtual void OnFilePageFileHistoryChange();
   virtual void OnHeaderPageNext();
   virtual void OnHeaderPageBack();
   virtual void OnHeaderPageInputChange();        
@@ -91,6 +94,7 @@ public:
   // Save related functions
   virtual void OnSaveFilePageFileInputChange();
   virtual void OnSaveFilePageFileFormatChange();
+  virtual void OnSaveFilePageFileHistoryChange();
   virtual void OnSaveFilePageBrowse();
   virtual void OnSaveFilePageSave();
   virtual void OnSaveCancel();
@@ -143,13 +147,13 @@ public:
    *
    * The method returns true if an image was loaded with success, false in case of cancellation
    */
-  virtual bool DisplayInputWizard();   
+  virtual bool DisplayInputWizard(const char *file);   
 
   /**
    * A method to save an image using the wizard (at this point it's just a one
    * page wizard 
    */
-  virtual bool DisplaySaveWizard(ImageType *image);
+  virtual bool DisplaySaveWizard(ImageType *image, const char *file);
 
   /**
    * Get the filename that was loaded
@@ -159,13 +163,14 @@ public:
     return m_InFilePageBrowser->value();
   }
 
-  /**
-   * Get the filename that was saved
-   */
+  /** Get the filename that was saved */
   const char *GetSaveFileName()
   {
     return m_InSaveFilePageBrowser->value();
   }
+
+  /** Set the history list of recently opened files */
+  void SetHistory(const HistoryType &history);
 
 protected:
 
@@ -180,6 +185,9 @@ protected:
 
   /** Has the image been saved? */
   bool m_ImageSaved;
+
+  /** A history of recently opened files */
+  HistoryType m_History;
 
   /** A mapping from axis index and flip state to orientation menu items */
   unsigned int m_MapOrientationIndexAndFlipToMenuItem[3][2];

@@ -105,6 +105,8 @@ SET(UI_CXX
   UserInterface/MainComponents/IntensityCurveBox.cxx
   UserInterface/MainComponents/IntensityCurveUILogic.cxx
   UserInterface/MainComponents/PreprocessingUILogic.cxx
+  UserInterface/MainComponents/RestoreSettingsDialogLogic.cxx
+  UserInterface/MainComponents/SimpleFileDialogLogic.cxx
   UserInterface/MainComponents/SnakeParametersUILogic.cxx
   UserInterface/MainComponents/UserInterfaceLogic.cxx
   UserInterface/SliceWindow/BubblesInteractionMode.cxx
@@ -143,8 +145,12 @@ SET(UI_HEADERS
   UserInterface/MainComponents/IntensityCurveUILogic.h
   UserInterface/MainComponents/PreprocessingUIBase.h
   UserInterface/MainComponents/PreprocessingUILogic.h
+  UserInterface/MainComponents/RestoreSettingsDialogBase.h
+  UserInterface/MainComponents/RestoreSettingsDialogLogic.h
   UserInterface/MainComponents/SnakeParametersUIBase.h
   UserInterface/MainComponents/SnakeParametersUILogic.h
+  UserInterface/MainComponents/SimpleFileDialogBase.h
+  UserInterface/MainComponents/SimpleFileDialogLogic.h
   UserInterface/MainComponents/UserInterfaceBase.h
   UserInterface/MainComponents/UserInterfaceLogic.h
   UserInterface/SliceWindow/BubblesInteractionMode.h
@@ -190,6 +196,8 @@ SET(APPLICATION_FLUIDS
   UserInterface/ImageIOWizard/ImageIOWizard.fl
   UserInterface/MainComponents/IntensityCurveUI.fl
   UserInterface/MainComponents/PreprocessingUI.fl
+  UserInterface/MainComponents/RestoreSettingsDialog.fl
+  UserInterface/MainComponents/SimpleFileDialog.fl
   UserInterface/MainComponents/SnakeParametersUI.fl
   UserInterface/MainComponents/UserInterface.fl
 )
@@ -303,3 +311,9 @@ FOREACH(DATAFILE ${PROGRAM_DATA_FILES})
     ${MY_BINARY_DIR}/${DATAFILE}
     COPYONLY)
 ENDFOREACH(DATAFILE)
+
+# Copy the InnoSetup installer configuration script
+CONFIGURE_FILE(
+  ${MY_SOURCE_DIR}/Utilities/InnoSetup/InstallSNAP.iss.in
+  ${MY_BINARY_DIR}/Utilities/InnoSetup/InstallSNAP.iss)
+

@@ -13,10 +13,30 @@
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "SystemInterface.h"
+#include "IRISApplication.h"
+#include "GlobalState.h"
+#include "SNAPRegistryIO.h"
 #include "FL/Fl_Preferences.h"
+#include "FL/filename.h"
 #include <itksys/SystemTools.hxx>
+#include <algorithm>
+#include <ctime>
+#include <iomanip>
 
 using namespace std;
+
+SystemInterface
+::SystemInterface()
+{
+  m_RegistryIO = new SNAPRegistryIO;
+}
+
+SystemInterface
+::~SystemInterface()
+{
+  delete m_RegistryIO;
+}
+
 
 void
 SystemInterface
@@ -140,5 +160,174 @@ SystemInterface
   // Return the file
   return path;
 }
+
+bool 
+SystemInterface
+::FindRegistryAssociatedWithFile(const char *file, Registry &registry)
+{
+  // Convert the file to an absolute path
+  char buffer[1024];
+  fl_filename_absolute(buffer,1024,file);
+
+  // Convert to unix slashes for consistency
+  string path(buffer);
+  itksys::SystemTools::ConvertToUnixSlashes(path);
+
+  // Look for the file in the registry (may already exist, if not use the
+  // code just generated
+  string key = Key("ImageAssociation.Mapping.Element[%s]",path.c_str());
+
+  // Find the key in the registry
+  string code = Entry(key)[string("")];
+
+  // If the code does not exist, return w/o success
+  if(code.length() == 0) return false;
+
+  // Create a preferences object for the associations subdirectory
+  Fl_Preferences test(Fl_Preferences::USER,"itk.org","SNAP/ImageAssociations");
+
+  // Use it to get a path for user data
+  char userDataPath[1024]; 
+  test.getUserdataPath(userDataPath,1024);
+
+  // Create a save filename
+  IRISOStringStream sfile;
+  sfile << userDataPath << "/" << "ImageAssociation." << code << ".txt";
+
+  // Try loading the registry
+  try 
+    {
+    registry.ReadFromFile(sfile.str().c_str());
+    return true;
+    }
+  catch(...)
+    {
+    return false;
+    }
+}
+
+bool 
+SystemInterface
+::AssociateRegistryWithFile(const char *file, Registry &registry)
+{
+  // Convert the file to an absolute path
+  char buffer[1024];
+  fl_filename_absolute(buffer,1024,file);
+
+  // Convert to unix slashes for consistency
+  string path(buffer);
+  itksys::SystemTools::ConvertToUnixSlashes(path);
+
+  // Compute a timestamp from the start of computer time
+  time_t timestr = time(NULL);
+
+  // Create a key for the file
+  IRISOStringStream scode;
+  scode << setfill('0') << setw(16) << hex << timestr;
+  
+  // Look for the file in the registry (may already exist, if not use the
+  // code just generated
+  string key = Key("ImageAssociation.Mapping.Element[%s]",path.c_str());
+  string code = Entry(key)[scode.str()];
+
+  // Put the key in the registry
+  Entry(key) << code;
+
+  // Create a preferences object for the associations subdirectory
+  Fl_Preferences test(Fl_Preferences::USER,"itk.org","SNAP/ImageAssociations");
+
+  // Use it to get a path for user data
+  char userDataPath[1024]; 
+  test.getUserdataPath(userDataPath,1024);
+
+  // Create a save filename
+  IRISOStringStream sfile;
+  sfile << userDataPath << "/" << "ImageAssociation." << code << ".txt";
+
+  // Store the registry to that path
+  try 
+    {
+    registry.WriteToFile(sfile.str().c_str());
+    return true;
+    }
+  catch(...)
+    {
+    return false;
+    }  
+}
+
+bool 
+SystemInterface
+::AssociateCurrentSettingsWithCurrentImageFile(const char *file, IRISApplication *app)
+{
+  // Get a registry already associated with this filename
+  Registry registry;
+  FindRegistryAssociatedWithFile(file,registry);
+
+  // Write the current state into that registry
+  m_RegistryIO->WriteImageAssociatedSettings(app,registry);
+
+  // Write the registry back
+  return AssociateRegistryWithFile(file,registry);
+}
+
+bool 
+SystemInterface
+::RestoreSettingsAssociatedWithImageFile(
+  const char *file, IRISApplication *app,
+  bool restoreLabels, bool restorePreprocessing,
+  bool restoreParameters, bool restoreDisplayOptions)
+{
+  // Get a registry already associated with this filename
+  Registry registry;
+  if(FindRegistryAssociatedWithFile(file,registry))
+    {
+    m_RegistryIO->ReadImageAssociatedSettings(
+      registry, app,
+      restoreLabels, restorePreprocessing,
+      restoreParameters, restoreDisplayOptions);
+    return true;
+    }
+  else
+    return false;
+}
+
+/** Get a filename history list by a particular name */
+SystemInterface::HistoryListType 
+SystemInterface
+::GetHistory(const char *key)
+{
+  // Get the history array
+  return Folder("IOHistory").Folder(string(key)).GetArray(string(""));
+}
+
+/** Update a filename history list with another filename */
+void
+SystemInterface
+::UpdateHistory(const char *key, const char *filename)
+{
+  // Create a string for the new file
+  string file(filename);
+
+  // Get the current history registry
+  HistoryListType array = GetHistory(key);
+
+  // First, search the history for the instance of the file and delete
+  // existing occurences
+  HistoryListType::iterator it;
+  while((it = find(array.begin(),array.end(),file)) != array.end())
+    array.erase(it);
+
+  // Append the file to the end of the array
+  array.push_back(file);
+
+  // Trim the array to appropriate size
+  if(array.size() > 20)
+    array.erase(array.begin(),array.begin() + array.size() - 20);
+
+  // Store the new array to the registry
+  Folder("IOHistory").Folder(string(key)).PutArray(array);      
+}
+
 
 

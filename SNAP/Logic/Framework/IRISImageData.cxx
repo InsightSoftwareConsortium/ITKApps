@@ -562,7 +562,7 @@ IRISImageData
 
   // Propagate the change to the label wrapper
   m_LabelWrapper->SetLabelColorTable(m_ColorLabels);
-}
+}                                                                                 
 
 void 
 IRISImageData

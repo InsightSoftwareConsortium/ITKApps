@@ -63,6 +63,9 @@ public:
     return m_ColorLabelCount;
   }
 
+  /** Reset the color label table */
+  void ResetColorLabelTable() { InitializeColorLabels(); }
+
   /**
    * Cut the segmentation using a plane and relabed the segmentation
    * on the side of that plane

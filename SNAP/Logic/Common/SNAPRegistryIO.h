@@ -15,49 +15,70 @@
 #ifndef __SNAPRegistryIO_h_
 #define __SNAPRegistryIO_h_
 
+#include "GlobalState.h"
 #include "Registry.h"
 #include "SnakeParameters.h"
 #include "MeshOptions.h"
 #include "EdgePreprocessingSettings.h"
 #include "ThresholdSettings.h"
 
+class IRISApplication;
+
 class SNAPRegistryIO 
 {
 public:
+  SNAPRegistryIO();
+  virtual ~SNAPRegistryIO() {}  
+  
+  /** Write settings associated with a greyscale image to a registry */
+  void WriteImageAssociatedSettings(
+    IRISApplication *app, Registry &registry);
+
+  /** Read settings associated with a greyscale image and apply them to 
+   * the current application */
+  bool ReadImageAssociatedSettings(
+    Registry &registry, IRISApplication *app,
+    bool restoreLabels, bool restorePreprocessing,
+    bool restoreParameters, bool restoreDisplayOptions);
+
   /** Read snake parameters from a registry */
-  static SnakeParameters ReadSnakeParameters(
+  SnakeParameters ReadSnakeParameters(
     Registry &registry,const SnakeParameters &defaultSet);
 
   /** Write snake parameters to a registry */
-  static void WriteSnakeParameters(
+  void WriteSnakeParameters(
     const SnakeParameters &in,Registry &registry);
 
   
   /** Read mesh options from a registry */
-  static MeshOptions ReadMeshOptions(
+  MeshOptions ReadMeshOptions(
     Registry &registry,const MeshOptions &defaultSet);
 
   /** Write mesh options to a registry */
-  static void WriteMeshOptions(
+  void WriteMeshOptions(
     const MeshOptions &in,Registry &registry);
 
   
   /** Read edge preprocessing settings from a registry */
-  static EdgePreprocessingSettings ReadEdgePreprocessingSettings(
+  EdgePreprocessingSettings ReadEdgePreprocessingSettings(
     Registry &registry,const EdgePreprocessingSettings &defaultSet);
 
   /** Write edge preprocessing settings to a registry */
-  static void WriteEdgePreprocessingSettings(
+  void WriteEdgePreprocessingSettings(
     const EdgePreprocessingSettings &in,Registry &registry);
 
-
   /** Read threshold settings from a registry */
-  static ThresholdSettings ReadThresholdSettings(
+  ThresholdSettings ReadThresholdSettings(
     Registry &registry,const ThresholdSettings &defaultSet);
 
   /** Write threshold settings to a registry */
-  static void WriteThresholdSettings(
+  void WriteThresholdSettings(
     const ThresholdSettings &in,Registry &registry);
+
+private:
+  // Some enumeraticns used by this class
+  RegistryEnumMap<CoverageModeType> m_EnumMapCoverage;
+
 };
 
 #endif // __SNAPRegistryIO_h_

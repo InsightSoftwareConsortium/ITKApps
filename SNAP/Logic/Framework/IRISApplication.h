@@ -137,9 +137,7 @@ public:
   void WriteLabelDescriptionsToTextFile(const char *file) 
     throw(itk::ExceptionObject);
 
-  /**
-   * Release the SNAP Image data
-   */
+  /** Release the SNAP Image data */
   void ReleaseSNAPImageData();
   
   /** Update the display-anatomy mapping as an RAI code */

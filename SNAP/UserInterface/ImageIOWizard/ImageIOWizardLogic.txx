@@ -362,6 +362,19 @@ ImageIOWizardLogic<TPixel>
 }
 
 template <class TPixel>
+void 
+ImageIOWizardLogic<TPixel>
+::OnFilePageFileHistoryChange()
+{
+  // Copy the history to the file box
+  m_InFilePageBrowser->value(
+    m_InFilePageHistory->mvalue()->label());
+
+  // Update everything
+  OnFilePageFileInputChange();
+}
+
+template <class TPixel>
 void ImageIOWizardLogic<TPixel>
 ::OnFilePageFileInputChange() 
 {
@@ -464,54 +477,6 @@ ImageIOWizardLogic<TPixel>
   // Do the loading
   if(LoadImage(m_ImageIO))
     GoForward();
-
-  /*
-  // Get the byte type
-  typedef typename ImageWrapper<TPixel>::RAWImagePixelType RAWPixelType;  
-  RAWPixelType ptype = 
-    static_cast<RAWPixelType>(ImageWrapper<TPixel>::IW_UBYTE + 
-                              (int)m_InHeaderPageVoxelType->value());
-
-  // Create the vector for the image size
-  Vector3ui size((unsigned int) m_InHeaderPageDimX->value(),
-                 (unsigned int) m_InHeaderPageDimY->value(),
-                 (unsigned int) m_InHeaderPageDimZ->value());
-
-  // Create the vector for the image spacing
-  Vector3d spacing(m_InHeaderPageSpacingX->value(),
-                   m_InHeaderPageSpacingY->value(),
-                   m_InHeaderPageSpacingZ->value());
-*/
-  
-
-  // Load the image with supplied information
-
-
-/*
-  fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
-  
-  bool success = 
-    m_Image->LoadFromRAWFile(m_InFilePageBrowser->value(),
-                             size,spacing,
-                             (unsigned int) m_InHeaderPageHeaderSize->value(),
-                             ptype,
-                             m_InHeaderPageByteAlign->value() == 0);
-
-  fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
-
-  if(success) 
-    {
-    // Update the UI to the image
-    DoImageLoadCommon();
-
-    // Go forward
-    GoForward();
-    }
-  else
-    {
-    fl_alert("Error. Image could not be read!");
-    }
-*/    
 }
 
 template <class TPixel>
@@ -566,37 +531,6 @@ ImageIOWizardLogic<TPixel>
   return CheckImageValidity();
 }
 
-/*
-template <class TPixel>
-void 
-ImageIOWizardLogic<TPixel>
-::DoImageLoadCommon() 
-{  
-  // Better have an image that's initialized
-  assert(m_Image->IsInitialized());
-
-  // Set the orientation page to the correct state.  First see if
-  // the loaded image has some sort of RAI information
-  // TODO: Get RAI from image
-
-  // Check if the currently selected RAI is valid
-  if(ImageCoordinateTransform::IsRAICodeValid(m_InRAICode->value()))
-    {
-    // Make sure that the old RAI gets integrated with the new image
-    SetRAI(m_InRAICode->value());
-    }
-  else
-    {
-    // Enter the default mode
-    m_InOrientationPagePreset->value(0);
-
-    // Make sure the preset is applied
-    OnOrientationPageSelectPreset();
-    }
-
-
-}
-*/
 template <class TPixel>
 void 
 ImageIOWizardLogic<TPixel>
@@ -971,7 +905,7 @@ ImageIOWizardLogic<TPixel>::~ImageIOWizardLogic() {
 template <class TPixel>
 bool 
 ImageIOWizardLogic<TPixel>
-::DisplayInputWizard() 
+::DisplayInputWizard(const char *file) 
 {
   // The loaded flag is false
   m_ImageLoaded = false;
@@ -981,7 +915,9 @@ ImageIOWizardLogic<TPixel>
 
   // Clear the file name box
   // TODO: Implement a history list
-  m_InFilePageBrowser->value("");
+  if(file)
+    m_InFilePageBrowser->value(file);
+  
   OnFilePageFileInputChange();
 
   // Show the input window
@@ -1006,7 +942,7 @@ ImageIOWizardLogic<TPixel>
 template <class TPixel>
 bool 
 ImageIOWizardLogic<TPixel>
-::DisplaySaveWizard(ImageType *image)
+::DisplaySaveWizard(ImageType *image,const char *file)
 {
   // Clear the saved flag
   m_ImageSaved = false;
@@ -1016,7 +952,8 @@ ImageIOWizardLogic<TPixel>
 
   // Clear the file name box
   // TODO: Implement a history list
-  m_InFilePageBrowser->value("");
+  if(file)
+    m_InFilePageBrowser->value(file);
   OnSaveFilePageFileInputChange();
 
   // Show the input window
@@ -1057,6 +994,19 @@ ImageIOWizardLogic<TPixel>
     {
     m_BtnSaveFilePageNext->deactivate();
     }            
+}
+
+template <class TPixel>
+void 
+ImageIOWizardLogic<TPixel>
+::OnSaveFilePageFileHistoryChange()
+{
+  // Copy the history to the file box
+  m_InSaveFilePageBrowser->value(
+    m_InSaveFilePageHistory->mvalue()->label());
+
+  // Update everything
+  OnSaveFilePageFileInputChange();
 }
 
 template <class TPixel>
@@ -1193,6 +1143,45 @@ ImageIOWizardLogic<TPixel>
 {
   // Just close the window
   m_WinOutput->hide();
+}
+
+template <class TPixel>
+void 
+ImageIOWizardLogic<TPixel>
+::SetHistory(const HistoryType &history)
+{
+  // Store the history
+  m_History = history;
+
+  // Clear the history drop box
+  m_InFilePageHistory->clear();
+  m_InSaveFilePageHistory->clear();
+
+  // Add the history
+  if(history.size() > 0)
+    {  
+    // Add each item to the history menu (history is traversed
+    // backwards)
+    for(HistoryType::reverse_iterator it=m_History.rbegin();
+        it!=m_History.rend();it++)
+      {
+      // FLTK's add() treats slashes as submenu separators, hence this code
+      m_InFilePageHistory->replace(
+        m_InFilePageHistory->add("dummy"),it->c_str());      
+      m_InSaveFilePageHistory->replace(
+        m_InSaveFilePageHistory->add("dummy"),it->c_str());
+      }
+
+    // Activate the history menu    
+    m_InFilePageHistory->activate();
+    m_InSaveFilePageHistory->activate();
+    }
+  else
+    {
+    // Deactivate history
+    m_InFilePageHistory->deactivate();
+    m_InSaveFilePageHistory->deactivate();
+    }
 }
 
 

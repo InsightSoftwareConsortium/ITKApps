@@ -118,7 +118,7 @@ Registry
     if(!ite->second.IsNull())
       {
       // Write the key = 
-      sout << prefix << ite->first << " = ";
+      sout << prefix << Encode(ite->first) << " = ";
 
       // Write the encoded value
       sout << Encode(ite->second.GetInternalString()) << endl;
@@ -164,6 +164,24 @@ Registry
     // Add the key to the collection list
     keyList.push_back(prefix + ite->first);
     }
+}
+
+void 
+Registry
+::RemoveKeys(const char *match)
+{
+  // Create a match substring
+  string sMatch = (match) ? match : 0;
+
+  // Search and delete from the map
+  EntryMapType newMap;
+  for(EntryIterator it=m_EntryMap.begin(); it != m_EntryMap.end(); it++)
+    {
+    if(it->first.compare(0,sMatch.length(),sMatch) != 0)
+      newMap[it->first] = it->second;
+    }
+
+  m_EntryMap = newMap;
 }
 
 Registry::StringType
@@ -272,17 +290,12 @@ Registry
       }
 
     // Extract the key
-    string key = line.substr(iToken,line.find_first_of(" \t\v\r\n=",iToken) - iToken);
+    string key = Decode(
+      line.substr(iToken,line.find_first_of(" \t\v\r\n=",iToken) - iToken));
 
     // Extract the value
     StringType::size_type iValue = line.find_first_not_of(" \t\v\r\n=",iOper);
-    if(iValue == iToken)
-      {
-      // Missing key
-      oss << std::setw(5) << lineNumber << " : Missing value after '='; line ignored." << endl;
-      continue;
-      }
-    string value = line.substr(iValue);
+    string value = (iValue == line.npos) ? "" : line.substr(iValue);
     
     // Now the key-value pair is present.  Add it using the normal interface
     Entry(key) = RegistryValue(Decode(value));
@@ -364,11 +377,13 @@ Registry
   // Create an error stream
   IRISOStringStream serr;
       
+  // Create output stream
+  ifstream sin(pathname,ios_base::in);
+  if(!sin.good())
+    throw IOException("Unable to open the Registry file");
+
   try 
     {
-    // Create output stream
-    ifstream sin(pathname,ios_base::in);
-
     // Try reading
     Read(sin,serr);
     }

@@ -18,6 +18,10 @@
 
 #include "Registry.h"
 #include <string>
+#include <vector>
+
+class IRISApplication;
+class SNAPRegistryIO;
 
 /**
  * \class SystemInterface 
@@ -28,6 +32,9 @@
 class SystemInterface : public Registry
 {
 public:
+  SystemInterface();
+  virtual ~SystemInterface();
+
   /** 
    * A method that checks whether the SNAP system directory can be found and 
    * if it can't, prompts the user for the directory.  If the user refuses to 
@@ -60,10 +67,41 @@ public:
     return "SNAPProgramDataDirectory.txt";
   }
 
+  // Typedef for history lists
+  typedef std::vector<std::string> HistoryListType;
+
+  /** Get a filename history list by a particular name */
+  HistoryListType GetHistory(const char *key);
+
+  /** Update a filename history list with another filename */
+  void UpdateHistory(const char *key, const char *file);
+
+  /** Find and load a registry file associated with a filename in the system.*/
+  bool FindRegistryAssociatedWithFile(const char *file, 
+                                      Registry &registry);
+
+  /** Find and load a registry file associated with a filename in the system */
+  bool AssociateRegistryWithFile(const char *file, Registry &registry);
+
+  /** A higher level method: associates current settings with the current image
+   * so that the next time the image is loaded, it can be saved */
+  bool AssociateCurrentSettingsWithCurrentImageFile(
+    const char *file,IRISApplication *app);
+
+  /** A higher level method: associates current settings with the current image
+   * so that the next time the image is loaded, it can be saved */
+  bool RestoreSettingsAssociatedWithImageFile(
+    const char *file, IRISApplication *app,
+    bool restoreLabels, bool restorePreprocessing,
+    bool restoreParameters, bool restoreDisplayOptions);
+
 private:
   std::string m_UserPreferenceFile;
   std::string m_DataDirectory;
   std::string m_DocumentationDirectory;
+
+  // An object used to write large chunks of SNAP data to the registry
+  SNAPRegistryIO *m_RegistryIO;
 };
 
 

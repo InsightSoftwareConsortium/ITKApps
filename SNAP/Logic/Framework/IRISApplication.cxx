@@ -209,6 +209,13 @@ IRISApplication
   
   // TODO: Unify this!
   m_GlobalState->SetCrosshairsPosition(cursor) ;
+
+  // Update the preprocessing settings in the global state
+  m_GlobalState->SetEdgePreprocessingSettings(
+    EdgePreprocessingSettings::MakeDefaultSettings());
+  m_GlobalState->SetThresholdSettings(
+    ThresholdSettings::MakeDefaultSettings(
+      m_IRISImageData->GetGrey()));
 }
 
 void 
@@ -485,9 +492,9 @@ void IRISApplication
     if(cl.IsValid())
       {
       fout << "  "  << right << std::setw(3) << i;
-      fout << "   " << right << std::setw(3) << cl.GetRGB(0);
-      fout << "  "  << right << std::setw(3) << cl.GetRGB(1);
-      fout << "  "  << right << std::setw(3) << cl.GetRGB(2);
+      fout << "   " << right << std::setw(3) << (int) cl.GetRGB(0);
+      fout << "  "  << right << std::setw(3) << (int) cl.GetRGB(1);
+      fout << "  "  << right << std::setw(3) << (int) cl.GetRGB(2);
       fout << "  "  << right << std::setw(7) << std::setprecision(2) 
            << (cl.GetAlpha() / 255.0f);
       fout << "  "  << right << std::setw(1) << (cl.IsVisible() ? 1 : 0);
@@ -497,5 +504,5 @@ void IRISApplication
     }
 
   fout.close();
-}
+}   
 

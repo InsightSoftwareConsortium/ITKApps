@@ -18,6 +18,7 @@
 #include "IRISApplication.h"
 #include "IRISException.h"
 #include "IRISImageData.h"
+#include "SNAPRegistryIO.h"
 #include "SystemInterface.h"
 #include "UserInterfaceLogic.h"
 
@@ -42,8 +43,8 @@ const GreyType MAXGREYVAL = itk::NumericTraits<GreyType>::max();
 
 // A templated load image method
 template<class TPixel>
-bool IRISLoadImage(const char *file, 
-                   typename itk::SmartPointer< itk::Image<TPixel,3> > &target)
+bool LoadImageFromFileInteractive(
+  const char *file, typename itk::SmartPointer< itk::Image<TPixel,3> > &target)
 {
   try
     {
@@ -246,7 +247,7 @@ int main(int argc, char **argv)
     
     // Load the image using itk IO
     IRISApplication::GreyImageType::Pointer img;
-    if(IRISLoadImage(fnGrey,img))
+    if(LoadImageFromFileInteractive(fnGrey,img))
       {      
       // Load the image
       iris->UpdateIRISGreyImage(img,raiCode);
@@ -273,7 +274,7 @@ int main(int argc, char **argv)
 
       // Try to load the image
       IRISApplication::LabelImageType::Pointer img;
-      if(IRISLoadImage(fname,img))
+      if(LoadImageFromFileInteractive(fname,img))
         {
         iris->UpdateIRISSegmentationImage(img);
         iris->GetGlobalState()->SetSegmentationFileName(fname);
@@ -297,7 +298,7 @@ int main(int argc, char **argv)
       iris->ReadLabelDescriptionsFromTextFile(fname);
     
       // Update the user interfafce
-      ui->OnSegmentationLabelsUpdate();
+      ui->OnSegmentationLabelsUpdate(true);
       }
     catch(itk::ExceptionObject &exc)
       {
@@ -337,6 +338,9 @@ int main(int argc, char **argv)
 
 /*
  *Log: SNAPMain.cxx
+ *Revision 1.4  2003/10/02 14:55:52  pauly
+ *ENH: Development during the September code freeze
+ *
  *Revision 1.3  2003/09/15 19:06:58  pauly
  *FIX: Trying to get last changes to compile
  *

@@ -8,7 +8,7 @@ class ImageIOWizard {open : ImageIOWizardBase
   } {
     Fl_Window m_WinInput {
       label {SnAP Image Input Wizard} open
-      xywh {4 30 470 330}
+      xywh {548 424 470 330}
       code0 {\#include "ImageIOWizardBase.h"} modal visible
     } {
       Fl_Wizard m_WizInput {open
@@ -18,20 +18,35 @@ class ImageIOWizard {open : ImageIOWizardBase
           label {File Selection} open
           xywh {0 0 470 330} box PLASTIC_DOWN_BOX labelfont 2 labelsize 10
         } {
-          Fl_Input m_InFilePageBrowser {
-            label {Image file name:}
-            callback {this->OnFilePageFileInputChange();}
-            xywh {30 100 335 25} labelsize 12 align 5 when 1 textsize 12
-          }
-          Fl_Button {} {
-            label {Browse...}
-            callback {this->OnFilePageBrowse();}
-            xywh {370 100 70 25} box PLASTIC_UP_BOX color 180 labelsize 12
-          }
           Fl_Group {} {
             label {Select a file that contains an image:} open
             xywh {10 15 370 40} labeltype EMBOSSED_LABEL align 20
           } {}
+          Fl_Input m_InFilePageBrowser {
+            label {Image file name:}
+            callback {this->OnFilePageFileInputChange();}
+            xywh {30 100 405 25} labelsize 12 align 5 when 1 textsize 12
+          }
+          Fl_Button {} {
+            label {Browse...}
+            callback {this->OnFilePageBrowse();}
+            xywh {265 130 80 25} box PLASTIC_UP_BOX labelsize 12
+          }
+          Fl_Menu_Button m_InFilePageHistory {
+            label History
+            callback {this->OnFilePageFileHistoryChange();} open
+            xywh {355 130 80 25} box PLASTIC_UP_BOX selection_color 181 labelsize 12 align 20 textsize 12
+          } {}
+          Fl_Choice m_InFilePageFormat {
+            label {Image file format:}
+            callback {this->OnFilePageFileFormatChange();} open
+            xywh {30 190 210 25} down_box BORDER_BOX labelsize 12 align 5 textsize 12
+          } {
+            menuitem {} {
+              label {Select a format...}
+              xywh {10 10 100 20} labelsize 12 hide
+            }
+          }
           Fl_Group {} {
             label {Button Group} open
             xywh {190 285 280 45} labeltype NO_LABEL
@@ -39,26 +54,16 @@ class ImageIOWizard {open : ImageIOWizardBase
             Fl_Button m_BtnFilePageNext {
               label {Next  >}
               callback {this->OnFilePageNext();}
-              xywh {290 295 80 25} box PLASTIC_UP_BOX color 180 labelfont 1 deactivate hotspot
+              xywh {290 295 80 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12 deactivate hotspot
             }
             Fl_Button {} {
               label {< Back}
-              xywh {200 295 80 25} box PLASTIC_UP_BOX color 180 deactivate
+              xywh {200 295 80 25} box PLASTIC_UP_BOX color 180 labelsize 12 deactivate
             }
             Fl_Button {} {
               label Cancel
               callback {this->OnCancel();}
-              xywh {380 295 80 25} box PLASTIC_UP_BOX color 180
-            }
-          }
-          Fl_Choice m_InFilePageFormat {
-            label {Image file format:}
-            callback {this->OnFilePageFileFormatChange();} open selected
-            xywh {30 150 200 25} down_box BORDER_BOX labelsize 12 align 5 textsize 12
-          } {
-            menuitem {} {
-              label {Select a format...}
-              xywh {10 10 100 20} labelsize 12 hide
+              xywh {380 295 80 25} box PLASTIC_UP_BOX color 180 labelsize 12
             }
           }
         }
@@ -71,23 +76,13 @@ class ImageIOWizard {open : ImageIOWizardBase
             xywh {10 15 370 40} labeltype EMBOSSED_LABEL align 20
           } {}
           Fl_Group {} {
-            label {Button Group} open
-            xywh {190 285 280 45} labeltype NO_LABEL
+            label {Header size:}
+            xywh {30 60 360 35} labelsize 12 align 20
           } {
-            Fl_Button m_BtnHeaderPageNext {
-              label {Next  >}
-              callback {this->OnHeaderPageNext();}
-              xywh {290 295 80 25} box PLASTIC_UP_BOX color 180 labelfont 1
-            }
-            Fl_Button m_BtnHeaderPageBack {
-              label {< Back}
-              callback {this->OnHeaderPageBack();}
-              xywh {200 295 80 25} box PLASTIC_UP_BOX color 180
-            }
-            Fl_Button {} {
-              label Cancel
-              callback {this->OnCancel();}
-              xywh {380 295 80 25} box PLASTIC_UP_BOX color 180
+            Fl_Value_Input m_InHeaderPageHeaderSize {
+              label bytes
+              callback {this->OnHeaderPageInputChange();}
+              xywh {185 65 70 25} labelsize 12 align 8 textsize 12
             }
           }
           Fl_Group {} {
@@ -108,6 +103,26 @@ class ImageIOWizard {open : ImageIOWizardBase
               label {Z:}
               callback {this->OnHeaderPageInputChange();}
               xywh {365 105 70 25} labelsize 12 textsize 12
+            }
+          }
+          Fl_Group {} {
+            label {Voxel spacing:} open
+            xywh {30 140 405 35} labelsize 12 align 20
+          } {
+            Fl_Value_Input m_InHeaderPageSpacingX {
+              label {X:}
+              callback {this->OnHeaderPageInputChange();}
+              tooltip {Spacing between voxels in each dimension} xywh {185 145 70 25} labelsize 12 maximum 100 step 0.01 value 1 textsize 12
+            }
+            Fl_Value_Input m_InHeaderPageSpacingY {
+              label {Y:}
+              callback {this->OnHeaderPageInputChange();}
+              tooltip {Spacing between voxels in each dimension} xywh {275 145 70 25} labelsize 12 maximum 100 step 0.01 value 1 textsize 12
+            }
+            Fl_Value_Input m_InHeaderPageSpacingZ {
+              label {Z:}
+              callback {this->OnHeaderPageInputChange();}
+              tooltip {Spacing between voxels in each dimension} xywh {365 145 70 25} labelsize 12 maximum 100 step 0.01 value 1 textsize 12
             }
           }
           Fl_Group {} {
@@ -167,64 +182,34 @@ class ImageIOWizard {open : ImageIOWizardBase
             }
           }
           Fl_Group {} {
-            label {Header size:} open
-            xywh {30 60 360 35} labelsize 12 align 20
+            label {Button Group} open
+            xywh {190 285 280 45} labeltype NO_LABEL
           } {
-            Fl_Value_Input m_InHeaderPageHeaderSize {
-              label bytes
-              callback {this->OnHeaderPageInputChange();}
-              xywh {185 65 70 25} labelsize 12 align 8 textsize 12
+            Fl_Button m_BtnHeaderPageNext {
+              label {Next  >}
+              callback {this->OnHeaderPageNext();}
+              xywh {290 295 80 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12
             }
-          }
-          Fl_Group {} {
-            label {Voxel spacing:} open
-            xywh {30 140 405 35} labelsize 12 align 20
-          } {
-            Fl_Value_Input m_InHeaderPageSpacingX {
-              label {X:}
-              callback {this->OnHeaderPageInputChange();}
-              tooltip {Spacing between voxels in each dimension} xywh {185 145 70 25} labelsize 12 maximum 100 step 0.01 value 1 textsize 12
+            Fl_Button m_BtnHeaderPageBack {
+              label {< Back}
+              callback {this->OnHeaderPageBack();}
+              xywh {200 295 80 25} box PLASTIC_UP_BOX color 180 labelsize 12
             }
-            Fl_Value_Input m_InHeaderPageSpacingY {
-              label {Y:}
-              callback {this->OnHeaderPageInputChange();}
-              tooltip {Spacing between voxels in each dimension} xywh {275 145 70 25} labelsize 12 maximum 100 step 0.01 value 1 textsize 12
-            }
-            Fl_Value_Input m_InHeaderPageSpacingZ {
-              label {Z:}
-              callback {this->OnHeaderPageInputChange();}
-              tooltip {Spacing between voxels in each dimension} xywh {365 145 70 25} labelsize 12 maximum 100 step 0.01 value 1 textsize 12
+            Fl_Button {} {
+              label Cancel
+              callback {this->OnCancel();}
+              xywh {380 295 80 25} box PLASTIC_UP_BOX color 180 labelsize 12
             }
           }
         }
         Fl_Group m_PageOrientation {
-          label {Image Orientation}
+          label {Image Orientation} open
           xywh {0 0 470 330} box PLASTIC_DOWN_BOX labelfont 2 labelsize 10 hide
         } {
           Fl_Group {} {
             label {Image Orientation:}
             xywh {10 15 370 40} labeltype EMBOSSED_LABEL align 20
           } {}
-          Fl_Group {} {
-            label {Button Group} open
-            xywh {190 285 280 45} labeltype NO_LABEL
-          } {
-            Fl_Button m_BtnOrientationPageNext {
-              label {Next  >}
-              callback {this->OnOrientationPageNext();}
-              xywh {290 295 80 25} box PLASTIC_UP_BOX color 180 labelfont 1
-            }
-            Fl_Button {} {
-              label {< Back}
-              callback {this->OnOrientationPageBack();}
-              xywh {200 295 80 25} box PLASTIC_UP_BOX color 180
-            }
-            Fl_Button {} {
-              label Cancel
-              callback {this->OnCancel();}
-              xywh {380 295 80 25} box PLASTIC_UP_BOX color 180
-            }
-          }
           Fl_Choice m_InOrientationPagePreset {
             label {Select an orientation preset:}
             callback {this->OnOrientationPageSelectPreset();} open
@@ -346,7 +331,17 @@ class ImageIOWizard {open : ImageIOWizardBase
               }
             }
           }
-          Fl_Group m_GrpOrientationPageGraphic {open
+          Fl_Group {} {
+            label {Advanced settings:} open
+            xywh {35 235 200 45} box PLASTIC_DOWN_FRAME labelsize 12 align 5
+          } {
+            Fl_Input m_InRAICode {
+              label {RAI Code:}
+              callback {this->OnOrientationPageRAIChange();}
+              xywh {160 245 60 25} labelsize 12 when 1 textsize 12
+            }
+          }
+          Fl_Group m_GrpOrientationPageGraphic {
             xywh {245 60 215 190} box RSHADOW_BOX color 7 labelsize 11 align 144
           } {
             Fl_Wizard m_WizOrientationPageDoll {
@@ -425,20 +420,30 @@ class ImageIOWizard {open : ImageIOWizardBase
             } {}
           }
           Fl_Group {} {
-            label {Advanced settings:} open
-            xywh {35 235 200 45} box PLASTIC_DOWN_FRAME labelsize 12 align 5
-          } {
-            Fl_Input m_InRAICode {
-              label {RAI Code:}
-              callback {this->OnOrientationPageRAIChange();}
-              xywh {160 245 60 25} labelsize 12 when 1 textsize 12
-            }
-          }
-          Fl_Group {} {
             label {A graphical representation of 
 the selected image orientation} open
             xywh {260 255 175 30} labelsize 11 align 145
           } {}
+          Fl_Group {} {
+            label {Button Group} open
+            xywh {190 285 280 45} labeltype NO_LABEL
+          } {
+            Fl_Button m_BtnOrientationPageNext {
+              label {Next  >}
+              callback {this->OnOrientationPageNext();}
+              xywh {290 295 80 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12
+            }
+            Fl_Button {} {
+              label {< Back}
+              callback {this->OnOrientationPageBack();}
+              xywh {200 295 80 25} box PLASTIC_UP_BOX color 180 labelsize 12
+            }
+            Fl_Button {} {
+              label Cancel
+              callback {this->OnCancel();}
+              xywh {380 295 80 25} box PLASTIC_UP_BOX color 180 labelsize 12
+            }
+          }
         }
         Fl_Group m_PageSummary {
           label Summary
@@ -455,17 +460,17 @@ the selected image orientation} open
             Fl_Button {} {
               label Finish
               callback {this->OnSummaryPageFinish();}
-              xywh {290 295 80 25} box PLASTIC_UP_BOX color 180 labelfont 1
+              xywh {290 295 80 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12
             }
             Fl_Button {} {
               label {< Back}
               callback {this->OnSummaryPageBack();}
-              xywh {200 295 80 25} box PLASTIC_UP_BOX color 180
+              xywh {200 295 80 25} box PLASTIC_UP_BOX color 180 labelsize 12
             }
             Fl_Button {} {
               label Cancel
               callback {this->OnCancel();}
-              xywh {380 295 80 25} box PLASTIC_UP_BOX color 180
+              xywh {380 295 80 25} box PLASTIC_UP_BOX color 180 labelsize 12
             }
           }
           Fl_Value_Output m_OutSummarySize {
@@ -512,30 +517,45 @@ the selected image orientation} open
       }
     }
     Fl_Window m_WinOutput {
-      label {SnAP Save Image Wizard} open
-      xywh {678 366 470 330} modal visible
+      label {SnAP Save Image Wizard} open selected
+      xywh {612 147 470 330} modal visible
     } {
-      Fl_Wizard m_WizOutput {open
+      Fl_Wizard m_WizOutput {
         xywh {-5 -10 505 395}
       } {
         Fl_Group m_PageSaveFile {
-          label {File Selection} open
+          label {File Selection}
           xywh {0 0 470 330} box PLASTIC_DOWN_BOX labelfont 2 labelsize 10
         } {
-          Fl_Input m_InSaveFilePageBrowser {
-            label {Filename:}
-            callback {this->OnSaveFilePageFileInputChange();}
-            xywh {30 100 335 25} labelsize 12 align 5 when 1 textsize 12
-          }
-          Fl_Button {} {
-            label {Browse...}
-            callback {this->OnSaveFilePageBrowse();}
-            xywh {370 100 70 25} box PLASTIC_UP_BOX color 180 labelsize 12
-          }
           Fl_Group {} {
             label {Choose a file name to save the image:}
             xywh {10 15 370 40} labeltype EMBOSSED_LABEL align 20
           } {}
+          Fl_Input m_InSaveFilePageBrowser {
+            label {Filename:}
+            callback {this->OnSaveFilePageFileInputChange();}
+            xywh {30 100 405 25} labelsize 12 align 5 when 1 textsize 12
+          }
+          Fl_Button {} {
+            label {Browse...}
+            callback {this->OnSaveFilePageBrowse();}
+            xywh {265 130 80 25} box PLASTIC_UP_BOX labelsize 12
+          }
+          Fl_Menu_Button m_InSaveFilePageHistory {
+            label History
+            callback {this->OnSaveFilePageFileHistoryChange();} open
+            xywh {355 130 80 25} box PLASTIC_UP_BOX selection_color 181 labelsize 12 align 20 textsize 12
+          } {}
+          Fl_Choice m_InSaveFilePageFormat {
+            label {Image file format:}
+            callback {this->OnSaveFilePageFileFormatChange();} open
+            xywh {30 190 210 25} down_box BORDER_BOX labelsize 12 align 5 textsize 12
+          } {
+            menuitem {} {
+              label {Select a format...}
+              xywh {0 0 100 20} labelsize 12 hide
+            }
+          }
           Fl_Group {} {
             label {Button Group}
             xywh {190 285 280 45} labeltype NO_LABEL
@@ -543,22 +563,12 @@ the selected image orientation} open
             Fl_Button m_BtnSaveFilePageNext {
               label Save
               callback {this->OnSaveFilePageSave();}
-              xywh {290 295 80 25} box PLASTIC_UP_BOX color 180 labelfont 1 deactivate hotspot
+              xywh {290 295 80 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12 deactivate hotspot
             }
             Fl_Button {} {
               label Cancel
               callback {this->OnSaveCancel();}
-              xywh {380 295 80 25} box PLASTIC_UP_BOX color 180
-            }
-          }
-          Fl_Choice m_InSaveFilePageFormat {
-            label {Image file format:}
-            callback {this->OnSaveFilePageFileFormatChange();} open
-            xywh {30 150 200 25} down_box BORDER_BOX labelsize 12 align 5 textsize 12
-          } {
-            menuitem {} {
-              label {Select a format...}
-              xywh {0 0 100 20} labelsize 12 hide
+              xywh {380 295 80 25} box PLASTIC_UP_BOX color 180 labelsize 12
             }
           }
         }

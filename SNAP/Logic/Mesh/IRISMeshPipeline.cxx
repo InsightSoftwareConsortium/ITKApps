@@ -128,12 +128,12 @@ IRISMeshPipeline
 
   // Create and configure a filter for triangle decimation
   m_DecimateFilter = vtkDecimatePro::New();
-  m_DecimateFilter->SetInput(m_ContourFilter->GetOutput());
+  m_DecimateFilter->SetInput(m_NormalsFilter->GetOutput());
   m_DecimateFilter->ReleaseDataFlagOn();
 
   // Create and configure a filter for polygon smoothing
   m_PolygonSmoothingFilter = vtkSmoothPolyDataFilter::New();
-  m_PolygonSmoothingFilter->SetInput(m_NormalsFilter->GetOutput());
+  m_PolygonSmoothingFilter->SetInput(m_ContourFilter->GetOutput());
   m_PolygonSmoothingFilter->ReleaseDataFlagOn();
 
   // Create and configure a filter for triangle strip generation
@@ -331,12 +331,6 @@ IRISMeshPipeline
   m_VTKImporter->SetCallbackUserData(
     m_VTKExporter->GetCallbackUserData());
 
-  // Create and configure the contour filter
-  m_ContourFilter->UpdateWholeExtent();
-  m_NormalsFilter->UpdateWholeExtent();
-  m_DecimateFilter->UpdateWholeExtent();
-  m_PolygonSmoothingFilter->UpdateWholeExtent();
-  
   // Graft the polydata to the last filter in the pipeline
   m_StripperFilter->SetOutput(outMesh);
 

@@ -57,6 +57,24 @@ inline const char *GetValueWithDefault<const char *>(const std::string &source, 
     return source.c_str();
 }
 
+/** A class used to associate a set of strings with an ENUM so that the 
+ * enum can be exported to the registry in a consistent fashion */
+template <class TEnum>
+class RegistryEnumMap
+{
+public:
+  typedef std::string StringType;
+  void AddPair(TEnum value, const char *description)
+  {
+    m_EnumToStringMap[value] = std::string(description);
+    m_StringToEnumMap[description] = value;
+  }
+private:
+  std::map<TEnum, StringType> m_EnumToStringMap;
+  std::map<StringType, TEnum> m_StringToEnumMap;
+  friend class RegistryValue;
+};
+
 /** A class that represents a value in the registry */
 class RegistryValue
 {
@@ -123,6 +141,22 @@ public:
     m_Null = false;
   }
 
+  /** Put an enum into this entry */
+  template <class TEnum> void PutEnum(
+    RegistryEnumMap<TEnum> &rem,TEnum value)
+  {
+    (*this) << rem.m_EnumToStringMap[value];;
+  }
+
+  /** Get an enum from this entry */
+  template <class TEnum> TEnum GetEnum(
+    RegistryEnumMap<TEnum> &rem,TEnum defaultValue)
+  {
+    if(rem.m_StringToEnumMap.find(m_String) == rem.m_StringToEnumMap.end())
+      return defaultValue;
+    else return rem.m_StringToEnumMap[m_String];
+  }
+
 private:  
   std::string m_String;
   bool m_Null;
@@ -176,6 +210,9 @@ public:
    * but can be specified to prepend a string to all keys */
   void CollectKeys(StringListType &keyList,const StringType &keyPrefix="");
 
+  /** Remove all keys from this folder that start with a string */
+  void RemoveKeys(const char *match = NULL);
+
   /** Write this Registry to an file */
   void WriteToFile(const char *pathname);
 
@@ -188,8 +225,20 @@ public:
   /** Put an array into the registry */
   template <class T> void PutArray(unsigned int size,const T *array)
   {
+    RemoveKeys("Element");
     Entry("ArraySize") << size;
     for(unsigned int i=0;i<size;i++)
+      {
+      Entry(Key("Element[%d]",i)) << array[i];
+      }
+  }
+
+  /** Put an array into the registry */
+  template <class T> void PutArray(const std::vector<T> &array)
+  {
+    RemoveKeys("Element");
+    Entry("ArraySize") << array.size();
+    for(unsigned int i=0;i<array.size();i++)
       {
       Entry(Key("Element[%d]",i)) << array[i];
       }
@@ -228,8 +277,8 @@ public:
 
 private:
   // Hashtable type definition
-    typedef std::map<StringType, Registry *> FolderMapType;
-    typedef std::map<StringType, RegistryValue> EntryMapType;
+  typedef std::map<StringType, Registry *> FolderMapType;
+  typedef std::map<StringType, RegistryValue> EntryMapType;
 
   // Commonly used hashtable iterators
   typedef FolderMapType::const_iterator FolderIterator;
@@ -241,23 +290,23 @@ private:
   /** A hash table for the registry values */
   EntryMapType m_EntryMap;
 
-    /** 
+  /** 
    * A flag as to whether keys and folders that are read and not found 
    * should be created and populated with default values.
    */
-    bool m_AddIfNotFound;
+  bool m_AddIfNotFound;
 
   /** Write this folder recursively to a stream */
   void Write(std::ostream &sout,const StringType &keyPrefix);
 
   /** Read this folder recursively from a stream, recording syntax errors */
-    void Read(std::istream &sin, std::ostream &serr);
+  void Read(std::istream &sin, std::ostream &serr);
 
   /** Encode a string for writing to file */
-    static StringType Encode(const StringType &input);
+  static StringType Encode(const StringType &input);
 
   /** Decode a string for writing to file */
-    static StringType Decode(const StringType &input);
+  static StringType Decode(const StringType &input);
 };
 
 #endif

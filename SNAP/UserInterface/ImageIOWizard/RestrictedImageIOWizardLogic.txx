@@ -18,7 +18,7 @@
 template<class TPixel>
 bool
 RestrictedImageIOWizardLogic<TPixel>
-::DisplayInputWizard()
+::DisplayInputWizard(const char *file)
 {
   // Make sure there is a grey image as a reference
   assert(m_GreyImage);
@@ -40,7 +40,7 @@ RestrictedImageIOWizardLogic<TPixel>
   m_PageOrientation->deactivate();
 
   // Call the parent's method
-  return Superclass::DisplayInputWizard();    
+  return Superclass::DisplayInputWizard(file);    
 }
 
 template<class TPixel>
