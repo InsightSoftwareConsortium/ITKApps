@@ -18,7 +18,7 @@
 #include <FL/Fl.h>
 #include <FL/Enumerations.h>
 
-#include "IRISTypes.h"
+#include "SNAPCommonUI.h"
 
 class FLTKCanvas;
 
@@ -53,6 +53,14 @@ struct FLTKEvent {
      * The button that generated this event
      */
     int Button;
+
+    /**
+     * The simulated event mouse button.  If user presses CTRL-LEFT, this will
+     * have the value FL_MIDDLE_MOUSE and when the user presses ALT-LEFT, this
+     * will have the value FL_RIGHT_MOUSE.  Useful for Macs and people without
+     * a middle mouse button 
+     */
+    int SoftButton;
 
     /**
      * The state of the interface (ALT,CTRL,SHIFT)

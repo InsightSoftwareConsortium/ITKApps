@@ -25,9 +25,7 @@
 #include "itkImageRegionIterator.h"
 
 #include <cstdio>
-#include <iostream>
 #include <sstream>
-#include <string>
 
 using namespace itk;
 using namespace std;

@@ -21,14 +21,14 @@
 
 #include <cstdio>
 #include <cstring>
-#include <sstream>
 #include <iostream>
 #include <list>
 #include <map>
+#include <sstream>
 #include <string>
-
-#include "IRISTypes.h"
 #include <vector>
+
+#include "SNAPCommon.h"
 
 template <class T> 
 inline T GetValueWithDefault(const std::string &source, bool isNull, T defaultValue)
@@ -213,8 +213,9 @@ public:
   /** Remove all keys from this folder that start with a string */
   void RemoveKeys(const char *match = NULL);
 
-  /** Write this Registry to an file */
-  void WriteToFile(const char *pathname);
+  /** Write this Registry to an file.  The second parameter is an optional
+   * header, each line of which must start with the '#" character  */
+  void WriteToFile(const char *pathname, const char *header = NULL);
 
   /** Read this Registry from a file */  
   void ReadFromFile(const char *pathname);

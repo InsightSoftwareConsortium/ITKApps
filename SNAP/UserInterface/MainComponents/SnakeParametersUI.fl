@@ -7,147 +7,150 @@ class SnakeParametersUI {open : SnakeParametersUIBase
   Function {MakeWindow()} {open
   } {
     Fl_Window m_Window {
-      label {Snake Parameters} open
-      xywh {363 272 715 454}
+      label {Snake Parameters} open selected
+      xywh {256 218 716 447} box PLASTIC_DOWN_BOX
       code0 {\#include "SnakeParametersUIBase.h"} non_modal visible
     } {
       Fl_Tabs m_TabsMode {open
-        xywh {5 5 350 325} box PLASTIC_UP_BOX color 60 labelfont 2 labelsize 12 align 0
+        xywh {5 5 350 340} box PLASTIC_UP_BOX color 60 labelfont 2 labelsize 12 align 0
       } {
         Fl_Group m_GrpEasy {
-          label {Intuitive Mode} selected
-          xywh {5 25 350 280} color 94 selection_color 134 labelfont 2 labelsize 11
+          label {Intuitive Mode} open
+          xywh {5 25 350 320} color 22 selection_color 94 labelfont 2 labelsize 11
         } {
-          Fl_Group m_GrpCurvatureEasy {
-            label {Curvature force:} open
-            xywh {15 140 330 70} box PLASTIC_DOWN_BOX color 134 labelsize 12 align 5
+          Fl_Group m_GrpPropagationEasy {
+            label {Balloon force:} open
+            xywh {15 55 330 70} box PLASTIC_DOWN_BOX color 22 labelsize 12 align 5
           } {
             Fl_Group {} {open
-              xywh {55 175 245 35}
+              xywh {55 90 245 35}
+            } {
+              Fl_Value_Slider m_InPropagationWeightEasy {
+                callback {o->take_focus();
+OnPropagationWeightChange(o);}
+                xywh {55 90 225 15} type Horizontal color 52 labelsize 12 align 4 minimum -3 maximum 3 step 0.1 value 1
+              }
+              Fl_Group {} {
+                label expanding open
+                xywh {250 110 50 15} labelsize 10 align 144
+              } {}
+              Fl_Group {} {
+                label contracting open
+                xywh {70 110 50 15} labelsize 10 align 16
+              } {}
+              Fl_Group {} {
+                label static open
+                xywh {160 110 50 15} labelsize 10 align 16
+              } {}
+              Fl_Group {} {
+                label {^} open
+                xywh {70 105 50 10} labelfont 1 labelsize 10 align 16
+              } {}
+              Fl_Group {} {
+                label {^} open
+                xywh {250 105 50 10} labelfont 1 labelsize 10 align 16
+              } {}
+              Fl_Group {} {
+                label {^} open
+                xywh {160 105 50 10} labelfont 1 labelsize 10 align 16
+              } {}
+            }
+            Fl_Button m_BtnEasyHelpPropagation {
+              label {More info...}
+              xywh {274 61 65 20} box PLASTIC_UP_BOX color 180 labelsize 11 align 128
+            }
+          }
+          Fl_Group m_GrpCurvatureEasy {
+            label {Curvature force:}
+            xywh {15 155 330 70} box PLASTIC_DOWN_BOX color 22 labelsize 12 align 5
+          } {
+            Fl_Group {} {
+              xywh {55 190 245 35}
             } {
               Fl_Value_Slider m_InCurvatureWeightEasy {
-                callback {OnCurvatureWeightChange(o);}
-                xywh {55 175 225 15} type Horizontal color 52 labelsize 12 align 4 value 0.7
+                callback {o->take_focus();
+OnCurvatureWeightChange(o);}
+                xywh {55 190 225 15} type Horizontal color 52 labelsize 12 align 4 value 0.7
               }
               Fl_Group {} {
                 label spherical open
-                xywh {250 195 50 15} labelsize 10 align 144
+                xywh {250 210 50 15} labelsize 10 align 144
               } {}
               Fl_Group {} {
                 label detailed open
-                xywh {70 195 50 15} labelsize 10 align 16
+                xywh {70 210 50 15} labelsize 10 align 16
               } {}
               Fl_Group {} {
                 label smooth open
-                xywh {155 195 50 15} labelsize 10 align 16
+                xywh {155 210 50 15} labelsize 10 align 16
               } {}
               Fl_Group {} {
                 label {^} open
-                xywh {70 190 50 10} labelfont 1 labelsize 10 align 16
+                xywh {70 205 50 10} labelfont 1 labelsize 10 align 16
               } {}
               Fl_Group {} {
                 label {^} open
-                xywh {250 190 50 10} labelfont 1 labelsize 10 align 16
+                xywh {250 205 50 10} labelfont 1 labelsize 10 align 16
               } {}
               Fl_Group {} {
                 label {^} open
-                xywh {155 190 50 10} labelfont 1 labelsize 10 align 16
+                xywh {155 205 50 10} labelfont 1 labelsize 10 align 16
               } {}
             }
             Fl_Group {} {
-              label {Makes the boundary smoother and may help prevent leaking at corners and narrow places.} open
-              xywh {20 145 245 25} labelsize 10 align 148
+              label {Makes the boundary smoother and may help prevent leaking at corners and narrow places.}
+              xywh {20 160 245 25} labelsize 10 align 148
             } {}
             Fl_Button m_BtnEasyHelpCurvature {
               label {More info...}
-              xywh {275 145 65 20} box PLASTIC_UP_BOX color 180 labelsize 11 align 128
+              xywh {274 161 65 20} box PLASTIC_UP_BOX color 180 labelsize 11 align 128
             }
           }
           Fl_Group m_GrpAdvectionEasy {
             label {Advection force:}
-            xywh {15 230 330 70} box PLASTIC_DOWN_BOX color 134 labelsize 12 align 5
+            xywh {15 255 330 70} box PLASTIC_DOWN_BOX color 22 labelsize 12 align 5
           } {
             Fl_Group {} {
-              xywh {55 265 250 35}
+              xywh {55 290 250 35}
             } {
               Fl_Value_Slider m_InAdvectionWeightEasy {
-                callback {OnAdvectionWeightChange(o);}
-                xywh {55 265 225 15} type Horizontal color 52 labelsize 12 align 4 value 0.7
+                callback {o->take_focus();
+OnAdvectionWeightChange(o);}
+                xywh {55 290 225 15} type Horizontal color 52 labelsize 12 align 4 value 0.7
               }
               Fl_Group {} {
                 label {large effect} open
-                xywh {245 285 60 15} labelsize 10 align 144
+                xywh {245 310 60 15} labelsize 10 align 144
               } {}
               Fl_Group {} {
                 label {no effect} open
-                xywh {70 285 50 15} labelsize 10 align 16
+                xywh {70 310 50 15} labelsize 10 align 16
               } {}
               Fl_Group {} {
                 label smooth open
-                xywh {155 285 50 15} labelsize 10 align 16 hide
+                xywh {155 310 50 15} labelsize 10 align 16 hide
               } {}
               Fl_Group {} {
                 label {^} open
-                xywh {70 280 50 10} labelfont 1 labelsize 10 align 16
+                xywh {70 305 50 10} labelfont 1 labelsize 10 align 16
               } {}
               Fl_Group {} {
                 label {^} open
-                xywh {250 280 50 10} labelfont 1 labelsize 10 align 16
+                xywh {250 305 50 10} labelfont 1 labelsize 10 align 16
               } {}
               Fl_Group {} {
                 label {^} open
-                xywh {155 280 50 10} labelfont 1 labelsize 10 align 16 hide
+                xywh {155 305 50 10} labelfont 1 labelsize 10 align 16 hide
               } {}
             }
             Fl_Group {} {
               label {Pushes boundary back as it tries to cross edges, 
 and may cause the segmentation to converge.} open
-              xywh {20 235 260 25} labelsize 10 align 148
+              xywh {20 260 260 25} labelsize 10 align 148
             } {}
             Fl_Button m_BtnEasyHelpAdvection {
               label {More info...}
-              xywh {275 235 65 20} box PLASTIC_UP_BOX color 180 labelsize 11
-            }
-          }
-          Fl_Group m_GrpPropagationEasy {
-            label {Balloon force:} open
-            xywh {15 50 330 70} box PLASTIC_DOWN_BOX color 134 labelsize 12 align 5
-          } {
-            Fl_Group {} {open
-              xywh {55 85 245 35}
-            } {
-              Fl_Value_Slider m_InPropagationWeightEasy {
-                callback {OnPropagationWeightChange(o);}
-                xywh {55 85 225 15} type Horizontal color 52 labelsize 12 align 4 minimum -3 maximum 3 step 0.1 value 1
-              }
-              Fl_Group {} {
-                label expanding open
-                xywh {250 105 50 15} labelsize 10 align 144
-              } {}
-              Fl_Group {} {
-                label contracting open
-                xywh {70 105 50 15} labelsize 10 align 16
-              } {}
-              Fl_Group {} {
-                label static open
-                xywh {160 105 50 15} labelsize 10 align 16
-              } {}
-              Fl_Group {} {
-                label {^} open
-                xywh {70 100 50 10} labelfont 1 labelsize 10 align 16
-              } {}
-              Fl_Group {} {
-                label {^} open
-                xywh {250 100 50 10} labelfont 1 labelsize 10 align 16
-              } {}
-              Fl_Group {} {
-                label {^} open
-                xywh {160 100 50 10} labelfont 1 labelsize 10 align 16
-              } {}
-            }
-            Fl_Button m_BtnEasyHelpPropagation {
-              label {More info...}
-              xywh {275 55 65 20} box PLASTIC_UP_BOX color 180 labelsize 11 align 128
+              xywh {274 261 65 20} box PLASTIC_UP_BOX color 180 labelsize 11
             }
           }
           Fl_Group {} {
@@ -156,8 +159,8 @@ and may cause the segmentation to converge.} open
           } {}
         }
         Fl_Group m_GrpMath {
-          label {Mathematical Mode} open
-          xywh {5 25 350 305} color 69 selection_color 109 labelfont 2 labelsize 11 align 2 hide
+          label {Mathematical Mode}
+          xywh {5 25 350 320} color 22 selection_color 102 labelfont 2 labelsize 11 align 2 hide
         } {
           Fl_Group {} {
             label {Front propagation equation:} open
@@ -183,8 +186,8 @@ and may cause the segmentation to converge.} open
             }
           }
           Fl_Group m_GrpCurvatureMath {
-            label {Curvature term:} open
-            xywh {20 210 325 40} box PLASTIC_DOWN_BOX color 69 labelsize 12 align 5
+            label {Curvature term:}
+            xywh {20 210 325 40} box PLASTIC_DOWN_BOX color 22 labelsize 12 align 5
           } {
             Fl_Value_Input m_InCurvatureWeightMathText {
               label {b:}
@@ -196,8 +199,9 @@ and may cause the segmentation to converge.} open
               image {Artwork/rb.gif} xywh {235 220 30 20} labelsize 11 maximum 2 step 1 textsize 12 hide
             }
             Fl_Slider m_InCurvatureWeightMathSlider {
-              callback {OnCurvatureWeightChange(o);}
-              xywh {95 220 110 20} type Horizontal color 51 selection_color 60 step 0.01
+              callback {o->take_focus();
+OnCurvatureWeightChange(o);}
+              xywh {95 220 110 20} type Horizontal step 0.01
             }
             Fl_Slider m_InCurvatureExponentMathSlider {
               callback {OnCurvatureExponentChange(o);}
@@ -206,7 +210,7 @@ and may cause the segmentation to converge.} open
           }
           Fl_Group m_GrpAdvectionMath {
             label {Advection Term:} open
-            xywh {20 275 325 40} box PLASTIC_DOWN_BOX color 69 labelsize 12 align 5
+            xywh {20 275 325 40} box PLASTIC_DOWN_BOX color 22 labelsize 12 align 5
           } {
             Fl_Value_Input m_InAdvectionWeightMathText {
               label {g:}
@@ -218,8 +222,9 @@ and may cause the segmentation to converge.} open
               image {Artwork/rc.gif} xywh {235 285 30 20} labelsize 11 maximum 2 step 1 textsize 12 hide
             }
             Fl_Slider m_InAdvectionWeightMathSlider {
-              callback {OnAdvectionWeightChange(o);}
-              xywh {95 285 110 20} type Horizontal color 51 selection_color 60 step 0.01
+              callback {o->take_focus();
+OnAdvectionWeightChange(o);}
+              xywh {95 285 110 20} type Horizontal step 0.01
             }
             Fl_Slider m_InAdvectionExponentMathSlider {
               callback {OnAdvectionExponentChange(o);}
@@ -228,7 +233,7 @@ and may cause the segmentation to converge.} open
           }
           Fl_Group m_GrpPropagationMath {
             label {Propagation (baloon force) term:} open
-            xywh {20 145 325 40} box PLASTIC_DOWN_BOX color 69 selection_color 59 labelsize 12 align 5
+            xywh {20 145 325 40} box PLASTIC_DOWN_BOX color 22 selection_color 59 labelsize 12 align 5
           } {
             Fl_Value_Input m_InPropagationWeightMathText {
               label {a:}
@@ -236,8 +241,9 @@ and may cause the segmentation to converge.} open
               xywh {45 155 45 20} labelfont 12 minimum -5 maximum 5 step 0.01 value 1 textsize 12
             }
             Fl_Slider m_InPropagationWeightMathSlider {
-              callback {OnPropagationWeightChange(o);}
-              xywh {95 155 110 20} type Horizontal color 51 selection_color 60 minimum -5 maximum 5 step 0.1 value -1
+              callback {o->take_focus();
+OnPropagationWeightChange(o);}
+              xywh {95 155 110 20} type Horizontal minimum -5 maximum 5 step 0.1 value -1
             }
             Fl_Value_Input m_InPropagationExponentMathText {
               callback {OnPropagationExponentChange(o);}
@@ -251,15 +257,16 @@ and may cause the segmentation to converge.} open
         }
         Fl_Group {} {
           label {Advanced Settings} open
-          xywh {5 25 350 305} color 245 selection_color 245 labelfont 2 labelsize 11 hide
+          xywh {5 25 350 320} color 22 selection_color 210 labelfont 2 labelsize 11 hide
         } {
           Fl_Group m_GrpTimeStep {
             label {Time step computation:} open
-            xywh {20 185 320 100} box PLASTIC_DOWN_BOX color 245 selection_color 245 labelsize 12 align 5
+            xywh {20 185 320 100} box PLASTIC_DOWN_BOX color 22 selection_color 245 labelsize 12 align 5
           } {
             Fl_Value_Slider m_InTimeStep {
               label {Time step:}
-              callback {OnTimeStepChange(o);}
+              callback {o->take_focus();
+OnTimeStepChange(o);}
               xywh {185 230 145 20} type Horizontal labelsize 11 align 4 value 0.1 textsize 11 deactivate
             }
             Fl_Round_Button {m_BtnTimeStepAuto[0]} {
@@ -281,13 +288,14 @@ and may cause the segmentation to converge.} open
             } {}
             Fl_Value_Slider m_InSmoothingWeight {
               label {Noise reduction:}
-              callback {OnSmoothingWeightChange(o);}
+              callback {o->take_focus();
+OnSmoothingWeightChange(o);}
               xywh {185 255 145 20} type Horizontal labelsize 11 align 4 value 0.1 textsize 11 deactivate
             }
           }
           Fl_Group {} {
             label {Algorithm configuration:} open
-            xywh {20 55 320 110} box PLASTIC_DOWN_BOX color 245 labelsize 12 align 5
+            xywh {20 55 320 110} box PLASTIC_DOWN_BOX color 22 labelsize 12 align 5
           } {
             Fl_Choice m_InSolver {
               label {Use algorithm:}
@@ -339,38 +347,24 @@ and may cause the segmentation to converge.} open
           }
         }
       }
-      Fl_Group {} {
-        label {Parameter presets:} open
-        xywh {5 355 350 40} box PLASTIC_UP_BOX labelsize 12 align 5
-      } {
-        Fl_Choice m_MenuPreset {
-          callback {this->OnSelectPresetAction();} open
-          xywh {15 365 235 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 textsize 12
-        } {}
-        Fl_Button m_BtnSavePreset {
-          label {Save as Preset...}
-          callback {this->OnSavePresetAction();}
-          xywh {255 365 90 20} box PLASTIC_UP_BOX color 180 labelsize 11
-        }
-      }
       Fl_Button m_BtnClose {
         label Cancel
         callback {this->OnCloseAction();}
-        xywh {335 410 64 25} box PLASTIC_UP_BOX color 180 labelsize 12
+        xywh {340 410 64 25} box PLASTIC_UP_BOX color 180 labelsize 12
       }
       Fl_Button m_BtnHelp {
         label {Help!}
         callback {this->OnHelpAction();}
-        xywh {410 410 64 25} box PLASTIC_UP_BOX color 180 labelsize 12
+        xywh {415 410 64 25} box PLASTIC_UP_BOX color 180 labelsize 12
       }
       Fl_Button m_BtnAccept {
         label Accept
         callback {this->OnOkAction();}
-        xywh {260 410 64 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12
+        xywh {265 410 64 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12
       }
       Fl_Group {} {
-        label {Illustration of the forces in 2D:} open
-        xywh {365 25 345 370} box PLASTIC_UP_BOX labelsize 12
+        label {Conceptual illustration of the forces in 2D:} open
+        xywh {365 25 345 370} box PLASTIC_UP_BOX color 22 labelsize 12
       } {
         Fl_Group {} {
           label {Curvature force} open
@@ -411,6 +405,20 @@ and may cause the segmentation to converge.} open
             code0 {\#include "SnakeParametersPreviewBox.h"}
             class SnakeParametersPreviewBox
           }
+        }
+      }
+      Fl_Group {} {open
+        xywh {5 350 350 45} box PLASTIC_UP_BOX color 22
+      } {
+        Fl_Button m_BtnLoadParameters {
+          label {Load Parameters...}
+          callback {this->OnLoadParametersAction();}
+          xywh {65 360 105 25} box PLASTIC_UP_BOX color 180 labelsize 11
+        }
+        Fl_Button m_BtnSaveParameters {
+          label {Save Parameters...}
+          callback {this->OnSaveParametersAction();}
+          xywh {185 360 105 25} box PLASTIC_UP_BOX color 180 labelsize 11
         }
       }
     }

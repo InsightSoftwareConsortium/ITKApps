@@ -15,7 +15,7 @@
 #ifndef __FunctionPlot2D_h_
 #define __FunctionPlot2D_h_
 
-#include "IRISTypes.h"
+#include "SNAPCommonUI.h"
 #include <vector>
 
 /**

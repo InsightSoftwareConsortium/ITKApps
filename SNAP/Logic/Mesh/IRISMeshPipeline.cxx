@@ -47,9 +47,7 @@
 #include <vtkStripper.h>
 
 // System includes
-#include <iostream>
-#include <vector>
-#include <stdlib.h>
+#include <cstdlib>
 #include <FL/gl.h>
 
 using namespace std;
@@ -60,13 +58,13 @@ IRISMeshPipeline
 {
   // Initialize the region of interest filter
   m_ROIFilter = ROIFilter::New();
-  m_ROIFilter->ReleaseDataFlagOn();
+  //m_ROIFilter->ReleaseDataFlagOn();
 
   // Define the binary thresholding filter that will map the image onto the 
   // range 0 to 255
   m_ThrehsoldFilter = ThresholdFilter::New();
   m_ThrehsoldFilter->SetInput(m_ROIFilter->GetOutput());
-  m_ThrehsoldFilter->ReleaseDataFlagOn();
+  //m_ThrehsoldFilter->ReleaseDataFlagOn();
   m_ThrehsoldFilter->SetInsideValue(255);
   m_ThrehsoldFilter->SetOutsideValue(0);
 
@@ -78,12 +76,13 @@ IRISMeshPipeline
 
   // Initialize the VTK Exporter
   m_VTKExporter = VTKExportType::New();
-  m_VTKExporter->SetInput(m_GaussianFilter->GetOutput());
-  m_VTKExporter->ReleaseDataFlagOn();
+  // m_VTKExporter->SetInput(m_GaussianFilter->GetOutput());
+  m_VTKExporter->SetInput(m_ThrehsoldFilter->GetOutput());
+  //m_VTKExporter->ReleaseDataFlagOn();
   
   // Initialize the VTK Importer
   m_VTKImporter = vtkImageImport::New();
-  m_VTKImporter->ReleaseDataFlagOn();
+  //m_VTKImporter->ReleaseDataFlagOn();
 
   // Pipe the importer into the exporter (that's a lot of code)
   m_VTKImporter->SetUpdateInformationCallback(
@@ -111,34 +110,42 @@ IRISMeshPipeline
   m_VTKImporter->SetCallbackUserData(
     m_VTKExporter->GetCallbackUserData());
 
+  m_VTKGaussianFilter = vtkImageGaussianSmooth::New();
+  m_VTKGaussianFilter->SetInput(m_VTKImporter->GetOutput());
+  
   // Create and configure the contour filter
   m_ContourFilter = vtkContourFilter::New();
-  m_ContourFilter->SetInput(m_VTKImporter->GetOutput());    
-  m_ContourFilter->ReleaseDataFlagOn();
+  // m_ContourFilter->SetInput(m_VTKImporter->GetOutput());      
+  m_ContourFilter->SetInput(m_VTKGaussianFilter->GetOutput());
+  //m_ContourFilter->ReleaseDataFlagOn();
+  m_ContourFilter->ComputeNormalsOff();
   m_ContourFilter->ComputeScalarsOff();
   m_ContourFilter->ComputeGradientsOff();
   m_ContourFilter->UseScalarTreeOn();
   m_ContourFilter->SetNumberOfContours(1);
   m_ContourFilter->SetValue(0, 128.0);
 
-  // Create and configure the normal computer
-  m_NormalsFilter = vtkPolyDataNormals::New();
-  m_NormalsFilter->SetInput(m_ContourFilter->GetOutput());
-  m_NormalsFilter->SetFeatureAngle(60.0);
-
   // Create and configure a filter for triangle decimation
   m_DecimateFilter = vtkDecimatePro::New();
-  m_DecimateFilter->SetInput(m_NormalsFilter->GetOutput());
-  m_DecimateFilter->ReleaseDataFlagOn();
+  m_DecimateFilter->SetInput(m_ContourFilter->GetOutput());
+  //m_DecimateFilter->ReleaseDataFlagOn();
+
+  // Create and configure the normal computer
+  m_NormalsFilter = vtkPolyDataNormals::New();
+  m_NormalsFilter->SetInput(m_DecimateFilter->GetOutput());
+  m_NormalsFilter->SplittingOff();
+  m_NormalsFilter->ConsistencyOff();
+  m_NormalsFilter->AutoOrientNormalsOff();
+  //m_NormalsFilter->ReleaseDataFlagOn();
 
   // Create and configure a filter for polygon smoothing
   m_PolygonSmoothingFilter = vtkSmoothPolyDataFilter::New();
-  m_PolygonSmoothingFilter->SetInput(m_ContourFilter->GetOutput());
-  m_PolygonSmoothingFilter->ReleaseDataFlagOn();
+  m_PolygonSmoothingFilter->SetInput(m_NormalsFilter->GetOutput());
+  //m_PolygonSmoothingFilter->ReleaseDataFlagOn();
 
   // Create and configure a filter for triangle strip generation
   m_StripperFilter = vtkStripper::New();
-  m_StripperFilter->SetInput( m_PolygonSmoothingFilter->GetOutput() );
+  m_StripperFilter->SetInput( m_NormalsFilter->GetOutput() );
   m_StripperFilter->ReleaseDataFlagOn();
 }
 
@@ -164,31 +171,38 @@ IRISMeshPipeline
   if(options.GetUseGaussianSmoothing()) 
     {
     // Pipe smoothed output into the pipeline
-    m_VTKExporter->SetInput(m_GaussianFilter->GetOutput());
+    // m_VTKExporter->SetInput(m_GaussianFilter->GetOutput());
+    m_ContourFilter->SetInput(m_VTKGaussianFilter->GetOutput());
 
     // Apply parameters to the Gaussian filter
     float sigma = options.GetGaussianStandardDeviation();
     Vector3f variance(sigma * sigma);
     m_GaussianFilter->SetVariance(variance.data_block());
 
+    // Sigma is in millimeters
+    const double *spacing = m_InputImage->GetSpacing();
+    m_VTKGaussianFilter->SetStandardDeviation(
+      sigma / spacing[0], sigma / spacing[1], sigma / spacing[2]);
+    m_VTKGaussianFilter->SetRadiusFactors(
+      3 * sigma / spacing[0], 3 * sigma / spacing[1], 3 * sigma / spacing[2]);
+
     // What would be a suitable setting?  I suppose we don't really care
     // how close the the Gaussian this filter is, we just want some smoothing
     // to happen
-    m_GaussianFilter->SetMaximumError(options.GetGaussianError());    
+    m_GaussianFilter->SetMaximumError(options.GetGaussianError());           
     }
   else
     {
     // Bypass the gaussian
-    m_VTKExporter->SetInput(m_ThrehsoldFilter->GetOutput());
+    // m_VTKExporter->SetInput(m_ThrehsoldFilter->GetOutput());
+    m_ContourFilter->SetInput(m_VTKImporter->GetOutput());
     }
 
-  // Need this variable for pipeline routing
-  vtkPolyData *pipeEnd = m_NormalsFilter->GetOutput();
-
+  // Include/exclude decimation filter
   if(options.GetUseDecimation())
     {
     // The decimate filter is the new pipe end
-    pipeEnd = m_DecimateFilter->GetOutput();
+    m_NormalsFilter->SetInput(m_DecimateFilter->GetOutput());
 
     // Apply parameters to the decimation filter
     m_DecimateFilter->SetTargetReduction(
@@ -197,11 +211,15 @@ IRISMeshPipeline
     m_DecimateFilter->SetPreserveTopology(
       options.GetDecimatePreserveTopology());
     }
+  else
+    {
+    m_NormalsFilter->SetInput(m_ContourFilter->GetOutput());
+    }
   
+  // Include/exclude mesh smoothing filter
   if(options.GetUseMeshSmoothing())
     {
     // Pipe smoothed output into the pipeline
-    m_PolygonSmoothingFilter->SetInput(pipeEnd);
     m_StripperFilter->SetInput(m_PolygonSmoothingFilter->GetOutput());
 
     // Apply parameters to the mesh smoothing filter
@@ -226,7 +244,7 @@ IRISMeshPipeline
   else 
     {
     // Pipe previous output into the pipeline
-    m_StripperFilter->SetInput(pipeEnd);
+    m_StripperFilter->SetInput(m_NormalsFilter->GetOutput());
     }
 }
 
@@ -292,6 +310,8 @@ IRISMeshPipeline
     }  
 }
 
+#include <ctime>
+
 bool
 IRISMeshPipeline
 ::ComputeMesh(LabelType label, vtkPolyData *outMesh)
@@ -309,33 +329,77 @@ IRISMeshPipeline
   //m_GaussianFilter->GenerateInputRequestedRegion();
 
   // TODO: make this more elegant
+  clock_t now,start = clock();
+
   InputImageType::RegionType bbWiderRegion = m_BoundingBox[label];
   bbWiderRegion.PadByRadius(5);
   bbWiderRegion.Crop(m_InputImage->GetLargestPossibleRegion()); 
-  m_GaussianFilter->GetInput()->GetRequestedRegion();
   
   // Pass the region to the ROI filter and propagate the filter
   m_ROIFilter->SetInput(m_InputImage);
   m_ROIFilter->SetRegionOfInterest(bbWiderRegion);
+  m_ROIFilter->Update();
+  
+  cout << endl << "Timing: " << (int) label << endl;
+  now = clock(); cout << "ROI " << now - start << endl; start = now;
 
   // Set the parameters for the thresholding filter
   m_ThrehsoldFilter->SetLowerThreshold(label);
   m_ThrehsoldFilter->SetUpperThreshold(label);
+  m_ThrehsoldFilter->UpdateLargestPossibleRegion();
+
+  now = clock(); cout << "THR " << now - start << endl; start = now;
+
+  // Graft the polydata to the last filter in the pipeline
+  m_StripperFilter->SetOutput(outMesh);
+  
+  // Connect importer and exporter
+  m_VTKImporter->SetCallbackUserData(
+    m_VTKExporter->GetCallbackUserData());
+
+  // All these update methods are here for timing, otherwise they can
+  // be collapsed to m_StripperFilter->UpdateWholeExtent
 
   // Update the ITK portion of the pipeline
   m_VTKExporter->UpdateLargestPossibleRegion();
   
   // This does the image processing steps
   m_VTKImporter->UpdateWholeExtent();
+  
+  now = clock(); cout << "IMP " << now - start << endl; start = now;
+  
+  // Update the Gaussian filter
+  if(m_MeshOptions.GetUseGaussianSmoothing())
+    m_VTKGaussianFilter->UpdateWholeExtent();
 
-  m_VTKImporter->SetCallbackUserData(
-    m_VTKExporter->GetCallbackUserData());
+  now = clock(); cout << "GAU " << now - start << endl; start = now;
+  
+  // Now the subsequent filters
+  m_ContourFilter->UpdateWholeExtent();
 
-  // Graft the polydata to the last filter in the pipeline
-  m_StripperFilter->SetOutput(outMesh);
+  now = clock(); cout << "CNT " << now - start << endl; start = now;
+
+  // Now the subsequent filters
+  if(m_MeshOptions.GetUseDecimation())
+    m_DecimateFilter->UpdateWholeExtent();
+
+  now = clock(); cout << "DEC " << now - start << endl; start = now;
+
+  // The normal filter
+  m_NormalsFilter->UpdateWholeExtent();
+
+  now = clock(); cout << "NRM " << now - start << endl; start = now;
+
+  // Now the subsequent filters
+  if(m_MeshOptions.GetUseMeshSmoothing())
+    m_PolygonSmoothingFilter->UpdateWholeExtent();
+
+  now = clock(); cout << "SMO " << now - start << endl; start = now;  
 
   // Now the subsequent filters
   m_StripperFilter->UpdateWholeExtent();
+
+  now = clock(); cout << "STR " << now - start << endl; start = now;
 
   // Success
   return true;

@@ -18,7 +18,7 @@
 #include <cassert>
 #include <cstdio>
 
-#include "IRISTypes.h"
+#include "SNAPCommon.h"
 #include "itkMacro.h"
 #include "itkProcessObject.h"
 

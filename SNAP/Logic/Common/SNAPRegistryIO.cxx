@@ -15,8 +15,13 @@
 #include "SNAPRegistryIO.h"
 #include "IRISApplication.h"
 #include "IRISImageData.h"
-#include <vector>
 #include <algorithm>
+#include <vector>
+#include <string>
+
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4786 )
+#endif
 
 using namespace std;
 
@@ -27,6 +32,16 @@ SNAPRegistryIO
   m_EnumMapCoverage.AddPair(PAINT_OVER_ALL,"OverAll");
   m_EnumMapCoverage.AddPair(PAINT_OVER_COLORS,"OverVisible");
   m_EnumMapCoverage.AddPair(PAINT_OVER_ONE,"OverAll");
+
+  m_EnumMapSolver.AddPair(SnakeParameters::DENSE_SOLVER,"Dense");
+  m_EnumMapSolver.AddPair(SnakeParameters::LEGACY_SOLVER,"Legacy");
+  m_EnumMapSolver.AddPair(SnakeParameters::SPARSE_FIELD_SOLVER,"SparseField");
+  m_EnumMapSolver.AddPair(SnakeParameters::NARROW_BAND_SOLVER,"NarrowBand");
+  m_EnumMapSolver.AddPair(SnakeParameters::PARALLEL_SPARSE_FIELD_SOLVER,
+                              "ParallelSparseField");
+
+  m_EnumMapSnakeType.AddPair(SnakeParameters::EDGE_SNAKE,"EdgeStopping");
+  m_EnumMapSnakeType.AddPair(SnakeParameters::REGION_SNAKE,"RegionCompetition");
 }
 
 /** Read snake parameters from a registry */
@@ -48,9 +63,6 @@ SNAPRegistryIO
 
   out.SetClamp(
     registry["Clamp"][defaultSet.GetClamp()]);
-
-  out.SetSnakeType((SnakeParameters::SnakeType) 
-    registry["SnakeType"][defaultSet.GetSnakeType()]);
 
   out.SetPropagationWeight(
     registry["PropagationWeight"][defaultSet.GetPropagationWeight()]);
@@ -76,6 +88,14 @@ SNAPRegistryIO
   out.SetAdvectionSpeedExponent(
     registry["AdvectionSpeedExponent"][defaultSet.GetAdvectionSpeedExponent()]);
 
+  out.SetSnakeType(
+    registry["SnakeType"].GetEnum(
+      m_EnumMapSnakeType,defaultSet.GetSnakeType()));
+
+  out.SetSolver(
+    registry["SolverAlgorithm"].GetEnum(
+      m_EnumMapSolver,defaultSet.GetSolver()));
+
   return out;
 }
 
@@ -88,7 +108,6 @@ SNAPRegistryIO
   registry["TimeStep"] << in.GetTimeStep();
   registry["Ground"] << in.GetGround();
   registry["Clamp"] << in.GetClamp();
-  registry["SnakeType"] << in.GetSnakeType();
   registry["PropagationWeight"] << in.GetPropagationWeight();
   registry["PropagationSpeedExponent"][in.GetPropagationSpeedExponent()];
   registry["CurvatureWeight"] << in.GetCurvatureWeight();
@@ -97,6 +116,8 @@ SNAPRegistryIO
   registry["LaplacianSpeedExponent"] << in.GetLaplacianSpeedExponent();
   registry["AdvectionWeight"] << in.GetAdvectionWeight();
   registry["AdvectionSpeedExponent"] << in.GetAdvectionSpeedExponent();
+  registry["SnakeType"].PutEnum(m_EnumMapSnakeType,in.GetSnakeType());
+  registry["SolverAlgorithm"].PutEnum(m_EnumMapSolver,in.GetSolver());
 }
 
 /** Read mesh options from a registry */

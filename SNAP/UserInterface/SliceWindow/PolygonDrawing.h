@@ -20,7 +20,7 @@
 #include <GL/glu.h>
 
 #include <iostream>
-#include "IRISTypes.h"
+#include "SNAPCommonUI.h"
 
 enum PolygonState
 {
@@ -91,6 +91,9 @@ private:
 
 /*
  *Log: PolygonDrawing.h
+ *Revision 1.5  2003/10/02 20:57:46  pauly
+ *FIX: Made sure that the previous check-in compiles on Linux
+ *
  *Revision 1.4  2003/10/02 14:55:53  pauly
  *ENH: Development during the September code freeze
  *

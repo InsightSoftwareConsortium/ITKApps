@@ -17,8 +17,6 @@
 #define __SystemInterface_h_
 
 #include "Registry.h"
-#include <string>
-#include <vector>
 
 class IRISApplication;
 class SNAPRegistryIO;

@@ -21,7 +21,7 @@ class GlobalState;
 class IRISImageData;
 class ColorLabel;
 
-#include "IRISTypes.h"
+#include "SNAPCommon.h"
 #include <vector>
 
 /**
@@ -122,6 +122,9 @@ public:
 
 /*
  *Log: MeshObject.h
+ *Revision 1.6  2003/10/02 14:54:53  pauly
+ *ENH: Development during the September code freeze
+ *
  *Revision 1.1  2003/09/11 13:50:29  pauly
  *FIX: Enabled loading of images with different orientations
  *ENH: Implemented image save and load operations

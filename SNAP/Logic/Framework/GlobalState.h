@@ -15,22 +15,27 @@
 #ifndef __GlobalState_h_
 #define __GlobalState_h_
 
-#include "IRISTypes.h"
+#include "SNAPCommon.h"
 #include "EdgePreprocessingSettings.h"
 #include "MeshOptions.h"
 #include "SnakeParameters.h"
 #include "ThresholdSettings.h"
 #include "itkImageRegion.h"
 
-#include <string>
-
 enum ToolbarModeType 
 {
   POLYGON_DRAWING_MODE,
   NAVIGATION_MODE,
-  PAINT3D_MODE,
   CROSSHAIRS_MODE,
   ROI_MODE
+};
+
+enum ToolbarMode3DType
+{
+  TRACKBALL_MODE,
+  CROSSHAIRS_3D_MODE,
+  SPRAYPAINT_MODE,
+  SCALPEL_MODE
 };
 
 enum CoverageModeType 
@@ -114,6 +119,12 @@ public:
 
   /** Set the current toolbar mode */
   irisGetMacro(ToolbarMode,ToolbarModeType );
+
+  /** Get the current 3D toolbar mode */
+  irisSetMacro(ToolbarMode3D,ToolbarMode3DType);
+
+  /** Set the current 3D toolbar mode */
+  irisGetMacro(ToolbarMode3D,ToolbarMode3DType);
 
   /** Get whether the slice requires an update or not (TODO: obsolete?) */
   irisSetMacro(UpdateSliceFlag,int );
@@ -284,6 +295,9 @@ private:
   /** The current toolbar mode */
   ToolbarModeType m_ToolbarMode;
 
+  /** The current 3D toolbar mode */
+  ToolbarMode3DType m_ToolbarMode3D;
+
   /** Whether the slice requires an update or not (TODO: obsolete?) */
   int m_UpdateSliceFlag;
 
@@ -359,6 +373,9 @@ private:
 
 /*
  *Log: GlobalState.h
+ *Revision 1.4  2003/10/02 14:54:52  pauly
+ *ENH: Development during the September code freeze
+ *
  *Revision 1.1  2003/09/11 13:50:29  pauly
  *FIX: Enabled loading of images with different orientations
  *ENH: Implemented image save and load operations

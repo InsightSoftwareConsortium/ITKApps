@@ -17,12 +17,10 @@
 
 #include <FL/Fl_Gl_Window.H>
 
-#include <IRISTypes.h>
+#include <SNAPCommonUI.h>
 #include <IntensityCurveInterface.h>
 #include <FLTKCanvas.h>
 #include <InteractionMode.h>
-
-#include <vector>
 
 class IntensityCurveUILogic;
 class GreyImageWrapper;

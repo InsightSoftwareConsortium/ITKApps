@@ -15,12 +15,8 @@
 #ifndef __PreprocessingUILogic_h_
 #define __PreprocessingUILogic_h_
 
-#if defined(_WIN32)
-#include <itkWindows.h>
-#endif
-
 #include "PreprocessingUI.h"
-#include "IRISTypes.h"
+#include "SNAPCommonUI.h"
 #include "itkSmartPointer.h"
 #include "EdgePreprocessingImageFilter.h"
 #include "SmoothBinaryThresholdImageFilter.h"

@@ -13,7 +13,7 @@
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "PolygonDrawing.h"
-#include "IRISTypes.h"
+#include "SNAPCommonUI.h"
 
 #include <GL/glu.h>
 #include <iostream>
@@ -774,6 +774,9 @@ PolygonDrawing
 
 /*
  *Log: PolygonDrawing.cxx
+ *Revision 1.5  2003/10/02 14:55:53  pauly
+ *ENH: Development during the September code freeze
+ *
  *Revision 1.1  2003/09/11 13:51:01  pauly
  *FIX: Enabled loading of images with different orientations
  *ENH: Implemented image save and load operations

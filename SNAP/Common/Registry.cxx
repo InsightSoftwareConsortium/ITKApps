@@ -21,6 +21,10 @@
 #include <fstream>
 #include <iomanip>
 
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4786 )
+#endif
+
 using namespace std;
 
 RegistryValue
@@ -355,16 +359,20 @@ Registry::
 */
 void 
 Registry
-::WriteToFile(const char *pathname) 
+::WriteToFile(const char *pathname, const char *header) 
 {
   // Open the file
   ofstream sout(pathname,ios_base::out);
 
   // Set the stream to be picky
   sout.exceptions(ios_base::failbit);
+
+  // Write the header
+  if(header)
+    sout << header << endl;
  
   // Write to the stream
-    Write(sout,"");
+  Write(sout,"");
 }
 
 /**

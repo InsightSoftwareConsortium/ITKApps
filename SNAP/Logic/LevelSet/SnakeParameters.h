@@ -15,7 +15,7 @@
 #ifndef __SnakeParameters_h_
 #define __SnakeParameters_h_
 
-#include "IRISTypes.h"
+#include "SNAPCommon.h"
 
 /**
  * \class SnakeParameters
@@ -53,8 +53,14 @@ public:
    */
   static SnakeParameters GetDefaultInOutParameters();
 
+  /**
+   * Initialize parameters with default values for snake extraction
+   * in Inside/Outside images
+   */
+  static SnakeParameters GetDefaultAllZeroParameters();
+
   // Define a comparison operator
-  bool operator ==(const SnakeParameters &p);
+  bool operator ==(const SnakeParameters &p) const;
 
   /** Whether we wish to automatically compute optimal time step 
    * in level snake propagation */

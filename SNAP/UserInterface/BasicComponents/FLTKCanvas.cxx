@@ -28,6 +28,7 @@ FLTKCanvas
 : Fl_Gl_Window(x,y,w,h,label)
 {
   m_Dragging = false;
+  m_FlipYCoordinate = true;
 }
 
 void                            
@@ -73,12 +74,25 @@ FLTKCanvas
   // Create an event object
   FLTKEvent event;
   event.Id = eventID;
+  
+  // Note that the y coordinate is optionally reflected
   event.XCanvas[0] = Fl::event_x();
-  event.XCanvas[1] = h() - 1 - Fl::event_y();
+  event.XCanvas[1] = m_FlipYCoordinate ? h()-1-Fl::event_y() : Fl::event_y();
+  
   event.TimeStamp = clock();
   event.Source = this;  
   event.Button = Fl::event_button();
   event.State = Fl::event_state();
+
+  // Construct the software button
+  if(event.Button == FL_LEFT_MOUSE && (event.State & FL_ALT))
+    event.SoftButton = FL_RIGHT_MOUSE;
+  else if(event.Button == FL_LEFT_MOUSE && (event.State & FL_CTRL))
+    event.SoftButton = FL_MIDDLE_MOUSE;
+  else if(event.Button == FL_RIGHT_MOUSE && (event.State & FL_CTRL))
+    event.SoftButton = FL_MIDDLE_MOUSE;
+  else
+    event.SoftButton = event.Button;
 
   // If the window has not been displayed, we can't compute the 
   // object space coordinates
@@ -101,10 +115,6 @@ FLTKCanvas
                  modelMatrix,projMatrix,viewport,
                  &xProjection[0],&xProjection[1],&xProjection[2]);
     event.XSpace = to_float(xProjection);
-
-    // Accomodate 2-button mice: Ctrl-right => middle
-    if (event.State & FL_CTRL && event.Button == FL_RIGHT_MOUSE)
-      event.Button = FL_MIDDLE_MOUSE;
     }
 
   // Record the event as the drag-start if the mouse was pressed

@@ -14,7 +14,7 @@
 =========================================================================*/
 #include "IntensityCurveVTK.h"
 
-#include "IRISTypes.h"
+#include "SNAPCommon.h"
 #include <cassert>
 
 using namespace std;

@@ -25,15 +25,12 @@
 #include <string>
 #include <vector>
 
-// #include "ImageWrapper.h"
 #include "ImageIOWizard.h"
 #include "FL/fl_draw.h"
-
-//#include "itkImage.h"
-//#include "itkImageIOBase.h"
-//#include "itkRawImageIO.h"
 #include "itkSmartPointer.h"
 #include "ImageCoordinateGeometry.h"
+#include <string>
+#include <vector>
 
 namespace itk 
 {

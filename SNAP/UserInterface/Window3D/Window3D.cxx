@@ -29,13 +29,8 @@
 //#endif
 
 #include <FL/glut.h>
-
-                
-static Vector3d ray;
-static Vector3d pt;
-   
-/** These classes are used internally for ray intersection testing */
-
+                         
+/** These classes are used internally for m_Ray intersection testing */
 class LabelImageHitTester 
 {
 public:
@@ -64,37 +59,314 @@ public:
   }
 };
 
+/**
+ * \class Trackball3DInteractionMode
+ * \brief 3D interaction mode that takes care of 3D rotation and zoom
+ *
+ * \see Window3D
+ */
+class Trackball3DInteractionMode : public Window3D::EventHandler {
+public:
+  Trackball3DInteractionMode(Window3D *parent) : 
+    Window3D::EventHandler(parent) {}
 
+  int OnMousePress(const FLTKEvent &event);
+  int OnMouseRelease(const FLTKEvent &event, const FLTKEvent &pressEvent);    
+  int OnMouseDrag(const FLTKEvent &event, const FLTKEvent &pressEvent);
+};
+
+int 
+Trackball3DInteractionMode
+::OnMousePress(const FLTKEvent &event)
+{
+  int x = event.XCanvas[0];
+  int y = event.XCanvas[1];
+
+  switch (event.SoftButton)
+    {
+    case FL_LEFT_MOUSE:   m_Parent->OnRotateStartAction(x,y);break;
+    case FL_MIDDLE_MOUSE: m_Parent->OnPanStartAction(x,y);break;
+    case FL_RIGHT_MOUSE:  m_Parent->OnZoomStartAction(x,y);break;
+    default: return 0;
+    }
+
+  return 1;
+}
+
+int 
+Trackball3DInteractionMode
+::OnMouseRelease(const FLTKEvent &irisNotUsed(event),
+                 const FLTKEvent &irisNotUsed(startEvent))
+{
+  m_Parent->OnTrackballStopAction();
+  return 1;
+}
+
+int 
+Trackball3DInteractionMode
+::OnMouseDrag(const FLTKEvent &event,
+              const FLTKEvent &irisNotUsed(startEvent))
+{
+  m_Parent->OnTrackballDragAction(event.XCanvas[0],event.XCanvas[1]);
+  return 1;
+}
+
+/**
+ * \class Crosshair3DInteractionMode
+ * \brief 3D interaction mode that takes care of 3D crosshair interaction
+ *
+ * \see Window3D
+ */
+class Crosshairs3DInteractionMode : public Window3D::EventHandler {
+public:
+  Crosshairs3DInteractionMode(Window3D *parent) : 
+    Window3D::EventHandler(parent) {}
+
+  int OnMousePress(const FLTKEvent &event);
+};
+
+int 
+Crosshairs3DInteractionMode
+::OnMousePress(const FLTKEvent &event)
+{
+  if(event.SoftButton == FL_LEFT_MOUSE)
+    {
+    m_Parent->OnCrosshairClickAction(event.XCanvas[0],event.XCanvas[1]);
+    return 1;
+    }
+  else return 0;
+}
+
+/**
+ * \class Scalpel3DInteractionMode
+ * \brief 3D interaction mode that takes care of cutting 3D view in two
+ *
+ * \see Window3D
+ */
+class Scalpel3DInteractionMode : public Window3D::EventHandler {
+public:
+  Scalpel3DInteractionMode(Window3D *parent) : 
+    Window3D::EventHandler(parent) 
+  { 
+    m_Started = false;
+    m_Inside = false;
+  }
+
+  int OnMousePress(const FLTKEvent &event);
+  int OnMouseMotion(const FLTKEvent &event);    
+  int OnMouseEnter(const FLTKEvent &event);
+  int OnMouseExit(const FLTKEvent &event);
+
+  irisGetMacro(Started,bool);
+  irisGetMacro(Inside,bool);
+  irisGetMacro(StartPoint,Vector2i);
+  irisGetMacro(EndPoint,Vector2i);
+
+protected:
+  bool m_Inside;
+  bool m_Started;
+  Vector2i m_StartPoint;
+  Vector2i m_EndPoint;
+};
+
+int 
+Scalpel3DInteractionMode
+::OnMousePress(const FLTKEvent &event)
+{
+  if(!m_Started)
+    {
+    // Only for left button
+    if(event.SoftButton != FL_LEFT_MOUSE) return 0;
+
+    // Record the starting and ending points
+    m_StartPoint = event.XCanvas;
+    m_EndPoint = event.XCanvas;
+    m_Started = true;
+    m_Inside = true;
+    }
+  else
+    {
+    // This is the second click, after the user finished dragging
+    m_EndPoint = event.XCanvas;
+    m_Started = false;
+
+    // If the user clicks another button, disengage, otherwise
+    // draw the plane in the parent
+    if(event.SoftButton == FL_LEFT_MOUSE)
+      m_Parent->OnScalpelPointPairAction(
+        m_StartPoint[0],m_StartPoint[1],m_EndPoint[0],m_EndPoint[1]);    
+    }
+
+  // Redraw the parent
+  m_Parent->redraw();
+
+  // Eat the event
+  return 1;
+}
+
+int 
+Scalpel3DInteractionMode::
+OnMouseMotion(const FLTKEvent &event)
+{
+  // Only valid if drawing has started
+  if(!m_Started) return 0;
+  
+  // Record the end point
+  m_EndPoint = event.XCanvas;
+
+  // Redraw the parent
+  m_Parent->redraw();
+
+  // Eat the event
+  return 1;
+}
+
+int 
+Scalpel3DInteractionMode
+::OnMouseEnter(const FLTKEvent &event)
+{
+  // Only valid if drawing has started
+  if(!m_Started) return 0;
+  
+  // Record that we're inside
+  m_Inside = true;
+  
+  // Record the end point
+  m_EndPoint = event.XCanvas;
+
+  // Redraw the parent
+  m_Parent->redraw();
+
+  // Eat the event
+  return 1;
+}
+
+int 
+Scalpel3DInteractionMode
+::OnMouseExit(const FLTKEvent &irisNotUsed(event))
+{
+  // Only valid if drawing has started
+  if(!m_Started) return 0;
+  
+  // Record that we're inside
+  m_Inside = false;
+  
+  // Redraw the parent
+  m_Parent->redraw();
+
+  // Eat the event
+  return 1;
+}
+
+
+/**
+ * \class Spraypaint3DInteractionMode
+ * \brief 3D interaction mode that takes care of spraying on top of the 3D view
+ *
+ * \see Window3D
+ */
+class Spraypaint3DInteractionMode : public Window3D::EventHandler {
+public:
+  Spraypaint3DInteractionMode(Window3D *parent) : 
+    Window3D::EventHandler(parent) {}
+
+  int OnMousePress(const FLTKEvent &event);
+  int OnMouseDrag(const FLTKEvent &event, const FLTKEvent &pressEvent);
+};
+
+
+int 
+Spraypaint3DInteractionMode
+::OnMousePress(const FLTKEvent &event)
+{
+  if(event.SoftButton == FL_LEFT_MOUSE)
+    {
+    m_Parent->OnSpraypaintClickAction(event.XCanvas[0],event.XCanvas[1]);
+    return 1;
+    }
+  else return 0;
+}
+
+int 
+Spraypaint3DInteractionMode
+::OnMouseDrag(const FLTKEvent &event,
+              const FLTKEvent &irisNotUsed(startEvent))
+{
+  if(event.SoftButton == FL_LEFT_MOUSE)
+    {
+    m_Parent->OnSpraypaintClickAction(event.XCanvas[0],event.XCanvas[1]);
+    return 1;
+    }
+  else return 0;
+}
 
 
 Window3D
 ::Window3D( int x, int y, int w, int h, const char *l )
-: Fl_Gl_Window(x, y, w, h, l)
+: FLTKCanvas(x, y, w, h, l)
 {
+  // Make sure FLTK canvas does not flip the Y coordinate
+  SetFlipYCoordinate(false);
+  
+  // Clear the flags
   m_NeedsInitialization = 1;
   m_CursorVisible = 0;
   m_Mode = WIN3D_NONE;
-
   m_Plane.valid = -1;
 
-  for (int i=0; i<3; i++)
-    {
-    m_ImageSize[i] = 0;
-    m_Center[i] = m_DefaultHalf[i] = m_ViewHalf[i] = 0;
-    m_Spacing[i] = 1.0;
-    }
-  m_NumberOfUsedSamples = 0;;
-  m_NumberOfAllocatedSamples = 64;
-  m_Samples = new Vector3i[m_NumberOfAllocatedSamples];
-  if ( m_Samples == NULL )
-    {
-    cerr << "Memory Allocation failure in:" << endl;
-    cerr << "   Window3D::Window3D(int,int,int,int, const char *)" << endl;
-    cerr << "Exiting." << endl;
-    exit( -1 );
-    }
+  // Reset the vectors to zero
+  m_Spacing.fill(1.0);
+  m_ImageSize.fill(0);
+  m_Center.fill(0);
+  m_DefaultHalf.fill(0);
+  m_ViewHalf.fill(0);
+
+  // Initialize the interaction modes
+  m_CrosshairsMode = new Crosshairs3DInteractionMode(this); 
+  m_TrackballMode = new Trackball3DInteractionMode(this);
+  m_SpraypaintMode = new Spraypaint3DInteractionMode(this);
+  m_ScalpelMode = new Scalpel3DInteractionMode(this);
+
+  // Start with the trackball mode, which is prevailing
+  PushInteractionMode(m_TrackballMode);
 }
 
+
+/** Enter the cross-hairs mode of operation */
+void 
+Window3D
+::EnterCrosshairsMode()
+{
+  PopInteractionMode();
+  PushInteractionMode(m_CrosshairsMode);
+}
+
+/** Enter the trackball mode of operation */
+void 
+Window3D
+::EnterTrackballMode()
+{
+  PopInteractionMode();
+  PushInteractionMode(m_TrackballMode);
+}
+
+/** Enter the scalpel mode of operation */
+void 
+Window3D
+::EnterScalpelMode()
+{
+  PopInteractionMode();
+  PushInteractionMode(m_ScalpelMode);
+}
+
+/** Enter the spraypaint mode of operation */
+void 
+Window3D
+::EnterSpraypaintMode()
+{
+  PopInteractionMode();
+  PushInteractionMode(m_SpraypaintMode);
+}
 
 void 
 Window3D
@@ -112,56 +384,41 @@ Window3D
   this->m_Mesh.Initialize(m_Driver);
 }
 
-
-
-
 Window3D
 ::~Window3D()
 {
-  if ( m_Samples != NULL ) delete [] m_Samples;
+  delete m_CrosshairsMode;
+  delete m_TrackballMode;
+  delete m_SpraypaintMode;
+  delete m_ScalpelMode;
 }
 
 
-/*
-   ===============================================
-   Public Member Functions
-   ===============================================
-   */
-
-/*
- Initializes lightning and other basic GL-state for the window
- */
+/* Initializes lightning and other basic GL-state for the window */
 void 
 Window3D
-::Init()
+::Initialize()
 {
   ResetView();
 
+  glClearColor(0.0, 0.0, 0.0, 0.0);
+  glEnable( GL_DEPTH_TEST );
+
+  // Set up the materials
   GLfloat light0Pos[4] = { 0.0, 0.0, 1.0, 0.0};
   GLfloat matAmb[4] = { 0.01, 0.01, 0.01, 1.00};
   GLfloat matDiff[4] = { 0.65, 0.65, 0.65, 1.00};
   GLfloat matSpec[4] = { 0.30, 0.30, 0.30, 1.00};
   GLfloat matShine = 10.0;
-
-  glClearColor(0.0, 0.0, 0.0, 0.0);
-  glEnable( GL_DEPTH_TEST );
-
-  //    glEnable( GL_NORMALIZE );
-
-
-  /*
-   ** Setup Lighting
-   */
   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, matAmb);
   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, matDiff);
   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, matSpec);
   glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, matShine);
-
   glEnable(GL_COLOR_MATERIAL);
 
+  // Setup Lighting
   glLightfv(GL_LIGHT0, GL_POSITION, light0Pos);
   glEnable(GL_LIGHT0);
-
   glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
   glEnable(GL_LIGHTING);
 }
@@ -170,20 +427,30 @@ void
 Window3D
 ::ClearScreen()
 {
-  make_current(); // update GL state
-  m_CursorVisible = 0;  // Hide the crosshairs.
-  m_Mesh.Reset(); // Hide the mesh.
+  // Update the GL state
+  make_current(); 
+
+  // Hide the crosshairs.
+  m_CursorVisible = 0;  
+
+  // Hide the mesh.
+  m_Mesh.Reset(); 
 }
 
 void 
 Window3D
 ::ResetView()
 {
-  // verbose << "Window 3D Reset View" << endl;
+  // Update the GL state
+  make_current(); 
 
-  make_current(); // update GL state
-
+  // Reset the trackball
   m_Trackball.Reset();
+
+  // Rotate a little bit, so we see the three axes
+  m_Trackball.StartRot(12,10,20,20);
+  m_Trackball.TrackRot(10,8,20,20);
+  m_Trackball.StopRot();
 
   if (m_Driver->GetCurrentImageData()->IsGreyLoaded())
     {
@@ -223,16 +490,15 @@ Window3D
 
   m_CursorVisible = 1;  // Show the crosshairs.
   m_Plane.valid = -1; // Resets the Cut m_Plane
-  m_NumberOfUsedSamples = 0;  // Resets the spray paint
+  
+  m_Samples.clear();
 }
 
 void 
 Window3D
 ::UpdateMesh()
 {
-  // verbose << "Window 3D Update m_Mesh" << endl;
-
-  make_current(); // update GL state
+  make_current();
   m_Mesh.GenerateMesh();
   redraw();
 }
@@ -241,24 +507,27 @@ void
 Window3D
 ::Accept()
 {
-  unsigned char colorid;
-  colorid = m_GlobalState->GetDrawingColorLabel();
+  // Get the current drawing color
+  unsigned char colorid = m_GlobalState->GetDrawingColorLabel();  
 
-  for ( int i = 0; i < m_NumberOfUsedSamples; i++ )
+  // Apply the spraypaint samples to the image
+  for(SampleListIterator it=m_Samples.begin();it!=m_Samples.end();++it)
     {
     m_Driver->GetCurrentImageData()->SetSegmentationVoxel(
-      to_unsigned_int(m_Samples[i]), colorid );
+      to_unsigned_int(*it), colorid );
     }
-      
-  m_NumberOfUsedSamples = 0;
-
+  
+  // Clear the list of samples
+  m_Samples.clear();
+  
+  // If the plane is valid, apply it for relabeling
   if (1 == m_Plane.valid )
-    {    // relabel
-    m_Driver->GetCurrentImageData()->RelabelSegmentationWithCutPlane(m_Plane.coords, m_Plane.distZero, colorid);
+    {   
+    m_Driver->GetCurrentImageData()->RelabelSegmentationWithCutPlane(
+      m_Plane.vNormal, m_Plane.dIntercept, colorid);
     m_Plane.valid = -1;
     }
 }
-
 
 void
 Window3D
@@ -278,7 +547,7 @@ Window3D
   if ( !valid() || m_NeedsInitialization )
     {
     glViewport(0,0,w(),h());
-    Init();
+    Initialize();
     m_NeedsInitialization = 0;
     }
 
@@ -299,12 +568,75 @@ Window3D
   // The mesh is already in isotropic coords (needed for marching cubes)
   m_Mesh.Display();
 
-  glMatrixMode(GL_MODELVIEW);//Nathan Moon
+  glMatrixMode(GL_MODELVIEW);
   glPopMatrix();  // from SetupModelView()
+
+  // Draw any overlays there may be
+  if(m_ScalpelMode->GetStarted() && m_ScalpelMode->GetInside())
+    {
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0,w(),h(),0);
+    
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glPushAttrib(GL_DEPTH_BUFFER_BIT);
+    glDepthFunc(GL_ALWAYS);
+
+    // Get the points
+    Vector2d x1 = to_double(m_ScalpelMode->GetStartPoint());
+    Vector2d x2 = to_double(m_ScalpelMode->GetEndPoint());
+    Vector2d d = x2-x1;
+
+    // Draw a line between the two points
+    glColor3d(1,1,1);
+    glBegin(GL_LINES);
+    glVertex2d(x1[0],x1[1]);    
+    glVertex2d(x2[0],x2[1]);    
+    glEnd();
+
+    // If the points are far enough apart, draw the normal
+    if(d.two_norm() > 10)
+      {
+      // Draw the normal midway through the line
+      Vector2d n = Vector2d(-d[1],d[0]).normalize();
+      Vector2d p1 = 0.5 * (x1 + x2);
+      Vector2d p2 = p1 + 10.0 * n;
+      
+      glBegin(GL_LINES);
+      glVertex2d(p1[0],p1[1]);    
+      glVertex2d(p2[0],p2[1]);    
+      glEnd();
+
+      // Draw a colored triangle
+      d.normalize();
+      Vector2d u1 = p2 + 4.0 * d;
+      Vector2d u2 = p2 - 4.0 * d;
+      Vector2d u3 = p2 + 1.732 * 4.0 * n;
+
+      glBegin(GL_TRIANGLES);
+      glVertex2d(u1[0],u1[1]);    
+      glVertex2d(u2[0],u2[1]);    
+      glVertex2d(u3[0],u3[1]);    
+      glEnd();
+      
+      }
+    
+    glPopAttrib();
+
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    }
+
+  
+
 
   glFlush();
   CheckErrors();
-  //  cerr << "Window3D::draw finished!" << endl;
 }
 
 /**
@@ -334,6 +666,7 @@ Window3D
  *  else no change in state
  *  if event is used, 1 is returned, else 0
  */
+/*
 int 
 Window3D
 ::handle(int event)
@@ -375,176 +708,124 @@ Window3D
 
   return 0;
 }
-
-
+*/
+  
 void 
 Window3D
-::MousePressFunc(int button)
+::OnRotateStartAction(int x, int y)
 {
-  // Allow only one action at a time.
   if ( m_Mode != WIN3D_NONE ) return;
-
-  switch (button)
-    {
-    case FL_LEFT_MOUSE:
-      m_Mode = WIN3D_ROTATE;
-      m_Trackball.StartRot( Fl::event_x(), Fl::event_y(), w(), h() );
-      break;
-    case FL_MIDDLE_MOUSE:
-      m_Mode = WIN3D_PAN;
-      m_Trackball.StartPan( Fl::event_x(), Fl::event_y() );
-      break;
-    case FL_RIGHT_MOUSE:
-      m_Mode = WIN3D_ZOOM;
-      m_Trackball.StartZoom( Fl::event_y() );
-      break;
-    default: break;
-    }
+  m_Mode = WIN3D_ROTATE;
+  m_Trackball.StartRot(x, y, w(), h());
 }
 
 void 
 Window3D
-::MouseReleaseFunc()
+::OnPanStartAction(int x, int y)
+{
+  if ( m_Mode != WIN3D_NONE ) return;
+  m_Mode = WIN3D_PAN;
+  m_Trackball.StartPan(x, y);
+}
+
+void 
+Window3D
+::OnZoomStartAction(int x, int y)
+{
+  if ( m_Mode != WIN3D_NONE ) return;
+  m_Mode = WIN3D_ZOOM;
+  m_Trackball.StartZoom(y);
+}
+
+void 
+Window3D
+::OnTrackballDragAction(int x, int y)
 {
   switch (m_Mode)
     {
-    case WIN3D_ROTATE:
-      m_Trackball.StopRot(); break;
-    case WIN3D_PAN:
-      m_Trackball.StopPan(); break;
-    case WIN3D_ZOOM:
-      m_Trackball.StopZoom(); break;
-    default: break;
+    case WIN3D_ROTATE: m_Trackball.TrackRot(x,y,w(),h()); break;
+    case WIN3D_ZOOM:   
+      m_Trackball.TrackZoom(y); 
+      this->SetupProjection();
+      break;
+    case WIN3D_PAN:    
+      m_Trackball.TrackPan(x,y,w(),h(),2*m_ViewHalf[X],2*m_ViewHalf[Y]);
+      break;
+    }
+
+  redraw();
+}
+
+void 
+Window3D
+::OnTrackballStopAction()
+{
+  switch (m_Mode)
+    {
+    case WIN3D_ROTATE:  m_Trackball.StopRot(); break;
+    case WIN3D_PAN:     m_Trackball.StopPan(); break;
+    case WIN3D_ZOOM:    
+      m_Trackball.StopZoom(); 
+      this->SetupProjection();
+      break;
     }
   m_Mode = WIN3D_NONE;
 }
 
 void 
 Window3D
-::MouseMotionFunc()
+::OnCrosshairClickAction(int x,int y)
 {
-  switch (m_Mode)
-    {
-    case WIN3D_ROTATE:
-      m_Trackball.TrackRot( Fl::event_x(), Fl::event_y(), w(), h() );
-      redraw();
-      break;
-    case WIN3D_ZOOM:
-      m_Trackball.TrackZoom( Fl::event_y() );
-      this->SetupProjection();
-      redraw();
-      break;
-    case WIN3D_PAN:
-      m_Trackball.TrackPan( Fl::event_x(), Fl::event_y(), 
-                            w(), h(), 2*m_ViewHalf[X], 2*m_ViewHalf[Y] );
-      redraw();
-      break;
-    default: break;
-    }
-}
+  // Make sure that there is a valid image
+  if (!m_Driver->GetCurrentImageData()->IsGreyLoaded()) return;
 
-void 
-Window3D
-::MouseCrossPressFunc(int button)
-{
+  // Only respond to the left mouse button (why?)
   Vector3i hit;
-
-  if (!m_Driver->GetCurrentImageData()->IsGreyLoaded())
-    return;
-
-  switch (button)
+  if (IntersectSegData(x, y, hit))
     {
-    case FL_LEFT_MOUSE:
-
-      if (this->IntersectSegData(Fl::event_x(), Fl::event_y(), hit))
-        {
-        // TODO: Unify this!
-        m_Driver->GetCurrentImageData()->SetCrosshairs(to_unsigned_int(hit));
-        m_GlobalState->SetCrosshairsPosition(to_unsigned_int(hit));
-        }
-
-      m_ParentUI->OnCrosshairPositionUpdate();
-      m_ParentUI->RedrawWindows();
-
-      break;
-    default: break;
+    // TODO: Unify this!
+    m_Driver->GetCurrentImageData()->SetCrosshairs(to_unsigned_int(hit));
+    m_GlobalState->SetCrosshairsPosition(to_unsigned_int(hit));
     }
+
+  m_ParentUI->OnCrosshairPositionUpdate();
+  m_ParentUI->RedrawWindows();
 }
 
-/**
- MousePointPressFunc() 
- when dragging the left button, the function gets the coordinates and
- adds it to the spray painted points (m_Samples).
- Vector3i hit is in image coordinates
-
- post: if max num of m_Samples was not exceeded, then the added spray
- painted point was added and then drawn on the screen.
- */
 void 
 Window3D
-::MousePointPressFunc(int button)
+::OnSpraypaintClickAction(int x,int y)
 {
+  // Make sure that there is a valid image
+  if (!m_Driver->GetCurrentImageData()->IsGreyLoaded()) return;
+
   Vector3i hit;
-
-  if (!m_Driver->GetCurrentImageData()->IsGreyLoaded())
-    return;
-
-  switch (button)
+  if (this->IntersectSegData(Fl::event_x(), Fl::event_y(), hit))
     {
-    case FL_LEFT_MOUSE:
-      if (this->IntersectSegData(Fl::event_x(), Fl::event_y(), hit))
-        {
-        AddSample( hit );
-        m_ParentUI->Activate3DAccept(true);
-        redraw();
-        }
-      break;
-    default: break;
+    AddSample( hit );
+    m_ParentUI->Activate3DAccept(true);
+    redraw();
     }
 }
 
 void 
 Window3D
-::MouseCutPressFunc(int button)
+::OnScalpelPointPairAction(int x1, int y1, int x2, int y2)
 {
-  if (!m_Driver->GetCurrentImageData()->IsGreyLoaded())
-    return;
+  // Requires a loaded image
+  if (!m_Driver->GetCurrentImageData()->IsGreyLoaded()) return;
 
-  switch (button)
+  // Pass in the first point
+  // OnCutPlanePointRayAction(x1, y1, 1);
+  // OnCutPlanePointRayAction(x2, y2, 2);
+
+  if(ComputeCutPlane(x1,y1,x2,y2)) 
     {
-    case FL_LEFT_MOUSE:
-      cout << "Left click, drag to start spray" << endl;
-      break;
-    case FL_RIGHT_MOUSE:
-      //    cout << "Handling rt click in cut planes m_Mode" << endl;
-      if (-1==m_Plane.valid)
-        {
-        cout << "saving 1st pt ";   // in middle of defining plane
-        OnCutPlanePointRayAction(Fl::event_x(), Fl::event_y(), 1);
-        redraw();
-        m_Plane.valid = 0;
-        break;
-        }     // 0 means is in middle of def cut plane
-      else if (0==m_Plane.valid)
-        {
-        cout << "saving 2nd pt, calculating plane" << endl;
-        OnCutPlanePointRayAction(Fl::event_x(), Fl::event_y(), 2);
-
-        m_Plane.valid = 1;
-        ComputePlane();
-        redraw();
-        m_ParentUI->Activate3DAccept(true);
-        break;
-        } else
-        {  // plane.valid is 1, plane is already defined
-        cout << "m_Plane already defined - Press Accept or Reset View" << endl;
-        }
-      break;
-
-    default:
-      cout << "Cut m_Planes, but not lt/rt click" << endl;
-      break;
+    m_Plane.valid = 1;
+    m_ParentUI->Activate3DAccept(true);
     }
+        
+  redraw();
 }
 
 /**
@@ -616,11 +897,101 @@ void Window3D::ComputeRay( int x, int y, double *mvmatrix, double *projmatrix,
   r[2] = r[2] - v[2];
 }
 
+bool 
+Window3D
+::ComputeCutPlane(int wx1, int wy1, int wx2, int wy2)
+{
+  // Open GL matrices
+  double mvmatrix[16];
+  double projmatrix[16];
+  int viewport[4];
+  Vector3d x1,x2,p1,p2;
+
+  // Compute the GL matrices
+  ComputeMatricies( viewport, mvmatrix, projmatrix );
+
+  // Flip the y coordinate
+  wy1 = viewport[3] - wy1 - 1;
+  wy2 = viewport[3] - wy2 - 1;
+
+  // Compute the normal to the viewplane  
+  gluUnProject(0,0,0,mvmatrix,projmatrix,viewport,
+               p1.data_block(),p1.data_block()+1,p1.data_block()+2);
+  gluUnProject(0,0,1,mvmatrix,projmatrix,viewport,
+               p2.data_block(),p2.data_block()+1,p2.data_block()+2);
+  
+  // W is a vector pointing into the screen
+  Vector3d w = p2 - p1;
+
+  // Compute the vector connecting the two points currently lying on the
+  // view plane
+  gluUnProject(wx1,wy1,0,mvmatrix,projmatrix,viewport,
+               x1.data_block(),x1.data_block()+1,x1.data_block()+2);
+  gluUnProject(wx2,wy2,0,mvmatrix,projmatrix,viewport,
+               x2.data_block(),x2.data_block()+1,x2.data_block()+2);
+
+  // Now we have two orthogonal vectors laying on the cut plane.  All we have
+  // to do is take the cross product
+  Vector3d delta = x2-x1;
+  Vector3d n = - cross_3d((vnl_vector<double>) delta,
+                            (vnl_vector<double>) w);
+
+  // Compute the length of the normal and exit if it's zero
+  double l = n.two_norm();
+  if(l == 0.0) return false;
+  
+  // Compute the distance to the origin
+  m_Plane.vNormal = n.normalize();
+  m_Plane.dIntercept = dot_product(x1,m_Plane.vNormal);
+
+  // Now, this is not enough, because we want to be able to draw the plane
+  // in space.  In order to do this we need four corners of a square on the
+  // plane.
+
+  // Compute the points on the plane in world space
+  Vector3d x1World(x1[0] * m_Spacing[0],x1[1] * m_Spacing[1],x1[2] * m_Spacing[2]);
+  Vector3d x2World(x2[0] * m_Spacing[0],x2[1] * m_Spacing[1],x2[2] * m_Spacing[2]);
+  Vector3d p1World(p1[0] * m_Spacing[0],p1[1] * m_Spacing[1],p1[2] * m_Spacing[2]);
+  Vector3d p2World(p2[0] * m_Spacing[0],p2[1] * m_Spacing[1],p2[2] * m_Spacing[2]);
+  
+  // Compute the normal in world coordinates
+  Vector3d nWorld = - cross_3d((vnl_vector<double>) (x2World - x1World),
+                               (vnl_vector<double>) (p2World - p1World));
+  m_Plane.vNormalWorld = nWorld.normalize();
+
+  // Compute the intercept in world coordinates  
+  double interceptWorld = dot_product(x1World,m_Plane.vNormalWorld);
+
+  // Compute the center of the volume
+  Vector3d xVol = to_double(m_VolumeSize) * 0.5;
+  
+  // Use that to compute the center of the square
+  double edgeLength = (xVol[0] > xVol[1]) ? xVol[0] : xVol[1];
+  edgeLength = (edgeLength > xVol[2]) ? edgeLength : xVol[2];
+
+  // Now compute the center point of the square   
+  Vector3d xCenter = 
+    xVol - m_Plane.vNormalWorld *
+     (dot_product(xVol,m_Plane.vNormalWorld) - interceptWorld);
+  
+  // Compute the 'up' vector and the 'in' vector
+  Vector3d vUp = (x2World - x1World).normalize();
+  Vector3d vIn = (p2World - p1World).normalize();
+
+  // Compute the corners
+  m_Plane.xDisplayCorner[0] = xCenter + edgeLength * (vUp + vIn);
+  m_Plane.xDisplayCorner[1] = xCenter + edgeLength * (vUp - vIn);
+  m_Plane.xDisplayCorner[2] = xCenter + edgeLength * (- vUp - vIn);
+  m_Plane.xDisplayCorner[3] = xCenter + edgeLength * (- vUp + vIn);
+
+  return true;
+}
+
 
 
 //------------------------------------------------------------------------
 // IntersectSegData(int mouse_x, int mouse_y, Vector3i *hit)
-// computes a ray going straight back from the current viewpoint
+// computes a m_Ray going straight back from the current viewpoint
 // from the mouse click position on screen.
 // The output Vector3i hit is in image coords.
 //
@@ -635,7 +1006,7 @@ int Window3D::IntersectSegData(int mouse_x, int mouse_y, Vector3i &hit)
   ComputeMatricies( viewport, mvmatrix, projmatrix );
   int x = mouse_x;
   int y = viewport[3] - mouse_y - 1;
-  ComputeRay( x, y, mvmatrix, projmatrix, viewport, pt, ray );
+  ComputeRay( x, y, mvmatrix, projmatrix, viewport, m_Point, m_Ray );
 
   // The result 
   int result = 0;
@@ -654,7 +1025,7 @@ int Window3D::IntersectSegData(int mouse_x, int mouse_y, Vector3i &hit)
     result = 
       caster.FindIntersection(
         m_Driver->GetSNAPImageData()->GetLevelSetImage(),
-        pt,ray,hit);
+        m_Point,m_Ray,hit);
     }
   else
     {
@@ -666,10 +1037,10 @@ int Window3D::IntersectSegData(int mouse_x, int mouse_y, Vector3i &hit)
     result = 
       caster.FindIntersection(
         m_Driver->GetCurrentImageData()->GetSegmentation()->GetImage(),
-        pt,ray,hit);
+        m_Point,m_Ray,hit);
     }
   
-  // ray now has the proj ray, pt is the pt in image space
+  // m_Ray now has the proj m_Ray, m_Point is the m_Point in image space
   switch (result)
     {
     case 1: return 1;
@@ -683,6 +1054,7 @@ int Window3D::IntersectSegData(int mouse_x, int mouse_y, Vector3i &hit)
 // ComputePointRay
 // 
 //-----------------------------------------------------------------------
+/*
 void Window3D::OnCutPlanePointRayAction(int mouse_x, int mouse_y, int i)
 {
   double mvmatrix[16];
@@ -701,29 +1073,32 @@ void Window3D::OnCutPlanePointRayAction(int mouse_x, int mouse_y, int i)
     << m_Plane.cutPt1[0] << ", " << m_Plane.cutPt1[1] << ", " << m_Plane.cutPt1[2] << ")" << endl;
     cout << "Ray 1: x = " << m_Plane.cutRay1[0] << " y = " << m_Plane.cutRay1[1] << " z = "
     << m_Plane.cutRay1[2] << endl;
-    // ray[i] and pt[] have been set
-    } else if ( 2==i )
+    // m_Ray[i] and m_Point[] have been set
+    } 
+  else if ( 2==i )
     {
     ComputeRay( x, y, mvmatrix, projmatrix, viewport, m_Plane.cutPt2,
                 m_Plane.cutRay2 );
-    cout << "Second pt: X = " << Fl::event_x() << " Y = " << Fl::event_y() << " in image space is ("
+    cout << "Second m_Point: X = " << Fl::event_x() << " Y = " << Fl::event_y() << " in image space is ("
     << m_Plane.cutPt2[0] << ", " << m_Plane.cutPt2[1] << ", " << m_Plane.cutPt2[2] << ")" << endl;
     cout << "Ray 2: x = " << m_Plane.cutRay2[0] << " y = " << m_Plane.cutRay2[1] << " z = "
     << m_Plane.cutRay2[2] << endl;
-    } else
+    } 
+  else
     {
     cerr << "Not able to set Cut m_Plane point: " << i << endl; 
     }
 }
+*/
 
 //-----------------------------------------------------------------------
 // Computem_Plane
 //   returns 0 if plane invalid, 1 if plane sucessfully computed
 //
 // parameters:
-//   pt1    1st user-defined pt
-//   pt2    2nd user-defined pt
-//   ray    ray projected back from pt2 through image from viewpt
+//   pt1    1st user-defined m_Point
+//   pt2    2nd user-defined m_Point
+//   m_Ray    m_Ray projected back from pt2 through image from viewpt
 //   ABC    output m_Plane coordinates Ax+By+Cz+1=0 if DisZero
 //          Ax+By+Cz=0 if !DixZero 
 //   DisZero    true if plane goes through origin, false otherwise
@@ -733,7 +1108,7 @@ void Window3D::OnCutPlanePointRayAction(int mouse_x, int mouse_y, int i)
 //   pt1 != pt2 return 1
 //  ABC returns coordinates of plane equation, and DisZero set
 //-----------------------------------------------------------------------
-
+/*
 void Window3D::ComputePlane() {
   if (m_Plane.valid != 1)
     {
@@ -747,7 +1122,7 @@ void Window3D::ComputePlane() {
     return;
     }
 
-  Vector3d ray3;    // create new ray between the 2 pts to help calc plane
+  Vector3d ray3;    // create new m_Ray between the 2 pts to help calc plane
   for (int i=0; i<3; i++) ray3[i] = m_Plane.cutPt2[i] - m_Plane.cutPt1[i];
 
   if (ray3[X] == 0 && ray3[Y] == 0 && ray3[Z] == 0)
@@ -779,24 +1154,11 @@ void Window3D::ComputePlane() {
   << (m_Plane.distZero ? "- 1 " : "") << "== 0" << endl;
 #endif
 }
-
+*/
 void Window3D::AddSample( Vector3i s )
 {
-  // Check to make sure there's room for another sample.
-  if ( m_NumberOfUsedSamples == m_NumberOfAllocatedSamples )
-    {
-    Vector3i *temp;
-    temp = new Vector3i[m_NumberOfAllocatedSamples * 2];
-    m_NumberOfAllocatedSamples *= 2;
-    for ( int i = 0; i < m_NumberOfUsedSamples; i++ )
-      temp[i] = m_Samples[i];
-    delete [] m_Samples;
-    m_Samples = temp;
-    }
-
   // Add another sample.
-  m_Samples[m_NumberOfUsedSamples] = s;
-  m_NumberOfUsedSamples++;
+  m_Samples.push_back(s);
 }
 
 void Window3D::DrawCrosshairs()
@@ -831,14 +1193,14 @@ void Window3D::DrawCrosshairs()
 #if DEBUGGING
   glColor3f( 1.0, 1.0, 0.0 );
   glBegin( GL_LINES );
-  glVertex3d( pt[0],        pt[1],        pt[2] );
-  glVertex3d( pt[0]+ray[0], pt[1]+ray[1], pt[2]+ray[2] );
+  glVertex3d( m_Point[0],        m_Point[1],        m_Point[2] );
+  glVertex3d( m_Point[0]+m_Ray[0], m_Point[1]+m_Ray[1], m_Point[2]+m_Ray[2] );
   glEnd();
 
-  cerr << "A = ( " << pt[0] << ", " << pt[1] << ", " << pt[2] << " )" << endl;
-  cerr << "B = ( " << pt[0]+ray[0]
-  << ", " << pt[1]+ray[1]
-  << ", " << pt[2]+ray[2] << " )" << endl;
+  cerr << "A = ( " << m_Point[0] << ", " << m_Point[1] << ", " << m_Point[2] << " )" << endl;
+  cerr << "B = ( " << m_Point[0]+m_Ray[0]
+  << ", " << m_Point[1]+m_Ray[1]
+  << ", " << m_Point[2]+m_Ray[2] << " )" << endl;
 #endif
 
   glEnable(GL_LIGHTING);
@@ -853,10 +1215,10 @@ void Window3D::DrawSamples()
 
   glColor3ubv(rgb);
   glMatrixMode( GL_MODELVIEW );
-  for ( int i = 0; i < m_NumberOfUsedSamples; i++ )
+  for (SampleListIterator it=m_Samples.begin();it!=m_Samples.end();it++)
     {
     glPushMatrix(); 
-    glTranslatef( m_Samples[i][X], m_Samples[i][Y], m_Samples[i][Z] );
+    glTranslatef( (*it)[X], (*it)[Y], (*it)[Z] );
 
     GLUquadric *quad = gluNewQuadric();
     gluSphere(quad,1.0,4,4);
@@ -874,8 +1236,17 @@ void Window3D::DrawSamples()
 // Input: the 'plane' member
 // Output: GLplane representing the Cutplane that is defined by the user
 //-----------------------------------------------------------------------
-void Window3D::DrawCutPlane() {
+void Window3D
+::DrawCutPlane() 
+{
   if (m_Plane.valid != 1) return;
+
+  // Compute the dimensions of the square representing the plane
+
+
+
+/*
+
 
   // Spit out a vertex with given x, y coords (assumes m_Plane.coords[Z] != 0)
   #define Z_VERTEX(x,y) Vector3d( (x), (y), \
@@ -915,9 +1286,20 @@ void Window3D::DrawCutPlane() {
     corner[2] = Z_VERTEX(m_VolumeSize[X], m_VolumeSize[Y]);
     corner[3] = Z_VERTEX(m_VolumeSize[X],        0.0);
     }
+*/
+  Vector3d corner[4];  
+  corner[0] = m_Plane.xDisplayCorner[0];
+  corner[1] = m_Plane.xDisplayCorner[1];
+  corner[2] = m_Plane.xDisplayCorner[2];
+  corner[3] = m_Plane.xDisplayCorner[3];
 
   // Save the settings
   glPushAttrib(GL_LINE_BIT | GL_COLOR_BUFFER_BIT | GL_LIGHTING_BIT);
+
+  // Make sure we're operating in world coordinates
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+  glScaled(1.0 / m_Spacing[X], 1.0 / m_Spacing[Y], 1.0 / m_Spacing[Z] );
   
   // Draw the plane using lines
   glEnable(GL_LINE_SMOOTH);
@@ -935,7 +1317,7 @@ void Window3D::DrawCutPlane() {
   
   // Start with a white color
   glColor3d(1,1,1);
-  Vector3d planeUnitNormal = Vector3d(m_Plane.coords).normalize();
+  Vector3d planeUnitNormal = Vector3d(m_Plane.vNormalWorld).normalize();
   for(unsigned int i=0;i<4;i++)
     {
     glPushMatrix();
@@ -958,11 +1340,15 @@ void Window3D::DrawCutPlane() {
     glPopMatrix();
     }
 
+  glPopMatrix();
   glPopAttrib();
 };
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.6  2003/10/02 20:57:46  pauly
+ *FIX: Made sure that the previous check-in compiles on Linux
+ *
  *Revision 1.5  2003/10/02 14:55:53  pauly
  *ENH: Development during the September code freeze
  *

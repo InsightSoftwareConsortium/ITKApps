@@ -15,7 +15,7 @@
 #ifndef __GreyImageIOWizardLogic_h_
 #define __GreyImageIOWizardLogic_h_
 
-#include "IRISTypes.h"
+#include "SNAPCommonUI.h"
 #include "RestrictedImageIOWizardLogic.h"
 
 /**

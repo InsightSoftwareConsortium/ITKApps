@@ -15,7 +15,7 @@
 #ifndef __UserInterfaceBase__h_
 #define __UserInterfaceBase__h_
 
-#include "IRISTypes.h"
+#include "SNAPCommonUI.h"
 
 // TODO: this is a hack.  Clean all code out of GUI!!!
 #include "GlobalState.h"
@@ -34,8 +34,9 @@ public:
   // Method for exiting IRIS
   virtual void OnMainWindowCloseAction() = 0;
 
-  // IRIS Toolbar mode
+  // Methods that set the IRIS Toolbar and 3D Toolbar modes
   virtual void SetToolbarMode(ToolbarModeType mode) = 0;
+  virtual void SetToolbarMode3D(ToolbarMode3DType mode) = 0;
   
   // Menu item callbacks
   virtual void OnMenuOpenProject() = 0;

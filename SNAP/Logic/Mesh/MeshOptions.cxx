@@ -19,8 +19,8 @@ MeshOptions
 {
   // Begin render switches
   m_UseGaussianSmoothing = true;
-  m_UseDecimation = true;
-  m_UseMeshSmoothing = true;
+  m_UseDecimation = false;
+  m_UseMeshSmoothing = false;
 
   // Begin gsmooth params
   m_GaussianStandardDeviation = 0.8f;
@@ -51,6 +51,9 @@ MeshOptions
 
 /*
  *Log: MeshOptions.cxx
+ *Revision 1.4  2003/10/02 14:54:53  pauly
+ *ENH: Development during the September code freeze
+ *
  *Revision 1.1  2003/09/11 13:50:29  pauly
  *FIX: Enabled loading of images with different orientations
  *ENH: Implemented image save and load operations

@@ -16,6 +16,7 @@
 #define __RestoreSettingsDialogLogic_h_
 
 #include "Registry.h"
+#include "IRISCommonUI.h"
 #include "RestoreSettingsDialog.h"
 
 class SystemInterface;

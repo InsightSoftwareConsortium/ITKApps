@@ -15,8 +15,7 @@
 #ifndef __IRIS_Exceptions_h_
 #define __IRIS_Exceptions_h_
 
-#include <iostream>
-#include <string>
+#include "SNAPCommon.h"
 
 using std::string;
 

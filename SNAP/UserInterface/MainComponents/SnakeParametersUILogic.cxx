@@ -14,22 +14,22 @@
 =========================================================================*/
 #include "SnakeParametersUILogic.h"
 
-#include "GlobalState.h"
-#include "IRISApplication.h"
-#include "IRISImageData.h"
-#include "SNAPImageData.h"
-#include "ThresholdSettings.h"
-#include "SystemInterface.h"
-#include "UserInterfaceLogic.h"
-#include "SnakeParametersPreviewPipeline.h"
-
-#include "itkImage.h"
 #include "itkEventObject.h" 
-
+#include "itkImage.h"
 #include "itkImageFileReader.h"
 #include "itkImageRegionIterator.h"
 #include "itkPNGImageIO.h"
 #include "itkRGBPixel.h"
+#include "GlobalState.h"
+#include "IRISApplication.h"
+#include "IRISImageData.h"
+#include "SNAPImageData.h"
+#include "SNAPRegistryIO.h"
+#include "SimpleFileDialogLogic.h"
+#include "SnakeParametersPreviewPipeline.h"
+#include "SystemInterface.h"
+#include "ThresholdSettings.h"
+#include "UserInterfaceLogic.h"
 
 using namespace itk;
 
@@ -55,7 +55,7 @@ SnakeParametersUILogic
 ::OnCurvatureExponentChange(Fl_Valuator *input)
 {
   int clamped = (int) input->clamp(input->value());
-  m_Parameters.SetCurvatureSpeedExponent(clamped);
+  m_Parameters.SetCurvatureSpeedExponent(clamped - 1);
   this->OnParameterUpdate();
 }
 
@@ -222,7 +222,7 @@ void SnakeParametersUILogic
   m_InCurvatureWeightEasy->value(value);
 
   // Curvature exponent
-  value = m_Parameters.GetCurvatureSpeedExponent();
+  value = m_Parameters.GetCurvatureSpeedExponent() + 1;
   m_InCurvatureExponentMathText->value(value);
   m_InCurvatureExponentMathSlider->value(value);
   m_InCurvatureExponentClassic->value(value);
@@ -273,6 +273,7 @@ void SnakeParametersUILogic
     }
   else
     {
+    m_InAdvectionExponentMathText->hide();
     m_InAdvectionExponentMathSlider->hide();
     m_InCurvatureExponentMathText->hide();
     m_InCurvatureExponentMathSlider->hide();
@@ -372,6 +373,12 @@ void SnakeParametersUILogic
 
   m_InTimeStep->value(m_Parameters.GetTimeStep());
   m_InSmoothingWeight->value(m_Parameters.GetLaplacianWeight());
+
+  // Update the parameter display windows
+  m_BoxPreview[0]->redraw();
+  m_BoxPreview[1]->redraw();
+  m_BoxPreview[2]->redraw();
+  m_BoxPreview[3]->redraw();
 }
  
 void 
@@ -396,15 +403,103 @@ void SnakeParametersUILogic
 }
 
 void SnakeParametersUILogic
-::OnSavePresetAction()
+::OnSaveParametersAction()
 {
-
+  // Show the save dialog using the correct history
+  m_IODialog->DisplaySaveDialog(
+    m_SystemInterface->GetHistory("SnakeParameters"),NULL);
 }
 
 void SnakeParametersUILogic
-::OnSelectPresetAction()
+::SaveParametersCallback()
 {
+  // Get the selected file name
+  const char *file = m_IODialog->GetFileName();
 
+  try 
+    {
+    // Create a registry for the file
+    Registry regParameters;
+
+    // Use a registry IO object to put the parameters into a registry
+    SNAPRegistryIO().WriteSnakeParameters(m_Parameters,regParameters);
+
+    // Write the registry to file
+    regParameters.WriteToFile(file,"# ITK-SNAP Snake Parameters File");
+    
+    // Add the filename to the history
+    m_SystemInterface->UpdateHistory("SnakeParameters",file);
+    }
+  catch(...)
+    {
+    fl_alert("Unable to write to file %s!",file);  
+    throw;
+    }
+}
+
+void SnakeParametersUILogic
+::OnLoadParametersAction()
+{
+  // Show the save dialog using the correct history
+  m_IODialog->DisplayLoadDialog(
+    m_SystemInterface->GetHistory("SnakeParameters"),NULL);
+}
+
+void SnakeParametersUILogic
+::LoadParametersCallback()
+{
+  // Get the selected file name
+  const char *file = m_IODialog->GetFileName();
+  SnakeParameters parameters;
+
+  try 
+    {
+    // Read a registry from the indicated file
+    Registry regParameters(file);
+
+    // Read the parameters from the registry
+    parameters = 
+      SNAPRegistryIO().ReadSnakeParameters(regParameters,m_Parameters);
+    }
+  catch(...)
+    {
+    fl_alert("Unable to load parameters from file %s!",file);  
+    throw;
+    }
+
+  // Make sure the parameters are of valid type
+  if(parameters.GetSnakeType() != m_Parameters.GetSnakeType())
+    {
+    string message = 
+      (m_Parameters.GetSnakeType() == SnakeParameters::EDGE_SNAKE) ?
+      "Warning!  The snake evolution parameters in the file are for the\n"
+      "REGION COMPETITION mode.  SnAP is currently in EDGE STOPPING mode.\n"
+      "Do you wish to load the parameters anyway?" : 
+      "Warning!  The snake evolution parameters in the file are for the\n"
+      "EDGE STOPPING mode.  SnAP is currently in REGION COMPETITION mode.\n"
+      "Do you wish to load the parameters anyway?";
+
+    // Show the message
+    int rc = fl_choice(message.c_str(),"Yes","No",NULL);
+    if(rc == 1) throw rc;
+
+    // If region competition, drop the advection stuff
+    if(m_Parameters.GetSnakeType() == SnakeParameters::REGION_SNAKE)
+      {
+      parameters.SetAdvectionSpeedExponent(0);
+      parameters.SetAdvectionWeight(0);
+      parameters.SetCurvatureSpeedExponent(-1);
+      }
+
+    // Keep the mode
+    parameters.SetSnakeType(m_Parameters.GetSnakeType());
+    }
+
+  // Set the parameters
+  SetParameters(parameters);
+
+  // Add the filename to the history
+  m_SystemInterface->UpdateHistory("SnakeParameters",file);
 }
 
 void SnakeParametersUILogic
@@ -421,12 +516,14 @@ void SnakeParametersUILogic
 ::Register(UserInterfaceLogic *parent)
 {
   // Get the parent's system object
-  SystemInterface *system = parent->GetSystemInterface();
+  m_SystemInterface = parent->GetSystemInterface();
   
   // Get the edge and region example image file names
   string fnImage[2];
-  fnImage[0] = system->GetFileInRootDirectory("Images2D/EdgeForcesExample.png");
-  fnImage[1] = system->GetFileInRootDirectory("Images2D/RegionForcesExample.png");
+  fnImage[0] = 
+    m_SystemInterface->GetFileInRootDirectory("Images2D/EdgeForcesExample.png");
+  fnImage[1] = 
+    m_SystemInterface->GetFileInRootDirectory("Images2D/RegionForcesExample.png");
 
   // We are converting read data from RGB pixel image
   typedef itk::RGBPixel<unsigned char> RGBPixelType;
@@ -482,8 +579,8 @@ void SnakeParametersUILogic
 
   // Load the points from the registry
   std::vector<Vector2d> points;
-  string fnPreset = 
-    system->GetFileInRootDirectory("Presets/SnakeParameterPreviewCurve.txt");
+  string fnPreset = m_SystemInterface->GetFileInRootDirectory(
+      "Presets/SnakeParameterPreviewCurve.txt");
   try 
     {
     Registry regPoints(fnPreset.c_str());
@@ -539,10 +636,21 @@ SnakeParametersUILogic
 {
   // Create a preview pipeline 
   m_PreviewPipeline = new SnakeParametersPreviewPipeline();
+
+  // Create the parameter IO dialog window
+  m_IODialog = new SimpleFileDialogLogic;
+  m_IODialog->MakeWindow();
+  m_IODialog->SetFileBoxTitle("Snake Parameters File:");
+  m_IODialog->SetPattern("Text files (*.{txt})");
+  m_IODialog->SetLoadCallback(
+    this,&SnakeParametersUILogic::LoadParametersCallback);
+  m_IODialog->SetSaveCallback(
+    this,&SnakeParametersUILogic::SaveParametersCallback);
 }
 
 SnakeParametersUILogic
 ::~SnakeParametersUILogic()
 {
   delete m_PreviewPipeline;
+  delete m_IODialog;
 }

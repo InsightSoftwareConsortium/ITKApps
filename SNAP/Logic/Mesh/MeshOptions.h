@@ -15,7 +15,7 @@
 #ifndef __MeshOptions_h_
 #define __MeshOptions_h_
 
-#include "IRISTypes.h"
+#include "SNAPCommon.h"
 
 /**
  * \class MeshOptions
@@ -114,6 +114,9 @@ private:
 
 /*
  *Log: MeshOptions.h
+ *Revision 1.4  2003/10/02 14:54:53  pauly
+ *ENH: Development during the September code freeze
+ *
  *Revision 1.1  2003/09/11 13:50:29  pauly
  *FIX: Enabled loading of images with different orientations
  *ENH: Implemented image save and load operations

@@ -15,15 +15,13 @@
 #ifndef __UserInterfaceLogic_h_
 #define __UserInterfaceLogic_h_
 
-#if defined(_WIN32)
-#include <itkWindows.h>
-#endif
-
+#include "SNAPCommonUI.h"
 #include "UserInterface.h"
 
 // Necessary forward references
 class IRISApplication;
 class GlobalState;
+class HelpViewerLogic;
 class IntensityCurveUILogic;
 class PreprocessingUILogic;
 class RestoreSettingsDialogLogic;
@@ -40,7 +38,6 @@ class SimpleFileDialogLogic;
 //class SegmentationImageIOWizardLogic;
 
 #include <ctime>
-#include <string>
 
 // ITK forward references
 namespace itk {
@@ -489,6 +486,9 @@ public:
 
   /** Set the current interaction mode */
   void SetToolbarMode(ToolbarModeType mode);
+  
+  /** Set the current 3D interaction mode */
+  void SetToolbarMode3D(ToolbarMode3DType mode);
 
   /** Get the pointer to the driving application */
   irisGetMacro(Driver,IRISApplication *);
@@ -698,6 +698,9 @@ private:
   /** A restore settings dialog */
   RestoreSettingsDialogLogic *m_DlgRestoreSettings;
 
+  /** Help window */
+  HelpViewerLogic *m_HelpUI;
+
   /** A coordinator for the slice windows */
   SliceWindowCoordinator *m_SliceCoordinator;
 
@@ -745,6 +748,9 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.8  2003/10/07 00:37:27  jjomier
+ *ENH: Added cygwin support
+ *
  *Revision 1.7  2003/10/06 12:30:00  pauly
  *ENH: Added history lists, remembering of settings, new snake parameter preview
  *

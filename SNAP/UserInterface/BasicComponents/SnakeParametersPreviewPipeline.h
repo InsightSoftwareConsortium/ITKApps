@@ -15,14 +15,25 @@
 #ifndef __SnakeParametersPreviewPipeline_h_
 #define __SnakeParametersPreviewPipeline_h_
 
-#include "IRISTypes.h"
+#include "SNAPCommonUI.h"
 #include "itkImage.h"
+#include "itkCovariantVector.h"
 #include "SnakeParameters.h"
-#include <vector>
 
 template<class TInputImage, class TOutputImage> class SignedDistanceFilter;
 template<class TInputImage> class SNAPLevelSetFunction;
+template<class TFilter> class LevelSetExtensionFilter;
 class Fl_Gl_Window;
+
+class vtkImageImport;
+class vtkContourFilter;
+class LevelSetPreviewPipeline2D;
+
+namespace itk {
+  template<class TInputImage, class TOutputImage> 
+    class SparseFieldLevelSetImageFilter;
+  template<class TInputImage> class VTKImageExport;
+};
 
 /** 
  * \class SnakeParametersPreviewPipeline
@@ -46,23 +57,28 @@ public:
   // Index type used to refer to pixels
   typedef FloatImageType::IndexType IndexType;
 
-  // A structure representing a point in the level set image for which the 
-  // evolution forces have been computed
-  struct PointInfo {
-    IndexType index;              // The index into the image
-    Vector2d normal;              // I.e., the normalized gradient of phi.
-    double CurvatureForce;        // Curvature force acting on the point
-    double PropagationForce;      // Propagation force acting on the point
-    double AdvectionForce;        // Advection force acting on the point
-    double UnitCurvatureForce;    // Unit curvature force (unscaled by parameters)
-    double UnitAdvectionForce;    // Unit advection force (unscaled by parameters)
-    double UnitPropagationForce;  // Unit propagation force (unscaled by parameters)
+  // Force types
+  enum ForceType {CURVATURE=0, ADVECTION, PROPAGATION, TOTAL };
+  
+  // A sample from the curve
+  struct SampledPoint {
+    // The geometry of the point
+    double t;
+    Vector2d x;
+    Vector2d n;
+    double kappa;
+    
+    // The forces acting on the point
+    double PropagationForce;
+    double CurvatureForce;
+    double AdvectionForce;
+    
   };
 
   // Various list types
   typedef std::vector<Vector2d> ControlPointList;
-  typedef std::vector<Vector2d> SampledPointList;  
-  typedef std::vector<PointInfo> ImagePointList;
+  typedef std::vector<Vector2d> LevelSetContourType;
+  typedef std::vector<SampledPoint> SampledPointList;  
 
   /** Set the speed image */
   void SetSpeedImage(FloatImageType *image);
@@ -86,6 +102,14 @@ public:
    * GL tesselation code for generating an image from the curve */
   void Update(Fl_Gl_Window *context);
 
+#ifdef SNAKE_PREVIEW_ADVANCED
+
+  /** Get the contours associated with a particular level set */
+  const LevelSetContourType &GetLevelSetContour(
+    ForceType force, unsigned int level);
+
+#endif
+
   /** Get the speed image */
   irisGetMacro(SpeedImage,FloatImageType *);
   
@@ -95,21 +119,19 @@ public:
   /** Get a list of densely interpolated points on the curve (for drawing) */
   irisGetMacro(SampledPoints,const SampledPointList &);
 
-  /** Get a list of points with forces computed */
-  irisGetMacro(ImagePoints, const ImagePointList &);
-
 private:
       
-  // Filter types used in the pipeline
-  typedef SignedDistanceFilter<FloatImageType,FloatImageType> DistanceFilterType;      
-  typedef SNAPLevelSetFunction<FloatImageType> LevelSetFunctionType;
-
   /** The speed image */
   itk::SmartPointer<FloatImageType> m_SpeedImage;
-  
-  /** An image containing the binary image of the spline inside */
-  itk::SmartPointer<FloatImageType> m_FloodFillImage;
 
+  // Gradient image used by this component
+  typedef itk::CovariantVector<float,2> VectorType;
+  typedef itk::Image<VectorType,2> VectorImageType;
+  typedef itk::SmartPointer<VectorImageType> VectorImagePointer;
+  
+  /** The grandient of the speed image */
+  VectorImagePointer m_GradientImage;
+  
   /** A set of snake parameters */
   SnakeParameters m_Parameters;
     
@@ -122,20 +144,12 @@ private:
   /** A list of sampled points */
   SampledPointList m_SampledPoints;
 
-  /** A list of points with forces computed on the image */
-  ImagePointList m_ImagePoints;
- 
-  // A filter used to fill the pipeline
-  itk::SmartPointer<DistanceFilterType> m_DistanceFilter;
-
-  // A level set function used to compute the forces
-  itk::SmartPointer<LevelSetFunctionType> m_LevelSetFunction;
-  
   // Flags indicating which part of the pipeline should be refreshed
   bool m_ControlsModified;
   bool m_SpeedModified;
   bool m_ParametersModified;
   bool m_QuickUpdate;
+  bool m_Updating;
     
   // Internal components of the Update method
   void UpdateLevelSetFunction();
@@ -144,8 +158,25 @@ private:
   void UpdateForces();
   void Update();
 
+
+#ifdef SNAKE_PREVIEW_ADVANCED
+  // Filter types used in the pipeline
+  typedef SignedDistanceFilter<FloatImageType,FloatImageType> DistanceFilterType;      
+  typedef SNAPLevelSetFunction<FloatImageType> LevelSetFunctionType;
+
+  /** An image containing the binary image of the spline inside */
+  itk::SmartPointer<FloatImageType> m_FloodFillImage;
+
+  // A filter used to fill the pipeline
+  itk::SmartPointer<DistanceFilterType> m_DistanceFilter;
+
+  // The mini leve set pipelines
+  LevelSetPreviewPipeline2D *m_LevelSetPipeline[4];
+
   // A method to scan-convert a polygon
   void ScanConvertSpline(Fl_Gl_Window *context);  
+#endif SNAKE_PREVIEW_ADVANCED
+
 };
 
 

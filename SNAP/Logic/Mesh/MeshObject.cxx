@@ -47,9 +47,7 @@
 #include <vtkStripper.h>
 
 // System includes
-#include <vector>
-#include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 #include <FL/gl.h>
 #include <GL/glu.h>
 
@@ -125,9 +123,6 @@ MeshObject
     // Create a pipeline for mesh generation
     IRISMeshPipeline *meshPipeline = new IRISMeshPipeline();
   
-    // Pass the settings on to the pipeline
-    meshPipeline->SetMeshOptions(m_GlobalState->GetMeshOptions());
-  
     // Initialize the pipeline with the correct image
     if(!m_GlobalState->GetSnakeActive())
       {
@@ -153,6 +148,9 @@ MeshObject
       meshPipeline->SetImage(snapData->GetSegmentation()->GetImage());
         // }
       }
+  
+    // Pass the settings on to the pipeline
+    meshPipeline->SetMeshOptions(m_GlobalState->GetMeshOptions());
   
     // Run the first step in this pipeline
     meshPipeline->ComputeBoundingBoxes();
@@ -317,6 +315,9 @@ MeshObject
 
 /*
  *Log: MeshObject.cxx
+ *Revision 1.7  2003/10/02 14:54:53  pauly
+ *ENH: Development during the September code freeze
+ *
  *Revision 1.1  2003/09/11 13:50:29  pauly
  *FIX: Enabled loading of images with different orientations
  *ENH: Implemented image save and load operations

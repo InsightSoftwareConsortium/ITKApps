@@ -1,0 +1,194 @@
+<h1> Installing and building SNAP on a UNIX System </h1>
+
+<p>SnAP is distributed as a part of the ITK Applications installation.  In order to build SNAP on a UNIX or Linux platform, the one must install ITK, VTK and FLTK on their system.  This document will guide you through that process.</p>
+
+<p>
+The following software must be installed on your system:
+<ul>
+  <li> CVS </li>
+  <li> GCC C++ compiler (or another compiler supported by ITK) </li>
+  <li> CMake (available from <a href="http://www.cmake.org">www.cmake.org</a>) </li>
+</ul>  
+
+<h3> 1. Directory Structure </h3>
+
+<p>
+Create the following directory structure, which is recommended and will be assumed in this document.Replace the directory <i>basedir</i> with your own directory name, i.e., <i>/home/myuserid/tk</i>. Experienced users can change the names and order of the subdirectories to their preference. 
+</p>
+
+<pre>
+  basedir/
+  basedir/app                          // Base directory for ITK applications
+  basedir/app/bingcc                   // ITK Applications binary directory
+  
+  basedir/itk                          // Base directory for ITK
+  basedir/itk/bingcc                   // ITK binary directory
+
+  basedir/vtk                          // Base directory for VTK
+  basedir/vtk/bingcc                   // VTK binary directory
+
+  basedir/fltk                         // FLTK directory
+</pre>
+
+<h3> 2. Install ITK </h3>
+
+<p> We will use CVS to download ITK.  For more instructions, please refer to the <i>ITK Software Guide</i> located at <a href="http://www.itk.org/HTML/Documentation.htm">www.itk.org</a></p>
+
+<p> These instructions recommend that you download the release 1.4 of ITK.  To use the latest version of ITK (at your own risk), remove the -r option in the cvs commands below.</p>
+
+<ol>
+  <li> Change directory to <i>basedir/itk</i></li><br>
+  <li> Execute the following commands to download ITK.  This will take several minutes.
+  <pre>
+    cvs -d :pserver:anonymous@www.itk.org:/cvsroot/Insight login
+    (respond with password <i>insight</i>)
+    
+    cvs -d :pserver:anonymous@www.itk.org:/cvsroot/Insight -r ITK-1-4 co Insight
+  </pre></li>
+  <li> Change the directory to <i>basedir/itk/bingcc</i> </li><br>
+  <li> Execute the CMake command: 
+  <pre>
+    ccmake ../Insight
+  </pre>
+  </li>
+  <li> The CMake user interface will appear.  Set the following options in this interface: 
+  <pre>
+    BUILD_EXAMPLES = OFF
+    BUILD_TESTING = OFF
+    CMAKE_BUILD_TYPE = Release
+  </pre></li>
+  <li> Use the <b>c</b> command to configure ITK and 
+  use the <b>g</b> command to generate makefiles </li><br>
+  <li> The following command will build ITK.  This will take a while.
+  <pre>
+    make
+  </pre></li>
+</ol>
+
+<p> At this point, you will have a working installation of ITK on your system.  Please refer to ITK documentation for troubleshooting information. </p>
+
+<h3> 3. Install VTK </h3>
+
+<p> VTK installation is similar to the installation of ITK.</p>
+
+<p> These instructions recommend that you download the release 4.2 of VTK.  To use the latest version of ITK (at your own risk), remove the -r option in the cvs commands below.</p>
+
+<ol>
+  <li> Change directory to <i>basedir/vtk</i></li><br>
+  <li> Execute the following commands to download VTK.  This will take several minutes.
+  <pre>
+    cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/VTK login
+    (respond with password vtk)
+
+    cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/VTK -r release-4-2 co VTK
+  </pre></li>
+  <li> Change the directory to <i>basedir/vtk/bingcc</i> </li><br>
+  <li> Execute the CMake command: 
+  <pre>
+    ccmake ../VTK
+  </pre>
+  </li>
+  <li> The CMake user interface will appear.  Set the following options in this interface: 
+  <pre>
+    BUILD_EXAMPLES = OFF
+    BUILD_TESTING = OFF
+    CMAKE_BUILD_TYPE = Release
+    VTK_USE_HYBRID = ON
+    VTK_USE_PARALLEL= ON
+    VTK_USE_RENDERING= ON
+  </pre></li>
+  <li> Use the <b>c</b> command to configure VTK and 
+  use the <b>g</b> command to generate makefiles </li><br>
+  <li> The following command will build VTK.  This will take a longer while.
+  <pre>
+    make
+  </pre></li>
+</ol>
+
+<p> At this point, you will have a working installation of ITK and VTK on your system.  Please refer to VTK documentation (at <a href="http://www.vtk.org">www.vtk.org</a>) for troubleshooting information. </p>
+
+<h3> 4. Install FLTK </h3>
+
+<p> FLTK is a multiplatform GUI toolkit.  SnAP has been developed and tested using version 1.1.2 of FLTK, but later 1.1.* versions should work as well.  In all the following commands, replace the <b>*</b> character with the correct version number, the current version is 1.1.4</p>
+
+<ol>
+  <li> Download the 1.1.x FLTK tarball <b>fltk-1.1.*-source.tar.gz</b> from 
+  <a href="http://www.fltk.org/software.php">www.fltk.org/software.php</a>.  You will have to follow some links to start the download. </li><br>
+  <li> Place the downloaded file <b>fltk-1.1.*-source.tar.gz</b> into the <i>basedir/fltk</i> directory.  Execute the following command to uncompress FLTK 
+  <pre>
+    tar -xzvf fltk-1.1.*-source.tar.gz 
+  </pre></li>
+
+  <li> [Linux, optional]: to enable anti-aliased fonts on Linux, in the following step pass the option <b>--enable-xft</b> to the <b>./configure</b> command.</li><br>
+    
+  <li> Go to the directory <i>basedir/fltk/fltk-1.1.*/</i> and execute the following commands:
+  <pre>
+    ./configure 
+    make
+    make fluid
+  </pre>
+</ol>
+
+<p> At this point, you will have a working installation of FLTK on your system.  Please refer to FLTK documentation (at <a href="http://www.fltk.org">www.fltk.org</a>) for troubleshooting information.</p>
+
+<h3> 5. Install the ITK InsightApplications directory </h3>
+
+<p> We will use CVS to download ITK Applications, including SNAP.  For more instructions, please refer to the <i>ITK Software Guide</i> located at <a href="http://www.itk.org/HTML/Documentation.htm">www.itk.org</a></p>
+
+<ol>
+  <li> Change directory to <i>basedir/app</i></li><br>
+  <li> Execute the following commands to download ITK Applications.  This will take several minutes.
+  <pre>
+    cvs -d :pserver:anonymous@www.itk.org:/cvsroot/Insight login
+    (respond with password <i>insight</i>)
+    
+    cvs -d :pserver:anonymous@www.itk.org:/cvsroot/Insight co InsightApplications
+  </pre></li>
+  <li> Change the directory to <i>basedir/app/bingcc</i> </li><br>
+  <li> Execute the CMake command: 
+  <pre>
+    ccmake ../InsightApplications
+  </pre>
+  </li>
+  <li> The CMake user interface will appear.  Set the following options in this interface: 
+  <pre>
+    BUILD_EXAMPLES = OFF
+    BUILD_TESTING = OFF
+    CMAKE_BUILD_TYPE = Release
+    ITK_DIR = basedir/itk/bingcc
+    USE_VTK = ON
+    USE_FLTK = ON
+  </pre></li>
+  <li> Use the <b>c</b> command to configure InsightApplications.  More options will appear: </li>
+  <pre>
+    VTK_DIR = basedir/vtk/bingcc
+    FLTK_BASE_LIBRARY = basedir/fltk/fltk-1.1.*
+    FLTK_FLUID_EXECUTABLE = basedir/fltk/fltk-1.1.*/fluid/fluid
+  </pre></li>
+  <li> Use the <b>c</b> command to configure InsightApplications and 
+  use the <b>g</b> command to generate makefiles </li><br>
+  <li> To build all InsightApplications, including SNAP execute the following command.  Alternatively, to only build SNAP, first change directory to <i>basedir/app/bingcc/SNAP</i> and run the same command.
+  <pre>
+    make
+  </pre></li>
+</ol>
+
+<p> At this point, you will have a working installation of ITK InsightApplications on your system.  Please refer to ITK documentation for troubleshooting information. </p>
+
+<h4> 6. Running SNAP </h4>
+<ol>
+  <li> Change directory to <i>basedir/app/bingcc/SNAP</i></li><br>
+  <li> Run the SNAP executable
+  <pre>
+    ./SNAP
+  </pre>
+  </li>
+</ol>
+
+If all goes well, SNAP user interface will launch.  
+
+<h4> 7. Troubleshooting </h4>
+
+<p> For troubleshooting the installation of ITK, VTK, FLTK and InsightApplications, please refer to the corresponding web sites noted above</p>
+
+<p> We recommend that you join the ITK users <a href="http://www.itk.org/HTML/MailingLists.htm">mailing list</a>, where you can find answers to questions posed by other users as well as post your own questions. </p>

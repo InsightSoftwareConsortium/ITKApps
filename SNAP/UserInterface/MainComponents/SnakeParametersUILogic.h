@@ -16,7 +16,7 @@
 #define __SnakeParametersUILogic_h_
 
 #include "SnakeParametersUI.h"
-#include "IRISTypes.h"
+#include "SNAPCommonUI.h"
 #include "SnakeParameters.h"
 #include "itkSmartPointer.h"
 
@@ -25,6 +25,8 @@ class GlobalState;
 class IRISApplication;
 class UserInterfaceLogic;
 class SnakeParametersPreviewPipeline;
+class SimpleFileDialogLogic;
+class SystemInterface;
 
 // ITK forward references
 namespace itk {
@@ -73,8 +75,8 @@ public:
   void OnHelpAction(); 
   void OnOkAction(); 
   void OnCloseAction(); 
-  void OnSavePresetAction(); 
-  void OnSelectPresetAction();
+  void OnSaveParametersAction();
+  void OnLoadParametersAction();
   void OnAdvancedEquationAction();
 
   // Advanced page
@@ -107,6 +109,16 @@ private:
   
   /** Whether or not to warn if the user tries to change the solver */
   bool m_WarnOnSolverUpdate;
+
+  /** A pointer to the system interface object */
+  SystemInterface *m_SystemInterface;
+
+  /** An interface used to save and load parameters */
+  SimpleFileDialogLogic *m_IODialog;
+
+  // IO Dialog callback functions
+  void LoadParametersCallback();
+  void SaveParametersCallback();
 };
 
 #endif // __SnakeParametersUILogic_h_

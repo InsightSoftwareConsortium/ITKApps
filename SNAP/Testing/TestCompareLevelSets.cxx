@@ -31,7 +31,6 @@
 #include "itkUnaryFunctorImageFilter.h"
 
 
-#include <string>
 #include <ctime>
 #include <iomanip>
 

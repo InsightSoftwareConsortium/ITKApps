@@ -15,7 +15,7 @@
 #ifndef __TestCompareLevelSets_h_
 #define __TestCompareLevelSets_h_
 
-#include "IRISTypes.h"
+#include "SNAPCommon.h"
 #include "TestBase.h"
 
 /**

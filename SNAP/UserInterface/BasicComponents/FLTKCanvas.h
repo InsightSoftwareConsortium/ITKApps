@@ -79,6 +79,9 @@ public:
   /** Are we dragging ? */
   irisIsMacro(Dragging);
 
+  /** Are we flipping? */
+  irisSetMacro(FlipYCoordinate,bool);
+
 protected:
   /**
    * This method should be called to draw the interactors (call their OnDraw methods 
@@ -95,6 +98,9 @@ private:
 
   // Are we dragging or not
   bool m_Dragging;
+
+  // Should we flip the Y coordinates of the events (top = 0, bottom = h)
+  bool m_FlipYCoordinate;
 
 };
 

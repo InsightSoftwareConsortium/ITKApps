@@ -16,7 +16,7 @@
 #define __GenericSliceWindow_h_
 
 #include "FLTKCanvas.h"
-#include "IRISTypes.h"
+#include "SNAPCommonUI.h"
 #include "GreyImageWrapper.h"
 #include "LabelImageWrapper.h"
 

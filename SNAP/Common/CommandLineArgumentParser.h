@@ -20,10 +20,10 @@
 #pragma warning ( disable : 4503 )
 #endif
 
+#include <vector>
+#include <string>
 #include <list>
 #include <map>
-#include <string>
-#include <vector>
 
 /**
  * \class CommandLineArgumentParseResult

@@ -15,12 +15,10 @@
 #ifndef __SimpleFileDialogLogic_h_
 #define __SimpleFileDialogLogic_h_
 
-#include "Registry.h"
 #include "itkSmartPointer.h"
+#include "SNAPCommonUI.h"
 #include "SimpleFileDialog.h"
 #include "itkCommand.h"
-#include <string>
-#include <vector>
 
 class Fl_File_Chooser;
 namespace itk {
@@ -55,10 +53,12 @@ public:
    *
    * The return from this method is analogous
    * to fl_file_chooser, ie, a filename or NULL if user cancelled.*/
-  void DisplayLoadDialog(Registry *history, const char *file = NULL);
+  void DisplayLoadDialog(
+    const HistoryListType &history, const char *file = NULL);
 
   /** Display a save dialog.  \see DisplayLoadDialog */
-  void DisplaySaveDialog(Registry *history, const char *file = NULL);
+  void DisplaySaveDialog(
+    const HistoryListType &history, const char *file = NULL);
 
   /** Set the title of the dialog */
   void SetTitle(const char *title)
@@ -66,7 +66,6 @@ public:
     m_Title = title;
     m_Window->label(m_Title.c_str());
     }
-
 
   /** Set the text displayed above the filename box */
   void SetFileBoxTitle(const char *title) 
@@ -79,10 +78,7 @@ public:
   irisSetMacro(Pattern,const char *);
 
   /** Get the file name currently in the box */
-  const char *GetFileName() 
-  {
-    return m_InFile->value();
-  }
+  const char *GetFileName() { return m_InFile->value(); }
 
   /** Set the command to call when the user clicks OK in the load dialog
    * This command should fire an exception (any exception) if the load 
@@ -115,7 +111,7 @@ public:
 private:
 
   /** Common dialog config, regardless of save/load */
-  void DisplayDialog(Registry *registry, const char *file);
+  void DisplayDialog(const HistoryListType &history, const char *file);
 
   // Whether we are in save or load mode
   bool m_SaveMode;
@@ -130,9 +126,6 @@ private:
   typedef itk::SmartPointer<itk::Command> CommandPointer;
   CommandPointer m_SaveCallback;
   CommandPointer m_LoadCallback;
-
-  // History
-  Registry *m_History;
 
   // File choosers
   Fl_File_Chooser *m_FileChooserLoad;

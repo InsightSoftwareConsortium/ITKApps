@@ -15,7 +15,7 @@
 #ifndef __SNAPLevelSetDriver_h_
 #define __SNAPLevelSetDriver_h_
 
-#include "IRISTypes.h"
+#include "SNAPCommon.h"
 #include "SnakeParameters.h"
 #include "SNAPLevelSetFunction.h"
 #include "SNAPLevelSetStopAndGoFilter.h"

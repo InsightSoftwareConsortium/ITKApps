@@ -447,6 +447,7 @@ GenericSliceWindow
 {
   // Place the mode on the stack
   ClearInteractionStack();
+  PushInteractionMode(m_CrosshairsMode);
   PushInteractionMode(m_ZoomPanMode);
 }
 
@@ -455,7 +456,8 @@ GenericSliceWindow
 ::SetViewZoom(float newZoom)
 {
   // Update the zoom
-  m_ViewZoom = newZoom;
+  m_ViewZoom = newZoom;  
+  // cout << m_Id << " : " << newZoom 
 
   // Repaint the window
   redraw();

@@ -38,7 +38,21 @@ ThresholdSettings
   
   settings.m_Smoothness = (iMax-iMin) / 6;
   // settings.m_Smoothness = 0.5;
-  settings.m_Smoothness = 5;
+  settings.m_Smoothness = 3;
+
+  return settings;
+}
+
+ThresholdSettings
+ThresholdSettings
+::MakeDefaultSettingsWithoutImage()
+{
+  ThresholdSettings settings;
+  settings.m_LowerThresholdEnabled = true;
+  settings.m_UpperThresholdEnabled = true;  
+  settings.m_LowerThreshold = 40;
+  settings.m_UpperThreshold = 80; 
+  settings.m_Smoothness = 3;
 
   return settings;
 }

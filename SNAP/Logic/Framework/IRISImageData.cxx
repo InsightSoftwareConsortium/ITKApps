@@ -178,11 +178,9 @@ IRISImageData
 // TODO: Clean up this code
 void 
 IRISImageData
-::RelabelSegmentationWithCutPlane(const Vector3d &plane,
-                                  bool dZero,LabelType newlabel) 
+::RelabelSegmentationWithCutPlane(const Vector3d &normal, double intercept,
+                                  LabelType newlabel) 
 {
-  double threshold = dZero ? 0 : 1;
-
   typedef ImageRegionIteratorWithIndex<LabelImageType> IteratorType;
   IteratorType it(m_LabelWrapper->GetImage(),this->GetImageRegion());
 
@@ -196,15 +194,18 @@ IRISImageData
       table[i] = i;
     }
 
+  // Adjust the intercept by 0.5 for voxel offset
+  intercept -= 0.5 * (normal[0] + normal[1] + normal[2]);
+
   // Iterate over the image, relabeling labels on one side of the plane
   while(!it.IsAtEnd())
     {
     // Compute the distance to the plane
     const long *index = it.GetIndex().GetIndex();
     double distance = 
-      index[0]*plane[0] + 
-      index[1]*plane[1] + 
-      index[2]*plane[2] - threshold;
+      index[0]*normal[0] + 
+      index[1]*normal[1] + 
+      index[2]*normal[2] - intercept;
 
     // Check the side of the plane
     if(distance > 0)

@@ -16,9 +16,6 @@
 #define __IntensityCurveVTK_h_
 
 #include <IntensityCurveInterface.h>
-
-#include <vector>
-
 #include <vtkKochanekSpline.h>
 
 /**

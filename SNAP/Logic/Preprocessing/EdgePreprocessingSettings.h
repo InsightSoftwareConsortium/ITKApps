@@ -15,7 +15,7 @@
 #ifndef __EdgePreprocessingSettings_h_
 #define __EdgePreprocessingSettings_h_
 
-#include "IRISTypes.h"
+#include "SNAPCommon.h"
 
 // Forward references
 class GreyImageWrapper;

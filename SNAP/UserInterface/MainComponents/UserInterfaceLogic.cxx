@@ -28,6 +28,7 @@
 #include "SystemInterface.h"
 
 // Additional UI component inludes
+#include "HelpViewerLogic.h"
 #include "PreprocessingUILogic.h"
 #include "SnakeParametersUILogic.h"
 #include "GreyImageIOWizardLogic.h"
@@ -38,9 +39,16 @@
 #include "SliceWindowCoordinator.h"
 
 #include <itksys/SystemTools.hxx>
-#include <string>
 #include <strstream>
 #include <iomanip>
+#include <string>
+#include <vector>
+
+// Disable some utterly annoying windows messages
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4786 )
+#pragma warning ( disable : 4503 )
+#endif
 
 using namespace itk;
 using namespace std;
@@ -98,6 +106,12 @@ UserInterfaceLogic
 
   // Create a callback command for the snake loop
   m_PostSnakeCommand = SimpleCommandType::New();
+
+  // Initialize the Help UI
+  m_HelpUI = new HelpViewerLogic;
+  m_HelpUI->MakeWindow();
+  m_HelpUI->SetContentsLink(
+    m_SystemInterface->GetFileInRootDirectory("HTMLHelp/Tutorial.html").c_str());
 
   //  Initialize the label IO dialog
   m_DlgLabelsIO = new SimpleFileDialogLogic();
@@ -233,6 +247,37 @@ UserInterfaceLogic
     }
   m_InBubbleRadius->redraw();
 
+  // Use the current SnakeParameters to determine which type of snake to use
+  const SnakeParameters &parameters = m_GlobalState->GetSnakeParameters();
+  if(parameters.GetSnakeType() == SnakeParameters::EDGE_SNAKE)
+    {
+    m_RadSnakeEdge->set();
+    m_RadSnakeInOut->clear();
+    m_GlobalState->SetSnakeMode(EDGE_SNAKE);
+    }
+  else
+    {
+    m_RadSnakeInOut->set();
+    m_RadSnakeEdge->clear();
+    m_GlobalState->SetSnakeMode(IN_OUT_SNAKE);
+    }
+
+  // The edge preprocessing settings pass through unchanged
+  // Get the current thresholding properties
+  ThresholdSettings threshSettings = m_GlobalState->GetThresholdSettings();
+
+  // We want to keep the current preprocessing settings, but we have to be
+  // careful that they are in range of image intensity
+  GreyType iMax =  m_Driver->GetCurrentImageData()->GetGrey()->GetImageMax();
+  GreyType iMin =  m_Driver->GetCurrentImageData()->GetGrey()->GetImageMin();
+  if(threshSettings.GetUpperThreshold() > iMax)
+    threshSettings.SetUpperThreshold(iMax);
+  if(threshSettings.GetLowerThreshold() < iMin)
+    threshSettings.SetLowerThreshold(iMin);
+  m_GlobalState->SetThresholdSettings(threshSettings);
+
+
+  // This method basically sends the current button state from IRIS to SNAP
   SyncSnakeToIRIS();
 
   //initialize GUI widgets
@@ -275,19 +320,6 @@ UserInterfaceLogic
   m_InStepSize->value(0);
 
   m_BtnAcceptSegmentation->deactivate();
-
-  // Set the thresholding properties to defaults
-  ThresholdSettings threshSettings = 
-    ThresholdSettings::MakeDefaultSettings(
-      m_Driver->GetCurrentImageData()->GetGrey());
-
-  m_GlobalState->SetThresholdSettings(threshSettings);
-
-  // Set the thresholding properties to defaults
-  EdgePreprocessingSettings edgeSettings = 
-    EdgePreprocessingSettings::MakeDefaultSettings();
-
-  m_GlobalState->SetEdgePreprocessingSettings(edgeSettings);
 
   // reset Mesh in IRIS window
   m_IRISWindow3D->ClearScreen();
@@ -1156,6 +1188,7 @@ UserInterfaceLogic
     m_SNAPWindow2D[i]->hide();
     }
 
+  // Swap the 3D window visibility
   m_IRISWindow3D->show();
   m_SNAPWindow3D->hide();
 
@@ -1177,8 +1210,12 @@ UserInterfaceLogic
     m_IRISWindow2D[i]->hide();
     }
 
+  // Swap the visible windows
   m_SNAPWindow3D->show();
   m_IRISWindow3D->hide();
+
+  // Reset the view in the snap window
+  m_SNAPWindow3D->ResetView();
 
   RedrawWindows();
 }
@@ -1211,19 +1248,6 @@ UserInterfaceLogic
   m_InIRISLabelOpacity->Fl_Valuator::value(128);
 
   this->InitColorMap();
-
-  // default file and display orientation
-  char RAI[3];
-  int xyz;
-  fileRAI = RAIConvert::GIPLToRAI(0);
-  for (xyz=0; xyz<3; xyz++)
-    RAI[xyz] = RAIConvert::RAIToChar(fileRAI[xyz]);
-  // FileRAI->value(RAI, 3);
-
-  strncpy(RAI, "IRP", 3);
-  for (xyz=0; xyz<3; xyz++)
-    intRAI[xyz] = RAIConvert::CharToRAI(RAI[xyz]);
-  // IntRAI->value(RAI, 3);
 
   // Window title
   this->UpdateMainLabel();
@@ -1513,7 +1537,7 @@ UserInterfaceLogic
   IRISOStringStream mainLabel;
 
   // Print version
-  mainLabel << IRISSoftVersion << ": ";
+  mainLabel << SNAPSoftVersion << ": ";
 
   // Get the grey and segmentation file names
   string fnGrey = m_GlobalState->GetGreyFileName();
@@ -2101,11 +2125,6 @@ UserInterfaceLogic
       m_TabsToolOptions->value(m_GrpToolOptionPolygon);
       break;
 
-    case PAINT3D_MODE:
-      m_IRISWindow2D[i]->EnterCrosshairsMode();
-      m_TabsToolOptions->value(m_GrpToolOptionPaintCan);
-      break;
-
     case ROI_MODE:
       m_IRISWindow2D[i]->EnterRegionMode();
       m_TabsToolOptions->value(m_GrpToolOptionSnAP);
@@ -2129,11 +2148,51 @@ UserInterfaceLogic
 
 void 
 UserInterfaceLogic
+::SetToolbarMode3D(ToolbarMode3DType mode)
+{
+  switch (mode)
+    {
+    case TRACKBALL_MODE:
+      m_IRISWindow3D->EnterTrackballMode();
+      m_SNAPWindow3D->EnterTrackballMode();
+      break;
+
+    case CROSSHAIRS_3D_MODE:
+      m_IRISWindow3D->EnterCrosshairsMode();
+      m_SNAPWindow3D->EnterCrosshairsMode();
+      break;
+
+    case SPRAYPAINT_MODE:
+      m_IRISWindow3D->EnterSpraypaintMode();
+      break;
+
+    case SCALPEL_MODE:
+      m_IRISWindow3D->EnterScalpelMode();
+      break;
+
+    default:
+      break;  
+    }
+
+  // Redraw the 3D windows
+  if(m_WizWindows->value() == m_GrpSNAPWindows) 
+    {
+    m_SNAPWindow3D->redraw();
+    }
+  else
+    {
+    m_IRISWindow3D->redraw();
+    }
+}
+
+
+void 
+UserInterfaceLogic
 ::OnMenuWriteVoxelCounts() 
 {
   // Display the load labels dialog
   m_DlgVoxelCountsIO->DisplaySaveDialog(
-    &m_SystemInterface->Folder("IOHistory.VolumeStatistics"));
+    m_SystemInterface->GetHistory("VolumeStatistics"));
 }
 
 void 
@@ -2148,6 +2207,9 @@ UserInterfaceLogic
     {
     // Compute the statistics and write them to file
     m_Driver->GetCurrentImageData()->CountVoxels(file);
+    
+    // Update the history
+    m_SystemInterface->UpdateHistory("VolumeStatistics",file);
     }
   catch (itk::ExceptionObject &exc) 
     {
@@ -2276,6 +2338,9 @@ UserInterfaceLogic
       }
     }
     
+  // Redraw the crosshairs in the 3D window  
+  m_IRISWindow3D->ResetView(); 
+
   // Redraw the user interface
   RedrawWindows();
   m_WinMain->redraw();
@@ -2290,7 +2355,7 @@ UserInterfaceLogic
   m_SegmentationLoaded =1; //now have valid grey data
 
   // Re-init other UserInterfaceLogic components
-  InitColorMap();
+  InitColorMap(false);
 
   // Re-Initialize the 2D windows
   for (unsigned int i=0; i<3; i++) 
@@ -2404,6 +2469,9 @@ UserInterfaceLogic
     
     // Update the user interface in response
     this->OnSegmentationLabelsUpdate(true);
+
+    // Update the history
+    m_SystemInterface->UpdateHistory("LabelDescriptions",file);
     }
   catch (itk::ExceptionObject &exc) 
     {
@@ -2427,6 +2495,9 @@ UserInterfaceLogic
     {
     // Write labels to the file
     m_Driver->WriteLabelDescriptionsToTextFile(file);
+    
+    // Update the history
+    m_SystemInterface->UpdateHistory("LabelDescriptions",file);
     }
   catch (itk::ExceptionObject &exc) 
     {
@@ -2444,7 +2515,7 @@ UserInterfaceLogic
 {
   // Display the load labels dialog
   m_DlgLabelsIO->DisplayLoadDialog(
-    &m_SystemInterface->Folder("IOHistory.LabelDescriptions"));
+    m_SystemInterface->GetHistory("LabelDescriptions"));
 }
 
 void UserInterfaceLogic
@@ -2452,7 +2523,7 @@ void UserInterfaceLogic
 {
   // Display the save labels dialog
   m_DlgLabelsIO->DisplaySaveDialog(
-    &m_SystemInterface->Folder("IOHistory.LabelDescriptions"));
+    m_SystemInterface->GetHistory("LabelDescriptions"));
 }
 
 void UserInterfaceLogic
@@ -2674,8 +2745,12 @@ void
 UserInterfaceLogic
 ::OnLaunchTutorialAction()
 {
-  m_WinHelp->show();
-  m_BrsHelp->load("UserInterface/HTMLHelp/Tutorial.html");
+  // Find the tutorial file name
+  string file = 
+    m_SystemInterface->GetFileInRootDirectory("HTMLHelp/Tutorial.html");
+
+  // Show the help window
+  m_HelpUI->ShowHelp(file.c_str());
 }
 
 void
@@ -2850,6 +2925,9 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.9  2003/10/06 12:30:00  pauly
+ *ENH: Added history lists, remembering of settings, new snake parameter preview
+ *
  *Revision 1.8  2003/10/02 20:57:46  pauly
  *FIX: Made sure that the previous check-in compiles on Linux
  *

@@ -15,9 +15,8 @@
 #ifndef __ColorLabel_h_
 #define __ColorLabel_h_
 
-#include "IRISTypes.h"
+#include "SNAPCommon.h"
 
-#include <string>
 #include <assert.h>
     
 

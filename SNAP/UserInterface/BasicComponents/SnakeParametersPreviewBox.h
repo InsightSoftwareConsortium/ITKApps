@@ -18,7 +18,6 @@
 
 #include "FLTKCanvas.h"
 #include "SnakeParameters.h"
-#include <vector>
 
 template<class TPixel> class OpenGLSliceTexture;
 class SnakeParametersPreviewPipeline;
@@ -45,7 +44,7 @@ public:
   /** An enumeration of different display modes for this widget */
   enum DisplayMode 
     {
-    PROPAGATION_FORCE,CURVATURE_FORCE,ADVECTION_FORCE,TOTAL_FORCE
+    CURVATURE_FORCE=0,ADVECTION_FORCE,PROPAGATION_FORCE,TOTAL_FORCE
     };
 
   /** Set the display mode */

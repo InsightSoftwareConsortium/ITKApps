@@ -111,6 +111,7 @@ IRISSliceWindow
 {
   // Place the mode on the stack
   ClearInteractionStack();
+  PushInteractionMode(m_CrosshairsMode);
   PushInteractionMode(m_PolygonMode);
 }
 

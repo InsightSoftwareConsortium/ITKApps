@@ -16,8 +16,7 @@
 #define __ImageWrapper_h_
 
 // Smart pointers have to be included from ITK, can't forward reference them
-#include <itkSmartPointer.h>
-#include <IRISTypes.h>
+#include <SNAPCommon.h>
 #include <ImageCoordinateTransform.h>
 
 // Forward declarations of the ITK classes

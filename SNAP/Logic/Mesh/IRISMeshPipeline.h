@@ -15,12 +15,10 @@
 #ifndef __IRISMeshPipeline_h_
 #define __IRISMeshPipeline_h_
 
-#include "IRISTypes.h"
+#include "SNAPCommon.h"
 #include "itkImageRegion.h"
 #include "itkSmartPointer.h"
 #include "MeshOptions.h"
-
-#include <vector>
 
 // Forward reference to itk classes
 namespace itk {
@@ -39,6 +37,7 @@ class vtkDecimatePro;
 class vtkStripper;
 class vtkPolyData;
 class vtkPolyDataNormals;
+class vtkImageGaussianSmooth;
 
 /**
  * \class IRISMeshPipeline
@@ -120,6 +119,10 @@ private:
 
   // The VTK importer for the data
   vtkImageImport *            m_VTKImporter;
+
+  // VTK Gaussian (because we care about the speed and not so much about
+  // precision
+  vtkImageGaussianSmooth *    m_VTKGaussianFilter;
 
   // The contour filter
   vtkContourFilter *          m_ContourFilter;

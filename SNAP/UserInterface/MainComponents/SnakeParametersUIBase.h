@@ -34,8 +34,8 @@ public:
   virtual void OnHelpAction() = 0 ;
   virtual void OnOkAction() = 0;
   virtual void OnCloseAction() = 0;
-  virtual void OnSavePresetAction() = 0;
-  virtual void OnSelectPresetAction() = 0;
+  virtual void OnSaveParametersAction() = 0;
+  virtual void OnLoadParametersAction() = 0;
   virtual void OnAdvancedEquationAction() = 0;  
 
   // Advanced page

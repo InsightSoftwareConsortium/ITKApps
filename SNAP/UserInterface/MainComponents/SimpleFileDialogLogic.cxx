@@ -49,7 +49,7 @@ SimpleFileDialogLogic
 
 void
 SimpleFileDialogLogic
-::DisplayLoadDialog(Registry *history,const char *file)
+::DisplayLoadDialog(const HistoryListType &history,const char *file)
 {
   m_SaveMode = false;
   this->DisplayDialog(history,file);
@@ -57,7 +57,7 @@ SimpleFileDialogLogic
   
 void
 SimpleFileDialogLogic
-::DisplaySaveDialog(Registry *history,const char *file)
+::DisplaySaveDialog(const HistoryListType &history,const char *file)
 {
   m_SaveMode = true;
   this->DisplayDialog(history,file);
@@ -65,27 +65,23 @@ SimpleFileDialogLogic
 
 void 
 SimpleFileDialogLogic
-::DisplayDialog(Registry *registry, const char *file)
+::DisplayDialog(const HistoryListType &history, const char *file)
 {
-  // Store the registry
-  m_History = registry;
-
   // If the filename was supplied, update it in the UI
   if(file)
     {
     m_InFile->value(file);
     }
 
-  // Get the history list from the registry
-  vector<string> array = m_History->GetArray(string(""));
-  vector<string>::reverse_iterator it;
-
+  // Clear the history drop box
   m_InHistory->clear();
-  if(array.size() > 0)
+
+  // Add elements in the history list
+  if(history.size() > 0)
     {  
-    // Add each item to the history menu (history is traversed
-    // backwards)
-    for(it=array.rbegin();it!=array.rend();it++)
+    // Add each item to the history menu (history is traversed backwards)
+    HistoryListType::const_reverse_iterator it;
+    for(it=history.rbegin();it!=history.rend();it++)
       {
       // FLTK's add() treats slashes as submenu separators, hence this code
       m_InHistory->replace(m_InHistory->add("dummy"),it->c_str());
@@ -168,34 +164,11 @@ SimpleFileDialogLogic
       m_SaveCallback->Execute((itk::Object *) 0,itk::NoEvent());
     else 
       m_LoadCallback->Execute((itk::Object *) 0,itk::NoEvent());
+  
+    // Hide the window
+    m_Window->hide();
   }
-  catch(...)
-  {
-    return;
-  }
-
-  // Merge the file with the history
-  string file = m_InFile->value();
-  vector<string> array = m_History->GetArray(string(""));
-  vector<string>::iterator it;
-
-  // First, search the history for the instance of the file and delete
-  // existing occurences
-  while((it = find(array.begin(),array.end(),file)) != array.end())
-    array.erase(it);
-
-  // Append the file to the end of the array
-  array.push_back(file);
-
-  // Trim the array to appropriate size
-  if(array.size() > 20)
-    array.erase(array.begin(),array.begin() + array.size() - 20);
-
-  // Store the new array to the registry
-  m_History->PutArray(array);      
-
-  // Hide the window
-  m_Window->hide();
+  catch(...) { }
 }
 
 void 

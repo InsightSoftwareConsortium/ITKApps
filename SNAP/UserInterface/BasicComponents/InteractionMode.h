@@ -17,7 +17,7 @@
 
 #include <FL/Fl.h>
 
-#include "IRISTypes.h"
+#include "SNAPCommonUI.h"
 #include "FLTKEvent.h"
 #include "FLTKCanvas.h"
 

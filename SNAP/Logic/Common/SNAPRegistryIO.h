@@ -22,6 +22,10 @@
 #include "EdgePreprocessingSettings.h"
 #include "ThresholdSettings.h"
 
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4786 )
+#endif
+
 class IRISApplication;
 
 class SNAPRegistryIO 
@@ -78,6 +82,8 @@ public:
 private:
   // Some enumeraticns used by this class
   RegistryEnumMap<CoverageModeType> m_EnumMapCoverage;
+  RegistryEnumMap<SnakeParameters::SolverType> m_EnumMapSolver;
+  RegistryEnumMap<SnakeParameters::SnakeType> m_EnumMapSnakeType;
 
 };
 

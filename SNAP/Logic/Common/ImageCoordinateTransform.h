@@ -15,7 +15,7 @@
 #ifndef __ImageCoordinateTransform_h_
 #define __ImageCoordinateTransform_h_
 
-#include "IRISTypes.h"
+#include "SNAPCommon.h"
 #include <vnl/vnl_matrix_fixed.h>
 
 /**

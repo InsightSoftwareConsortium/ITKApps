@@ -37,6 +37,10 @@ PolygonInteractionMode
 ::OnEitherEvent(const FLTKEvent &event, 
                 const FLTKEvent &irisNotUsed(pressEvent))
 {
+  // Pass through events that are irrelevant
+  if(event.SoftButton != FL_LEFT_MOUSE && event.SoftButton != FL_RIGHT_MOUSE)
+    return 0;
+
   // We'll need these shorthands
   int id = m_Parent->m_Id;
 
@@ -51,9 +55,8 @@ PolygonInteractionMode
   Vector3f xEvent = m_Parent->MapWindowToSlice(event.XSpace.extract(2));
 
   // Handle the event
-  int rc = m_Drawing->Handle(event.Id,event.Button,
-                             xEvent(0),xEvent(1),
-                             pixelSize(0),pixelSize(1));
+  m_Drawing->Handle(event.Id,event.SoftButton,xEvent(0),xEvent(1),
+                    pixelSize(0),pixelSize(1));
 
 #ifdef DRAWING_LOCK
   m_GlobalState->ReleaseDrawingLock(id);
@@ -65,7 +68,9 @@ PolygonInteractionMode
   // Let the parent UI know that the polygon state has changed
   m_ParentUI->OnPolygonStateUpdate(id);
 
-  return rc;
+  // Even though no action may have been performed, we don't want other handlers
+  // to get the left and right mouse button events
+  return 1;
 }
 
 Vector2f 

@@ -15,7 +15,7 @@
 #ifndef __SegmentationImageIOWizardLogic_h_
 #define __SegmentationImageIOWizardLogic_h_
 
-#include "IRISTypes.h"
+#include "SNAPCommonUI.h"
 #include "RestrictedImageIOWizardLogic.h"
 
 /**

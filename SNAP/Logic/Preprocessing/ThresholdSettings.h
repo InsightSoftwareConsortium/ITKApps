@@ -15,7 +15,7 @@
 #ifndef __ThresholdSettings_h_
 #define __ThresholdSettings_h_
 
-#include "IRISTypes.h"
+#include "SNAPCommon.h"
 
 // Forward references
 class GreyImageWrapper;
@@ -49,6 +49,11 @@ public:
    * Create a default instance of the settings based on an image wrapper
    */
   static ThresholdSettings MakeDefaultSettings(GreyImageWrapper *wrapper);
+
+  /** This will create a slightly less useful settings object with thresholds
+   * at 40 and 100.  Before using them, make sure that the image is in range
+   * of 40 and 100 */
+  static ThresholdSettings MakeDefaultSettingsWithoutImage();
 
 private:
   unsigned int m_LowerThreshold;

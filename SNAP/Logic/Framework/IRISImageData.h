@@ -15,7 +15,7 @@
 #ifndef __IRISImageData_h_
 #define __IRISImageData_h_
 
-#include "IRISTypes.h"
+#include "SNAPCommon.h"
 #include "IRISException.h"
 #include "LabelImageWrapper.h"
 #include "GreyImageWrapper.h"
@@ -70,8 +70,8 @@ public:
    * Cut the segmentation using a plane and relabed the segmentation
    * on the side of that plane
    */
-  void RelabelSegmentationWithCutPlane(const Vector3d &plane, bool dZero, 
-                       LabelType newlabel);
+  void RelabelSegmentationWithCutPlane(
+    const Vector3d &normal, double intercept, LabelType newlabel);
 
   /**
    * Compute the intersection of the segmentation with a ray

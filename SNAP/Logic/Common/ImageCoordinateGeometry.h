@@ -16,7 +16,6 @@
 #define __ImageCoordinateGeometry_h_
 
 #include "ImageCoordinateTransform.h"
-#include <string>
 
 /**
  * \class ImageCoordinateGeometry

@@ -18,8 +18,6 @@
 #include "itkExceptionObject.h"
 #include "GlobalState.h"
 
-#include <string>
-
 // Forward reference to the classes pointed at
 class IRISImageData;
 class SNAPImageData;

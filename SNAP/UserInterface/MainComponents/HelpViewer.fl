@@ -1,0 +1,40 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0102 
+header_name {.h} 
+code_name {.cxx}
+class HelpViewer {open : HelpViewerBase
+} {
+  Function {MakeWindow()} {open
+  } {
+    Fl_Window m_WinHelp {
+      label {SNAP/IRIS Help Window} open selected
+      xywh {133 98 365 710} type Double color 53
+      code0 {\#include "HelpViewerBase.h"} visible
+    } {
+      Fl_Help_View m_BrsHelp {
+        callback {OnLinkAction();}
+        xywh {5 5 355 660} color 17
+      }
+      Fl_Button {} {
+        label Contents
+        callback {OnContentsAction()}
+        xywh {15 675 75 25} box PLASTIC_UP_BOX color 180 labelsize 12
+      }
+      Fl_Button m_BtnBack {
+        label {@<-  Back}
+        callback {OnBackAction();}
+        xywh {100 675 75 25} box PLASTIC_UP_BOX color 180 labelsize 12 deactivate
+      }
+      Fl_Button m_BtnForward {
+        label {@->  Forward}
+        callback {OnForwardAction();}
+        xywh {185 675 80 25} box PLASTIC_UP_BOX color 180 labelsize 12 deactivate
+      }
+      Fl_Button m_BtnClose {
+        label Close
+        callback {OnCloseAction();}
+        xywh {275 675 70 25} box PLASTIC_UP_BOX color 180 labelsize 12
+      }
+    }
+  }
+} 

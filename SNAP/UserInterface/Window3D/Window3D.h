@@ -20,7 +20,8 @@
 #include <FL/gl.h>
 #include <GL/glu.h>
 #include <stdlib.h>
-#include "IRISTypes.h"
+#include "FLTKCanvas.h"
+#include "SNAPCommonUI.h"
 #include "Trackball.h"
 #include "MeshObject.h"
 
@@ -29,23 +30,38 @@ class UserInterfaceLogic;
 class IRISApplication;
 class GlobalState;
 
+// Forward references to interactors defined in Window3D.cxx
+class Crosshairs3DInteractionMode;
+class Trackball3DInteractionMode;
+class Spraypaint3DInteractionMode;
+class Scalpel3DInteractionMode;
+
 //--------------------------------------------------------------
 // plane struct
 //-------------------------------------------------------------
-typedef struct
-  {
-  Vector3d cutPt1, cutPt2, cutRay1, cutRay2;
-  Vector3d coords;
-  bool distZero;
-  int valid; 
-  } CutPlaneStruct;
+struct CutPlaneStruct
+{
+  // The normal vector in image coordinates
+  Vector3d vNormal;
 
+  // The intercept (distance to zero) in image coordinates
+  double dIntercept;
+
+  // The normal vector in world coordinates
+  Vector3d vNormalWorld;
+
+  // The four corners used to display the plane  
+  Vector3d xDisplayCorner[4];
+
+  // The valid/invalid state of the plane
+  int valid; 
+};
 
 /**
  * \class Window3D
  * \brief Window used to display the 3D segmentation
  */
-class Window3D : public Fl_Gl_Window
+class Window3D : public FLTKCanvas
 {
 public:
 
@@ -55,20 +71,78 @@ public:
   ~Window3D();
   Window3D& operator= ( const Window3D& W ) { return *this; };
 
-  /**
-   * Register the parent classes with this application
-   */
+  /** Register the parent classes with this application */
   void Register(int i, UserInterfaceLogic *driver);
 
+  /** Initialize the window */
+  void Initialize();
 
-  void Init();
+  /** Clear the 3D display */
   void ClearScreen();
-  void ResetView();
-  void draw();
-  int  handle( int event );
 
+  /** Reset the trackball to default position */
+  void ResetView();
+
+  /** Perform the GL drawing operations */
+  void draw();
+
+  /** Recompute the mesh (slow operation) */
   void UpdateMesh();
+
+  /** Respond to user pressing the accept button */
   void Accept();
+
+  /** Enter the cross-hairs mode of operation */
+  virtual void EnterCrosshairsMode();
+  
+  /** Enter the trackball mode of operation */
+  virtual void EnterTrackballMode();
+
+  /** Enter the scalpel mode of operation */
+  virtual void EnterScalpelMode();
+  
+  /** Enter the spraypaint mode of operation */
+  virtual void EnterSpraypaintMode();
+
+  /** A parent class from which all the Fl event handlers associated
+   * with this class should be derived */
+  class EventHandler : public InteractionMode {
+  public:
+    EventHandler(Window3D *parent) {
+      m_Parent = parent;
+    }    
+    void Register() 
+    {
+      m_Driver = m_Parent->m_Driver;
+      m_ParentUI = m_Parent->m_ParentUI;
+      m_GlobalState = m_Parent->m_GlobalState;
+    }
+  protected:
+    Window3D *m_Parent;
+    GlobalState *m_GlobalState;
+    UserInterfaceLogic *m_ParentUI;
+    IRISApplication *m_Driver;
+  };
+
+  // Allow friendly access by interactors
+  friend class EventHandler;
+  friend class Trackball3DInteractionMode;
+  friend class Crosshairs3DInteractionMode;
+  friend class Scalpel3DInteractionMode;
+  friend class Spraypaint3DInteractionMode;
+
+  // Methods called by these interactors (unlike GenericSliceWindow, this window
+  // does not delegate much of its control to the interactors and only provides
+  // these interfaces for them
+  void OnRotateStartAction(int x, int y);
+  void OnPanStartAction(int x, int y);
+  void OnZoomStartAction(int x, int y);
+  void OnTrackballDragAction(int x, int y);
+  void OnTrackballStopAction();
+  void OnCrosshairClickAction(int x,int y);
+  void OnSpraypaintClickAction(int x,int y);
+  void OnScalpelPointPairAction(int x1, int y1, int x2, int y2);
+
 
 private:
 
@@ -80,6 +154,12 @@ private:
 
   // Pointer to GUI that contains this Window3D object
   UserInterfaceLogic *m_ParentUI;   
+
+  // Interaction modes
+  Crosshairs3DInteractionMode *m_CrosshairsMode;
+  Trackball3DInteractionMode *m_TrackballMode;
+  Spraypaint3DInteractionMode *m_SpraypaintMode;
+  Scalpel3DInteractionMode *m_ScalpelMode;
 
   // Cut planes 3d mode added by Robin
   enum Win3DMode
@@ -122,9 +202,14 @@ private:
   // width of view, in world coords
   Vector3f m_DefaultHalf, m_ViewHalf; 
 
-  Vector3i *m_Samples;
-  int   m_NumberOfUsedSamples;
-  int   m_NumberOfAllocatedSamples;
+  // A ray and a point used for projecting mouse-clicks onto the 3D surface
+  Vector3d m_Ray;
+  Vector3d m_Point;
+
+  // An array of samples
+  typedef std::list<Vector3i> SampleListType;
+  typedef SampleListType::iterator SampleListIterator;
+  SampleListType m_Samples;
 
   void MousePressFunc(int button);
   void MouseReleaseFunc();
@@ -137,10 +222,14 @@ private:
   void ComputeMatricies( int *vport, double *mview, double *proj );
   void ComputeRay( int x, int y, double *mvmatrix, double *projmat,
                    int *viewport, Vector3d &v, Vector3d &r );
+
+  /** Try to compute cut plane.  Return false if the points coincide */
+  bool ComputeCutPlane(int wx1, int wy1, int wx2, int wy2);
+
   int IntersectSegData(int mouse_x, int mouse_y, Vector3i &hit);
 
-  void OnCutPlanePointRayAction(int mouse_x, int mouse_y, int i);
-  void ComputePlane();
+  // void OnCutPlanePointRayAction(int mouse_x, int mouse_y, int i);
+  // void ComputePlane();
   void DrawCutPlane(); // Added by Robin & Ming
 
   void AddSample( Vector3i s );
@@ -155,6 +244,9 @@ private:
 
 /*
  *Log: Window3D.h
+ *Revision 1.4  2003/10/02 14:55:53  pauly
+ *ENH: Development during the September code freeze
+ *
  *Revision 1.1  2003/09/11 13:51:15  pauly
  *FIX: Enabled loading of images with different orientations
  *ENH: Implemented image save and load operations

@@ -15,7 +15,7 @@
 #ifndef __LevelSetMeshPipeline_h_
 #define __LevelSetMeshPipeline_h_
 
-#include "IRISTypes.h"
+#include "SNAPCommon.h"
 #include "itkSmartPointer.h"
 #include "MeshOptions.h"
 

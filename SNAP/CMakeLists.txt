@@ -41,11 +41,11 @@ SET(LOGIC_HEADERS
   Common/CommandLineArgumentParser.h
   Common/Credits.h
   Common/IRISException.h
-  Common/IRISTypes.h
   Common/IRISVectorTypes.h
   Common/IRISVectorTypesToITKConversion.h
   Common/IRISVectorTypes.txx
   Common/Registry.h
+  Common/SNAPCommon.h
   Common/SystemInterface.h
   Logic/Common/ColorLabel.h
   Logic/Common/ImageCoordinateGeometry.h
@@ -64,6 +64,7 @@ SET(LOGIC_HEADERS
   Logic/ImageWrapper/LabelImageWrapper.h
   Logic/ImageWrapper/LevelSetImageWrapper.h
   Logic/ImageWrapper/SpeedImageWrapper.h
+  Logic/LevelSet/LevelSetExtensionFilter.h
   Logic/LevelSet/SnakeParameters.h
   Logic/LevelSet/SignedDistanceFilter.h
   Logic/LevelSet/SignedDistanceFilter.txx
@@ -102,6 +103,7 @@ SET(UI_CXX
   UserInterface/ImageIOWizard/GreyImageIOWizardLogic.cxx
   UserInterface/ImageIOWizard/PreprocessingImageIOWizardLogic.cxx
   UserInterface/ImageIOWizard/SegmentationImageIOWizardLogic.cxx
+  UserInterface/MainComponents/HelpViewerLogic.cxx
   UserInterface/MainComponents/IntensityCurveBox.cxx
   UserInterface/MainComponents/IntensityCurveUILogic.cxx
   UserInterface/MainComponents/PreprocessingUILogic.cxx
@@ -132,6 +134,7 @@ SET(UI_HEADERS
   UserInterface/BasicComponents/InteractionMode.h
   UserInterface/BasicComponents/SnakeParametersPreviewBox.h
   UserInterface/BasicComponents/SnakeParametersPreviewPipeline.h
+  UserInterface/Common/SNAPCommonUI.h
   UserInterface/ImageIOWizard/GreyImageIOWizardLogic.h
   UserInterface/ImageIOWizard/ImageIOWizardBase.h
   UserInterface/ImageIOWizard/ImageIOWizardLogic.h
@@ -140,6 +143,8 @@ SET(UI_HEADERS
   UserInterface/ImageIOWizard/RestrictedImageIOWizardLogic.h
   UserInterface/ImageIOWizard/RestrictedImageIOWizardLogic.txx
   UserInterface/ImageIOWizard/SegmentationImageIOWizardLogic.h
+  UserInterface/MainComponents/HelpViewerBase.h
+  UserInterface/MainComponents/HelpViewerLogic.h
   UserInterface/MainComponents/IntensityCurveBox.h
   UserInterface/MainComponents/IntensityCurveUIBase.h
   UserInterface/MainComponents/IntensityCurveUILogic.h
@@ -194,6 +199,7 @@ SET(TESTING_HEADERS
 # The FL files for SNAP
 SET(APPLICATION_FLUIDS
   UserInterface/ImageIOWizard/ImageIOWizard.fl
+  UserInterface/MainComponents/HelpViewer.fl
   UserInterface/MainComponents/IntensityCurveUI.fl
   UserInterface/MainComponents/PreprocessingUI.fl
   UserInterface/MainComponents/RestoreSettingsDialog.fl
@@ -271,13 +277,12 @@ INCLUDE_DIRECTORIES(
   ${MY_SOURCE_DIR}/Testing/Compatibility/CVS
   ${MY_SOURCE_DIR}/UserInterface
   ${MY_SOURCE_DIR}/UserInterface/BasicComponents
-  ${MY_SOURCE_DIR}/UserInterface/HTMLHelp
+  ${MY_SOURCE_DIR}/UserInterface/Common
   ${MY_SOURCE_DIR}/UserInterface/ImageIOWizard
   ${MY_SOURCE_DIR}/UserInterface/MainComponents
   ${MY_SOURCE_DIR}/UserInterface/MainComponents/Artwork
   ${MY_SOURCE_DIR}/UserInterface/SliceWindow
   ${MY_SOURCE_DIR}/UserInterface/Window3D
-  ${MY_BINARY_DIR}/Testing
   ${MY_BINARY_DIR}/UserInterface/ImageIOWizard
   ${MY_BINARY_DIR}/UserInterface/MainComponents
   ${FLTK_INCLUDE_PATH}

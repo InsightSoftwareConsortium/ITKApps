@@ -15,7 +15,7 @@
 #ifndef __PreprocessingImageIOWizardLogic_h_
 #define __PreprocessingImageIOWizardLogic_h_
 
-#include "IRISTypes.h"
+#include "SNAPCommonUI.h"
 #include "RestrictedImageIOWizardLogic.h"
 
 /**
