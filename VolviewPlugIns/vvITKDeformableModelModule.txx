@@ -152,6 +152,7 @@ DeformableModelModule<TInputPixelType>
   m_DeformableModelFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
 
   // Execute the filters and progressively remove temporary memory
+  m_MeshSource->Update();
   m_GradientMagnitudeFilter->Update();
   m_DeformableModelFilter->Update();
 
@@ -179,11 +180,12 @@ DeformableModelModule<TInputPixelType>
   // Temporarily use the sphere output, just to debug the convertion from ITK mesh
   // to Plugin mesh.
   //typename MeshType::ConstPointer mesh = m_DeformableModelFilter->GetOutput();
-  typename MeshType::ConstPointer mesh = m_MeshSource->GetOutput();
+  typename MeshType::Pointer mesh = m_MeshSource->GetOutput();
 
   // now put the results into the data structure
   const unsigned int numberOfPoints = mesh->GetNumberOfPoints();
   opds->NumberOfMeshPoints = numberOfPoints;
+
   float * points = new float[ numberOfPoints * 3 ];
   typedef typename MeshType::PointsContainer::ConstIterator PointIterator;
   PointIterator pointItr  = mesh->GetPoints()->Begin();
@@ -196,24 +198,58 @@ DeformableModelModule<TInputPixelType>
     ++pointItr;
     }
 
-  // Check about memory LEAKS !!!
   opds->MeshPoints = points;
 
   opds->NumberOfMeshCells = mesh->GetNumberOfCells();
-  int numEntries = 10;
-  opds->MeshCells = new int [numEntries];
-  int i;
-  for (i = 0; i < numEntries; ++i)
+  unsigned int numEntries = 0;
+  
+  typedef typename MeshType::CellsContainer::ConstIterator CellIterator;
+  CellIterator cellItr = mesh->GetCells()->Begin();
+  CellIterator cellEnd = mesh->GetCells()->End();
+
+  // Cell connectivity entries follow the format of vtkCellArray:
+  // n1, id1, id2,... idn1,  n2, id1, id2,.. idn2....
+  while( cellItr != cellEnd )
     {
-    opds->MeshCells[i] = 0; // put real data here
+    // one position for the number of points
+    numEntries += 1;  
+    // plus one position per each point Id
+    numEntries += cellItr.Value()->GetNumberOfPoints();
+    ++cellItr;
     }
 
-  // return the polygonal data
+  int * cellsTopology = new int [ numEntries ];
 
+  typedef typename MeshType::CellType               CellType;
+  typedef typename CellType::PointIdConstIterator   PointIdIterator;
+
+  cellItr = mesh->GetCells()->Begin();
+   while( cellItr != cellEnd )
+    {
+    const CellType * cell = cellItr.Value();
+    const unsigned int np = cell->GetNumberOfPoints();
+    *cellsTopology++ = np;
+    PointIdIterator pointIdItr = cell->PointIdsBegin();
+    PointIdIterator pointIdEnd = cell->PointIdsEnd();
+    while( pointIdItr != pointIdEnd )
+      {
+      *cellsTopology = *pointIdItr;
+      ++cellsTopology;
+      ++pointIdItr;
+      }
+    ++cellItr;
+    }
+
+  opds->MeshCells = cellsTopology;
+
+
+  // return the polygonal data
   info->AssignPolygonalData(info, opds);
 
-
-
+  // clean up
+  delete [] cellsTopology;
+  delete [] points;
+  
 } // end of PostProcessData
 
 
