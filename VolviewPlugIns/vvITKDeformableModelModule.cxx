@@ -23,6 +23,10 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     return -1;
     }
 
+  const float centerX = info->Markers[0];
+  const float centerY = info->Markers[0];
+  const float centerZ = info->Markers[0];
+
   try 
   {
   switch( info->InputVolumeScalarType )
@@ -36,6 +40,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Computing Deformable Model...");
       module.SetEllipsoidRadius( radiusX, radiusY, radiusZ );
+      module.SetEllipsoidCenter( centerX, centerY, centerZ );
       module.SetSigma( sigma );
       // Execute the filter
       module.ProcessData( pds  );
@@ -50,6 +55,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Computing Deformable Model...");
       module.SetEllipsoidRadius( radiusX, radiusY, radiusZ );
+      module.SetEllipsoidCenter( centerX, centerY, centerZ );
       module.SetSigma( sigma );
       // Execute the filter
       module.ProcessData( pds  );

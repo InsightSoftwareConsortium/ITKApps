@@ -94,7 +94,7 @@ public:
     DeformableModelModule();
    ~DeformableModelModule();
 
-    void SetEllipsoidCenter( const PointType & center );
+    void SetEllipsoidCenter( float rx, float ry, float rz );
     void SetEllipsoidRadius( float rx, float ry, float rz );
 
     void SetSigma( float value );

@@ -54,8 +54,12 @@ DeformableModelModule<TInputPixelType>
 template <class TInputPixelType >
 void 
 DeformableModelModule<TInputPixelType>
-::SetEllipsoidCenter( const PointType & center )
+::SetEllipsoidCenter( float centerX, float centerY, float centerZ )
 {
+  PointType center;
+  center[0] = centerX;
+  center[1] = centerY;
+  center[2] = centerZ;
   m_MeshSource->SetCenter( center );
 }
 
@@ -168,7 +172,46 @@ DeformableModelModule<TInputPixelType>
 ::PostProcessData( const vtkVVProcessDataStruct * pds )
 {
 
-   typename MeshType::ConstPointer mesh = m_DeformableModelFilter->GetOutput();
+  // A change in ProcessData signature could prevent this const_cast...
+  vtkVVProcessDataStruct * opds = const_cast<vtkVVProcessDataStruct *>( pds );
+  vtkVVPluginInfo * info = this->GetPluginInfo();
+
+  // Temporarily use the sphere output, just to debug the convertion from ITK mesh
+  // to Plugin mesh.
+  //typename MeshType::ConstPointer mesh = m_DeformableModelFilter->GetOutput();
+  typename MeshType::ConstPointer mesh = m_MeshSource->GetOutput();
+
+  // now put the results into the data structure
+  const unsigned int numberOfPoints = mesh->GetNumberOfPoints();
+  opds->NumberOfMeshPoints = numberOfPoints;
+  float * points = new float[ numberOfPoints * 3 ];
+  typedef typename MeshType::PointsContainer::ConstIterator PointIterator;
+  PointIterator pointItr  = mesh->GetPoints()->Begin();
+  PointIterator pointsEnd = mesh->GetPoints()->End();
+  while( pointItr != pointsEnd )
+    {
+    *points++ = pointItr.Value()[0]; 
+    *points++ = pointItr.Value()[1]; 
+    *points++ = pointItr.Value()[2]; 
+    ++pointItr;
+    }
+
+  // Check about memory LEAKS !!!
+  opds->MeshPoints = points;
+
+  opds->NumberOfMeshCells = mesh->GetNumberOfCells();
+  int numEntries = 10;
+  opds->MeshCells = new int [numEntries];
+  int i;
+  for (i = 0; i < numEntries; ++i)
+    {
+    opds->MeshCells[i] = 0; // put real data here
+    }
+
+  // return the polygonal data
+
+  info->AssignPolygonalData(info, opds);
+
 
 
 } // end of PostProcessData
