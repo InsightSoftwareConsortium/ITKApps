@@ -59,7 +59,7 @@ SET(MatroxInput_SRCS
 )
 
 SET(MatroxInput_GUI_SRCS
-  MatroxViewerGUI.fd
+  MatroxViewerGUI.fl
 )
 
 
