@@ -29,6 +29,7 @@
 #include "itkImage.h"
 #include "itkImageRegionIterator.h"
 #include "itkNormalizeImageFilter.h"
+#include "itkThresholdImageFilter.h"
 #include "itkChangeInformationImageFilter.h"
 #include "itkShrinkImageFilter.h"
 #include "itkQuaternionRigidTransform.h"
@@ -92,8 +93,9 @@ int main(int argc, char **argv)
     }
   
   // Declare all the filters
-  typedef itk::Image<unsigned short,3> InputType;
+  typedef itk::Image<short,3> InputType;
   typedef itk::Image<float,3> OutputType;
+  typedef itk::ThresholdImageFilter<InputType> ThresholdFilter;
   typedef itk::NormalizeImageFilter<InputType,OutputType> NormalizeFilter;
   typedef itk::ChangeInformationImageFilter<OutputType> ChangeInformationFilter;
   typedef itk::ShrinkImageFilter<OutputType,OutputType> ShrinkFilter;
@@ -108,9 +110,8 @@ int main(int argc, char **argv)
 
   // Moving ----------------
   vtkImageReader *movingReader = vtkImageReader::New();
-    movingReader->SetDataScalarTypeToUnsignedShort();
+    movingReader->SetDataScalarTypeToShort();
     movingReader->SetFilePrefix(study1Prefix.c_str());
-    movingReader->SetDataMask(0x7fff);
     if (study1ByteOrder == "BigEndian")
       {
       movingReader->SetDataByteOrderToBigEndian();
@@ -140,8 +141,13 @@ int main(int argc, char **argv)
 
   ConnectPipelines(movingVtkExporter, movingItkImporter);
 
+  ThresholdFilter::Pointer movingThreshold = ThresholdFilter::New();
+    movingThreshold->SetInput(movingItkImporter->GetOutput());
+    movingThreshold->ThresholdBelow(-32767);
+
   NormalizeFilter::Pointer movingNormalize = NormalizeFilter::New();
     movingNormalize->SetInput(movingItkImporter->GetOutput());
+    movingNormalize->SetInput(movingThreshold->GetOutput());
 
   sf[0] = shrinkFactors[0];
   sf[1] = shrinkFactors[1];
@@ -156,9 +162,9 @@ int main(int argc, char **argv)
 
   // Fixed ----------------
    vtkImageReader *fixedReader = vtkImageReader::New();
-    fixedReader->SetDataScalarTypeToUnsignedShort();
+    fixedReader->SetDataScalarTypeToShort();
     fixedReader->SetFilePrefix(study2Prefix.c_str());
-    fixedReader->SetDataMask(0x7fff);
+    //    fixedReader->SetDataMask(0x7fff);
     if (study2ByteOrder == "BigEndian")
       {
       fixedReader->SetDataByteOrderToBigEndian();
@@ -188,8 +194,13 @@ int main(int argc, char **argv)
 
   ConnectPipelines(fixedVtkExporter, fixedItkImporter);
 
+  ThresholdFilter::Pointer fixedThreshold = ThresholdFilter::New();
+    fixedThreshold->SetInput(fixedItkImporter->GetOutput());
+    fixedThreshold->ThresholdBelow(-32767);
+
   NormalizeFilter::Pointer fixedNormalize = NormalizeFilter::New();
     fixedNormalize->SetInput(fixedItkImporter->GetOutput());
+    fixedNormalize->SetInput(fixedThreshold->GetOutput());
 
   sf[0] = shrinkFactors[0];
   sf[1] = shrinkFactors[1];
@@ -357,7 +368,7 @@ int main(int argc, char **argv)
 
 void print_usage()
 {
-  std::cerr << "RegisterAD $Revision: 1.3 $  $Date: 2003-01-07 15:00:54 $"  << std::endl;
+  std::cerr << "RegisterAD $Revision: 1.4 $  $Date: 2003-04-08 11:16:38 $"  << std::endl;
 
   std::cerr <<  " usage: RegisterAD" << std::endl;
   std::cerr <<  "    --study1Prefix prefix" << std::endl;
