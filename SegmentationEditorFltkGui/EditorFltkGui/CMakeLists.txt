@@ -1,4 +1,4 @@
-PROJECT( SegmentationEditorFltkGui )
+PROJECT( EditorFltkGui )
 
 INCLUDE_DIRECTORIES(
 ${ITK_SOURCE_DIR}/Code/Common
@@ -16,7 +16,7 @@ ${VTK_SOURCE_DIR}/Imaging
 ${VTK_SOURCE_DIR}/Rendering
 ${VTK_SOURCE_DIR}/IO
 ${VTK_SOURCE_DIR}/Patented
-${SegmentationEditorFltkGui_SOURCE_DIR}
+${EditorFltkGui_SOURCE_DIR}
 ${FLTK_INCLUDE_PATH}
 ${OPENGL_INCLUDE_PATH}
 )
@@ -35,13 +35,13 @@ ${VTK_BINARY_DIR}/Imaging
 ${VTK_BINARY_DIR}/Rendering
 ${VTK_BINARY_DIR}/IO
 ${VTK_BINARY_DIR}/Patented
-${SegmentationEditorFltkGui_BINARY_DIR}
+${EditorFltkGui_BINARY_DIR}
 ${FLTK_LIBRARY}
 ${OPENGL_LIBRARY}
 ${OPENGL_glu_LIBRARY}
 )
 
-SET(SegmentationEditorFltkGui_SRCS
+SET(EditorFltkGui_SRCS
 EditorConsole.cxx
 EditorConsoleBase.cxx
 Editor.cxx
@@ -59,7 +59,7 @@ SourceViewer.cxx
 BinaryViewer.cxx	
 )
 
-SET(SegmentationEditorFltkGui_GUI_SRCS
+SET(EditorFltkGui_GUI_SRCS
 EditorConsoleGUI.fl
 )
 
@@ -86,6 +86,6 @@ IF(WIN32)
   )
 ENDIF(WIN32)
 
-ADD_EXECUTABLE(EditorFltkGui ${SegmentationEditorFltkGui_SRCS})
+ADD_EXECUTABLE(EditorFltkGui ${EditorFltkGui_SRCS})
 
-FLTK_WRAP_UI(EditorFltkGui   ${SegmentationEditorFltkGui_GUI_SRCS})
+FLTK_WRAP_UI(EditorFltkGui   ${EditorFltkGui_GUI_SRCS})
