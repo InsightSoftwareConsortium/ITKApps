@@ -38,7 +38,7 @@ private:
 
   // Four vertices in the region box (correspond to the two corners 
   // of the 3D region of interest
-  Vector2f m_CornerDragStart[2];
+  Vector3f m_CornerDragStart[2];
 
   /**
    * The four edges in the rectangle, ordered first by orientation
@@ -54,15 +54,15 @@ private:
   bool m_IsAnyEdgeHighlighted;
 
   /** Map from system's ROI in image coordinates to 2D slice coords */
-  void GetSystemROICorners(Vector2f corner[2]);
+  void GetSystemROICorners(Vector3f corner[2]);
 
   /** Compute the slice-space vertices corresponding to an edge */
   void GetEdgeVertices(unsigned int direction,
-    unsigned int index,Vector2f &x0,Vector2f &x1,const Vector2f corner[2]);
+    unsigned int index,Vector2f &x0,Vector2f &x1,const Vector3f corner[2]);
 
   /** Compute a distance to an edge */
   float GetEdgeDistance(unsigned int direction,
-    unsigned int index,const Vector2f &point,const Vector2f corner[2]);
+    unsigned int index,const Vector2f &point,const Vector3f corner[2]);
 
   /**
    * Update the region of interest in response to the dragging or release

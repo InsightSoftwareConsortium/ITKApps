@@ -1,0 +1,12 @@
+Points.ArraySize = 11
+Points.Element[0]  =  46  85
+Points.Element[1]  =  59 120
+Points.Element[2]  =  86 122
+Points.Element[3]  = 133 155
+Points.Element[4]  =  86  84
+Points.Element[5]  = 110  34
+Points.Element[6]  =  73  51
+Points.Element[7]  =  26  11
+Points.Element[8]  =  61  21
+Points.Element[9]  =  17  20
+Points.Element[10] =  31  59

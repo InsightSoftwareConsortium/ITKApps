@@ -537,7 +537,6 @@ int snake3D::run(int num_steps)
 
           float c_term = static_cast<float>(convergence * g_c[i] * sqrt(gradFB));
 
-
           float smooth_term = c_smooth * (uxx + uyy + uzz);
           if (ing) smooth_term *= g_smooth[i];
 
@@ -1283,6 +1282,10 @@ int edt3ddan(const unsigned char *input,int six,int siy,int siz,unsigned char me
 
 /*
  *Log: SnakeWrapper.cxx
+ *Revision 1.3  2003/09/11 13:50:29  pauly
+ *FIX: Enabled loading of images with different orientations
+ *ENH: Implemented image save and load operations
+ *
  *Revision 1.2  2003/08/27 14:03:22  pauly
  *FIX: Made sure that -Wall option in gcc generates 0 warnings.
  *FIX: Removed 'comment within comment' problem in the cvs log.

@@ -48,33 +48,23 @@ PolygonInteractionMode
   Vector2f pixelSize = GetPixelSizeVector();
 
   // Map the event into slice coordinates 
-  Vector2f xEvent = m_Parent->MapWindowToSlice(event.XSpace.extract(2));
+  Vector3f xEvent = m_Parent->MapWindowToSlice(event.XSpace.extract(2));
 
   // Handle the event
   int rc = m_Drawing->Handle(event.Id,event.Button,
                              xEvent(0),xEvent(1),
                              pixelSize(0),pixelSize(1));
 
-  if(rc) 
-  {
-    // Update the UI if the event was handled
-    if (m_Drawing->GetState() == INACTIVE_STATE) {
-      m_ParentUI->ActivatePaste(id, true);
-      m_ParentUI->ActivateAccept(id, false);
-
-  #ifdef DRAWING_LOCK
-      m_GlobalState->ReleaseDrawingLock(id);
-  #endif /* DRAWING_LOCK */
-
-    } else {
-      m_ParentUI->ActivatePaste(id, false);
-    }
-    if (m_Drawing->GetState() == EDITING_STATE)
-      m_ParentUI->ActivateAccept(id, true);
-
-    m_Parent->redraw();
-  }
+#ifdef DRAWING_LOCK
+  m_GlobalState->ReleaseDrawingLock(id);
+#endif /* DRAWING_LOCK */
   
+  // Update the display
+  m_Parent->redraw();
+  
+  // Let the parent UI know that the polygon state has changed
+  m_ParentUI->OnPolygonStateUpdate(id);
+
   return rc;
 }
 
@@ -82,9 +72,11 @@ Vector2f
 PolygonInteractionMode
 ::GetPixelSizeVector()
 {
-  return 
+  Vector3f x = 
     m_Parent->MapWindowToSlice(Vector2f(1.0f)) - 
     m_Parent->MapWindowToSlice(Vector2f(0.0f));
+
+  return Vector2f(x[0],x[1]);
 }
 
 

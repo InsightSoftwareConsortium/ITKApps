@@ -14,6 +14,8 @@
 =========================================================================*/
 #include "IntensityCurveBox.h"
 #include "IntensityCurveUILogic.h"
+#include "GreyImageWrapper.h"
+#include "itkImageRegionConstIterator.h"
 
 #include <cassert>
 #include <cstdio>
@@ -65,7 +67,7 @@ IntensityCurveBox
     }
 
   // Clear the viewport
-  glClearColor(0.75,0.75,0.75,1.0);
+  glClearColor(.906,.906,.906,1.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
   // Push the related attributes
@@ -87,6 +89,25 @@ IntensityCurveBox
   glColor3d(0.,0.,0.);
   glVertex2d(1,0);
   glEnd();
+
+  // Draw a histogram if it exists
+  if(m_Histogram.size())
+    {
+    float wBin = 1.0f / m_Histogram.size();
+    glBegin(GL_QUADS);
+    glColor3f(0.0f,0.0f,0.75f);
+    for(unsigned int i=0;i < m_Histogram.size();i++)
+      {
+      float xBin = wBin * i;
+      float hBin = m_Histogram[i] * 0.9f / m_HistogramMax;
+
+      glVertex2f(xBin,0);
+      glVertex2f(xBin,hBin);
+      glVertex2f(xBin+wBin,hBin);
+      glVertex2f(xBin+wBin,0);
+      }
+    glEnd();
+    }
 
   // Draw the box around the plot area
   glColor3d(0,0,0);
@@ -184,6 +205,55 @@ IntensityCurveBox
 
   // Negative: return -1
   return nearestPoint;
+}
+
+void 
+IntensityCurveBox
+::ComputeHistogram(GreyImageWrapper *source)
+{
+  // Need a wrapper
+  assert(source);
+
+  // Get 'absolute' image intensity range, i.e., the largest and smallest
+  // intensity in the whole image
+  GreyType iAbsMin = source->GetImageMin();
+  GreyType iAbsMax = source->GetImageMax();
+  unsigned int nFrequencies = (iAbsMax - iAbsMin) + 1;
+
+  // Compute the freqencies of the intensities
+  unsigned int *frequency = new unsigned int[nFrequencies];
+  memset(frequency,0,sizeof(unsigned int) * nFrequencies);
+  GreyImageWrapper::ConstIterator it = source->GetImageConstIterator();
+  for(it.GoToBegin();!it.IsAtEnd();++it)
+  {
+    frequency[it.Value()-iAbsMin]++;
+  }
+
+  // Determine the bin size: no bin should be less than a single pixel wide
+  unsigned int szBin = 1;
+  while(nFrequencies > szBin * this->w()) 
+    szBin++;
+  unsigned int nBins = (unsigned int) ceil(nFrequencies * 1.0 / szBin);
+
+  // Allocate an array of bins
+  m_Histogram.resize(nBins,0);
+
+  // Reset the max-frequency
+  m_HistogramMax = 0;
+
+  // Put the frequencies into the bins
+  for(unsigned int i=0;i<nFrequencies;i++)
+  {
+    unsigned int iBin = i / szBin;
+    m_Histogram[iBin] += frequency[i];
+
+    // Compute the maximum frequency
+    if(m_HistogramMax < m_Histogram[iBin])
+       m_HistogramMax  = m_Histogram[iBin]; 
+  }
+
+  // Clear the frequencies
+  delete frequency;
 }
 
 IntensityCurveBox::DefaultHandler

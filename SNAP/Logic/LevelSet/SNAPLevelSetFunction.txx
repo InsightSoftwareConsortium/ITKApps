@@ -80,6 +80,17 @@ SNAPLevelSetFunction<TImageType>
     this->GetLaplacianSmoothingSpeedExponent()
   };
 
+  // What equation are we solving?
+  cout << "Solving Equation :  = " << endl;
+  cout << "  P-W = " << GetPropagationWeight() << endl;
+  cout << "  P-E = " << GetPropagationSpeedExponent() << endl;
+  cout << "  C-W = " << GetCurvatureWeight() << endl;
+  cout << "  C-E = " << GetCurvatureSpeedExponent() << endl;
+  cout << "  A-W = " << GetAdvectionWeight() << endl;
+  cout << "  A-E = " << GetAdvectionSpeedExponent() << endl;
+  cout << "  L-W = " << GetLaplacianSmoothingWeight() << endl;
+  cout << "  L-E = " << GetLaplacianSmoothingSpeedExponent() << endl;
+
   // Create an image for each of these powers, if needed
   for(unsigned int iPower=0; iPower < 4; iPower++)
     {
@@ -312,3 +323,4 @@ SNAPLevelSetFunction<TImageType>
 {
   Superclass::PrintSelf(os, indent);
 }
+

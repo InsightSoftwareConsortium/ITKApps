@@ -174,7 +174,6 @@ SET(TESTING_CXX
   Testing/SNAPTestDriver.cxx
   Testing/TestCompareLevelSets.cxx
   Testing/TestMain.cxx
-  Testing/VTKTests.cxx
 )
 
 # The headers for the testing code
@@ -201,7 +200,6 @@ SET(PROGRAM_DATA_FILES
   ProgramData/HTMLHelp/Tutorial.html
   ProgramData/Images2D/EdgeForcesExample.png
   ProgramData/Images2D/RegionForcesExample.png
-  ProgramData/Images2D/ForcesInterface.png
   ProgramData/Presets/SnakeParameterPreviewCurve.txt
 )
 

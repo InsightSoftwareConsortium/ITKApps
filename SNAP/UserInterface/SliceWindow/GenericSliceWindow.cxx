@@ -82,14 +82,15 @@ GenericSliceWindow
   m_GlobalState = m_Driver->GetGlobalState();    
 
   // This array describes the conjugate axes for the three display orientations
-  static const unsigned int linkedAxes[3][2] = {{1,2},{0,2},{0,1}};
+  // static const unsigned int linkedAxes[3][2] = {{1,2},{0,2},{0,1}};
+  // static const unsigned int linkedAxes[3][2] = {{2,1},{0,2},{0,1}};
 
   // Initialize the axes indices (these indices map u,v coordinates of the 
   // slice to the x,y,z coordinates of the display space
   m_Id = index;
-  m_DisplayAxes[0] = linkedAxes[m_Id][0];
-  m_DisplayAxes[1] = linkedAxes[m_Id][1];
-  m_DisplayAxes[2] = m_Id;
+  // m_DisplayAxes[0] = linkedAxes[m_Id][0];
+  // m_DisplayAxes[1] = linkedAxes[m_Id][1];
+  // m_DisplayAxes[2] = m_Id;
 
   // Register the interaction modes
   m_CrosshairsMode->Register();
@@ -109,34 +110,41 @@ GenericSliceWindow
   // Store the image data pointer
   m_ImageData = imageData;
 
-  // Get the current display space to image space transform
-  ImageCoordinateTransform dti = m_Driver->GetDisplayToImageTransform();
+  // Initialize the grey slice texture
+  m_GreyTexture->SetImage(
+    m_ImageData->GetGrey()->GetDisplaySlice(m_Id));
+
+  // Initialize the segmentation slice texture
+  m_LabelTexture->SetImage(
+    m_ImageData->GetSegmentation()->GetDisplaySlice(m_Id));
+
+  // Store the transforms between the display and image spaces
+  m_ImageToDisplayTransform = 
+    imageData->GetImageGeometry().GetImageToDisplayTransform(m_Id);
+  m_DisplayToImageTransform =
+    imageData->GetImageGeometry().GetDisplayToImageTransform(m_Id);
+  m_DisplayToAnatomyTransform = 
+    imageData->GetImageGeometry().GetAnatomyToDisplayTransform(m_Id).Inverse();
   
   // Get the volume extents & voxel scale factors
-  Vector3i size = m_ImageData->GetVolumeExtents();
-  Vector3f scaling = m_ImageData->GetVoxelScaleFactor();
+  Vector3ui imageSizeInImageSpace = m_ImageData->GetVolumeExtents();
+  Vector3f imageScalingInImageSpace = m_ImageData->GetVoxelScaleFactor();
 
   // Initialize quantities that depend on the image and its transform
   for(unsigned int i = 0;i < 3;i++) 
     {    
     // Get the direction in image space that corresponds to the i'th
     // direction in slice space
-    m_ImageAxes[i] = dti.GetCoordinateIndexZeroBased(m_DisplayAxes[i]);
+    m_ImageAxes[i] = m_DisplayToImageTransform.GetCoordinateIndexZeroBased(i);
 
     // Record the size and scaling of the slice
-    m_SliceSize[i] = size[m_ImageAxes[i]];
-    m_SliceScale[i] = scaling[m_ImageAxes[i]]; // TODO: Reverse sign by orientation?
+    m_SliceSize[i] = imageSizeInImageSpace[m_ImageAxes[i]];
+    m_SliceSpacing[i] = imageScalingInImageSpace[m_ImageAxes[i]]; // TODO: Reverse sign by orientation?
     }
 
-  // Initialize the grey slice texture
-  m_GreyTexture->SetImage(m_ImageData->GetGrey()->GetDisplaySlice(m_Id));
-
-  // Initialize the segmentation slice texture
-  m_LabelTexture->SetImage(
-    m_ImageData->GetSegmentation()->GetDisplaySlice(m_Id));
-
   // No information about the current slice available yet
-  m_SliceIndex = -1;
+  m_ImageSliceIndex = -1;
+  m_DisplayAxisPosition = 0.0f;
 
   // We have been initialized
   m_IsSliceInitialized = true;
@@ -146,20 +154,20 @@ GenericSliceWindow
     PushInteractionMode(m_CrosshairsMode);
   
   // setup default view - fit to window
-  ResetView();
+  ResetViewToFit();
 }
 
 void
 GenericSliceWindow
-::ResetView()
+::ResetViewToFit()
 {
   // Should be fully initialized
   assert(m_IsRegistered && m_IsSliceInitialized);
 
   // Compute slice size in spatial coordinates
   Vector2f worldSize(
-    m_SliceSize[0] * m_SliceScale[0],
-    m_SliceSize[1] * m_SliceScale[1]);
+    m_SliceSize[0] * m_SliceSpacing[0],
+    m_SliceSize[1] * m_SliceSpacing[1]);
 
   // Set the view position (position of the center of the image?)
   m_ViewPosition = worldSize * 0.5f;
@@ -172,58 +180,47 @@ GenericSliceWindow
     szCanvas(0) / worldSize(0),
     szCanvas(1) / worldSize(1));
 
-  // The zoom factor is the bigger of these ratios
-  m_ViewZoom = ratios.min_value();
+  // The zoom factor is the bigger of these ratios, the number of pixels 
+  // on the screen per millimeter in world space
+  m_OptimalZoom = m_ViewZoom = ratios.min_value();
+
+  // Cause a redraw of the window
+  redraw();
 }
 
 Vector3f 
 GenericSliceWindow
-::MapSliceToImage(const Vector2f &uvSlice) 
+::MapSliceToImage(const Vector3f &xSlice) 
 {
-  assert(m_IsSliceInitialized && m_SliceIndex >= 0);
+  assert(m_IsSliceInitialized);
 
-  // Get the transform from the application driver
-  const ImageCoordinateTransform &T = m_Driver->GetDisplayToImageTransform();
-  
-  // Create a display space vector
-  Vector3f xDisplay;
-  xDisplay[m_DisplayAxes[0]] = uvSlice(0);
-  xDisplay[m_DisplayAxes[1]] = uvSlice(1);
-  xDisplay[m_DisplayAxes[2]] = m_SliceIndex;
-  
-  // Map to image space
-  return T.Apply(xDisplay);
+  // Get corresponding position in display space
+  return m_DisplayToImageTransform.TransformPoint(xSlice);
 }
 
 /**
  * Map a point in image coordinates to slice coordinates
  */
-Vector2f 
+Vector3f 
 GenericSliceWindow
 ::MapImageToSlice(const Vector3f &xImage) 
 {
   assert(m_IsSliceInitialized);
 
-  // Get the transform from the application driver
-  const ImageCoordinateTransform &T = m_Driver->GetImageToDisplayTransform();
-  
   // Get corresponding position in display space
-  Vector3f xDisplay = T.Apply(xImage);
-  
-  // Extract the slice coordinates
-  return Vector2f(xDisplay(m_DisplayAxes[0]), xDisplay(m_DisplayAxes[1]));
+  return  m_ImageToDisplayTransform.TransformPoint(xImage);
 }
 
 
 Vector2f 
 GenericSliceWindow
-::MapSliceToWindow(const Vector2f &uvSlice)
+::MapSliceToWindow(const Vector3f &xSlice)
 {
   assert(m_IsSliceInitialized);
 
   // Adjust the slice coordinates by the scaling amounts
   Vector2f uvScaled(
-    uvSlice(0) * m_SliceScale(0),uvSlice(1) * m_SliceScale(1));
+    xSlice(0) * m_SliceSpacing(0),xSlice(1) * m_SliceSpacing(1));
 
   // Compute the window coordinates
   Vector2f uvWindow = 
@@ -233,7 +230,7 @@ GenericSliceWindow
   return uvWindow;
 }
 
-Vector2f 
+Vector3f 
 GenericSliceWindow
 ::MapWindowToSlice(const Vector2f &uvWindow)
 {
@@ -244,11 +241,34 @@ GenericSliceWindow
     m_ViewPosition + (uvWindow - Vector2f(0.5f*w(),0.5f*h())) / m_ViewZoom;
   
   // The window coordinates are already in the scaled-slice units
-  Vector2f uvSlice(
-    uvScaled(0) / m_SliceScale(0),uvScaled(1) / m_SliceScale(1));
+  Vector3f uvSlice(
+    uvScaled(0) / m_SliceSpacing(0),
+    uvScaled(1) / m_SliceSpacing(1),
+    m_DisplayAxisPosition);
 
   // Return this vector
   return uvSlice;
+}
+
+int 
+GenericSliceWindow
+::handle(int eventID)
+{
+  // When mouse enters the window, request focus
+  if(eventID == FL_ENTER)
+    {
+    this->take_focus();
+    return 1;
+    }
+
+  // Handle the focus event properly
+  if(eventID == FL_FOCUS)
+    {
+    return 1;
+    }
+
+  // Normal processing
+  return FLTKCanvas::handle(eventID);
 }
 
 void
@@ -278,17 +298,15 @@ GenericSliceWindow
   if (!m_IsSliceInitialized) 
     return;
 
-  // TODO: Move this into an event listener, there is no point
-  // doing this every draw()
-  if (m_Id==0) m_ParentUI->UpdateImageProbe();
-
   // Compute the position of the cross-hairs in display space
-  Vector3i cursorImageSpace = m_GlobalState->GetCrosshairsPosition();
-  Vector3i cursor = 
-    m_Driver->GetImageToDisplayTransform().Apply(cursorImageSpace);
+  Vector3ui cursorImageSpace = m_GlobalState->GetCrosshairsPosition();
+  Vector3f cursorDisplaySpace = 
+    m_ImageToDisplayTransform.TransformPoint(
+      to_float(cursorImageSpace) + Vector3f(0.5f));
 
   // Get the current slice number
-  m_SliceIndex = cursor[m_Id];
+  m_ImageSliceIndex = cursorImageSpace[m_ImageAxes[2]];
+  m_DisplayAxisPosition = cursorDisplaySpace[2];
 
   // Set up lighting attributes
   glPushAttrib(GL_LIGHTING_BIT | GL_DEPTH_BUFFER_BIT | 
@@ -305,7 +323,7 @@ GenericSliceWindow
   glTranslated(0.5 * w(),0.5 * h(),0.0);
   glScalef(m_ViewZoom,m_ViewZoom,1.0);
   glTranslated(-m_ViewPosition(0),-m_ViewPosition(1),0.0);
-  glScalef(m_SliceScale[0],m_SliceScale[1],1.0);
+  glScalef(m_SliceSpacing[0],m_SliceSpacing[1],1.0);
   
   // Make the grey and segmentation image textures up-to-date
   DrawGreyTexture();
@@ -327,7 +345,7 @@ GenericSliceWindow
 ::DrawGreyTexture() 
 {
   // We should have a slice to return
-  assert(m_ImageData->IsGreyLoaded() && m_SliceIndex >= 0);
+  assert(m_ImageData->IsGreyLoaded() && m_ImageSliceIndex >= 0);
 
   // Paint the grey texture
   m_GreyTexture->Draw();
@@ -339,7 +357,7 @@ GenericSliceWindow
 {
   // We should have a slice to return
   assert(m_ImageData->IsSegmentationLoaded() 
-    && m_SliceIndex >= 0);
+    && m_ImageSliceIndex >= 0);
 
   // Update the texture memory
   m_LabelTexture->DrawTransparent(m_GlobalState->GetSegmentationAlpha());
@@ -354,18 +372,17 @@ GenericSliceWindow
   
   // Draw the crosshairs
   m_CrosshairsMode->OnDraw(); 
+
+  // Draw the zoom mode (does't really draw, repaints a UI widget)
+  m_ZoomPanMode->OnDraw();
 }
 
 void 
 GenericSliceWindow
 ::DrawOrientationLabels()
 {
-  // Get the transform from the display space to the anatomy space
-  ImageCoordinateTransform transform = 
-    m_Driver->GetAnatomyToDisplayTransform().Inverse();
-
   // The letter labels
-  static const char *letters[3][2] = {{"R","L"},{"P","A"},{"I","S"}};
+  static const char *letters[3][2] = {{"R","L"},{"A","P"},{"I","S"}};
   const char *labels[2][2];
 
   // Repeat for X and Y directions
@@ -373,11 +390,11 @@ GenericSliceWindow
     {
     // Which axis are we on in anatomy space?
     unsigned int anatomyAxis = 
-      transform.GetCoordinateIndexZeroBased(m_DisplayAxes[i]);
+      m_DisplayToAnatomyTransform.GetCoordinateIndexZeroBased(i);
 
     // Which direction is the axis facing (returns -1 or 1)
     unsigned int anatomyAxisDirection = 
-      transform.GetCoordinateOrientation(m_DisplayAxes[i]);
+      m_DisplayToAnatomyTransform.GetCoordinateOrientation(i);
 
     // Map the direction onto 0 or 1
     unsigned int letterIndex = (1 + anatomyAxisDirection) >> 1;
@@ -432,5 +449,17 @@ GenericSliceWindow
   ClearInteractionStack();
   PushInteractionMode(m_ZoomPanMode);
 }
+
+void 
+GenericSliceWindow
+::SetViewZoom(float newZoom)
+{
+  // Update the zoom
+  m_ViewZoom = newZoom;
+
+  // Repaint the window
+  redraw();
+}
+
 
 

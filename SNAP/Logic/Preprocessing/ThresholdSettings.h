@@ -33,8 +33,8 @@ public:
   irisGetMacro(UpperThreshold,unsigned int);
   irisSetMacro(UpperThreshold,unsigned int);
 
-  irisGetMacro(Smoothness,unsigned int);
-  irisSetMacro(Smoothness,unsigned int);
+  irisGetMacro(Smoothness,float);
+  irisSetMacro(Smoothness,float);
 
   irisIsMacro(LowerThresholdEnabled);
   irisSetMacro(LowerThresholdEnabled,bool);
@@ -53,7 +53,7 @@ public:
 private:
   unsigned int m_LowerThreshold;
   unsigned int m_UpperThreshold;
-  unsigned int m_Smoothness;
+  float m_Smoothness;
   
   bool m_UpperThresholdEnabled;
   bool m_LowerThresholdEnabled;

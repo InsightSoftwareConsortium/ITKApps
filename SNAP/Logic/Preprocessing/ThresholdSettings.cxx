@@ -35,7 +35,10 @@ ThresholdSettings
   settings.m_UpperThresholdEnabled = true;  
   settings.m_LowerThreshold = iMin + (iMax-iMin) / 3;
   settings.m_UpperThreshold = iMin + 2 * (iMax-iMin) / 3;
+  
   settings.m_Smoothness = (iMax-iMin) / 6;
+  // settings.m_Smoothness = 0.5;
+  settings.m_Smoothness = 5;
 
   return settings;
 }

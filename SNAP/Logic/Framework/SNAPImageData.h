@@ -20,7 +20,16 @@
 #include "SpeedImageWrapper.h"
 #include "LevelSetImageWrapper.h"
 
+#include "EdgePreprocessingSettings.h"
+#include "ThresholdSettings.h"
+
 class SNAPLevelSetDriver;
+template <class ImageType> class SNAPLevelSetFunction;
+
+namespace itk {
+  class Command;
+  class EventObject;
+}
 
 /**
  * \class SNAPImageData
@@ -37,6 +46,9 @@ public:
   // The type of the internal level set image
   typedef itk::Image<float,3> LevelSetImageType;
 
+  // Command type for callbacks 
+  typedef itk::SmartPointer<itk::Command> CommandPointer;
+
   SNAPImageData();
   ~SNAPImageData();
 
@@ -44,6 +56,16 @@ public:
    * Get the preprocessed (speed) image wrapper
    */
   SpeedImageWrapper* GetSpeed();
+
+  /** A high level method to perform edge preprocessing on the grey image and
+   * store the result in the speed image wrapper */
+  void DoEdgePreprocessing(
+    const EdgePreprocessingSettings &settings,itk::Command *progressCallback = 0);  
+
+  /** A high level method to perform in-out preprocessing on the grey image and
+   * store the result in the speed image wrapper */
+  void DoInOutPreprocessing(
+    const ThresholdSettings &settings,itk::Command *progressCallback = 0);
 
   /**
    * Initialize the Speed image wrapper to blank data
@@ -60,9 +82,7 @@ public:
    */
   bool IsSpeedLoaded();
   
-  /**
-   * Get the current snake image wrapper
-   */
+  /** Get the current snake image wrapper */
   LevelSetImageWrapper* GetSnake();
 
   /**
@@ -75,51 +95,75 @@ public:
    */
   bool IsSnakeLoaded();
 
-  /**
-   *    Check if the snake is currently running
-   */
-  bool IsSnakeInitialized();
+
+  /** =========== Methods dealing with the segmentation pipeline ============ */
 
   /**
    * This method computes the two-sided distance transform from the array of
    * bubbles passed on and, if the segmentation image is not blank, the pixels
    * in that image.  This method also initializes the level set driver, ie, the
-   * engine driving the segmentation process.
+   * pipeline driving the segmentation process.  This method may take a while
+   * to run because of the distance transforms.
    * 
-   * @return Number of voxels of color labelColor in the resulting image
-   * TODO: return value.
+   * @return If there were no voxels of labelColor in the union of the 
+   * segmentation image with the bubbles, false will be returned and 
+   * initialization will not be completed.  Otherwise, true will be returned.
    */
-  unsigned int InitializeLevelSet(int snakeMode, 
-                                  const SnakeParameters &parameters,
-                                  Bubble *bubbles, unsigned int nBubbles, 
-                                  unsigned int labelColor);
+  bool InitializeSegmentationPipeline(
+    const SnakeParameters &parameters,Bubble *bubbles, 
+    unsigned int nBubbles, unsigned int labelColor);
 
-  /**
-   * Set current snake parameters
-   */
-  void SetSnakeParameters(const SnakeParameters &parms);
+  /** Begin level set pipeline execution.  This method is somewhat peculiar,
+   * because it does not return until the pipeline has finished executing.  In
+   * the mean time, it communicates with the caller by the means of two callback
+   * commands, idleCallback and updateCallback, which it calls after some 
+   * iterations are executed.  Remember, do not put any code that deals with
+   * the segmentation pipeline after calling StartSegmentationPipeline! */
+  void StartSegmentationPipeline(
+    itk::Command *idleCallback,itk::Command *updateCallback);
 
-  /**
-   * Restart snake propagation
-   */
-  void RestartSnake();
+  /** Request that the pipeline execute a number of iterations.  This method
+   * must be called from the idle or update callbacks passed in to the 
+   * StartSegmentationPipeline method.  After running the iterations, the
+   * pipeline will resume calling idleCallback continuously.  This method
+   * schedules a step and returns immideately */
+  void RequestSegmentationStep(unsigned int nIterations);
 
-  /**
-   * Take a step in snake propagation
-   */
-  void StepSnake(int nSteps);
+  /** Request that the pipeline be restarted (brought back to the beginning).  
+   * This method will schedule the restart and will return immideately */
+  void RequestSegmentationRestart();
 
-  /**
-   * Check if the snake has converged
-   */
-  bool IsSnakeConverged();
+  /** Request that the pipeline be shut down.  This method will return 
+   * immideately, but will schedule an exit from the pipeline mechanism.  If
+   * everything goes well, control will return to the point where 
+   * StartSegmentationPipeline was called */
+  void RequestSegmentationPipelineTermination();
 
-  /**
-   * Update snake image (from the snake pipeline)
-   * TODO: This should be unnecessary with ITK pipeline Update command
-   */
-  void UpdateSnakeImage();
+  /** Update the segmentation parameters, can be done either from the 
+   * segmentation pipeline callback or on the fly.  This method is smart enough 
+   * to reinitialize the level set driver if the Solver parameter changes */
+  void SetSegmentationParameters(const SnakeParameters &parameters);
 
+  /** Release the resources associated with the level set segmentation.  This 
+   * method must be called once the segmentation pipeline has terminated, or 
+   * else it would create a nasty crash */
+  void ReleaseSegmentationPipeline();
+
+  /** This method is an alternative to using the segmentation pipeline with 
+   * callbacks.  It will simply run nIterations of the solver and return with
+   * an updated SnakeWrapper.  Call this method after calling 
+   * InitializeSegmentationPipeline() */
+  void RunNonInteractiveSegmentation(int nIterations);
+
+  /** Check if the segmentation pipeline has been initialized */
+  bool IsSegmentationPipelineInitialized();
+
+  /** Check if the segmentation pipeline is actively running, i.e., the 
+   * stack frame contains the Update method of the segmentation filter */
+  bool IsSegmentationPipelineRunning();
+
+  /** ====================================================================== */
+  
   /**
    * Merge the segmentation result with the segmentation contained in a
    * IRIS image data object.
@@ -129,34 +173,55 @@ public:
   /**
    * Set the cross-hairs position
    */
-  void SetCrosshairs(const Vector3i &crosshairs);
+  void SetCrosshairs(const Vector3ui &crosshairs);
+
+  /**
+   * Set the image coordinate geometry
+   */
+  void SetImageGeometry(const ImageCoordinateGeometry &geometry);
 
   /**
    * Get the level set image currently being evolved
    */
   LevelSetImageType *GetLevelSetImage();
+
+  /** This method is public for testing purposes.  It will give a pointer to 
+   * the level set function used internally for segmentation */
+  SNAPLevelSetFunction<SpeedImageWrapper::ImageType> *GetLevelSetFunction();
   
 private:
   
-  /**
-   * Initialize the snake driver and allocate the SnakeWrapper.  Called from 
-   * InitializeLevelSet and RewindSnake
-   */
-  void InitalizeSnakeDriver(int snakeMode, const SnakeParameters &param);
+  /** Initialize the driver used to control the snake.  This driver is used to
+   * run the snake several iterations at a time, without resetting the filter
+   * between iteration blocks.  After executing each block of iterations, the
+   * filter will call a callback routine, which is provided as a parameter to
+   * this method.  In a UI environment, that callback routine should check for
+   * user input.  */
+  void InitalizeSnakeDriver(const SnakeParameters &param);
 
-  /**
-   * Get the snake initialization image
-   */
+  /** A callback used internally to communicate with the LevelSetDriver */
+  void IntermediatePauseCallback(
+    itk::Object *object,const itk::EventObject &event);
+
+  /** Another callback, used in non-interactive mode */
+  void TerminatingPauseCallback();
+
+  /** Type of fommands used for callbacks to the user of this class */
+  typedef itk::SmartPointer<itk::Command> CommandPointer;
+  
+  /** A callback for idle cycle of the segmentation pipeline */
+  CommandPointer m_SegmentationIdleCallback;
+
+  /** A callback made after an update in the segmentation pipeline */
+  CommandPointer m_SegmentationUpdateCallback;
+
+  /** Get the snake initialization image */
   LevelSetImageWrapper* GetSnakeInitialization();
 
-  /**
-   * Clear the snake initialization image (discard data, etc)
-   */
+  /** Clear the snake initialization image (discard data, etc) */
   void ClearSnakeInitialization();
 
-  /**
-   * Check the snake initialization image for validity
-   */
+  /** Check the snake initialization image for validity */
   bool IsSnakeInitializationLoaded();
   
   // Speed image adata
@@ -176,10 +241,6 @@ private:
 
   // Current value of snake parameters
   SnakeParameters m_CurrentSnakeParameters;       
-
-  // Current snake mode (in/out or edge)
-  int m_CurrentSnakeMode;
-
 };
 
 

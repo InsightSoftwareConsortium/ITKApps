@@ -22,7 +22,10 @@
 #include <FLTKCanvas.h>
 #include <InteractionMode.h>
 
+#include <vector>
+
 class IntensityCurveUILogic;
+class GreyImageWrapper;
 
 /**
  * \class IntensityCurveBox
@@ -36,6 +39,9 @@ public:
    * Handle displaying the curve
    */
   void draw();
+
+  /** Compute the histogram given an image wrapper */
+  void ComputeHistogram(GreyImageWrapper *source);
 
   // Get/set the intensity curve
   irisGetMacro(Curve,IntensityCurveInterface *);
@@ -58,15 +64,17 @@ private:
    */
   int GetControlPointInVincinity(float x, float y, int pixelRadius); 
 
-  /**
-   * The intensity mapping curve
-   */
+  /** The intensity mapping curve */
   IntensityCurveInterface *m_Curve;
 
-  /** 
-   * Parent object
-   */
+  /** Parent object */
   IntensityCurveUILogic *m_Parent;
+
+  /** Histogram of the image */
+  std::vector<unsigned int> m_Histogram;   
+
+  /** Max frequency in the histogram */
+  unsigned int m_HistogramMax;
 
   /**
    * Interaction handler for control point manipulation

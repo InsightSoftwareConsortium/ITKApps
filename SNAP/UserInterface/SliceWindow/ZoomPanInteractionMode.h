@@ -30,6 +30,7 @@ public:
   int OnMousePress(const FLTKEvent &event);
   int OnMouseRelease(const FLTKEvent &event, const FLTKEvent &pressEvent);    
   int OnMouseDrag(const FLTKEvent &event, const FLTKEvent &pressEvent);
+  void OnDraw();
   
   // void OnDraw();
 protected:
@@ -38,9 +39,9 @@ protected:
 
   /** The starting zoom level */
   float m_StartViewZoom;
-  
-  /** The upper and lower limits on the zoom level */
-  float m_ViewZoomMax,m_ViewZoomMin;
+
+  /** Used to schedule UI repaint updates */
+  bool m_NeedUIUpdateOnRepaint;
 };
 
 #endif // __ZoomPanInteractionMode_h_

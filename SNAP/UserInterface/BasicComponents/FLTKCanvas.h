@@ -35,12 +35,14 @@
  * in the stack is the first to receive events, and the event is propagated through
  * the stack until it has been handled properly.
  */
-class FLTKCanvas : public Fl_Gl_Window {
+class FLTKCanvas : public Fl_Gl_Window 
+{
 public:
   /**
    * Constructor sets up some basics, sets interaction mode stack to be empty
    */
   FLTKCanvas(int x, int y, int w, int h, const char *label);
+  virtual ~FLTKCanvas() {}
 
   /**
    * Push an interaction mode onto the stack of modes.  Mode becomes first to 
@@ -72,7 +74,10 @@ public:
   /**
    * Handle events
    */
-  int handle(int eventID);
+  virtual int handle(int eventID);
+
+  /** Are we dragging ? */
+  irisIsMacro(Dragging);
 
 protected:
   /**
@@ -87,6 +92,9 @@ private:
 
   // The event at the start of a drag operation (if there is one going on)
   FLTKEvent m_DragStartEvent;
+
+  // Are we dragging or not
+  bool m_Dragging;
 
 };
 

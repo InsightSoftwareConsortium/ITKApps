@@ -15,16 +15,15 @@
 #ifndef __LevelSetImageWrapper_h_
 #define __LevelSetImageWrapper_h_
 
-#include "ImageWrapper.h"
-#include "ColorLabel.h"
-#include "IRISTypes.h"
 #include "itkRGBAPixel.h"
+#include "ImageWrapper.h"
 
-namespace itk {  
-  template<class TPixel,unsigned int VDimension> class Image;
-  template<class TInput,class TOutput> class FunctionBase;
-  template<class TImage> class ImageSource;
+// Forward references to ITK
+namespace itk {
+  template <class TInput,class TOutput,class TFunctor> 
+    class UnaryFunctorImageFilter;
 };
+class ColorLabel;
 
 /**
  * \class LevelSetImageWrapper
@@ -34,26 +33,59 @@ namespace itk {
  * the interior (negative) regions of the level set image are mapped
  * to an RGB value and the exterior regions are black.
  * 
- * \sa ImageWrapper, LevelSetImageWrapperImplementation
+ * \sa ImageWrapper
  */
-class LevelSetImageWrapper : virtual public ImageWrapper<float> 
+class LevelSetImageWrapper : public ImageWrapper<float>
 {
 public:
+
   // Type of color slice returned by this class
   typedef itk::RGBAPixel<unsigned char> DisplayPixelType;
   typedef itk::Image<DisplayPixelType,2> DisplaySliceType;
   typedef itk::SmartPointer<DisplaySliceType> DisplaySlicePointer;
-    
-  /**
-   * Set the color label used to paint the inside of the level set
-   */
-  virtual void SetColorLabel(const ColorLabel &label) = 0;
 
+  /** Set the color label for inside */
+  void SetColorLabel(const ColorLabel &label);
+  
   /**
    * Get the display slice in a given direction.  To change the
    * display slice, call parent's MoveToSlice() method
    */
-  virtual DisplaySlicePointer GetDisplaySlice(unsigned int dim) = 0;
+  DisplaySlicePointer GetDisplaySlice(unsigned int dim);
+
+  /** Constructor initializes mappers */
+  LevelSetImageWrapper();
+
+  /** Destructor */
+  ~LevelSetImageWrapper();
+
+private:
+  /**
+   * A very simple functor used to map intensities
+   */
+  class MappingFunctor 
+  {
+  public:
+    DisplayPixelType operator()(float in);
+    DisplayPixelType m_InsidePixel;
+    DisplayPixelType m_OutsidePixel;
+  };  
+  
+  // Type of the display intensity mapping filter used when the 
+  // input is a in-out image
+  typedef itk::UnaryFunctorImageFilter<
+    ImageWrapper<float>::SliceType,DisplaySliceType,MappingFunctor> 
+    IntensityFilterType;
+  typedef itk::SmartPointer<IntensityFilterType> IntensityFilterPointer;
+
+  /** 
+   * The filters used to remap internal level set image 
+   * to a color display image
+   */
+  IntensityFilterPointer m_DisplayFilter[3];
+
+  /** The currently used overlay functor */
+  MappingFunctor m_MappingFunctor;
 };
 
 #endif // __LevelSetImageWrapper_h_

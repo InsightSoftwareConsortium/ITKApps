@@ -21,8 +21,20 @@
 class IRISApplication;
 class GlobalState;
 class IntensityCurveUILogic;
-template<class TPixel> class ImageIOWizardLogic;
 class PreprocessingUILogic;
+class SnakeParametersUILogic;
+class SystemInterface;
+
+class GreyImageIOWizardLogic;
+class SegmentationImageIOWizardLogic;
+class PreprocessingImageIOWizardLogic;
+class SliceWindowCoordinator;
+
+//template<class TPixel> class ImageIOWizardLogic;
+//class SegmentationImageIOWizardLogic;
+
+#include <ctime>
+#include <string>
 
 // ITK forward references
 namespace itk {
@@ -45,7 +57,8 @@ namespace itk {
  * windows (the IRIS window, the 3D Snake window,
  * and all the dialogs).
  */
-class UserInterfaceLogic : public UserInterface {
+class UserInterfaceLogic : public UserInterface 
+{
 public:
 
   /* 
@@ -57,7 +70,7 @@ public:
    * POSTCONDITIONS:
    * - IRIS window is ready to be shown
    */
-  UserInterfaceLogic(IRISApplication *iris);
+  UserInterfaceLogic(IRISApplication *iris,SystemInterface *system);
   virtual ~UserInterfaceLogic();
 
   /**
@@ -224,102 +237,10 @@ public:
    */
   void OnBubbleRadiusChange();
 
-  /**
-   *
-   * DESCRIPTION:
-   * callback to set snake parameters
-   *
-   * PRECONDITIONS:
-   *
-   * POSTCONDITIONS:
-   * - if the snake exists, it's parameters have been set
-   *
-   */
-  void OnSnakeParametersApplyAction();
-
-  /**
-   * DESCRIPTION
+  /** 
    * Opens the snake params dialog, allowing the user to modify snake params
-   *
-   * PARAMETERS
-   *
-   * PRE
-   *
-   * POST
-   *
-   * RETURNS
    */
   void OnSnakeParametersAction();
-
-  /**
-   * DESCRIPTION
-   * Sets the snake params dialog to Schlegel values
-   *
-   * PARAMETERS
-   *
-   * PRE
-   *
-   * POST
-   *
-   * RETURNS
-   */
-  void OnSnakeParametersSchlegelSelect();
-
-  /**
-   * DESCRIPTION
-   * Sets the snake params dialog to Sapiro values
-   *
-   * PARAMETERS
-   *
-   * PRE
-   *
-   * POST
-   *
-   * RETURNS
-   */
-  void OnSnakeParametersSapiroSelect();
-
-  /**
-   * DESCRIPTION
-   * Sets the snake params dialog to Turello values
-   *
-   * PARAMETERS
-   *
-   * PRE
-   *
-   * POST
-   *
-   * RETURNS
-   */
-  void OnSnakeParametersTurelloSelect();
-
-  /**
-   * DESCRIPTION
-   * Allows user to modify snake params
-   *
-   * PARAMETERS
-   *
-   * PRE
-   *
-   * POST
-   *
-   * RETURNS
-   */
-  void OnSnakeParametersUserDefinedSelect();
-
-  /**
-   * DESCRIPTION
-   * Activates the ground slider based on the clamp toggle in the snake params
-   *
-   * PARAMETERS
-   *
-   * PRE
-   *
-   * POST
-   *
-   * RETURNS
-   */
-  void OnSnakeParametersClampChange();
 
   /**
    *
@@ -352,32 +273,6 @@ public:
    */
   void OnCancelSegmentationAction();
 
-  /**
-   *
-   * DESCRIPTION:
-   * snake window version of UpdatePositionDisplay
-   * set the textbox display of slice number for 2d window id
-   *
-   * PRECONDITIONS:
-   *
-   * POSTCONDITIONS:
-   *
-   */
-  void UpdateSNAPPositionDisplay(int id);
-
-  /**
-   *
-   * DESCRIPTION:
-   * snake window version of UpdateImageProbe
-   * update the intensity and label outputs to reflect values at
-   * the current cursor position
-   *
-   * PRECONDITIONS:
-   *
-   * POSTCONDITIONS:
-   *
-   */
-  void UpdateSNAPImageProbe();
 
   /**
    *
@@ -391,19 +286,6 @@ public:
    *
    */
   void OnContinuousViewUpdateChange();
-
-  /**
-   *
-   * DESCRIPTION:
-   * callback for moving the 2d window sliders
-   * snake window version of PositionSliderCallback
-   *
-   * PRECONDITIONS:
-   *
-   * POSTCONDITIONS:
-   *
-   */
-  void OnSNAPSliceSliderChange(int id);
 
   /**
    *
@@ -645,17 +527,17 @@ public:
     */
   void TweakROI(Vector3i &pt1, Vector3i &pt2);
 
+  // Color label callbacks
   void InitColorMap();
+  void UpdateColorChips();
+  void OnDrawingLabelUpdate();
+  void OnDrawOverLabelUpdate();
+  
   void RedrawWindows();
   void ResetScrollbars();
   void MakeSegTexturesCurrent();
-  void UpdateColorChips();
   void UpdateImageProbe();
-  void UpdateMainLabel(char *greyImg, char* segImg);
-  void ActivatePaste(int id, bool on);
-  void ActivatePaste(bool on);
-  void ActivateAccept(int id, bool on);
-  void ActivateAccept(bool on);
+  void UpdateMainLabel();
   void Activate3DAccept(bool on);
   void UpdateEditLabelWindow();
   void UpdatePositionDisplay(int id);
@@ -667,8 +549,58 @@ public:
   /** Get the pointer to the driving application */
   irisGetMacro(Driver,IRISApplication *);
 
-  /** TODO: Move this to a UserInterfaceDriver class or something */
-  void DoLoadImage(GreyImageWrapper *source);
+  /** Get the pointer to the system interface */
+  irisGetMacro(SystemInterface,SystemInterface *);
+
+  /** Update the user interface after loading a new grey image  */
+  void OnGreyImageUpdate();
+
+  /** Update the user interface after loading a new segmentation image  */
+  void OnSegmentationImageUpdate();
+
+  /** Update the user interface after loading a new labels file  */
+  void OnSegmentationLabelsUpdate();
+
+  /** Update the user interface after loading a new preprocessing image  */
+  void OnSpeedImageUpdate();
+
+  // Splash screen functions
+  void ShowSplashScreen();
+  void HideSplashScreen();
+  void UpdateSplashScreen(const char *message);
+  
+  /** A utility to center one window inside another */
+  static void CenterChildWindowInParentWindow(Fl_Window *childWindow,
+                                              Fl_Window *parentWindow);
+
+  // Zoom/pan management callbacks
+  void OnResetView2DAction(unsigned int window);
+  void OnResetAllViews2DAction();
+  void OnLinkedZoomChange();
+  void OnZoomPercentageChange();
+
+  // Internal callback used to update the zoom percentage displayed
+  void OnZoomUpdate();
+
+  // Internal callback for when the crosshairs position changes
+  void OnCrosshairPositionUpdate();
+
+  // Internal method called when slices need to be re-connected to the image,
+  // i.e., when a new image is loaded or the image-display geometry changes
+  void OnImageGeometryUpdate();
+
+  /** Get the object used to coordinate zoom in slice windows */
+  irisGetMacro(SliceCoordinator,SliceWindowCoordinator *);
+
+  // Polygon button callbacks
+  void OnAcceptPolygonAction(unsigned int window);
+  void OnInsertIntoPolygonSelectedAction(unsigned int window);
+  void OnDeletePolygonSelectedAction(unsigned int window);
+  void OnPastePolygonAction(unsigned int window);
+  void OnPolygonStateUpdate(unsigned int id);
+
+  // Method called when user tries to close the window
+  void OnMainWindowCloseAction();
 
 protected:
 
@@ -713,12 +645,15 @@ protected:
    * RETURNS
    * 1 if running is successful, 0 if an error occurred
    */
-  int RunSnake();
+  // int RunSnake();
 
-  void LoadLabelsCallback();
+  // Label IO callbacks
+  void OnLoadLabelsBrowseAction();
+  void OnLoadLabelsCancelAction();
+  void OnLoadLabelsOkAction();
+
   void ChangeLabelsCallback();
-  void OnIRISSliceSliderChange(int id);
-  void AcceptPolygonCallback(int id);
+  void OnSliceSliderChange(int id);
   void SaveLabelsCallback();
   void PrintVoxelCountsCallback();
 
@@ -726,16 +661,26 @@ protected:
   void OnMenuLoadGrey();
   void OnMenuLoadSegmentation();
   void OnMenuLoadLabels();
+  void OnMenuSaveGreyROI();
   void OnMenuSaveSegmentation();
   void OnMenuSaveLabels();
   void OnMenuIntensityCurve();
   void OnMenuLoadPreprocessed();  
   void OnMenuSavePreprocessed();  
+  void OnLoadPreprocessedImageAction();
 
-  // Rendering options callbacks
-  void OnRenderOptionsChange();
-  void OnRenderOptionsCancel();
-  void OnRenderOptionsOk();
+  // Display options callbacks
+  void OnMenuShowDisplayOptions();
+  void OnSliceAnatomyOptionsChange(unsigned int order);
+  void OnDisplayOptionsCancelAction();
+  void OnDisplayOptionsOkAction();
+  void OnDisplayOptionsApplyAction();
+  void ApplyRenderingOptions();
+  void ApplySliceLayoutOptions();
+  void FillRenderingOptions();
+  void FillSliceLayoutOptions();
+  
+  // Opacity slider callbacks
   void OnSNAPLabelOpacityChange();
   void OnIRISLabelOpacityChange();
 
@@ -746,9 +691,6 @@ protected:
 
   // Help system callbacks
   void OnLaunchTutorialAction();
-
-  // Update rendering options widgets from the Global state
-  void UpdateRenderOptionsUI();
 
   // Set the active page in the segmentation pipeline
   void SetActiveSegmentationPipelinePage(unsigned int page);
@@ -763,6 +705,9 @@ private:
   // Pointer to the driving IRIS application object
   IRISApplication *m_Driver;
 
+  // Pointer to the system interface object
+  SystemInterface *m_SystemInterface;
+
   // Bubble highlighted in the browser
   int m_HighlightedBubble;
 
@@ -775,20 +720,35 @@ private:
   // flag for the play button to know when to stop
   int m_SnakeIsRunning;
 
-  /**
-   * UI object responsible for handling the File IO dialogs
-   */
-  ImageIOWizardLogic<GreyType> *m_WizGreyIO;
+  // The callback command used in the (complicated) snake VCR pipeline
+  itk::SmartPointer<SimpleCommandType> m_PostSnakeCommand;
 
-  /**
-   * UI object used for handling Curve editing
-   */
-  IntensityCurveUILogic *m_WinIntensityCurve;
+  // The main window label
+  std::string m_MainWindowLabel;
 
-  /** 
-   * Preprocessing UI object
-   */
+  /** Wizard used to load grey image files */
+  GreyImageIOWizardLogic *m_WizGreyIO;
+
+  /** Wizard used to load and save segmentation image files */
+  SegmentationImageIOWizardLogic *m_WizSegmentationIO;
+
+  /** Wizard used to load and save preprocessing image files */
+  PreprocessingImageIOWizardLogic *m_WizPreprocessingIO;
+
+  /** UI object used for handling Curve editing */
+  IntensityCurveUILogic *m_IntensityCurveUI;
+
+  /** Preprocessing UI object */
   PreprocessingUILogic *m_PreprocessingUI;
+
+  /** Parameter setting UI object */
+  SnakeParametersUILogic *m_SnakeParametersUI;
+
+  /** A coordinator for the slice windows */
+  SliceWindowCoordinator *m_SliceCoordinator;
+
+  // Splash screen timer
+  clock_t m_SplashScreenStartTime;
 
   // Intensity curve update callback (uses ITK event system)
   void OnIntensityCurveUpdate();
@@ -850,14 +810,33 @@ private:
    */
   void SyncSnakeToIRIS();
 
+  /** Snake callback, called repeatedly while we are on the step 3 of the 
+   * SNAP wizard */
+  void OnSnakeVCRUpdateCallback();
+  void OnSnakeVCRIdleCallback();
+
   /** Common code for cancelling and accepting the segmentation */
   void CloseSegmentationCommon();
+
+  /** This method is used to figure out which image axis corresponds to a
+   * given display window */
+  unsigned int GetImageAxisForDisplayWindow(unsigned int window);
 };
 
 #endif
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.2  2003/09/13 15:18:01  pauly
+ *FIX: Got SNAP to work properly with different image orientations
+ *
+ *Revision 1.1  2003/09/11 13:51:01  pauly
+ *FIX: Enabled loading of images with different orientations
+ *ENH: Implemented image save and load operations
+ *
+ *Revision 1.5  2003/08/28 22:58:30  pauly
+ *FIX: Erratic scrollbar behavior
+ *
  *Revision 1.4  2003/08/28 14:37:09  pauly
  *FIX: Clean 'unused parameter' and 'static keyword' warnings in gcc.
  *FIX: Label editor repaired

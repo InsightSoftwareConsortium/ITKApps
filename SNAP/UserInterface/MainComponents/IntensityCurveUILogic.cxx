@@ -35,6 +35,7 @@ IntensityCurveUILogic
 ::SetImageWrapper(GreyImageWrapper *wrapper)
 {
   m_ImageWrapper = wrapper;
+  m_BoxCurve->ComputeHistogram(wrapper);
 }
 
 void 
@@ -63,23 +64,28 @@ IntensityCurveUILogic
 
   // Compute the level and window in intensity units
   GreyType level = iMin;
-  GreyType window = iMax - iMin + 1;
+  GreyType window = iMax - iMin;
 
   // Compute and constrain the level 
   m_InLevel->value(level);
   m_InLevel->minimum(iAbsMin);
-  m_InLevel->maximum(iAbsMax - window - 1);
+  m_InLevel->maximum(iAbsMax - window);
 
   // Compute and constrain the window
   m_InWindow->value(window);
   m_InWindow->minimum(1);
-  m_InWindow->maximum(iAbsMax - level + 1);
+  m_InWindow->maximum(iAbsMax - level);
 }
 
 void 
 IntensityCurveUILogic
 ::OnWindowLevelChange()
 {
+  // Assure that input and output outside of the image range
+  // is handled gracefully
+  m_InLevel->value(m_InLevel->clamp(m_InLevel->value()));
+  m_InWindow->value(m_InWindow->clamp(m_InWindow->value()));
+
   // Get 'absolute' image intensity range, i.e., the largest and smallest
   // intensity in the whole image
   GreyType iAbsMin = m_ImageWrapper->GetImageMin();
@@ -87,10 +93,10 @@ IntensityCurveUILogic
 
   // Get the new values of min and max
   int iMin = (int) m_InLevel->value();
-  int iMax = iMin + (int)m_InWindow->value() - 1;
+  int iMax = iMin + (int)m_InWindow->value();
 
   // Min better be less than max
-  assert(iMin <= iMax);
+  assert(iMin < iMax);
 
   // Compute the unit coordinate values that correspond to min and max
   float factor = 1.0f / (iAbsMax - iAbsMin);
@@ -164,7 +170,11 @@ void
 IntensityCurveUILogic
 ::OnControlPointNumberChange()
 {
-  // Do nothing?
+  // Reinitialize the curve, using the new number of control points
+  m_Curve->Initialize((int)m_InControlPoints->value());
+
+  // Stretch the curve to the currently entered level and window
+  OnWindowLevelChange();
 }
 
 

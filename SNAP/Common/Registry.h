@@ -41,7 +41,7 @@ inline T GetValueWithDefault(const std::string &source, bool isNull, T defaultVa
     return returnValue;
 
   // Try to access the value using c++ formatting
-  std::istringstream iss(source);
+  IRISIStringStream iss(source);
   iss >> returnValue;
 
   // Proceed as if the operation succeeded
@@ -113,7 +113,7 @@ public:
   template <class T> void operator << (const T newValue)
   {
     // Create an output stream
-    std::ostringstream oss;
+    IRISOStringStream oss;
 
     // Put the new value into the stream
     oss << newValue;

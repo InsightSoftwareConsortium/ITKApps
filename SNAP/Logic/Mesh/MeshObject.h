@@ -122,6 +122,10 @@ public:
 
 /*
  *Log: MeshObject.h
+ *Revision 1.1  2003/09/11 13:50:29  pauly
+ *FIX: Enabled loading of images with different orientations
+ *ENH: Implemented image save and load operations
+ *
  *Revision 1.4  2003/08/28 14:37:09  pauly
  *FIX: Clean 'unused parameter' and 'static keyword' warnings in gcc.
  *FIX: Label editor repaired

@@ -253,6 +253,14 @@ int edt3ddan(const unsigned char *input,int six,int siy,int siz,unsigned char me
 
 /*
  *Log: SnakeWrapper.h
+ *Revision 1.3  2003/09/11 13:50:29  pauly
+ *FIX: Enabled loading of images with different orientations
+ *ENH: Implemented image save and load operations
+ *
+ *Revision 1.2  2003/08/27 14:03:22  pauly
+ *FIX: Made sure that -Wall option in gcc generates 0 warnings.
+ *FIX: Removed 'comment within comment' problem in the cvs log.
+ *
  *Revision 1.1  2003/07/12 04:50:42  pauly
  *Initial checkin of SNAP testing code to the InsightApplications tree
  *

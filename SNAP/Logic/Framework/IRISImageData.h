@@ -20,6 +20,7 @@
 #include "LabelImageWrapper.h"
 #include "GreyImageWrapper.h"
 #include "ColorLabel.h"
+#include "ImageCoordinateGeometry.h"
 
 /**
  * \class IRISImageData
@@ -31,10 +32,12 @@
  *  + exists(si) ==> exists(gi)
  *  + if exists(si) then size(si) == size(gi)
  */
-class IRISImageData {
+class IRISImageData 
+{
 public:
-  typedef GreyImageWrapper GreyWrapperType;
-  typedef LabelImageWrapper LabelWrapperType;
+  // Image type definitions
+  typedef GreyImageWrapper::ImageType GreyImageType;
+  typedef LabelImageWrapper::ImageType LabelImageType;
   typedef itk::ImageRegion<3> RegionType;
 
   IRISImageData();
@@ -61,16 +64,6 @@ public:
   }
 
   /**
-   * Read color label table from disk.
-   */
-  void ReadASCIIColorLabels(const char* filename);
-
-  /**
-   * Write color label table to disk.
-   */
-  void WriteASCIIColorLabels(const char* filename);
-
-  /**
    * Cut the segmentation using a plane and relabed the segmentation
    * on the side of that plane
    */
@@ -84,22 +77,10 @@ public:
                      const Vector3d &ray, 
                      Vector3i &hit) const;
 
-  /** 
-   * This method is used to create a copy of the region of the grey
-   * and segmentation images contained in this class.  The grey image
-   * is simply copied, and the segmentation image is filtered in such
-   * a way that the pixels that are not equal to the passThroughLabel are
-   * copied as zero.
-   */
-  void DeepCopyROI(const RegionType &roi, 
-                   IRISImageData &target,
-                   LabelType passThroughLabel);
-
-
   /**
    * Access the greyscale image (read only access is allowed)
    */
-  GreyWrapperType* GetGrey() const {
+  GreyImageWrapper* GetGrey() const {
     assert(m_GreyWrapper);
     return m_GreyWrapper;
   }
@@ -108,7 +89,7 @@ public:
    * Access the segmentation image (read only access allowed 
    * to preserve state)
    */
-  LabelWrapperType* GetSegmentation() const {
+  LabelImageWrapper* GetSegmentation() const {
     assert(m_GreyWrapper && m_LabelWrapper);
     return m_LabelWrapper;
   }
@@ -116,7 +97,7 @@ public:
   /** 
    * Get the extents of the image volume
    */
-  Vector3i GetVolumeExtents() const {
+  Vector3ui GetVolumeExtents() const {
     assert(m_GreyWrapper != NULL);
     assert(m_GreyWrapper->GetSize() == m_Size);
     return m_Size;
@@ -139,18 +120,22 @@ public:
    * by the pointer that is passed in.  That means that the caller should relinquish
    * control of this pointer and that the IRISImageData class will dispose of the
    * pointer properly. 
+   *
+   * The second parameter to this method is the new geometry object, which depends
+   * on the size of the grey image and will be updated.
    */
-  void SetGrey(GreyWrapperType *inWrapper);
+  void SetGreyImage(GreyImageType *newGreyImage,
+                    const ImageCoordinateGeometry &newGeometry);
 
   /**
    * This method sets the segmentation image (see note for SetGrey).
    */
-  void SetSegmentation(LabelWrapperType *inWrapper);
+  void SetSegmentationImage(LabelImageType *newLabelImage);
 
   /**
    * Set voxel in segmentation image
    */
-  void SetSegmentationVoxel(const Vector3i &index, LabelType value);
+  void SetSegmentationVoxel(const Vector3ui &index, LabelType value);
 
   /**
    * Check validity of greyscale image
@@ -167,20 +152,29 @@ public:
    * to some sort of a file.  
    * TODO: Implement a GUI for this, with a save button
    */
-  int CountVoxels(const char *filename);
+  void CountVoxels(const char *filename) throw(itk::ExceptionObject);
 
   /**
    * Set the cursor (crosshairs) position, in pixel coordinates
    */
-  virtual void SetCrosshairs(const Vector3i &crosshairs);
+  virtual void SetCrosshairs(const Vector3ui &crosshairs);
+
+  /**
+   * Set the image coordinate geometry for this image set.  Propagates
+   * the transform to the internal image wrappers
+   */
+  virtual void SetImageGeometry(const ImageCoordinateGeometry &geometry);
+
+  /** Get the image coordinate geometry */
+  irisGetMacro(ImageGeometry,ImageCoordinateGeometry);
 
 
 protected:
   // Wrapper around the grey-scale image
-  GreyWrapperType *m_GreyWrapper;
+  GreyImageWrapper *m_GreyWrapper;
 
   // Wrapper around the segmentatoin image
-  LabelWrapperType *m_LabelWrapper;
+  LabelImageWrapper *m_LabelWrapper;
 
   // A table of color labels
   ColorLabel m_ColorLabels[MAX_COLOR_LABELS];
@@ -189,7 +183,11 @@ protected:
   unsigned int m_ColorLabelCount;
 
   // Dimensions of the images (must match) 
-  Vector3i m_Size;
+  Vector3ui m_Size;
+
+  // Image coordinate geometry (it's placed here because the transform depends
+  // on image size)
+  ImageCoordinateGeometry m_ImageGeometry;
 
   // Color label initialization methods
   void InitializeColorLabels();

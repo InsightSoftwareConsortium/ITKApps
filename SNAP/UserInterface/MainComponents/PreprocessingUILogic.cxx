@@ -48,10 +48,10 @@ PreprocessingUILogic
     m_InEdgeScale->clamp(settings.GetGaussianBlurScale()));
 
   m_InEdgeKappa->value(
-    m_InEdgeScale->clamp(settings.GetRemappingSteepness()));
+    m_InEdgeKappa->clamp(settings.GetRemappingSteepness()));
 
   m_InEdgeExponent->value(
-    m_InEdgeScale->clamp(settings.GetRemappingExponent()));
+    m_InEdgeExponent->clamp(settings.GetRemappingExponent()));
 
   // Position the window and show it
   m_WinEdge->position(
@@ -115,8 +115,10 @@ PreprocessingUILogic
   m_InUpperThreshold->minimum(iMin);
   m_InUpperThreshold->maximum(iMax);
 
+  //m_InThresholdSteepness->minimum(1);
+  //m_InThresholdSteepness->maximum(iMax-iMin);
   m_InThresholdSteepness->minimum(1);
-  m_InThresholdSteepness->maximum(iMax-iMin);
+  m_InThresholdSteepness->maximum(10);
 
   // Make sure the current values of the upper and lower threshold are 
   // within the bounds (Nathan Moon)
@@ -198,12 +200,16 @@ PreprocessingUILogic
   else if(m_RadioThresholdAbove->value())
     {
     m_InLowerThreshold->deactivate();
+      m_InLowerThreshold->value(
+          m_Driver->GetCurrentImageData()->GetGrey()->GetImageMin());
     m_InUpperThreshold->activate();
     }
   else
     {
     m_InLowerThreshold->activate();
     m_InUpperThreshold->deactivate();
+        m_InUpperThreshold->value(
+          m_Driver->GetCurrentImageData()->GetGrey()->GetImageMax());
     }
 
   // The settings have changed, so call that method
@@ -275,7 +281,7 @@ PreprocessingUILogic
   ThresholdSettings settings;
   settings.SetLowerThreshold((unsigned int)m_InLowerThreshold->value());
   settings.SetUpperThreshold((unsigned int)m_InUpperThreshold->value());
-  settings.SetSmoothness((unsigned int)m_InThresholdSteepness->value());
+  settings.SetSmoothness(m_InThresholdSteepness->value());
   settings.SetLowerThresholdEnabled(m_InLowerThreshold->active());
   settings.SetUpperThresholdEnabled(m_InUpperThreshold->active());  
 
@@ -327,14 +333,23 @@ PreprocessingUILogic
       // Pass the current settings to the filter
       m_EdgePreviewFilter[i]->SetEdgePreprocessingSettings(
         m_GlobalState->GetEdgePreprocessingSettings());
-  
-      // Tell the speed wrapper who it's previewer is
-      m_Driver->GetSNAPImageData()->GetSpeed()->SetSliceSourceForPreview(
-        i,m_EdgePreviewFilter[i]->GetOutput());
-
-      // The speed preview is now valid
-      m_GlobalState->SetSpeedPreviewValid(true);
       }
+        
+    // Attach the preview filters to the corresponding slicers
+    for(unsigned int j=0;j<3;j++)
+      {
+      // What is the image axis corresponding to the j-th slicer?
+      unsigned int iSliceAxis = 
+        m_Driver->GetSNAPImageData()->GetSpeed()->GetDisplaySliceImageAxis(j);
+
+      // Connect the previewer to that slicer
+      m_Driver->GetSNAPImageData()->GetSpeed()->SetSliceSourceForPreview(
+        j,m_EdgePreviewFilter[iSliceAxis]->GetOutput());
+      }
+
+    // The speed preview is now valid
+    m_GlobalState->SetSpeedPreviewValid(true);
+
     }
   else
     {
@@ -385,14 +400,22 @@ PreprocessingUILogic
       // Pass the current settings to the filter
       m_InOutPreviewFilter[i]->SetThresholdSettings(
         m_GlobalState->GetThresholdSettings());
-  
-      // Tell the speed wrapper who it's previewer is
-      m_Driver->GetSNAPImageData()->GetSpeed()->SetSliceSourceForPreview(
-        i,m_InOutPreviewFilter[i]->GetOutput());
-
-      // The speed preview is now valid
-      m_GlobalState->SetSpeedPreviewValid(true);
       }
+
+    // Attach the preview filters to the corresponding slicers
+    for(unsigned int j=0;j<3;j++)
+      {
+      // What is the image axis corresponding to the j-th slicer?
+      unsigned int iSliceAxis = 
+        m_Driver->GetSNAPImageData()->GetSpeed()->GetDisplaySliceImageAxis(j);
+
+      // Connect the previewer to that slicer
+      m_Driver->GetSNAPImageData()->GetSpeed()->SetSliceSourceForPreview(
+        j,m_InOutPreviewFilter[iSliceAxis]->GetOutput());
+      }
+
+    // The speed preview is now valid
+    m_GlobalState->SetSpeedPreviewValid(true);
     }
   else
     {
@@ -439,112 +462,38 @@ void
 PreprocessingUILogic
 ::OnEdgeApply()
 {
-  // Make sure that the speed image exists
-  if(!m_Driver->GetSNAPImageData()->IsSpeedLoaded())
-    m_Driver->GetSNAPImageData()->InitializeSpeed();
-    
-  // Keep a handle to the speed image wrapper
-  SpeedImageWrapper *speed = m_Driver->GetSNAPImageData()->GetSpeed();
-
-  // Create an edge filter for whole-image preprocessing
-  m_EdgeFilterWhole = EdgeFilterType::New();
-  
-  // Pass the settings to the filter
-  m_EdgeFilterWhole->SetEdgePreprocessingSettings(
-    m_GlobalState->GetEdgePreprocessingSettings());
-
-  // Set the filter's input
-  m_EdgeFilterWhole->SetInput(
-    m_Driver->GetSNAPImageData()->GetGrey()->GetImage());
-
-  // Attach the filter to the progress bar
+  // Create a callback object
   CommandPointer callback = CommandType::New();
   callback->SetCallbackFunction(this,&PreprocessingUILogic::OnEdgeProgress);
-  m_EdgeFilterWhole->AddObserver(ProgressEvent(),callback);
-
-  // Run the filter
-  m_EdgeFilterWhole->UpdateLargestPossibleRegion();
   
-  // Pass the output of the filter to the speed wrapper
-  speed->SetImage(m_EdgeFilterWhole->GetOutput());
-  
-  // Dismantle this pipeline
-  speed->GetImage()->DisconnectPipeline();
-
-  // Clean up the filter
-  m_EdgeFilterWhole = NULL;
+  // Use the SNAPImageData to perform preprocessing
+  m_Driver->GetSNAPImageData()->DoEdgePreprocessing(
+    m_GlobalState->GetEdgePreprocessingSettings(),callback);
 
   // The preprocessing image is valid
   m_GlobalState->SetSpeedValid(true);
 
-  // Activate some buttons
-  // TODO: Fix direct access
-  m_ParentUI->m_GrpImageOptions->activate();
-
-  // update the view with the new preprocessed data
-  m_ParentUI->m_RadioSNAPViewPreprocessed->setonly();
-  m_ParentUI->OnViewPreprocessedSelect();
-
-  // Allow preprocessing to be saved
-  m_ParentUI->m_MenuSavePreprocessed->activate();
-
-  // Repaint the slice windows
-  m_ParentUI->RedrawWindows();
+  // Update the parent UI
+  m_ParentUI->OnSpeedImageUpdate();
 }
 
 void 
 PreprocessingUILogic
 ::OnThresholdApply()
 {
-  // Make sure that the speed image exists
-  if(!m_Driver->GetSNAPImageData()->IsSpeedLoaded())
-    m_Driver->GetSNAPImageData()->InitializeSpeed();
-    
-  // Keep a handle to the speed image wrapper
-  SpeedImageWrapper *speed = m_Driver->GetSNAPImageData()->GetSpeed();
-
-  // Create an edge filter for whole-image preprocessing
-  m_InOutFilterWhole = InOutFilterType::New();
-  
-  // Pass the settings to the filter
-  m_InOutFilterWhole->SetThresholdSettings(
-    m_GlobalState->GetThresholdSettings());
-
-  // Set the filter's input
-  m_InOutFilterWhole->SetInput(
-    m_Driver->GetSNAPImageData()->GetGrey()->GetImage());
-
-  // Attach the filter to the progress bar
+  // Create a callback object
   CommandPointer callback = CommandType::New();
-  callback->SetCallbackFunction(this,
-                                &PreprocessingUILogic::OnThresholdProgress);
-  m_InOutFilterWhole->AddObserver(ProgressEvent(),callback);
+  callback->SetCallbackFunction(this,&PreprocessingUILogic::OnThresholdProgress);
+  
+  // Use the SNAPImageData to perform preprocessing
+  m_Driver->GetSNAPImageData()->DoInOutPreprocessing(
+    m_GlobalState->GetThresholdSettings(),callback);
 
-  // Run the filter
-  m_InOutFilterWhole->UpdateLargestPossibleRegion();
-  
-  // Pass the output of the filter to the speed wrapper
-  speed->SetImage(m_InOutFilterWhole->GetOutput());
-  
-  // Dismantle this pipeline
-  speed->GetImage()->DisconnectPipeline();
-
-  // Clean up the filter
-  m_InOutFilterWhole = NULL;
-  
   // The preprocessing image is valid
   m_GlobalState->SetSpeedValid(true);
 
-  // Activate some buttons
-  // TODO: Fix direct access
-  m_ParentUI->m_GrpImageOptions->activate();
-
-  // update the view with the new preprocessed data
-  m_ParentUI->m_RadioSNAPViewPreprocessed->setonly();
-  m_ParentUI->OnViewPreprocessedSelect();
-
-  // Allow preprocessing to be saved
-  m_ParentUI->m_MenuSavePreprocessed->activate();
+  // Update the parent UI
+  m_ParentUI->OnSpeedImageUpdate();
 }
 
 void 
@@ -718,10 +667,13 @@ PreprocessingUILogic
 
 void 
 PreprocessingUILogic
-::OnEdgeProgress()
+::OnEdgeProgress(itk::Object *object, const itk::EventObject &event)
 {
+  // Get the value of the progress
+  float progress = reinterpret_cast<ProcessObject *>(object)->GetProgress();
+  
   // Display the filter's progress
-  m_OutEdgeProgress->value(m_EdgeFilterWhole->GetProgress());
+  m_OutEdgeProgress->value(progress);
 
   // Let the UI refresh
   Fl::check();
@@ -729,10 +681,13 @@ PreprocessingUILogic
 
 void 
 PreprocessingUILogic
-::OnThresholdProgress()
+::OnThresholdProgress(itk::Object *object, const itk::EventObject &event)
 {
+  // Get the value of the progress
+  float progress = reinterpret_cast<ProcessObject *>(object)->GetProgress();
+  
   // Display the filter's progress
-  m_OutThresholdProgress->value(m_InOutFilterWhole->GetProgress());
+  m_OutThresholdProgress->value(progress);
 
   // Let the UI refresh
   Fl::check();

@@ -84,7 +84,7 @@ void SNAPSliceWindow
      !m_GlobalState->GetSpeedViewZero())
     {
     // We should have a slice to draw
-    assert(m_ImageData->IsSpeedLoaded() && m_SliceIndex >= 0);
+    assert(m_ImageData->IsSpeedLoaded() && m_ImageSliceIndex >= 0);
 
     // Make sure the correct image is pointed to
     m_SpeedTexture->SetImage(m_ImageData->GetSpeed()->GetDisplaySlice(m_Id));
@@ -105,7 +105,7 @@ void SNAPSliceWindow
   if(m_GlobalState->GetSpeedViewZero())
     {
     // We should have a slice to draw
-    assert(m_ImageData->IsSpeedLoaded() && m_SliceIndex >= 0);
+    assert(m_ImageData->IsSpeedLoaded() && m_ImageSliceIndex >= 0);
     
     // Make sure that the right image is there
     m_OverlayTexture->SetImage(m_ImageData->GetSpeed()->GetOverlaySlice(m_Id));
@@ -118,7 +118,7 @@ void SNAPSliceWindow
   else if(m_GlobalState->GetSnakeActive())
     {
     // We should have a slice to draw
-    assert(m_ImageData->IsSnakeLoaded() && m_SliceIndex >= 0);
+    assert(m_ImageData->IsSnakeLoaded() && m_ImageSliceIndex >= 0);
 
     // Make sure that the right image is there
     m_SnakeTexture->SetImage(m_ImageData->GetSnake()->GetDisplaySlice(m_Id));

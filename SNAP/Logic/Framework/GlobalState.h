@@ -6,7 +6,7 @@
   Date:      $Date$
   Version:   $Revision$
   Copyright (c) 2003 Insight Consortium. All rights reserved.
-  See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
+  See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.                                      
 
      This software is distributed WITHOUT ANY WARRANTY; without even 
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
@@ -21,6 +21,8 @@
 #include "SnakeParameters.h"
 #include "ThresholdSettings.h"
 #include "itkImageRegion.h"
+
+#include <string>
 
 enum ToolbarModeType 
 {
@@ -102,10 +104,10 @@ public:
   irisGetMacro(SegmentationAlpha,unsigned char );
 
   /** Get the current crosshairs position */
-  irisSetMacro(CrosshairsPosition,Vector3i );
+  irisSetMacro(CrosshairsPosition,Vector3ui );
 
   /** Set the current crosshairs position */
-  irisGetMacro(CrosshairsPosition,Vector3i );
+  irisGetMacro(CrosshairsPosition,Vector3ui );
 
   /** Get the current toolbar mode */
   irisSetMacro(ToolbarMode,ToolbarModeType );
@@ -234,10 +236,28 @@ public:
 #endif /* DRAWING_LOCK */
 
   /** Set the extension of the grey image */
-  void SetGreyExtension(char * fname);
+  void SetGreyExtension(const char * fname);
   
   /** Get the extension of the grey image */
   void GetGreyExtension(char *& ext);
+
+  /** Set the grey image file name */
+  irisSetStringMacro(GreyFileName);
+
+  /** Get the grey image file name */
+  irisGetStringMacro(GreyFileName);
+
+  /** Set the segmentation image file name */
+  irisSetStringMacro(SegmentationFileName);
+
+  /** Get the segmentation image file name */
+  irisGetStringMacro(SegmentationFileName);
+
+  /** Set the preprocessing image file name */
+  irisSetStringMacro(PreprocessingFileName);
+
+  /** Get the preprocessing image file name */
+  irisGetStringMacro(PreprocessingFileName);
 
 private:
   /** Color label used to draw polygons */
@@ -259,7 +279,7 @@ private:
   unsigned char m_SegmentationAlpha;
 
   /** The current crosshairs position */
-  Vector3i m_CrosshairsPosition;
+  Vector3ui m_CrosshairsPosition;
 
   /** The current toolbar mode */
   ToolbarModeType m_ToolbarMode;
@@ -324,12 +344,29 @@ private:
 
   // Current settings for the snake algorithm
   SnakeParameters m_SnakeParameters;
+
+  // File name of the current grey file
+  std::string m_GreyFileName;
+
+  // File name of the current grey file
+  std::string m_SegmentationFileName;
+
+  // File name of the current preprocessing file
+  std::string m_PreprocessingFileName;
 };
 
 #endif // __GlobalState_h_
 
 /*
  *Log: GlobalState.h
+ *Revision 1.1  2003/09/11 13:50:29  pauly
+ *FIX: Enabled loading of images with different orientations
+ *ENH: Implemented image save and load operations
+ *
+ *Revision 1.3  2003/08/27 14:03:20  pauly
+ *FIX: Made sure that -Wall option in gcc generates 0 warnings.
+ *FIX: Removed 'comment within comment' problem in the cvs log.
+ *
  *Revision 1.2  2003/08/27 04:57:45  pauly
  *FIX: A large number of bugs has been fixed for 1.4 release
  *

@@ -77,34 +77,53 @@ public:
    * Reset the view parameters of the window (zoom, view position) to
    * defaults
    */
-  virtual void ResetView();
+  virtual void ResetViewToFit();
 
-  /**
-   * The FLTK draw method (paints the window)
-   */
+  /** The FLTK draw method (paints the window) */
   void draw();
+
+  /** The FLTK handle() event, overrides parent's method to grab focus
+   * when the mouse enters the window */
+  int handle(int eventID);
 
   /**
    * Map a point in window coordinates to a point in slice coordinates
    * (Window coordinates are the ones stored in FLTKEvent.xSpace)
    */
-  Vector2f MapWindowToSlice(const Vector2f &xWindow); 
+  Vector3f MapWindowToSlice(const Vector2f &xWindow); 
   
   /**
    * Map a point in slice coordinates to a point in window coordinates
    * (Window coordinates are the ones stored in FLTKEvent.xSpace)
    */
-  Vector2f MapSliceToWindow(const Vector2f &uvSlice);
+  Vector2f MapSliceToWindow(const Vector3f &xSlice);
   
   /**
    * Map a point in slice coordinates to a point in the image coordinates
    */
-  Vector3f MapSliceToImage(const Vector2f &uvSlice);
+  Vector3f MapSliceToImage(const Vector3f &xSlice);
 
   /**
    * Map a point in image coordinates to slice coordinates
    */
-  Vector2f MapImageToSlice(const Vector3f &xImage);
+  Vector3f MapImageToSlice(const Vector3f &xImage);
+
+  /** Set the zoom factor (number of pixels on the screen per millimeter in
+   * image space */
+  void SetViewZoom(float newZoom);
+
+  /** Get the zoom factor (number of pixels on the screen per millimeter in
+   * image space */
+  irisGetMacro(ViewZoom,float);
+
+  /** Compute the optimal zoom (best fit) */
+  irisGetMacro(OptimalZoom,float);
+
+  /** Get the slice spacing in the display space orientation */
+  irisGetMacro(SliceSpacing,Vector3f);
+
+  /** Get the slice spacing in the display space orientation */
+  irisGetMacro(SliceSize,Vector3i);
 
   /**
    * A parent class from which all the Fl event handlers associated
@@ -169,30 +188,41 @@ protected:
   // shows slices
   int m_Id;       
 
-  // Current slice number
-  int m_SliceIndex;
+  // Current slice number in image coordinates 
+  int m_ImageSliceIndex;
 
-  // The index of the display space axes that correspond to the u,v,w of the 
-  // window id==0 => (1,2,0); id==1 => (0,2,1); id==2 => (0,1,2)
-  int m_DisplayAxes[3];
-  
+  // The position of the slice on its z-axis, in the display coordinate space
+  float m_DisplayAxisPosition;
+
   // The index of the image space axes corresponding to the u,v,w of the window
   // (computed by applying a transform to the DisplayAxes)
   int m_ImageAxes[3]; 
 
+  // The transform from image coordinates to display coordinates
+  ImageCoordinateTransform m_ImageToDisplayTransform;
+  
+  // The transform from display coordinates to image coordinates
+  ImageCoordinateTransform m_DisplayToImageTransform;
+
+  // The transform from display coordinates to patient coordinates
+  ImageCoordinateTransform m_DisplayToAnatomyTransform;
+  
   // Dimensions of the current slice (the third component is the size of the
   // image in the slice direction)
   Vector3i m_SliceSize;             
 
   // Pixel dimensions for the slice.  (the thirs component is the pixel width
   // in the slice direction)
-  Vector3f m_SliceScale;
+  Vector3f m_SliceSpacing;
   
   // Position of visible window in slice space coordinates
   Vector2f m_ViewPosition;            
 
-  // The current zoom factor
-  float m_ViewZoom;                         
+  // The number of screen pixels per mm of image
+  float m_ViewZoom;  
+
+  // The zoom level at which the slice fits snugly into the window
+  float m_OptimalZoom;
 
   // The default screen margin (area into which we do not paint) at lest in 
   // default zoom

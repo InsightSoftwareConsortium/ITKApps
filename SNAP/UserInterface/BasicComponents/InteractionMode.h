@@ -86,6 +86,14 @@ public:
   }
 
   /**
+   * Called when mouse moves in the canvas
+   */
+  virtual int OnMouseWheel(const FLTKEvent &irisNotUsed(event)) 
+  {
+    return 0;
+  }
+
+  /**
    * Called when a key on the keyboard is pressed.
    */
   virtual int OnKeyDown(const FLTKEvent &irisNotUsed(event)) 

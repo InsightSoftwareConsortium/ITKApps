@@ -12,258 +12,132 @@
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
-#include "IRISImageData.h"
-#include "GreyImageWrapperImplementation.h"
-#include "LabelImageWrapperImplementation.h"
-
 // ITK Includes
 #include "itkImage.h"
 #include "itkImageIterator.h"
+#include "itkImageRegionIterator.h"
 #include "itkImageRegionConstIterator.h"
+#include "itkImageRegionIteratorWithIndex.h"
 
-#include <sstream>
+#include "IRISImageData.h"
+#include "GreyImageWrapper.h"
+#include "LabelImageWrapper.h"
+
+// System includes
+#include <fstream>
+#include <iostream>
+#include <iomanip>
 
 using namespace itk;
 
-/** A wrapper around a FILE pointer */
-class CFilePointer
-{
-private:
-  FILE *m_FilePointer;
-public:
-  CFilePointer(const char *fname, const char *mode) {
-    m_FilePointer = fopen(fname,mode);
-  }
-  virtual ~CFilePointer() {
-    if (m_FilePointer)
-      fclose(m_FilePointer);
-  }
-  FILE * operator ->() {
-    return m_FilePointer;
-  }
-  operator int() {
-    return(int)m_FilePointer;
-  }
-};
-
-/**
- * TODO: Rewrite this method to read labels in an XML format.
- */
 void 
 IRISImageData
-::ReadASCIIColorLabels(const char* irisNotUsed(filename))
+::CountVoxels(const char *filename) throw(ExceptionObject)
 {
-  /*
-  // FILE* fp = fopen(filename, "r");
-  CFilePointer fp(filename,"r");
-  char buff[1000];
-  char toks[5][500];
-
-  if(!fp) {
-  throw IRISExceptionIO("Label file does not exist");
-  }
-
-  try {
-  // fp = fopen(filename, "r");
-  while (!feof(fp)) {
-  readline(buff, fp);
-  if (strlen(buff) > 1) {
-  // comment lines begin with '#'
-  if (strncasecmp(buff, "#", 1) == 0) break;
-
-  // toks[0] holds the part of the line up to a quote \" char,
-  // toks[1] hold the rest (the label name)
-  unsigned int a = 0;
-  while (a < (int)strlen(buff) && buff[a] != '\"') a++;
-  if (a < 7 || a == (int)strlen(buff)) break;
-  strncpy(toks[0], buff, a);
-  strcpy(toks[1], buff+a+1);
-
-  // null-terminate the label string
-  for (a = 0; a < strlen(toks[1]); a++)
-  if (toks[1][a] == '\"') toks[1][a] = '\0';
-
-  // Parse the data
-  int idx, r, g, b, v, m;
-  float al;
-  sscanf(toks[0], " %d %d %d %d %f %d %d", &idx, &r, &g, &b, &al, &v, &m);
-
-  // Merge with the m_ColorLabels table
-  if (!m_ColorLabels[idx].IsValid()) m_ColorLabelCount++;
-
-  m_ColorLabels[idx].SetValid(true);
-  m_ColorLabels[idx].SetRGB(0,(unsigned char) r);
-  m_ColorLabels[idx].SetRGB(1,(unsigned char) g);
-  m_ColorLabels[idx].SetRGB(2,(unsigned char) b);
-  m_ColorLabels[idx].SetAlpha( (al<0) ? 0. : ((al>1) ? 1. : al) );
-  m_ColorLabels[idx].SetVisible(v != 0);
-  m_ColorLabels[idx].SetDoMesh(m != 0);
-  m_ColorLabels[idx].SetLabel(toks[1]);
-  }
-  } catch(...) {
-  // fclose(fp);
-  throw SNAPExceptionIO("Error reading label file");
-  }
-
-  // fclose(fp);
-  */
-}
-
-/**
- * TODO: Rewrite this method to read labels in an XML format.
- */
-void 
-IRISImageData
-::WriteASCIIColorLabels(const char* irisNotUsed(filename))
-{
-  /*    int c = 0;
-
-  // Open file for writing
-  FILE *fileptr = fopen(filename, "w+");
-  if (!fileptr) {
-  cerr << "ook, can't open " << filename << " for writing" << endl;
-  return 0;
-  }
-
-  for (int i=0; i<MAX_COLOR_LABELS; i++) {
-  if (c%24 == 0)
-  fprintf(fileptr, "# IDX   -R-  -G-  -B-  -A--  VIS MSH  LABEL\n");
-  if (m_ColorLabels[i].valid) {
-  fprintf(fileptr, "  %3d   %3d  %3d  %3d  %4.2f  %1d   %1d    \"%s\"\n",
-  i, 
-  m_ColorLabels[i].GetRGB(0), 
-  m_ColorLabels[i].GetRGB(1), 
-  m_ColorLabels[i].GetRGB(2),
-  m_ColorLabels[i].GetAlpha(),
-  (int)m_ColorLabels[i].GetVisible(),
-  (int)m_ColorLabels[i].GetDomesh(),
-  m_ColorLabels[i].GetLabel());
-  c++;
-  }
-  }
-
-  fclose(fileptr);*/
-}
-
-int 
-IRISImageData
-::CountVoxels(const char *irisNotUsed(filename)) 
-{
-  /*
-
+  unsigned int i;
+  
   // Make sure that the segmentation image exists
   assert(IsSegmentationLoaded());
 
-  unsigned int i, c;
-
-  // histogram of the segmentation image
-  unsigned long int hist[MAX_COLOR_LABELS];
-
-  // mean greyscale values for each bin
-  double mean[MAX_COLOR_LABELS];
-
-  // standard deviations of greyscale intensities for each bin
-  double stddev[MAX_COLOR_LABELS];
-
-  // initialize bins
-  for (i=0; i<MAX_COLOR_LABELS; i++)
-  mean[i] = stddev[i] = hist[i] = 0;
-
-  // First pass to get sum and number of voxels for each bin
-  LabelType   *segData = ( LabelType *) m_LabelWrapper->GetScalarPointer();
-  GreyType *greyData = (GreyType *) m_GreyWrapper->GetScalarPointer();
-  unsigned int num_voxels = m_Size[0]*m_Size[1]*m_Size[2];
-  for (c=0; c < num_voxels; c++) {
-  double curgreyval = greyData[c]/this->grey_scale_factor + this->grey_min;
-  hist[segData[c]]++;
-  mean[segData[c]] += curgreyval;
-  }
-
-  for (i=0; i<MAX_COLOR_LABELS; i++) mean[i] /= hist[i];
-
-  // Second pass to get the 2nd moments of deviation
-  for (c=0; c < num_voxels; c++) {
-  double curgreyval = greyData[c]/this->grey_scale_factor + this->grey_min;
-  double dev = curgreyval - mean[segData[c]];
-  stddev[segData[c]] += dev*dev;
-  }
-
-  // Standard deviation
-  for (i=0; i<MAX_COLOR_LABELS; i++) 
-  stddev[i] = sqrt( stddev[i] / (hist[i]-1) );
-
-  // Get the size of a voxel, in mm^3
-  float voxvol = 1.0;
-  for (i=0; i<3; i++) voxvol *= this->greyImageData->GetSpacing()[i];
-
-  // Open file for writing
-  ofstream *filestr = new ofstream(filename);
-  if (!filestr || filestr->fail()) {
-  cerr << "ook, can't open " << filename << " for writing" << endl;
-  return 0;
-  }
-
-   *filestr << "Voxel counts / volumes in mm^3 / mean intensity / stddev:" << endl;
-
-   for (i=1; i<MAX_COLOR_LABELS; i++) {
-   if (color_labels[i].valid && hist[i] > 0) {
-   *filestr 
-   << color_labels[i].label << ": " 
-   << hist[i] << " / "
-   << hist[i]*voxvol << " / "
-   << mean[i] << " / "
-   << stddev[i] << endl;
-   }
-   }
-
-   filestr->close();
-   return 1;
-   */
-  return 0;
-}
-
-
-/**
- * TODO: This whole thing is really silly.  ImageWrapper should be able to work
- * with a region of an ITK image and not with the whole image at once
- */
-void 
-IRISImageData
-::DeepCopyROI(const RegionType &roi, IRISImageData &target,
-              LabelType passThroughLabel)
-{
-  // Create a new grey image wrapper
-  GreyWrapperType *wrapGrey = new GreyImageWrapperImplementation();  
-  LabelWrapperType *wrapSeg = new LabelImageWrapperImplementation();
-
-  // Place the partial image into this wrapper
-  wrapGrey->SetImage(m_GreyWrapper->DeepCopyRegion(roi));
-  wrapSeg->SetImage(m_LabelWrapper->DeepCopyRegion(roi));
-
-  // Allow only the pass through label to pass through
-  // TODO: Make this more elegant, perhaps
-  typedef ImageRegionIterator<LabelWrapperType::ImageType> IteratorType;
-  IteratorType itLabel(wrapSeg->GetImage(),
-                       wrapSeg->GetImage()->GetBufferedRegion());
+  // A structure to describe each label
+  struct Entry {
+    unsigned long int count;
+    unsigned long int sumGrey;
+    unsigned long int sumGreySqr;
+    double mean;
+    double stddev;
   
+    Entry() : count(0),sumGrey(0),sumGreySqr(0),mean(0),stddev(0) {}
+  };
+  
+  // histogram of the segmentation image
+  Entry data[MAX_COLOR_LABELS];
+
+  // Create an iterator for parsing the segmentation image
+  typedef ImageRegionConstIterator<LabelImageType> LabelIteratorType;
+  LabelIteratorType itLabel(m_LabelWrapper->GetImage(),this->GetImageRegion());
+
+  // Another iterator for accessing the grey image
+  typedef ImageRegionConstIterator<GreyImageType> GreyIteratorType;
+  GreyIteratorType itGrey(m_GreyWrapper->GetImage(),this->GetImageRegion());
+
+  // Compute the number, sum and sum of squares of grey intensities for each 
+  // label
   while(!itLabel.IsAtEnd())
     {
-    if(itLabel.Value() != passThroughLabel)
-      itLabel.Value() = (LabelType) 0;
+    LabelType label = itLabel.Value();
+    GreyType grey = itGrey.Value();
+
+    data[label].count++;
+    data[label].sumGrey += grey;
+    data[label].sumGreySqr += grey * grey;
+
     ++itLabel;
+    ++itGrey;
+    }
+  
+  // Compute the mean and standard deviation
+  for (i=0; i<MAX_COLOR_LABELS; i++)
+    {
+    // The mean
+    data[i].mean = data[i].sumGrey * 1.0 / data[i].count;
+
+    // The standard deviation
+    data[i].stddev = sqrt(
+      (data[i].sumGreySqr * 1.0 - data[i].count * data[i].mean * data[i].mean) 
+      / (data[i].count - 1));
+    }
+  
+  // Compute the size of a voxel, in mm^3
+  const double *spacing = m_GreyWrapper->GetImage()->GetSpacing();
+  double volVoxel = spacing[0] * spacing[1] * spacing[2];
+
+  // Open the selected file for writing
+  std::fstream fout(filename);
+
+  // Check if the file is readable
+  if(!fout.good())
+    throw itk::ExceptionObject(__FILE__, __LINE__,
+                               "File can not be opened for writing");
+  try 
+    {
+    // Write voxel volumes to the file
+    fout << "##########################################################" << endl;
+    fout << "# SNAP Voxel Count File" << endl;
+    fout << "# File format:" << endl;
+    fout << "# LABEL: NUMBER / VOLUME / MEAN / SD" << endl;
+    fout << "# Fields:" << endl;
+    fout << "#    LABEL         Label description" << endl;
+    fout << "#    NUMBER        Number of voxels that have that label " << endl;
+    fout << "#    VOLUME        Volume of those voxels in cubic mm " << endl;
+    fout << "#    MEAN          Mean intensity of those voxels " << endl;
+    fout << "#    SD            Standard deviation of those voxels " << endl;
+    fout << "##########################################################" << endl;
+
+    for (i=1; i<MAX_COLOR_LABELS; i++) 
+      {
+      if(m_ColorLabels[i].IsValid() && data[i].count > 0)
+        {
+        fout << std::left << std::setw(40) << m_ColorLabels[i].GetLabel() << ": ";
+        fout << std::right << std::setw(10) << data[i].count << " / ";
+        fout << std::setw(10) << (data[i].count * volVoxel) << " / ";
+        fout << std::internal << std::setw(10) << data[i].mean << " / ";
+        fout << std::setw(10) << data[i].stddev << endl;
+        }      
+      }
+    }
+  catch(...)
+    {
+    throw itk::ExceptionObject(__FILE__, __LINE__,
+                           "File can not be written");
     }
 
-  // The segmentation wrapper needs the label colors
-  wrapSeg->SetLabelColorTable(m_ColorLabels);
-
-  // Assign the new wrapper to the target
-  target.SetGrey(wrapGrey);
-  target.SetSegmentation(wrapSeg);
+  fout.close();
 }
 
 void 
 IRISImageData
-::SetSegmentationVoxel(const Vector3i &index, LabelType value)
+::SetSegmentationVoxel(const Vector3ui &index, LabelType value)
 {
   // Make sure that the grey data and the segmentation data exist
   assert(m_GreyWrapper && m_LabelWrapper);
@@ -309,35 +183,41 @@ IRISImageData
 {
   double threshold = dZero ? 0 : 1;
 
-  for (int x=0; x<m_Size[0]; x++)
+  typedef ImageRegionIteratorWithIndex<LabelImageType> IteratorType;
+  IteratorType it(m_LabelWrapper->GetImage(),this->GetImageRegion());
+
+  // Compute a label mapping table based on the color labels
+  LabelType table[MAX_COLOR_LABELS];
+  for(unsigned int i=0;i<MAX_COLOR_LABELS;i++)
     {
-    for (int y=0; y<m_Size[1]; y++)
-      {
-      for (int z=0; z<m_Size[2]; z++)
-        {
-
-        // Check the distance to the cut plane
-        double distance =  x*plane[0] + y*plane[1] + z*plane[2] - threshold;
-
-        if (distance > 0)
-          {
-
-          // Get the next voxel
-          LabelType &voxel = m_LabelWrapper->GetVoxelForUpdate(x,y,z);
-
-          // Get the color label associated with voxel
-          const ColorLabel &cl = GetColorLabel(voxel);
-
-          // Check if relabelling applies
-          if (cl.IsValid() && cl.IsVisible())
-            {
-            voxel = newlabel;
-            }
-          }
-        }
-      }
+    if(m_ColorLabels[i].IsValid() && m_ColorLabels[i].IsVisible())
+      table[i] = newlabel;
+    else
+      table[i] = i;
     }
 
+  // Iterate over the image, relabeling labels on one side of the plane
+  while(!it.IsAtEnd())
+    {
+    // Compute the distance to the plane
+    const long *index = it.GetIndex().GetIndex();
+    double distance = 
+      index[0]*plane[0] + 
+      index[1]*plane[1] + 
+      index[2]*plane[2] - threshold;
+
+    // Check the side of the plane
+    if(distance > 0)
+      {
+      LabelType &voxel = it.Value();
+      voxel = table[voxel];
+      }
+
+    // Next voxel
+    ++it;
+    }
+  
+  // Register that the image has been updated
   m_LabelWrapper->GetImage()->Modified();
 }
 
@@ -367,7 +247,7 @@ IRISImageData
 {
   assert(m_LabelWrapper && m_LabelWrapper->GetImage());
 
-  Vector3i lIndex;
+  Vector3ui lIndex;
   double delta[3][3], dratio[3];
   int    signrx, signry, signrz;
 
@@ -513,7 +393,8 @@ IRISImageData
 
 void 
 IRISImageData
-::SetGrey(GreyWrapperType *inWrapper) 
+::SetGreyImage(GreyImageType *newGreyImage,
+               const ImageCoordinateGeometry &newGeometry) 
 {
   // Dispose of the old wrapper
   if (m_GreyWrapper)
@@ -523,12 +404,13 @@ IRISImageData
   if (m_LabelWrapper)
     delete m_LabelWrapper;
 
-  // Make a copy of the wrapper
-  m_GreyWrapper = inWrapper;
+  // Make a new wrapper
+  m_GreyWrapper = new GreyImageWrapper;
+  m_GreyWrapper->SetImage(newGreyImage);
 
-  // Clear the segmentation data to zeros (...)
-  m_LabelWrapper = new LabelImageWrapperImplementation;
-  m_LabelWrapper->InitializeToImage(m_GreyWrapper->GetImage());
+  // Clear the segmentation data to zeros
+  m_LabelWrapper = new LabelImageWrapper;
+  m_LabelWrapper->InitializeToImage(newGreyImage);
   m_LabelWrapper->GetImage()->FillBuffer(0);
 
   // The segmentation wrapper needs the label colors
@@ -536,34 +418,39 @@ IRISImageData
 
   // Store the image size info
   m_Size = m_GreyWrapper->GetSize();
+
+  // Pass the coordinate transform to the wrappers
+  SetImageGeometry(newGeometry);
 }
 
 void 
 IRISImageData
-::SetSegmentation(LabelWrapperType *inWrapper) 
+::SetSegmentationImage(LabelImageType *newLabelImage) 
 {
-  // The dimensions of the images must match
-  assert(m_Size == inWrapper->GetSize());
+  // Check that the image matches the size of the grey image
+  assert(m_GreyWrapper->GetImage()->GetBufferedRegion() == 
+         newLabelImage->GetBufferedRegion());
 
-  // Dispose of the old segmentation wrapper
-  if (m_LabelWrapper)
-    delete m_LabelWrapper;
+  // Pass the image to the segmentation wrapper
+  m_LabelWrapper->SetImage(newLabelImage);
 
-  // Copy the passed in wrapper
-  m_LabelWrapper = inWrapper;
-
-  // Sync up spacing of seg and grey ImageDatas 
-  m_LabelWrapper->GetImage()->SetSpacing(m_GreyWrapper->GetImage()->GetSpacing());
+  // Sync up spacing between the grey and label image
+  newLabelImage->SetSpacing(m_GreyWrapper->GetImage()->GetSpacing());
 
   // Update the validity of the labels
-  for (LabelWrapperType::ConstIterator it = m_LabelWrapper->GetImageIterator();!it.IsAtEnd();++it)
+  LabelImageWrapper::ConstIterator it = m_LabelWrapper->GetImageConstIterator();
+  while(!it.IsAtEnd())
     {
     if (!m_ColorLabels[it.Get()].IsValid())
       {
       m_ColorLabels[it.Get()].SetValid(true);
       m_ColorLabelCount++;
       }
+    ++it;
     }
+
+  // There is no need to update the image-to-display transform because the 
+  // image dimensions have not changed
 }
 
 bool 
@@ -636,7 +523,7 @@ IRISImageData
     m_ColorLabels[i].SetVisible(true);
     m_ColorLabels[i].SetDoMesh(true);
 
-    itk::OStringStream sout;
+    IRISOStringStream sout;
     sout << "Label" << i;
     m_ColorLabels[i].SetLabel(sout.str().c_str());
     }
@@ -644,7 +531,7 @@ IRISImageData
 
 void
 IRISImageData
-::SetCrosshairs(const Vector3i &crosshairs)
+::SetCrosshairs(const Vector3ui &crosshairs)
 {
   assert(m_GreyWrapper && m_LabelWrapper);  
   m_GreyWrapper->SetSliceIndex(crosshairs);
@@ -675,4 +562,24 @@ IRISImageData
 
   // Propagate the change to the label wrapper
   m_LabelWrapper->SetLabelColorTable(m_ColorLabels);
+}
+
+void 
+IRISImageData
+::SetImageGeometry(const ImageCoordinateGeometry &geometry)
+{
+  // Save the geometry
+  m_ImageGeometry = geometry;
+
+  // Propagate the geometry to the image wrappers
+  for(unsigned int iSlice = 0;iSlice < 3;iSlice ++)
+    {
+    if(m_GreyWrapper)
+      m_GreyWrapper->SetImageToDisplayTransform(
+        iSlice,m_ImageGeometry.GetImageToDisplayTransform(iSlice));
+
+    if(m_LabelWrapper)
+      m_LabelWrapper->SetImageToDisplayTransform(
+        iSlice,m_ImageGeometry.GetImageToDisplayTransform(iSlice));
+    }
 }

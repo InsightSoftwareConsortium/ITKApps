@@ -64,6 +64,14 @@ public:
 
 /*
  *Log: Trackball.h
+ *Revision 1.1  2003/09/11 13:51:15  pauly
+ *FIX: Enabled loading of images with different orientations
+ *ENH: Implemented image save and load operations
+ *
+ *Revision 1.3  2003/08/27 14:03:24  pauly
+ *FIX: Made sure that -Wall option in gcc generates 0 warnings.
+ *FIX: Removed 'comment within comment' problem in the cvs log.
+ *
  *Revision 1.2  2003/08/27 04:57:47  pauly
  *FIX: A large number of bugs has been fixed for 1.4 release
  *

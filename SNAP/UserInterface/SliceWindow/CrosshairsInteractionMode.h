@@ -28,32 +28,21 @@ class CrosshairsInteractionMode : public GenericSliceWindow::EventHandler {
 public:
   CrosshairsInteractionMode(GenericSliceWindow *parent);
 
-  int OnMousePress(const FLTKEvent &event)
-  {
-    UpdateCrosshairs(event);
-    m_Parent->m_GlobalState->SetUpdateSliceFlag(0);
-    return 1;
-  }
-
+  void OnDraw(); 
+  int OnMousePress(const FLTKEvent &event);
+  int OnMouseWheel(const FLTKEvent &event);
   int OnMouseRelease(const FLTKEvent &event, 
-                     const FLTKEvent &irisNotUsed(pressEvent))
-  {
-    UpdateCrosshairs(event);
-    return 1;
-  }
-
+                     const FLTKEvent &irisNotUsed(pressEvent));
   int OnMouseDrag(const FLTKEvent &event, 
-                  const FLTKEvent &irisNotUsed(pressEvent))
-  {
-    UpdateCrosshairs(event);
-    m_Parent->m_GlobalState->SetUpdateSliceFlag(1);
-    return 1;
-  }
-
-  void OnDraw();
+                  const FLTKEvent &irisNotUsed(pressEvent));
 
 private:
   void UpdateCrosshairs(const FLTKEvent &event);
+
+  // Whether or not we need to repaint the controls that depend on
+  // the current slice position
+  bool m_NeedToRepaintControls;
+
 };
 
 #endif // __CrosshairsInteractionMode_h_

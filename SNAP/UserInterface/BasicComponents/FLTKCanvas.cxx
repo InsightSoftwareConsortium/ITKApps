@@ -27,6 +27,7 @@ FLTKCanvas
 ::FLTKCanvas(int x, int y, int w, int h, const char *label)
 : Fl_Gl_Window(x,y,w,h,label)
 {
+  m_Dragging = false;
 }
 
 void                            
@@ -111,6 +112,11 @@ FLTKCanvas
     {
     // Debug positions
     m_DragStartEvent = event;
+    m_Dragging = true;
+    }
+  else if(eventID == FL_RELEASE)
+    {
+    m_Dragging = false;
     }
 
   // Propagate the event through the stack
@@ -140,6 +146,9 @@ FLTKCanvas
         break;
       case FL_MOVE : 
         result = mode->OnMouseMotion(event);
+        break;
+      case FL_MOUSEWHEEL :
+        result = mode->OnMouseWheel(event);
         break;
       case FL_KEYDOWN :
         result = mode->OnKeyDown(event);

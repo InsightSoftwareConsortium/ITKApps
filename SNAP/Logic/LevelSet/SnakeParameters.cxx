@@ -21,13 +21,14 @@ SnakeParameters
 {
   SnakeParameters p;
 
-  p.m_TimeStep = 0.0f;
+  p.m_AutomaticTimeStep = true;
+  p.m_TimeStep = 0.1f;
   p.m_Ground = 5.0;
 
-  p.m_Type = USER;
+  p.m_SnakeType = EDGE_SNAKE;
   p.m_Clamp = true;
 
-  p.m_PropagationWeight = -5.0;
+  p.m_PropagationWeight = 5.0;
   p.m_PropagationSpeedExponent = 1;
 
   p.m_CurvatureWeight = 1.0;
@@ -39,6 +40,8 @@ SnakeParameters
   p.m_AdvectionWeight = 0;
   p.m_AdvectionSpeedExponent = 0;       
 
+  p.m_Solver = PARALLEL_SPARSE_FIELD_SOLVER;
+
   return p;
 }
 
@@ -48,13 +51,14 @@ SnakeParameters
 {
   SnakeParameters p;
 
-  p.m_TimeStep = 0.0f;
+  p.m_AutomaticTimeStep = true;
+  p.m_TimeStep = 0.1f;
   p.m_Ground = 5.0;
 
-  p.m_Type = USER;
+  p.m_SnakeType = REGION_SNAKE;
   p.m_Clamp = true;
 
-  p.m_PropagationWeight = -5.0;
+  p.m_PropagationWeight = 5.0;
   p.m_PropagationSpeedExponent = 1;
 
   p.m_CurvatureWeight = 1.0;
@@ -66,6 +70,8 @@ SnakeParameters
   p.m_AdvectionWeight = 0;
   p.m_AdvectionSpeedExponent = 0;       
 
+  p.m_Solver = PARALLEL_SPARSE_FIELD_SOLVER;
+
   return p;
 }
 
@@ -74,16 +80,18 @@ SnakeParameters
 ::operator == (const SnakeParameters &p) 
 {
   return(
-        m_TimeStep == p.m_TimeStep &&
-        m_Ground == p.m_Ground &&
-        m_Type == p.m_Type &&
-        m_Clamp == p.m_Clamp &&
-        m_PropagationWeight == p.m_PropagationWeight &&
-        m_PropagationSpeedExponent == p.m_PropagationSpeedExponent &&
-        m_CurvatureWeight == p.m_CurvatureWeight &&
-        m_CurvatureSpeedExponent == p.m_CurvatureSpeedExponent &&
-        m_LaplacianWeight == p.m_LaplacianWeight &&
-        m_LaplacianSpeedExponent == p.m_LaplacianSpeedExponent &&
-        m_AdvectionWeight == p.m_AdvectionWeight &&
-        m_AdvectionSpeedExponent == p.m_AdvectionSpeedExponent);
+    m_AutomaticTimeStep = p.m_AutomaticTimeStep &&
+    (m_AutomaticTimeStep || (m_TimeStep == p.m_TimeStep)) &&
+    m_Ground == p.m_Ground &&
+    m_SnakeType == p.m_SnakeType &&
+    m_Clamp == p.m_Clamp &&
+    m_PropagationWeight == p.m_PropagationWeight &&
+    m_PropagationSpeedExponent == p.m_PropagationSpeedExponent &&
+    m_CurvatureWeight == p.m_CurvatureWeight &&
+    m_CurvatureSpeedExponent == p.m_CurvatureSpeedExponent &&
+    m_LaplacianWeight == p.m_LaplacianWeight &&
+    m_LaplacianSpeedExponent == p.m_LaplacianSpeedExponent &&
+    m_AdvectionWeight == p.m_AdvectionWeight &&
+    m_AdvectionSpeedExponent == p.m_AdvectionSpeedExponent && 
+    m_Solver == p.m_Solver);
 }

@@ -15,9 +15,9 @@
 #include "BubblesInteractionMode.h"
 
 #include "IRISApplication.h"
-#include "IRISImageData.h"
 #include "IRISSliceWindow.h"
 #include "UserInterfaceLogic.h"
+#include "IRISImageData.h"
 
 #include <cassert>
 #include <cmath>
@@ -39,8 +39,6 @@ BubblesInteractionMode
     int numBubbles = m_ParentUI->getNumberOfBubbles();
     if (numBubbles > 0)
       {
-      
-      
       // Get the active color label 
       int currentcolor =  m_GlobalState->GetDrawingColorLabel();      
       ColorLabel cl = 
@@ -59,13 +57,13 @@ BubblesInteractionMode
         Bubble *bubbles = m_ParentUI->getBubbles();
         
         // Get the current crosshairs position
-        Vector3i cursorImage = m_GlobalState->GetCrosshairsPosition();
+        Vector3ui cursorImage = m_GlobalState->GetCrosshairsPosition();
 
         // Get the image space dimension that corresponds to this window
         int iid = m_Parent->m_ImageAxes[2];
         
         // Get the other essentials from the parent
-        Vector3f scaling = m_Parent->m_SliceScale;       
+        Vector3f scaling = m_Parent->m_SliceSpacing;       
         
         // Turn on alpha blending
         glEnable(GL_BLEND);
@@ -80,11 +78,11 @@ BubblesInteractionMode
           {  
           
           // Get the center and radius of the i-th bubble
-          Vector3i ctrImage = bubbles[i].center;
+          Vector3f ctrImage = to_float(bubbles[i].center) + Vector3f(0.5f);
           int radius = bubbles[i].radius;
 
           // Remap the center into slice coordinates
-          Vector2f ctrSlice = m_Parent->MapImageToSlice(to_float(ctrImage));
+          Vector3f ctrSlice = m_Parent->MapImageToSlice(to_float(ctrImage));
 
           // Compute the offset from the center along the slice z-direction
           // in physical coordinates
@@ -97,10 +95,10 @@ BubblesInteractionMode
           float diskradius = sqrt(fabs(radius*radius - dcenter*dcenter));
 
           // Draw the bubble
-          glColor4f(rgb[0],rgb[1],rgb[2],alpha);
+          glColor4ub(rgb[0],rgb[1],rgb[2],alpha);
           glPushMatrix();
           
-          glTranslatef(ctrSlice[0]+0.5f, ctrSlice[1]+0.5f, 0.0f);
+          glTranslatef(ctrSlice[0], ctrSlice[1], 0.0f);
           glScalef(1.0f / scaling(0),1.0f / scaling(1),1.0f);
           gluDisk(object,0,diskradius,100,100);
           glPopMatrix();

@@ -44,7 +44,7 @@ void
 RegionInteractionMode
 ::GetEdgeVertices(unsigned int direction,unsigned int index,
                   Vector2f &x0,Vector2f &x1, 
-                  const Vector2f corner[2])
+                  const Vector3f corner[2])
 {
   x0(direction) = corner[0](direction);
   x1(direction) = corner[1](direction);
@@ -56,7 +56,7 @@ RegionInteractionMode
 ::GetEdgeDistance(unsigned int direction,
                   unsigned int index,
                   const Vector2f &x,
-                  const Vector2f corner[2])
+                  const Vector3f corner[2])
 {
   // Compute the vertices of the edge
   Vector2f x0,x1;
@@ -87,7 +87,8 @@ int RegionInteractionMode
   m_IsAnyEdgeHighlighted = false;
   
   // Convert the event location into slice u,v coordinates
-  Vector2f uvSlice = m_Parent->MapWindowToSlice(event.XSpace.extract(2));    
+  Vector3f xSlice = m_Parent->MapWindowToSlice(event.XSpace.extract(2));    
+  Vector2f uvSlice(xSlice(0),xSlice(1));
   
   // Record the system's corners at the time of drag start
   GetSystemROICorners(m_CornerDragStart);
@@ -128,7 +129,7 @@ int RegionInteractionMode
 }
 
 void RegionInteractionMode
-::GetSystemROICorners(Vector2f corner[2])
+::GetSystemROICorners(Vector3f corner[2])
 {
   // Get the region of interest in image coordinates  
   GlobalState::RegionType roi = m_GlobalState->GetSegmentationROI();
@@ -148,13 +149,13 @@ void RegionInteractionMode
 ::UpdateCorners(const FLTKEvent &event, const FLTKEvent &pressEvent)
 {
   // Compute the corners in slice coordinates
-  Vector2f corner[2];
+  Vector3f corner[2];
   GetSystemROICorners(corner);
 
   // Convert the location of the events into slice u,v coordinates
-  Vector2f uvSliceNow = 
+  Vector3f uvSliceNow = 
     m_Parent->MapWindowToSlice(event.XSpace.extract(2));
-  Vector2f uvSlicePress = 
+  Vector3f uvSlicePress = 
     m_Parent->MapWindowToSlice(pressEvent.XSpace.extract(2));
 
   // Get the current bounds and extents of the region of interest 
@@ -186,8 +187,6 @@ void RegionInteractionMode
       {
       if (m_EdgeHighlighted[dir][i])
         {
-        verbose << i << ", " << dir << ", " << uvSliceNow << ", " << uvSlicePress << endl;
-
         // Horizontal edge affects the y of the vertex and vice versa
         corner[i](1-dir) =
           m_CornerDragStart[i](1-dir) + uvSliceNow(1-dir) - uvSlicePress(1-dir);
@@ -217,8 +216,9 @@ void RegionInteractionMode
 
   // The slice z-direction index and size in the ROI should retain the system's
   // previous value because we are only manipulating the slice in 2D
-  roiCorner.SetIndex(m_Parent->m_Id,roiSystem.GetIndex(m_Parent->m_Id));
-  roiCorner.SetSize(m_Parent->m_Id,roiSystem.GetSize(m_Parent->m_Id));
+  unsigned int idx = m_Parent->m_ImageAxes[2];
+  roiCorner.SetIndex(idx,roiSystem.GetIndex(idx));
+  roiCorner.SetSize(idx,roiSystem.GetSize(idx));
 
   // Update the system's ROI
   m_GlobalState->SetSegmentationROI(roiCorner);
@@ -275,17 +275,18 @@ RegionInteractionMode
   assert(m_GlobalState->GetIsValidROI());
 
   // Compute the corners in slice coordinates
-  Vector2f corner[2];
+  Vector3f corner[2];
   GetSystemROICorners(corner);
 
   // Check that the current slice is actually within the bounding box
-  int slice = m_Parent->m_SliceIndex;
-  int dim = m_Parent->m_Id;
+  // int slice = m_Parent->m_SliceIndex;
+  int dim = m_Parent->m_ImageAxes[2];
+  int slice = m_GlobalState->GetCrosshairsPosition()[dim];
   int bbMin = m_GlobalState->GetSegmentationROI().GetIndex(dim);
   int bbMax = bbMin + m_GlobalState->GetSegmentationROI().GetSize(dim);
 
   // And if so, return without painting anything
-  if(bbMin > slice || bbMax < slice)
+  if(bbMin > slice || bbMax <= slice)
     return;
   
   // Set line properties
@@ -304,9 +305,9 @@ RegionInteractionMode
     {
       // Select color according to edge state
       if(m_EdgeHighlighted[dir][i])
-        glColor3f(1,1,0);
+        glColor3f(1,1,0.5);
       else
-        glColor3f(1,0,0);
+        glColor3f(1,0.5,0.5);
 
       // Compute the vertices of the edge
       Vector2f x0,x1;

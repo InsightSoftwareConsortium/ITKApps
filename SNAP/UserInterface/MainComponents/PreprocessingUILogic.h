@@ -29,7 +29,8 @@ class UserInterfaceLogic;
 // ITK forward references
 namespace itk {
   template<class TPixel, unsigned int VDimension> class Image;
-  template<class TObject> class SimpleMemberCommand;
+  template<class TObject> class MemberCommand;
+  class EventObject;
 }
 
 /**
@@ -93,7 +94,7 @@ private:
   typedef itk::SmartPointer<EdgeFilterType> EdgeFilterPointer;
 
   /** A command type for progress reporting */
-  typedef itk::SimpleMemberCommand<PreprocessingUILogic> CommandType;
+  typedef itk::MemberCommand<PreprocessingUILogic> CommandType;
   typedef itk::SmartPointer<CommandType> CommandPointer;
 
   /** The filter used for in-out thresholding */
@@ -111,10 +112,10 @@ private:
   void UpdateThresholdPlot();
 
   /** Progress callback for edge preprocessing */
-  void OnEdgeProgress();
+  void OnEdgeProgress(itk::Object *object, const itk::EventObject &event);
 
   /** Progress callback for thresholding preprocessing */
-  void OnThresholdProgress();
+  void OnThresholdProgress(itk::Object *object, const itk::EventObject &event);
 
   /** Common closing code for both preprocessors */
   void OnCloseCommon();

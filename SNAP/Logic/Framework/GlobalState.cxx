@@ -109,9 +109,9 @@ GlobalState
  */
 void 
 GlobalState
-::SetGreyExtension(char * fname)
+::SetGreyExtension(const char *fname)
 {
-  char * basename;
+  const char * basename;
   // Make sure fname is valid
   if(fname != NULL)
     {

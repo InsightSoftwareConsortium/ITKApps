@@ -13,37 +13,64 @@
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "UserInterfaceLogic.h"
-#include "ImageIOWizardLogic.h"
 #include "IntensityCurveUILogic.h"
 #include "GlobalState.h"
-#include "GreyImageWrapperImplementation.h"
+#include "GreyImageWrapper.h"
 #include "IRISApplication.h"
 #include "IRISImageData.h"
-#include "PreprocessingUILogic.h"
 #include "SmoothBinaryThresholdImageFilter.h"
 #include "EdgePreprocessingImageFilter.h"
 #include "SNAPImageData.h"
 #include "IRISVectorTypesToITKConversion.h"
 
+// Additional UI component inludes
+#include "PreprocessingUILogic.h"
+#include "SnakeParametersUILogic.h"
+#include "GreyImageIOWizardLogic.h"
+#include "PreprocessingImageIOWizardLogic.h"
+#include "SegmentationImageIOWizardLogic.h"
+#include "SliceWindowCoordinator.h"
+#include "SNAPLevelSetDriver.h"
+
+#include <itksys/SystemTools.hxx>
+#include <string>
+#include <strstream>
+#include <iomanip>
+
 using namespace itk;
+using namespace std;
 
 UserInterfaceLogic
-::UserInterfaceLogic(IRISApplication *iris)
+::UserInterfaceLogic(IRISApplication *iris, SystemInterface *system)
 : UserInterface()
 {
-  // Get some pointers to application data 
+  // Store the pointers to application and system high level objects
   m_Driver = iris;
+  m_SystemInterface = system;
 
   // This is just done for shorthand
   m_GlobalState = iris->GetGlobalState();
 
-  // Create the sub-interfaces
-  m_WizGreyIO = new ImageIOWizardLogic<GreyType>;
-  m_WinIntensityCurve = new IntensityCurveUILogic;
+  // Instantiate the IO wizards
+  m_WizGreyIO = new GreyImageIOWizardLogic; 
+  m_WizSegmentationIO = new SegmentationImageIOWizardLogic;
+  m_WizPreprocessingIO = new PreprocessingImageIOWizardLogic;
+  
+  // Instantiate other windows
+  m_IntensityCurveUI = new IntensityCurveUILogic;
 
   // Initialize the preprocessing windows
   m_PreprocessingUI = new PreprocessingUILogic;
   m_PreprocessingUI->Register(this);
+
+  // Initialize the snake parameter window
+  m_SnakeParametersUI = new SnakeParametersUILogic;
+
+  // Initialize the slice window coordinator object
+  m_SliceCoordinator = new SliceWindowCoordinator();
+
+  // Create a callback command for the snake loop
+  m_PostSnakeCommand = SimpleCommandType::New();
 
   m_SnakeIsRunning = 0;
   init();
@@ -52,9 +79,18 @@ UserInterfaceLogic
 UserInterfaceLogic
 ::~UserInterfaceLogic() 
 {
-  // Deallocate the sub-interfaces
+  // Delete the IO wizards
   delete m_WizGreyIO;
-  delete m_WinIntensityCurve;
+  delete m_WizSegmentationIO;
+  delete m_WizPreprocessingIO;
+
+  // Delete the UI's
+  delete m_IntensityCurveUI;
+  delete m_SnakeParametersUI;
+  delete m_PreprocessingUI;
+
+  // Delete the window coordinator
+  delete m_SliceCoordinator;
 }
 
 void UserInterfaceLogic
@@ -121,16 +157,16 @@ UserInterfaceLogic
   if (ShowROI_check->value())
   {
   m_GlobalState->SetShowROI(true);
-  Win2D[0]->EnterRegionMode();
-  Win2D[1]->EnterRegionMode();
-  Win2D[2]->EnterRegionMode();
+  m_IRISWindow2D[0]->EnterRegionMode();
+  m_IRISWindow2D[1]->EnterRegionMode();
+  m_IRISWindow2D[2]->EnterRegionMode();
   }
   else 
   {
   m_GlobalState->SetShowROI(false);
-  Win2D[0]->ExitRegionMode();
-  Win2D[1]->ExitRegionMode();
-  Win2D[2]->ExitRegionMode();
+  m_IRISWindow2D[0]->ExitRegionMode();
+  m_IRISWindow2D[1]->ExitRegionMode();
+  m_IRISWindow2D[2]->ExitRegionMode();
   }
 
   RedrawWindows();
@@ -168,11 +204,19 @@ UserInterfaceLogic
 //
 //--------------------------------------------
 
+unsigned int 
+UserInterfaceLogic
+::GetImageAxisForDisplayWindow(unsigned int window)
+{
+  return m_Driver->GetCurrentImageData()->
+    GetImageGeometry().GetDisplayToImageTransform(window).
+    GetCoordinateIndexZeroBased(2);
+}
+
 void 
 UserInterfaceLogic
 ::OnSnakeStartAction()
 {
-  
   uchar index = m_GlobalState->GetDrawingColorLabel();
 
   if (0 == index) 
@@ -203,33 +247,12 @@ UserInterfaceLogic
   // Inform the global state that we're in sNAP
   m_GlobalState->SetSNAPActive(true);
 
-  // reinitialize the point of view
-  Vector3i dims = m_Driver->GetCurrentImageData()->GetVolumeExtents();
-  cerr << "roi_data dims: (" << dims[0] << "," << dims[1] << "," << dims[2] << ")" << endl;
-  Vector3i init_pos;
-  int i;
-  for (i=0; i<3; i++) init_pos[i] = dims[i] / 2;
-
-  // TODO: Unify this!
-  m_Driver->GetCurrentImageData()->SetCrosshairs(init_pos);
-  m_GlobalState->SetCrosshairsPosition(init_pos) ;
-
-
-  for (i=0; i<3; i++) 
-    {
-    // As with the other sliders, the range is negative
-    m_InSNAPSliceSlider[i]->range( 1.0 - roi.GetSize(i), 0.0 );
-    m_InSNAPSliceSlider[i]->slider_size( 1.0/ roi.GetSize(i) );
-    m_InSNAPSliceSlider[i]->linesize(1);
-    m_OutSNAPSliceIndex[i]->activate();
-    }
-  this->ResetScrollbars();
-
-  //set bubble radius range according to volume dimensions (world dimensions)
+  // Set bubble radius range according to volume dimensions (world dimensions)
+  Vector3ui size = m_Driver->GetCurrentImageData()->GetVolumeExtents();
   Vector3f voxdims = m_Driver->GetSNAPImageData()->GetVoxelScaleFactor();
-  float mindim = dims[0]*voxdims[0];
-  if (dims[1]*voxdims[1] < mindim) mindim = dims[1]*voxdims[1];
-  if (dims[2]*voxdims[2] < mindim) mindim = dims[2]*voxdims[2];
+  float mindim = size[0]*voxdims[0];
+  if (size[1]*voxdims[1] < mindim) mindim = size[1]*voxdims[1];
+  if (size[2]*voxdims[2] < mindim) mindim = size[2]*voxdims[2];
 
   m_InBubbleRadius->value(1);
   if ((int)(mindim/2) < 1)
@@ -243,10 +266,6 @@ UserInterfaceLogic
 
   SyncSnakeToIRIS();
 
-  // Kick the Window2D's
-  for (i=0; i<3; i++) 
-    m_SNAPWindow2D[i]->InitializeSlice(m_Driver->GetCurrentImageData());
-
   //initialize GUI widgets
   m_BtnPreprocess->activate();
   m_BtnAcceptPreprocessing->deactivate();
@@ -258,24 +277,23 @@ UserInterfaceLogic
   m_RadioSNAPViewOriginal->value(1);
   m_BtnAcceptInitialization->show();
   m_BtnRestartInitialization->hide();
-  m_MenuSavePreprocessed->deactivate();
-  m_MenuLoadPreprocessed->activate();
   m_ChkContinuousView3DUpdate->deactivate();
   m_ChkContinuousView3DUpdate->value(0);
   m_BtnSNAPMeshUpdate->deactivate();
 
-  m_GlobalState->SetShowSpeed(false);
+  // Menu items
+  m_MenuLoadGrey->deactivate();
+  m_MenuLoadSegmentation->deactivate();
+  m_MenuSaveSegmentation->deactivate();
+  m_MenuSaveGreyROI->activate();
+  m_MenuLoadLabels->deactivate();
+  m_MenuSaveLabels->deactivate();
+  m_MenuSavePreprocessed->deactivate();
+  m_MenuLoadPreprocessed->activate();
+  m_MenuSaveVoxelCounts->deactivate();
 
-  /*   
-       if (m_GlobalState->GetSnakeMode() == IN_OUT_SNAKE)
-       {
-       OnInOutSnakeSelect();
-       }
-       else
-       {
-       OnEdgeSnakeSelect();
-       }
-       */
+
+  m_GlobalState->SetShowSpeed(false);
 
   m_BrsActiveBubbles->clear();
 
@@ -307,6 +325,9 @@ UserInterfaceLogic
 
   // show the snake window, hide the IRIS window
   ShowSNAP();
+
+  // Image geometry has changed
+  OnImageGeometryUpdate();
 
   m_OutMessage->value("Initalize snake");
 }
@@ -363,7 +384,7 @@ UserInterfaceLogic
 void 
 UserInterfaceLogic
 ::OnAcceptPreprocessingAction()
-{
+{  
   SetActiveSegmentationPipelinePage(1);
 }
 
@@ -408,7 +429,7 @@ UserInterfaceLogic
   m_OutMessage->value("");
   Bubble* bubble;
   bubble=new Bubble();
-  bubble->center=m_GlobalState->GetCrosshairsPosition();
+  bubble->center=to_int(m_GlobalState->GetCrosshairsPosition());
   bubble->radius=(int) m_InBubbleRadius->value();
   char msg[1024];
   sprintf(msg,"x,y,z=%d,%d,%d; R=%d ", bubble->center[0]+1,
@@ -502,84 +523,6 @@ UserInterfaceLogic
 //--------------------------------------------
 //
 //
-// MISC WIDGET STUFF
-//
-//
-//--------------------------------------------
-
-void 
-UserInterfaceLogic
-::UpdateSNAPImageProbe()
-{
-  char strLabel[256];
-  Vector3i crosshairs = m_GlobalState->GetCrosshairsPosition();
-
-  // Get a pointer to the SNAP image data
-  SNAPImageData *snap = m_Driver->GetSNAPImageData();
-  
-  // Get the grey value
-  GreyType grey = snap->GetGrey()->GetVoxel(crosshairs);
-  sprintf(strLabel,"%d",grey);
-  m_OutSNAPProbe->value(strLabel);
-
-  // Get the label value
-  LabelType label = snap->GetSegmentation()->GetVoxel(crosshairs);
-  sprintf(strLabel, "%d", (int) label);
-  m_OutSNAPLabelProbe->value(strLabel);
-
-  // Get the speed value (if possible)
-  if(m_GlobalState->GetSpeedPreviewValid())
-    {
-    // Speed preview is being shown.  Get a preview pixel
-    float speed = snap->GetSpeed()->GetPreviewVoxel(crosshairs);
-    sprintf(strLabel, "%6f", speed);
-    }
-  else if(m_GlobalState->GetSpeedValid())
-    {
-    // Speed image is valid, i.e., has been properly computed
-    float speed = snap->GetSpeed()->GetVoxel(crosshairs);
-    sprintf(strLabel, "%6f", speed);
-    }
-  else 
-    {
-    sprintf(strLabel, "n/a");
-    }
-  
-  // Display the speed string
-  m_OutSNAPSpeedProbe->value(strLabel);
-}
-
-void 
-UserInterfaceLogic
-::UpdateSNAPPositionDisplay(int id)
-{
-  // Textbox below the Window2D sliders
-  char temp[20];
-  sprintf(temp,"%d of %d",
-    1 - (int) m_InSNAPSliceSlider[id]->value(),
-    1 - (int) m_InSNAPSliceSlider[id]->minimum());
-  m_OutSNAPSliceIndex[id]->value((const char*) temp);
-}
-
-void 
-UserInterfaceLogic
-::OnSNAPSliceSliderChange(int id)
-{
-  // Sliders selecting the slice in a Window2D
-  Vector3i pos = m_GlobalState->GetCrosshairsPosition();
-  pos[id] =  (int) - m_InSNAPSliceSlider[id]->value();
-
-  // TODO: Unify this!
-  m_Driver->GetCurrentImageData()->SetCrosshairs(pos);  
-  m_GlobalState->SetCrosshairsPosition(pos);
-
-  UpdateSNAPPositionDisplay(id);
-  RedrawWindows();
-}
-
-//--------------------------------------------
-//
-//
 // SNAKE TYPE RADIO BUTTONS
 //
 //
@@ -609,12 +552,6 @@ UserInterfaceLogic
   // Set parameters to default values
   m_GlobalState->SetSnakeParameters(
     SnakeParameters::GetDefaultInOutParameters());
-
-  m_InSnakeParametersGradientWeight->hide();
-  m_InSnakeParametersGradientExponent->hide();
-  m_InSnakeParametersMCFExponent->hide();
-  m_InSnakeParametersSpeedExponent->hide();
-  m_InSnakeParametersSmoothingExponent->hide();
 
   m_Driver->GetSNAPImageData()->ClearSpeed();
 
@@ -654,11 +591,6 @@ UserInterfaceLogic
   m_GlobalState->SetSnakeParameters(
     SnakeParameters::GetDefaultEdgeParameters());
 
-  m_InSnakeParametersGradientWeight->show();
-  m_InSnakeParametersGradientExponent->show();
-  m_InSnakeParametersMCFExponent->show();
-  m_InSnakeParametersSpeedExponent->show();
-  m_InSnakeParametersSmoothingExponent->show();
   if (m_Driver->GetSNAPImageData()) m_Driver->GetSNAPImageData()->ClearSpeed();
   m_GlobalState->SetSpeedValid(false);
   m_GrpImageOptions->deactivate();
@@ -707,18 +639,20 @@ UserInterfaceLogic
   fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
 
   // Merge bubbles with the segmentation image and initialize the snake
-  int nInitVoxels = snapData->InitializeLevelSet(
-    m_GlobalState->GetSnakeMode(),m_GlobalState->GetSnakeParameters(),
-    bubbles, numbubbles,m_GlobalState->GetDrawingColorLabel());
+  bool rc = snapData->InitializeSegmentationPipeline(
+    m_GlobalState->GetSnakeParameters(),bubbles, numbubbles,
+    m_GlobalState->GetDrawingColorLabel());
 
   // Restore the cursor
   fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
   
   // Check if we need to bail
-  if (nInitVoxels <= 0) 
+  if (!rc) 
     {    
     // There were no voxels selected in the end
-    m_OutMessage->value("No valid snake initialization specified!");
+    fl_alert("Can not proceed without an initialization\n"
+             "Please place a bubble into the image!");
+    
     m_BtnPreprocess->activate();
     m_GrpSnakeChoiceRadio->activate();
     m_GrpSNAPStepInitialize->activate();
@@ -733,18 +667,16 @@ UserInterfaceLogic
   m_BtnAcceptInitialization->hide();
   m_BtnRestartInitialization->show();
 
-  m_GlobalState->SetSnakeActive(true);
-
-  // for (int i=0; i<3; i++) m_SNAPWindow2D[i]->MakeSegTextureCurrent();
 
   m_GrpSnakeControl->activate();
-
   m_ChkContinuousView3DUpdate->activate();
   m_ChkContinuousView3DUpdate->value(0);
   m_BtnSNAPMeshUpdate->activate();
 
+  // Reset the snake iteration counter
   m_SnakeIteration = 0;
   UpdateIterationOutput();
+
   m_BtnAcceptSegmentation->activate();
   RedrawWindows();
   m_SNAPWindow3D->ClearScreen();// reset Mesh object in Window3D_s
@@ -754,6 +686,43 @@ UserInterfaceLogic
   SetActiveSegmentationPipelinePage(2);
 
   m_OutMessage->value("Snake initialized successfully");
+
+  m_GlobalState->SetSnakeActive(true);
+
+  // This is unconventional code.  At this point, the filter contained in
+  // the LevelSetDriver is going to enter and execute its Update() code.  After
+  // initializing, it is going to call the callback method that we construct 
+  // here, and it will keep calling it, until we use the RequestEnd() method 
+  // in the LevelSetDriver, which will return the control to this point in the
+  // code.  That's why the snake deinitialization code is also here
+
+  // Create the idle callback command
+  SimpleCommandType::Pointer commandIdle = SimpleCommandType::New();
+  commandIdle->SetCallbackFunction(
+    this,UserInterfaceLogic::OnSnakeVCRIdleCallback);
+
+  // Create the update callback command
+  SimpleCommandType::Pointer commandUpdate = SimpleCommandType::New();
+  commandUpdate->SetCallbackFunction(
+    this,UserInterfaceLogic::OnSnakeVCRUpdateCallback);
+
+  // Clear the post-snake command (command used to tell this method whom to
+  // call back after it's done
+  m_PostSnakeCommand = NULL;
+
+  // TODO: Progress bar is needed here
+  fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+  
+  // Next, enter the update loop
+  m_Driver->GetSNAPImageData()->StartSegmentationPipeline(
+    commandIdle,commandUpdate);
+
+  // When we end up here, it means that the update loop has finished, which 
+  // means that we've either gone back one page, or finished, or accepted the
+  // segmentation.  The command pointed to by m_PostSnakeCommand will point to
+  // the function that the user interface needs to execute now
+  if(m_PostSnakeCommand)
+    m_PostSnakeCommand->Execute((const itk::Object *) 0,itk::NoEvent());
 }
 
 
@@ -763,20 +732,20 @@ UserInterfaceLogic
 {
   switch(page)
     {
-  case 0 : 
-    m_BtnSNAPStepPreprocess->setonly();
-    m_WizSegmentationPipeline->value(m_GrpSNAPStepPreprocess);
-    break;
+    case 0 : 
+      m_BtnSNAPStepPreprocess->setonly();
+      m_WizSegmentationPipeline->value(m_GrpSNAPStepPreprocess);
+      break;
 
-  case 1 :
-    m_BtnSNAPStepInitialize->setonly();
-    m_WizSegmentationPipeline->value(m_GrpSNAPStepInitialize);
-    break;
+    case 1 :
+      m_BtnSNAPStepInitialize->setonly();
+      m_WizSegmentationPipeline->value(m_GrpSNAPStepInitialize);
+      break;
 
-  case 2 :
-    m_BtnSNAPStepSegment->setonly();
-    m_WizSegmentationPipeline->value(m_GrpSNAPStepSegment);
-    break;
+    case 2 :
+      m_BtnSNAPStepSegment->setonly();
+      m_WizSegmentationPipeline->value(m_GrpSNAPStepSegment);
+      break;
     }
 }
 
@@ -794,28 +763,43 @@ void
 UserInterfaceLogic
 ::OnRestartInitializationAction()
 {
-  m_SnakeIsRunning = 0;
-  m_GlobalState->SetSnakeActive(false);
-  m_GrpSnakeControl->deactivate();
-  m_BtnPreprocess->activate();
-  m_GrpSnakeChoiceRadio->activate();
-  m_GrpSNAPStepInitialize->activate();
-  m_MenuLoadPreprocessed->activate();
-  m_BtnRestartInitialization->hide();
-  m_BtnAcceptInitialization->show();
-  m_WinSnakeParameters->hide();
-  m_ChkContinuousView3DUpdate->value(0);
-  m_ChkContinuousView3DUpdate->deactivate();
-  m_BtnSNAPMeshUpdate->deactivate();
-  m_BtnAcceptSegmentation->deactivate();
-  // for (int i=0; i<3; i++) m_SNAPWindow2D[i]->MakeSegTextureCurrent();
-  m_SNAPWindow3D->ClearScreen(); // reset Mesh object in Window3D_s
-  m_SNAPWindow3D->ResetView();   // reset cursor
-  RedrawWindows();
-  m_OutMessage->value("Snake initialization restarted");
+  // This callback has double functionality, depending on whether the 
+  // level set update loop is active or not
+  if(m_Driver->GetSNAPImageData()->IsSegmentationPipelineRunning())
+    {
+    // Tell the update loop to terminate
+    m_Driver->GetSNAPImageData()->RequestSegmentationPipelineTermination();
 
-  // Flip to the second page
-  SetActiveSegmentationPipelinePage(1);
+    // Set the post-update callback to right here
+    m_PostSnakeCommand = SimpleCommandType::New();
+    m_PostSnakeCommand->SetCallbackFunction(
+      this,UserInterfaceLogic::OnRestartInitializationAction);
+    }
+  else
+    {
+    m_SnakeIsRunning = 0;
+    m_GlobalState->SetSnakeActive(false);
+    m_GrpSnakeControl->deactivate();
+    m_BtnPreprocess->activate();
+    m_GrpSnakeChoiceRadio->activate();
+    m_GrpSNAPStepInitialize->activate();
+    m_MenuLoadPreprocessed->activate();
+    m_BtnRestartInitialization->hide();
+    m_BtnAcceptInitialization->show();
+    m_ChkContinuousView3DUpdate->value(0);
+    m_ChkContinuousView3DUpdate->deactivate();
+    m_BtnSNAPMeshUpdate->deactivate();
+    m_BtnAcceptSegmentation->deactivate();
+
+    m_SNAPWindow3D->ClearScreen(); // reset Mesh object in Window3D_s
+    m_SNAPWindow3D->ResetView();   // reset cursor
+    RedrawWindows();
+
+    m_OutMessage->value("Snake initialization restarted");
+
+    // Flip to the second page
+    SetActiveSegmentationPipelinePage(1);
+    }
 }
 
 void
@@ -823,7 +807,6 @@ UserInterfaceLogic
 ::OnRestartPreprocessingAction()
 {
   // Clear the bubble list
-  m_BrsActiveBubbles->clear();
   m_HighlightedBubble = 0;
 
   // Flip to the first page
@@ -837,150 +820,43 @@ void
 UserInterfaceLogic
 ::OnSnakeParametersAction()
 {
-  m_WinSnakeParameters->position(m_WinMain->x()+m_GRPSNAPView3D->x()+10,
-    m_WinMain->y()+m_GRPSNAPView3D->y()+30);
-
-  //sync snake params widgets with global state
-
-  /*
-  float timestep,speed;
-  bool clamp;
-  float ground;
-
-  ConstraintsType type;
-  float c_MCF,c_smooth,c_del_g;
-  int r_MCF,r_c,r_smooth,r_del_g;
-  */
-  // Get global parameters
-  SnakeParameters p = m_GlobalState->GetSnakeParameters();
-
-  switch (p.GetType()) 
-    {
-  case SnakeParameters::SAPIRO:
-    m_BtnSnakeParametersSapiro->setonly();
-    OnSnakeParametersSapiroSelect();
-    break;
-  case SnakeParameters::SCHLEGEL:
-    m_BtnSnakeParametersSchlegel->setonly();
-    OnSnakeParametersSchlegelSelect();
-    break;
-  case SnakeParameters::TURELLO:
-    m_BtnSnakeParametersTurello->setonly();
-    OnSnakeParametersTurelloSelect();
-    break;
-  case SnakeParameters::USER:
-    m_BtnSnakeParametersUserDefined->setonly();
-    OnSnakeParametersUserDefinedSelect();
-    break;
-    }
-  m_InSnakeParametersGradientWeight->value(m_InSnakeParametersGradientWeight->clamp(p.GetAdvectionWeight()));
-  m_InSnakeParametersGradientExponent->value(m_InSnakeParametersGradientExponent->clamp(p.GetAdvectionSpeedExponent()));
-  m_InSnakeParametersSmoothingWeight->value(m_InSnakeParametersSmoothingWeight->clamp(p.GetLaplacianWeight()));
-  m_InSnakeParametersMCFWeight->value(m_InSnakeParametersMCFWeight->clamp(p.GetCurvatureWeight()));
-  m_InSnakeParametersSpeedExponent->value(m_InSnakeParametersSpeedExponent->clamp(p.GetPropagationSpeedExponent()));
-  m_InSnakeParametersSmoothingExponent->value(m_InSnakeParametersSmoothingExponent->clamp(p.GetLaplacianSpeedExponent()));
-  m_InSnakeParametersMCFExponent->value(m_InSnakeParametersMCFExponent->clamp(p.GetCurvatureSpeedExponent()));
-  m_InSnakeParametersTimeStep->value(m_InSnakeParametersTimeStep->clamp(p.GetTimeStep()));
-  m_InSnakeParametersGround->value(m_InSnakeParametersGround->clamp(p.GetGround()));
-  m_InSnakeParametersSpeed->value(m_InSnakeParametersSpeed->clamp(p.GetPropagationWeight()));
-  m_InSnakeParametersParamsClamp->value(p.GetClamp());
-  OnSnakeParametersClampChange();
-
-  m_WinSnakeParameters->show();
-}
-
-void 
-UserInterfaceLogic
-::OnSnakeParametersApplyAction()
-{
-  SnakeParameters pNew;
+  // Get the current parameters from the system
   SnakeParameters pGlobal = m_GlobalState->GetSnakeParameters();
+  
+  // Send current parameter to the snake parameter setting UI
+  m_SnakeParametersUI->SetParameters(pGlobal);
 
-  pNew.SetTimeStep((float)m_InSnakeParametersTimeStep->value());
-  pNew.SetPropagationWeight((float)m_InSnakeParametersSpeed->value());
-  pNew.SetGround((float)m_InSnakeParametersGround->value());
-  pNew.SetClamp(0 != m_InSnakeParametersParamsClamp->value());
-  pNew.SetLaplacianWeight((float)m_InSnakeParametersSmoothingWeight->value());
-  pNew.SetLaplacianSpeedExponent((int)m_InSnakeParametersSmoothingExponent->value());
-  pNew.SetCurvatureWeight((float)m_InSnakeParametersMCFWeight->value());
-  pNew.SetCurvatureSpeedExponent((int)m_InSnakeParametersMCFExponent->value());
-  pNew.SetAdvectionWeight((int)m_InSnakeParametersGradientWeight->value());
-  pNew.SetAdvectionSpeedExponent((int)m_InSnakeParametersGradientExponent->value());
-  pNew.SetPropagationSpeedExponent((int)m_InSnakeParametersSpeedExponent->value());
-
-  if (m_BtnSnakeParametersSapiro->value())
-    pNew.SetType(SnakeParameters::SAPIRO);
-  else if (m_BtnSnakeParametersSchlegel->value())
-    pNew.SetType(SnakeParameters::SCHLEGEL);
-  else if (m_BtnSnakeParametersTurello->value())
-    pNew.SetType(SnakeParameters::TURELLO);
-  else
-    pNew.SetType(SnakeParameters::USER);
-
-  // Only apply if parameters have changed
-  if (!(pNew == pGlobal)) 
+  // Chech whether we need to warn user about changing the solver in the 
+  // process of evolution
+  m_SnakeParametersUI->SetWarnOnSolverUpdate(m_SnakeIteration > 1);
+  
+  // Show the snake parameters window
+  CenterChildWindowInParentWindow(m_SnakeParametersUI->GetWindow(),m_WinMain);
+  m_SnakeParametersUI->DisplayWindow();
+  
+  // Wait until the window has been closed
+  while(m_SnakeParametersUI->GetWindow()->visible())
+    Fl::wait();
+    
+  // Have the parameters been accepted by the user?
+  if(m_SnakeParametersUI->GetUserAccepted())
     {
-    m_GlobalState->SetSnakeParameters(pNew);
-
-    if (m_Driver->GetSNAPImageData()->IsSnakeInitialized()) 
+    // Get the new parameters
+    SnakeParameters pNew = m_SnakeParametersUI->GetParameters();
+    
+    // Have the parameters changed?
+    if(!(pGlobal == pNew))
       {
-      m_Driver->GetSNAPImageData()->SetSnakeParameters(pNew);
+      // Update the system's parameters with new values
+      m_GlobalState->SetSnakeParameters(pNew);
+
+      // Update the running snake
+      if (m_Driver->GetSNAPImageData()->IsSegmentationPipelineInitialized()) 
+        {
+        m_Driver->GetSNAPImageData()->SetSegmentationParameters(pNew);
+        }
       }
     }
-}
-
-void 
-UserInterfaceLogic
-::OnSnakeParametersSchlegelSelect()
-{
-  m_GrpSnakeParametersSliders->deactivate();
-  m_InSnakeParametersMCFWeight->value(0.7);
-  m_InSnakeParametersMCFExponent->value(1);
-  m_InSnakeParametersGradientExponent->value(1);
-  m_InSnakeParametersSpeedExponent->value(2);
-  m_InSnakeParametersSmoothingExponent->value(2);
-  m_InSnakeParametersSmoothingWeight->value(1);
-}
-
-void 
-UserInterfaceLogic
-::OnSnakeParametersSapiroSelect()
-{
-  m_GrpSnakeParametersSliders->deactivate();
-  m_InSnakeParametersMCFWeight->value(0.7);
-  m_InSnakeParametersMCFExponent->value(0);
-  m_InSnakeParametersGradientExponent->value(0);
-  m_InSnakeParametersSpeedExponent->value(1);
-  m_InSnakeParametersSmoothingWeight->value(0.0);
-  m_InSnakeParametersSmoothingExponent->value(0.0);
-}
-
-void 
-UserInterfaceLogic
-::OnSnakeParametersTurelloSelect()
-{
-  m_GrpSnakeParametersSliders->deactivate();
-  m_InSnakeParametersMCFWeight->value(0.7);
-  m_InSnakeParametersMCFExponent->value(0);
-  m_InSnakeParametersGradientExponent->value(1);
-  m_InSnakeParametersSpeedExponent->value(2);
-  m_InSnakeParametersSmoothingWeight->value(0.25);
-  m_InSnakeParametersSmoothingExponent->value(2);
-}
-
-void 
-UserInterfaceLogic
-::OnSnakeParametersUserDefinedSelect()
-{
-  m_GrpSnakeParametersSliders->activate();
-}
-
-void 
-UserInterfaceLogic
-::OnSnakeParametersClampChange()
-{
-  if (m_InSnakeParametersParamsClamp->value()) m_InSnakeParametersGround->activate();
-  else m_InSnakeParametersGround->deactivate();
 }
 
 void 
@@ -1002,60 +878,67 @@ void
 UserInterfaceLogic
 ::OnSnakeRewindAction()
 {
-  if (!m_GlobalState->GetSnakeActive()) return;
-
-  m_SnakeIsRunning = 0;//stop the play button, if it's running
-
-  m_Driver->GetSNAPImageData()->RestartSnake();
-
+  // Stop the play button, if it's running
+  m_SnakeIsRunning = 0;
   m_SnakeIteration = 0;
-  UpdateIterationOutput();
-  // for (int i=0; i<3; i++) m_SNAPWindow2D[i]->MakeSegTextureCurrent();
-  if (m_ChkContinuousView3DUpdate->value())
-    m_SNAPWindow3D->UpdateMesh();
-  RedrawWindows();
+
+  // Basically, we tell the level set driver that we want a restart
+  m_Driver->GetSNAPImageData()->RequestSegmentationRestart();
 }
 
 void 
 UserInterfaceLogic
 ::OnSnakeStopAction()
 {
-  m_SnakeIsRunning = 0;//stop the play button, if it's running
+  // Stop the play button, if it's running
+  m_SnakeIsRunning = 0;
 }
 
-int 
+void 
 UserInterfaceLogic
-::RunSnake()
+::OnSnakeVCRUpdateCallback()
 {
-  try 
-    {
-    m_Driver->GetSNAPImageData()->StepSnake(m_SnakeStepSize);
-    }
-  catch (IRISException &exc) 
-    {
-    m_OutMessage->value(exc);
-    return 0;
-    }
+  // This function is called from the level set driver after an iteration has
+  // been performed or after reinitialization 
 
-  if (m_Driver->GetSNAPImageData()->IsSnakeConverged()) 
-    {
-    m_OutMessage->value("Snake has converged!");
-    //    m_SnakeIsRunning = 0;
-    //    m_BtnSnakePlay->deactivate();
-    }
-
-  m_SnakeIteration += m_SnakeStepSize;
+  // Display the current iteration (start with 0)
   UpdateIterationOutput();
 
-  m_Driver->GetSNAPImageData()->UpdateSnakeImage();
-
-  // for (int i=0; i<3; i++) m_SNAPWindow2D[i]->MakeSegTextureCurrent();
+  // Update the snake mesh if continuous update is on
   if (m_ChkContinuousView3DUpdate->value())
     m_SNAPWindow3D->UpdateMesh();
+
+  // Restore the cursor to normal
+  fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+
+  // Redraw the 2D windows
   RedrawWindows();
 
-  return 1;
+  // Increment the number of iterations
+  m_SnakeIteration++;
 }
+
+void 
+UserInterfaceLogic
+::OnSnakeVCRIdleCallback()
+{
+  // If the run button is depressed, we continuously schedule runs in
+  // this idle callback
+  if(m_SnakeIsRunning)
+    {
+    // We're in run mode (run button is down).  Request more iterations
+    m_Driver->GetSNAPImageData()->RequestSegmentationStep(m_SnakeStepSize);
+
+    // Let Fltk refresh as needed
+    Fl::check();
+    }
+  else 
+    {
+    // The snake is not contnuously running, so we just call Fl::wait()
+    Fl::wait();    
+    }  
+}
+
 
 void 
 UserInterfaceLogic
@@ -1063,40 +946,26 @@ UserInterfaceLogic
 {
   if (!m_GlobalState->GetSnakeActive()) return;
 
+  // Make sure the callback function is actively requesting more iterations
   m_SnakeIsRunning = 1;
-
-  while (m_SnakeIsRunning) 
-    {
-    if (0 == RunSnake()) 
-      {
-      m_OutMessage->value("Error running snake!");
-      return;
-      }
-
-    Fl::check();//lets the stop button or something else set m_SnakeIsRunning to 0
-    }
 }
 
 void 
 UserInterfaceLogic
 ::OnSnakeStepAction()
 {
-  if (!m_GlobalState->GetSnakeActive()) return;
+  // Stop the play button, if it's on
+  m_SnakeIsRunning = 0;
 
-  m_SnakeIsRunning = 0;//stop the play button, if it's running
-
-  //step the snake
-  if (0 == RunSnake()) 
-    {
-    m_OutMessage->value("Error running snake!");
-    return;
-    }
+  // Request that the desired number of iterations be executed
+  m_Driver->GetSNAPImageData()->RequestSegmentationStep(m_SnakeStepSize);
 }
 
 void 
 UserInterfaceLogic
 ::OnSnakeStepSizeChange()
 {
+  // Save the step size
   m_SnakeStepSize = atoi(m_InStepSize->text());
 }
 
@@ -1462,28 +1331,23 @@ UserInterfaceLogic
   m_Driver->SetCurrentImageDataToIRIS();
   m_Driver->ReleaseSNAPImageData();
 
+  // Inform the global state that we're not in sNAP
+  m_GlobalState->SetSNAPActive(false);
+
   // Speed image is no longer visible
   m_GlobalState->SetSpeedValid(false);
   m_GlobalState->SetShowSpeed(false);
-
-  // Set the crosshair position in IRIS
-  Vector3i xCross = m_Driver->GetCurrentImageData()->GetVolumeExtents() / 2;
-  
-  // TODO: Unify this
-  m_Driver->GetCurrentImageData()->SetCrosshairs(xCross);
-  m_GlobalState->SetCrosshairsPosition(xCross);
-  this->ResetScrollbars();
+  m_GlobalState->SetSnakeActive(false);
 
   // Updates some UI components (?)
   SyncIRISToSnake();
 
-  // Update the source for Window2D's
-  for (unsigned int i=0; i<3; i++) 
-    Win2D[i]->InitializeSlice(m_Driver->GetCurrentImageData());
-
   // Reset the mesh display
   m_SNAPWindow3D->ClearScreen();
   m_SNAPWindow3D->ResetView();
+
+  // Image geometry has changed
+  OnImageGeometryUpdate();
 
   // Make sure that the SNAP 'wizard' is in the right state for 
   // returning to the application
@@ -1491,11 +1355,18 @@ UserInterfaceLogic
 
   // Clear the list of bubbles
   m_BrsActiveBubbles->clear();
-  m_HighlightedBubble = 0;
-  m_GlobalState->SetSnakeActive(false);
-  
-  // Inform the global state that we're not in sNAP
-  m_GlobalState->SetSNAPActive(false);
+  m_HighlightedBubble = 0;  
+
+  // Activate/deactivate menu items
+  m_MenuLoadGrey->activate();
+  m_MenuLoadSegmentation->activate();
+  m_MenuSaveGreyROI->deactivate();
+  m_MenuSaveSegmentation->activate();
+  m_MenuLoadLabels->activate();
+  m_MenuSaveLabels->activate();
+  m_MenuSavePreprocessed->deactivate();
+  m_MenuLoadPreprocessed->deactivate();
+  m_MenuSaveVoxelCounts->activate();
   
   // Show IRIS window, Hide the snake window
   ShowIRIS();
@@ -1508,25 +1379,55 @@ void
 UserInterfaceLogic
 ::OnAcceptSegmentationAction()
 {
-  // Get data from SNAP back into IRIS
-  m_Driver->UpdateIRISWithSnapImageData();
+  // This callback has double functionality, depending on whether the 
+  // level set update loop is active or not
+  if(m_Driver->GetSNAPImageData()->IsSegmentationPipelineRunning())
+    {
+    // Tell the update loop to terminate
+    m_Driver->GetSNAPImageData()->RequestSegmentationPipelineTermination();
 
-  // Close up SNAP
-  this->CloseSegmentationCommon();
+    // Set the post-update callback to right here
+    m_PostSnakeCommand = SimpleCommandType::New();
+    m_PostSnakeCommand->SetCallbackFunction(
+      this,UserInterfaceLogic::OnAcceptSegmentationAction);
+    }
+  else
+    {
+    // Get data from SNAP back into IRIS
+    m_Driver->UpdateIRISWithSnapImageData();
 
-  // Message to the user
-  m_OutMessage->value("Accepted snake segmentation");
+    // Close up SNAP
+    this->CloseSegmentationCommon();
+
+    // Message to the user
+    m_OutMessage->value("Accepted snake segmentation");
+    }  
 }
 
 void 
 UserInterfaceLogic
 ::OnCancelSegmentationAction()
 {
-  // Clean up SNAP image data
-  this->CloseSegmentationCommon();
+  // This callback has double functionality, depending on whether the 
+  // level set update loop is active or not
+  if(m_Driver->GetSNAPImageData()->IsSegmentationPipelineRunning())
+    {
+    // Tell the update loop to terminate
+    m_Driver->GetSNAPImageData()->RequestSegmentationPipelineTermination();
 
-  // Message to the user
-  m_OutMessage->value("Snake segmentation cancelled");
+    // Set the post-update callback to right here
+    m_PostSnakeCommand = SimpleCommandType::New();
+    m_PostSnakeCommand->SetCallbackFunction(
+      this,UserInterfaceLogic::OnCancelSegmentationAction);
+    }
+  else
+    {
+    // Clean up SNAP image data
+    this->CloseSegmentationCommon();
+
+    // Message to the user
+    m_OutMessage->value("Snake segmentation cancelled");
+    }
 }
 
 void 
@@ -1534,8 +1435,33 @@ UserInterfaceLogic
 ::shutdown()
 {
   m_PreprocessingUI->HidePreprocessingWindows();
-  m_WinSnakeParameters->hide();
   m_WinMain->hide();
+}
+
+void 
+UserInterfaceLogic
+::OnMainWindowCloseAction()
+{
+  // We don't want to just exit when users press escape
+  if(Fl::event_key() == FL_Escape) return;
+
+  // Make sure that if the segmentation pipeline is currently running that we
+  // terminate it before closing the application
+  if(m_GlobalState->GetSNAPActive() &&
+     m_Driver->GetSNAPImageData()->IsSegmentationPipelineRunning())
+    {
+    // Tell the update loop to terminate
+    m_Driver->GetSNAPImageData()->RequestSegmentationPipelineTermination();
+
+    // Set the post-update callback to right here
+    m_PostSnakeCommand = SimpleCommandType::New();
+    m_PostSnakeCommand->SetCallbackFunction(
+      this,UserInterfaceLogic::OnMainWindowCloseAction);
+    }
+  else
+    {
+    exit(0);
+    }
 }
 
 void 
@@ -1554,7 +1480,7 @@ UserInterfaceLogic
   // Show and hide the GL windows
   for(unsigned int i=0;i<3;i++)
     {
-    Win2D[i]->show();
+    m_IRISWindow2D[i]->show();
     m_SNAPWindow2D[i]->hide();
     }
 
@@ -1576,7 +1502,7 @@ UserInterfaceLogic
   for(unsigned int i=0;i<3;i++)
     {
     m_SNAPWindow2D[i]->show();
-    Win2D[i]->hide();
+    m_IRISWindow2D[i]->hide();
     }
 
   m_SNAPWindow3D->show();
@@ -1589,9 +1515,12 @@ void
 UserInterfaceLogic
 ::init()
 {
+  // Make the menu bar global
+  m_MenubarMain->global();
+
   int i;
   // Register the GUI with its children
-  for (i=0; i<3; i++) Win2D[i]->Register(i,this);
+  for (i=0; i<3; i++) m_IRISWindow2D[i]->Register(i,this);
   m_IRISWindow3D->Register(3,this);
 
   for (i = 0; i < 3; i++) m_SNAPWindow2D[i]->Register(i,this);
@@ -1607,9 +1536,6 @@ UserInterfaceLogic
 
   m_GlobalState->SetSegmentationAlpha(128);
   m_InIRISLabelOpacity->Fl_Valuator::value(128);
-
-  // Default rendering options
-  UpdateRenderOptionsUI();
 
   this->InitColorMap();
 
@@ -1627,7 +1553,7 @@ UserInterfaceLogic
   // IntRAI->value(RAI, 3);
 
   // Window title
-  this->UpdateMainLabel(NULL, NULL);
+  this->UpdateMainLabel();
   m_OutMessage->value("Welcome to SnAP; select File->Load->Grey Data to begin");
 
   // #include "Common/m_OutAboutCredits.h" to define char credits[]
@@ -1649,22 +1575,28 @@ UserInterfaceLogic
   m_InStepSize->add("5");
   m_InStepSize->add("10");
 
-  // Initialize the Image IO wizard
+  // Initialize the Image IO wizards
   m_WizGreyIO->MakeWindow();
+  m_WizSegmentationIO->MakeWindow();
+  m_WizPreprocessingIO->MakeWindow();
 
   // Initialize the intensity mapping curve window
-  m_WinIntensityCurve->MakeWindow();
+  m_IntensityCurveUI->MakeWindow();
 
   // Create the preprocessing window
   m_PreprocessingUI->MakeWindow();
 
+  // Create the snake parameters window
+  m_SnakeParametersUI->MakeWindow();
+  m_SnakeParametersUI->Register(this);
+  
   // Add a listener for the events generated by the curve editor
   SimpleCommandType::TMemberFunctionPointer ptrMember = 
     & UserInterfaceLogic::OnIntensityCurveUpdate;
 
   SimpleCommandType::Pointer cmd = SimpleCommandType::New();
   cmd->SetCallbackFunction(this,ptrMember);
-  m_WinIntensityCurve->GetEventSystem()->AddObserver(
+  m_IntensityCurveUI->GetEventSystem()->AddObserver(
     IntensityCurveUILogic::CurveUpdateEvent(),cmd);
 
   // Set the welcome page to display
@@ -1681,124 +1613,6 @@ UserInterfaceLogic
     }
 }
 
-
-/*
-   void UserInterfaceLogic::LoadGreyFileCallback()
-   {
-   LoadGrey_win->hide();
-
-// Read in Values
-int headersize = (int) HeaderSize->value();
-bool bigendian = (BigEndian->value() == 0);
-int emin = (int) eMin->value();
-int emax = (int) eMax->value();
-Vector3i dims;
-dims[0] = (int)Xdim->value();
-dims[1] = (int)Ydim->value();
-dims[2] = (int)Zdim->value();
-Vector3f scale;
-scale[0] = (float)Xspc->value();
-scale[1] = (float)Yspc->value();
-scale[2] = (float)Zspc->value();
-int elen;
-switch (eLen->value()) 
-{
-case 0: elen = 1; break;
-case 1: elen = 2; break;
-case 2: elen = 4; break;
-}
-
-if (!this->CheckOrient(FileRAI->value(), fileRAI)
-|| !this->CheckOrient(IntRAI->value(), intRAI)) 
-{
-m_OutMessage->value("Orientation syntax error");
-return;
-}
-SegRAI->value(FileRAI->value());
-
-const char* myfile = LoadGrey_filename->value();
-if (strlen(myfile) == 0) 
-{
-m_OutMessage->value("No filename entered -- cannot load");
-return;  
-}
-else if (m_Driver->GetCurrentImageData()->ReadRawGreyData((char *)myfile,
-headersize, bigendian, elen, emin, emax,
-dims, scale, fileRAI, intRAI) != 1) 
-{
-m_OutMessage->value("Loading GreyFile failed");
-return;
-}
-else 
-{
-m_OutMessage->value("Loading GreyFile successful");
-}     
-
-// blank the screen - useful on a load of new grey data
-// when there is already a segmentation file present
-m_IRISWindow3D->ClearScreen(); 
-
-// reinitialize the point of view
-dims = vox_data->GetVolumeExtents();
-Vector3i init_pos;
-int i;
-for (i=0; i<3; i++) init_pos[i] = dims[i] / 2;
-m_GlobalState->SetCrosshairsPosition(init_pos) ;
-
-// Set the 2D slice sliders and textboxes
-for (i=0; i<3; i++) 
-{
-m_InIRISSliceSlider[i]->range( dims[i]-1.0, 0.0 );
-m_InIRISSliceSlider[i]->slider_size( 1.0/dims[i] );
-m_InIRISSliceSlider[i]->linesize(1);
-Position[i]->activate();
-}
-this->ResetScrollbars();
-
-// Kick the Window2D's
-for (i=0; i<3; i++) Win2D[i]->InitializeSlice();
-
-m_FileLoaded =1; //now have valid grey data
-m_SegmentationLoaded = 0;
-
-InitColorMap();
-m_InDrawingColor->set_changed();
-m_InDrawOverColor->set_changed();
-RedrawWindows();
-m_WinMain->redraw();
-
-m_GlobalState->SetGreyExtension((char *)myfile);
-UpdateMainLabel((char *)myfile,NULL);
-Vector3i roiul,roilr;
-roiul[0]=roiul[1]=roiul[2]=0;
-roilr = full_data->GetVolumeExtents();
-roilr[0] -= 1;
-roilr[1] -= 1;
-roilr[2] -= 1;
-char msg[1024];
-if (roiul[0] == roilr[0] || roiul[1] == roilr[1] || roiul[2] == roilr[2])
-{
-    m_BtnStartSnake->deactivate();
-    m_GlobalState->SetIsValidROI(false);
-    RedrawWindows();
-}
-else
-{
-    m_GlobalState->SetROIul(roiul);
-    m_GlobalState->SetROIlr(roilr);
-    m_GlobalState->SetIsValidROI(true);
-    ShowROI_check->value(0);
-    ShowROI_check->activate();
-    m_BtnResetROI->activate();
-    m_BtnStartSnake->activate();
-    RedrawWindows();
-}
-}
-*/
-/*******************************************************************************************
- * PAUL: I cut this junk out of the Fluid file.  Should never have code in Fluid files, 
- * it's just a pain in the butt.
- ******************************************************************************************/
 void 
 UserInterfaceLogic
 ::InitColorMap() 
@@ -1806,12 +1620,17 @@ UserInterfaceLogic
   // invalidate all colormap entries
   unsigned int i,j;
   for (i=0; i<256; i++) m_ColorMap[i] = -1;
-
-  // Always have the Clear color
+  
+  // Set up the over-paint label
   m_InDrawOverColor->clear();
+  m_InDrawOverColor->add("All labels");
+  m_InDrawOverColor->add("Visible labels");
+  m_InDrawOverColor->add("Clear label");
+  
+  // Set up the draw color
   m_InDrawingColor->clear();
-  m_InDrawOverColor->add("Clear");
-  m_InDrawingColor->add("Clear");
+  m_InDrawingColor->add("Clear label");
+  
   m_ColorMap[0] = 0;
 
   j=1;
@@ -1831,8 +1650,8 @@ UserInterfaceLogic
 
   int defcol = (j>1 ? 1 : 0);
   m_GlobalState->SetDrawingColorLabel(m_ColorMap[defcol]);
-  m_GlobalState->SetOverWriteColorLabel(m_ColorMap[defcol]);
-  m_InDrawOverColor->value(defcol);
+  m_GlobalState->SetOverWriteColorLabel(m_ColorMap[0]);
+  m_InDrawOverColor->value(0);
   m_InDrawingColor->value(defcol);
   this->UpdateColorChips();
 }
@@ -1851,9 +1670,9 @@ UserInterfaceLogic
     }
   else
     {
-    Win2D[0]->redraw();
-    Win2D[1]->redraw();
-    Win2D[2]->redraw();
+    m_IRISWindow2D[0]->redraw();
+    m_IRISWindow2D[1]->redraw();
+    m_IRISWindow2D[2]->redraw();
     m_IRISWindow3D->redraw();
     }
 }
@@ -1862,25 +1681,37 @@ void
 UserInterfaceLogic
 ::ResetScrollbars() 
 {
-  // Get the crosshairs position
-  Vector3i xCross = m_GlobalState->GetCrosshairsPosition();
+  // Get the cursor position in image coordinated
+  Vector3d cursor = to_double(m_GlobalState->GetCrosshairsPosition());
 
   // Update the correct scroll bars
   for (unsigned int dim=0; dim<3; dim++)
     {
+    // What image axis does dim correspond to?
+    unsigned int imageAxis = GetImageAxisForDisplayWindow(dim);
+
     if (!m_GlobalState->GetSNAPActive())
       {
       // IRIS Scrollbars (notice the negation of the value!)
-      m_InIRISSliceSlider[dim]->Fl_Valuator::value( (double)-xCross[dim] );
-      this->UpdatePositionDisplay(dim);
+      m_InIRISSliceSlider[dim]->Fl_Valuator::value( -cursor[imageAxis] );      
       }
     else
       {
       // SNAP Scrollbars (notice the negation of the value!)
-      m_InSNAPSliceSlider[dim]->Fl_Valuator::value( (double)-xCross[dim] );
-      this->UpdateSNAPPositionDisplay(dim);
+      m_InSNAPSliceSlider[dim]->Fl_Valuator::value( -cursor[imageAxis] );      
       }
+
+    // Update the little display box at the bottom of the scroll bar
+    UpdatePositionDisplay(dim);
     }
+}
+
+void 
+UserInterfaceLogic
+::OnCrosshairPositionUpdate()
+{
+  this->ResetScrollbars();
+  this->UpdateImageProbe();
 }
 
 void 
@@ -1888,9 +1719,9 @@ UserInterfaceLogic
 ::MakeSegTexturesCurrent() 
 {
   /*
-  Win2D[0]->MakeSegTextureCurrent();
-  Win2D[1]->MakeSegTextureCurrent();
-  Win2D[2]->MakeSegTextureCurrent();
+  m_IRISWindow2D[0]->MakeSegTextureCurrent();
+  m_IRISWindow2D[1]->MakeSegTextureCurrent();
+  m_IRISWindow2D[2]->MakeSegTextureCurrent();
   */
   m_BtnAccept3D->activate();
   this->RedrawWindows();
@@ -1906,93 +1737,160 @@ UserInterfaceLogic
   m_GrpCurrentColor->color(fl_rgb_color(rgb[0], rgb[1], rgb[2]));
   m_GrpCurrentColor->redraw();
 
-  index = m_GlobalState->GetOverWriteColorLabel();
-  m_Driver->GetCurrentImageData()->GetColorLabel(index).GetRGBVector(rgb);
-  m_OutDrawOverColor->color(fl_rgb_color(rgb[0], rgb[1], rgb[2]));
-  m_OutDrawOverColor->redraw();
+  if(m_GlobalState->GetCoverageMode() == PAINT_OVER_ONE)
+    {
+    index = m_GlobalState->GetOverWriteColorLabel();
+    m_Driver->GetCurrentImageData()->GetColorLabel(index).GetRGBVector(rgb);
+    m_OutDrawOverColor->color(fl_rgb_color(rgb[0], rgb[1], rgb[2]));
+    m_OutDrawOverColor->redraw();
+    }
+  else
+    {
+    m_OutDrawOverColor->color(fl_rgb_color(192, 192, 192));
+    m_OutDrawOverColor->redraw();
+    }
+}
+
+void 
+UserInterfaceLogic
+::OnDrawingLabelUpdate()
+{
+  // Set the color chips
+  m_GlobalState->SetDrawingColorLabel(
+    (unsigned char) m_ColorMap[m_InDrawingColor->value()]);
+  this->UpdateColorChips();
+  this->UpdateEditLabelWindow();
+}
+
+void 
+UserInterfaceLogic
+::OnDrawOverLabelUpdate()
+{
+  
+
+  if(m_InDrawOverColor->value() == 0)
+    // The first menu item is 'paint over all'
+    m_GlobalState->SetCoverageMode(PAINT_OVER_ALL);
+  else if(m_InDrawOverColor->value() == 1)
+    // The first menu item is 'paint over visible'
+    m_GlobalState->SetCoverageMode(PAINT_OVER_COLORS);
+  else
+    {
+    // The rest are labels
+    unsigned char label = m_ColorMap[m_InDrawOverColor->value() - 2];
+    m_GlobalState->SetCoverageMode(PAINT_OVER_ONE);
+    m_GlobalState->SetOverWriteColorLabel(label);
+    }
+
+  this->UpdateColorChips();
 }
 
 void 
 UserInterfaceLogic
 ::UpdateImageProbe() 
 {
+  // Code common to SNAP and IRIS
+  Vector3ui crosshairs = m_GlobalState->GetCrosshairsPosition();
+    
+  // String streams for different labels
+  IRISOStringStream sGrey,sSegmentation,sSpeed;
+
+  // Get the grey intensity
+  sGrey << m_Driver->GetCurrentImageData()->GetGrey()->GetVoxel(crosshairs);
+
+  // Get the segmentation lavel intensity
+  int iSegmentation = 
+    (int)m_Driver->GetCurrentImageData()->GetSegmentation()->GetVoxel(crosshairs);
+  sSegmentation << iSegmentation;
+    
+
+  // The rest depends on the current mode
   if(m_GlobalState->GetSNAPActive())
     {
-    UpdateSNAPImageProbe();
+    // Fill the grey and label outputs
+    m_OutSNAPProbe->value(sGrey.str().c_str());
+    m_OutSNAPLabelProbe->value(sSegmentation.str().c_str());
+
+    // Get a pointer to the speed image wrapper
+    SNAPImageData *snap = m_Driver->GetSNAPImageData();
+
+    // Get the speed value (if possible)
+    if(m_GlobalState->GetSpeedPreviewValid())
+      {
+      // Speed preview is being shown.  Get a preview pixel
+      sSpeed << std::setprecision(4) << 
+        snap->GetSpeed()->GetPreviewVoxel(crosshairs);
+      }
+    else if(m_GlobalState->GetSpeedValid())
+      {
+      // Speed image is valid, i.e., has been properly computed
+      sSpeed << std::setprecision(4) << 
+        snap->GetSpeed()->GetVoxel(crosshairs);
+      }
+    else 
+      {
+      sSpeed << "N/A";
+      }
+
+    // Display the speed string
+    m_OutSNAPSpeedProbe->value(sSpeed.str().c_str());
     }
   else
     {
-    char label_str[50];
-    Vector3i crosshairs = m_GlobalState->GetCrosshairsPosition();
+    m_OutGreyProbe->value(sGrey.str().c_str());
+    m_OutLabelProbe->value(sSegmentation.str().c_str());
 
-    GreyType greyval = m_Driver->GetCurrentImageData()->GetGrey()->GetVoxel(crosshairs);
-    /*
-    double grey_scale_factor = m_Driver->GetCurrentImageData()->GetGrey()->GetImageScaleFactor();
-    double grey_min = m_Driver->GetCurrentImageData()->GetGrey()->GetImageMin();
-    int origgreyval = (int) (greyval/grey_scale_factor + grey_min);
-    sprintf(label_str, "%d", origgreyval);*/
-    sprintf(label_str, "%d", greyval);
-    this->m_OutGreyProbe->value(label_str);
-
-    LabelType ret2 = m_Driver->GetCurrentImageData()->GetSegmentation()->GetVoxel(crosshairs);
-    sprintf(label_str, "%d", (int) ret2);
-    this->m_OutLabelProbe->value(label_str);
+    // Get the label description
+    ColorLabel cl = 
+      m_Driver->GetCurrentImageData()->GetColorLabel(iSegmentation);
+    m_OutLabelProbeText->value(cl.GetLabel());      
     }
 }
 
 void 
 UserInterfaceLogic
-::UpdateMainLabel(char *greyImg, char* segImg) 
+::UpdateMainLabel() 
 {
-  // Note segImage is not static; it changes with every call, either to
-  // a given string, or to the default.
+  // Will print to this label
+  IRISOStringStream mainLabel;
 
-  const int titleLength = 30; // excluding filenames
-  const int imgLength = 100;  // each filename
-  static char greyImage[imgLength] = "no Grey img";
-  char segImage[imgLength] = "no Seg img";
-  static char mainLabel[2*imgLength+titleLength];
-  char *basename;
+  // Print version
+  mainLabel << IRISSoftVersion << ": ";
 
-  if (greyImg) 
+  // Get the grey and segmentation file names
+  string fnGrey = m_GlobalState->GetGreyFileName();
+  string fnSeg = m_GlobalState->GetSegmentationFileName();
+
+  // Grey file name
+  if (fnGrey.length()) 
     {
-    basename = strrchr(greyImg, '/');
-    if (basename) 
-      {
-      strncpy(greyImage, basename+1, imgLength-1);
-      }
-    else 
-      {
-      strncpy(greyImage, greyImg, imgLength-1);
-      }
+    // Strip the path of the file
+    mainLabel << itksys::SystemTools::GetFilenameName(fnGrey.c_str());
+    }
+  else
+    {
+    mainLabel << "no Grey img";
     }
 
-  if (segImg) 
+  mainLabel << " - ";
+
+  // Segmentation file name
+  if (fnSeg.length()) 
     {
-    basename = strrchr(segImg, '/'); 
-    if (basename) 
-      {
-      strncpy(segImage, basename+1, imgLength-1);
-      }
-    else 
-      {
-      strncpy(segImage, segImg, imgLength-1);
-      }
+    // Strip the path of the file
+    mainLabel << itksys::SystemTools::GetFilenameName(fnSeg.c_str());
+    }
+  else
+    {
+    mainLabel << "no Seg img";
     }
 
-  char *ver = strstr(IRISver, ": ");
-  if (ver) 
-    {
-    ver += 2;
-    }
-  else 
-    {
-    ver = (char *) IRISver;
-    }
+  // Store the label
+  m_MainWindowLabel = mainLabel.str();
 
-  sprintf(mainLabel,"SnAP:IRIS (%s): %s - %s",
-    ver, greyImage, segImage);
-  m_WinMain->label(mainLabel);
+  // Apply to the window
+  m_WinMain->label(m_MainWindowLabel.c_str());
+
   return;
 }
 
@@ -2094,9 +1992,9 @@ m_SegmentationLoaded =1; //now have valid grey data
 
 // Re-init other UserInterfaceLogic components
 InitColorMap();
-Win2D[0]->InitializeSlice();
-Win2D[1]->InitializeSlice();
-Win2D[2]->InitializeSlice();
+m_IRISWindow2D[0]->InitializeSlice();
+m_IRISWindow2D[1]->InitializeSlice();
+m_IRISWindow2D[2]->InitializeSlice();
 
 m_IRISWindow3D->ResetView();
 m_BtnMeshUpdate->activate();
@@ -2106,6 +2004,7 @@ m_WinMain->redraw();
 UpdateMainLabel(NULL, (char *)myfile);
 }
 */
+/*
 void 
 UserInterfaceLogic
 ::LoadLabelsCallback() 
@@ -2134,6 +2033,7 @@ UserInterfaceLogic
     return;
     }
 }
+*/
 
 void 
 UserInterfaceLogic
@@ -2199,7 +2099,7 @@ UserInterfaceLogic
       return;
       }
     m_InDrawingColor->replace(offset, new_name);
-    m_InDrawOverColor->replace(offset, new_name);
+    m_InDrawOverColor->replace(offset+2, new_name);
     }
   m_InDrawingColor->value(offset);
   m_InDrawingColor->set_changed();
@@ -2245,17 +2145,31 @@ UserInterfaceLogic
 
 void 
 UserInterfaceLogic
-::OnIRISSliceSliderChange(int id) 
+::OnSliceSliderChange(int id) 
 {
-  // Sliders selecting the slice in a Window2D
-  Vector3i pos = m_GlobalState->GetCrosshairsPosition();
-  pos[id] = (int) - m_InIRISSliceSlider[id]->value();
+  // Get the new value depending on the current state
+  unsigned int value = (unsigned int)
+    (m_GlobalState->GetSNAPActive() ? 
+     - m_InSNAPSliceSlider[id]->value() :
+     - m_InIRISSliceSlider[id]->value());
+  
+  // Get the cursor position
+  Vector3ui cursor = m_GlobalState->GetCrosshairsPosition();
+
+  // Determine which image axis the display window 'id' corresponds to
+  unsigned int imageAxis = GetImageAxisForDisplayWindow(id);
+
+  // Update the cursor
+  cursor[imageAxis] = value;
 
   // TODO: Unify this!
-  m_Driver->GetCurrentImageData()->SetCrosshairs(pos);
-  m_GlobalState->SetCrosshairsPosition(pos);
+  m_Driver->GetCurrentImageData()->SetCrosshairs(cursor);
+  m_GlobalState->SetCrosshairsPosition(cursor);
 
+  // Update the little display box under the scroll bar
   UpdatePositionDisplay(id);
+
+  // Repaint the windows
   RedrawWindows();
 }
 
@@ -2263,42 +2177,143 @@ void
 UserInterfaceLogic
 ::UpdatePositionDisplay(int id) 
 {
-  // Textbox below the Window2D sliders
-  char temp[20];
-  sprintf(temp,"%d of %d", 
-    1 - (int) m_InIRISSliceSlider[id]->value(),
-    1 - (int) m_InIRISSliceSlider[id]->minimum());
-  m_OutIRISSliceIndex[id]->value(temp);
+  // Dump out the slice index of the given window
+  IRISOStringStream sIndex;
+
+  // Code depends on SNAP/IRIS mode
+  if(m_GlobalState->GetSNAPActive())
+    {
+    sIndex << std::setw(4) << (1 - m_InSNAPSliceSlider[id]->value());
+    sIndex << " of ";
+    sIndex << (1 - m_InSNAPSliceSlider[id]->minimum());
+    m_OutSNAPSliceIndex[id]->value(sIndex.str().c_str());
+    }
+  else
+    {
+    sIndex << std::setw(4) << (1 - m_InIRISSliceSlider[id]->value());
+    sIndex << " of ";
+    sIndex << (1 - m_InIRISSliceSlider[id]->minimum());
+    m_OutIRISSliceIndex[id]->value(sIndex.str().c_str());
+    }    
 }
 
 void 
 UserInterfaceLogic
-::AcceptPolygonCallback(int id) 
+::OnAcceptPolygonAction(unsigned int window)
 {
-  Win2D[id]->AcceptPolygon();
+  m_IRISWindow2D[window]->AcceptPolygon();
+  OnPolygonStateUpdate(window);
+  
   MakeSegTexturesCurrent();
   m_BtnMeshUpdate->activate();
 }
 
 void 
 UserInterfaceLogic
-::OnRenderOptionsChange() 
+::OnInsertIntoPolygonSelectedAction(unsigned int window)
+{
+  m_IRISWindow2D[window]->InsertPolygonPoints();  
+  OnPolygonStateUpdate(window);
+}
+
+void 
+UserInterfaceLogic
+::OnDeletePolygonSelectedAction(unsigned int window)
+{
+  m_IRISWindow2D[window]->DeleteSelectedPolygonPoints();
+  OnPolygonStateUpdate(window);
+}
+
+void 
+UserInterfaceLogic
+::OnPastePolygonAction(unsigned int window)
+{
+  m_IRISWindow2D[window]->PastePolygon();
+  OnPolygonStateUpdate(window);
+}
+
+void 
+UserInterfaceLogic
+::OnPolygonStateUpdate(unsigned int id)
+{
+  // Get the drawing object
+  PolygonDrawing *draw = m_IRISWindow2D[id]->GetPolygonDrawing();
+
+  if (draw->GetState() == INACTIVE_STATE) 
+    {
+    // There is no active polygon
+    m_BtnPolygonAccept[id]->deactivate();
+    m_BtnPolygonDelete[id]->deactivate();
+    m_BtnPolygonInsert[id]->deactivate();
+
+    // Check if there is a cached polygon for pasting
+    if(draw->CachedPolygon()) 
+      m_BtnPolygonPaste[id]->activate();
+    else
+      m_BtnPolygonPaste[id]->deactivate();      
+    }
+  else if(draw->GetState() == DRAWING_STATE)
+    {
+    // There is no active polygon
+    m_BtnPolygonAccept[id]->deactivate();
+    m_BtnPolygonDelete[id]->deactivate();
+    m_BtnPolygonInsert[id]->deactivate();
+    m_BtnPolygonPaste[id]->deactivate();
+    }
+  else
+    {
+    m_BtnPolygonAccept[id]->activate();
+    m_BtnPolygonPaste[id]->deactivate();
+
+    if(draw->GetSelectedVertices() > 0)
+      {
+      m_BtnPolygonDelete[id]->activate();
+      m_BtnPolygonInsert[id]->activate();
+      }
+    else
+      {
+      m_BtnPolygonDelete[id]->deactivate();
+      m_BtnPolygonInsert[id]->deactivate();
+      }
+    }
+}
+/*
+void 
+UserInterfaceLogic
+::ActivatePaste(bool on) 
+{
+  for (int xyz=0; xyz<3; xyz++)
+    this->ActivatePaste(xyz, on);
+  cerr << "activating pastes..." << endl;
+}
+
+void 
+UserInterfaceLogic
+::ActivateAccept(bool on) 
+{
+  for (int xyz=0; xyz<3; xyz++)
+    this->ActivateAccept(xyz, on);
+}
+*/
+
+
+
+void 
+UserInterfaceLogic
+::ApplyRenderingOptions() 
 {
   // Get the current mesh options
   MeshOptions mops;
 
   // Set the Gaussian properties
-  Vector3f sd(this->m_InRenderOptionsGaussianStandardDeviationX->value(),
-    this->m_InRenderOptionsGaussianStandardDeviationY->value(),
-    this->m_InRenderOptionsGaussianStandardDeviationZ->value());
-
-  mops.SetGaussianStandardDeviation(sd);
+  mops.SetGaussianStandardDeviation(
+    m_InRenderOptionsGaussianStandardDeviation->value());
   mops.SetUseGaussianSmoothing(
     m_InUseGaussianSmoothing->value());
   mops.SetGaussianError(
     m_InRenderOptionsGaussianError->value());
 
-  //Triangle Decimation
+  // Triangle Decimation
   mops.SetUseDecimation(
     m_InUseDecimate->value());
   mops.SetDecimateAspectRatio(
@@ -2338,40 +2353,20 @@ UserInterfaceLogic
 
 void 
 UserInterfaceLogic
-::OnRenderOptionsCancel()
+::FillRenderingOptions() 
 {
-  this->m_WinRenderOptions->hide();
-}
-
-void 
-UserInterfaceLogic
-::OnRenderOptionsOk()
-{
-  OnRenderOptionsChange();
-  this->m_WinRenderOptions->hide();
-}
-
-void 
-UserInterfaceLogic
-::UpdateRenderOptionsUI() 
-{  
   // Get the current mesh options
   MeshOptions mops = m_GlobalState->GetMeshOptions();
 
-  // Gaussian settings
-  m_InRenderOptionsGaussianStandardDeviationX->value(
-    mops.GetGaussianStandardDeviation()[0]);
-  m_InRenderOptionsGaussianStandardDeviationY->value(
-    mops.GetGaussianStandardDeviation()[1]);
-  m_InRenderOptionsGaussianStandardDeviationZ->value(
-    mops.GetGaussianStandardDeviation()[2]);
-
+  // Set the Gaussian properties
+  m_InRenderOptionsGaussianStandardDeviation->value(
+    mops.GetGaussianStandardDeviation());
   m_InUseGaussianSmoothing->value(
     mops.GetUseGaussianSmoothing());
   m_InRenderOptionsGaussianError->value(
     mops.GetGaussianError());
 
-  //Triangle Decimation
+  // Triangle Decimation
   m_InUseDecimate->value(
     mops.GetUseDecimation());
   m_InRenderOptionsDecimateAspectRatio->value(
@@ -2383,15 +2378,15 @@ UserInterfaceLogic
   m_InRenderOptionsDecimateInitialError->value(
     mops.GetDecimateInitialError());
   m_InRenderOptionsDecimateIterations->value(
-    mops.GetDecimateMaximumIterations());
+    (double)mops.GetDecimateMaximumIterations());
   m_InRenderOptionsDecimateTopology->value(
     mops.GetDecimatePreserveTopology());
   m_InRenderOptionsDecimateReductions->value(
     mops.GetDecimateTargetReduction());
 
   // Mesh Smoothing
-  m_InUseMeshSmoothing->value(  
-    mops.GetUseMeshSmoothing());
+  m_InUseMeshSmoothing->value(
+    mops.GetUseMeshSmoothing());  
   m_InRenderOptionsMeshSmoothBoundarySmoothing->value(
     mops.GetMeshSmoothingBoundarySmoothing());
   m_InRenderOptionsMeshSmoothConvergence->value(
@@ -2401,11 +2396,175 @@ UserInterfaceLogic
   m_InRenderOptionsMeshSmoothFeatureEdge->value(
     mops.GetMeshSmoothingFeatureEdgeSmoothing());
   m_InRenderOptionsMeshSmoothIterations->value(
-    mops.GetMeshSmoothingIterations());
+    (double)mops.GetMeshSmoothingIterations());
   m_InRenderOptionsMeshSmoothRelaxation->value(
     mops.GetMeshSmoothingRelaxationFactor());
 }
 
+void 
+UserInterfaceLogic
+::FillSliceLayoutOptions() 
+{
+  // Hack
+  if(!m_OutDisplayOptionsPanel[0]->value()==NULL ||
+     strlen(m_OutDisplayOptionsPanel[0]->value()) == 0)
+    {
+    OnSliceAnatomyOptionsChange(0);
+    }
+}
+
+
+void 
+UserInterfaceLogic
+::OnMenuShowDisplayOptions()
+{
+  FillSliceLayoutOptions();
+  FillRenderingOptions();
+  m_WinDisplayOptions->show();
+}
+
+void 
+UserInterfaceLogic
+::OnDisplayOptionsCancelAction()
+{
+  this->m_WinDisplayOptions->hide();
+}
+
+void 
+UserInterfaceLogic
+::OnDisplayOptionsOkAction()
+{
+  OnDisplayOptionsApplyAction();
+  this->m_WinDisplayOptions->hide();
+}
+
+void 
+UserInterfaceLogic
+::OnDisplayOptionsApplyAction()
+{
+  ApplySliceLayoutOptions();
+  ApplyRenderingOptions();
+}
+
+
+void 
+UserInterfaceLogic
+::ApplySliceLayoutOptions()
+{
+  unsigned int order[6][3] = 
+    {{0,1,2},{0,2,1},{1,0,2},{1,2,0},{2,0,1},{2,1,0}};
+
+  // Search for the selected orientation toggle
+  unsigned int i;
+  for(i=0;i<6;i++)
+    if(m_BtnOptionsViews2D[i]->value())
+      break;
+
+  // Make sure something is selected
+  if(i == 6) return;
+
+  // Start with stock orientations
+  string axes[3] = {string("RPS"),string("AIL"),string("RIP")};
+
+  // Switch the configurable directions
+  if(m_ChkOptionsViews2DRightIsLeft->value() == 0)
+    {
+    axes[0][0] = axes[2][0] = 'L';
+    }
+  if(m_ChkOptionsViews2DNoseLeft->value() == 0)
+    {
+    axes[1][0] = 'P';
+    }
+
+  // Check if the configuration is different
+  if(axes[order[i][0]] != string(m_Driver->GetDisplayToAnatomyRAI(0)) ||
+     axes[order[i][1]] != string(m_Driver->GetDisplayToAnatomyRAI(1)) ||
+     axes[order[i][2]] != string(m_Driver->GetDisplayToAnatomyRAI(2)))
+    {
+    // Assign the configuration
+    m_Driver->SetDisplayToAnatomyRAI(axes[order[i][0]].c_str(),
+                                     axes[order[i][1]].c_str(),
+                                     axes[order[i][2]].c_str());
+    // Reassign slices to windows
+    OnImageGeometryUpdate();
+
+    // Redraw the windows
+    RedrawWindows();
+    }
+}
+
+void 
+UserInterfaceLogic
+::OnSliceAnatomyOptionsChange(unsigned int option)
+{
+  static const char *labels[3] = {"Axial","Sagittal","Coronal"};
+  unsigned int order[6][3] = 
+    {{0,1,2},{0,2,1},{1,0,2},{1,2,0},{2,0,1},{2,1,0}};
+
+  for(unsigned int i=0;i<3;i++)
+    m_OutDisplayOptionsPanel[i]->value(labels[order[option][i]]);
+}
+
+void
+UserInterfaceLogic
+::OnImageGeometryUpdate()
+{
+  if(!m_Driver->GetCurrentImageData()->IsGreyLoaded())
+    return;
+
+  // Set the crosshairs to the center of the image
+  Vector3ui size = m_Driver->GetCurrentImageData()->GetVolumeExtents();
+  Vector3ui xCross = size / ((unsigned int) 2);
+  m_GlobalState->SetCrosshairsPosition(xCross);
+  m_Driver->GetCurrentImageData()->SetCrosshairs(xCross);
+
+  // Update the crosshairs display
+  this->OnCrosshairPositionUpdate();
+
+  // Update the source for slice windows as well as scroll bars
+  if(m_GlobalState->GetSNAPActive())
+    {
+    for (unsigned int i=0; i<3; i++) 
+      {
+      // Connect slices to windows
+      m_SNAPWindow2D[i]->InitializeSlice(m_Driver->GetCurrentImageData());
+      
+      // Get the image axis that corresponds to the display window i
+      unsigned int imageAxis = GetImageAxisForDisplayWindow(i);
+
+      // Notice the sliders have a negative range!  That's so that the 1 position is at the 
+      // bottom.  We need to always negate the slider values
+      m_InSNAPSliceSlider[i]->range( 1.0 - size[imageAxis], 0.0 );
+      m_InSNAPSliceSlider[i]->slider_size( 1.0/ size[imageAxis] );
+      m_InSNAPSliceSlider[i]->linesize(1);
+      m_OutSNAPSliceIndex[i]->activate();
+      }
+    }
+  else
+    {
+    for (unsigned int i=0; i<3; i++) 
+      {
+      m_IRISWindow2D[i]->InitializeSlice(m_Driver->GetCurrentImageData());
+      
+      // Get the image axis that corresponds to the display window i
+      unsigned int imageAxis = GetImageAxisForDisplayWindow(i);
+
+      // As with the other sliders, the range is negative
+      m_InIRISSliceSlider[i]->range( 1.0 - size[imageAxis], 0.0 );
+      m_InIRISSliceSlider[i]->slider_size( 1.0/size[imageAxis] );
+      m_InIRISSliceSlider[i]->linesize(1);
+      m_OutIRISSliceIndex[i]->activate();
+      }      
+    }
+
+  // Group the three windows inside the window coordinator
+  m_SliceCoordinator->RegisterWindows(
+    reinterpret_cast<GenericSliceWindow **>(m_IRISWindow2D));    
+
+  // Reset the view in 2D windows to fit
+  m_SliceCoordinator->ResetViewToFitInAllWindows();
+}
+  
 int 
 UserInterfaceLogic
 ::CheckOrient(const char *txt, Vector3i &RAI) 
@@ -2435,40 +2594,6 @@ UserInterfaceLogic
   for (i=0; i<3; i++) RAI[i] = tmpRAI[i];
   return 1;
 }
-
-void 
-UserInterfaceLogic
-::ActivatePaste(int id, bool on) 
-{
-  if (on) m_BtnPaste[id]->activate();
-  else m_BtnPaste[id]->deactivate();
-}
-
-void 
-UserInterfaceLogic
-::ActivatePaste(bool on) 
-{
-  for (int xyz=0; xyz<3; xyz++)
-    this->ActivatePaste(xyz, on);
-  cerr << "activating pastes..." << endl;
-}
-
-void 
-UserInterfaceLogic
-::ActivateAccept(int id, bool on) 
-{
-  if (on) Accept_button[id]->activate();
-  else Accept_button[id]->deactivate();
-}
-
-void 
-UserInterfaceLogic
-::ActivateAccept(bool on) 
-{
-  for (int xyz=0; xyz<3; xyz++)
-    this->ActivateAccept(xyz, on);
-}
-
 void 
 UserInterfaceLogic
 ::Activate3DAccept(bool on) 
@@ -2492,7 +2617,7 @@ UserInterfaceLogic
 
   try 
     {
-    m_Driver->GetCurrentImageData()->WriteASCIIColorLabels((char *)myfile);
+    m_Driver->WriteLabelDescriptionsToTextFile(myfile);
     m_OutMessage->value("Saving Labels Successful");
     }
   catch (IRISException &exc) 
@@ -2517,143 +2642,94 @@ UserInterfaceLogic
     switch(mode) 
       {
     case CROSSHAIRS_MODE:
-      Win2D[i]->EnterCrosshairsMode();
+      m_IRISWindow2D[i]->EnterCrosshairsMode();
       m_SNAPWindow2D[i]->EnterCrosshairsMode();
       m_TabsToolOptions->value(m_GrpToolOptionCrosshairs);
       break;
 
     case NAVIGATION_MODE:
-      Win2D[i]->EnterZoomPanMode();
+      m_IRISWindow2D[i]->EnterZoomPanMode();
       m_SNAPWindow2D[i]->EnterZoomPanMode();
       m_TabsToolOptions->value(m_GrpToolOptionZoomPan);
       break;
 
     case POLYGON_DRAWING_MODE:
-      Win2D[i]->EnterPolygonMode();
+      m_IRISWindow2D[i]->EnterPolygonMode();
       m_TabsToolOptions->value(m_GrpToolOptionPolygon);
       break;
 
     case PAINT3D_MODE:
-      Win2D[i]->EnterCrosshairsMode();
+      m_IRISWindow2D[i]->EnterCrosshairsMode();
       m_TabsToolOptions->value(m_GrpToolOptionPaintCan);
       break;
 
     case ROI_MODE:
-      Win2D[i]->EnterRegionMode();
+      m_IRISWindow2D[i]->EnterRegionMode();
       m_TabsToolOptions->value(m_GrpToolOptionSnAP);
       break;
 
     default:
       break;  
       }
+
+    // Enable the polygon editing windows
+    if(mode == POLYGON_DRAWING_MODE)
+      m_GrpPolygonEdit[i]->show();
+    else
+      m_GrpPolygonEdit[i]->hide();
+
     }
 
   // Redraw the windows
   RedrawWindows();
 }
 
-/*
-void UserInterfaceLogic::SaveSegFileCallback() 
-{
-    SaveSeg_win->hide();
-
-    const char* myfile = SaveSeg_filename->value();
-    if (strlen(myfile) == 0) 
-    {
-        m_OutMessage->value("No filename entered - cannot save");
-        return;
-    }
-    else if (vox_data->WriteSegData((char *)myfile) !=1) 
-    {
-        m_OutMessage->value("Saving failed");
-        return;
-    }
-    else 
-    {
-        m_OutMessage->value("Saving Successful");
-    }
-
-    UpdateMainLabel(NULL, (char *)myfile);
-}
-*/
 void 
 UserInterfaceLogic
 ::PrintVoxelCountsCallback() 
 {
-  char *m_ChosedFile;
-  m_ChosedFile = fl_file_chooser("Voxel Count Output",NULL,NULL);
-  if (m_Driver->GetCurrentImageData()->CountVoxels(m_ChosedFile)) 
+  const char *chosenFile = 
+    fl_file_chooser("Voxel Count Output",
+                    "Text Files (*.txt)","voxels.txt");
+  if(chosenFile)
+  {
+    try 
     {
-    m_OutMessage->value("Voxel Count successful");
+      m_Driver->GetCurrentImageData()->CountVoxels(chosenFile);
+      m_OutMessage->value("Voxel Count successful");
     }
-  else 
+    catch(itk::ExceptionObject &exc)
     {
-    m_OutMessage->value("Failed to print Voxel Counts");
+      fl_alert("Error writing voxel counts: %s",exc.GetDescription());
     }
+  }
 }
 
 void 
 UserInterfaceLogic
-::OnMenuLoadPreprocessed() 
+::OnGreyImageUpdate()
 {
-
-}
-
-void 
-UserInterfaceLogic
-::OnMenuSavePreprocessed() 
-{
-
-}
-
-void 
-UserInterfaceLogic
-::DoLoadImage(GreyImageWrapper *source)
-{
-  // Reinitialize the intensity mapping curve in the application
-  m_Driver->GetIntensityCurve()->Initialize(4);
-
-  // Update the image wrapper with the intensity mapping curve
-  source->SetIntensityMapFunction(m_Driver->GetIntensityCurve());
-
-  // Update the image information in m_Driver->GetCurrentImageData()
-  m_Driver->GetCurrentImageData()->SetGrey(source);    
-
-  // blank the screen - useful on a load of new grey data
-  // when there is already a segmentation file present
+  // Blank the screen - useful on a load of new grey data when there is 
+  // already a segmentation file present
   m_IRISWindow3D->ClearScreen(); 
 
   // Flip over to the toolbar page
   m_WizControlPane->value(m_GrpToolbarPage);
 
-  // reinitialize the point of view
-  Vector3i dims = m_Driver->GetCurrentImageData()->GetVolumeExtents();
-  Vector3i init_pos;
-  int i;
-  for (i=0; i<3; i++) init_pos[i] = dims[i] / 2;
+  // Enable some menu items
+  m_MenuLoadSegmentation->activate();
+  m_MenuSaveSegmentation->activate();
+  m_MenuSaveVoxelCounts->activate(); 
+  m_MenuIntensityCurve->activate();
 
-  // TODO: Unify this!
-  m_Driver->GetCurrentImageData()->SetCrosshairs(init_pos);
-  m_GlobalState->SetCrosshairsPosition(init_pos) ;
+  // Reinitialize the point of view
+  Vector3ui dims = m_Driver->GetCurrentImageData()->GetVolumeExtents();
+  
+  // Image geometry has changed
+  OnImageGeometryUpdate();
 
-  // Set the 2D slice sliders and textboxes
-  for (i=0; i<3; i++) 
-    {
-    // Notice the sliders have a negative range!  That's so that the 1 position is at the 
-    // bottom.  We need to always negate the slider values
-    m_InIRISSliceSlider[i]->range( 1.0 - dims[i], 0.0 );
-    m_InIRISSliceSlider[i]->slider_size( 1.0/dims[i] );
-    m_InIRISSliceSlider[i]->linesize(1);
-    m_OutIRISSliceIndex[i]->activate();
-    }
-
-  this->ResetScrollbars();
-
-  // Kick the Window2D's
-  for (i=0; i<3; i++) 
-    Win2D[i]->InitializeSlice(m_Driver->GetCurrentImageData());
-
-  m_FileLoaded =1; //now have valid grey data
+  // We now have valid grey data
+  m_FileLoaded = 1;
   m_SegmentationLoaded = 0;
 
   InitColorMap();
@@ -2661,8 +2737,10 @@ UserInterfaceLogic
   m_InDrawOverColor->set_changed();
 
   m_GlobalState->SetGreyExtension((char *)m_WizGreyIO->GetFileName());
-  UpdateMainLabel((char *)m_WizGreyIO->GetFileName(),NULL);
   
+  // Update the label of the UI
+  UpdateMainLabel();
+
   // Get the largest image region
   GlobalState::RegionType roi = m_Driver->GetIRISImageData()->GetImageRegion();
   
@@ -2681,10 +2759,92 @@ UserInterfaceLogic
     m_BtnStartSnake->activate();
     }   
 
+  // Update the polygon buttons
+  OnPolygonStateUpdate(0);
+  OnPolygonStateUpdate(1);
+  OnPolygonStateUpdate(2);
+
   // Redraw the user interface
   RedrawWindows();
   m_WinMain->redraw();
 }
+
+void 
+UserInterfaceLogic
+::OnSegmentationImageUpdate()
+{
+  m_OutMessage->value("Loading Seg successful");
+
+  m_SegmentationLoaded =1; //now have valid grey data
+
+  // Re-init other UserInterfaceLogic components
+  InitColorMap();
+
+  // Re-Initialize the 2D windows
+  for (unsigned int i=0; i<3; i++) 
+      m_IRISWindow2D[i]->InitializeSlice(m_Driver->GetCurrentImageData());
+
+  m_IRISWindow3D->ResetView();
+  m_BtnMeshUpdate->activate();
+  
+  UpdateMainLabel();
+  
+  RedrawWindows();
+  m_WinMain->redraw();
+}
+
+void 
+UserInterfaceLogic
+::OnSegmentationLabelsUpdate()
+{
+  InitColorMap();
+  m_BtnMeshUpdate->activate();
+  MakeSegTexturesCurrent();
+  m_WinMain->redraw();        
+  m_OutMessage->value("Loading Label file successful");
+
+}
+
+void 
+UserInterfaceLogic
+::OnSpeedImageUpdate()
+{
+  if(m_GlobalState->GetSpeedValid())
+    {
+    // Can flip between preprocessed and grey images
+    m_GrpImageOptions->activate();
+
+    // Choose to view the preprocessed image
+    m_RadioSNAPViewPreprocessed->setonly();
+
+    // Run the callback associated with that change
+    OnViewPreprocessedSelect();
+    
+    // Allow preprocessing to be saved
+    m_MenuSavePreprocessed->activate();
+
+    // Allow progression to the next stage
+    m_BtnAcceptPreprocessing->activate();
+    }
+  else
+    {
+    // Choose to view the grey image
+    m_RadioSNAPViewOriginal->setonly();
+
+    // Run the callback associated with that change
+    OnViewPreprocessedSelect();
+    
+    // Can't flip between preprocessed and grey images
+    m_GrpImageOptions->deactivate();
+
+    // Disallow preprocessing to be saved
+    m_MenuSavePreprocessed->deactivate();
+
+    // Block progression to the next stage
+    m_BtnAcceptPreprocessing->deactivate();
+    }
+}
+
 
 /**
  * Load greyscale image using the wizard
@@ -2693,27 +2853,83 @@ void
 UserInterfaceLogic
 ::OnMenuLoadGrey() 
 {
-
-  // Create a new image wrapper
-  GreyImageWrapper *wrapper = new GreyImageWrapperImplementation;
-
   // Show the input wizard
-  m_WizGreyIO->DisplayInputWizard(wrapper);
+  m_WizGreyIO->DisplayInputWizard();
 
   // If the load operation was successful, populate the data and GUI with the
   // new image
   if(m_WizGreyIO->IsImageLoaded()) 
     {
-    DoLoadImage(wrapper);
+    // Send the image and RAI to the IRIS application driver
+    m_Driver->UpdateIRISGreyImage(m_WizGreyIO->GetLoadedImage(),
+                                  m_WizGreyIO->GetLoadedImageRAI());
+
+    // Save the filename
+    m_GlobalState->SetGreyFileName(m_WizGreyIO->GetFileName());
+
+    // Update the user interface accordingly
+    OnGreyImageUpdate();
     }
 }
 
+void 
+UserInterfaceLogic
+::OnLoadLabelsBrowseAction() 
+{
+  static const char *pattern = 
+    "All Label Files (*.{label,lbl,lab,txt})";
+
+  // Open a browse window and load a file
+  char *chosenFile = fl_file_chooser("Select a File",pattern,NULL);
+  if(chosenFile != NULL)
+    m_InLoadLabelsFileName->value((const char*)chosenFile);
+}
+
+void 
+UserInterfaceLogic
+::OnLoadLabelsCancelAction() 
+{
+  // Close window and take no action
+  m_WinLoadLabel->hide();
+}
+
+void 
+UserInterfaceLogic
+::OnLoadLabelsOkAction() 
+{
+  // Get label file
+  const char* myfile = m_InLoadLabelsFileName->value();
+  
+  // Try reading file
+  if (strlen(myfile) == 0) 
+    {
+    fl_alert("No filename entered -- cannot load");
+    return;  
+    }
+
+  try 
+    {
+    // Read the labels from file
+    m_Driver->ReadLabelDescriptionsFromTextFile(myfile);    
+    
+    // Update the user interface in response
+    this->OnSegmentationLabelsUpdate();
+    }
+  catch (itk::ExceptionObject &exc) 
+    {
+    fl_alert("Error loading labels: %s",exc.GetDescription());
+    return;
+    }
+
+  // Hide the window
+  m_WinLoadLabel->hide();
+}
 
 void 
 UserInterfaceLogic
 ::OnMenuLoadLabels() 
 {
-
+  m_WinLoadLabel->show();
 }
 
 void UserInterfaceLogic
@@ -2725,14 +2941,132 @@ void UserInterfaceLogic
 void UserInterfaceLogic
 ::OnMenuLoadSegmentation() 
 {
+  // Grey image should be loaded
+  assert(m_Driver->GetCurrentImageData()->IsGreyLoaded());
 
+  // Should not be in SNAP mode
+  assert(!m_GlobalState->GetSNAPActive());
+  
+  // Set up the input wizard with the grey image
+  m_WizSegmentationIO->SetGreyImage(
+    m_Driver->GetCurrentImageData()->GetGrey()->GetImage());
+
+  // Show the input wizard
+  m_WizSegmentationIO->DisplayInputWizard();
+
+  // If the load operation was successful, populate the data and GUI with the
+  // new image
+  if(m_WizSegmentationIO->IsImageLoaded()) 
+    {
+    // Send the image and RAI to the IRIS application driver
+    m_Driver->UpdateIRISSegmentationImage(m_WizSegmentationIO->GetLoadedImage());
+
+    // Save the segmentation file name
+    m_GlobalState->SetSegmentationFileName(m_WizSegmentationIO->GetFileName());
+
+    // Update the user interface accordingly
+    OnSegmentationImageUpdate();
+    }
+
+  // Disconnect the input wizard from the grey image
+  m_WizSegmentationIO->SetGreyImage(NULL);
+}
+
+void UserInterfaceLogic
+::OnMenuSaveGreyROI() 
+{
+  // Better be in snap
+  assert(m_GlobalState->GetSNAPActive());
+
+  // Save the segmentation
+  if(m_WizGreyIO->DisplaySaveWizard(
+    m_Driver->GetCurrentImageData()->GetGrey()->GetImage()))
+    {
+    // Some silly feedback
+    m_OutMessage->value("Saving segmentation file successful");    
+    }
 }
 
 void UserInterfaceLogic
 ::OnMenuSaveSegmentation() 
 {
+  // Better have a segmentation image
+  assert(m_Driver->GetIRISImageData()->IsSegmentationLoaded());
 
+  // Save the segmentation
+  if(m_WizSegmentationIO->DisplaySaveWizard(
+    m_Driver->GetIRISImageData()->GetSegmentation()->GetImage()))
+    {
+    // Store the new filename
+    m_GlobalState->SetSegmentationFileName(
+      m_WizSegmentationIO->GetSaveFileName());
+
+    // Some silly feedback
+    m_OutMessage->value("Saving segmentation file successful");    
+    }
 }
+
+void 
+UserInterfaceLogic
+::OnMenuLoadPreprocessed() 
+{
+  this->OnLoadPreprocessedImageAction();
+}
+
+void 
+UserInterfaceLogic
+::OnLoadPreprocessedImageAction() 
+{
+  // Preprocessing image can only be loaded in SNAP mode
+  assert(m_GlobalState->GetSNAPActive());
+  
+  // Set up the input wizard with the grey image
+  m_WizPreprocessingIO->SetGreyImage(
+    m_Driver->GetCurrentImageData()->GetGrey()->GetImage());
+
+  // Show the input wizard
+  m_WizPreprocessingIO->DisplayInputWizard();
+
+  // If the load operation was successful, populate the data and GUI with the
+  // new image
+  if(m_WizPreprocessingIO->IsImageLoaded()) 
+    {
+    // Update the application with the new speed image
+    m_Driver->UpdateSNAPSpeedImage(
+      m_WizPreprocessingIO->GetLoadedImage(),
+      m_RadSnakeEdge->value() ? EDGE_SNAKE : IN_OUT_SNAKE);
+    
+    // Save the segmentation file name
+    m_GlobalState->SetPreprocessingFileName(m_WizPreprocessingIO->GetFileName());
+
+    // Update the user interface accordingly
+    OnSpeedImageUpdate();
+    }
+
+  // Disconnect the input wizard from the grey image
+  m_WizPreprocessingIO->SetGreyImage(NULL);
+}
+
+void 
+UserInterfaceLogic
+::OnMenuSavePreprocessed() 
+{
+  // Better have a speed image to save
+  assert(m_GlobalState->GetSpeedValid());
+
+  // Save the speed
+  if(m_WizPreprocessingIO->DisplaySaveWizard(
+    m_Driver->GetSNAPImageData()->GetSpeed()->GetImage()))
+    {
+    // Store the new filename
+    m_GlobalState->SetPreprocessingFileName(
+      m_WizPreprocessingIO->GetSaveFileName());
+
+    // Some silly feedback
+    m_OutMessage->value("Saving preprocessing file successful");    
+    }
+}
+
 
 void UserInterfaceLogic
 ::OnMenuIntensityCurve() 
@@ -2741,13 +3075,12 @@ void UserInterfaceLogic
   assert(m_Driver->GetCurrentImageData()->IsGreyLoaded());
 
   // Update the curve in the UI dialog (is this necessary?)
-  m_WinIntensityCurve->SetCurve(m_Driver->GetIntensityCurve());    
-  m_WinIntensityCurve->SetImageWrapper(
+  m_IntensityCurveUI->SetCurve(m_Driver->GetIntensityCurve());    
+  m_IntensityCurveUI->SetImageWrapper(
     m_Driver->GetCurrentImageData()->GetGrey());
 
   // Show the window
-  m_WinIntensityCurve->DisplayWindow();
-
+  m_IntensityCurveUI->DisplayWindow();
 }
 
 void UserInterfaceLogic
@@ -2804,7 +3137,132 @@ UserInterfaceLogic
 ::OnLaunchTutorialAction()
 {
   m_WinHelp->show();
-  m_BrsHelp->load("Documentation/Tutorial.html");
+  m_BrsHelp->load("UserInterface/HTMLHelp/Tutorial.html");
+}
+
+
+// Splash screen functions
+void
+UserInterfaceLogic
+::ShowSplashScreen()
+{
+  // Place the window in the center of display
+  CenterChildWindowInParentWindow(m_WinSplash,m_WinMain);
+
+  // Show a wait cursor
+  fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+
+  // Show the splash screen
+  m_WinSplash->show();
+
+  // Make FL update the screen
+  Fl::check();
+
+  // Save the time of the splash screen
+  m_SplashScreenStartTime = clock();
+}
+
+void
+UserInterfaceLogic
+::HideSplashScreen()
+{
+  // Wait a second with the splash screen
+  while(clock() - m_SplashScreenStartTime < CLOCKS_PER_SEC) {}
+  
+  // Hide the screen 
+  m_WinSplash->hide();
+
+  // Clear the cursor
+  fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+
+  m_SnakeParametersUI->SetParameters(m_GlobalState->GetSnakeParameters());
+  m_SnakeParametersUI->DisplayWindow();
+}
+
+void
+UserInterfaceLogic
+::UpdateSplashScreen(const char *message)
+{
+  m_OutSplashMessage->label(message);
+  Fl::check();
+
+  // Save the time of the splash screen
+  m_SplashScreenStartTime = clock();
+}
+
+void
+UserInterfaceLogic
+::CenterChildWindowInParentWindow(Fl_Window *childWindow,
+                                  Fl_Window *parentWindow)
+{
+  int px = parentWindow->x() + (parentWindow->w() - childWindow->w()) / 2;
+  int py = parentWindow->y() + (parentWindow->h() - childWindow->h()) / 2;
+  childWindow->resize(px,py,childWindow->w(),childWindow->h());
+}
+
+void
+UserInterfaceLogic
+::OnResetView2DAction(unsigned int window)
+{
+  m_SliceCoordinator->ResetViewToFitInOneWindow(window);
+  
+  // Update the zoom level display
+  OnZoomUpdate();
+}
+
+void
+UserInterfaceLogic
+::OnResetAllViews2DAction()
+{
+  m_SliceCoordinator->ResetViewToFitInAllWindows();
+  
+  // Update the zoom level display
+  OnZoomUpdate();
+}
+
+void
+UserInterfaceLogic
+::OnLinkedZoomChange()
+{
+  if(m_ChkLinkedZoom->value() > 0)
+    {
+    m_SliceCoordinator->SetLinkedZoom(true);
+    m_InZoomPercentage->activate();
+    }
+  else
+    {
+    m_SliceCoordinator->SetLinkedZoom(false);
+    m_InZoomPercentage->deactivate();
+    }
+  
+  // Update the zoom level display
+  OnZoomUpdate();
+}
+
+void
+UserInterfaceLogic
+::OnZoomPercentageChange()
+{
+  float zoom = m_InZoomPercentage->value();
+  m_SliceCoordinator->SetZoomFactorAllWindows(zoom / 100.0f);  
+}
+
+void 
+UserInterfaceLogic
+::OnZoomUpdate()
+{
+  // This method should be called whenever the zoom changes
+  if(m_SliceCoordinator->GetLinkedZoom())
+    {
+    // Get the zoom from the first window and display it on the screen
+    m_InZoomPercentage->value(m_SliceCoordinator->GetCommonZoom() * 100);
+    }
+
+  else
+    {
+    // Otherwise, clear the display
+    m_InZoomPercentage->value(0);
+    }
 }
 
 
@@ -2823,6 +3281,27 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.5  2003/09/16 16:10:17  pauly
+ *FIX: No more Internal compiler errors on VC
+ *FIX: Intensity curve no longer crashes
+ *ENH: Histogram display on intensity curve window
+ *
+ *Revision 1.4  2003/09/15 19:06:58  pauly
+ *FIX: Trying to get last changes to compile
+ *
+ *Revision 1.3  2003/09/15 17:32:19  pauly
+ *ENH: Removed ImageWrapperImplementation classes
+ *
+ *Revision 1.2  2003/09/13 15:18:01  pauly
+ *FIX: Got SNAP to work properly with different image orientations
+ *
+ *Revision 1.1  2003/09/11 13:51:01  pauly
+ *FIX: Enabled loading of images with different orientations
+ *ENH: Implemented image save and load operations
+ *
+ *Revision 1.5  2003/08/28 22:58:30  pauly
+ *FIX: Erratic scrollbar behavior
+ *
  *Revision 1.4  2003/08/28 14:37:09  pauly
  *FIX: Clean 'unused parameter' and 'static keyword' warnings in gcc.
  *FIX: Label editor repaired

@@ -245,6 +245,14 @@ PolygonDrawing
   if (m_NumberOfUsedVertices == 0) m_State = INACTIVE_STATE;
 }
 
+void 
+PolygonDrawing
+::Reset()
+{
+  m_State = INACTIVE_STATE;
+  m_NumberOfUsedVertices = 0;
+}
+
 /**
  * Insert()
  *
@@ -766,6 +774,14 @@ PolygonDrawing
 
 /*
  *Log: PolygonDrawing.cxx
+ *Revision 1.1  2003/09/11 13:51:01  pauly
+ *FIX: Enabled loading of images with different orientations
+ *ENH: Implemented image save and load operations
+ *
+ *Revision 1.4  2003/08/28 14:37:09  pauly
+ *FIX: Clean 'unused parameter' and 'static keyword' warnings in gcc.
+ *FIX: Label editor repaired
+ *
  *Revision 1.3  2003/08/27 14:03:23  pauly
  *FIX: Made sure that -Wall option in gcc generates 0 warnings.
  *FIX: Removed 'comment within comment' problem in the cvs log.

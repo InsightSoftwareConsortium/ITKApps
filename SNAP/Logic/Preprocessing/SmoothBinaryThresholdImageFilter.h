@@ -40,13 +40,18 @@ public:
     assert(settings.IsLowerThresholdEnabled() || 
            settings.IsUpperThresholdEnabled());
 
-    // Set the factor by which the input is multiplied
-    // m_ScalingFactor = 1.0f / (smoothness * (imageMax-imageMin));
-    m_ScalingFactor = 1.0f / settings.GetSmoothness();
-
     // Store the upper and lower bounds
     m_LowerThreshold = settings.GetLowerThreshold();
     m_UpperThreshold = settings.GetUpperThreshold();
+
+    // Compute the largest scaling for U-L such that the function is greater
+    // than 1-eps
+    float eps = pow(10,-settings.GetSmoothness());
+    float maxScaling = (m_UpperThreshold - m_LowerThreshold) / log((2-eps)/eps);
+
+    // Set the factor by which the input is multiplied
+    // m_ScalingFactor = settings.GetSmoothness(); 
+    m_ScalingFactor = 1 / maxScaling; 
 
     // Combine the usage and inversion flags to get the scaling factors    
     m_FactorLower = settings.IsLowerThresholdEnabled() ? 1.0f : 0.0f;
@@ -54,6 +59,17 @@ public:
 
     // Compute the shift
     m_Shift = 1.0f - (m_FactorLower + m_FactorUpper);
+
+    // Compute the maximum using these parameters
+    //TInput zMax = (m_UpperThreshold + m_LowerThreshold) / 2;
+    //TInput fMax = (*this)(zMax) - m_Shift;
+
+    // Update the shift and scaling factors so that the function range becomes
+    // -1 to 1
+    //float fFactor = (m_FactorLower+m_FactorUpper) / fMax;
+    //m_FactorLower *= fFactor;
+    //m_FactorUpper *= fFactor;
+    double z = (*this)((m_LowerThreshold + m_UpperThreshold)/2);
   }
 
   /**

@@ -44,6 +44,9 @@ IRISSliceWindow
   m_PolygonMode = new PolygonInteractionMode(this);
   m_RegionMode = new RegionInteractionMode(this);
 
+  // Get a pointer to the drawing object
+  m_PolygonDrawing = m_PolygonMode->m_Drawing;
+
   // Initialize polygon slice canvas to NULL
   m_PolygonSlice = NULL;
 }
@@ -74,6 +77,9 @@ IRISSliceWindow
 {
   // Call the parent's version of this method
   GenericSliceWindow::InitializeSlice(imageData);
+
+  // Reset the polygon drawing interface
+  m_PolygonDrawing->Reset();
 
   // Initialize the polygon drawing canvas
   Size<2> imgSize;
@@ -118,17 +124,14 @@ IRISSliceWindow
   PushInteractionMode(m_RegionMode);
 }
 
-void 
+bool 
 IRISSliceWindow
 ::AcceptPolygon() 
 {
   assert(m_IsRegistered && m_IsSliceInitialized);
 
-  // We'll be working with this PolygonDrawing object
-  PolygonDrawing *draw = m_PolygonMode->m_Drawing;
-
   // Make sure we are in editing mode
-  if (draw->GetState() != EDITING_STATE) return;
+  if (m_PolygonDrawing->GetState() != EDITING_STATE) return false;
 
 #ifdef DRAWING_LOCK
   if (m_GlobalState->GetDrawingLock(id)) {
@@ -138,7 +141,7 @@ IRISSliceWindow
     make_current(); 
 
     // Have the polygon drawing object render the polygon slice
-    draw->AcceptPolygon((unsigned char *) m_PolygonSlice->GetBufferPointer(),
+    m_PolygonDrawing->AcceptPolygon((unsigned char *) m_PolygonSlice->GetBufferPointer(),
                         m_SliceSize(0),m_SliceSize(1));
 
     // take polygon rendered by polygon_drawing and merge with 
@@ -176,13 +179,14 @@ IRISSliceWindow
             (mode == PAINT_OVER_COLORS && pxLabel != 0))
         {
           // Get the index into the image that we'll be updating
-          Vector3f idxImageFloat = MapSliceToImage(Vector2f(idx[0],idx[1]));
+          Vector3f idxImageFloat = 
+            MapSliceToImage(Vector3f(idx[0]+0.5f,idx[1]+0.5f,m_DisplayAxisPosition));
 
           // Convert to integer
-          Vector3i idxImage = to_int(idxImageFloat);
+          Vector3ui idxImage = to_unsigned_int(idxImageFloat);
           
           // Check for rounding errors!  We could be editing the wrong pixel
-          assert(to_float(idxImage) == idxImageFloat);
+          // assert(to_float(idxImage) == idxImageFloat);
 
           // Set the value of the pixel in segmentation image
           m_Driver->GetCurrentImageData()->SetSegmentationVoxel(
@@ -191,35 +195,63 @@ IRISSliceWindow
       }
     }
 
-    m_ParentUI->ActivatePaste(m_Id, true);
-    m_ParentUI->ActivateAccept(m_Id, false);
 #ifdef DRAWING_LOCK
     m_GlobalState->ReleaseDrawingLock(m_Id);
   }
 #endif /* DRAWING_LOCK */
+
+  return true;
 }
 
 void 
-  IRISSliceWindow
-  ::PastePolygon()
+IRISSliceWindow
+::PastePolygon()
 {
   assert(m_IsRegistered && m_IsSliceInitialized);
 
 #ifdef DRAWING_LOCK
-  if (m_GlobalState->GetDrawingLock(m_Id)) {
+  if (m_GlobalState->GetDrawingLock(m_Id)) 
+    {
 #endif /* DRAWING_LOCK */
 
-    if (m_PolygonMode->m_Drawing->CachedPolygon()) {
-      m_PolygonMode->m_Drawing->PastePolygon();
-      m_ParentUI->ActivateAccept(m_Id, true);
+    if (m_PolygonDrawing->CachedPolygon()) 
+      {
+      m_PolygonDrawing->PastePolygon();
       redraw();
-    }
+      }
 
 #ifdef DRAWING_LOCK
-  } else {
+    } 
+  else 
+    {
     m_GlobalState->ReleaseDrawingLock(m_Id);
-  }
+    }
 #endif /* DRAWING_LOCK */
 }
+
+void 
+IRISSliceWindow
+::ClearPolygon()
+{
+  m_PolygonDrawing->Delete();
+  redraw();
+}
+
+void 
+IRISSliceWindow
+::DeleteSelectedPolygonPoints()
+{
+  m_PolygonDrawing->Delete();
+  redraw();
+}
+
+void 
+IRISSliceWindow
+::InsertPolygonPoints()
+{
+  m_PolygonDrawing->Insert();
+  redraw();
+}
+
 
 

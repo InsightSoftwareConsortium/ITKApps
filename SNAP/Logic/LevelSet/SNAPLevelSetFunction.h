@@ -15,7 +15,8 @@
 #ifndef __SNAPLevelSetFunction_h_
 #define __SNAPLevelSetFunction_h_
 
-#include "itkLevelSetFunction.h"
+//#include "itkLevelSetFunction.h"
+#include "itkSegmentationLevelSetFunction.h"
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkVectorLinearInterpolateImageFunction.h"
 #include "itkVectorCastImageFilter.h"
@@ -65,12 +66,12 @@
  */
 template <class TImageType>
 class ITK_EXPORT SNAPLevelSetFunction
-  : public itk::LevelSetFunction<TImageType>
+  : public itk::SegmentationLevelSetFunction<TImageType>
 {
 public:
   /** Standard class typedefs. */
   typedef SNAPLevelSetFunction Self;
-  typedef itk::LevelSetFunction<TImageType> Superclass;
+  typedef itk::SegmentationLevelSetFunction<TImageType> Superclass;
   typedef itk::SmartPointer<Self> Pointer;
   typedef itk::SmartPointer<const Self> ConstPointer;
                                                                                 
@@ -113,10 +114,10 @@ public:
       computation of the variuous internal speed images is
       based.  The function g() should be near zero at edges
       of structures in the image and near one at flat regions */
-  void SetSpeedImage(ImageType *pointer);
+  virtual void SetSpeedImage(ImageType *pointer);
       
   /** Get the speed image g() */
-  ImageType *GetSpeedImage()
+  virtual ImageType *GetSpeedImage()
     {
     return m_SpeedImage;
     }

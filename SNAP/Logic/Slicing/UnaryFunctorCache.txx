@@ -47,7 +47,7 @@ UnaryFunctorCache<TInput,TOutput,TFunctor>
   m_Cache = new TOutput[m_CacheLength];
 
   // Compute the cache elements
-  for(TInput iCache = 0, iFunc = m_CacheBegin;
+  for(unsigned int iCache = 0, iFunc = m_CacheBegin;
     iCache < m_CacheLength;
     iCache++,iFunc++)
     {
@@ -65,6 +65,4 @@ UnaryFunctorCache<TInput,TOutput,TFunctor>
   os << indent << "Cache Start: " << m_CacheBegin << std::endl;
   os << indent << "Cache Length: " << m_CacheLength << std::endl;
 }
-
-
 

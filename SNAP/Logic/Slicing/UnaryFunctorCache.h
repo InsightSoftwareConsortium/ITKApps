@@ -19,7 +19,13 @@
 #include <cstdio>
 
 #include "IRISTypes.h"
-#include "itkObject.h"
+#include "itkMacro.h"
+#include "itkProcessObject.h"
+
+// Forward references
+// template <class TInput, class TOutput, class TFunctor> class UnaryFunctorCache;
+template <class TInput, class TOutput, class TFunctor> 
+  class CachingUnaryFunctor;
 
 /**
  * \class UnaryFunctorCache
@@ -40,16 +46,20 @@ public:
   typedef itk::SmartPointer<Self> Pointer;
   typedef itk::SmartPointer<const Self> ConstPointer;
 
+  // Caching functor typedef
+  typedef CachingUnaryFunctor<TInput,TOutput,TFunctor> CachingFunctor;
+
+  /** New macro */
+  itkNewMacro(Self);
+
   /** Run-time type information (and related methods). */
   itkTypeMacro(UnaryFunctorCache,itk::Object);
 
-  /** New macro */
-  itkNewMacro(UnaryFunctorCache);
-
   /** Evaluate the function using cache lookup */
-  TOutput Evaluate(const TInput &in) const {
+  TOutput Evaluate(const TInput &in) const 
+    {
     return m_Cache[in - m_CacheBegin];
-  }
+    }
 
   /**
    * Set the function instance to call evaluate on
@@ -63,37 +73,21 @@ public:
 
   /**
    * Set the evaluation bounds, if you use these and these are small enough,
-   * you can use int or long.
+   * you can use int or long as template parameters.
    */
-  void SetEvaluationRange(TInput begin, TInput length) {
+  void SetEvaluationRange(TInput begin, TInput end) 
+  {
     m_CacheBegin = begin;
-    m_CacheLength = length;
+
+    // This code makes sure that if 'end' is the maximum value of TInput type, 
+    // the length is still valid
+    m_CacheLength = end;
+    m_CacheLength += 1;
+    m_CacheLength -= begin;
   }
 
   /** Compute the cache */
   void ComputeCache();
-
-  /**
-   * A functor is a lightweight object that has an Evaluate function and 
-   * can be passed on to itk::UnaryFunctorFilter
-   */
-  class CachingFunctor {
-  public:
-    TOutput operator()(const TInput &in) {
-      // assert(m_Parent);
-      return m_Parent->Evaluate(in);
-    }
-
-    CachingFunctor(UnaryFunctorCache *parent) {
-      m_Parent = parent;
-    }
-
-    CachingFunctor() {
-      m_Parent = NULL;
-    }
-  private:
-    Pointer m_Parent;
-  };
 
   /**
    * This method returns the lightweight functor (it can be copied)
@@ -119,12 +113,42 @@ protected:
   /**
    * The bounds of the cache
    */
-  TInput m_CacheBegin,m_CacheLength;
+  TInput m_CacheBegin;
+  
+  /** The length of the cache */
+  unsigned int m_CacheLength;
+
 
   /**
    * The functor
    */
-  CachingFunctor m_CachingFunctor;
+  CachingUnaryFunctor<TInput,TOutput,TFunctor> m_CachingFunctor;
+};
+
+/**
+ * \class CachingUnaryFunctor
+ * \brief A functor that works with UnaryFunctorCache to return precomputed 
+ * values
+ */
+template <class TInput, class TOutput, class TFunctor> 
+class CachingUnaryFunctor 
+{
+public:
+  // Typedef to the cache that updates this object
+  typedef UnaryFunctorCache<TInput,TOutput,TFunctor> CacheType;
+  typedef typename itk::SmartPointer<CacheType> CachePointer;
+
+  /** Perform an evaluation using the cache */
+  TOutput operator()(const TInput &in) { return m_Parent->Evaluate(in); }
+
+  /** Initialize with a cache object */
+  CachingUnaryFunctor(CacheType *parent) { m_Parent = parent; }
+
+  /** Default constructor */
+  CachingUnaryFunctor() { }
+private:
+  /** Pointer to the cache */
+  CachePointer m_Parent;
 };
 
 #ifndef ITK_MANUAL_INSTANTIATION

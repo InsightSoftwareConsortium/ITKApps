@@ -192,18 +192,26 @@ Window3D
 
     // voxel m_Spacing        
     m_Spacing = m_Driver->GetCurrentImageData()->GetVoxelScaleFactor(); 
+
+    // Volume size
+    m_VolumeSize[0] = m_Spacing[0] * m_ImageSize[0];
+    m_VolumeSize[1] = m_Spacing[1] * m_ImageSize[1];
+    m_VolumeSize[2] = m_Spacing[2] * m_ImageSize[2];
     } 
   else
     {
     m_ImageSize.fill(0);
     m_Spacing.fill(0.0);
+    m_VolumeSize.fill(0.0);
     }
 
-  int maxdim = 0;
+  unsigned int maxdim = 0;
   for (int i=0; i<3; i++)
     {
-    m_Center[i]       = m_ImageSize[i] / 2.0;
-    if (maxdim < m_ImageSize[i]) maxdim = m_ImageSize[i];
+    float len = m_ImageSize[i];
+    m_Center[i] = len / 2.0;
+    if (maxdim < len) 
+      maxdim = len;
     }
   m_DefaultHalf[X] = m_DefaultHalf[Y] = m_DefaultHalf[Z] = maxdim * 0.7 + 1.0;
   m_DefaultHalf[Z] *= 4.0;
@@ -237,7 +245,11 @@ Window3D
   colorid = m_GlobalState->GetDrawingColorLabel();
 
   for ( int i = 0; i < m_NumberOfUsedSamples; i++ )
-    m_Driver->GetCurrentImageData()->SetSegmentationVoxel( m_Samples[i], colorid );
+    {
+    m_Driver->GetCurrentImageData()->SetSegmentationVoxel(
+      to_unsigned_int(m_Samples[i]), colorid );
+    }
+      
   m_NumberOfUsedSamples = 0;
 
   if (1 == m_Plane.valid )
@@ -277,6 +289,7 @@ Window3D
   //SetupModelView calls glPushMatrix
   glPushMatrix();
   glScalef( m_Spacing[X], m_Spacing[Y], m_Spacing[Z] );
+
   DrawCrosshairs();
   DrawSamples();
   DrawCutPlane();
@@ -446,11 +459,11 @@ Window3D
       if (this->IntersectSegData(Fl::event_x(), Fl::event_y(), hit))
         {
         // TODO: Unify this!
-        m_Driver->GetCurrentImageData()->SetCrosshairs(hit);
-        m_GlobalState->SetCrosshairsPosition( hit );
+        m_Driver->GetCurrentImageData()->SetCrosshairs(to_unsigned_int(hit));
+        m_GlobalState->SetCrosshairsPosition(to_unsigned_int(hit));
         }
 
-      m_ParentUI->ResetScrollbars();
+      m_ParentUI->OnCrosshairPositionUpdate();
       m_ParentUI->RedrawWindows();
 
       break;
@@ -543,8 +556,8 @@ Window3D
 ::SetupModelView()
 {
   // Set m_Center of rotation
-  Vector3i crosshair = m_GlobalState->GetCrosshairsPosition();
-  for (int i=0; i<3; i++) m_CenterOfRotation[i] = crosshair[i];
+  Vector3ui crosshair = m_GlobalState->GetCrosshairsPosition();
+  for (int i=0; i<3; i++) m_CenterOfRotation[i] = m_Spacing[i] * crosshair[i];
 
   glMatrixMode( GL_MODELVIEW );
   glPushMatrix();
@@ -631,7 +644,7 @@ int Window3D::IntersectSegData(int mouse_x, int mouse_y, Vector3i &hit)
   // segmentation image
   // TODO: Need both conditions?
   if(m_GlobalState->GetSnakeActive() && 
-     m_Driver->GetSNAPImageData()->IsSnakeInitialized())
+     m_Driver->GetSNAPImageData()->IsSnakeLoaded())
     {
     typedef ImageRayIntersectionFinder<
       float,SnakeImageHitTester> RayCasterType;
@@ -790,7 +803,7 @@ void Window3D::DrawCrosshairs()
 {
   if ( !m_CursorVisible ) return;
 
-  Vector3i crosshair = m_GlobalState->GetCrosshairsPosition();
+  Vector3ui crosshair = m_GlobalState->GetCrosshairsPosition();
 
   glDisable(GL_LIGHTING);
 
@@ -864,63 +877,102 @@ void Window3D::DrawSamples()
 void Window3D::DrawCutPlane() {
   if (m_Plane.valid != 1) return;
 
-  // GLdouble clipbottom[4]={0.0,1.0,0.0,0.0};
-  // GLdouble cliptop[4]={0.0,-1/m_ImageSize[1],0.0,1};
-  // GLdouble clipright[4]={1/m_ImageSize[0],0.0,0.0,1.0};
-  // GLdouble clipleft[4]={1,0,0,0};
-  //glClipPlane(GL_CLIP_PLANE0,clipbottom);
-  //glClipPlane(GL_CLIP_PLANE1,cliptop);
-  //glClipPlane(GL_CLIP_PLANE2,clipright);
-  //glClipPlane(GL_CLIP_PLANE3,clipleft);
-  //glEnable(GL_CLIP_PLANE0);
-  //glEnable(GL_CLIP_PLANE1);
-  //glEnable(GL_CLIP_PLANE2);
-  //glEnable(GL_CLIP_PLANE3);
-
-  // Perhaps draw a simple rectangle and do the rest with glScale,
-  // glMultMatrix, glTranslate, etc.?
-  //glRectf(0.0, 0.0, 1.0, 1.0);
-
-  glBegin(GL_QUADS);
-  glColor3f(1.0,1.0,0.0);
-
   // Spit out a vertex with given x, y coords (assumes m_Plane.coords[Z] != 0)
-#define Z_VERTEX(x,y) glVertex3d( (x), (y), \
+  #define Z_VERTEX(x,y) Vector3d( (x), (y), \
         ( 1.0 - (m_Plane.coords[X]*(x)) - (m_Plane.coords[Y]*(y)) ) / m_Plane.coords[Z] )
 
   // Spit out a vertex with given x, z coords (assumes m_Plane.coords[Y] != 0)
-#define Y_VERTEX(x,z) glVertex3d( (x), \
+  #define Y_VERTEX(x,z) Vector3d( (x), \
         ( 1.0 - (m_Plane.coords[X]*(x)) - (m_Plane.coords[Z]*(z)) ) / m_Plane.coords[Y],\
         (z) )
 
+  // Compute the corners of the plane
+  Vector3d corner[4];  
   if (m_Plane.coords[Z]==0)
-    {   // plane is parallel to Z axis
+    {   
+    // plane is parallel to Z axis
     if (m_Plane.coords[Y]==0)
-      {   // plane is parallel to Y axis (also)
-      glVertex3d(1.0/m_Plane.coords[X],        0.0,        0.0);
-      glVertex3d(1.0/m_Plane.coords[X],        0.0, m_ImageSize[Z]);
-      glVertex3d(1.0/m_Plane.coords[X], m_ImageSize[Y], m_ImageSize[Z]);
-      glVertex3d(1.0/m_Plane.coords[X], m_ImageSize[Y],        0.0);
-      } else
+      {   
+      // plane is parallel to Y axis (also)
+      corner[0] = Vector3d(1.0/m_Plane.coords[X],        0.0,        0.0);
+      corner[1] = Vector3d(1.0/m_Plane.coords[X],        0.0, m_VolumeSize[Z]);
+      corner[2] = Vector3d(1.0/m_Plane.coords[X], m_VolumeSize[Y], m_VolumeSize[Z]);
+      corner[3] = Vector3d(1.0/m_Plane.coords[X], m_VolumeSize[Y],        0.0);
+      } 
+    else
       {
-      Y_VERTEX(       0.0,        0.0);
-      Y_VERTEX(       0.0, m_ImageSize[Z]);
-      Y_VERTEX(m_ImageSize[X], m_ImageSize[Z]);
-      Y_VERTEX(m_ImageSize[X],        0.0);
+      corner[0] = Y_VERTEX(       0.0,        0.0);
+      corner[1] = Y_VERTEX(       0.0, m_VolumeSize[Z]);
+      corner[2] = Y_VERTEX(m_VolumeSize[X], m_VolumeSize[Z]);
+      corner[3] = Y_VERTEX(m_VolumeSize[X],        0.0);
       }
-    } else
-    {        // Standard case, generic plane
-    Z_VERTEX(       0.0,        0.0);
-    Z_VERTEX(       0.0, m_ImageSize[Y]);
-    Z_VERTEX(m_ImageSize[X], m_ImageSize[Y]);
-    Z_VERTEX(m_ImageSize[X],        0.0);
+    } 
+  else
+    {        
+    // Standard case, generic plane
+    corner[0] = Z_VERTEX(       0.0,        0.0);
+    corner[1] = Z_VERTEX(       0.0, m_VolumeSize[Y]);
+    corner[2] = Z_VERTEX(m_VolumeSize[X], m_VolumeSize[Y]);
+    corner[3] = Z_VERTEX(m_VolumeSize[X],        0.0);
     }
 
-  glEnd();
+  // Save the settings
+  glPushAttrib(GL_LINE_BIT | GL_COLOR_BUFFER_BIT | GL_LIGHTING_BIT);
+  
+  // Draw the plane using lines
+  glEnable(GL_LINE_SMOOTH);
+  glEnable(GL_LINE_STIPPLE);
+  glEnable(GL_BLEND);
+  glDisable(GL_LIGHTING);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glLineWidth(2.0);
+  glLineStipple(2,0xAAAA);
+
+  // Use the current label color
+  unsigned char rgb[3];
+  m_Driver->GetCurrentImageData()->GetColorLabel(
+    m_GlobalState->GetDrawingColorLabel()).GetRGBVector(rgb);
+  
+  // Start with a white color
+  glColor3d(1,1,1);
+  Vector3d planeUnitNormal = Vector3d(m_Plane.coords).normalize();
+  for(unsigned int i=0;i<4;i++)
+    {
+    glPushMatrix();
+
+    // Create a parallel plane to create a moving effect
+    Vector3d vOffset = planeUnitNormal * (1.0 * i);
+    glTranslated(vOffset[0],vOffset[1],vOffset[2]);
+
+    // Draw a line loop
+    glBegin(GL_LINE_LOOP);
+    glVertex3dv(corner[0].data_block());
+    glVertex3dv(corner[1].data_block());
+    glVertex3dv(corner[2].data_block());
+    glVertex3dv(corner[3].data_block());
+    glEnd();
+
+    // Switch to new color
+    glColor3ubv(rgb);
+
+    glPopMatrix();
+    }
+
+  glPopAttrib();
 };
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.2  2003/09/11 19:23:29  pauly
+ *FIX: Code compiles and runs on UNIX platform
+ *
+ *Revision 1.1  2003/09/11 13:51:15  pauly
+ *FIX: Enabled loading of images with different orientations
+ *ENH: Implemented image save and load operations
+ *
+ *Revision 1.4  2003/08/28 22:58:30  pauly
+ *FIX: Erratic scrollbar behavior
+ *
  *Revision 1.3  2003/08/27 14:03:24  pauly
  *FIX: Made sure that -Wall option in gcc generates 0 warnings.
  *FIX: Removed 'comment within comment' problem in the cvs log.

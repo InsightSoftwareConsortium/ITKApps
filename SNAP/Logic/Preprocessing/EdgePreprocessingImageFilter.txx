@@ -25,6 +25,7 @@ EdgePreprocessingImageFilter<TInputImage,TOutputImage>
   
   // Construct the Gaussian filter
   m_GaussianFilter = GaussianFilterType::New();
+  m_GaussianFilter->SetUseImageSpacing(false);
   m_GaussianFilter->ReleaseDataFlagOn();
   m_GaussianFilter->SetInput(m_CastFilter->GetOutput());
 

@@ -32,8 +32,14 @@ public:
   };
 
   enum SnakeType {
-    EDGE_SNAKE, IN_OUT_SNAKE
+    EDGE_SNAKE, REGION_SNAKE
   };
+
+  enum SolverType {
+    PARALLEL_SPARSE_FIELD_SOLVER, SPARSE_FIELD_SOLVER,
+    NARROW_BAND_SOLVER, LEGACY_SOLVER, DENSE_SOLVER
+  };
+
 
   /**
    * Initialize parameters with default values for snake extraction
@@ -50,7 +56,13 @@ public:
   // Define a comparison operator
   bool operator ==(const SnakeParameters &p);
 
-  /** Time step in level snake propagation (TODO: compute automatically) */
+  /** Whether we wish to automatically compute optimal time step 
+   * in level snake propagation */
+  irisGetMacro(AutomaticTimeStep,bool);
+  irisSetMacro(AutomaticTimeStep,bool);
+
+  /** Time step in level snake propagation.  This is is only used if the
+   * automatic computation is off */
   irisGetMacro(TimeStep,float);
   irisSetMacro(TimeStep,float);
 
@@ -64,9 +76,13 @@ public:
   irisGetMacro(Clamp,bool);
   irisSetMacro(Clamp,bool);
 
+  /** Which solver to use to run the equation */
+  irisGetMacro(Solver,SolverType);
+  irisSetMacro(Solver,SolverType);
+
   /** Type of equation (well known parameter sets) */
-  irisGetMacro(Type,ConstraintsType);
-  irisSetMacro(Type,ConstraintsType);
+  irisGetMacro(SnakeType,SnakeType);
+  irisSetMacro(SnakeType,SnakeType);
 
   irisGetMacro(PropagationWeight,float);
   irisSetMacro(PropagationWeight,float);
@@ -96,8 +112,10 @@ private:
   float m_TimeStep;
   float m_Ground;
 
-  ConstraintsType m_Type;
+  SnakeType m_SnakeType;
   bool m_Clamp;
+
+  bool m_AutomaticTimeStep;
 
   float m_PropagationWeight;
   int m_PropagationSpeedExponent;
@@ -109,7 +127,9 @@ private:
   int m_LaplacianSpeedExponent;
 
   float m_AdvectionWeight;
-  int m_AdvectionSpeedExponent;       
+  int m_AdvectionSpeedExponent;   
+
+  SolverType m_Solver;
 };
 
 #endif // __SnakeParameters_h_

@@ -42,7 +42,7 @@ FunctionPlot2DBox
     }
     
   // Clear the viewport
-  glClearColor(0.75,0.75,0.75,1.0);
+  glClearColor(0.906f,0.906f,0.906f,1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
   // Push the related attributes

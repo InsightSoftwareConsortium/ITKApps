@@ -19,7 +19,8 @@
 
 #include <itkImageToImageFilter.h>
 #include <itkImageSliceConstIteratorWithIndex.h>
-#include <itkImageRegionIterator.h>
+#include <itkImageRegionIteratorWithIndex.h>
+#include <itkImageLinearIteratorWithIndex.h>
 
 /**
  * \class IRISSlicer
@@ -58,22 +59,32 @@ public:
   typedef typename OutputImageType::Pointer  OutputImagePointer;
   typedef typename OutputImageType::RegionType  OutputImageRegionType;
   typedef itk::ImageSliceConstIteratorWithIndex<InputImageType>  InputIteratorType;
-  typedef itk::ImageRegionIterator<OutputImageType>  OutputIteratorType;
-
-  /** Set the transform that maps the image space into the display space */
-  void SetImageToDisplayTransform(const ImageCoordinateTransform &imageToDisplay);
-  
-  /** Get the transforms stored in the slicer */
-  irisGetMacro(ImageToDisplay,ImageCoordinateTransform);
-  irisGetMacro(DisplayToImage,ImageCoordinateTransform);
+  typedef itk::ImageRegionIteratorWithIndex<OutputImageType>  SimpleOutputIteratorType;
+  typedef itk::ImageLinearIteratorWithIndex<OutputImageType> OutputIteratorType;
 
   /** Set the current slice index */
   itkSetMacro(SliceIndex,unsigned int);
   itkGetMacro(SliceIndex,unsigned int);
 
-  /** Set the current axis direction */
-  itkSetMacro(SliceAxis,unsigned int);
-  itkGetMacro(SliceAxis,unsigned int);
+  /** Set the image axis along which the subsequent slices lie */
+  itkSetMacro(SliceDirectionImageAxis,unsigned int);
+  itkGetMacro(SliceDirectionImageAxis,unsigned int);
+
+  /** Set the image axis along which the subsequent lines in a slice lie */
+  itkSetMacro(LineDirectionImageAxis,unsigned int);
+  itkGetMacro(LineDirectionImageAxis,unsigned int);
+
+  /** Set the image axis along which the subsequent pixels in a line lie */
+  itkSetMacro(PixelDirectionImageAxis,unsigned int);
+  itkGetMacro(PixelDirectionImageAxis,unsigned int);
+
+  /** Set the direction of line traversal */
+  itkSetMacro(LineTraverseForward,bool);
+  itkGetMacro(LineTraverseForward,bool);
+
+  /** Set the direction of pixel traversal */
+  itkSetMacro(PixelTraverseForward,bool);
+  itkGetMacro(PixelTraverseForward,bool);
 
 protected:
   IRISSlicer();
@@ -107,36 +118,29 @@ private:
   IRISSlicer(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
-  // Transform from image to the slices
-  ImageCoordinateTransform m_ImageToDisplay;
-   
-  // Transform from slices to the image
-  ImageCoordinateTransform m_DisplayToImage;
-
   // Current slice in each of the dimensions
   unsigned int m_SliceIndex;
 
-  // Current axis direction
-  unsigned int m_SliceAxis;
+  // Image axis corresponding to the slice direction
+  unsigned int m_SliceDirectionImageAxis;
 
-  // Axes in display space that correspond to the z,x,y axes of the slice
-  // (The z axes of the slice is the dimension in which the slice moves)
-  Vector3i m_DisplayAxes;
+  // Image axis corresponding to the line direction
+  unsigned int m_LineDirectionImageAxis;
+  
+  // Image axis corresponding to the pixel direction  
+  unsigned int m_PixelDirectionImageAxis;
 
-  // Axes in image space that correspond to the z,x,y axes of the slice
-  // (The z axes of the slice is the dimension in which the slice moves)
-  Vector3i m_ImageAxes;
+  // Whether the line direction is reversed
+  bool m_LineTraverseForward;
 
-  // The direction in which the image axes are traversed (+1 or -1)
-  Vector3i m_AxesDirection;
-
-  // This method computes the axes.  Since this is so fast, the method is run 
-  // each time the axes are needed
-  void ComputeAxes();
-
-  // The worker method in this filter
-  void CopySlice(InputIteratorType itImage, OutputIteratorType itSlice, 
-                 int sliceDir, int lineDir);
+  // Whether the pixel direction is reversed
+  bool m_PixelTraverseForward;
+  
+  // The worker methods in this filter
+  void CopySliceLineForwardPixelForward(InputIteratorType, OutputImageType *);
+  void CopySliceLineForwardPixelBackward(InputIteratorType, OutputImageType *);
+  void CopySliceLineBackwardPixelForward(InputIteratorType, OutputImageType *);
+  void CopySliceLineBackwardPixelBackward(InputIteratorType, OutputImageType *);
 };
 
 #ifndef ITK_MANUAL_INSTANTIATION

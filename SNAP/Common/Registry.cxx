@@ -170,7 +170,7 @@ Registry::StringType
 Registry
 ::Encode(const StringType &input) 
 {
-  ostringstream oss;
+  IRISOStringStream oss;
   for(unsigned int i=0; i < input.length() ; i++)
     {
     if(!isprint(input[i]) || input[i]=='%')
@@ -194,8 +194,8 @@ Registry::StringType
 Registry::Decode(const StringType &input) 
 {
   // Create an input stream
-  istringstream iss(input);
-  ostringstream oss;
+  IRISIStringStream iss(input);
+  IRISOStringStream oss;
 
   // Read until we run out or crash
   while(iss.good())
@@ -362,7 +362,7 @@ Registry
 ::ReadFromFile(const char *pathname) 
 {
   // Create an error stream
-  ostringstream serr;
+  IRISOStringStream serr;
       
   try 
     {

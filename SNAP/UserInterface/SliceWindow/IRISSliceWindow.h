@@ -85,7 +85,7 @@ public:
    *   drawing lock released and polygon_drawing state is INACTIVE_STATE
    * else state not changed.
    */
-  void AcceptPolygon();
+  bool AcceptPolygon();
 
   /**
    * PastePolygon()
@@ -106,6 +106,18 @@ public:
    */
   void PastePolygon();
   
+  /** Clear the polygon currently being edited */
+  void ClearPolygon();
+
+  /** Delete currently selected polygon points */
+  void DeleteSelectedPolygonPoints();
+
+  /** Insert points between selected polygon points */
+  void InsertPolygonPoints();
+
+  /** Get the polygon drawing object */
+  irisGetMacro(PolygonDrawing,PolygonDrawing *);
+
   // Allow friendly access by interactors
   friend class RegionInteractionMode;
   friend class ZoomPanInteractionMode;
@@ -119,7 +131,7 @@ protected:
   PolygonInteractionMode *m_PolygonMode;
 
   /** polygon drawing object */
-  PolygonDrawing m_PolygonDrawing;
+  PolygonDrawing *m_PolygonDrawing;
 
   // Type definition for the slice used for polygon rendering
   typedef LabelImageWrapper::DisplaySliceType PolygonSliceType;

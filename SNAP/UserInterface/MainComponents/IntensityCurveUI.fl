@@ -7,8 +7,8 @@ class IntensityCurveUI {open : IntensityCurveUIBase
   Function {MakeWindow()} {open
   } {
     Fl_Window m_WinCurve {
-      label {Intensity Mapping Curves} open
-      xywh {315 197 414 239}
+      label {Image to Screen Intensity Mapping} open selected
+      xywh {165 299 414 239} box PLASTIC_DOWN_BOX
       code0 {\#include "IntensityCurveUIBase.h"}
       code1 {\#include "IntensityCurveBox.h"} visible
     } {
@@ -36,18 +36,18 @@ class IntensityCurveUI {open : IntensityCurveUIBase
       } {}
       Fl_Value_Input m_InLevel {
         label {Level:}
-        callback {this->OnWindowLevelChange();} selected
+        callback {this->OnWindowLevelChange();}
         xywh {310 30 95 20} labelsize 12 align 5 step 1 textsize 11
       }
       Fl_Value_Input m_InWindow {
         label {Window:}
-        callback {this->OnWindowLevelChange();} selected
+        callback {this->OnWindowLevelChange();}
         xywh {310 70 95 20} labelsize 12 align 5 step 1 textsize 11
       }
       Fl_Value_Slider m_InControlPoints {
         label {Control Points:}
         callback {this->OnControlPointNumberChange();}
-        xywh {310 125 95 20} type Horizontal labelsize 12 align 5 minimum 3 maximum 10 step 1 value 4
+        xywh {310 125 95 20} type Horizontal color 52 selection_color 197 labelsize 12 align 5 minimum 3 maximum 10 step 1 value 4
       }
     }
   }

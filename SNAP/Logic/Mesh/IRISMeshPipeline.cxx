@@ -73,6 +73,7 @@ IRISMeshPipeline
   m_GaussianFilter = GaussianFilter::New();
   m_GaussianFilter->SetInput(m_ThrehsoldFilter->GetOutput());
   m_GaussianFilter->ReleaseDataFlagOn();
+  m_GaussianFilter->SetUseImageSpacing(true);
 
   // Initialize the VTK Exporter
   m_VTKExporter = VTKExportType::New();
@@ -153,8 +154,8 @@ IRISMeshPipeline
   m_MeshOptions = options;
 
   // Apply parameters to the Gaussian filter
-  Vector3f sigma = options.GetGaussianStandardDeviation();
-  Vector3f variance = vector_multiply(sigma,sigma);
+  float sigma = options.GetGaussianStandardDeviation();
+  Vector3f variance(sigma * sigma);
   m_GaussianFilter->SetVariance(variance.data_block());
 
   // What would be a suitable setting?  I suppose we don't really care
@@ -217,7 +218,7 @@ IRISMeshPipeline
   else
     {
     m_StripperFilter->SetInput(m_ContourFilter->GetOutput());
-    }
+    m_StripperFilter->SetInput(m_ContourFilter->GetOutput());
 */
 }
 
@@ -304,12 +305,6 @@ IRISMeshPipeline
   bbWiderRegion.PadByRadius(5);
   bbWiderRegion.Crop(m_InputImage->GetLargestPossibleRegion()); 
   m_GaussianFilter->GetInput()->GetRequestedRegion();
-  
-  // Let's compare the two regions
-  verbose << "Label " << label << " bounding box:" << std::endl;
-  m_BoundingBox[label].Print(verbose);
-  verbose << "Expanded bounding box: " << std::endl;
-  bbWiderRegion.Print(verbose);
   
   // Pass the region to the ROI filter and propagate the filter
   m_ROIFilter->SetInput(m_InputImage);

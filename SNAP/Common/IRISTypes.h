@@ -19,6 +19,7 @@
 #include <cassert>
 
 // Include the VectorNx defintions
+#include "itkMacro.h"
 #include "IRISVectorTypes.h"
 
 // short name (release tag, e.g. $Name:  $)
@@ -197,12 +198,20 @@ public:
  */
 #define irisNotUsed(x)
 
+
+/** Definitions for the string streams, for compatibility */
+typedef itk::OStringStream IRISOStringStream;
+typedef std::istringstream IRISIStringStream;
+
 // Number of color labels
 #define MAX_COLOR_LABELS 256
 
 #endif // __IrisTypes_h_
 /*
  *Log: IRISTypes.h
+ *Revision 1.5  2003/10/02 13:43:12  pauly
+ *ENH: Development during September code freeze
+ *
  *Revision 1.12  2003/09/11 13:50:29  pauly
  *FIX: Enabled loading of images with different orientations
  *ENH: Implemented image save and load operations

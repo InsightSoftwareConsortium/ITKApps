@@ -20,6 +20,7 @@
 #include <GL/glu.h>
 
 #include <iostream>
+#include "IRISTypes.h"
 
 enum PolygonState
 {
@@ -51,6 +52,13 @@ public:
   void Draw(float pixel_x, float pixel_y);
   int  Handle(int event, int button, float x, float y, float pixel_x, float pixel_y);
 
+  void Delete();
+  void Insert();
+  void Reset();
+
+  /** How many vertices are selected */
+  irisGetMacro(SelectedVertices,int);
+
 private:
   PolygonState m_State;
   PolygonVertex *m_Vertices;
@@ -77,15 +85,20 @@ private:
   void ComputeEditBox();
   void Add(float x, float y, int selected);
 
-  void Delete();
-
-  void Insert();
 };
 
 #endif // __PolygonDrawing_h_
 
 /*
  *Log: PolygonDrawing.h
+ *Revision 1.1  2003/09/11 13:51:01  pauly
+ *FIX: Enabled loading of images with different orientations
+ *ENH: Implemented image save and load operations
+ *
+ *Revision 1.3  2003/08/27 14:03:23  pauly
+ *FIX: Made sure that -Wall option in gcc generates 0 warnings.
+ *FIX: Removed 'comment within comment' problem in the cvs log.
+ *
  *Revision 1.2  2003/08/27 04:57:47  pauly
  *FIX: A large number of bugs has been fixed for 1.4 release
  *
