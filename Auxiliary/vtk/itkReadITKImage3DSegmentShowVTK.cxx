@@ -146,7 +146,7 @@ int main(int argc, char * argv [] )
     seed[1] = start[1] + size[1] / 2;
     seed[2] = start[2] + size[2] / 2;
 
-    if( argc >= 4 )
+    if( argc >  4 )
       {
       seed[0] = atoi( argv[2] );
       seed[1] = atoi( argv[3] );
@@ -172,6 +172,7 @@ int main(int argc, char * argv [] )
     ConnectPipelines(itkExporter2, vtkImporter2);
     
 
+    vtkImporter1->Update();
      
     //------------------------------------------------------------------------
     // VTK pipeline.
@@ -276,7 +277,7 @@ int main(int argc, char * argv [] )
   
     renderer->AddActor( polyActor );
     
-    if( argc >=5 )
+    if( argc > 5 )
       {
       vtkPolyDataWriter * writer = vtkPolyDataWriter::New();
       writer->SetFileName(argv[5]);
@@ -284,7 +285,7 @@ int main(int argc, char * argv [] )
       writer->Write();
       }
  
-    if( argc >=6 )
+    if( argc > 6 )
       {
       int representation = atoi( argv[6] );
       switch(representation)
