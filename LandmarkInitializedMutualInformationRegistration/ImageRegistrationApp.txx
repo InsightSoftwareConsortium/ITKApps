@@ -148,8 +148,8 @@ ImageRegistrationApp< TImage >
   typename RigidRegistratorType::Pointer registrator = 
                                          RigidRegistratorType::New();
 
-  registrator->SetMovingImage(m_MovingImage) ;
-  registrator->SetFixedImage( m_FixedImage ) ;
+  registrator->SetMovingImage(m_FixedImage) ;   // ITK is messed up
+  registrator->SetFixedImage( m_MovingImage ) ; // - it transforms the fixed image into the moving image
   registrator->SetFixedImageRegion( m_FixedImageRegion ) ;
   registrator->SetOptimizerScales( m_RigidScales );
   registrator->SetOptimizerNumberOfIterations(m_RigidNumberOfIterations);
@@ -172,17 +172,17 @@ ImageRegistrationApp< TImage >
     typename TImage::IndexType fixedCenterIndex;
     itk::Point<double, 3> fixedCenterPoint;
     size = m_FixedImage->GetLargestPossibleRegion().GetSize();
-    fixedCenterIndex[0] = size[0]/2+m_FixedImage->GetOrigin()[0];
-    fixedCenterIndex[1] = size[1]/2+m_FixedImage->GetOrigin()[1];
-    fixedCenterIndex[2] = size[2]/2+m_FixedImage->GetOrigin()[2];
+    fixedCenterIndex[0] = size[0]/2;
+    fixedCenterIndex[1] = size[1]/2;
+    fixedCenterIndex[2] = size[2]/2;
     m_FixedImage->TransformIndexToPhysicalPoint(fixedCenterIndex,
                                                 fixedCenterPoint);
     typename TImage::IndexType movingCenterIndex;
     itk::Point<double, 3> movingCenterPoint;
     size = m_MovingImage->GetLargestPossibleRegion().GetSize();
-    movingCenterIndex[0] = size[0]/2+m_MovingImage->GetOrigin()[0];
-    movingCenterIndex[1] = size[1]/2+m_MovingImage->GetOrigin()[1];
-    movingCenterIndex[2] = size[2]/2+m_MovingImage->GetOrigin()[2];
+    movingCenterIndex[0] = size[0]/2;
+    movingCenterIndex[1] = size[1]/2;
+    movingCenterIndex[2] = size[2]/2;
     m_MovingImage->TransformIndexToPhysicalPoint(movingCenterIndex,
                                                 movingCenterPoint);
     RigidParametersType params;
@@ -214,7 +214,7 @@ ImageRegistrationApp< TImage >
       this->PrintUncaughtError() ;
     }
 
-  m_RigidRegTransform = registrator->GetTypedTransform();
+  m_RigidRegTransform  = registrator->GetTypedTransform();
   m_RigidAffineTransform->SetMatrix( m_RigidRegTransform->GetRotationMatrix());
   m_RigidAffineTransform->SetOffset(m_RigidRegTransform->GetOffset());
   m_FinalTransform = m_RigidAffineTransform;
@@ -236,8 +236,8 @@ ImageRegistrationApp< TImage >
   typename AffineRegistratorType::Pointer registrator = 
                                          AffineRegistratorType::New();
 
-  registrator->SetMovingImage(m_MovingImage) ;
-  registrator->SetFixedImage( m_FixedImage ) ;
+  registrator->SetMovingImage(m_FixedImage) ; // ITK is messed up
+  registrator->SetFixedImage( m_MovingImage ) ;  // - it transforms the fixed into the moving - here we fix
   registrator->SetFixedImageRegion( m_FixedImageRegion ) ;
   registrator->SetOptimizerScales( m_AffineScales );
   registrator->SetOptimizerNumberOfIterations(m_AffineNumberOfIterations);

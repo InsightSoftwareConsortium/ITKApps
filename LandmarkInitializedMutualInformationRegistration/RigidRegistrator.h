@@ -62,10 +62,11 @@ class RigidRegistrator : public itk::ImageRegistrationMethod < TImage, TImage >
     itkSetMacro(OptimizerScales, ScalesType) ;
     itkGetConstMacro(OptimizerScales, ScalesType) ;
 
-    MetricType * GetTypedMetric(void)
+    typename MetricType * GetTypedMetric(void)
       {
       return static_cast<MetricType *>(Superclass::GetMetric());
       }
+
 
     itkSetMacro(MetricNumberOfSpatialSamples, unsigned int) ;
     itkGetConstMacro(MetricNumberOfSpatialSamples, unsigned int) ;

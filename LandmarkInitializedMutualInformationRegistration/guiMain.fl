@@ -132,22 +132,22 @@ Register();}
             Fl_Round_Button tkFixedImageLandmark1Button {
               label {Landmark 1}
               callback {UpdateLandmark(o->parent(), 0);}
-              tooltip {Landmark 1: mucosa point most opposite to the cervex} xywh {10 103 85 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 4
+              xywh {10 103 85 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 4
             }
             Fl_Round_Button tkFixedImageLandmark2Button {
               label {Landmark 2}
               callback {UpdateLandmark(o->parent(), 1);}
-              tooltip {Landmark 2: Extreme left point of the mucosa} xywh {10 122 85 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 1
+              xywh {10 122 85 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 1
             }
             Fl_Round_Button tkFixedImageLandmark3Button {
               label {Landmark 3}
               callback {UpdateLandmark(o->parent(), 2);}
-              tooltip {Landmark 3: mucosa point closest to the cervex} xywh {10 140 85 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 63
+              xywh {10 140 85 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 63
             }
             Fl_Round_Button tkFixedImageLandmark4Button {
               label {Landmark 4}
               callback {UpdateLandmark(o->parent(), 3);}
-              tooltip {Landmark 4: extreme right point of the mucosa} xywh {10 157 85 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 3
+              xywh {10 157 85 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 3
             }
             Fl_Button {} {
               label {Region of interest...}
@@ -196,22 +196,22 @@ Register();}
             Fl_Round_Button tkMovingImageLandmark1Button {
               label {Landmark 1}
               callback {UpdateLandmark(o->parent(), 0);}
-              tooltip {Landmark 1: mucosa point most opposite to the cervex} xywh {10 410 84 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 4
+              xywh {10 410 84 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 4
             }
             Fl_Round_Button tkMovingImageLandmark2Button {
               label {Landmark 2}
               callback {UpdateLandmark(o->parent(), 1);}
-              tooltip {Landmark 2: Extreme left point of the mucosa} xywh {10 428 84 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 1
+              xywh {10 428 84 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 1
             }
             Fl_Round_Button tkMovingImageLandmark3Button {
               label {Landmark 3}
               callback {UpdateLandmark(o->parent(), 2);}
-              tooltip {Landmark 3: mucosa point closest to the cervex} xywh {10 446 84 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 63
+              xywh {10 446 84 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 63
             }
             Fl_Round_Button tkMovingImageLandmark4Button {
               label {Landmark 4}
-              callback {UpdateLandmark(o->parent(), 3);}
-              tooltip {Landmark 4: extreme right point of the mucosa} xywh {10 464 83 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 3
+              callback {UpdateLandmark(o->parent(), 3);} selected
+              xywh {10 464 83 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9 labelcolor 3
             }
           }
           Fl_Box tkMovingImageViewer {
@@ -682,7 +682,7 @@ tkFixedImageViewer->DrawRegionOfInterest() ;}
           }
         }
         Fl_Group {} {
-          label Region open selected
+          label Region open
           xywh {25 50 365 430}
         } {
           Fl_Box {} {

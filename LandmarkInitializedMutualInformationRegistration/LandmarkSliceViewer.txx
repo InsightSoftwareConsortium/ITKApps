@@ -26,6 +26,11 @@ LandmarkSliceViewer<TImagePixel>
   size.Fill(0);
   m_RegionOfInterest.SetIndex(index);
   m_RegionOfInterest.SetSize(size);
+
+  cColorTable->SetColor(0, 0, 0, 1, "Blue");
+  cColorTable->SetColor(1, 1, 0, 0, "Red");
+  cColorTable->SetColor(2, 0, 1, 0), "Green";
+  cColorTable->SetColor(3, 0.741, 0.86, 0.84, "Yellow");
   }
 
 /**
@@ -176,9 +181,9 @@ LandmarkSliceViewer<TImagePixel>
 ::AddLandmark(unsigned int id, ViewerColorType color)
   {
   m_LandmarkCandidateId = id;
-  m_LandmarkCandidate.SetColor( cColorTable->color(color, 'r'),
-                                cColorTable->color(color, 'g'),
-                                cColorTable->color(color, 'b'), 1 );
+  m_LandmarkCandidate.SetColor( cColorTable->GetColorComponent(color, 'r'),
+                                cColorTable->GetColorComponent(color, 'g'),
+                                cColorTable->GetColorComponent(color, 'b'), 1 );
   m_Mode = Selection;
   m_Action = Add;
   }
@@ -332,9 +337,13 @@ LandmarkSliceViewer<TImagePixel>
     }
   else
     {
+    std::cout << "Color = " << landmark.GetColor().GetRed() << ", "
+                            << landmark.GetColor().GetGreen() << ", "
+                            << landmark.GetColor().GetBlue() << std::endl;
     color = cColorTable->GetClosestColorTableId(landmark.GetColor().GetRed(),
                                               landmark.GetColor().GetGreen(),
-                                              landmark.GetColor().GetBlue());
+                                              landmark.GetColor().GetBlue()) + 1;
+    std::cout << "   Closest ColorID = " << color-1 << std::endl;
     }
 
   for( int i=-5; i<6; i++ )

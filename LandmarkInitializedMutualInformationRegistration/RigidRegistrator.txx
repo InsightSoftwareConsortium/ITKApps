@@ -75,8 +75,6 @@ RigidRegistrator< TImage >
     throw(e);
     }
   
-  std::cout << "RigidRegistrator: Initialize" << std::endl;
-
   // Base class handles
   // m_Interpolator->SetInputImage(m_MovingImage) ;
 

@@ -1,6 +1,4 @@
 #include "guiMainImplementation.h"
-
-guiMainImplementation * ptr;
  
 guiMainImplementation
 ::guiMainImplementation()
@@ -39,8 +37,6 @@ guiMainImplementation
 
   m_FixedImageSize.Fill(0);
   m_MovingImageSize.Fill(0);
-
-  ptr = this;
   }
 
 guiMainImplementation
@@ -461,7 +457,7 @@ guiMainImplementation
   if (!(view->IsLandmarkAvailable( id ) ))
     {
     button->value(1);
-    view->AddLandmark(id, id+1);
+    view->AddLandmark(id, id);
     }
   else
     {
@@ -648,21 +644,6 @@ guiMainImplementation
                      LandmarkPointListType * target,
                      AffineTransformType * transform)
   {
-  /*LandmarkPointListType landmarkList;
-  LandmarkPointType landmarkPoint;
-
-  while ( s_iter != source->GetPoints().end() )
-    {
-    landmarkPoint.SetPosition ( 
-                  transform->Inverse()->TransformPoint( 
-                                        s_iter->GetPosition() ) );
-    landmarkPoint.SetColor( s_iter->GetColor() );
-    landmarkPoint.SetID( s_iter->GetID() );
-    landmarkList.push_back(landmarkPoint);
-    ++s_iter;
-    }
-  tkMovingImageViewer->SetLandmarkPointList( source );
-  target->SetPoints( landmarkList );*/
   target->assign(source->begin(), source->end());
   LandmarkPointListType::iterator iter = target->begin();
   while ( iter != target->end() )
@@ -1210,6 +1191,7 @@ guiMainImplementation
   {
   this->ChangeStatusDisplay("Registration begins.");
   fl_cursor(Fl_Cursor(FL_CURSOR_WAIT), (Fl_Color) 56, (Fl_Color) 255);
+  
   m_ImageRegistrationApp->SetFixedImage(m_FixedImage.GetPointer());
   m_ImageRegistrationApp->SetMovingImage(m_MovingImage.GetPointer());
   typedef itk::VectorContainer<int, Point< double, 3 > > PointSetType;
