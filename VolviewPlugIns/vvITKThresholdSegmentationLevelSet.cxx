@@ -141,7 +141,7 @@ static int UpdateGUI(void *inf)
   info->SetGUIProperty(info, 2, VVP_GUI_TYPE, VVP_GUI_SCALE);
   info->SetGUIProperty(info, 2, VVP_GUI_DEFAULT, "1.0" );
   info->SetGUIProperty(info, 2, VVP_GUI_HELP, "Degree of smoothness of the surface. This terms affects the curvature scaling of the level set");
-  info->SetGUIProperty(info, 2, VVP_GUI_HINTS, "0.0 20.0 0.1");
+  info->SetGUIProperty(info, 2, VVP_GUI_HINTS, "0.0 100.0 1.0");
 
 
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, "0");
