@@ -1,0 +1,106 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0105 
+header_name {.h} 
+code_name {.cxx}
+class DeformableModelApplicationGUI {open : {public DeformableModelApplicationBase}
+} {
+  Function {DeformableModelApplicationGUI()} {} {
+    Fl_Window mainWindow {
+      label {ISIS - DeformableModelApplication} open
+      xywh {251 84 870 815} type Double resizable
+      code0 {\#include "DeformableModelApplicationBase.h"} visible
+    } {
+      Fl_Button {} {
+        label Quit
+        callback {this->Quit();}
+        xywh {311 765 75 35}
+      }
+      Fl_Button {} {
+        label Deform
+        callback {this->DeformMesh();}
+        xywh {221 765 75 35}
+      }
+      Fl_Button {} {
+        label Mesh
+        callback {this->LoadMesh();}
+        xywh {131 765 75 35}
+      }
+      Fl_Button {} {
+        label Load
+        callback {this->Load();}
+        xywh {41 765 75 35}
+      }
+      Fl_Box axialView {
+        label Axial
+        xywh {25 25 380 345} box DOWN_FRAME align 2
+        code0 {\#include "vtkFlRenderWindowInteractor.h"}
+        class vtkFlRenderWindowInteractor
+      }
+      Fl_Value_Slider axialViewSlider {
+        callback {this->SelectAxialSlice( static_cast<int>( o->value() ));}
+        xywh {410 25 15 345} maximum 100 step 1
+      }
+      Fl_Box coronalView {
+        label Coronal
+        xywh {445 25 380 345} box DOWN_FRAME align 2
+        code0 {\#include "vtkFlRenderWindowInteractor.h"}
+        class vtkFlRenderWindowInteractor
+      }
+      Fl_Value_Slider coronalViewSlider {
+        callback {this->SelectCoronalSlice( static_cast<int>( o->value() ) );}
+        xywh {830 25 15 345} maximum 100 step 1
+      }
+      Fl_Box sagittalView {
+        label Sagittal
+        xywh {445 400 380 345} box DOWN_FRAME align 2
+        code0 {\#include "vtkFlRenderWindowInteractor.h"}
+        class vtkFlRenderWindowInteractor
+      }
+      Fl_Value_Slider sagittalViewSlider {
+        callback {this->SelectSagittalSlice( static_cast<int>( o->value() ) );}
+        xywh {830 400 15 345} maximum 100 step 1
+      }
+      Fl_Box surfaceView {
+        label Surface
+        xywh {30 395 380 345} box DOWN_FRAME align 2
+        code0 {\#include "vtkFlRenderWindowInteractor.h"}
+        class vtkFlRenderWindowInteractor
+      }
+      Fl_Value_Input {} {
+        label {Internal: }
+        callback {m_DeformFilter->SetAlpha( o->value() );}
+        xywh {505 770 50 25} maximum 10 step 0.1 value 0.2
+      }
+      Fl_Value_Input {} {
+        label {External: }
+        callback {m_DeformFilter->SetBeta( o->value() );}
+        xywh {650 770 50 25} maximum 10 step 0.1 value 0.1
+      }
+      Fl_Value_Input {} {
+        label {Balloon: : }
+        callback {m_DeformFilter->SetKappa( o->value() );} selected
+        xywh {790 770 50 25} maximum 10 step 0.1 value 0.5
+      }
+    }
+  }
+  Function {~DeformableModelApplicationGUI()} {return_type virtual
+  } {}
+  Function {Quit()} {return_type {virtual void}
+  } {}
+  Function {DeformMesh()} {return_type {virtual void}
+  } {}
+  Function {LoadMesh()} {return_type {virtual void}
+  } {}
+  Function {Load()} {return_type {virtual void}
+  } {}
+  Function {Show()} {open return_type {virtual void}
+  } {}
+  Function {Hide()} {open return_type {virtual void}
+  } {}
+  Function {SelectAxialSlice( int )} {open return_type {virtual void}
+  } {}
+  Function {SelectCoronalSlice( int )} {open return_type {virtual void}
+  } {}
+  Function {SelectSagittalSlice( int )} {return_type {virtual void}
+  } {}
+} 
