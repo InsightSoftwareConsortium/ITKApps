@@ -15,6 +15,10 @@
 #ifndef __SNAPAppearanceSettings_h_
 #define __SNAPAppearanceSettings_h_
 
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4786 )
+#endif
+
 // Include the common items from the logic part of SNAP
 #include "SNAPCommonUI.h"
 
@@ -32,8 +36,10 @@ public:
    */
   struct Element 
     {
-    Vector3d NormalColor, ActiveColor;
-    double LineThickness, DashSpacing;
+    Vector3d NormalColor;
+    Vector3d ActiveColor;
+    double LineThickness;
+    double DashSpacing;
     int FontSize;
     };
 
@@ -99,7 +105,7 @@ private:
   static const int m_Applicable[ELEMENT_COUNT][FEATURE_COUNT];
 
   /** The set of default values for each element */
-  static const Element m_DefaultElementSettings[ELEMENT_COUNT];
+  Element m_DefaultElementSettings[ELEMENT_COUNT];
 
   /** Text constants for the elements */
   static const char *m_ElementNames[ELEMENT_COUNT];

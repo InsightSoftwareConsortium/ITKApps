@@ -26,7 +26,7 @@ SNAPAppearanceSettings
     { 1, 0, 0, 0, 0 },
     { 1, 1, 1, 1, 0 }};  
 
-const 
+/*const 
 SNAPAppearanceSettings::Element
 SNAPAppearanceSettings
 ::m_DefaultElementSettings[SNAPAppearanceSettings::ELEMENT_COUNT] = 
@@ -37,7 +37,7 @@ SNAPAppearanceSettings
     { Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0), 0.0, 0.0, 0.0 },
     { Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0), 0.0, 0.0, 0.0 },
     { Vector3d(1.0, 1.0, 0.0), Vector3d(0.0, 0.0, 0.0), 0.0, 0.0, 0.0 },
-};  
+};*/  
 
 const char *
 SNAPAppearanceSettings
@@ -54,9 +54,46 @@ SNAPAppearanceSettings
   m_ZoomThumbnailSizeInPercent = 30.0;
   m_FlagDisplayZoomThumbnail = true;
 
-  // Set the UI elements to their default values
+  m_DefaultElementSettings[0].NormalColor = Vector3d(0.5, 0.5, 1.0);
+  m_DefaultElementSettings[0].ActiveColor = Vector3d(0.0, 0.0, 0.0);
+  m_DefaultElementSettings[0].LineThickness = 1.0;
+  m_DefaultElementSettings[0].DashSpacing = 3.0;
+  m_DefaultElementSettings[0].FontSize = 0.0;
+
+  m_DefaultElementSettings[1].NormalColor = Vector3d(1.0, 1.0, 0.2);
+  m_DefaultElementSettings[1].ActiveColor = Vector3d(0.0, 0.0, 0.0);
+  m_DefaultElementSettings[1].LineThickness = 0.0;
+  m_DefaultElementSettings[1].DashSpacing = 0.0;
+  m_DefaultElementSettings[1].FontSize = 12.0;
+
+  m_DefaultElementSettings[2].NormalColor = Vector3d(1.0, 0.0, 0.2);
+  m_DefaultElementSettings[2].ActiveColor = Vector3d(1.0, 1.0, 0.2);
+  m_DefaultElementSettings[2].LineThickness = 1.0;
+  m_DefaultElementSettings[2].DashSpacing = 3.0;
+  m_DefaultElementSettings[2].FontSize = 0.0;
+
+  m_DefaultElementSettings[3].NormalColor = Vector3d(0.0, 0.0, 0.0);
+  m_DefaultElementSettings[2].ActiveColor = Vector3d(0.0, 0.0, 0.0);
+  m_DefaultElementSettings[2].LineThickness = 0.0;
+  m_DefaultElementSettings[2].DashSpacing = 0.0;
+  m_DefaultElementSettings[2].FontSize = 0.0;
+
+  m_DefaultElementSettings[4].NormalColor = Vector3d(0.0, 0.0, 0.0);
+  m_DefaultElementSettings[2].ActiveColor = Vector3d(0.0, 0.0, 0.0);
+  m_DefaultElementSettings[2].LineThickness = 0.0;
+  m_DefaultElementSettings[2].DashSpacing = 0.0;
+  m_DefaultElementSettings[2].FontSize = 0.0;
+
+  m_DefaultElementSettings[5].NormalColor = Vector3d(1.0, 1.0, 0.0);
+  m_DefaultElementSettings[2].ActiveColor = Vector3d(0.0, 0.0, 0.0);
+  m_DefaultElementSettings[2].LineThickness = 0.0;
+  m_DefaultElementSettings[2].DashSpacing = 0.0;
+  m_DefaultElementSettings[2].FontSize = 0.0;
+
+  // Set the UI elements to their default values  
   for(unsigned int iElement = 0; iElement < ELEMENT_COUNT; iElement++)
     m_Elements[iElement] = m_DefaultElementSettings[iElement];
+
 }
 
 void
