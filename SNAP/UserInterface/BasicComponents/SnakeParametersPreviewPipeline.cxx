@@ -319,18 +319,26 @@ SnakeParametersPreviewPipeline
 }
 
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(__CYGWIN__)
 typedef void (CALLBACK *TessCallback)();
 extern void CALLBACK BeginCallback(GLenum);
 extern void CALLBACK EndCallback();
 extern void CALLBACK ErrorCallback(GLenum);
 extern void CALLBACK CombineCallback(GLdouble[3], GLdouble **,GLfloat *,GLdouble **) ;
 #else
+#if defined(__CYGWIN__)
+typedef void (__stdcall *TessCallback)();
+extern void __stdcall BeginCallback(GLenum);
+extern void __stdcall EndCallback();
+extern void __stdcall ErrorCallback(GLenum);
+extern void __stdcall CombineCallback(GLdouble[3], GLdouble **,GLfloat *,GLdouble **) ;
+#else
 typedef void (*TessCallback)();
 extern void BeginCallback(GLenum);
 extern void EndCallback();
 extern void ErrorCallback(GLenum);
 extern void CombineCallback(GLdouble*, GLdouble **,GLfloat *,GLdouble **) ;
+#endif
 #endif
 
 
