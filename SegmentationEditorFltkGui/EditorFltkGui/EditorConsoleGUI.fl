@@ -1,0 +1,441 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0102 
+header_name {.h} 
+code_name {.cxx}
+class EditorConsoleGUI {open : {public EditorConsoleBase}
+} {
+  Function {EditorConsoleGUI()} {open
+  } {}
+  Function {CreateGUI()} {open
+  } {
+    Fl_Window consoleWindow {
+      label {Segmentation Editor} open selected
+      xywh {18 452 1203 444} color 215 resizable
+      code0 {\#include <EditorConsoleBase.h>}
+      code1 {\#include <fltkLightButton.h>} visible
+    } {
+      Fl_Button {} {
+        label Quit
+        callback {Quit();}
+        xywh {947 408 70 30}
+      }
+      Fl_Value_Slider sliceNumberSlider {
+        label {Slice Number}
+        callback {SelectSlice((unsigned int)o->value());}
+        xywh {556 78 295 25} type {Horz Knob} align 5 step 1 textsize 12
+      }
+      Fl_Value_Slider scaleSlider {
+        label Scale
+        callback {SetMerge(o->value());}
+        xywh {555 127 385 25} type {Horz Knob} align 5 step 0.001 textsize 12
+      }
+      Fl_Button {} {
+        label {Add Selected Region}
+        callback {AddSelectedRegion();}
+        xywh {566 19 150 30}
+      }
+      Fl_Value_Slider paintRadiusSlider {
+        label {Paint Radius}
+        callback {sourceWin->SetPaintRadius(o->value());}
+        xywh {1037 104 150 25} type {Horz Knob} align 1 maximum 20 step 1 value 5 textsize 12
+      }
+      Fl_Button {} {
+        label {Subtract Selected Region}
+        callback {SubtractSelectedRegion();}
+        xywh {729 19 175 30}
+      }
+      Fl_Button {} {
+        label {Render/Update 3D Image}
+        callback {ToggleAntialiasing();}
+        xywh {566 197 182 33}
+      }
+      Fl_Button {} {
+        label {Merge Selected}
+        callback {MergeSelected();}
+        xywh {915 18 124 30}
+      }
+      Fl_Button {} {
+        label {Undo Last Merge}
+        callback {UndoLastMerge();}
+        xywh {1049 18 129 30}
+      }
+      Fl_Value_Slider scaleUnitsSlider {
+        label {Scale Units}
+        callback {SetMergeResolution(o->value());}
+        xywh {949 92 29 103} type {Vert Knob} align 1 maximum 200 step 5 value 200 textsize 12
+      }
+      Fl_Check_Button toggleOverlay {
+        label {Toggle Overlay}
+        callback {ToggleOverlay();}
+        xywh {1057 241 25 25} down_box DOWN_BOX value 1
+      }
+      Fl_Check_Button toggleZoom {
+        label {Toggle Zoom}
+        callback {ToggleZoom();}
+        xywh {818 348 25 25} down_box DOWN_BOX value 1
+      }
+      Fl_Value_Slider zoomSlider {
+        xywh {929 348 150 25} type {Horz Knob} labeltype NO_LABEL align 5 minimum 0.1 maximum 5 step 0.1 value 1 textsize 12
+      }
+      Fl_Button {} {
+        label {Randomize Colors}
+        callback {DoRecolor();}
+        xywh {1052 200 130 29}
+      }
+      Fl_Button {} {
+        label Zoom
+        callback {ScaleZoom(zoomSlider->value());}
+        xywh {1095 345 70 30}
+      }
+      Fl_File_Input fileSeg {
+        label {File Name/Prefix:}
+        xywh {15 38 245 35} align 5
+      }
+      Fl_File_Input treeSeg {
+        label {Tree File Name::}
+        xywh {16 89 245 35} align 5
+      }
+      Fl_Value_Input XSeg {
+        label {Size X:}
+        xywh {63 125 32 23}
+      }
+      Fl_Value_Input YSeg {
+        label {Size Y:}
+        xywh {63 153 32 23}
+      }
+      Fl_Value_Input ZSeg {
+        label {Size Z:}
+        xywh {63 181 31 23}
+      }
+      Fl_Group endianSeg {open
+        xywh {120 146 150 27}
+      } {
+        Fl_Round_Button bigSeg {
+          label Big
+          xywh {120 146 45 25} type Radio down_box ROUND_DOWN_BOX value 1
+        }
+        Fl_Round_Button littleSeg {
+          label Little
+          xywh {177 146 60 25} type Radio down_box ROUND_DOWN_BOX
+        }
+      }
+      Fl_Check_Button multFilesSeg {
+        label {Stored in Multiple Files}
+        xywh {105 169 140 40} down_box DOWN_BOX align 148
+      }
+      Fl_Output dataTypeSeg {
+        xywh {136 210 125 25} box DOWN_FRAME labeltype NO_LABEL textfont 1 textcolor 120
+      }
+      Fl_Menu_Bar menuSeg {open
+        xywh {14 210 122 25} color 50 selection_color 175 labelfont 1
+      } {
+        submenu {} {
+          label {Select Data Type} open
+          xywh {0 0 100 20}
+        } {
+          menuitem {} {
+            label {unsigned char}
+            callback {SetDataTypeSeg("UnsignedChar");}
+            xywh {0 0 100 20}
+          }
+          menuitem {} {
+            label {unsigned long}
+            callback {SetDataTypeSeg("UnsignedLong");}
+            xywh {0 0 100 20}
+          }
+          menuitem {} {
+            label {unsigned short}
+            callback {SetDataTypeSeg("UnsignedShort");}
+            xywh {0 0 100 20}
+          }
+          menuitem {} {
+            label short
+            callback {SetDataTypeSeg("Short");}
+            xywh {0 0 100 20}
+          }
+          menuitem {} {
+            label int
+            callback {SetDataTypeSeg("Int");}
+            xywh {0 0 100 20}
+          }
+          menuitem {} {
+            label float
+            callback {SetDataTypeSeg("Float");}
+            xywh {0 0 100 20}
+          }
+        }
+      }
+      Fl_Value_Input componentsSeg {
+        label {Number of Components:}
+        xywh {174 238 86 25} value 1
+      }
+      Fl_Input extSeg {
+        label {File Extension:}
+        xywh {114 267 146 25}
+      }
+      Fl_Value_Input sliceSeg {
+        label {Number of First Slice:}
+        xywh {156 296 104 25}
+      }
+      Fl_Value_Input headerSeg {
+        label {Size of Header to Skip:}
+        xywh {162 325 98 25}
+      }
+      Fl_Box byteOrderSeg {
+        label {Byte Order:}
+        xywh {102 123 87 25} labelfont 1
+      }
+      Fl_File_Input fileSor {
+        label {File Name/Prefix:}
+        xywh {291 41 245 35} align 5
+      }
+      Fl_Value_Input XSor {
+        label {Size X:}
+        xywh {339 80 32 23}
+      }
+      Fl_Value_Input YSor {
+        label {Size Y:}
+        xywh {339 108 32 23}
+      }
+      Fl_Value_Input ZSor {
+        label {Size Z:}
+        xywh {339 136 31 23}
+      }
+      Fl_Round_Button bigSor {
+        label Big
+        xywh {396 101 45 25} type Radio down_box ROUND_DOWN_BOX value 1
+      }
+      Fl_Round_Button littleSor {
+        label Little
+        xywh {453 101 60 25} type Radio down_box ROUND_DOWN_BOX
+      }
+      Fl_Check_Button multFilesSor {
+        label {Stored in Multiple Files}
+        xywh {381 124 140 40} down_box DOWN_BOX align 148
+      }
+      Fl_Output dataTypeSor {
+        xywh {412 165 125 25} box DOWN_FRAME labeltype NO_LABEL textfont 1 textcolor 120
+      }
+      Fl_Menu_Bar menuBarSor {open
+        xywh {290 165 122 25} color 50 selection_color 175 labelfont 1
+      } {
+        submenu {} {
+          label {Select Data Type} open
+          xywh {10 10 100 20}
+        } {
+          menuitem {} {
+            label {unsigned char}
+            callback {SetDataTypeSor("UnsignedChar");}
+            xywh {10 10 100 20}
+          }
+          menuitem {} {
+            label {unsigned short}
+            callback {SetDataTypeSor("UnsignedShort");}
+            xywh {10 10 100 20}
+          }
+          menuitem {} {
+            label short
+            callback {SetDataTypeSor("Short");}
+            xywh {10 10 100 20}
+          }
+          menuitem {} {
+            label int
+            callback {SetDataTypeSor("Int");}
+            xywh {10 10 100 20}
+          }
+          menuitem {} {
+            label float
+            callback {SetDataTypeSor("Float");}
+            xywh {10 10 100 20}
+          }
+        }
+      }
+      Fl_Value_Input componentsSor {
+        label {Number of Components:}
+        xywh {450 193 88 25} value 1
+      }
+      Fl_Input extSor {
+        label {File Extension:}
+        xywh {390 222 147 25}
+      }
+      Fl_Value_Input sliceSor {
+        label {Number of First Slice:}
+        xywh {432 251 105 25}
+      }
+      Fl_Value_Input headerSor {
+        label {Size of Header to Skip:}
+        xywh {438 280 98 25}
+      }
+      Fl_Box byteOrderSor {
+        label {Byte Order:}
+        xywh {378 78 87 25} labelfont 1
+      }
+      Fl_Button {} {
+        label {Load Images}
+        callback {LoadImages();}
+        xywh {351 323 125 30}
+      }
+      Fl_Box {} {
+        label {Source Data}
+        xywh {284 19 261 291} box DOWN_FRAME labelfont 1 align 5
+      }
+      Fl_Box {} {
+        label {Segmented Data}
+        xywh {10 18 260 337} box DOWN_FRAME labelfont 1 align 5
+      }
+      Fl_Button {} {
+        label {Load Session}
+        callback {LoadSession();}
+        xywh {438 408 115 29}
+      }
+      Fl_Button {} {
+        label {Save Session}
+        callback {SaveSession();}
+        xywh {303 408 120 30}
+      }
+      Fl_Button {} {
+        label {Clear All}
+        callback {ClearAll();}
+        xywh {793 408 140 30}
+      }
+      Fl_Value_Input colormapMin {
+        xywh {793 223 40 30} labeltype NO_LABEL
+      }
+      Fl_Value_Input colormapMax {
+        xywh {839 223 40 30} labeltype NO_LABEL value 255
+      }
+      Fl_Button {} {
+        label {Scalar Colormap}
+        callback {ChangeColormap();}
+        xywh {885 223 125 30}
+      }
+      Fl_Value_Input window {
+        xywh {793 265 40 30} labeltype NO_LABEL value 256
+      }
+      Fl_Value_Input level {
+        xywh {840 265 40 30} labeltype NO_LABEL value 127.5
+      }
+      Fl_Check_Button vtk_antialiasing {
+        label {Toggle VTK Antialiasing}
+        callback {ToggleAntialiasing();}
+        xywh {569 299 20 25} down_box DOWN_BOX
+      }
+      Fl_Group paint {
+        label {Paint Value:} open
+        xywh {1026 160 170 29} labelfont 1 align 5
+      } {
+        Fl_Round_Button paint1 {
+          label Red
+          callback {ChangePaintValue(1);}
+          xywh {1026 160 35 28} type Radio down_box ROUND_DOWN_BOX value 1
+        }
+        Fl_Round_Button paint2 {
+          label Green
+          callback {ChangePaintValue(2);}
+          xywh {1080 160 38 29} type Radio down_box ROUND_DOWN_BOX
+        }
+        Fl_Round_Button paint3 {
+          label Blue
+          callback {ChangePaintValue(3);}
+          xywh {1147 160 40 29} type Radio down_box ROUND_DOWN_BOX
+        }
+      }
+      Fl_Group render {
+        label {Add Renderer For:} open
+        xywh {572 261 170 27} labelfont 1 align 5
+      } {
+        Fl_Round_Button r1 {
+          label Red
+          callback {AddRenderer(1);}
+          xywh {572 261 35 25} type Radio down_box ROUND_DOWN_BOX value 1
+        }
+        Fl_Round_Button r2 {
+          label Green
+          callback {AddRenderer(2);}
+          xywh {626 262 38 25} type Radio down_box ROUND_DOWN_BOX
+        }
+        Fl_Round_Button r3 {
+          label Blue
+          callback {AddRenderer(3);}
+          xywh {693 262 40 25} type Radio down_box ROUND_DOWN_BOX
+        }
+      }
+      Fl_Box {} {
+        label {Rendering Options}
+        xywh {555 185 205 150} box DOWN_FRAME labelfont 1 align 5
+      }
+      Fl_Button {} {
+        label {Window/Level}
+        callback {ChangeWindowLevel();}
+        xywh {886 264 125 30}
+      }
+      Fl_Button {} {
+        label {Show Help}
+        callback {helpWin->show();}
+        xywh {194 408 95 30}
+      }
+      Fl_Button {} {
+        label {Save Binary}
+        xywh {564 408 100 30}
+	callback {WriteBinaryVolume();}
+      }
+      Fl_Button {} {
+        label {Load Binary}
+        xywh {679 408 100 30}
+	callback {ReadBinaryVolume();}
+      }
+    }
+    Fl_Window segmentedConsole {
+      label {Segmented Image} open
+      xywh {786 50 256 256} labeltype NORMAL_LABEL resizable visible
+    } {
+      Fl_Box segmentedWin {
+        label label
+        xywh {0 0 256 256} labeltype NO_LABEL
+        code0 {\#include <SegmentedViewer.h>}
+        class SegmentedViewer
+      }
+    }
+    Fl_Window sourceConsole {
+      label {Source Image} open
+      xywh {784 116 256 256} labeltype NORMAL_LABEL resizable visible
+    } {
+      Fl_Box sourceWin {
+        label label
+        xywh {0 0 256 256} labeltype NO_LABEL resizable
+        code0 {\#include <SourceViewer.h>}
+        class SourceViewer
+      }
+    }
+    Fl_Window binaryConsole {
+      label {Binary Image} open
+      xywh {833 71 256 256} labeltype NORMAL_LABEL resizable visible
+    } {
+      Fl_Box binaryWin {
+        label label
+        xywh {0 0 25 25} labeltype NO_LABEL resizable
+        code0 {\#include <BinaryViewer.h>}
+        class BinaryViewer
+      }
+    }
+    Fl_Window helpWin {
+      label Help open
+      xywh {345 180 458 372} resizable visible
+    } {
+      Fl_Output helpOut {
+        xywh {12 10 430 310} type Multiline labeltype NO_LABEL resizable
+      }
+      Fl_Button {} {
+        label Close
+        callback {helpWin->hide();}
+        xywh {200 330 100 30}
+      }
+    }
+  }
+  Function {~EditorConsoleGUI()} {return_type virtual
+  } {}
+  Function {Quit( void )} {return_type {virtual void}
+  } {}
+  Function {ShowSeg( void )} {return_type {virtual void}
+  } {}
+} 
