@@ -82,7 +82,7 @@ guiMainImplementation
 ::Quit()
 {
   tkAdvancedOptionsWindow->hide();
-//  tkRegionOptionsWindow->hide();
+  tkRegionOfInterestWindow->hide();
   tkWindow->hide();
 }
 
