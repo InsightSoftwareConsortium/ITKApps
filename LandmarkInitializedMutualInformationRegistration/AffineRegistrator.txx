@@ -16,7 +16,7 @@ AffineRegistrator< TImage >
   this->SetInterpolator(InterpolatorType::New());
   
   m_OptimizerMethod = ONEPLUSONEPLUSGRADIENT;
-  m_OptimizerNumberOfIterations = 1000 ;
+  m_OptimizerNumberOfIterations = 500 ;
   m_OptimizerScales.set_size(15) ; 
   m_OptimizerScales[0] = 100; // rotations
   m_OptimizerScales[1] = 100;
@@ -36,6 +36,8 @@ AffineRegistrator< TImage >
   
   this->SetMetric(MetricType::New());
   m_MetricNumberOfSpatialSamples = 40000 ;
+
+  m_Observer = NULL;
   }
 
 template< class TImage >
@@ -89,6 +91,10 @@ AffineRegistrator< TImage >
       opt->Initialize(1.01); // Initial search radius
       opt->SetScales( m_OptimizerScales );
       this->SetOptimizer(opt);
+      if(m_Observer != NULL)
+        {
+        opt->AddObserver(itk::IterationEvent(), m_Observer);
+        }
       break;
       }
     case GRADIENT:
@@ -100,6 +106,10 @@ AffineRegistrator< TImage >
       opt->SetMaximumIteration(m_OptimizerNumberOfIterations);
       opt->SetScales( m_OptimizerScales );
       this->SetOptimizer(opt);
+      if(m_Observer != NULL)
+        {
+        opt->AddObserver(itk::IterationEvent(), m_Observer);
+        }
       break;
       }
     case ONEPLUSONEPLUSGRADIENT:
@@ -115,11 +125,16 @@ AffineRegistrator< TImage >
       opt->SetMaximize(false);
       opt->SetStepLength(0.25);
       opt->SetStepTolerance(1e-10);
-      opt->SetMaximumIteration(4);
+      opt->SetMaximumIteration(24);
       opt->SetScales( m_OptimizerScales );
 
       this->SetOptimizer(initOpt);
       this->SetSecondaryOptimizer(opt);
+      if(m_Observer != NULL)
+        {
+        initOpt->AddObserver(itk::IterationEvent(), m_Observer);
+        opt->AddObserver(itk::IterationEvent(), m_Observer);
+        }
 
       break;
       }

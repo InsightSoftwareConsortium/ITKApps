@@ -16,7 +16,7 @@ RigidRegistrator< TImage >
   this->SetInterpolator(InterpolatorType::New());
 
   m_OptimizerMethod = ONEPLUSONEPLUSGRADIENT;
-  m_OptimizerNumberOfIterations = 100 ;
+  m_OptimizerNumberOfIterations = 500 ;
   m_OptimizerScales.set_size(6) ; 
   m_OptimizerScales[0] = 200; // rotations
   m_OptimizerScales[1] = 200;
@@ -83,6 +83,10 @@ RigidRegistrator< TImage >
       opt->SetScales( m_OptimizerScales );
       this->SetOptimizer(opt);
       this->SetSecondaryOptimizer(0);
+      if(m_Observer != NULL)
+        {
+        opt->AddObserver(itk::IterationEvent(), m_Observer);
+        }
       break;
       }
     case GRADIENT:
@@ -95,6 +99,10 @@ RigidRegistrator< TImage >
       opt->SetScales( m_OptimizerScales );
       this->SetOptimizer(opt);
       this->SetSecondaryOptimizer(0);
+      if(m_Observer != NULL)
+        {
+        opt->AddObserver(itk::IterationEvent(), m_Observer);
+        }
       break;
       }
     case ONEPLUSONEPLUSGRADIENT:
@@ -110,11 +118,16 @@ RigidRegistrator< TImage >
       opt->SetMaximize(false);
       opt->SetStepLength(0.25);
       opt->SetStepTolerance(1e-10);
-      opt->SetMaximumIteration(4);
+      opt->SetMaximumIteration(12);
       opt->SetScales( m_OptimizerScales );
 
       this->SetOptimizer(initOpt);
       this->SetSecondaryOptimizer(opt);
+      if(m_Observer != NULL)
+        {
+        initOpt->AddObserver(itk::IterationEvent(), m_Observer);
+        opt->AddObserver(itk::IterationEvent(), m_Observer);
+        }
 
       break;
       }

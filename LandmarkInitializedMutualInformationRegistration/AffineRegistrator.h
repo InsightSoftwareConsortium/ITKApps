@@ -2,6 +2,7 @@
 #define __AffineRegistrator_h
 
 #include "itkImage.h"
+#include "itkCommand.h"
 
 #include "itkImageRegistrationMethod.h"
 #include "itkScaleSkewVersor3DTransform.h"
@@ -9,7 +10,7 @@
 
 #include "itkOnePlusOneEvolutionaryOptimizer.h"
 #include "itkNormalVariateGenerator.h"
-#include "itkPowellOptimizer.h"
+#include "itkFRPROptimizer.h"
 
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkStatisticsImageFilter.h"
@@ -40,7 +41,7 @@ class AffineRegistrator : public ImageRegistrationMethod < TImage, TImage >
                                                 OptimizerMethodType;
 
     typedef OnePlusOneEvolutionaryOptimizer     OnePlusOneOptimizerType ;
-    typedef PowellOptimizer                     GradientOptimizerType ;
+    typedef FRPROptimizer                     GradientOptimizerType ;
     typedef Statistics::NormalVariateGenerator  OptimizerNormalGeneratorType;
     typedef TransformType::ParametersType       ParametersType ;
     typedef TransformType::ParametersType       ScalesType ;
@@ -76,6 +77,8 @@ class AffineRegistrator : public ImageRegistrationMethod < TImage, TImage >
     itkSetMacro(MetricNumberOfSpatialSamples, unsigned int) ;
     itkGetConstMacro(MetricNumberOfSpatialSamples, unsigned int) ;
 
+    itkSetObjectMacro(Observer, Command);
+
   protected:
     AffineRegistrator() ;
     virtual ~AffineRegistrator() ;
@@ -91,6 +94,8 @@ class AffineRegistrator : public ImageRegistrationMethod < TImage, TImage >
 
 
   private:
+
+    Command::Pointer        m_Observer;
 
     OptimizerMethodType     m_OptimizerMethod;
     unsigned int            m_OptimizerNumberOfIterations;

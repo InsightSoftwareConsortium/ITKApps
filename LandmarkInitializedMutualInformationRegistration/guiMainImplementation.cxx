@@ -35,6 +35,8 @@ guiMainImplementation
   m_FixedImageSize.Fill(0);
   m_MovingImageSize.Fill(0);
 
+  tkInitializationMethodChoice->value(3);
+  tkRegistrationMethodChoice->value(1);
   }
 
 guiMainImplementation

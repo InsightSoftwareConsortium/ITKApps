@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0105 
+version 1.0106 
 header_name {.h} 
 code_name {.cxx}
 class guiMain {open
@@ -43,12 +43,12 @@ class guiMain {open
           xywh {410 666 100 19} box PLASTIC_UP_BOX down_box BORDER_BOX color 255 selection_color 255 labelsize 10 align 36 when 1 textsize 10
         } {
           menuitem tkInitNoneMethod {
-            label None selected
+            label None
             xywh {45 45 100 34} labelsize 10
           }
           menuitem tkInitCentersMethod {
             label {Image Centers}
-            xywh {55 55 100 34} labelsize 10
+            xywh {55 55 100 34} value 1 labelsize 10
           }
           menuitem tkInitLandmarkMethod {
             label Landmark
@@ -73,7 +73,7 @@ class guiMain {open
           }
           menuitem tkRegRigidMethod {
             label Rigid
-            xywh {25 25 100 34} labelsize 10
+            xywh {25 25 100 34} value 1 labelsize 10
           }
           menuitem tkRegAffineMethod {
             label Affine
@@ -96,7 +96,7 @@ Register();}
           xywh {910 665 135 20} box PLASTIC_UP_BOX color 1 labelsize 10
         }
         Fl_Box tkResultImageViewer {
-          label label
+          label label selected
           xywh {475 56 573 601} box FLAT_BOX color 42 deactivate resizable
           code0 {\#include <GLTwoImageSliceView.h>}
           class {GLTwoImageSliceView< short, unsigned char >}

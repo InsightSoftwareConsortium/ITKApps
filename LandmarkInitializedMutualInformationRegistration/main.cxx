@@ -15,6 +15,10 @@ int usage()
   std::cout << "        3 - Moments" << std::endl;
   std::cout << "        4 - Landmarks" << std::endl;
   std::cout << "        5 <#_Of_Tfms> <tfm1> [<tfm2> ...] - Load transform" 
+            << std::endl
+            << "          - if #_of_Tfms is negative, the transforms are" 
+            << std::endl
+            << "            inverted before being applied."
             << std::endl;
   std::cout << "  -R <method#>: Registration Method" << std::endl;
   std::cout << "        0 - NONE" << std::endl;
@@ -45,7 +49,7 @@ int main(int argc, char **argv)
       return usage();
       }
 
-    unsigned long iterations = 1000;
+    unsigned long iterations = 500;
     unsigned long samples = 20000;
 
     int initializationMethod = 2;
@@ -80,7 +84,7 @@ int main(int argc, char **argv)
           if(initializationMethod == 5)
             {
             loadedTransformNumber = (int)atof(argv[argNum++]);
-            for(int i=0; i<loadedTransformNumber; i++)
+            for(int i=0; i<abs(loadedTransformNumber); i++)
               {
               loadedTransformFilename[i] = argv[argNum++];
               }
@@ -251,18 +255,23 @@ int main(int argc, char **argv)
         break;
       case 5:
         typedef ImageRegistrationAppType::LoadedRegTransformType LoadedTType;
-        for(int i=0; i<loadedTransformNumber; i++)
+        for(int i=0; i<abs(loadedTransformNumber); i++)
           {
           GroupReaderType::Pointer transformReader = GroupReaderType::New();
           transformReader->SetFileName(loadedTransformFilename[i].c_str());
           transformReader->Update();
           GroupType::Pointer group = transformReader->GetGroup();
-          GroupType::TransformType::Pointer transform;
-          transform = group->GetObjectToParentTransform();
-          LoadedTType::Pointer loadedTransform = LoadedTType::New();
-          loadedTransform->SetCenter(transform->GetCenter());
-          loadedTransform->SetMatrix(transform->GetMatrix());
-          loadedTransform->SetOffset(transform->GetOffset());
+          if(loadedTransformNumber<0)
+            {
+            std::cout << "Inverting" << std::endl;
+            GroupType::TransformType::Pointer transform;
+            transform = group->GetObjectToParentTransform();
+            LoadedTType::Pointer invertedTransform = LoadedTType::New();
+            transform->GetInverse(invertedTransform);
+            transform->SetCenter(invertedTransform->GetCenter());
+            transform->SetMatrix(invertedTransform->GetMatrix());
+            transform->SetOffset(invertedTransform->GetOffset());
+            }
           if(i == 0)
             {
             imageRegistrationApp->SetLoadedTransform(

@@ -7,6 +7,50 @@
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkResampleImageFilter.h"
 
+#include "itkCommand.h"
+#include "itkSingleValuedNonLinearOptimizer.h"
+
+class ImageRegistrationAppViewer
+: public itk::Command
+{
+  public :
+    typedef ImageRegistrationAppViewer  Self;
+    typedef itk::Command                Superclass;
+    typedef itk::SmartPointer<Self>     Pointer;
+
+    itkNewMacro( ImageRegistrationAppViewer );
+    itkTypeMacro( ImageRegistrationAppViewer, itk::Command );
+    
+    typedef itk::SingleValuedNonLinearOptimizer  OptimizerType;
+
+    void Execute( itk::Object * caller, const itk::EventObject & event )
+      {
+      Execute( (const itk::Object *)caller, event );
+      }
+    void Execute( const itk::Object * object, const itk::EventObject & event )
+      {
+      if( typeid( event ) != typeid( itk::IterationEvent ) || object == NULL)
+        {
+        return;
+        }
+
+      const OptimizerType * opt = static_cast<const OptimizerType *>(object);
+
+      std::cout << opt->GetCurrentPosition() << " : "
+                << opt->GetValue( opt->GetCurrentPosition() )
+                << std::endl;
+      }
+
+    void Update()
+      {
+      this->Execute ( (const itk::Object *)NULL, itk::IterationEvent() );
+      }
+
+  protected:
+    ImageRegistrationAppViewer() {};
+    ~ImageRegistrationAppViewer() {};
+
+};
 
 template< class TImage >
 ImageRegistrationApp< TImage >
@@ -43,7 +87,7 @@ ImageRegistrationApp< TImage >
   m_LandmarkScales[3] = 1;
   m_LandmarkScales[4] = 1;
   m_LandmarkScales[5] = 1;
-  m_LandmarkNumberOfIterations = 5000 ;
+  m_LandmarkNumberOfIterations = 2000 ;
   m_LandmarkRegTransform = LandmarkRegTransformType::New() ;
   m_LandmarkRegTransform->SetIdentity() ;
   m_LandmarkAffineTransform = AffineTransformType::New() ;
@@ -56,7 +100,7 @@ ImageRegistrationApp< TImage >
   m_LoadedAffineTransform->SetIdentity();
   m_LoadedRegValid = false;
 
-  m_RigidNumberOfIterations = 2000 ;
+  m_RigidNumberOfIterations = 500 ;
   m_RigidNumberOfSpatialSamples = 20000 ;
   m_RigidScales.set_size(6);
   m_RigidScales[0] = 200;
@@ -72,7 +116,7 @@ ImageRegistrationApp< TImage >
   m_RigidRegValid = false;
   m_RigidMetricValue = 0;
 
-  m_AffineNumberOfIterations = 2000 ;
+  m_AffineNumberOfIterations = 500 ;
   m_AffineNumberOfSpatialSamples = 40000 ;
   m_AffineScales.set_size(15) ;
   m_AffineScales[0] = 200; // rotations
@@ -593,6 +637,10 @@ ImageRegistrationApp< TImage >
   registrator->GetTypedTransform()->SetCenter(center);
   registrator->SetInitialTransformParameters(params);
 
+  ImageRegistrationAppViewer::Pointer viewer =
+    ImageRegistrationAppViewer::New();
+  registrator->SetObserver( viewer );
+
   //std::cout << "DEBUG: Rigid: INITIAL versor transform: "
             //<< std::endl
             //<< registrator->GetInitialTransformParameters() << std::endl ;
@@ -669,6 +717,10 @@ ImageRegistrationApp< TImage >
   params[8] = 1;
   registrator->GetTypedTransform()->SetCenter(center);
   registrator->SetInitialTransformParameters(params);
+
+  ImageRegistrationAppViewer::Pointer viewer =
+    ImageRegistrationAppViewer::New();
+  registrator->SetObserver( viewer );
 
   //std::cout << "DEBUG: Affine: INITIAL versor/offset/scale/skew transform: "
             //<< std::endl 
