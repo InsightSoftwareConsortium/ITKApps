@@ -80,13 +80,13 @@ GetITKPixelType()
 
 
 
-
-
 template <class ImageType, class PixelType>
 void
 itkFlWriteFile( ImageType * img, PixelType val, char * filename )
   {
-  typedef itk::Image< PixelType, 3 >                          SavedImageType;//ImageType::Dimensions
+
+  itkStaticConstMacro(ImageDimension,unsigned int, ImageType::ImageDimension);
+  typedef itk::Image< PixelType,  itkGetStaticConstMacro(ImageDimension)>  SavedImageType;
   typedef itk::ImageFileWriter< SavedImageType  >             WriterType;
   typename WriterType::Pointer writer = WriterType::New();
 
@@ -115,9 +115,9 @@ itkFlWriteFile( ImageType * img, PixelType val, char * filename )
 
 
 
-template <class ImageType>
-bool                                  // O - Filename or NULL
-ITKFlFileWriter( ImageType *imP,
+template <class ImageType>                                 
+bool
+itkFlFileWriter( ImageType *imP,       // O - Filename or NULL
                  const char *message,  // I - Message in titlebar
                  const char *pat,      // I - Filename pattern
                  const char *fname,    // I - Initial filename selection
