@@ -470,9 +470,15 @@ TestCompareLevelSets
   app->GetGlobalState()->SetDrawingColorLabel(
     (LabelType)registry["Image.BubbleLabel"][255]);
 
-  // Start SNAP logic with the entire region
-  app->InitializeSNAPImageData(
-    app->GetCurrentImageData()->GetImageRegion());
+  // Create an ROI object to specify the region of interest to select
+  SNAPSegmentationROISettings roiSettings;
+
+  // Use the entire region and no resampling of the region
+  roiSettings.SetROI(app->GetCurrentImageData()->GetImageRegion());
+  roiSettings.SetResampleFlag(false);
+
+  // Start SNAP logic with the selected region settings
+  app->InitializeSNAPImageData(roiSettings);
 
   // Get a pointer to the SNAP image data
   SNAPImageData *snap = app->GetSNAPImageData();
@@ -648,8 +654,8 @@ TestCompareLevelSets
   bool parmUseEdgeSnake = true;
   
   // Bubble default, based on the image
-  Vector3f parmBubbleCenter = to_float(wrapper.GetSize()) / 2.0f;
-  float parmBubbleRadius = 2.0;
+  Vector3d parmBubbleCenter = to_double(wrapper.GetSize()) / 2.0;
+  double parmBubbleRadius = 2.0;
 
   // Get the configuration file
   if(!m_Command.IsOptionPresent("config"))
@@ -732,7 +738,10 @@ TestCompareLevelSets
   app->UpdateIRISGreyImage(m_Image,"RAI");
 
   // Start SNAP logic with the entire region
-  app->InitializeSNAPImageData(app->GetCurrentImageData()->GetImageRegion());
+  SNAPSegmentationROISettings roiSettings;
+  roiSettings.SetROI(app->GetCurrentImageData()->GetImageRegion());
+  roiSettings.SetResampleFlag(false);
+  app->InitializeSNAPImageData(roiSettings);
 
   // Get a pointer to the SNAP image data
   SNAPImageData *snap = app->GetSNAPImageData();

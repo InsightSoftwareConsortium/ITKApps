@@ -43,7 +43,7 @@ Create the following directory structure, which is recommended and will be assum
     cvs -d :pserver:anonymous@www.itk.org:/cvsroot/Insight login
     (respond with password <i>insight</i>)
     
-    cvs -d :pserver:anonymous@www.itk.org:/cvsroot/Insight -r ITK-1-4 co Insight
+    cvs -d :pserver:anonymous@www.itk.org:/cvsroot/Insight co Insight
   </pre></li>
   <li> Change the directory to <i>basedir/itk/bingcc</i> </li><br>
   <li> Execute the CMake command: 
@@ -80,7 +80,7 @@ Create the following directory structure, which is recommended and will be assum
     cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/VTK login
     (respond with password vtk)
 
-    cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/VTK -r release-4-2 co VTK
+    cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/VTK co -r LatestRelease VTK
   </pre></li>
   <li> Change the directory to <i>basedir/vtk/bingcc</i> </li><br>
   <li> Execute the CMake command: 
@@ -97,6 +97,10 @@ Create the following directory structure, which is recommended and will be assum
     VTK_USE_PARALLEL= ON
     VTK_USE_RENDERING= ON
   </pre></li>
+  <li> Use the <b>t</b> command to show advanced VTK options, and set the following options:
+  <pre>
+    VTK_USE_ANSI_STDLIB = ON
+  </pre>
   <li> Use the <b>c</b> command to configure VTK and 
   use the <b>g</b> command to generate makefiles </li><br>
   <li> The following command will build VTK.  This will take a longer while.
