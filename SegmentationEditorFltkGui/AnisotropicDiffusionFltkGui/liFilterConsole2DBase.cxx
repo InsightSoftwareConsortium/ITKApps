@@ -206,6 +206,18 @@ liFilterConsole2DBase
 
 /************************************
  *
+ *  Set Time Step For Gradient
+ *
+ ***********************************/
+void
+liFilterConsole2DBase 
+::SetTimeStepForGradient( double value )
+{
+  m_FilterG->SetTimeStep( value );
+}
+
+/************************************
+ *
  *  Set Conductance Parameter For Gradient
  *
  ***********************************/
@@ -238,5 +250,18 @@ liFilterConsole2DBase
 ::SetConductanceForCurvature( double value )
 {
   m_FilterC->SetConductanceParameter( value );
+}
+
+
+/************************************
+ *
+ *  Set Time Step For Curvature
+ *
+ ***********************************/
+void
+liFilterConsole2DBase 
+::SetTimeStepForCurvature( double value )
+{
+  m_FilterC->SetTimeStep( value );
 }
 

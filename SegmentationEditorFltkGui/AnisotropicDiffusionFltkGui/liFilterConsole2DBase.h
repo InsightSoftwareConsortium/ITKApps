@@ -74,8 +74,10 @@ public:
   virtual void ShowGradientImage(void);
   virtual void ShowCurvatureImage(void);
   virtual void SetIterationsForGradient( double );
+  virtual void SetTimeStepForGradient( double );
   virtual void SetConductanceForGradient( double );
   virtual void SetIterationsForCurvature( double );
+  virtual void SetTimeStepForCurvature( double );
   virtual void SetConductanceForCurvature( double );
   virtual void SaveGradientImage(void) = 0;
   virtual void SaveGradientImage(const char * filename);
