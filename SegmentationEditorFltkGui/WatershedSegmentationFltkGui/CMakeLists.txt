@@ -44,10 +44,7 @@ ITKBasicFilters
 ITKIO
 ITKNumerics
 ITKFltkImageViewer
-fltk
-fltk_forms
-fltk_gl
-fltk_images
+${FTLK_LIBRARY}
 ${OPENGL_LIBRARY}
 ${GLU_LIBRARY}
 )

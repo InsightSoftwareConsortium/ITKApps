@@ -57,6 +57,8 @@ SegmenterConsole3D
 
   this->ShowStatus("Let's start by loading an image...");
 
+  instructTextOutput->value("Help Text to be Updated Soon");
+  /*
   instructTextOutput->value( 
 "This module runs data through the actual watershed segmentation algorithm.  
 The output is a labeled image of unsiged long integers which represents the 
@@ -103,6 +105,7 @@ Lower Threshold value, for example, could change execution time from a minute
 or two into several hours for a large volume.  As a general rule, eliminate 
 as much detail in the image as you can afford to, either through more smoothing 
 or by using a higher threshold value.\n\n" );
+*/
 
 }
 
