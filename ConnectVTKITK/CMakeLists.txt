@@ -23,7 +23,7 @@ IF(ITK_CSWIG_TCL)
     SOURCE ${ConnectVTKITK_SOURCE_DIR}/ConnectVTKITK.i
     COMMAND ${CableSwig_cswig_EXE}
     ARGS -I${ConnectVTKITK_SOURCE_DIR}
-         -nocable -c ${IGNORE_WARNINGS}
+         -nocable -noruntime ${IGNORE_WARNINGS}
          -o ConnectVTKITK_wrapTcl.cxx
          -c++ ${ConnectVTKITK_SOURCE_DIR}/ConnectVTKITK.i
     TARGET ConnectVTKITKTcl
