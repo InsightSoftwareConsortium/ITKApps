@@ -179,12 +179,8 @@ DeformableModelApplication
 
   for(int p =0; p < numberOfPoints; p++)
     {
-
-      vtkFloatingPointType * apoint = vtkpoints->GetPoint( p );
-      m_TriangleMesh->SetPoint( p, TriangleMeshType::PointType( apoint ));
-
-      
-
+    vtkFloatingPointType * apoint = vtkpoints->GetPoint( p );
+ 
     // Need to convert the point to PoinType
     TriangleMeshType::PointType pt;
     for(unsigned int i=0;i<3; i++)
@@ -193,7 +189,6 @@ DeformableModelApplication
       }
 
     m_TriangleMesh->SetPoint( p, pt);
-
     }
 
   //
@@ -380,7 +375,11 @@ DeformableModelApplication
       // Set the vtk point at the index with the the coord array from itk
       // itk returns a const pointer, but vtk is not const correct, so
       // we have to use a const cast to get rid of the const
-      vtkFloatingPointType * pp = const_cast<vtkFloatingPointType*>(i->Value().GetDataPointer());
+      double * pp1 = const_cast<double*>(i->Value().GetDataPointer());
+      vtkFloatingPointType* pp = new vtkFloatingPointType[3];
+      pp[0] = pp1[0];
+      pp[1] = pp1[1];
+      pp[2] = pp1[2];
       vpoints->SetPoint(idx, pp);
     }
 
