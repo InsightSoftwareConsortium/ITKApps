@@ -17,11 +17,14 @@ class SurfaceSplineRunner
     SurfaceSplineRunner() {}
     void Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
     {
+      const unsigned int pointsAlongRows  = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
+      const unsigned int pointsAlongCols  = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
+
       ModuleType  module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Computing Surface Spline...");
-      module.SetNumberOfPointsAlongRows( 7 );
-      module.SetNumberOfPointsAlongColumns( 7 );
+      module.SetNumberOfPointsAlongRows( pointsAlongRows );
+      module.SetNumberOfPointsAlongColumns( pointsAlongCols );
       // Execute the filter
       module.ProcessData( pds  );
     }
@@ -117,8 +120,22 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 }
 
 
-static int UpdateGUI(void *)
+static int UpdateGUI( void *inf )
 {
+  vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
+
+  info->SetGUIProperty(info, 0, VVP_GUI_LABEL, "Number of points in rows");
+  info->SetGUIProperty(info, 0, VVP_GUI_TYPE, VVP_GUI_SCALE);
+  info->SetGUIProperty(info, 0, VVP_GUI_DEFAULT, "21.0");
+  info->SetGUIProperty(info, 0, VVP_GUI_HELP, "Number of points to along the rows of the spline surface. This is used to define the resolution of the grid that resamples the spline.");
+  info->SetGUIProperty(info, 0, VVP_GUI_HINTS , "3 200 1");
+
+  info->SetGUIProperty(info, 1, VVP_GUI_LABEL, "Number of points in columns");
+  info->SetGUIProperty(info, 1, VVP_GUI_TYPE, VVP_GUI_SCALE);
+  info->SetGUIProperty(info, 1, VVP_GUI_DEFAULT, "21.0");
+  info->SetGUIProperty(info, 1, VVP_GUI_HELP, "Number of points to along the columns of the spline surface. This is used to define the resolution of the grid that resamples the spline.");
+  info->SetGUIProperty(info, 1, VVP_GUI_HINTS , "3 200 1");
+
   return 1;
 }
 
@@ -142,7 +159,7 @@ void VV_PLUGIN_EXPORT vvITKSurfaceSplineInit(vtkVVPluginInfo *info)
 
   info->SetProperty(info, VVP_SUPPORTS_IN_PLACE_PROCESSING, "0");
   info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "0");
-  info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "0");
+  info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "2");
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP,           "0");
   info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "0");
   info->SetProperty(info, VVP_PRODUCES_MESH_ONLY,           "1");
