@@ -22,6 +22,7 @@ vtkITKMutualInformationTransform.cxx
 vtkITKNeighborhoodConnectedImageFilter.h
 vtkITKNormalizeImageFilter.cxx
 vtkITKPDEDeformableRegistrationFilter.h
+vtkITKSmoothingRecursiveGaussianImageFilter.h
 vtkITKThresholdSegmentationLevelSetImageFilter.h
 vtkITKTobogganImageFilter.h
 vtkITKWatershedImageFilter.cxx
