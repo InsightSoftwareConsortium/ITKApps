@@ -4,32 +4,37 @@
 
 #include "itkCurvatureFlowImageFilter.h"
 
-static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
-{
 
-  vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
-
-  const unsigned int Dimension = 3;
-
-  typedef   float       InternalPixelType;
-  typedef   itk::Image< InternalPixelType,Dimension > InternalImageType; 
-
-  typedef   itk::CurvatureFlowImageFilter< 
-                                InternalImageType,  
-                                InternalImageType >   FilterType;
- 
-  const unsigned int numberOfIterations = atoi(  info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
-  const float        timeStep           = atof(  info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
-
-  try 
+template <class InputPixelType>
+class CurvatureFlowRunner
   {
-  switch( info->InputVolumeScalarType )
+  public:
+      typedef   float       InternalPixelType;
+      typedef   itk::Image< InternalPixelType, 3 > InternalImageType; 
+
+      typedef   itk::CurvatureFlowImageFilter< 
+                                        InternalImageType,  
+                                        InternalImageType >   FilterType;
+ 
+      typedef  InputPixelType                            OutputPixelType;                                          
+
+      typedef  VolView::PlugIn::FilterModuleWithCasting< InputPixelType, 
+                                                         FilterType,
+                                                         OutputPixelType > ModuleType;
+  public:
+    CurvatureFlowRunner() {}
+    void Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
     {
-    case VTK_UNSIGNED_CHAR:
-      {
-      VolView::PlugIn::FilterModuleWithCasting< unsigned char, 
-                                                FilterType,
-                                                unsigned char > module;
+      const unsigned int numberOfIterations = atoi(  info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
+      const float        timeStep           = atof(  info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
+
+      if( info->NumberOfMarkers < 1 )
+        {
+        info->SetProperty( info, VVP_ERROR, "Please select seed points using the 3D Markers in the Annotation menu" ); 
+        return;
+        }
+
+      ModuleType  module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Smoothing with Curvature Flow...");
       // Set the parameters on it
@@ -37,23 +42,84 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.GetFilter()->SetTimeStep( timeStep );
       // Execute the filter
       module.ProcessData( pds  );
+    }
+  };
+
+
+
+static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
+{
+
+  vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
+
+
+  try 
+  {
+  switch( info->InputVolumeScalarType )
+  {
+    case VTK_CHAR:
+      {
+      CurvatureFlowRunner<signed char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_CHAR:
+      {
+      CurvatureFlowRunner<unsigned char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_SHORT:
+      {
+      CurvatureFlowRunner<signed short> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_SHORT:
       {
-      VolView::PlugIn::FilterModuleWithCasting< unsigned short, 
-                                                FilterType,
-                                                unsigned short > module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Smoothing with Curvature Flow...");
-      // Set the parameters on it
-      module.GetFilter()->SetNumberOfIterations( numberOfIterations );
-      module.GetFilter()->SetTimeStep( timeStep );
-      // Execute the filter
-      module.ProcessData( pds );
+      CurvatureFlowRunner<unsigned short> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_INT:
+      {
+      CurvatureFlowRunner<signed int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_INT:
+      {
+      CurvatureFlowRunner<unsigned int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_LONG:
+      {
+      CurvatureFlowRunner<signed long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_LONG:
+      {
+      CurvatureFlowRunner<unsigned long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_FLOAT:
+      {
+      CurvatureFlowRunner<float> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_DOUBLE:
+      {
+      CurvatureFlowRunner<double> runner;
+      runner.Execute( info, pds );
       break; 
       }
     }
+
+
   }
   catch( itk::ExceptionObject & except )
   {
@@ -62,6 +128,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
   }
   return 0;
 }
+
 
 
 static int UpdateGUI(void *inf)
