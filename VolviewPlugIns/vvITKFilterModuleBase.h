@@ -119,7 +119,7 @@ public:
   }
 
 
-  CommandType::Pointer
+  CommandType *
   GetCommandObserver()
   {
      return m_CommandObserver;
