@@ -75,6 +75,17 @@ public:
     return tmp;
   }
 
+  static 
+  const char * GetInputVolumeScalarMidValue( const vtkVVPluginInfo  * info )
+  {
+    static char tmp[1024];
+    const float lower = info->InputVolumeScalarRange[0];
+    const float upper = info->InputVolumeScalarRange[1];
+    const float midvalue = ( upper + lower ) / 2.0;
+    sprintf( tmp,"%f", midvalue ); 
+    return tmp;
+  }
+
 
   static 
   const char * GetInputVolumeScalarTypeRange( const vtkVVPluginInfo  * info )
@@ -86,6 +97,16 @@ public:
     return tmp;
   }
 
+  static 
+  const char * GetInputVolumeScalarTypeMidValue( const vtkVVPluginInfo  * info )
+  {
+    static char tmp[1024];
+    const float lower = info->InputVolumeScalarTypeRange[0];
+    const float upper = info->InputVolumeScalarTypeRange[1];
+    const float midvalue = ( upper + lower ) / 2.0;
+    sprintf( tmp,"%f", midvalue ); 
+    return tmp;
+  }
 
   static 
   const char * GetInputVolumeScalarMinimum( const vtkVVPluginInfo  * info )
