@@ -19,25 +19,22 @@ class FilterModuleDoubleOutput : public FilterModule<TFilterType> {
 
 public:
 
+  typedef FilterModule<TFilterType>               Superclass;
+
    // Instantiate the image types
-  typedef TFilterType                             FilterType;
-  typedef typename FilterType::InputImageType     InputImageType;
-  typedef typename FilterType::OutputImageType    OutputImageType;
-  typedef typename InputImageType::PixelType      InputPixelType;
-  typedef typename OutputImageType::PixelType     OutputPixelType;
+  typedef typename Superclass::FilterType         FilterType;
+  typedef typename Superclass::InputImageType     InputImageType;
+  typedef typename Superclass::OutputImageType    OutputImageType;
+  typedef typename Superclass::InputPixelType     InputPixelType;
+  typedef typename Superclass::OutputPixelType    OutputPixelType;
 
   itkStaticConstMacro( Dimension, unsigned int, 
          itk::GetImageDimension< InputImageType >::ImageDimension );
 
-  // Instantiate the ImportImageFilter
-  // This filter is used for building an ITK image using 
-  // the data passed in a buffer.
-  typedef itk::ImportImageFilter< InputPixelType, 
-                                  Dimension       > ImportFilterType;
-
-  typedef typename ImportFilterType::SizeType      SizeType;
-  typedef typename ImportFilterType::IndexType     IndexType;
-  typedef typename ImportFilterType::RegionType    RegionType;
+  typedef typename Superclass::ImportFilterType   ImportFilterType;
+  typedef typename Superclass::SizeType           SizeType;
+  typedef typename Superclass::IndexType          IndexType;
+  typedef typename Superclass::RegionType         RegionType;
 
 
 
@@ -61,14 +58,14 @@ public:
     {
     // Copy the data (with casting) to the output buffer provided by the PlugIn API
     typename OutputImageType::ConstPointer outputImage =
-                                               m_Filter->GetOutput();
+                                               this->GetFilter()->GetOutput();
 
     typedef itk::ImageRegionConstIterator< OutputImageType >  OutputIteratorType;
 
     OutputIteratorType ot( outputImage, outputImage->GetBufferedRegion() );
 
    typename InputImageType::ConstPointer inputImage =
-                                               m_Filter->GetInput();
+                                               this->GetFilter()->GetInput();
 
     typedef itk::ImageRegionConstIterator< InputImageType >  InputIteratorType;
 
@@ -90,8 +87,7 @@ public:
     }
 
 private:
-    typename ImportFilterType::Pointer    m_ImportFilter;
-    typename FilterType::Pointer          m_Filter;
+
 };
 
 
