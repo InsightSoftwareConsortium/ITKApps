@@ -280,7 +280,7 @@ VanderbiltValidationInputParser<TImage>
   temp.Fill( 0 );
   m_NumberOfIterations = temp;
   }
-  for( unsigned int j = 0; j < m_NumberOfLevels; j++ )
+  for( j = 0; j < m_NumberOfLevels; j++ )
     {
     if( fscanf( paramFile, "%d", &uNumber ) != 1 )
      {
@@ -295,7 +295,7 @@ VanderbiltValidationInputParser<TImage>
   temp.Fill( 0 );
   m_LearningRates = temp;
   }
-  for( unsigned int j = 0; j < m_NumberOfLevels; j++ )
+  for( j = 0; j < m_NumberOfLevels; j++ )
     {
     if( fscanf( paramFile, "%lf", &fNumber ) != 1 )
      {
