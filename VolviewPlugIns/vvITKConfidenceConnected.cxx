@@ -14,7 +14,7 @@ class ConfidenceConnectedRunner
     typedef  itk::Image< InputPixelType, Dimension >  InputImageType; 
     typedef  unsigned char                            OutputPixelType;
     typedef  itk::Image< OutputPixelType, Dimension > OutputImageType; 
-    typedef  InputImageType::IndexType                IndexType;
+    typedef  typename InputImageType::IndexType       IndexType;
     typedef  itk::ConfidenceConnectedImageFilter< InputImageType,  
                                                 OutputImageType >   FilterType;
   public:
