@@ -155,8 +155,8 @@ static int UpdateGUI(void *inf)
     if( compositeOutput )
       {
       info->OutputVolumeScalarType = info->InputVolumeScalarType;
-      info->OutputVolumeNumberOfComponents = 2;
-      info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "2");
+      info->OutputVolumeNumberOfComponents = 4; // 3 from RGB + segmentation
+      info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "4");
       }
     }
 
