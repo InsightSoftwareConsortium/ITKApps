@@ -19,9 +19,6 @@ ${ITK_BINARY_DIR}/Code/Algorithms
 ${ITK_BINARY_DIR}/Code/IO
 ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
 ${ThresholdSegmentationLevelSetFltkGui_BINARY_DIR}
-${FLTK_LIBRARY}
-${OPENGL_LIBRARY}
-${GLU_LIBRARY}
 )
 
 SET(ThresholdSegmentationLevelSetFltkGui_SRCS
@@ -41,16 +38,8 @@ ITKBasicFilters
 ITKIO
 ITKNumerics
 ITKFltkImageViewer
-${FLTK_LIBRARY}
-${OPENGL_LIBRARY}
-${GLU_LIBRARY}
 )
 
-IF(WIN32)
-  LINK_LIBRARIES(
-  wsock32
-  )
-ENDIF(WIN32)
 
 ADD_EXECUTABLE(ThresholdSegmentationLevelSetFltkGui ${ThresholdSegmentationLevelSetFltkGui_SRCS})
 
