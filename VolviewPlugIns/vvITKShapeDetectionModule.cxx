@@ -18,7 +18,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
   const float propagationScaling    = atof( info->GetGUIProperty(info, 4, VVP_GUI_VALUE ));
   const float maximumRMSError       = atof( info->GetGUIProperty(info, 5, VVP_GUI_VALUE ));
 
-  const unsigned int maximumNumberOfIterations = atof( info->GetGUIProperty(info, 6, VVP_GUI_VALUE ));
+  const unsigned int maximumNumberOfIterations = atoi( info->GetGUIProperty(info, 6, VVP_GUI_VALUE ));
 
   const unsigned int numberOfSeeds = info->NumberOfMarkers;
   if( numberOfSeeds < 1 )

@@ -45,8 +45,8 @@ FastMarchingModule<TInputPixelType>
     // This transfer function will invert the map
     m_IntensityWindowingFilter->SetWindowMinimum( m_InitialSeedValue );
     m_IntensityWindowingFilter->SetWindowMaximum( m_FastMarchingFilter->GetStoppingValue() );
-    m_IntensityWindowingFilter->SetOutputMinimum( m_FastMarchingFilter->GetStoppingValue() );
-    m_IntensityWindowingFilter->SetOutputMaximum( m_InitialSeedValue );
+    m_IntensityWindowingFilter->SetOutputMinimum( static_cast< OutputPixelType >( m_FastMarchingFilter->GetStoppingValue() ));
+    m_IntensityWindowingFilter->SetOutputMaximum( static_cast< OutputPixelType >( m_InitialSeedValue ));
 
     // Set up the pipeline
     m_GradientMagnitudeFilter->SetInput(  m_ImportFilter->GetOutput()             );
@@ -87,10 +87,12 @@ FastMarchingModule<TInputPixelType>
 ::AddSeed( float x, float y, float z )
 {
   NodeType node;
-  typename NodeType::IndexType seedPosition;
-  seedPosition[0] = x;
-  seedPosition[1] = y;
-  seedPosition[2] = z;
+  typedef typename NodeType::IndexType          IndexType;
+  typedef typename IndexType::IndexValueType    IndexValueType;
+  IndexType seedPosition;
+  seedPosition[0] = static_cast<IndexValueType>( x );
+  seedPosition[1] = static_cast<IndexValueType>( y );
+  seedPosition[2] = static_cast<IndexValueType>( z );
   node.SetValue( m_InitialSeedValue );
   node.SetIndex( seedPosition );
   m_NodeContainer->InsertElement( m_CurrentNumberOfSeeds, node );
@@ -126,8 +128,8 @@ FastMarchingModule<TInputPixelType>
 ::SetStoppingValue( float value )
 {
   m_FastMarchingFilter->SetStoppingValue( value );
-  m_IntensityWindowingFilter->SetOutputMinimum( value );
-  m_IntensityWindowingFilter->SetWindowMaximum( value );
+  m_IntensityWindowingFilter->SetOutputMinimum( static_cast<OutputPixelType>( value ) );
+  m_IntensityWindowingFilter->SetWindowMaximum( static_cast<RealPixelType>(   value ) );
 }
 
 
