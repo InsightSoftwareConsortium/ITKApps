@@ -20,11 +20,18 @@
 #include <SegmenterConsoleGUI.h>
 #include "ImageViewer.h"
 
-
-class SegmenterConsole : public SegmenterConsoleGUI {
-
+/**
+ * \class SegmenterConsole
+ *
+ *
+ */
+class SegmenterConsole : public SegmenterConsoleGUI
+{
 public:
-
+  typedef SegmenterConsoleBase::InputPixelType InputPixelType;
+  typedef SegmenterConsoleBase::WritePixelType WritePixelType;
+  typedef SegmenterConsoleBase::InputImageType InputImageType;
+ 
   typedef ImageViewer< InputPixelType, WritePixelType > 
                                                InputImageViewerType;
   typedef ImageViewer< InputPixelType, WritePixelType > 
@@ -32,13 +39,13 @@ public:
   typedef ImageViewer< InputPixelType, WritePixelType > 
                                                SpeedViewerType;
 
-
-public:
   SegmenterConsole();
   virtual ~SegmenterConsole();
+
   virtual void Show(void);
   virtual void Hide(void);
   virtual void Load(void);
+  virtual void Load(const char * filename);
   virtual void Quit(void);
   virtual void ShowInputImage(void);
   virtual void InitializeGuessImages(void);
@@ -62,10 +69,14 @@ public:
   virtual void SetThresholdFilterToModified();
   virtual void SaveSession();
   virtual void LoadSession();
-
+  
   static void ClickSelectCallback(float x, float y, float z, float value, void * args );
 
 private:
+  void ResetAllParameters();
+  void SetThresholdSegmentationInput();
+  void SetThresholdRange(const InputImageType *);
+
   InputImageViewerType*      m_InputViewer;
   SeedViewerType*            m_SeedViewer;
   SpeedViewerType*           m_SpeedViewer;

@@ -7,361 +7,335 @@ class SegmenterConsoleGUI {open : {public SegmenterConsoleBase}
   Function {SegmenterConsoleGUI()} {open
   } {
     Fl_Window consoleWindow {
-      label {Segmenter } open
-      xywh {302 198 905 345} labelsize 12 labelcolor 0 resizable
+      label {Level-Set Segmenter } open
+      xywh {408 202 665 400} box DOWN_BOX color 0 labelsize 10 labelcolor 0
       code0 {\#include <SegmenterConsoleBase.h>}
       code1 {\#include <fltkLightButton.h>} visible
     } {
       Fl_Box {} {
-        label label
-        xywh {148 109 25 10} box FLAT_BOX color 120 labeltype NO_LABEL
+        label Menu
+        xywh {5 5 360 45} box PLASTIC_UP_BOX color 0 labelfont 1 labelcolor 8 align 21
+      }
+      Fl_Box {} {
+        label {Image to Segment}
+        xywh {5 55 140 235} box PLASTIC_DOWN_BOX color 8 labelfont 1 labelcolor 8 align 17
+      }
+      Fl_Box {} {
+        label Parameters
+        xywh {370 5 290 285} box PLASTIC_UP_BOX color 8 labelfont 1 labelcolor 8 align 17
+      }
+      Fl_Box {} {
+        label {Threshold Values}
+        xywh {375 30 280 65} box PLASTIC_DOWN_BOX color 255 labelfont 1 labelsize 10 labelcolor 28 align 21
+      }
+      Fl_Box {} {
+        label {Level-set Initialization}
+        xywh {150 55 215 235} box PLASTIC_DOWN_BOX color 8 labelfont 1 labelcolor 8 align 17
+      }
+      Fl_Box {} {
+        label {Smoothing (optional)}
+        xywh {10 125 130 105} box PLASTIC_DOWN_BOX color 255 labelsize 10 labelcolor 8 align 17
       }
       Fl_Light_Button ShowInputButton {
         label {Load Input Image}
         callback {Load();}
-        xywh {11 8 134 30} type Normal box ROUND_UP_BOX down_box EMBOSSED_BOX value 1 selection_color 121 labelsize 12 align 16
+        xywh {20 83 105 22} type Normal box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX value 1 selection_color 121 labelsize 10 align 16
         class {fltk::LightButton}
       }
-      Fl_Group Case1Group {open
-        xywh {338 5 272 177} deactivate
+      Fl_Group Case1Group {
+        xywh {270 50 340 177} deactivate
       } {
         Fl_Box {} {
           label {Case 2}
-          xywh {339 92 104 90} box DOWN_FRAME labeltype NO_LABEL
+          xywh {270 82 91 58} box PLASTIC_DOWN_BOX color 255 labeltype NO_LABEL labelsize 10
         }
         Fl_Light_Button ViewSeedButton {
-          label {Load Seed Image}
+          label {Load Prior}
           callback {LoadSeedImage();}
-          xywh {360 20 131 30} type Normal box ROUND_UP_BOX down_box EMBOSSED_BOX value 1 selection_color 121 labelsize 12 align 16
+          xywh {275 110 80 20} type Normal box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX value 1 selection_color 121 labelsize 10 align 16
           class {fltk::LightButton}
         }
         Fl_Value_Input isosurface {
-          label {Isosurface:}
-          xywh {419 55 45 25} labelsize 12 labelcolor 0 textsize 12
+          label Isovalue
+          xywh {320 87 35 18} box PLASTIC_THIN_DOWN_BOX labelsize 10 labelcolor 0 textsize 10
         }
       }
-      Fl_Group Case2Group {open
-        xywh {338 10 272 180} deactivate
+      Fl_Group Case2Group {
+        xywh {270 55 340 180} deactivate
       } {
-        Fl_Value_Input seedX {
-          label {Seed X:}
-          xywh {393 97 45 25} labelsize 12 labelcolor 0 textsize 12
-        }
-        Fl_Value_Input seedY {
-          label {Seed Y:}
-          xywh {393 124 45 25} labelsize 12 labelcolor 0 textsize 12
-        }
-        Fl_Value_Input distance {
-          label {Radius:}
-          xywh {393 151 45 25} labelsize 12 labelcolor 0 textsize 12
-        }
         Fl_Box {} {
           label {Case 1}
-          xywh {338 11 167 74} box DOWN_FRAME labeltype NO_LABEL
+          xywh {270 150 90 70} box PLASTIC_DOWN_BOX color 255 labeltype NO_LABEL labelsize 10
+        }
+        Fl_Value_Input seedX {
+          label {Center X}
+          xywh {320 157 35 18} box PLASTIC_DOWN_BOX labelsize 10 labelcolor 0 textsize 12
+        }
+        Fl_Value_Input seedY {
+          label {Center Y}
+          xywh {320 177 35 18} box PLASTIC_DOWN_BOX labelsize 10 labelcolor 0 textsize 10
+        }
+        Fl_Value_Input distance {
+          label Radius
+          xywh {320 197 35 18} box PLASTIC_DOWN_BOX labelsize 10 labelcolor 0 textsize 10
         }
       }
-      Fl_Group radioGroup {open
-        xywh {196 15 145 195} labeltype NO_LABEL deactivate
+      Fl_Group Case3Group {
+        xywh {270 205 256 95} labeltype NO_LABEL deactivate
+      } {
+        Fl_Box {} {
+          label label
+          xywh {270 230 90 55} box PLASTIC_DOWN_BOX color 255 labeltype NO_LABEL labelsize 10
+        }
+        Fl_Value_Slider paintRadius {
+          label {Brush Size}
+          callback {ChangePaintRadius(o->value());}
+          xywh {275 237 80 18} type Horizontal box PLASTIC_DOWN_BOX color 59 labelsize 10 labelcolor 0 align 16 maximum 10 step 1 value 2
+        }
+        Fl_Button {} {
+          label Clear
+          callback {ClearGuess();}
+          xywh {275 258 80 22} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX labelsize 10
+        }
+      }
+      Fl_Group radioGroup {
+        xywh {120 50 221 240} labeltype NO_LABEL deactivate
       } {
         Fl_Round_Button radio1 {
-          label {Load Seed Image}
+          label {Load a prior segmentation}
           callback {SwitchCase(1);}
-          xywh {200 23 113 25} type Radio down_box ROUND_DOWN_BOX value 1 labelsize 12 labelcolor 0
+          xywh {155 95 105 30} type Radio box PLASTIC_UP_BOX down_box PLASTIC_THIN_DOWN_BOX value 1 labelsize 10 labelcolor 0 align 148
         }
         Fl_Round_Button radio2 {
-          label {Use Coordinates  for Seed Image}
+          label {Use a circle}
           callback {SwitchCase(2);}
-          xywh {201 95 112 40} type Radio down_box ROUND_DOWN_BOX labelsize 12 labelcolor 0 align 148
+          xywh {155 170 105 25} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX labelsize 10 labelcolor 0 align 148
         }
         Fl_Round_Button radio3 {
-          label {Use Initial Guess}
+          label {Draw an initial segmentation}
           callback {SwitchCase(3);}
-          xywh {201 185 112 25} type Radio down_box ROUND_DOWN_BOX labelsize 12 labelcolor 0 align 148
+          xywh {155 240 105 30} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX selection_color 41 labelsize 10 labelcolor 0 align 148
         }
       }
       Fl_Group endControlsGroup {open
-        xywh {509 8 457 338} deactivate
+        xywh {5 8 931 632} deactivate
       } {
+        Fl_Box {} {
+          label {Equation Term Weights}
+          xywh {375 100 125 100} box PLASTIC_DOWN_BOX color 255 labelfont 1 labelsize 10 labelcolor 8 align 17
+        }
+        Fl_Box {} {
+          label {Laplacian Smoothing}
+          xywh {375 205 125 80} box PLASTIC_DOWN_BOX color 255 labelfont 1 labelsize 10 labelcolor 8 align 17
+        }
+        Fl_Box {} {
+          label {Convergence Criteria}
+          xywh {505 100 150 60} box PLASTIC_DOWN_BOX color 255 labelfont 1 labelsize 10 labelcolor 8 align 17
+        }
+        Fl_Box {} {
+          label {Maximum Time Step Manipulators (Dangerous!)}
+          xywh {505 165 150 70} box PLASTIC_DOWN_BOX color 255 labelfont 1 labelsize 10 labelcolor 1 align 145
+        }
         Fl_Value_Input minThresh2 {
           callback {ChangeMinThresh(o->value());}
-          xywh {748 13 45 25} labeltype NO_LABEL labelsize 12 when 4 textsize 12
-        }
-        Fl_Slider minThresh {
-          callback {ChangeMinThresh(o->value());}
-          xywh {629 13 115 25} type Horizontal labeltype NO_LABEL labelsize 12 when 4
+          xywh {475 48 40 17} box PLASTIC_DOWN_BOX color 60 labeltype NO_LABEL labelsize 10 when 4 textsize 10
         }
         Fl_Value_Input maxThresh2 {
           callback {ChangeMaxThresh(o->value());}
-          xywh {749 42 45 25} labeltype NO_LABEL labelsize 12 when 4 textsize 12
+          xywh {475 72 40 18} box PLASTIC_DOWN_BOX color 60 labeltype NO_LABEL labelsize 10 when 4 textsize 12
+        }
+        Fl_Slider minThresh {
+          label {Lower Threshold}
+          callback {ChangeMinThresh(o->value());}
+          xywh {520 47 130 18} type Horizontal box PLASTIC_DOWN_BOX color 60 labelsize 10 align 20 when 4
         }
         Fl_Slider maxThresh {
+          label {Upper Threshold}
           callback {ChangeMaxThresh(o->value());}
-          xywh {629 42 114 25} type Horizontal labeltype NO_LABEL when 4
+          xywh {520 72 130 18} type Horizontal box PLASTIC_DOWN_BOX color 60 labelsize 10 align 20 when 4
         }
         Fl_Value_Input curvature {
-          label {Curvature Weight:}
+          label Curvature
           callback {SetThresholdFilterToModified();}
-          xywh {704 72 45 25} labelsize 12 when 4 textsize 12
+          xywh {460 117 30 18} box PLASTIC_THIN_DOWN_BOX labelsize 10 when 4 textsize 10
         }
         Fl_Value_Input propagation {
-          label {Propagation Weight:}
+          label Propagation
           callback {SetThresholdFilterToModified();}
-          xywh {704 102 45 25} labelsize 12 when 4 textsize 12
+          xywh {460 137 30 18} box PLASTIC_THIN_DOWN_BOX labelsize 10 when 4 textsize 10
         }
         Fl_Value_Input edge {
-          label {Laplacian Term Weight:}
+          label {Edge (Laplacian)}
           callback {SetThresholdFilterToModified();}
-          xywh {705 132 45 25} labelsize 12 when 4 textsize 12
-        }
-        Fl_Value_Input maxIterations {
-          label {Maximum Iterations:}
-          callback {SetThresholdFilterToModified();}
-          xywh {705 162 45 25} labelsize 12 when 4 textsize 12
-        }
-        Fl_Value_Input RMSError {
-          label {RMS Error:}
-          callback {SetThresholdFilterToModified();}
-          xywh {705 192 45 25} labelsize 12 when 4 textsize 12
+          xywh {460 157 30 18} box PLASTIC_THIN_DOWN_BOX labelsize 10 when 4 textsize 10
         }
         Fl_Check_Button reverseExpansionDir {
-          label {Reverse Expansion Direction}
+          label {Reverse Expansion}
           callback {SetThresholdFilterToModified();}
-          xywh {735 219 25 27} down_box DOWN_BOX labelsize 12 align 4 when 1
+          xywh {470 177 20 18} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX labelsize 10 align 4 when 1
+        }
+        Fl_Value_Input maxIterations {
+          label {Maximum Iterations}
+          callback {SetThresholdFilterToModified();}
+          xywh {605 117 45 18} box PLASTIC_THIN_DOWN_BOX labelsize 10 when 4 textsize 10
+        }
+        Fl_Value_Input RMSError {
+          label {Min. RMS Change}
+          callback {SetThresholdFilterToModified();}
+          xywh {605 137 45 18} box PLASTIC_THIN_DOWN_BOX labelsize 10 when 4 textsize 10
         }
         Fl_Value_Input threshIterations {
-          label {Laplacian Smoothing Iterations:}
+          label Iterations
           callback {SetThresholdFilterToModified();}
-          xywh {706 250 45 25} labelsize 12 when 4 textsize 12
+          xywh {455 222 35 18} box PLASTIC_THIN_DOWN_BOX labelsize 10 when 4 textsize 10
         }
         Fl_Value_Input threshConductance {
-          label {Laplacian Smoothing Conductance:}
+          label Conductance
           callback {SetThresholdFilterToModified();}
-          xywh {706 279 45 25} labelsize 12 when 4 textsize 12
+          xywh {455 242 35 18} box PLASTIC_DOWN_BOX labelsize 10 when 4 textsize 10
         }
         Fl_Value_Input threshTimeStep {
-          label {Laplacian Smoothing Time Step:}
+          label {Time Step}
           callback {SetThresholdFilterToModified();}
-          xywh {706 308 45 25} labelsize 12 when 4 textsize 12
-        }
-        Fl_Text_Display {} {
-          label {Lower Threshold:}
-          xywh {563 37 35 5} box NO_BOX labelsize 12 align 133
-        }
-        Fl_Text_Display {} {
-          label {Upper Threshold:}
-          xywh {564 66 35 5} box NO_BOX labelsize 12 align 133
-        }
-        Fl_Button save {
-          label {Save Segmentation}
-          callback {SaveSegmented();}
-          xywh {772 185 125 27} box ROUND_UP_BOX labelsize 12
-        }
-        Fl_Button binarySave {
-          label {Save Binary Mask}
-          callback {SaveBinaryMask();}
-          xywh {777 225 114 27} box ROUND_UP_BOX labelsize 12 deactivate
-        }
-        Fl_Light_Button SegmentButton {
-          label Segment
-          callback {ShowSegmentedImage();}
-          xywh {793 112 78 27} type Normal box ROUND_UP_BOX down_box EMBOSSED_BOX selection_color 121 labelsize 12
-          class {fltk::LightButton}
-        }
-        Fl_Value_Slider updateIterations {
-          label {Update Iterations:}
-          xywh {785 89 103 20} type Horizontal labelsize 12 align 5 minimum 1 maximum 500 step 1 value 1
+          xywh {455 262 35 18} box PLASTIC_THIN_DOWN_BOX labelsize 10 when 4 textsize 10
         }
         Fl_Box {} {
-          xywh {777 71 115 100} box DOWN_FRAME labeltype NO_LABEL
+          label {Segmentation Control}
+          xywh {5 295 655 80} box PLASTIC_DOWN_BOX color 8 labelfont 1 labelcolor 0 align 145
+        }
+        Fl_Light_Button SegmentButton {
+          label Start
+          callback {ShowSegmentedImage();}
+          xywh {270 315 75 55} type Normal box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 63 selection_color 121
+          class {fltk::LightButton}
         }
         Fl_Button stopSeg {
           label Stop
-          xywh {809 142 52 25} box ROUND_UP_BOX deactivate
+          callback {m_thresholdSegmentation->AbortGenerateDataOn();} selected
+          xywh {350 315 60 55} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 1
         }
-        Fl_Value_Input lastRMSChange {
-          label {Last RMS Change}
-          xywh {775 275 100 25} color 93 labelsize 12 align 5 when 4 textsize 12 deactivate
+        Fl_Value_Slider updateIterations {
+          label {Display Update Interval}
+          xywh {420 347 120 18} type Horizontal box PLASTIC_UP_BOX color 93 labelsize 10 align 8 minimum 1 maximum 500 step 1 value 1
+        }
+        Fl_Value_Input maxCurvatureTimeStep {
+          label {Curvature-Based}
+          callback {SetThresholdFilterToModified();}
+          xywh {610 192 35 18} box PLASTIC_THIN_DOWN_BOX color 89 labelsize 10 labelcolor 1 when 4 textsize 10
+        }
+        Fl_Value_Input maxPropagationTimeStep {
+          label {Propagation-Based}
+          callback {SetThresholdFilterToModified();}
+          xywh {610 212 35 18} box PLASTIC_THIN_DOWN_BOX color 89 labelsize 10 labelcolor 1 when 4 textsize 10
+        }
+        Fl_Button save {
+          label {Save as Float}
+          callback {SaveSegmented();}
+          xywh {230 10 75 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX labelsize 10
+        }
+        Fl_Button binarySave {
+          label {Save as Char}
+          callback {SaveBinaryMask();}
+          xywh {230 30 75 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX labelsize 10 deactivate
         }
         Fl_Value_Input elapsedIterations {
-          label {Elapsed Iterations} selected
-          xywh {775 315 100 25} color 93 labelsize 12 align 5 when 4 textsize 12 deactivate
+          label {Elapsed Iterations}
+          xywh {185 322 75 18} box PLASTIC_UP_BOX color 93 labelsize 10 when 4 textsize 10 deactivate
+        }
+        Fl_Value_Input lastRMSChange {
+          label {RMS Change}
+          xywh {185 347 75 18} box PLASTIC_THIN_UP_BOX color 93 labelsize 10 when 4 textsize 10 deactivate
+        }
+      }
+      Fl_Group diffusionGroup {
+        xywh {5 47 915 383} labelfont 1 labelsize 10 align 21 deactivate
+      } {
+        Fl_Value_Input diffusionIterations {
+          label Iterations
+          xywh {85 145 35 15} box PLASTIC_THIN_DOWN_BOX labelsize 10 labelcolor 0 textsize 10
+        }
+        Fl_Value_Input diffusionConductance {
+          label Conductance
+          xywh {85 165 35 15} box PLASTIC_THIN_DOWN_BOX labelsize 10 labelcolor 0 textsize 10
+        }
+        Fl_Value_Input diffusionTimeStep {
+          label {Time Step}
+          xywh {85 185 35 15} box PLASTIC_THIN_DOWN_BOX labelsize 10 labelcolor 0 textsize 10
+        }
+        Fl_Light_Button DiffuseButton {
+          label {Diffuse Image}
+          callback {SmoothImage();}
+          xywh {30 205 90 20} type Normal box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX value 1 selection_color 121 labelsize 10 align 16
+          class {fltk::LightButton}
+        }
+        Fl_Check_Button calcThresh {
+          label {Draw Region}
+          callback {ToggleThresholdGuess();}
+          xywh {380 47 90 18} box PLASTIC_DOWN_BOX down_box DOWN_BOX value 1 selection_color 90 labelsize 10 align 148
+        }
+        Fl_Button {} {
+          label Calculate
+          callback {CalculateThresholds();}
+          xywh {420 70 50 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX labelsize 10 align 128
+        }
+        Fl_Button {} {
+          label Clear
+          callback {ClearThresh();}
+          xywh {380 70 35 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX labelsize 10
         }
       }
       Fl_Button {} {
         label Quit
         callback {Quit();}
-        xywh {450 311 60 30} box ROUND_UP_BOX labelsize 12
-      }
-      Fl_Box {} {
-        label label
-        xywh {173 30 10 172} box FLAT_BOX color 120 labeltype NO_LABEL
-      }
-      Fl_Box {} {
-        label label
-        xywh {183 30 15 10} box FLAT_BOX color 120 labeltype NO_LABEL
-      }
-      Fl_Box {} {
-        label label
-        xywh {183 109 15 10} box FLAT_BOX color 120 labeltype NO_LABEL
-      }
-      Fl_Box {} {
-        label label
-        xywh {183 192 15 10} box FLAT_BOX color 120 labeltype NO_LABEL
-      }
-      Fl_Box {} {
-        label label
-        xywh {316 30 22 10} box FLAT_BOX color 120 labeltype NO_LABEL
-      }
-      Fl_Box {} {
-        label label
-        xywh {505 30 40 10} box FLAT_BOX color 120 labeltype NO_LABEL
-      }
-      Fl_Box {} {
-        label label
-        xywh {315 112 24 10} box FLAT_BOX color 120 labeltype NO_LABEL
-      }
-      Fl_Box {} {
-        label label
-        xywh {443 113 107 10} box FLAT_BOX color 120 labeltype NO_LABEL
-      }
-      Fl_Box {} {
-        label label
-        xywh {520 194 25 10} box FLAT_BOX color 120 labeltype NO_LABEL
-      }
-      Fl_Box {} {
-        label label
-        xywh {538 30 10 174} box FLAT_BOX color 120 labeltype NO_LABEL
-      }
-      Fl_Box {} {
-        label label
-        xywh {548 113 32 10} box FLAT_BOX color 120 labeltype NO_LABEL
-      }
-      Fl_Box {} {
-        label label
-        xywh {752 94 25 10} box FLAT_BOX color 120 labeltype NO_LABEL
-      }
-      Fl_Box {} {
-        label label
-        xywh {71 38 10 30} box FLAT_BOX color 120 labeltype NO_LABEL
-      }
-      Fl_Box {} {
-        label label
-        xywh {72 158 10 16} box FLAT_BOX color 120 labeltype NO_LABEL
-      }
-      Fl_Box {} {
-        label label
-        xywh {73 204 10 19} box FLAT_BOX color 120 labeltype NO_LABEL
-      }
-      Fl_Box {} {
-        label label
-        xywh {148 110 10 85} box FLAT_BOX color 120 labeltype NO_LABEL
-      }
-      Fl_Box {} {
-        label label
-        xywh {135 185 20 10} box FLAT_BOX color 120 labeltype NO_LABEL
+        xywh {310 10 50 35} box PLASTIC_UP_BOX labelsize 12
       }
       Fl_Button helpButton {
-        label {Show Help}
+        label {Help!}
         callback {helpWin->show();}
-        xywh {373 311 70 30} box ROUND_UP_BOX labelsize 12
-      }
-      Fl_Group diffusionGroup {
-        label Smoothing open
-        xywh {0 66 170 302} labelfont 1 labelsize 12 align 5 deactivate
-      } {
-        Fl_Value_Input diffusionIterations {
-          label {Iterations:}
-          xywh {86 72 45 25} labelsize 12 labelcolor 0 textsize 12
-        }
-        Fl_Value_Input diffusionConductance {
-          label {Conductance:}
-          xywh {86 101 45 25} labelsize 12 labelcolor 0 textsize 12
-        }
-        Fl_Value_Input diffusionTimeStep {
-          label {Time Step:}
-          xywh {86 129 45 25} labelsize 12 labelcolor 0 textsize 12
-        }
-        Fl_Light_Button DiffuseButton {
-          label {Diffuse Image}
-          callback {SmoothImage();}
-          xywh {17 173 120 30} type Normal box ROUND_UP_BOX down_box EMBOSSED_BOX value 1 selection_color 121 labelsize 12 align 16
-          class {fltk::LightButton}
-        }
-        Fl_Check_Button calcThresh {
-          label {Draw Threshold Region}
-          callback {ToggleThresholdGuess();}
-          xywh {8 228 25 25} down_box DOWN_BOX value 1 labelsize 12
-        }
-        Fl_Button {} {
-          label {Calculate Thresholds}
-          callback {CalculateThresholds();}
-          xywh {77 249 85 35} box ROUND_UP_BOX labelsize 12 align 128
-        }
-        Fl_Button {} {
-          label Clear
-          callback {ClearThresh();}
-          xywh {12 254 60 25} box ROUND_UP_BOX labelsize 12
-        }
-        Fl_Box {} {
-          label label
-          xywh {5 222 165 71} box DOWN_FRAME labeltype NO_LABEL
-        }
-      }
-      Fl_Box {} {
-        xywh {2 68 140 90} box DOWN_FRAME labeltype NO_LABEL
-      }
-      Fl_Group Case3Group {open
-        xywh {335 185 190 70} labeltype NO_LABEL deactivate
-      } {
-        Fl_Value_Slider paintRadius {
-          label {Paint Square}
-          callback {ChangePaintRadius(o->value());}
-          xywh {418 192 92 20} type Horizontal labelsize 12 labelcolor 0 align 4 maximum 10 step 1 value 2 textsize 12
-        }
-        Fl_Box {} {
-          label label
-          xywh {339 187 180 63} box DOWN_FRAME labeltype NO_LABEL
-        }
-        Fl_Button {} {
-          label {Clear Guess}
-          callback {ClearGuess();}
-          xywh {379 218 101 25} box ROUND_UP_BOX labelsize 12
-        }
-      }
-      Fl_Box {} {
-        label label
-        xywh {315 193 24 10} box FLAT_BOX color 120 labeltype NO_LABEL
-      }
-      Fl_Box {} {
-        label label
-        xywh {829 171 10 15} box FLAT_BOX color 120 labeltype NO_LABEL
+        xywh {65 10 60 35} box PLASTIC_UP_BOX labelsize 12
       }
       Fl_Button saveSessionButton {
         label {Save Session}
         callback {SaveSession();}
-        xywh {150 311 105 30} box ROUND_UP_BOX labelsize 12
+        xywh {130 30 95 15} box PLASTIC_UP_BOX labelsize 10
       }
       Fl_Button loadSessionButton {
         label {Load Session}
         callback {LoadSession();}
-        xywh {262 311 105 30} box ROUND_UP_BOX labelsize 12
+        xywh {130 10 95 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX labelsize 10
+      }
+      Fl_Progress progressBar {
+        label Progress
+        xywh {5 380 655 15} box PLASTIC_DOWN_BOX color 255 selection_color 1 labelsize 10 labelcolor 8
       }
       Fl_Box {} {
         label label
-        xywh {829 211 10 15} box FLAT_BOX color 120 labeltype NO_LABEL
+        xywh {70 105 5 20} box FLAT_BOX color 120 labeltype NO_LABEL
+      }
+      Fl_Box lineSelectPriorA {
+        label label
+        xywh {260 105 10 5} box FLAT_BOX color 120 labeltype NO_LABEL
+      }
+      Fl_Box lineSelectCircleA {
+        label label
+        xywh {260 180 10 5} box FLAT_BOX color 120 labeltype NO_LABEL
+      }
+      Fl_Box lineSelectDrawA {
+        label label
+        xywh {260 250 10 5} box FLAT_BOX color 120 labeltype NO_LABEL
       }
     }
     Fl_Window helpWin {
-      label Help open
-      xywh {368 624 340 305} resizable visible
+      label Help
+      xywh {473 673 340 305} box PLASTIC_UP_BOX color 58 hide resizable
     } {
       Fl_Output helpText {
-        xywh {6 5 330 265} type Multiline labeltype NO_LABEL labelsize 12 textsize 12 resizable
+        xywh {6 5 330 265} type Multiline box PLASTIC_DOWN_BOX color 17 labeltype NO_LABEL labelsize 10 textsize 10 resizable
       }
       Fl_Button {} {
         label Close
         callback {helpWin->hide();}
-        xywh {144 275 55 25}
+        xywh {144 275 55 25} box PLASTIC_UP_BOX down_box PLASTIC_THIN_DOWN_BOX color 17 labelsize 10
       }
     }
   }

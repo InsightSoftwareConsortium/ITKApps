@@ -20,23 +20,25 @@
 #include <itkImage.h>
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
-
 #include <itkThresholdSegmentationLevelSetImageFilter.h>
-
 #include <itkFastMarchingImageFilter.h>
-
 #include <itkCurvatureAnisotropicDiffusionImageFilter.h>
-
 #include <itkCastImageFilter.h>
-
 #include <itkBinaryThresholdImageFilter.h>
-
 #include <itkMinimumMaximumImageCalculator.h>
 
-
+/**
+ * \class SegmenterConsoleBase
+ *
+ * This class contains declarations of pipeline objects and any methods that
+ * need to be exposed to the GUI.  The fluid generated SegmentationConsoleGUI
+ * class will inherit from this class so that its methods can reference these
+ * objects.  The final SegmenterConsole class inherits from SegmenterConsoleGUI
+ * so that it can access both the pipeline objects and the GUI widgets.
+ *
+ */
 class SegmenterConsoleBase 
-{
-
+{  
 public:
   typedef   float                              InputPixelType;
   typedef   float                              OutputPixelType;
@@ -63,8 +65,6 @@ public:
                             WriteImageType, 
                             WriteImageType3D > SegmentedCasterType;
 
-
-
   typedef   itk::CurvatureAnisotropicDiffusionImageFilter<
                             InputImageType,
                             InputImageType  >  CurvatureDiffusionType;
@@ -85,23 +85,16 @@ public:
   typedef   itk::CastImageFilter<InputImageType, WriteImageType> WriteCasterType;
   typedef   itk::ImageFileWriter<InputImageType>  SegmentWriterType;
   typedef   itk::ImageFileWriter<WriteImageType>  BinaryWriterType;
-  
-  
 
   typedef   FastMarchingFilterType::NodeContainer  NodeContainer;
   typedef   FastMarchingFilterType::NodeType       NodeType;
 
   typedef   itk::MinimumMaximumImageCalculator<InputImageType> CalculatorType;
 
-public:
-
   SegmenterConsoleBase();
   virtual ~SegmenterConsoleBase();
-  virtual void Load(void) = 0;
-  virtual void Load(const char * filename);
-
-protected:
   
+protected:
   ReaderType::Pointer                                            m_Reader;
   CurvatureDiffusionType::Pointer                                m_Curvature;
   InputCasterType::Pointer                                       m_InputCaster;
@@ -144,7 +137,5 @@ protected:
   // so each time the input is set
   CalculatorType::Pointer                                        m_minMax;
 };
-
-
 
 #endif
