@@ -27,8 +27,6 @@
 
 #include "vtkImageImport.h"
 #include "vtkImageExport.h"
-#include "vtkImageActor.h"
-#include "vtkInteractorStyleImage.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -42,6 +40,7 @@
 #include "vtkImagePlaneWidget.h"
 #include "vtkCellPicker.h"
 
+#include <iostream>
 
 
 /**
@@ -92,9 +91,9 @@ void ConnectPipelines(VTK_Exporter* exporter, ITK_Importer importer)
  * pipelines.  The combined pipeline flows as follows:
  *
  * itkImageFileReader ==> itkVTKImageExport ==>
- *    vtkImageImport ==> vtkImageActor
+ *    vtkImageImport ==> vtkImagePlaneWidget
  *
- * The resulting vtkImageActor is displayed in a vtkRenderWindow.
+ * The resulting vtkImagePlaneWidget is displayed in a vtkRenderWindow.
  * Whenever the VTK pipeline executes, information is propagated
  * through the ITK pipeline.  If the ITK pipeline is out of date, it
  * will re-execute and cause the VTK pipeline to update properly as
@@ -172,7 +171,7 @@ int main(int argc, char * argv [] )
     vtkRenderer* renderer = vtkRenderer::New();
     vtkRenderWindow* renWin = vtkRenderWindow::New();
     vtkRenderWindowInteractor* iren = vtkRenderWindowInteractor::New();
-    
+
     renWin->SetSize(500, 500);
     renWin->AddRenderer(renderer);
     iren->SetRenderWindow(renWin);
@@ -237,7 +236,8 @@ int main(int argc, char * argv [] )
     zImagePlaneWidget->SetInteractor( iren );
     zImagePlaneWidget->On();
 
-    // Add the vtkImageActor to the renderer for display.
+
+    // Set the background to something grayish
     renderer->SetBackground(0.4392, 0.5020, 0.5647);
 
 
@@ -261,9 +261,10 @@ int main(int argc, char * argv [] )
     property->SetSpecular(0.5);
     property->SetColor(1.0,0.0,0.0);
     property->SetLineWidth(2.0);
+    property->SetRepresentationToWireframe();
 
     polyActor->SetProperty( property );
-    
+  
     renderer->AddActor( polyActor );
 
     // Bring up the render window and begin interaction.
