@@ -1120,7 +1120,7 @@ UserInterfaceLogic
 
 void 
 UserInterfaceLogic
-::OnITKProgressEvent(itk::Object *source, const EventObject &event)
+::OnITKProgressEvent(itk::Object *source, const EventObject &)
 {
   // Get the elapsed progress
   itk::ProcessObject *po = reinterpret_cast<ProcessObject *>(source);
@@ -3016,6 +3016,12 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.18.2.1  2004/01/24 18:16:50  king
+ *ERR: Fixed warnings.
+ *
+ *Revision 1.18  2003/12/12 19:34:01  pauly
+ *FIX: Trying to get everything to compile again after API changes
+ *
  *Revision 1.17  2003/12/10 23:20:15  hjohnson
  *UPD: Code changes to allow compilation under linux.
  *

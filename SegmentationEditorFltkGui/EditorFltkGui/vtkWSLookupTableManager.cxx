@@ -233,7 +233,7 @@ void vtkWSLookupTableManager::HighlightComputedEquivalencyList()
 
 void vtkWSLookupTableManager::GenerateColorTable()
 {
-  for (unsigned long i = 0; i < this->LookupTable->GetNumberOfTableValues(); i++)
+  for (long i = 0; i < this->LookupTable->GetNumberOfTableValues(); i++)
     {
       this->LookupTable->SetTableValue(i, (float)(rand() / (RAND_MAX + 1.0)),
                                           (float)(rand() / (RAND_MAX + 1.0)),
