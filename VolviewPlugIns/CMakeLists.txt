@@ -71,7 +71,7 @@ SET (PLUGINS
 # copy the plugins to a plugin directory
 FOREACH (PLUG ${PLUGINS})
   ADD_LIBRARY( ${PLUG} MODULE ${PLUG}.cxx )
-  TARGET_LINK_LIBRARIES( ${PLUG} ITKCommon ITKBasicFilters )
+  TARGET_LINK_LIBRARIES( ${PLUG} ITKIO ITKCommon ITKBasicFilters )
   ADD_CUSTOM_COMMAND(
     SOURCE ${PLUG}
     COMMAND ${CMAKE_COMMAND} 
