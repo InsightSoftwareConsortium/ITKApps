@@ -1,8 +1,12 @@
 #ifndef __ConnectVTKITK_h
 #define __ConnectVTKITK_h
 
+#ifndef vtkFloatingPointType
+#define vtkFloatingPointType float
+#endif
+
 template <typename ImageType>
-void ConnectITKToVTK(itk::VTKImageExport<ImageType > *in, 
+void ConnectITKToVTK(itk::VTKImageExport<ImageType ,vtkFloatingPointType> *in, 
                      vtkImageImport* out ) 
 {
   out->SetUpdateInformationCallback(in->GetUpdateInformationCallback());
@@ -22,7 +26,7 @@ void ConnectITKToVTK(itk::VTKImageExport<ImageType > *in,
 
 template <typename ImageType>
 void ConnectVTKToITK (vtkImageExport* in, 
-                      itk::VTKImageImport<ImageType > *out ) 
+                      itk::VTKImageImport<ImageType, vtkFloatingPointType > *out ) 
 {
   out->SetUpdateInformationCallback(in->GetUpdateInformationCallback());
   out->SetPipelineModifiedCallback(in->GetPipelineModifiedCallback());
