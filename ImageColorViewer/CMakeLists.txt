@@ -22,7 +22,7 @@ TARGET_LINK_LIBRARIES (ImageColorViewer
 )
 
 SET(ImageColorViewer_GUI_SRCS
-  ImageColorViewerGUI.fld
+  ImageColorViewerGUI.fl
   )
 
 FLTK_WRAP_UI( ImageColorViewer ${ImageColorViewer_GUI_SRCS} )
