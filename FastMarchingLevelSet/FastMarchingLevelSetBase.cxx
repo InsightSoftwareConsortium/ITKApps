@@ -45,10 +45,6 @@ FastMarchingLevelSetBase
   m_FastMarchingFilter = FastMarchingFilterType::New();
   m_FastMarchingFilter->SetInput( m_SigmoidFilter->GetOutput() );
 
-
-  m_FastMarchingFilter = FastMarchingFilterType::New();
-  m_FastMarchingFilter->SetInput( m_SigmoidFilter->GetOutput() );
-
   m_SeedValue     = 0;
 
   m_FastMarchingWindowingFilter = FastMarchingWindowingFilterType::New();
