@@ -398,7 +398,6 @@ SegmenterConsole::ShowSpeedImage()
     this->ResetAllParameters();
     
     // Only run one iteration
-    //m_thresholdSegmentation->SetMaximumIterations( 0 ); 
     m_thresholdSegmentation->SetNumberOfIterations( 0 );
 
     // Give an input guaranteed to be intialized
@@ -474,7 +473,6 @@ SegmenterConsole::ResetAllParameters()
   m_thresholdSegmentation->SetPropagationScaling( propagation->value() );
   m_thresholdSegmentation->SetEdgeWeight( edge->value() );
   m_thresholdSegmentation->SetMaximumRMSError( RMSError->value() );
-  //m_thresholdSegmentation->SetMaximumIterations( (unsigned int)maxIterations->value() );
   m_thresholdSegmentation->SetNumberOfIterations( (unsigned int)maxIterations->value() );
   m_thresholdSegmentation->SetMaximumCurvatureTimeStep( maxCurvatureTimeStep->value() );
   m_thresholdSegmentation->SetMaximumPropagationTimeStep( maxPropagationTimeStep->value() );  
