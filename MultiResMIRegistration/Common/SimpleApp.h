@@ -82,16 +82,16 @@ protected:
   /** Initialize the input parser. */
   virtual void InitializeParser()
     {
-    m_Parser->SetParameterFileName( m_ParameterFileName.c_str() );
+    this->m_Parser->SetParameterFileName( m_ParameterFileName.c_str() );
     }
 
   /*** Initialize the output generator. */
   virtual void InitializeGenerator()
     {
-    m_Generator->SetFixedImage( m_Parser->GetFixedImage() );
-    m_Generator->SetMovingImage( m_Parser->GetMovingImage() );
-    m_Generator->SetTransform( m_Transform );
-    m_Generator->SetOutputFileName( m_Parser->GetOutputFileName() );
+    this->m_Generator->SetFixedImage( this->m_Parser->GetFixedImage() );
+    this->m_Generator->SetMovingImage( this->m_Parser->GetMovingImage() );
+    this->m_Generator->SetTransform( this->m_Transform );
+    this->m_Generator->SetOutputFileName( this->m_Parser->GetOutputFileName() );
     };
 
 

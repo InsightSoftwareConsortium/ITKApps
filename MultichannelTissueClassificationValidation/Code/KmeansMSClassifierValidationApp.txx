@@ -47,18 +47,18 @@ void
 KmeansMSClassifierValidationApp<TImage,TMaskImage>
 ::InitializeParser()
 {
-  m_Parser->SetImageDirectoryName( m_ImageDirectoryName.c_str() );
-  m_Parser->SetFileExtensions( m_FileExtensions );
-  m_Parser->SetBrainSegmentationDirectoryName( m_BrainSegmentationDirectoryName.c_str() );
+  this->m_Parser->SetImageDirectoryName( m_ImageDirectoryName.c_str() );
+  this->m_Parser->SetFileExtensions( m_FileExtensions );
+  this->m_Parser->SetBrainSegmentationDirectoryName( m_BrainSegmentationDirectoryName.c_str() );
 
-  m_Parser->SetPatientID( m_PatientID.c_str() );
-  m_Parser->SetStartSliceNumber( m_StartSliceNumber );
-  m_Parser->SetNumberOfSlices( m_NumberOfSlices );
-  m_Parser->SetStartSegSliceNumber( m_StartSegSliceNumber );
-  m_Parser->SetNumberOfSegSlices( m_NumberOfSegSlices );
-  m_Parser->SetNumberOfChannels( m_NumberOfChannels );
+  this->m_Parser->SetPatientID( m_PatientID.c_str() );
+  this->m_Parser->SetStartSliceNumber( m_StartSliceNumber );
+  this->m_Parser->SetNumberOfSlices( m_NumberOfSlices );
+  this->m_Parser->SetStartSegSliceNumber( m_StartSegSliceNumber );
+  this->m_Parser->SetNumberOfSegSlices( m_NumberOfSegSlices );
+  this->m_Parser->SetNumberOfChannels( m_NumberOfChannels );
 
-  m_Parser->SetParameterFileName( m_ParameterFileName.c_str() );
+  this->m_Parser->SetParameterFileName( m_ParameterFileName.c_str() );
 }
 
 
@@ -69,12 +69,12 @@ KmeansMSClassifierValidationApp<TImage,TMaskImage>
 {
   typedef TImage VectorInputImageType;
 
-  typename VectorInputImageType::Pointer testImage = m_Parser->GetVectorInputImage();
+  typename VectorInputImageType::Pointer testImage = this->m_Parser->GetVectorInputImage();
 
-  m_MSClassifier->SetVectorInputImage( m_Parser->GetVectorInputImage() );
-  m_MSClassifier->SetMaskInputImage( m_Parser->GetMaskImage() );
-  m_MSClassifier->SetNumberOfClasses( m_NumberOfClasses );  
-  m_MSClassifier->SetNumberOfChannels( m_Parser->GetNumberOfChannels() );  
+  this->m_MSClassifier->SetVectorInputImage( this->m_Parser->GetVectorInputImage() );
+  this->m_MSClassifier->SetMaskInputImage( this->m_Parser->GetMaskImage() );
+  this->m_MSClassifier->SetNumberOfClasses( m_NumberOfClasses );  
+  this->m_MSClassifier->SetNumberOfChannels( this->m_Parser->GetNumberOfChannels() );  
  
 }
 
@@ -84,18 +84,18 @@ void
 KmeansMSClassifierValidationApp<TImage,TMaskImage>
 ::InitializeOutputGenerator()
 {
-  m_OutputGenerator->SetPatientID( m_PatientID.c_str() );
+  this->m_OutputGenerator->SetPatientID( m_PatientID.c_str() );
 
-  m_OutputGenerator->SetClassifiedImage( m_MSClassifier->GetClassifiedImage() );
-//  m_OutputGenerator->SetTruthImage( m_Parser->GetTruthImage() );
+  this->m_OutputGenerator->SetClassifiedImage( this->m_MSClassifier->GetClassifiedImage() );
+//  this->m_OutputGenerator->SetTruthImage( this->m_Parser->GetTruthImage() );
 
-//  m_OutputGenerator->SetStartSegSliceNumber( m_Parser->GetStartSegSliceNumber() );
-  m_OutputGenerator->SetNumberOfSegSlices( m_Parser->GetNumberOfSegSlices() );
+//  this->m_OutputGenerator->SetStartSegSliceNumber( this->m_Parser->GetStartSegSliceNumber() );
+  this->m_OutputGenerator->SetNumberOfSegSlices( this->m_Parser->GetNumberOfSegSlices() );
 
-  m_OutputGenerator->SetTruthLabels( m_TruthLabels );
+  this->m_OutputGenerator->SetTruthLabels( m_TruthLabels );
 
-  m_OutputGenerator->SetOutputFileName( m_OutputFileName.c_str() );
-  m_OutputGenerator->SetAppendOutputFile( m_AppendOutputFile );
+  this->m_OutputGenerator->SetOutputFileName( m_OutputFileName.c_str() );
+  this->m_OutputGenerator->SetAppendOutputFile( m_AppendOutputFile );
 } 
 
 

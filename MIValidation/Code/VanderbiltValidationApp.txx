@@ -45,11 +45,11 @@ void
 VanderbiltValidationApp<TInputPixel,TInputImage,TImage>
 ::InitializeParser()
 {
-  m_Parser->SetImageDirectoryName( m_ImageDirectoryName.c_str() );
-  m_Parser->SetPatientNumber( m_PatientNumber );
-  m_Parser->SetFromModality( m_FromModality );
-  m_Parser->SetToModality( m_ToModality );
-  m_Parser->SetParameterFileName( m_ParameterFileName.c_str() );
+  this->m_Parser->SetImageDirectoryName( m_ImageDirectoryName.c_str() );
+  this->m_Parser->SetPatientNumber( m_PatientNumber );
+  this->m_Parser->SetFromModality( m_FromModality );
+  this->m_Parser->SetToModality( m_ToModality );
+  this->m_Parser->SetParameterFileName( m_ParameterFileName.c_str() );
 }
 
 
@@ -58,21 +58,21 @@ void
 VanderbiltValidationApp<TInputPixel,TInputImage,TImage>
 ::InitializeGenerator()
 {
-  m_Generator->SetMovingImage( m_Parser->GetMovingImage() );
-  m_Generator->SetFixedImage( m_Parser->GetFixedImage() );
-  m_Generator->SetTransform( m_Transform );
-  m_Generator->SetInvertTransform( m_InvertTransform );
+  this->m_Generator->SetMovingImage( this->m_Parser->GetMovingImage() );
+  this->m_Generator->SetFixedImage( this->m_Parser->GetFixedImage() );
+  this->m_Generator->SetTransform( this->m_Transform );
+  this->m_Generator->SetInvertTransform( m_InvertTransform );
 
-  m_Generator->SetOutputFileName( m_OutputFileName.c_str() );
-  m_Generator->SetAppendOutputFile( m_AppendOutputFile );
+  this->m_Generator->SetOutputFileName( m_OutputFileName.c_str() );
+  this->m_Generator->SetAppendOutputFile( m_AppendOutputFile );
 
-  m_Generator->SetPatientNumber( m_PatientNumber );
-  m_Generator->SetFromModality( m_FromModality );
-  m_Generator->SetToModality( m_ToModality );
+  this->m_Generator->SetPatientNumber( m_PatientNumber );
+  this->m_Generator->SetFromModality( m_FromModality );
+  this->m_Generator->SetToModality( m_ToModality );
 
-  m_Generator->SetInvestigatorString1( m_InvestigatorString.c_str() );
-  m_Generator->SetSiteString1( m_SiteString.c_str() );
-  m_Generator->SetMethodString( m_MethodString.c_str() );
+  this->m_Generator->SetInvestigatorString1( m_InvestigatorString.c_str() );
+  this->m_Generator->SetSiteString1( m_SiteString.c_str() );
+  this->m_Generator->SetMethodString( m_MethodString.c_str() );
 
   char buffer[20];
   time_t currentTime;
@@ -80,7 +80,7 @@ VanderbiltValidationApp<TInputPixel,TInputImage,TImage>
   ::time( &currentTime );
   now = localtime( &currentTime );
   ::strftime( buffer, 20, "%d %B %Y", now );
-  m_Generator->SetDateString( buffer );
+  this->m_Generator->SetDateString( buffer );
 }
 
 

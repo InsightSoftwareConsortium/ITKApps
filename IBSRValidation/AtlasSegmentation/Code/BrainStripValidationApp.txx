@@ -46,18 +46,18 @@ void
 BrainStripValidationApp<TImage,TLabelImage,TRealImage>
 ::InitializeParser()
 {
-  m_Parser->SetImageDirectoryName( m_ImageDirectoryName.c_str() );
-  m_Parser->SetBrainSegmentationDirectoryName( m_BrainSegmentationDirectoryName.c_str() );
+  this->m_Parser->SetImageDirectoryName( m_ImageDirectoryName.c_str() );
+  this->m_Parser->SetBrainSegmentationDirectoryName( m_BrainSegmentationDirectoryName.c_str() );
 
-  m_Parser->SetAtlasPatientID( m_AtlasPatientID.c_str() );
-  m_Parser->SetAtlasStartSliceNumber( m_AtlasStartSliceNumber );
-  m_Parser->SetAtlasNumberOfSlices( m_AtlasNumberOfSlices );
+  this->m_Parser->SetAtlasPatientID( m_AtlasPatientID.c_str() );
+  this->m_Parser->SetAtlasStartSliceNumber( m_AtlasStartSliceNumber );
+  this->m_Parser->SetAtlasNumberOfSlices( m_AtlasNumberOfSlices );
 
-  m_Parser->SetSubjectPatientID( m_SubjectPatientID.c_str() );
-  m_Parser->SetSubjectStartSliceNumber( m_SubjectStartSliceNumber );
-  m_Parser->SetSubjectNumberOfSlices( m_SubjectNumberOfSlices );
+  this->m_Parser->SetSubjectPatientID( m_SubjectPatientID.c_str() );
+  this->m_Parser->SetSubjectStartSliceNumber( m_SubjectStartSliceNumber );
+  this->m_Parser->SetSubjectNumberOfSlices( m_SubjectNumberOfSlices );
 
-  m_Parser->SetParameterFileName( m_ParameterFileName.c_str() );
+  this->m_Parser->SetParameterFileName( m_ParameterFileName.c_str() );
 }
 
 
@@ -66,11 +66,11 @@ void
 BrainStripValidationApp<TImage,TLabelImage,TRealImage>
 ::InitializePreprocessor()
 {
-  m_Preprocessor->SetInputFixedImage( m_Parser->GetSubjectImage() );
-  m_Preprocessor->SetInputMovingImage( m_Parser->GetAtlasImage() );
+  this->m_Preprocessor->SetInputFixedImage( this->m_Parser->GetSubjectImage() );
+  this->m_Preprocessor->SetInputMovingImage( this->m_Parser->GetAtlasImage() );
 
-  m_Preprocessor->SetNumberOfHistogramLevels( m_Parser->GetNumberOfHistogramLevels() );
-  m_Preprocessor->SetNumberOfMatchPoints( m_Parser->GetNumberOfMatchPoints() );
+  this->m_Preprocessor->SetNumberOfHistogramLevels( this->m_Parser->GetNumberOfHistogramLevels() );
+  this->m_Preprocessor->SetNumberOfMatchPoints( this->m_Parser->GetNumberOfMatchPoints() );
 }
 
 
@@ -79,14 +79,14 @@ void
 BrainStripValidationApp<TImage,TLabelImage,TRealImage>
 ::InitializeRegistrator()
 {
-  m_Registrator->SetFixedImage( m_Preprocessor->GetOutputFixedImage() );
-  m_Registrator->SetMovingImage( m_Preprocessor->GetOutputMovingImage() );
+  this->m_Registrator->SetFixedImage( this->m_Preprocessor->GetOutputFixedImage() );
+  this->m_Registrator->SetMovingImage( this->m_Preprocessor->GetOutputMovingImage() );
 
-  m_Registrator->SetNumberOfLevels( m_Parser->GetNumberOfLevels() );
-  m_Registrator->SetNumberOfIterations( m_Parser->GetNumberOfIterations() );
+  this->m_Registrator->SetNumberOfLevels( this->m_Parser->GetNumberOfLevels() );
+  this->m_Registrator->SetNumberOfIterations( this->m_Parser->GetNumberOfIterations() );
 
-  m_Registrator->SetFixedImageShrinkFactors( m_Parser->GetSubjectImageShrinkFactors() );
-  m_Registrator->SetMovingImageShrinkFactors( m_Parser->GetAtlasImageShrinkFactors() );
+  this->m_Registrator->SetFixedImageShrinkFactors( this->m_Parser->GetSubjectImageShrinkFactors() );
+  this->m_Registrator->SetMovingImageShrinkFactors( this->m_Parser->GetAtlasImageShrinkFactors() );
 
 }
 
@@ -97,14 +97,14 @@ BrainStripValidationApp<TImage,TLabelImage,TRealImage>
 ::InitializeLabeler()
 {
 
-  m_Labeler->SetAtlasLabelImage( m_Parser->GetAtlasLabelImage() );
-  m_Labeler->SetDeformationField( m_Registrator->GetDeformationField() );
+  this->m_Labeler->SetAtlasLabelImage( this->m_Parser->GetAtlasLabelImage() );
+  this->m_Labeler->SetDeformationField( this->m_Registrator->GetDeformationField() );
 
   typedef typename TLabelImage::PixelType LabelPixelType;
-  m_Labeler->SetLowerThreshold( 1 );
-  m_Labeler->SetUpperThreshold( NumericTraits<LabelPixelType>::max() );
+  this->m_Labeler->SetLowerThreshold( 1 );
+  this->m_Labeler->SetUpperThreshold( NumericTraits<LabelPixelType>::max() );
 
-  m_Labeler->SetOutputValue( 1 );
+  this->m_Labeler->SetOutputValue( 1 );
 
 }
 
@@ -115,13 +115,13 @@ BrainStripValidationApp<TImage,TLabelImage,TRealImage>
 ::InitializeGenerator()
 {
 
-  m_Generator->SetPatientID( m_SubjectPatientID.c_str() );
-  m_Generator->SetGroundTruthImage( m_Parser->GetSubjectLabelImage() );
+  this->m_Generator->SetPatientID( m_SubjectPatientID.c_str() );
+  this->m_Generator->SetGroundTruthImage( this->m_Parser->GetSubjectLabelImage() );
 
-  m_Generator->SetLabelImage( m_Labeler->GetOutputLabelImage() );
+  this->m_Generator->SetLabelImage( this->m_Labeler->GetOutputLabelImage() );
 
-  m_Generator->SetOutputFileName( m_OutputFileName.c_str() );
-  m_Generator->SetAppendOutputFile( m_AppendOutputFile );
+  this->m_Generator->SetOutputFileName( m_OutputFileName.c_str() );
+  this->m_Generator->SetAppendOutputFile( m_AppendOutputFile );
 }
 
 

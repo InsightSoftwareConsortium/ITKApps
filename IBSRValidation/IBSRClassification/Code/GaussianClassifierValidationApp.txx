@@ -46,18 +46,18 @@ void
 GaussianClassifierValidationApp<TImage,TMaskImage>
 ::InitializeParser()
 {
-  m_Parser->SetImageDirectoryName( m_ImageDirectoryName.c_str() );
-  m_Parser->SetBrainMaskDirectoryName( m_BrainMaskDirectoryName.c_str() );
-  m_Parser->SetBrainSegmentationDirectoryName( m_BrainSegmentationDirectoryName.c_str() );
+  this->m_Parser->SetImageDirectoryName( m_ImageDirectoryName.c_str() );
+  this->m_Parser->SetBrainMaskDirectoryName( m_BrainMaskDirectoryName.c_str() );
+  this->m_Parser->SetBrainSegmentationDirectoryName( m_BrainSegmentationDirectoryName.c_str() );
 
-  m_Parser->SetPatientID( m_PatientID.c_str() );
-  m_Parser->SetStartSliceNumber( m_StartSliceNumber );
-  m_Parser->SetNumberOfSlices( m_NumberOfSlices );
-  m_Parser->SetStartSegSliceNumber( m_StartSegSliceNumber );
-  m_Parser->SetNumberOfSegSlices( m_NumberOfSegSlices );
-  m_Parser->SetNumberOfChannels( m_NumberOfChannels );
+  this->m_Parser->SetPatientID( m_PatientID.c_str() );
+  this->m_Parser->SetStartSliceNumber( m_StartSliceNumber );
+  this->m_Parser->SetNumberOfSlices( m_NumberOfSlices );
+  this->m_Parser->SetStartSegSliceNumber( m_StartSegSliceNumber );
+  this->m_Parser->SetNumberOfSegSlices( m_NumberOfSegSlices );
+  this->m_Parser->SetNumberOfChannels( m_NumberOfChannels );
 
-  m_Parser->SetParameterFileName( m_ParameterFileName.c_str() );
+  this->m_Parser->SetParameterFileName( m_ParameterFileName.c_str() );
 }
 
 
@@ -68,16 +68,16 @@ GaussianClassifierValidationApp<TImage,TMaskImage>
 {
   typedef TImage VectorInputImageType;
 
-  typename VectorInputImageType::Pointer testImage = m_Parser->GetVectorInputImage();
+  typename VectorInputImageType::Pointer testImage = this->m_Parser->GetVectorInputImage();
 
-  m_Classifier->SetVectorInputImage( m_Parser->GetVectorInputImage() );
-  m_Classifier->SetMaskInputImage( m_Parser->GetMaskImage() );
-  m_Classifier->SetNumberOfClasses( m_Parser->GetNumberOfClasses() );  
-  m_Classifier->SetNumberOfChannels( m_Parser->GetNumberOfChannels() );  
+  this->m_Classifier->SetVectorInputImage( this->m_Parser->GetVectorInputImage() );
+  this->m_Classifier->SetMaskInputImage( this->m_Parser->GetMaskImage() );
+  this->m_Classifier->SetNumberOfClasses( this->m_Parser->GetNumberOfClasses() );  
+  this->m_Classifier->SetNumberOfChannels( this->m_Parser->GetNumberOfChannels() );  
  
-  m_Classifier->SetClassMeans( m_Parser->GetClassMeans() );
-  m_Classifier->SetClassNumberOfSamples( m_Parser->GetClassNumberOfSamples() );
-  m_Classifier->SetClassCovariances( m_Parser->GetClassCovariances() ); 
+  this->m_Classifier->SetClassMeans( this->m_Parser->GetClassMeans() );
+  this->m_Classifier->SetClassNumberOfSamples( this->m_Parser->GetClassNumberOfSamples() );
+  this->m_Classifier->SetClassCovariances( this->m_Parser->GetClassCovariances() ); 
   
 }
 
@@ -87,18 +87,18 @@ void
 GaussianClassifierValidationApp<TImage,TMaskImage>
 ::InitializeOutputGenerator()
 {
-  m_OutputGenerator->SetPatientID( m_PatientID.c_str() );
+  this->m_OutputGenerator->SetPatientID( m_PatientID.c_str() );
 
-  m_OutputGenerator->SetClassifiedImage( m_Classifier->GetClassifiedImage() );
-  m_OutputGenerator->SetTruthImage( m_Parser->GetTruthImage() );
+  this->m_OutputGenerator->SetClassifiedImage( this->m_Classifier->GetClassifiedImage() );
+  this->m_OutputGenerator->SetTruthImage( this->m_Parser->GetTruthImage() );
 
-  m_OutputGenerator->SetStartSegSliceNumber( m_Parser->GetStartSegSliceNumber() );
-  m_OutputGenerator->SetNumberOfSegSlices( m_Parser->GetNumberOfSegSlices() );
+  this->m_OutputGenerator->SetStartSegSliceNumber( this->m_Parser->GetStartSegSliceNumber() );
+  this->m_OutputGenerator->SetNumberOfSegSlices( this->m_Parser->GetNumberOfSegSlices() );
 
-  m_OutputGenerator->SetTruthLabels( m_TruthLabels );
+  this->m_OutputGenerator->SetTruthLabels( m_TruthLabels );
 
-  m_OutputGenerator->SetOutputFileName( m_OutputFileName.c_str() );
-  m_OutputGenerator->SetAppendOutputFile( m_AppendOutputFile );
+  this->m_OutputGenerator->SetOutputFileName( m_OutputFileName.c_str() );
+  this->m_OutputGenerator->SetAppendOutputFile( m_AppendOutputFile );
 } 
 
 

@@ -48,20 +48,20 @@ void
 FEMBrainStripValidationApp<TImage,TLabelImage,TRealImage>
 ::InitializeParser()
 {
-  m_Parser->SetImageDirectoryName( m_ImageDirectoryName.c_str() );
-  m_Parser->SetBrainSegmentationDirectoryName( m_BrainSegmentationDirectoryName.c_str() );
+  this->m_Parser->SetImageDirectoryName( m_ImageDirectoryName.c_str() );
+  this->m_Parser->SetBrainSegmentationDirectoryName( m_BrainSegmentationDirectoryName.c_str() );
 
-  m_Parser->SetAtlasPatientID( m_AtlasPatientID.c_str() );
-  m_Parser->SetAtlasStartSliceNumber( m_AtlasStartSliceNumber );
-  m_Parser->SetAtlasNumberOfSlices( m_AtlasNumberOfSlices );
+  this->m_Parser->SetAtlasPatientID( m_AtlasPatientID.c_str() );
+  this->m_Parser->SetAtlasStartSliceNumber( m_AtlasStartSliceNumber );
+  this->m_Parser->SetAtlasNumberOfSlices( m_AtlasNumberOfSlices );
 
-  m_Parser->SetSubjectPatientID( m_SubjectPatientID.c_str() );
-  m_Parser->SetSubjectStartSliceNumber( m_SubjectStartSliceNumber );
-  m_Parser->SetSubjectNumberOfSlices( m_SubjectNumberOfSlices );
-  m_Parser->SetImageXSize(m_ImageXSize);
-  m_Parser->SetImageYSize(m_ImageYSize);
+  this->m_Parser->SetSubjectPatientID( m_SubjectPatientID.c_str() );
+  this->m_Parser->SetSubjectStartSliceNumber( m_SubjectStartSliceNumber );
+  this->m_Parser->SetSubjectNumberOfSlices( m_SubjectNumberOfSlices );
+  this->m_Parser->SetImageXSize(m_ImageXSize);
+  this->m_Parser->SetImageYSize(m_ImageYSize);
 
-  m_Parser->SetParameterFileName( m_ParameterFileName.c_str() );
+  this->m_Parser->SetParameterFileName( m_ParameterFileName.c_str() );
 }
 
 
@@ -96,10 +96,10 @@ FEMBrainStripValidationApp<TImage,TLabelImage,TRealImage>
 
   // Run the resampling filter
   
-  interp->SetInputImage(m_Parser->GetSubjectImage());
-  resample->SetInput(m_Parser->GetSubjectImage());
+  interp->SetInputImage(this->m_Parser->GetSubjectImage());
+  resample->SetInput(this->m_Parser->GetSubjectImage());
   resample->Update();
-  m_Parser->SetSubjectImage(resample->GetOutput());
+  this->m_Parser->SetSubjectImage(resample->GetOutput());
   
   interp = InterpolatorType::New();
   resample = itk::ResampleImageFilter< ImageType, ImageType >::New();
@@ -108,10 +108,10 @@ FEMBrainStripValidationApp<TImage,TLabelImage,TRealImage>
   resample->SetInterpolator(interp.GetPointer());
   
 
-  interp->SetInputImage(m_Parser->GetAtlasImage());
-  resample->SetInput(m_Parser->GetAtlasImage());
+  interp->SetInputImage(this->m_Parser->GetAtlasImage());
+  resample->SetInput(this->m_Parser->GetAtlasImage());
   resample->Update();
-  m_Parser->SetAtlasImage(resample->GetOutput());
+  this->m_Parser->SetAtlasImage(resample->GetOutput());
 
 
 
@@ -130,10 +130,10 @@ FEMBrainStripValidationApp<TImage,TLabelImage,TRealImage>
 
   // Run the resampling filter
   
-  interp2->SetInputImage(m_Parser->GetSubjectLabelImage());
-  resample2->SetInput(m_Parser->GetSubjectLabelImage());
+  interp2->SetInputImage(this->m_Parser->GetSubjectLabelImage());
+  resample2->SetInput(this->m_Parser->GetSubjectLabelImage());
   resample2->Update();
-  m_Parser->SetSubjectLabelImage(resample2->GetOutput());
+  this->m_Parser->SetSubjectLabelImage(resample2->GetOutput());
   
   
   interp2 = InterpolatorType::New();
@@ -142,10 +142,10 @@ FEMBrainStripValidationApp<TImage,TLabelImage,TRealImage>
   resample2->SetTransform(aff.GetPointer());
   resample2->SetInterpolator(interp2.GetPointer());
 
-  interp2->SetInputImage(m_Parser->GetAtlasLabelImage());
-  resample2->SetInput(m_Parser->GetAtlasLabelImage());
+  interp2->SetInputImage(this->m_Parser->GetAtlasLabelImage());
+  resample2->SetInput(this->m_Parser->GetAtlasLabelImage());
   resample2->Update();
-  m_Parser->SetAtlasLabelImage(resample2->GetOutput());
+  this->m_Parser->SetAtlasLabelImage(resample2->GetOutput());
   
   /*
   typedef typename LabelImageType::PixelType PType;
@@ -169,13 +169,13 @@ FEMBrainStripValidationApp<TImage,TLabelImage,TRealImage>
   */
   }
 
-  m_Preprocessor->SetInputFixedImage( m_Parser->GetSubjectImage() );
-  m_Preprocessor->SetInputMovingImage( m_Parser->GetAtlasImage() );
+  this->m_Preprocessor->SetInputFixedImage( this->m_Parser->GetSubjectImage() );
+  this->m_Preprocessor->SetInputMovingImage( this->m_Parser->GetAtlasImage() );
 
-  m_Preprocessor->SetNumberOfHistogramLevels( this->GetNumberOfHistogramLevels() );
-  m_Preprocessor->SetNumberOfMatchPoints( this->GetNumberOfMatchPoints() );
+  this->m_Preprocessor->SetNumberOfHistogramLevels( this->GetNumberOfHistogramLevels() );
+  this->m_Preprocessor->SetNumberOfMatchPoints( this->GetNumberOfMatchPoints() );
 
-  m_Preprocessor->SetEdgeFilter( this->GetEdgeFilter() );
+  this->m_Preprocessor->SetEdgeFilter( this->GetEdgeFilter() );
 }
 
 
@@ -184,10 +184,10 @@ void
 FEMBrainStripValidationApp<TImage,TLabelImage,TRealImage>
 ::InitializeRegistrator()
 {
-  m_Registrator->SetFixedImage( m_Preprocessor->GetOutputFixedImage() );
-  m_Registrator->SetMovingImage( m_Preprocessor->GetOutputMovingImage() );
-  m_Registrator->SetFEMConfigurationFileName(this->m_FEMConfigurationFileName.c_str());
-  m_Registrator->SetAtlasLabelImage( m_Parser->GetAtlasLabelImage() );
+  this->m_Registrator->SetFixedImage( this->m_Preprocessor->GetOutputFixedImage() );
+  this->m_Registrator->SetMovingImage( this->m_Preprocessor->GetOutputMovingImage() );
+  this->m_Registrator->SetFEMConfigurationFileName(this->m_FEMConfigurationFileName.c_str());
+  this->m_Registrator->SetAtlasLabelImage( this->m_Parser->GetAtlasLabelImage() );
 }
 
 
@@ -197,13 +197,13 @@ FEMBrainStripValidationApp<TImage,TLabelImage,TRealImage>
 ::InitializeLabeler()
 {
 
-  m_Labeler->SetAtlasLabelImage( m_Registrator->GetWarpedAtlasLabelImage() );
+  this->m_Labeler->SetAtlasLabelImage( this->m_Registrator->GetWarpedAtlasLabelImage() );
 
   typedef typename TLabelImage::PixelType LabelPixelType;
-  m_Labeler->SetLowerThreshold( 1 );
-  m_Labeler->SetUpperThreshold( NumericTraits<LabelPixelType>::max() );
+  this->m_Labeler->SetLowerThreshold( 1 );
+  this->m_Labeler->SetUpperThreshold( NumericTraits<LabelPixelType>::max() );
 
-  m_Labeler->SetOutputValue( 1 );
+  this->m_Labeler->SetOutputValue( 1 );
 
 }
 
@@ -214,13 +214,13 @@ FEMBrainStripValidationApp<TImage,TLabelImage,TRealImage>
 ::InitializeGenerator()
 {
 
-  m_Generator->SetPatientID( m_SubjectPatientID.c_str() );
-  m_Generator->SetGroundTruthImage( m_Parser->GetSubjectLabelImage() );
+  this->m_Generator->SetPatientID( m_SubjectPatientID.c_str() );
+  this->m_Generator->SetGroundTruthImage( this->m_Parser->GetSubjectLabelImage() );
 
-  m_Generator->SetLabelImage( m_Labeler->GetOutputLabelImage() );
+  this->m_Generator->SetLabelImage( this->m_Labeler->GetOutputLabelImage() );
 
-  m_Generator->SetOutputFileName( m_OutputFileName.c_str() );
-  m_Generator->SetAppendOutputFile( m_AppendOutputFile );
+  this->m_Generator->SetOutputFileName( m_OutputFileName.c_str() );
+  this->m_Generator->SetAppendOutputFile( m_AppendOutputFile );
 
 
   typedef typename LabelImageType::PixelType PType;
@@ -230,7 +230,7 @@ FEMBrainStripValidationApp<TImage,TLabelImage,TRealImage>
   writer = itk::ImageFileWriter<LabelImageType>::New();
   writer->SetImageIO(io);
   writer->SetFileName("subjectlabel.raw");
-  writer->SetInput(m_Parser->GetSubjectLabelImage() ); 
+  writer->SetInput(this->m_Parser->GetSubjectLabelImage() ); 
   writer->Write();
  
   typename itk::RawImageIO<PType,ImageDimension>::Pointer io2;
@@ -239,7 +239,7 @@ FEMBrainStripValidationApp<TImage,TLabelImage,TRealImage>
   writer2 = itk::ImageFileWriter<LabelImageType>::New();
   writer2->SetImageIO(io2);
   writer2->SetFileName("outputlabel.raw");
-  writer2->SetInput(m_Labeler->GetOutputLabelImage()); 
+  writer2->SetInput(this->m_Labeler->GetOutputLabelImage()); 
   writer2->Write();
 
  
