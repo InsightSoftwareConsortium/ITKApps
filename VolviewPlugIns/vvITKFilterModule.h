@@ -89,9 +89,8 @@ public:
 
     const unsigned int numberOfComponents = this->GetPluginInfo()->InputVolumeNumberOfComponents;
 
-    for(unsigned int component=0; component < numberOfComponents; component )
+    for(unsigned int component=0; component < numberOfComponents; component++ )
       {
-
       this->ImportPixelBuffer( component, pds );
 
        // Execute the filter
@@ -104,7 +103,7 @@ public:
         return;
         }
 
-      this->CopyOutputData( pds );
+      this->CopyOutputData( component, pds );
 
      }
 
@@ -112,27 +111,31 @@ public:
 
 
 
-  /**  ProcessData performs the actual filtering on the data */
+  /**  Copy the output data into the volview data structure */
   virtual void 
-  CopyOutputData( const vtkVVProcessDataStruct * pds )
+  CopyOutputData( unsigned int component, const vtkVVProcessDataStruct * pds )
   {
 
     // Copy the data (with casting) to the output buffer provided by the PlugIn API
     typename OutputImageType::ConstPointer outputImage =
                                                m_Filter->GetOutput();
 
+    const unsigned int numberOfComponents = this->GetPluginInfo()->InputVolumeNumberOfComponents;
+
     typedef itk::ImageRegionConstIterator< OutputImageType >  OutputIteratorType;
 
     OutputIteratorType ot( outputImage, outputImage->GetBufferedRegion() );
 
-    OutputPixelType * outData = (OutputPixelType *)(pds->outData);
+    OutputPixelType * outData = static_cast< OutputPixelType * >( pds->outData );
+
+    outData += component;  // move to the start of the selected component;
 
     ot.GoToBegin(); 
     while( !ot.IsAtEnd() )
       {
       *outData = ot.Get();
       ++ot;
-      ++outData;
+      outData += numberOfComponents;
       }
 
   } // end of ProcessData
