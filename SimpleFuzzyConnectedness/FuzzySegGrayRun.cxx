@@ -245,7 +245,7 @@ GenerateData()
     idx[0]=(int)(point.x);  
     idx[1]=(int)(point.y);  
     idx[2]=(int)(point.z);  
-    m_Segmenter->SetObjectsSeed(idx);
+    m_Segmenter->SetObjectSeed(idx);
     m_Segmenter->Update(); 
     ShowResult();
     }
