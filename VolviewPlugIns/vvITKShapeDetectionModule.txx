@@ -98,6 +98,7 @@ void
 ShapeDetectionModule<TInputPixelType>
 ::SetDistanceFromSeeds( float value )
 {
+  m_FastMarchingModule.SetStoppingValue( 10.0 * value );
   m_FastMarchingModule.SetInitialSeedValue( -value );
 }
 
