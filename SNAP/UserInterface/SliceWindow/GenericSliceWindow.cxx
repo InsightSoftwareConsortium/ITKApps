@@ -20,8 +20,10 @@
 #include "IRISImageData.h"
 #include "OpenGLSliceTexture.h"
 #include "SliceWindowCoordinator.h"
+#include "SNAPAppearanceSettings.h"
 #include "UserInterfaceLogic.h"
 #include "ZoomPanInteractionMode.h"
+#include "ThumbnailInteractionMode.h"
 
 #include <cassert>
 #include <cstdio>
@@ -44,6 +46,7 @@ GenericSliceWindow
   // Initialize the interaction modes
   m_CrosshairsMode = new CrosshairsInteractionMode(this);
   m_ZoomPanMode = new ZoomPanInteractionMode(this);
+  m_ThumbnailMode = new ThumbnailInteractionMode(this);
 
   // Zero out the registered flags
   m_IsRegistered = false;
@@ -70,6 +73,7 @@ GenericSliceWindow
   // Delete the interaction modes
   delete m_CrosshairsMode;
   delete m_ZoomPanMode;
+  delete m_ThumbnailMode;
 
   // Delete textures
   delete m_GreyTexture;
@@ -99,6 +103,7 @@ GenericSliceWindow
   // Register the interaction modes
   m_CrosshairsMode->Register();
   m_ZoomPanMode->Register();
+  m_ThumbnailMode->Register();
 
   // We have been registered
   m_IsRegistered = true;
@@ -368,7 +373,7 @@ GenericSliceWindow
   DrawOverlays(false);
 
   // Draw the zoom locator
-  if(m_ViewZoom > m_OptimalZoom)
+  if(IsThumbnailOn())
     DrawThumbnail();
 
   // Clean up the GL state
@@ -410,10 +415,12 @@ GenericSliceWindow
   Vector2i xCanvas( w(), h() );
 
   // The thumbnail will occupy a specified fraction of the target canvas
-  float xFraction = 0.33f; // m_GlobalState->GetThumbnailFraction();
+  float xFraction = 0.01f * 
+    m_ParentUI->GetAppearanceSettings()->GetZoomThumbnailSizeInPercent();
 
   // But it must not exceed a predefined size in pixels in either dimension
-  float xThumbMax = 150.0f; // m_GlobalState->GetThumbnailMax();
+  float xThumbMax = 
+    m_ParentUI->GetAppearanceSettings()->GetZoomThumbnailMaximumSize();
 
   // Recompute the fraction based on maximum size restriction
   float xNewFraction = xFraction;
@@ -426,11 +433,16 @@ GenericSliceWindow
   double w = m_SliceSize[0];
   double h = m_SliceSize[1];
 
+  // Set the position and size of the thumbnail, in pixels
+  m_ThumbnailZoom = xNewFraction * m_OptimalZoom;
+  m_ThumbnailPosition.fill(5);
+  m_ThumbnailSize[0] = m_SliceSize[0] * m_SliceSpacing[0] * m_ThumbnailZoom;
+  m_ThumbnailSize[1] = m_SliceSize[1] * m_SliceSpacing[1] * m_ThumbnailZoom;
+  
   glPushMatrix();
   glLoadIdentity();
-  glTranslated(5.0, 5.0, 0.0);
-
-  glScalef(xNewFraction * m_OptimalZoom, xNewFraction * m_OptimalZoom, 1.0);
+  glTranslated((double) m_ThumbnailPosition[0], (double) m_ThumbnailPosition[1], 0.0);
+  glScaled(m_ThumbnailZoom, m_ThumbnailZoom, 1.0);
 
   glPushMatrix();
   glScalef(m_SliceSpacing[0],m_SliceSpacing[1],1.0);
@@ -469,7 +481,7 @@ GenericSliceWindow
 }
 
 void 
-  GenericSliceWindow
+GenericSliceWindow
 ::DrawOverlays(bool inZoomLocator) 
 {
   if(!inZoomLocator) 
@@ -486,7 +498,7 @@ void
 }
 
 void 
-  GenericSliceWindow
+GenericSliceWindow
 ::DrawOrientationLabels()
 {
   // The letter labels
@@ -539,24 +551,37 @@ void
   glPopMatrix();
   glPopAttrib();
 }
+
+void 
+GenericSliceWindow
+::EnterInteractionMode(InteractionMode *mode)
+{
+  // Empty the stack
+  ClearInteractionStack();
+
+  // Push the crosshairs mode - last to get events
+  PushInteractionMode(m_CrosshairsMode);
+
+  // Push the input mode
+  if(mode != m_CrosshairsMode)
+    PushInteractionMode(mode);
+
+  // Push the thumbnail mode
+  PushInteractionMode(m_ThumbnailMode);
+}
   
 void 
 GenericSliceWindow
 ::EnterCrosshairsMode()
 {
-  // Place the mode on the stack
-  ClearInteractionStack();
-  PushInteractionMode(m_CrosshairsMode);
+  EnterInteractionMode(m_CrosshairsMode);
 }
 
 void 
 GenericSliceWindow
 ::EnterZoomPanMode()
 {
-  // Place the mode on the stack
-  ClearInteractionStack();
-  PushInteractionMode(m_CrosshairsMode);
-  PushInteractionMode(m_ZoomPanMode);
+  EnterInteractionMode(m_ZoomPanMode);
 }
 
 void 
@@ -579,3 +604,10 @@ GenericSliceWindow
   return swc->GetWindow( (m_Id+1) % 3);
 }
 
+bool
+GenericSliceWindow
+::IsThumbnailOn()
+{ 
+  return m_ParentUI->GetAppearanceSettings()->GetFlagDisplayZoomThumbnail() 
+    && m_ViewZoom > m_OptimalZoom; 
+}

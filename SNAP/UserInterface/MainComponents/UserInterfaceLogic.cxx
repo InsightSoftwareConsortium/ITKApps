@@ -38,6 +38,7 @@
 #include "SegmentationImageIOWizardLogic.h"
 #include "SimpleFileDialogLogic.h"
 #include "SliceWindowCoordinator.h"
+#include "SNAPAppearanceSettings.h"
 
 #include <itksys/SystemTools.hxx>
 #include <strstream>
@@ -64,6 +65,11 @@ UserInterfaceLogic
 
   // This is just done for shorthand
   m_GlobalState = iris->GetGlobalState();
+
+  // Load the appearance settings from the system interface
+  m_AppearanceSettings = new SNAPAppearanceSettings();
+  Registry &regAppearance = system->Folder("UserInterface.AppearanceSettings");
+  m_AppearanceSettings->LoadFromRegistry(regAppearance);
 
   // Instantiate the IO wizards
   m_WizGreyIO = new GreyImageIOWizardLogic; 
@@ -170,6 +176,9 @@ UserInterfaceLogic
 
   // Delete the window coordinator
   delete m_SliceCoordinator;
+
+  // Delete the appearance settings
+  delete m_AppearanceSettings;
 }
 
 void 
@@ -1315,12 +1324,6 @@ UserInterfaceLogic
   this->UpdateMainLabel();
   m_OutMessage->value("Welcome to SnAP; select File->Load->Grey Data to begin");
 
-  // #include "Common/m_OutAboutCredits.h" to define char credits[]
-  m_OutAboutCredits->value(credits);
-  char *compil = new char[200];
-  sprintf(compil, "m_OutAboutCompiled %s", __DATE__);
-  m_OutAboutCompiled->value(compil);
-
   m_GlobalState->SetShowSpeed(false);
 
   m_InSNAPLabelOpacity->Fl_Valuator::value(128);
@@ -1343,6 +1346,16 @@ UserInterfaceLogic
     {
     OnEdgeSnakeSelect();
     }
+
+  // Apply the special appearance settings that determine startup behavior
+  if(m_AppearanceSettings->GetFlagLinkedZoomByDefault())
+    {
+    m_ChkLinkedZoom->value(1);
+    OnLinkedZoomChange();
+    }
+
+  // Apply the appearance settings to the user interface
+  ApplyAppearanceSettings();
 }
 
 void 
@@ -2033,7 +2046,24 @@ void
 UserInterfaceLogic
 ::OnDisplayOptionsApplyAction()
 {
-  ApplySliceLayoutOptions();
+  // Store the appearance options
+  m_AppearanceSettings->SetFlagDisplayZoomThumbnail(
+    m_ChkOptionsSliceThumbnailOn->value() != 0);
+  m_AppearanceSettings->SetFlagLinkedZoomByDefault(
+    m_ChkOptionsSliceLinkedZoom->value() != 0);
+  m_AppearanceSettings->SetZoomThumbnailSizeInPercent(
+    m_InOptionsSliceThumbnailPercent->value());
+  m_AppearanceSettings->SetZoomThumbnailMaximumSize(
+    (int) m_InOptionsSliceThumbnailMaxSize->value());
+
+  // Place the options in the registry
+  m_AppearanceSettings->SaveToRegistry(
+    m_SystemInterface->Folder("UserInterface.AppearanceSettings"));
+
+  // Apply the options 
+  ApplyAppearanceSettings();
+
+  // Also, apply the rendering options
   ApplyRenderingOptions();
 }
 
@@ -2086,6 +2116,27 @@ UserInterfaceLogic
       m_GrpIRISWindows->w(),m_GrpIRISWindows->h());
     panels[i]->redraw();
     }
+}
+
+void 
+UserInterfaceLogic
+::ApplyAppearanceSettings()
+{
+  // Propagate the settings to the controls 
+  m_ChkOptionsSliceThumbnailOn->value(
+    m_AppearanceSettings->GetFlagDisplayZoomThumbnail() ? 1 : 0);
+  m_ChkOptionsSliceLinkedZoom->value(
+    m_AppearanceSettings->GetFlagLinkedZoomByDefault() ? 1 : 0);
+  m_InOptionsSliceThumbnailPercent->value(
+    m_AppearanceSettings->GetZoomThumbnailSizeInPercent());
+  m_InOptionsSliceThumbnailMaxSize->value(
+    (double) m_AppearanceSettings->GetZoomThumbnailMaximumSize());
+
+  // Cause a refresh
+  RedrawWindows();
+
+  // The slice layout options are pushed
+  ApplySliceLayoutOptions();
 }
 
 void 
@@ -3139,6 +3190,9 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.22  2004/07/22 19:22:49  pauly
+ *ENH: Large image support for SNAP. This includes being able to use more screen real estate to display a slice, a fix to the bug with manual segmentation of images larger than the window size, and a thumbnail used when zooming into the image.
+ *
  *Revision 1.21  2004/07/21 18:17:45  pauly
  *ENH: Enhancements to the way that the slices are displayed
  *

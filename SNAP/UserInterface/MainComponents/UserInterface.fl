@@ -37,7 +37,7 @@ class UserInterface {open : {public UserInterfaceBase}
   } {
     Fl_Window m_WinMain {
       label {SnAP: IRIS}
-      callback {OnMainWindowCloseAction();} open
+      callback {OnMainWindowCloseAction();}
       xywh {647 214 877 710} type Double align 0 resizable
       code0 {\#include "UserInterfaceBase.h"} visible
     } {
@@ -704,7 +704,7 @@ this->OnSNAPLabelOpacityChange();}
             xywh {147 0 365 355} box UP_BOX
           } {
             Fl_Box {m_IRISWindow2D[0]} {
-              label {m_GrpIRISAxial(0)} selected
+              label {m_GrpIRISAxial(0)}
               xywh {152 5 333 320} box BORDER_BOX color 0 labelcolor 7 resizable
               code0 {\#include "IRISSliceWindow.h"}
               class IRISSliceWindow
@@ -1137,18 +1137,18 @@ this->ChangeLabelsCallback();}
       }
     }
     Fl_Window m_WinDisplayOptions {
-      label {Display Options}
-      xywh {178 233 415 372} type Double box PLASTIC_DOWN_BOX align 0 hide
+      label {Display Options} open selected
+      xywh {490 319 415 377} type Double box PLASTIC_DOWN_BOX align 0 non_modal visible
     } {
       Fl_Tabs {} {open
         xywh {10 10 395 320} box PLASTIC_UP_BOX labelsize 12 align 0
       } {
         Fl_Group {} {
-          label {Screen Layout} open
-          xywh {10 32 395 298} labelsize 12
+          label {Screen Layout}
+          xywh {10 32 395 298} labelsize 12 hide
         } {
           Fl_Group {} {
-            label {Configuration of 2D views:} open
+            label {Select 2-d slice arrangement:} open
             xywh {190 85 205 85} box PLASTIC_DOWN_BOX labelsize 12 align 5
           } {
             Fl_Group {} {
@@ -1334,7 +1334,32 @@ RedrawWindows();}
           } {}
         }
         Fl_Group {} {
-          label {3D Rendering} open
+          label {Slice Display}
+          xywh {10 35 395 295} labelsize 12
+        } {
+          Fl_Check_Button m_ChkOptionsSliceThumbnailOn {
+            label {Show thumbnail when the slice does not fit in the window}
+            xywh {20 50 350 25} down_box DOWN_BOX value 1 labelsize 12
+          }
+          Fl_Group {} {open
+            xywh {30 70 355 55} box PLASTIC_DOWN_BOX
+          } {
+            Fl_Value_Input m_InOptionsSliceThumbnailPercent {
+              label {Thumbnail size, relative to slice (%): }
+              xywh {330 75 50 20} labelsize 11 minimum 5 maximum 100 step 5 value 30 textsize 11
+            }
+            Fl_Value_Input m_InOptionsSliceThumbnailMaxSize {
+              label {Maximum thumbnail size (pixels): }
+              xywh {330 100 50 20} labelsize 11 minimum 10 maximum 400 step 10 value 160 textsize 11
+            }
+          }
+          Fl_Check_Button m_ChkOptionsSliceLinkedZoom {
+            label {By default, use the same zoom in all slice views (linked zoom)}
+            xywh {20 135 375 25} down_box DOWN_BOX labelsize 12
+          }
+        }
+        Fl_Group {} {
+          label {3D Rendering}
           xywh {10 32 395 298} labelsize 12 hide
         } {
           Fl_Group {} {

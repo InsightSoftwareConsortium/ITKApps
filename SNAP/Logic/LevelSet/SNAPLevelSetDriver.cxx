@@ -29,15 +29,8 @@
 
 using namespace itk;
 
-// Create an inverting functor
-class InvertFunctor {
-public:
-  unsigned char operator()(unsigned char input) { 
-    return input == 0 ? 1 : 0; 
-  }  
-};
-
-SNAPLevelSetDriver
+template<unsigned int VDimension>
+SNAPLevelSetDriver<VDimension>
 ::SNAPLevelSetDriver(FloatImageType *init, FloatImageType *speed,
                      const SnakeParameters &sparms,
                      VectorImageType *externalAdvection)
@@ -63,8 +56,9 @@ SNAPLevelSetDriver
   DoCreateLevelSetFilter();
 }
 
+template<unsigned int VDimension>
 void 
-SNAPLevelSetDriver
+SNAPLevelSetDriver<VDimension>
 ::AssignParametersToPhi(const SnakeParameters &p, bool irisNotUsed(firstTime))
 {
   // Set up the level set function
@@ -97,8 +91,9 @@ SNAPLevelSetDriver
   m_Parameters = p;
 }
 
+template<unsigned int VDimension>
 void
-SNAPLevelSetDriver
+SNAPLevelSetDriver<VDimension>
 ::DoCreateLevelSetFilter()
 {
   // In this method we have the flexibility to create a level set filter
@@ -180,8 +175,9 @@ SNAPLevelSetDriver
     }
 }
 
+template<unsigned int VDimension>
 void
-SNAPLevelSetDriver
+SNAPLevelSetDriver<VDimension>
 ::RequestRestart()
 { 
   // Makes no sense to call this if not in update cycle
@@ -195,8 +191,9 @@ SNAPLevelSetDriver
   m_CommandAfterUpdate->SetCallbackFunction(this,&SNAPLevelSetDriver::DoRestart);
 }
 
+template<unsigned int VDimension>
 void
-SNAPLevelSetDriver
+SNAPLevelSetDriver<VDimension>
 ::DoRestart()
 {
   // To be on the safe side, just create a new filter (alternative is commented
@@ -211,8 +208,9 @@ SNAPLevelSetDriver
   // m_LevelSetFilter->Modified();
 }
 
+template<unsigned int VDimension>
 void 
-SNAPLevelSetDriver
+SNAPLevelSetDriver<VDimension>
 ::BeginUpdate(Command *pauseCallback)
 {
   // This call may not nest
@@ -253,15 +251,17 @@ SNAPLevelSetDriver
     }
 }
 
+template<unsigned int VDimension>
 bool
-SNAPLevelSetDriver
+SNAPLevelSetDriver<VDimension>
 ::IsInUpdateLoop()
 {
   return ((m_ExtensionView != NULL) && m_ExtensionView->IsUpdating());
 }
 
+template<unsigned int VDimension>
 void 
-SNAPLevelSetDriver
+SNAPLevelSetDriver<VDimension>
 ::RequestEndUpdate()
 {
   // Makes no sense to call this if not in update cycle
@@ -272,8 +272,9 @@ SNAPLevelSetDriver
 }
 
 
+template<unsigned int VDimension>
 void 
-SNAPLevelSetDriver
+SNAPLevelSetDriver<VDimension>
 ::RequestIterations(int nIterations)
 {
   // This method should only be called once the filter is updating, from the
@@ -286,8 +287,9 @@ SNAPLevelSetDriver
   m_ExtensionView->SetIterationsUntilPause(nIterations);
 }
 
-SNAPLevelSetDriver::FloatImageType * 
-SNAPLevelSetDriver
+template<unsigned int VDimension>
+typename SNAPLevelSetDriver<VDimension>::FloatImageType * 
+SNAPLevelSetDriver<VDimension>
 ::GetCurrentState()
 {
   // Fix the spacing of the level set filter's output
@@ -297,8 +299,9 @@ SNAPLevelSetDriver
   return m_LevelSetFilter->GetOutput();
 }
 
+template<unsigned int VDimension>
 void 
-SNAPLevelSetDriver
+SNAPLevelSetDriver<VDimension>
 ::CleanUp()
 {
   // This method should not be called within the pause callback, or else
@@ -312,8 +315,9 @@ SNAPLevelSetDriver
   m_LevelSetFunction = NULL;
 }
 
+template<unsigned int VDimension>
 void
-SNAPLevelSetDriver
+SNAPLevelSetDriver<VDimension>
 ::SetSnakeParameters(const SnakeParameters &sparms)
 {
   // Parameter setting can be destructive or passive.  If the solver has 

@@ -34,6 +34,7 @@ class PreprocessingImageIOWizardLogic;
 class SliceWindowCoordinator;
 class SimpleFileDialogLogic;
 class ResizeRegionDialogLogic;
+class SNAPAppearanceSettings;
 
 //template<class TPixel> class ImageIOWizardLogic;
 //class SegmentationImageIOWizardLogic;
@@ -498,6 +499,9 @@ public:
   /** Get the pointer to the system interface */
   irisGetMacro(SystemInterface,SystemInterface *);
 
+  /** Get the reference to the appearance settings */
+  irisGetMacro(AppearanceSettings, SNAPAppearanceSettings *);
+
   /** Update the user interface after loading a new grey image  */
   void OnGreyImageUpdate();
 
@@ -641,6 +645,7 @@ protected:
   void OnDisplayOptionsApplyAction();
   void ApplyRenderingOptions();
   void ApplySliceLayoutOptions();
+  void ApplyAppearanceSettings();
   void FillRenderingOptions();
   void FillSliceLayoutOptions();
   
@@ -674,6 +679,9 @@ private:
 
   // Pointer to the system interface object
   SystemInterface *m_SystemInterface;
+
+  // Settings related to the cosmetic appearance of the application
+  SNAPAppearanceSettings *m_AppearanceSettings;
 
   // Bubble highlighted in the browser
   int m_HighlightedBubble;
@@ -774,6 +782,9 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.15  2004/07/21 18:17:45  pauly
+ *ENH: Enhancements to the way that the slices are displayed
+ *
  *Revision 1.14  2004/03/19 00:54:48  pauly
  *ENH: Added the ability to externally load the advection image
  *

@@ -228,14 +228,6 @@ SNAPImageData
   return (m_SnakeWrapper != NULL);
 }
 
-// Create an inverting functor
-class InvertFunctor {
-public:
-  unsigned char operator()(unsigned char input) { 
-    return input == 0 ? 1 : 0; 
-  }  
-};
-
 bool
 SNAPImageData
 ::InitializeSegmentationPipeline(
@@ -547,7 +539,7 @@ SNAPImageData
 
   // Initialize the snake driver and pass the parameters
   m_LevelSetDriver = 
-    new SNAPLevelSetDriver(m_SnakeInitializationWrapper->GetImage(),
+    new SNAPLevelSetDriver3d(m_SnakeInitializationWrapper->GetImage(),
                            m_SpeedWrapper->GetImage(),
                            m_CurrentSnakeParameters,
                            m_ExternalAdvectionField);

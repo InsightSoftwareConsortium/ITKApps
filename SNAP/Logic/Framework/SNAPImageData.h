@@ -24,8 +24,9 @@
 #include "EdgePreprocessingSettings.h"
 #include "ThresholdSettings.h"
 
-class SNAPLevelSetDriver;
+template <unsigned int VDimension> class SNAPLevelSetDriver;
 template <class ImageType> class SNAPLevelSetFunction;
+typedef SNAPLevelSetDriver<3> SNAPLevelSetDriver3d;
 
 namespace itk {
   class Command;
@@ -203,7 +204,14 @@ public:
   SNAPLevelSetFunction<SpeedImageWrapper::ImageType> *GetLevelSetFunction();
   
 private:
-  
+
+  /** A functor for inverting an image */
+  class InvertFunctor {
+  public:
+    unsigned char operator()(unsigned char input) 
+      { return input == 0 ? 1 : 0; }
+  };
+
   /** Initialize the driver used to control the snake.  This driver is used to
    * run the snake several iterations at a time, without resetting the filter
    * between iteration blocks.  After executing each block of iterations, the
@@ -247,7 +255,7 @@ private:
   LevelSetImageWrapper *m_SnakeInitializationWrapper;
 
   // Snake driver
-  SNAPLevelSetDriver *m_LevelSetDriver;
+  SNAPLevelSetDriver3d *m_LevelSetDriver;
 
   // Label color used for the snake images
   LabelType m_SnakeColorLabel;

@@ -245,15 +245,11 @@ public:
 
   /** Shortcut ot set the actual bounding box in the ROI from the settings */
   void SetSegmentationROI(const RegionType &roi)
-  {
-    m_SegmentationROISettings.SetROI(roi);
-  }
+    { m_SegmentationROISettings.SetROI(roi); }
 
   /** Shortcut ot get the actual bounding box in the ROI from the settings */
   RegionType GetSegmentationROI()
-  {
-    return m_SegmentationROISettings.GetROI();
-  }
+    { return m_SegmentationROISettings.GetROI(); }
 
 #ifdef DRAWING_LOCK
   int GetDrawingLock( short );
@@ -398,6 +394,9 @@ private:
 
 /*
  *Log: GlobalState.h
+ *Revision 1.7  2004/03/19 00:54:47  pauly
+ *ENH: Added the ability to externally load the advection image
+ *
  *Revision 1.6  2003/12/07 19:48:41  pauly
  *ENH: Resampling, multiresolution
  *

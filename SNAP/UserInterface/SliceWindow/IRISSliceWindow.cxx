@@ -110,20 +110,14 @@ void
 IRISSliceWindow
 ::EnterPolygonMode()
 {
-  // Place the mode on the stack
-  ClearInteractionStack();
-  PushInteractionMode(m_CrosshairsMode);
-  PushInteractionMode(m_PolygonMode);
+  EnterInteractionMode(m_PolygonMode);
 }
 
 void 
 IRISSliceWindow
 ::EnterRegionMode()
 {
-  // This interaction mode works in conjuction with the crosshairs mode
-  ClearInteractionStack();
-  PushInteractionMode(m_CrosshairsMode);
-  PushInteractionMode(m_RegionMode);
+  EnterInteractionMode(m_RegionMode);
 }
 
 bool 

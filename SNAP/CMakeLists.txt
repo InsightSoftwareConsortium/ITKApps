@@ -28,7 +28,6 @@ SET(LOGIC_CXX
   Logic/ImageWrapper/LevelSetImageWrapper.cxx
   Logic/ImageWrapper/SpeedImageWrapper.cxx
   Logic/LevelSet/SnakeParameters.cxx
-  Logic/LevelSet/SNAPLevelSetDriver.cxx
   Logic/Mesh/IRISMeshPipeline.cxx
   Logic/Mesh/LevelSetMeshPipeline.cxx
   Logic/Mesh/MeshObject.cxx
@@ -76,6 +75,7 @@ SET(LOGIC_HEADERS
   Logic/LevelSet/SNAPAdvectionFieldImageFilter.h
   Logic/LevelSet/SNAPAdvectionFieldImageFilter.txx
   Logic/LevelSet/SNAPLevelSetDriver.h
+  Logic/LevelSet/SNAPLevelSetDriver.txx
   Logic/LevelSet/SNAPLevelSetFunction.h
   Logic/LevelSet/SNAPLevelSetFunction.txx
   Logic/LevelSet/SNAPLevelSetStopAndGoFilter.h
@@ -106,6 +106,7 @@ SET(UI_CXX
   UserInterface/BasicComponents/FunctionPlot2D.cxx
   UserInterface/BasicComponents/SnakeParametersPreviewBox.cxx
   UserInterface/BasicComponents/SnakeParametersPreviewPipeline.cxx
+  UserInterface/Common/SNAPAppearanceSettings.cxx
   UserInterface/ImageIOWizard/GreyImageIOWizardLogic.cxx
   UserInterface/ImageIOWizard/PreprocessingImageIOWizardLogic.cxx
   UserInterface/ImageIOWizard/SegmentationImageIOWizardLogic.cxx
@@ -127,6 +128,7 @@ SET(UI_CXX
   UserInterface/SliceWindow/RegionInteractionMode.cxx
   UserInterface/SliceWindow/SNAPSliceWindow.cxx
   UserInterface/SliceWindow/SliceWindowCoordinator.cxx
+  UserInterface/SliceWindow/ThumbnailInteractionMode.cxx
   UserInterface/SliceWindow/ZoomPanInteractionMode.cxx
   UserInterface/Window3D/Trackball.cxx
   UserInterface/Window3D/Window3D.cxx
@@ -142,6 +144,7 @@ SET(UI_HEADERS
   UserInterface/BasicComponents/SnakeParametersPreviewBox.h
   UserInterface/BasicComponents/SnakeParametersPreviewPipeline.h
   UserInterface/Common/SNAPCommonUI.h
+  UserInterface/Common/SNAPAppearanceSettings.h  
   UserInterface/ImageIOWizard/GreyImageIOWizardLogic.h
   UserInterface/ImageIOWizard/ImageIOWizardBase.h
   UserInterface/ImageIOWizard/ImageIOWizardLogic.h
@@ -178,6 +181,7 @@ SET(UI_HEADERS
   UserInterface/SliceWindow/RegionInteractionMode.h
   UserInterface/SliceWindow/SNAPSliceWindow.h
   UserInterface/SliceWindow/SliceWindowCoordinator.h
+  UserInterface/SliceWindow/ThumbnailInteractionMode.h
   UserInterface/SliceWindow/ZoomPanInteractionMode.h
   UserInterface/Window3D/Trackball.h
   UserInterface/Window3D/Window3D.h

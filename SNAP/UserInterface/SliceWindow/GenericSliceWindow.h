@@ -29,6 +29,7 @@ class UserInterfaceLogic;
 // Forward references to interaction modes that work with this window
 class CrosshairsInteractionMode;
 class ZoomPanInteractionMode;
+class ThumbnailInteractionMode;
 
 // Forward reference to Gl texture object
 template <class TPixel> class OpenGLSliceTexture;
@@ -157,6 +158,7 @@ public:
   friend class ZoomPanInteractionMode;
   friend class RegionInteractionMode;
   friend class PolygonInteractionMode;
+  friend class ThumbnailInteractionMode;
 
 protected:
 
@@ -177,6 +179,10 @@ protected:
 
   /** Interaction mode used to zoom and pan the image */
   ZoomPanInteractionMode *m_ZoomPanMode;
+
+  /** Interaction mode used to control the zoom thumbnail. This mode is always
+   * on and at the top of the interaction stack */
+  ThumbnailInteractionMode *m_ThumbnailMode;
 
   /** Whether or not we have been registered with the parent UI */
   bool m_IsRegistered;
@@ -248,6 +254,15 @@ protected:
   // Label texture object
   LabelTextureType *m_LabelTexture;
 
+  // Check whether the thumbnail should be draw or not
+  bool IsThumbnailOn();
+
+  // The position and size of the zoom thumbnail
+  Vector2i m_ThumbnailPosition, m_ThumbnailSize;
+
+  // The zoom level in the thumbnail
+  double m_ThumbnailZoom;
+
   // Computes the zoom that gives the best fit for the window
   void ComputeOptimalZoom();
   
@@ -269,6 +284,9 @@ protected:
 
   /** Access the next window in the slice pipeline */
   GenericSliceWindow *GetNextSliceWindow();
+
+  /** Activate a given interaction mode */
+  virtual void EnterInteractionMode(InteractionMode *mode);
 };
 
 #endif // __GenericSliceWindow_h_

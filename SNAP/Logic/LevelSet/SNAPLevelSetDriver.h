@@ -29,6 +29,41 @@ namespace itk {
   template <class TOwner> class MemberCommand;
   class Command;
 };
+
+/** 
+ * \class SNAPLevelSetDriverBase
+ * \brief An abstract interface that allows code to be written independently of
+ * the dimensionality of the level set filter. For documentation of the methods,
+ * see SNAPLevelSetDriver.
+ */
+class SNAPLevelSetDriverBase
+{
+public:
+  /** Set snake parameters */
+  virtual void SetSnakeParameters(const SnakeParameters &parms) = 0;
+
+  /** Tell the update loop to execute.  Halts until the execution has ended */
+  virtual void BeginUpdate(itk::Command *pauseCallback) = 0;
+
+  /** Request the update loop to end execution */
+  virtual void RequestEndUpdate() = 0;
+
+  /** Check whether the driver is currently withing the update loop */
+  virtual bool IsInUpdateLoop() = 0;
+  
+  /** This method will run the evolution for N iterations.  Afterwards, it
+   * will call the pauseCallback command repeatedly (unless the command is
+   * NULL, in which case, it will return to caller).  The callback is provided
+   * so that the filter may be updated in stages, with user interation.  You 
+   * may call Run repeatedly from the callback or call Restart or CleanUp */
+  virtual void RequestIterations(int nIterations) = 0;
+
+  /** Restart the snake */
+  virtual void RequestRestart() = 0;
+
+  /** Clean up the snake's state */
+  virtual void CleanUp() = 0;
+};
  
 /**
  * \class SNAPLevelSetDriver
@@ -40,16 +75,17 @@ namespace itk {
  * modularity.  As far as SNAP cares, the public methods declared in this class are
  * the only ways to control level set evolution.
  */
-class SNAPLevelSetDriver
+template <unsigned int VDimension> 
+class SNAPLevelSetDriver : public SNAPLevelSetDriverBase
 {
 public:
   /** Floating point image type used internally */
-  typedef itk::Image<float,3> FloatImageType;
-  typedef itk::SmartPointer<FloatImageType> FloatImagePointer;
+  typedef itk::Image<float, VDimension> FloatImageType;
+  typedef typename itk::SmartPointer<FloatImageType> FloatImagePointer;
 
   /** Type definition for the level set function */
   typedef SNAPLevelSetFunction<FloatImageType> LevelSetFunctionType;
-  typedef LevelSetFunctionType::VectorImageType VectorImageType;
+  typedef typename LevelSetFunctionType::VectorImageType VectorImageType;
 
   /** Initialize the level set driver.  Note that the type of snake (in/out
    * or edge) is determined entirely by the speed image and by the values
@@ -97,18 +133,24 @@ public:
   void CleanUp();
   
 private:
+  /** An internal class used to invert an image */
+  class InvertFunctor {
+  public:
+    unsigned char operator()(unsigned char input) 
+      { return input == 0 ? 1 : 0; }  
+  };
 
   /** Type definition for the level set filter */
   typedef itk::ImageToImageFilter<FloatImageType,FloatImageType> FilterType;
 
   /** Level set filter wrapped by this object */
-  FilterType::Pointer m_LevelSetFilter;
+  typename FilterType::Pointer m_LevelSetFilter;
 
   /** A pointer to the filter, but veiwed as a level set extension interface */
   LevelSetExtensionFilterInterface *m_ExtensionView;
 
   /** Level set function used by the level set filter */
-  LevelSetFunctionType::Pointer m_LevelSetFunction;
+  typename LevelSetFunctionType::Pointer m_LevelSetFunction;
 
   /** An initialization image */
   FloatImagePointer m_InitializationImage;
@@ -134,5 +176,13 @@ private:
   void DoRestart();
   void DoCreateLevelSetFilter();
 };
+
+// Type definitions
+typedef SNAPLevelSetDriver<3> SNAPLevelSetDriver3d;
+typedef SNAPLevelSetDriver<2> SNAPLevelSetDriver2d;
+
+#ifndef ITK_MANUAL_INSTANTIATION
+#include "SNAPLevelSetDriver.txx"
+#endif
 
 #endif // __SNAPLevelSetDriver_h_
