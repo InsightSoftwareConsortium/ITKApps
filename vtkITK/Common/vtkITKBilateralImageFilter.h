@@ -38,7 +38,7 @@ class VTK_EXPORT vtkITKBilateralImageFilter : public vtkITKImageToImageFilterFF
 
 protected:
   //BTX
-  typedef itk::BilateralImageFilter<Superclass::InputImageType,Superclass::InputImageType> ImageFilterType;
+  typedef itk::BilateralImageFilter<Superclass::InputImageType,Superclass::OutputImageType> ImageFilterType;
   vtkITKBilateralImageFilter() : Superclass ( ImageFilterType::New() ){};
   ~vtkITKBilateralImageFilter() {};
   ImageFilterType* GetImageFilterPointer() { return dynamic_cast<ImageFilterType*> ( m_Filter.GetPointer() ); }
@@ -50,7 +50,7 @@ private:
   void operator=(const vtkITKBilateralImageFilter&);  // Not implemented.
 };
 
-vtkCxxRevisionMacro(vtkITKBilateralImageFilter, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(vtkITKBilateralImageFilter, "$Revision: 1.3 $");
 vtkStandardNewMacro(vtkITKBilateralImageFilter);
 
 #endif

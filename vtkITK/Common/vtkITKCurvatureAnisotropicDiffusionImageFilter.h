@@ -57,7 +57,7 @@ class VTK_EXPORT vtkITKCurvatureAnisotropicDiffusionImageFilter : public vtkITKI
 
 protected:
   //BTX
-  typedef itk::CurvatureAnisotropicDiffusionImageFilter<Superclass::InputImageType,Superclass::InputImageType> ImageFilterType;
+  typedef itk::CurvatureAnisotropicDiffusionImageFilter<Superclass::InputImageType,Superclass::OutputImageType> ImageFilterType;
   vtkITKCurvatureAnisotropicDiffusionImageFilter() : Superclass ( ImageFilterType::New() ){};
   ~vtkITKCurvatureAnisotropicDiffusionImageFilter() {};
   ImageFilterType* GetImageFilterPointer() { return dynamic_cast<ImageFilterType*> ( m_Filter.GetPointer() ); }
@@ -69,7 +69,7 @@ private:
   void operator=(const vtkITKCurvatureAnisotropicDiffusionImageFilter&);  // Not implemented.
 };
 
-vtkCxxRevisionMacro(vtkITKCurvatureAnisotropicDiffusionImageFilter, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkITKCurvatureAnisotropicDiffusionImageFilter, "$Revision: 1.4 $");
 vtkStandardNewMacro(vtkITKCurvatureAnisotropicDiffusionImageFilter);
 
 #endif

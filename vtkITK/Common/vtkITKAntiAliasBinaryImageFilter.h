@@ -52,7 +52,7 @@ class VTK_EXPORT vtkITKAntiAliasBinaryImageFilter : public vtkITKImageToImageFil
 
 protected:
   //BTX
-  typedef itk::AntiAliasBinaryImageFilter<Superclass::InputImageType,Superclass::InputImageType> ImageFilterType;
+  typedef itk::AntiAliasBinaryImageFilter<Superclass::InputImageType,Superclass::OutputImageType> ImageFilterType;
   vtkITKAntiAliasBinaryImageFilter() : Superclass ( ImageFilterType::New() ){};
   ~vtkITKAntiAliasBinaryImageFilter() {};
   ImageFilterType* GetImageFilterPointer() { return dynamic_cast<ImageFilterType*> ( m_Filter.GetPointer() ); }
@@ -64,7 +64,7 @@ private:
   void operator=(const vtkITKAntiAliasBinaryImageFilter&);  // Not implemented.
 };
 
-vtkCxxRevisionMacro(vtkITKAntiAliasBinaryImageFilter, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(vtkITKAntiAliasBinaryImageFilter, "$Revision: 1.3 $");
 vtkStandardNewMacro(vtkITKAntiAliasBinaryImageFilter);
 
 #endif

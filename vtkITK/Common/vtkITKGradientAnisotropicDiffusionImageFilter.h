@@ -57,7 +57,7 @@ class VTK_EXPORT vtkITKGradientAnisotropicDiffusionImageFilter : public vtkITKIm
 
 protected:
   //BTX
-  typedef itk::GradientAnisotropicDiffusionImageFilter<Superclass::InputImageType,Superclass::InputImageType> ImageFilterType;
+  typedef itk::GradientAnisotropicDiffusionImageFilter<Superclass::InputImageType,Superclass::OutputImageType> ImageFilterType;
   vtkITKGradientAnisotropicDiffusionImageFilter() : Superclass ( ImageFilterType::New() ){};
   ~vtkITKGradientAnisotropicDiffusionImageFilter() {};
   ImageFilterType* GetImageFilterPointer() { return dynamic_cast<ImageFilterType*> ( m_Filter.GetPointer() ); }
@@ -69,7 +69,7 @@ private:
   void operator=(const vtkITKGradientAnisotropicDiffusionImageFilter&);  // Not implemented.
 };
 
-vtkCxxRevisionMacro(vtkITKGradientAnisotropicDiffusionImageFilter, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkITKGradientAnisotropicDiffusionImageFilter, "$Revision: 1.4 $");
 vtkStandardNewMacro(vtkITKGradientAnisotropicDiffusionImageFilter);
 
 #endif

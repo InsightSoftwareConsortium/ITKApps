@@ -49,7 +49,7 @@ class VTK_EXPORT vtkITKDiscreteGaussianImageFilter : public vtkITKImageToImageFi
 
 protected:
   //BTX
-  typedef itk::DiscreteGaussianImageFilter<Superclass::InputImageType,Superclass::InputImageType> ImageFilterType;
+  typedef itk::DiscreteGaussianImageFilter<Superclass::InputImageType,Superclass::OutputImageType> ImageFilterType;
   vtkITKDiscreteGaussianImageFilter() : Superclass ( ImageFilterType::New() ){};
   ~vtkITKDiscreteGaussianImageFilter() {};
   ImageFilterType* GetImageFilterPointer() { return dynamic_cast<ImageFilterType*> ( m_Filter.GetPointer() ); }
@@ -61,7 +61,7 @@ private:
   void operator=(const vtkITKDiscreteGaussianImageFilter&);  // Not implemented.
 };
 
-vtkCxxRevisionMacro(vtkITKDiscreteGaussianImageFilter, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkITKDiscreteGaussianImageFilter, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkITKDiscreteGaussianImageFilter);
 
 #endif

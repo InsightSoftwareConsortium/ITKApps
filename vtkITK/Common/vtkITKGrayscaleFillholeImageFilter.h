@@ -27,7 +27,7 @@ class VTK_EXPORT vtkITKGrayscaleFillholeImageFilter : public vtkITKImageToImageF
 
 protected:
   //BTX
-  typedef itk::GrayscaleFillholeImageFilter<Superclass::InputImageType,Superclass::InputImageType> ImageFilterType;
+  typedef itk::GrayscaleFillholeImageFilter<Superclass::InputImageType,Superclass::OutputImageType> ImageFilterType;
   vtkITKGrayscaleFillholeImageFilter() : Superclass ( ImageFilterType::New() ){};
   ~vtkITKGrayscaleFillholeImageFilter() {};
   ImageFilterType* GetImageFilterPointer() { return dynamic_cast<ImageFilterType*> ( m_Filter.GetPointer() ); }
@@ -39,7 +39,7 @@ private:
   void operator=(const vtkITKGrayscaleFillholeImageFilter&);  // Not implemented.
 };
 
-vtkCxxRevisionMacro(vtkITKGrayscaleFillholeImageFilter, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkITKGrayscaleFillholeImageFilter, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkITKGrayscaleFillholeImageFilter);
 
 #endif

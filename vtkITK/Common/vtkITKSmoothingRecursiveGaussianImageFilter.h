@@ -37,7 +37,7 @@ class VTK_EXPORT vtkITKSmoothingRecursiveGaussianImageFilter : public vtkITKImag
 
 protected:
   //BTX
-  typedef itk::SmoothingRecursiveGaussianImageFilter<Superclass::InputImageType,Superclass::InputImageType> ImageFilterType;
+  typedef itk::SmoothingRecursiveGaussianImageFilter<Superclass::InputImageType,Superclass::OutputImageType> ImageFilterType;
   vtkITKSmoothingRecursiveGaussianImageFilter() : Superclass ( ImageFilterType::New() ){};
   ~vtkITKSmoothingRecursiveGaussianImageFilter() {};
   ImageFilterType* GetImageFilterPointer() { return dynamic_cast<ImageFilterType*> ( m_Filter.GetPointer() ); }
@@ -49,7 +49,7 @@ private:
   void operator=(const vtkITKSmoothingRecursiveGaussianImageFilter&);  // Not implemented.
 };
 
-vtkCxxRevisionMacro(vtkITKSmoothingRecursiveGaussianImageFilter, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkITKSmoothingRecursiveGaussianImageFilter, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkITKSmoothingRecursiveGaussianImageFilter);
 
 #endif

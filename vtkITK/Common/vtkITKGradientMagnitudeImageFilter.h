@@ -27,7 +27,7 @@ class VTK_EXPORT vtkITKGradientMagnitudeImageFilter : public vtkITKImageToImageF
 
 protected:
   //BTX
-  typedef itk::GradientMagnitudeImageFilter<Superclass::InputImageType,Superclass::InputImageType> ImageFilterType;
+  typedef itk::GradientMagnitudeImageFilter<Superclass::InputImageType,Superclass::OutputImageType> ImageFilterType;
   vtkITKGradientMagnitudeImageFilter() : Superclass ( ImageFilterType::New() ){};
   ~vtkITKGradientMagnitudeImageFilter() {};
   ImageFilterType* GetImageFilterPointer() { return dynamic_cast<ImageFilterType*> ( m_Filter.GetPointer() ); }
@@ -39,7 +39,7 @@ private:
   void operator=(const vtkITKGradientMagnitudeImageFilter&);  // Not implemented.
 };
 
-vtkCxxRevisionMacro(vtkITKGradientMagnitudeImageFilter, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkITKGradientMagnitudeImageFilter, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkITKGradientMagnitudeImageFilter);
 
 #endif

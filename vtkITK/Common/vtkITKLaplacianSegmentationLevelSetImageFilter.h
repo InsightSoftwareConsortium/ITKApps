@@ -107,7 +107,7 @@ class VTK_EXPORT vtkITKLaplacianSegmentationLevelSetImageFilter : public vtkITKI
     
 protected:
   //BTX
-  typedef itk::LaplacianSegmentationLevelSetImageFilter<Superclass::InputImageType,Superclass::InputImageType> ImageFilterType;
+  typedef itk::LaplacianSegmentationLevelSetImageFilter<Superclass::InputImageType,Superclass::OutputImageType> ImageFilterType;
   typedef itk::VTKImageImport<InputImageType> FeatureImageImportType;
   typedef itk::VTKImageExport<InputImageType> SpeedImageExportType;
   
@@ -139,7 +139,7 @@ private:
   
 };
 
-vtkCxxRevisionMacro(vtkITKLaplacianSegmentationLevelSetImageFilter, "$Revision: 1.6 $");
+vtkCxxRevisionMacro(vtkITKLaplacianSegmentationLevelSetImageFilter, "$Revision: 1.7 $");
 vtkStandardNewMacro(vtkITKLaplacianSegmentationLevelSetImageFilter);
 
 #endif

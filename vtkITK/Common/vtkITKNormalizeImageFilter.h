@@ -27,7 +27,7 @@ class VTK_EXPORT vtkITKNormalizeImageFilter : public vtkITKImageToImageFilterFF
 
 protected:
   //BTX
-  typedef itk::NormalizeImageFilter<Superclass::InputImageType,Superclass::InputImageType> ImageFilterType;
+  typedef itk::NormalizeImageFilter<Superclass::InputImageType,Superclass::OutputImageType> ImageFilterType;
   vtkITKNormalizeImageFilter() : Superclass ( ImageFilterType::New() ){};
   ~vtkITKNormalizeImageFilter() {};
 
@@ -38,7 +38,7 @@ private:
   void operator=(const vtkITKNormalizeImageFilter&);  // Not implemented.
 };
 
-vtkCxxRevisionMacro(vtkITKNormalizeImageFilter, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkITKNormalizeImageFilter, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkITKNormalizeImageFilter);
 
 #endif
