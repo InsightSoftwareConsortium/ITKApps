@@ -93,11 +93,11 @@ void
 ImageWrapper<TPixel>
 ::PrintDebugInformation() 
 {
-  cout << "=== Image Properties ===" << endl;
-  cout << "   Dimensions         : " << m_Image->GetLargestPossibleRegion().GetSize() << endl;
-  cout << "   Origin             : " << m_Image->GetOrigin() << endl;
-  cout << "   Spacing            : " << m_Image->GetSpacing() << endl;
-  cout << "------------------------" << endl;
+  std::cout << "=== Image Properties ===" << std::endl;
+  std::cout << "   Dimensions         : " << m_Image->GetLargestPossibleRegion().GetSize() << std::endl;
+  std::cout << "   Origin             : " << m_Image->GetOrigin() << std::endl;
+  std::cout << "   Spacing            : " << m_Image->GetSpacing() << std::endl;
+  std::cout << "------------------------" << std::endl;
 }
 
 template <class TPixel>
@@ -387,8 +387,8 @@ ImageWrapper<TPixel>
     m_MinMaxCalc->Modified();
     m_ImageScaleFactor = 1.0 / (m_MinMaxCalc->GetMaximum() - m_MinMaxCalc->GetMinimum());
 
-    verbose << "Computing intensity range:" << endl;
-    verbose << "   " << m_MinMaxCalc->GetMinimum() << " to " << m_MinMaxCalc->GetMaximum() << endl;
+    verbose << "Computing intensity range:" << std::endl;
+    verbose << "   " << m_MinMaxCalc->GetMinimum() << " to " << m_MinMaxCalc->GetMaximum() << std::endl;
     }
 }
 

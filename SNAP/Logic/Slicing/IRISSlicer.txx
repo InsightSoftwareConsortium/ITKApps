@@ -17,10 +17,10 @@ IRISSlicer<TPixel>
 ::IRISSlicer()
 {
   // There is a single input to the filter
-  SetNumberOfRequiredInputs(1);
+  this->SetNumberOfRequiredInputs(1);
 
   // There are three outputs from the filter
-  SetNumberOfRequiredOutputs(1);
+  this->SetNumberOfRequiredOutputs(1);
 
   // Initialize the slice to be along the z-direction in the image
   m_SliceDirectionImageAxis = 2;
@@ -39,8 +39,8 @@ void IRISSlicer<TPixel>
 ::GenerateOutputInformation()
 {
   // Get pointers to the inputs and outputs
-  typename Superclass::InputImageConstPointer inputPtr = GetInput();
-  typename Superclass::OutputImagePointer outputPtr = GetOutput();
+  typename Superclass::InputImageConstPointer inputPtr = this->GetInput();
+  typename Superclass::OutputImagePointer outputPtr = this->GetOutput();
   
   // The inputs and outputs should exist
   if (!outputPtr || !inputPtr) return;
@@ -105,7 +105,7 @@ void IRISSlicer<TPixel>
     // output
     destRegion.SetIndex(
       m_PixelDirectionImageAxis,
-      GetInput()->GetLargestPossibleRegion().GetSize(m_PixelDirectionImageAxis)
+      this->GetInput()->GetLargestPossibleRegion().GetSize(m_PixelDirectionImageAxis)
       - (srcRegion.GetIndex(0) + srcRegion.GetSize(0)));
     }
 
@@ -118,7 +118,7 @@ void IRISSlicer<TPixel>
     {    
     destRegion.SetIndex(
       m_LineDirectionImageAxis,
-      GetInput()->GetLargestPossibleRegion().GetSize(m_LineDirectionImageAxis)
+      this->GetInput()->GetLargestPossibleRegion().GetSize(m_LineDirectionImageAxis)
       - (srcRegion.GetIndex(1) + srcRegion.GetSize(1)));
     }
 }
@@ -128,11 +128,11 @@ void IRISSlicer<TPixel>
 ::GenerateData()
 {
   // Here's the input and output
-  InputImagePointer  inputPtr = GetInput();
-  OutputImagePointer  outputPtr = GetOutput();
+  InputImagePointer  inputPtr = this->GetInput();
+  OutputImagePointer  outputPtr = this->GetOutput();
   
   // Allocate (why is this necessary?)
-  AllocateOutputs();
+  this->AllocateOutputs();
 
   // Compute the region in the image for which the slice is being extracted
   InputImageRegionType inputRegion = inputPtr->GetRequestedRegion();
@@ -276,7 +276,6 @@ void IRISSlicer<TPixel>
 {  
   // Create an simple iterator for the slice
   SimpleOutputIteratorType itSlice(outputPtr,outputPtr->GetRequestedRegion());
-
   // Position both iterators at the beginning
   itSlice.GoToReverseBegin();
   itImage.GoToBegin();

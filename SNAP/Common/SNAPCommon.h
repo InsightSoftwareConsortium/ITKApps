@@ -22,10 +22,6 @@
 #include <assert.h>
 #include <iostream>
 
-// Make standard streams available to all
-using std::cout;
-using std::cerr;
-using std::endl;
 
 // Specify a standard stream for verbose messages
 extern std::ostream &verbose;

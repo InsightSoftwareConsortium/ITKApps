@@ -91,15 +91,15 @@ SNAPLevelSetFunction<TImageType>
   };
 
   // What equation are we solving?
-  cout << "Solving Equation :  = " << endl;
-  cout << "  P-W = " << GetPropagationWeight() << endl;
-  cout << "  P-E = " << GetPropagationSpeedExponent() << endl;
-  cout << "  C-W = " << GetCurvatureWeight() << endl;
-  cout << "  C-E = " << GetCurvatureSpeedExponent() << endl;
-  cout << "  A-W = " << GetAdvectionWeight() << endl;
-  cout << "  A-E = " << GetAdvectionSpeedExponent() << endl;
-  cout << "  L-W = " << GetLaplacianSmoothingWeight() << endl;
-  cout << "  L-E = " << GetLaplacianSmoothingSpeedExponent() << endl;
+  std::cout << "Solving Equation :  = " << std::endl;
+  std::cout << "  P-W = " << this->GetPropagationWeight() << std::endl;
+  std::cout << "  P-E = " << this->GetPropagationSpeedExponent() << std::endl;
+  std::cout << "  C-W = " << this->GetCurvatureWeight() << std::endl;
+  std::cout << "  C-E = " << this->GetCurvatureSpeedExponent() << std::endl;
+  std::cout << "  A-W = " << this->GetAdvectionWeight() << std::endl;
+  std::cout << "  A-E = " << this->GetAdvectionSpeedExponent() << std::endl;
+  std::cout << "  L-W = " << this->GetLaplacianSmoothingWeight() << std::endl;
+  std::cout << "  L-E = " << this->GetLaplacianSmoothingSpeedExponent() << std::endl;
 
   // Create an image for each of these powers, if needed
   for(unsigned int iPower=0; iPower < 4; iPower++)

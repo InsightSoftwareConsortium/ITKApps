@@ -28,8 +28,8 @@ SNAPAdvectionFieldImageFilter<TInputImage,TOutputValueType>
 ::GenerateData()
 {
   // Get the input and output pointers
-  typename InputImageType::ConstPointer imgInput = GetInput();
-  typename OutputImageType::Pointer imgOutput = GetOutput();
+  typename InputImageType::ConstPointer imgInput = this->GetInput();
+  typename OutputImageType::Pointer imgOutput = this->GetOutput();
 
   // Allocate the output image
   imgOutput->SetBufferedRegion(imgOutput->GetRequestedRegion());

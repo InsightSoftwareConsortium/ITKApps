@@ -846,7 +846,7 @@ static void vtkPatchedImageReaderUpdate2(vtkPatchedImageReader *self, vtkImageDa
       // if that happens, store the value in correction and apply later
       if (filePos + streamSkip0 >= 0)
         {
-        self->GetFile()->seekg(self->GetFile()->tellg() + streamSkip0, ios::beg);
+        self->GetFile()->seekg(static_cast<long>(self->GetFile()->tellg()) + streamSkip0, ios::beg);
         correction = 0;
         }
       else
@@ -856,7 +856,7 @@ static void vtkPatchedImageReaderUpdate2(vtkPatchedImageReader *self, vtkImageDa
       outPtr1 += outIncr[1];
       }
     // move to the next image in the file and data
-    self->GetFile()->seekg(self->GetFile()->tellg() + streamSkip1 + correction, 
+    self->GetFile()->seekg(static_cast<long>(self->GetFile()->tellg()) + streamSkip1 + correction, 
                       ios::beg);
     outPtr2 += outIncr[2];
     }

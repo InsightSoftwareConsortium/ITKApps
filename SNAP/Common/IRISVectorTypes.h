@@ -65,7 +65,7 @@ public:
     Self y;
     for(unsigned int i=0;i<VSize;i++)
     {
-      T a = get(i), l = lower(i), u = upper(i);
+      T a = this->get(i), l = lower(i), u = upper(i);
       assert(l <= u);      
       y(i) = a < l ? l : (a > u ? u : a);
     }

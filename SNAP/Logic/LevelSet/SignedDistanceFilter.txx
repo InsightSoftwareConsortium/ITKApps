@@ -57,8 +57,8 @@ SignedDistanceFilter<TInputImage,TOutputImage>
 ::GenerateData()
 {
   // Get the input and output pointers
-  const typename InputImageType::ConstPointer inputImage = GetInput();
-  typename OutputImageType::Pointer outputImage = GetOutput();
+  const typename InputImageType::ConstPointer inputImage = this->GetInput();
+  typename OutputImageType::Pointer outputImage = this->GetOutput();
 
   // Initialize the progress counter
   m_ProgressAccumulator->ResetProgress();

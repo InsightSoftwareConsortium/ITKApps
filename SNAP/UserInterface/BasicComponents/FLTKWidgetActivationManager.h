@@ -210,7 +210,7 @@ private:
     virtual void OnStateChange(bool newState)
       {
       GenericWidgetWrapper<TWidget,TFlag>::OnStateChange(newState);
-      m_Widget->value( newState ? m_OnValue : m_OffValue );
+      this->m_Widget->value( newState ? m_OnValue : m_OffValue );
       }
 
     // Constructor

@@ -49,8 +49,8 @@ TestCompareLevelSets
   Superclass::PrintUsage();
 
   // RAI may be passed to this test
-  cout << "  config FILE : Set configuration registry file (required)" << endl;
-  cout << "  generate : Instead of running the test, generate a sample config" << endl;
+  std::cout << "  config FILE : Set configuration registry file (required)" << std::endl;
+  std::cout << "  generate : Instead of running the test, generate a sample config" << std::endl;
 }
 
 template <class TFilter>
@@ -376,7 +376,7 @@ public:
 
     // Write data
     m_Out << m_Iteration << "\t" << delta << 
-      /* "\t" << CountInterfaceVoxels() << */ endl;
+      /* "\t" << CountInterfaceVoxels() << */ std::endl;
   }
 
   unsigned long CountInterfaceVoxels()
@@ -442,8 +442,8 @@ TestCompareLevelSets
   }
   catch(Registry::IOException &exc)
   {
-    cerr << "Error: " << exc << endl;
-    cerr << "Hint: Try generating a config file using 'generate' option!" << endl;
+    std::cerr << "Error: " << exc << std::endl;
+    std::cerr << "Hint: Try generating a config file using 'generate' option!" << std::endl;
     throw new TestUsageException;
   }
 
@@ -581,31 +581,31 @@ TestCompareLevelSets
   InteriorFilter::Pointer fltInterior = InteriorFilter::New();
 
   // Run and save the three filters
-  fout << "Running the Narrow filter!" << endl;
+  fout << "Running the Narrow filter!" << std::endl;
   fltNarrow->Update();
 
-  fout << "Running the Sparse filter!" << endl;
+  fout << "Running the Sparse filter!" << std::endl;
   fltSparse->Update();
 
-  fout << "Running the Parallel filter!" << endl;
+  fout << "Running the Parallel filter!" << std::endl;
   fltParallel->Update();
   
-  // fout << "Running the Dense filter!" << endl;
+  // fout << "Running the Dense filter!" << std::endl;
   // fltDense->Update();
 
   // Compute the difference between filter outputs
   fout << "Narrow-Sparse\t" << 
-    ComputeOverlapDistance(fltNarrow->GetOutput(),fltSparse->GetOutput()) << endl;
+    ComputeOverlapDistance(fltNarrow->GetOutput(),fltSparse->GetOutput()) << std::endl;
   fout << "Narrow-Dense\t" << 
-    ComputeOverlapDistance(fltNarrow->GetOutput(),fltDense->GetOutput()) << endl;
+    ComputeOverlapDistance(fltNarrow->GetOutput(),fltDense->GetOutput()) << std::endl;
   fout << "Narrow-Parallel\t" << 
-    ComputeOverlapDistance(fltNarrow->GetOutput(),fltParallel->GetOutput()) << endl;
+    ComputeOverlapDistance(fltNarrow->GetOutput(),fltParallel->GetOutput()) << std::endl;
   fout << "Sparse-Dense\t" << 
-    ComputeOverlapDistance(fltSparse->GetOutput(),fltDense->GetOutput()) << endl;
+    ComputeOverlapDistance(fltSparse->GetOutput(),fltDense->GetOutput()) << std::endl;
   fout << "Sparse-Parallel\t" << 
-    ComputeOverlapDistance(fltSparse->GetOutput(),fltParallel->GetOutput()) << endl;
+    ComputeOverlapDistance(fltSparse->GetOutput(),fltParallel->GetOutput()) << std::endl;
   fout << "Dense-Parallel\t" << 
-    ComputeOverlapDistance(fltDense->GetOutput(),fltParallel->GetOutput()) << endl;
+    ComputeOverlapDistance(fltDense->GetOutput(),fltParallel->GetOutput()) << std::endl;
   
   // Write each result to a file
   fltInterior->SetInput(fltNarrow->GetOutput());
@@ -707,8 +707,8 @@ TestCompareLevelSets
   }
   catch(Registry::IOException &exc)
   {
-    cerr << "Error: " << exc << endl;
-    cerr << "Hint: Try generating a config file using 'generate' option!" << endl;
+    std::cerr << "Error: " << exc << std::endl;
+    std::cerr << "Hint: Try generating a config file using 'generate' option!" << std::endl;
     throw new TestUsageException;
   }
 
@@ -823,19 +823,19 @@ TestCompareLevelSets
   InteriorFilter::Pointer fltInterior = InteriorFilter::New();
 
   // Run and save the narrow filter
-  cout << "Running the Narrow filter!" << endl;
+  std::cout << "Running the Narrow filter!" << std::endl;
   //fltInterior->SetInput(fltNarrow->GetOutput());
   //fltInterior->Update();
   //SaveImageToFile("CompareLevelSets.narrow.gipl",fltInterior->GetOutput());
   
   // Run and save the dense filter
-  cout << "Running the Dense filter!" << endl;
+  std::cout << "Running the Dense filter!" << std::endl;
   //fltInterior->SetInput(fltDense->GetOutput());
   //fltInterior->Update();
   //SaveImageToFile("CompareLevelSets.dense.gipl",fltInterior->GetOutput());
 
   // Run and save the sparse filter
-  cout << "Running the Sparse filter!" << endl;
+  std::cout << "Running the Sparse filter!" << std::endl;
   fltInterior->SetInput(fltSparse->GetOutput());
   fltInterior->Update();
   SaveImageToFile("CompareLevelSets.sparse.gipl",fltInterior->GetOutput());

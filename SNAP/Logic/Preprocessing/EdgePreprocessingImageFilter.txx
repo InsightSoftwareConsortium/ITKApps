@@ -21,7 +21,7 @@ EdgePreprocessingImageFilter<TInputImage,TOutputImage>
   // Construct the adaptor
   m_CastFilter = CastFilterType::New();
   m_CastFilter->ReleaseDataFlagOn();
-  m_CastFilter->SetInput(GetInput()); 
+  m_CastFilter->SetInput(this->GetInput()); 
   
   // Construct the Gaussian filter
   m_GaussianFilter = GaussianFilterType::New();
@@ -64,8 +64,8 @@ EdgePreprocessingImageFilter<TInputImage,TOutputImage>
 ::GenerateData()
 {
   // Get the input and output pointers
-  const typename InputImageType::ConstPointer inputImage = GetInput();
-  typename OutputImageType::Pointer outputImage = GetOutput();
+  const typename InputImageType::ConstPointer inputImage = this->GetInput();
+  typename OutputImageType::Pointer outputImage = this->GetOutput();
 
   // Initialize the progress counter
   m_ProgressAccumulator->ResetProgress();
@@ -118,7 +118,7 @@ EdgePreprocessingImageFilter<TInputImage,TOutputImage>
   if(!(settings == m_EdgePreprocessingSettings))
     {
     m_EdgePreprocessingSettings = settings;    
-    Modified();
+    this->Modified();
     }
 }
 

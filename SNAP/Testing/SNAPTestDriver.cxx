@@ -32,18 +32,18 @@ void
 SNAPTestDriver
 ::PrintUsage()
 {
-  cerr << "SNAP Test Driver Usage:" << endl;
-  cerr << "  SNAPTest list" << endl;
-  cerr << "or " << endl;
-  cerr << "  SNAPTest help NAME " << endl;
-  cerr << "or " << endl;
-  cerr << "  SNAPTest test NAME [type TYPE] [options]" << endl;
-  cerr << "Commands :" << endl;
-  cerr << "  list                List all known tests" << endl;
-  cerr << "  help NAME           Provide help on test 'NAME'" << endl;
-  cerr << "  test NAME           Run test 'NAME'" << endl;
-  cerr << "  type TYPE           Specify template parameter of test" << endl;    
-  cerr << "                      (e.g., unsigned_short)" << endl;      
+  std::cerr << "SNAP Test Driver Usage:" << std::endl;
+  std::cerr << "  SNAPTest list" << std::endl;
+  std::cerr << "or " << std::endl;
+  std::cerr << "  SNAPTest help NAME " << std::endl;
+  std::cerr << "or " << std::endl;
+  std::cerr << "  SNAPTest test NAME [type TYPE] [options]" << std::endl;
+  std::cerr << "Commands :" << std::endl;
+  std::cerr << "  list                List all known tests" << std::endl;
+  std::cerr << "  help NAME           Provide help on test 'NAME'" << std::endl;
+  std::cerr << "  test NAME           Run test 'NAME'" << std::endl;
+  std::cerr << "  type TYPE           Specify template parameter of test" << std::endl;    
+  std::cerr << "                      (e.g., unsigned_short)" << std::endl;      
 }
 
 template <class TPixel> 
@@ -120,21 +120,21 @@ SNAPTestDriver
     // Print test usage
     if(test)
       {
-      cout << "SNAPTests " << name << " options" << endl;
-      cout << "Options: " << endl;
+      std::cout << "SNAPTests " << name << " options" << std::endl;
+      std::cout << "Options: " << std::endl;
       test->PrintUsage();
       }
       
     else
-      cerr << "Unknown test name: " << name << endl;
+      std::cerr << "Unknown test name: " << name << std::endl;
     }
 
   else if(parms.IsOptionPresent("list"))
     {
     // Print out a header
-    cout << std::setw(20) << std::left << "Test Name";
-    cout << std::setw(12) << std::left << "Templated";
-    cout << "Description" << endl;
+    std::cout << std::setw(20) << std::left << "Test Name";
+    std::cout << std::setw(12) << std::left << "Templated";
+    std::cout << "Description" << std::endl;
     
     // Go through the list of known tests
     for(unsigned int i=0;i<NUMBER_OF_TESTS;i++)
@@ -144,9 +144,9 @@ SNAPTestDriver
       if(test) 
         {
         // Print out test info
-        cout << std::setw(20) << std::left << m_TestNames[i];
-        cout << std::setw(12) << std::left << m_TestTemplated[i] ? "Yes" : "No";
-        cout << test->GetDescription() << endl;
+        std::cout << std::setw(20) << std::left << m_TestNames[i];
+        std::cout << std::setw(12) << std::left << m_TestTemplated[i] ? "Yes" : "No";
+        std::cout << test->GetDescription() << std::endl;
         }
       }
     }
@@ -189,14 +189,14 @@ SNAPTestDriver
         test = TemplatedTestCreator<double>(name).GetTest();
       else
         {
-        cerr << "Missing or invalid or missing type parameter.  Using default (char)" << endl;
-        cerr << "Should be one of: " << endl;
-        cerr << "  char, unsigned_char," << endl;
-        cerr << "  short, unsigned_short," << endl;
-        cerr << "  int, unsigned_int," << endl;
-        cerr << "  long, unsigned_long," << endl;
-        cerr << "  float, " << endl;
-        cerr << "  double." << endl;
+        std::cerr << "Missing or invalid or missing type parameter.  Using default (char)" << std::endl;
+        std::cerr << "Should be one of: " << std::endl;
+        std::cerr << "  char, unsigned_char," << std::endl;
+        std::cerr << "  short, unsigned_short," << std::endl;
+        std::cerr << "  int, unsigned_int," << std::endl;
+        std::cerr << "  long, unsigned_long," << std::endl;
+        std::cerr << "  float, " << std::endl;
+        std::cerr << "  double." << std::endl;
         }
       }
 
@@ -228,16 +228,16 @@ SNAPTestDriver
         }
       catch(itk::ExceptionObject &exc)
         {
-        cerr << "ITK Exception: " << endl << exc << endl;
+        std::cerr << "ITK Exception: " << std::endl << exc << std::endl;
         }
       catch(...)
         {
-        cerr << "Unknowm Exception!" << endl;
+        std::cerr << "Unknowm Exception!" << std::endl;
         }
       }
     else
       {
-      cerr << "Could not create test!" << endl;
+      std::cerr << "Could not create test!" << std::endl;
       PrintUsage();
       }    
     }

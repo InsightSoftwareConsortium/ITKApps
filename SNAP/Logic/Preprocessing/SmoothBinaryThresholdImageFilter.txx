@@ -36,8 +36,8 @@ SmoothBinaryThresholdImageFilter<TInputImage,TOutputImage>
 ::GenerateData()
 {
   // Get the input and output pointers
-  const typename InputImageType::ConstPointer inputImage = GetInput();
-  typename OutputImageType::Pointer outputImage = GetOutput();
+  const typename InputImageType::ConstPointer inputImage = this->GetInput();
+  typename OutputImageType::Pointer outputImage = this->GetOutput();
 
   // Allocate the output image
   outputImage->SetBufferedRegion(outputImage->GetRequestedRegion());
@@ -85,6 +85,6 @@ SmoothBinaryThresholdImageFilter<TInputImage,TOutputImage>
   if(!(settings == m_ThresholdSettings))
     {
     m_ThresholdSettings = settings;
-    Modified();
+    this->Modified();
     }
 }

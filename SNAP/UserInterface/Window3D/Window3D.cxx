@@ -533,7 +533,7 @@ Window3D
   GLenum error;
   while ((error = glGetError()) != GL_NO_ERROR)
     {
-    cerr << "GL-Error: " << (char *) gluErrorString(error) << endl;
+    std::cerr << "GL-Error: " << (char *) gluErrorString(error) << std::endl;
     }
 }
 
@@ -724,7 +724,7 @@ Window3D
     case POLYGON_DRAWING_MODE:
       break;
     default:
-      cerr << "Case not handled in  Window3D::handle(int)" << endl;
+      cerr << "Case not handled in  Window3D::handle(int)" << std::endl;
     }
 
   return 0;
@@ -908,12 +908,12 @@ void Window3D::ComputeRay( int x, int y, double *mvmatrix, double *projmatrix,
   val = gluUnProject( (GLdouble) x, (GLdouble) y, 0.0,
                       mvmatrix, projmatrix, viewport,
                       &(v[0]), &(v[1]), &(v[2]) );
-  if ( val == GL_FALSE ) cerr << "gluUnProject #1 FAILED!!!!!" << endl;
+  if ( val == GL_FALSE ) std::cerr << "gluUnProject #1 FAILED!!!!!" << std::endl;
   
   val = gluUnProject( (GLdouble) x, (GLdouble) y, 1.0,
                       mvmatrix, projmatrix, viewport,
                       &(r[0]), &(r[1]), &(r[2]) );
-  if ( val == GL_FALSE ) cerr << "gluUnProject #2 FAILED!!!!!" << endl;
+  if ( val == GL_FALSE ) std::cerr << "gluUnProject #2 FAILED!!!!!" << std::endl;
 
   r[0] = r[0] - v[0];
   r[1] = r[1] - v[1];
@@ -1066,8 +1066,8 @@ int Window3D::IntersectSegData(int mouse_x, int mouse_y, Vector3i &hit)
   switch (result)
     {
     case 1: return 1;
-    case -1: /*cerr << "RAY WAS INVALID!" << endl;*/ break;
-    /* default: cerr << "No hit found" << endl;*/
+    case -1: /*std::cerr << "RAY WAS INVALID!" << std::endl;*/ break;
+    /* default: std::cerr << "No hit found" << std::endl;*/
     }
   return 0;
 }
@@ -1091,24 +1091,24 @@ void Window3D::OnCutPlanePointRayAction(int mouse_x, int mouse_y, int i)
     {
     ComputeRay( x, y, mvmatrix, projmatrix, viewport, m_Plane.cutPt1,
                 m_Plane.cutRay1 );
-    cout << "1st Point: X = " << Fl::event_x() << " Y = " << Fl::event_y() << " in image space is ("
-    << m_Plane.cutPt1[0] << ", " << m_Plane.cutPt1[1] << ", " << m_Plane.cutPt1[2] << ")" << endl;
-    cout << "Ray 1: x = " << m_Plane.cutRay1[0] << " y = " << m_Plane.cutRay1[1] << " z = "
-    << m_Plane.cutRay1[2] << endl;
+    std::cout << "1st Point: X = " << Fl::event_x() << " Y = " << Fl::event_y() << " in image space is ("
+    << m_Plane.cutPt1[0] << ", " << m_Plane.cutPt1[1] << ", " << m_Plane.cutPt1[2] << ")" << std::endl;
+    std::cout << "Ray 1: x = " << m_Plane.cutRay1[0] << " y = " << m_Plane.cutRay1[1] << " z = "
+    << m_Plane.cutRay1[2] << std::endl;
     // m_Ray[i] and m_Point[] have been set
     } 
   else if ( 2==i )
     {
     ComputeRay( x, y, mvmatrix, projmatrix, viewport, m_Plane.cutPt2,
                 m_Plane.cutRay2 );
-    cout << "Second m_Point: X = " << Fl::event_x() << " Y = " << Fl::event_y() << " in image space is ("
-    << m_Plane.cutPt2[0] << ", " << m_Plane.cutPt2[1] << ", " << m_Plane.cutPt2[2] << ")" << endl;
-    cout << "Ray 2: x = " << m_Plane.cutRay2[0] << " y = " << m_Plane.cutRay2[1] << " z = "
-    << m_Plane.cutRay2[2] << endl;
+    std::cout << "Second m_Point: X = " << Fl::event_x() << " Y = " << Fl::event_y() << " in image space is ("
+    << m_Plane.cutPt2[0] << ", " << m_Plane.cutPt2[1] << ", " << m_Plane.cutPt2[2] << ")" << std::endl;
+    std::cout << "Ray 2: x = " << m_Plane.cutRay2[0] << " y = " << m_Plane.cutRay2[1] << " z = "
+    << m_Plane.cutRay2[2] << std::endl;
     } 
   else
     {
-    cerr << "Not able to set Cut m_Plane point: " << i << endl; 
+    std::cerr << "Not able to set Cut m_Plane point: " << i << std::endl; 
     }
 }
 */
@@ -1134,13 +1134,13 @@ void Window3D::OnCutPlanePointRayAction(int mouse_x, int mouse_y, int i)
 void Window3D::ComputePlane() {
   if (m_Plane.valid != 1)
     {
-    cerr << "m_Plane not properly initiated, cannot compute plane" << endl;
+    std::cerr << "m_Plane not properly initiated, cannot compute plane" << std::endl;
     return;
     }
 
   if (m_Plane.cutRay2[X]==0 && m_Plane.cutRay2[Y]==0 && m_Plane.cutRay2[Z]==0)
     {
-    cerr << "oops, can't have cutRay2 be (0,0,0)" << endl;
+    std::cerr << "oops, can't have cutRay2 be (0,0,0)" << std::endl;
     return;
     }
 
@@ -1149,7 +1149,7 @@ void Window3D::ComputePlane() {
 
   if (ray3[X] == 0 && ray3[Y] == 0 && ray3[Z] == 0)
     {
-    cerr << "badness, points are the same - don't double click"  << endl;
+    std::cerr << "badness, points are the same - don't double click"  << std::endl;
     return;
     }
 
@@ -1169,11 +1169,11 @@ void Window3D::ComputePlane() {
   m_Plane.coords = normal;
 
 #ifdef DEBUG
-  cout << "Window3D::Computem_Plane() plane equation is: " << endl << "("
+  std::cout << "Window3D::Computem_Plane() plane equation is: " << std::endl << "("
   << m_Plane.coords[0] << ")*x + ("
   << m_Plane.coords[1] << ")*y + ("
   << m_Plane.coords[2] << ")*z "
-  << (m_Plane.distZero ? "- 1 " : "") << "== 0" << endl;
+  << (m_Plane.distZero ? "- 1 " : "") << "== 0" << std::endl;
 #endif
 }
 */
@@ -1304,10 +1304,10 @@ void Window3D::DrawCrosshairs()
   glVertex3d( m_Point[0]+m_Ray[0], m_Point[1]+m_Ray[1], m_Point[2]+m_Ray[2] );
   glEnd();
 
-  cerr << "A = ( " << m_Point[0] << ", " << m_Point[1] << ", " << m_Point[2] << " )" << endl;
-  cerr << "B = ( " << m_Point[0]+m_Ray[0]
+  std::cerr << "A = ( " << m_Point[0] << ", " << m_Point[1] << ", " << m_Point[2] << " )" << std::endl;
+  std::cerr << "B = ( " << m_Point[0]+m_Ray[0]
   << ", " << m_Point[1]+m_Ray[1]
-  << ", " << m_Point[2]+m_Ray[2] << " )" << endl;
+  << ", " << m_Point[2]+m_Ray[2] << " )" << std::endl;
 #endif
 
   // Finish
@@ -1402,7 +1402,7 @@ int
 Window3D
 ::OnKeyAction(int key)
 {
-  cout << "Key press: " << key << endl;
+  std::cout << "Key press: " << key << std::endl;
   if(key == 's')
     {
     // Store the state of the trackball
@@ -1421,6 +1421,9 @@ Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.24  2004/10/04 17:41:46  pauly
+ *FIX: Filename extensions for FLTK includes
+ *
  *Revision 1.23  2004/09/21 16:13:35  jjomier
  *FIX: Linux, gcc3.3 fixes
  *

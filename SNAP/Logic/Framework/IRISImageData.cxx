@@ -137,17 +137,17 @@ IRISImageData
   try 
     {
     // Write voxel volumes to the file
-    fout << "##########################################################" << endl;
-    fout << "# SNAP Voxel Count File" << endl;
-    fout << "# File format:" << endl;
-    fout << "# LABEL: NUMBER / VOLUME / MEAN / SD" << endl;
-    fout << "# Fields:" << endl;
-    fout << "#    LABEL         Label description" << endl;
-    fout << "#    NUMBER        Number of voxels that have that label " << endl;
-    fout << "#    VOLUME        Volume of those voxels in cubic mm " << endl;
-    fout << "#    MEAN          Mean intensity of those voxels " << endl;
-    fout << "#    SD            Standard deviation of those voxels " << endl;
-    fout << "##########################################################" << endl;
+    fout << "##########################################################" << std::endl;
+    fout << "# SNAP Voxel Count File" << std::endl;
+    fout << "# File format:" << std::endl;
+    fout << "# LABEL: NUMBER / VOLUME / MEAN / SD" << std::endl;
+    fout << "# Fields:" << std::endl;
+    fout << "#    LABEL         Label description" << std::endl;
+    fout << "#    NUMBER        Number of voxels that have that label " << std::endl;
+    fout << "#    VOLUME        Volume of those voxels in cubic mm " << std::endl;
+    fout << "#    MEAN          Mean intensity of those voxels " << std::endl;
+    fout << "#    SD            Standard deviation of those voxels " << std::endl;
+    fout << "##########################################################" << std::endl;
 
     for (i=1; i<MAX_COLOR_LABELS; i++) 
       {
@@ -157,7 +157,7 @@ IRISImageData
         fout << std::right << std::setw(10) << data[i].count << " / ";
         fout << std::setw(10) << (data[i].count * volVoxel) << " / ";
         fout << std::internal << std::setw(10) << data[i].mean << " / ";
-        fout << std::setw(10) << data[i].stddev << endl;
+        fout << std::setw(10) << data[i].stddev << std::endl;
         }      
       }
     }

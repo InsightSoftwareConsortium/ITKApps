@@ -69,7 +69,7 @@ public:
   // Print how to use this test
   virtual void PrintUsage()
   {
-    cerr << "  image FILE : Pass image name " << endl;
+    std::cerr << "  image FILE : Pass image name " << std::endl;
   }
 
   // Tack on options to the command line parser

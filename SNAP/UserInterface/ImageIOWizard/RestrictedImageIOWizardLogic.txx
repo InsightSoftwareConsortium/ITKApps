@@ -29,15 +29,15 @@ RestrictedImageIOWizardLogic<TPixel>
   const double *requiredSpacing = m_GreyImage->GetSpacing().GetDataPointer();
 
   // Prepare the header page of the wizard UI
-  m_InHeaderPageDimX->value(requiredSize[0]);
-  m_InHeaderPageDimY->value(requiredSize[1]);
-  m_InHeaderPageDimZ->value(requiredSize[2]);
-  m_InHeaderPageSpacingX->value(requiredSpacing[0]);
-  m_InHeaderPageSpacingY->value(requiredSpacing[1]);
-  m_InHeaderPageSpacingZ->value(requiredSpacing[2]);
+  this->m_InHeaderPageDimX->value(requiredSize[0]);
+  this->m_InHeaderPageDimY->value(requiredSize[1]);
+  this->m_InHeaderPageDimZ->value(requiredSize[2]);
+  this->m_InHeaderPageSpacingX->value(requiredSpacing[0]);
+  this->m_InHeaderPageSpacingY->value(requiredSpacing[1]);
+  this->m_InHeaderPageSpacingZ->value(requiredSpacing[2]);
 
   // Disable the orientation page
-  m_PageOrientation->deactivate();
+  this->m_PageOrientation->deactivate();
 
   // Call the parent's method
   return Superclass::DisplayInputWizard(file);    
@@ -49,7 +49,7 @@ RestrictedImageIOWizardLogic<TPixel>
 ::CheckImageValidity()
 {
   SizeType requiredSize = m_GreyImage->GetBufferedRegion().GetSize();
-  SizeType loadedSize = m_Image->GetBufferedRegion().GetSize();
+  SizeType loadedSize = this->m_Image->GetBufferedRegion().GetSize();
 
   // Check whether or not the image size matches the 'forced' image size
   if(!(requiredSize == loadedSize))

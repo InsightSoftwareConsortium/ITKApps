@@ -51,7 +51,7 @@ void TestImageWrapper<TPixel>
   Superclass::PrintUsage();
 
   // RAI may be passed to this test
-  cout << "  rai CODE : Pass in an RAI anatomy-image code" << endl;
+  std::cout << "  rai CODE : Pass in an RAI anatomy-image code" << std::endl;
 }
 
 template<class TPixel> 
@@ -62,13 +62,13 @@ void TestImageWrapper<TPixel>
   Superclass::Run();
 
   // Do the rest
-  cout << "Testing code in ImageWrapper.h" << endl;
+  std::cout << "Testing code in ImageWrapper.h" << std::endl;
 
   // Create an image wrapper
   WrapperType *wrapper = new WrapperType;
 
   // Insert image into the wrapper
-  wrapper->SetImage(m_Image);
+  wrapper->SetImage(this->m_Image);
   
   // Set the cursor position in the slice wrapper
   wrapper->SetSliceIndex(wrapper->GetSize() / ((unsigned int)2));
@@ -81,11 +81,11 @@ void TestImageWrapper<TPixel>
   typename WrapperType::SlicePointer slice = wrapper->GetSlice(0);
 
   // Report min/max intensities
-  cout << "Max intensity: " << wrapper->GetImageMax() << endl;
-  cout << "Min intensity: " << wrapper->GetImageMin() << endl;
+  std::cout << "Max intensity: " << wrapper->GetImageMax() << std::endl;
+  std::cout << "Min intensity: " << wrapper->GetImageMin() << std::endl;
 
   // We are finished testing
-  cout << "Testing complete" << endl;
+  std::cout << "Testing complete" << std::endl;
 }
 
 #endif //__TestImageWrapper_h_
