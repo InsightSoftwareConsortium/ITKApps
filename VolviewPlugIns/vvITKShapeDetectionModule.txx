@@ -37,7 +37,8 @@ ShapeDetectionModule<TInputPixelType>
   m_ShapeDetectionFilter->ReleaseDataFlagOn();
 
   m_ShapeDetectionFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
-  m_IntensityWindowingFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
+  m_ShapeDetectionFilter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
+  m_ShapeDetectionFilter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
 }
 
 
@@ -229,13 +230,13 @@ ShapeDetectionModule<TInputPixelType>
 
   m_FastMarchingModule.SetPluginInfo( this->GetPluginInfo() );
 
-  // Set the Observer for updating progress in the GUI
-  m_ShapeDetectionFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
-
   // Execute the FastMarching module as preprocessing stage
+  m_FastMarchingModule.SetProgressWeighting( 0.7 );
   m_FastMarchingModule.ProcessData( pds );
 
   // Execute the filters and progressively remove temporary memory
+  this->SetCurrentFilterProgressWeight( 0.3 );
+  this->SetUpdateMessage("Computing ShapeDetection...");
   m_ShapeDetectionFilter->Update();
 
   if( m_PerformPostprocessing )
@@ -283,7 +284,7 @@ ShapeDetectionModule<TInputPixelType>
     }
   else
     {
-    std::ofstream ofs("Azucar.txt");
+    std::ofstream ofs("Error.log");
     ofs << "Minimum < 0 && Maximum > 0 assertion failed";
     ofs << "Minimum = " << minimum << std::endl;
     ofs << "Maximum = " << maximum << std::endl;

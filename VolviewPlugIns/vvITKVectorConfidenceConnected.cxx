@@ -154,7 +154,7 @@ static int UpdateGUI(void *inf)
     const bool compositeOutput  = atoi( compositeOutputProperty );
     if( compositeOutput )
       {
-      info->OutputVolumeScalarType = info->InputVolumeScalarType;
+      info->OutputVolumeScalarType = VTK_UNSIGNED_CHAR;
       info->OutputVolumeNumberOfComponents = 4; // 3 from RGB + segmentation
       info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "4");
       }

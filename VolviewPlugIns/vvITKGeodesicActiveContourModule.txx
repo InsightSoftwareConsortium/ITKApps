@@ -37,7 +37,8 @@ GeodesicActiveContourModule<TInputPixelType>
   m_GeodesicActiveContourFilter->ReleaseDataFlagOn();
 
   m_GeodesicActiveContourFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
-  m_IntensityWindowingFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
+  m_GeodesicActiveContourFilter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
+  m_GeodesicActiveContourFilter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
 }
 
 
@@ -244,13 +245,13 @@ GeodesicActiveContourModule<TInputPixelType>
 
   m_FastMarchingModule.SetPluginInfo( this->GetPluginInfo() );
 
-  // Set the Observer for updating progress in the GUI
-  m_GeodesicActiveContourFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
-
   // Execute the FastMarching module as preprocessing stage
+  m_FastMarchingModule.SetProgressWeighting( 0.7 );
   m_FastMarchingModule.ProcessData( pds );
 
   // Execute the filters and progressively remove temporary memory
+  this->SetCurrentFilterProgressWeight( 0.3 );
+  this->SetUpdateMessage("Computing Geodesic Active Contour...");
   m_GeodesicActiveContourFilter->Update();
 
   if( m_PerformPostprocessing )
@@ -298,7 +299,7 @@ GeodesicActiveContourModule<TInputPixelType>
     }
   else
     {
-    std::ofstream ofs("Azucar.txt");
+    std::ofstream ofs("Error.log");
     ofs << "Minimum < 0 && Maximum > 0 assertion failed";
     ofs << "Minimum = " << minimum << std::endl;
     ofs << "Maximum = " << maximum << std::endl;
@@ -315,12 +316,12 @@ GeodesicActiveContourModule<TInputPixelType>
 
   OutputIteratorType ot( outputImage, outputImage->GetBufferedRegion() );
 
-  InputPixelType * outData = (InputPixelType *)(pds->outData);
+  OutputPixelType * outData = static_cast< OutputPixelType * >( pds->outData );
 
   ot.GoToBegin(); 
   while( !ot.IsAtEnd() )
     {
-    *outData = static_cast< InputPixelType >( ot.Get() );
+    *outData = static_cast< OutputPixelType >( ot.Get() );
     ++ot;
     ++outData;
     }

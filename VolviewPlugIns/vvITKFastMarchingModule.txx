@@ -31,6 +31,8 @@ FastMarchingModule<TInputPixelType>
 
     m_PerformPostprocessing   = true;
 
+    m_ProgressWeighting = 1.0;
+
     const float couplingFactor = 1.0;
 
     m_NodeContainer->Initialize();
@@ -41,12 +43,6 @@ FastMarchingModule<TInputPixelType>
     m_SigmoidFilter->SetOutputMaximum( couplingFactor );
 
     m_CurrentNumberOfSeeds    = 0;
-
-    // This transfer function will invert the map
-    m_IntensityWindowingFilter->SetWindowMinimum( m_InitialSeedValue );
-    m_IntensityWindowingFilter->SetWindowMaximum( m_FastMarchingFilter->GetStoppingValue() );
-    m_IntensityWindowingFilter->SetOutputMinimum( static_cast< OutputPixelType >( m_FastMarchingFilter->GetStoppingValue() ));
-    m_IntensityWindowingFilter->SetOutputMaximum( static_cast< OutputPixelType >( m_InitialSeedValue ));
 
     // Set up the pipeline
     m_GradientMagnitudeFilter->SetInput(  m_ImportFilter->GetOutput()             );
@@ -122,8 +118,6 @@ FastMarchingModule<TInputPixelType>
 ::SetStoppingValue( float value )
 {
   m_FastMarchingFilter->SetStoppingValue( value );
-  m_IntensityWindowingFilter->SetOutputMinimum( static_cast<OutputPixelType>( value ) );
-  m_IntensityWindowingFilter->SetWindowMaximum( static_cast<RealPixelType>(   value ) );
 }
 
 
@@ -167,6 +161,19 @@ FastMarchingModule<TInputPixelType>
   m_LowestBorderValue = value;
 }
 
+
+
+/*
+ *  Set the weighting factor for using this modules
+ *  as a component of a larger pipeline.
+ */
+template <class TInputPixelType >
+void 
+FastMarchingModule<TInputPixelType>
+::SetProgressWeighting( float value )
+{
+  m_ProgressWeighting = value;
+}
 
 
 
@@ -283,32 +290,18 @@ FastMarchingModule<TInputPixelType>
                                     importFilterWillDeleteTheInputBuffer );
 
   // Set the Observer for updating progress in the GUI
-  m_GradientMagnitudeFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
-  m_SigmoidFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
   m_FastMarchingFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
-  m_IntensityWindowingFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
-
-  m_GradientMagnitudeFilter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
-  m_SigmoidFilter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
   m_FastMarchingFilter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
-  m_IntensityWindowingFilter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
-
-  m_GradientMagnitudeFilter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
-  m_SigmoidFilter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
   m_FastMarchingFilter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
-  m_IntensityWindowingFilter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
 
   // Execute the filters and progressively remove temporary memory
-  this->SetCurrentFilterProgressWeight( 0.3 );
   this->SetUpdateMessage("Preprocessing with gradient magnitude...");
   m_GradientMagnitudeFilter->Update();
 
-  this->SetCurrentFilterProgressWeight( 0.1 );
   this->SetUpdateMessage("Preprocessing with sigmoid...");
   m_SigmoidFilter->Update();
 
-  // note that there is 10% of progress left for Postprocessing
-  this->SetCurrentFilterProgressWeight( 0.5 );
+  this->SetCurrentFilterProgressWeight( 1.0 * m_ProgressWeighting );
   this->SetUpdateMessage("Computing Fast Marching...");
   m_FastMarchingFilter->Update();
 
@@ -331,9 +324,14 @@ void
 FastMarchingModule<TInputPixelType>
 ::PostProcessData( const vtkVVProcessDataStruct * pds )
 {
-  // note that there is 10% of progress left for Postprocessing
-  this->SetCurrentFilterProgressWeight( 0.1 );
-  this->SetUpdateMessage("Postprocessing output...");
+
+  // This transfer function will invert the map
+  m_IntensityWindowingFilter->SetWindowMinimum( m_InitialSeedValue );
+  m_IntensityWindowingFilter->SetWindowMaximum( m_FastMarchingFilter->GetStoppingValue() );
+  m_IntensityWindowingFilter->SetOutputMinimum( static_cast< OutputPixelType >( m_FastMarchingFilter->GetStoppingValue() ));
+  m_IntensityWindowingFilter->SetOutputMaximum( static_cast< OutputPixelType >( m_InitialSeedValue ));
+
+m_IntensityWindowingFilter->Print( std::cout );
   m_IntensityWindowingFilter->Update();
 
   // Copy the data (with casting) to the output buffer provided by the Plug In API
@@ -344,7 +342,7 @@ FastMarchingModule<TInputPixelType>
 
   OutputIteratorType ot( outputImage, outputImage->GetBufferedRegion() );
 
-  OutputPixelType * outData = (OutputPixelType *)(pds->outData);
+  OutputPixelType * outData = static_cast< OutputPixelType * >( pds->outData );
 
   ot.GoToBegin(); 
   while( !ot.IsAtEnd() )

@@ -55,6 +55,7 @@ SET (PLUGINS
   vvITKMedian
   vvITKSigmoid
   vvITKShapeDetectionModule
+  vvITKVectorConfidenceConnected
   vvITKWatershedModule
   )
 

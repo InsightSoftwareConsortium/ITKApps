@@ -58,8 +58,6 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     return -1;
     }
 
-  itk::Index<3> seedPosition;
-
   try 
   {
   switch( info->InputVolumeScalarType )

@@ -116,6 +116,11 @@ public:
         this module is used for initializing other level set methods */
     void SetPerformPostProcessing( bool value );
     
+    /** This methods sets a weighting factor for progress reporting
+        it allows to use this module as a component of another module 
+        and make a combined progress report. */
+    void SetProgressWeighting( float weigth );
+    
     /*
      *  Get LevelSet (returns the time-crossing map). This method
      *  is provided to facilitate the use of this module for initializing
@@ -150,6 +155,7 @@ private:
 
     bool                                            m_PerformPostprocessing;
 
+    float                                           m_ProgressWeighting;
 };
 
 } // end of namespace PlugIn

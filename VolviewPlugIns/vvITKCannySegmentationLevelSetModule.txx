@@ -47,6 +47,14 @@ CannySegmentationLevelSetModule<TInputPixelType>
   m_FastMarchingImageFilter->AddObserver(              itk::ProgressEvent(), this->GetCommandObserver() );
   m_IntensityWindowingFilter->AddObserver(        itk::ProgressEvent(), this->GetCommandObserver() );
 
+  m_CannySegmentationLevelSetFilter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
+  m_FastMarchingImageFilter->AddObserver(              itk::StartEvent(), this->GetCommandObserver() );
+  m_IntensityWindowingFilter->AddObserver(        itk::StartEvent(), this->GetCommandObserver() );
+
+  m_CannySegmentationLevelSetFilter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
+  m_FastMarchingImageFilter->AddObserver(              itk::EndEvent(), this->GetCommandObserver() );
+  m_IntensityWindowingFilter->AddObserver(        itk::EndEvent(), this->GetCommandObserver() );
+
   m_FastMarchingImageFilter->SetTrialPoints( m_NodeContainer );
 
   m_InitialSeedValue     = 0.0;
@@ -291,8 +299,11 @@ CannySegmentationLevelSetModule<TInputPixelType>
 
 
   // Execute the filters and progressively remove temporary memory
+  this->SetCurrentFilterProgressWeight( 0.15 );
   m_FastMarchingImageFilter->Update();
 
+  this->SetCurrentFilterProgressWeight( 0.80 );
+  this->SetUpdateMessage("Computing Canny segmentation level set...");
   m_CannySegmentationLevelSetFilter->Update();
 
   if( m_PerformPostprocessing )
@@ -339,6 +350,8 @@ CannySegmentationLevelSetModule<TInputPixelType>
       }
     }
 
+  this->SetCurrentFilterProgressWeight( 0.05 );
+  this->SetUpdateMessage("Postprocessing ...");
   m_IntensityWindowingFilter->Update();
 
   // Copy the data (with casting) to the output buffer provided by the Plug In API
@@ -349,12 +362,12 @@ CannySegmentationLevelSetModule<TInputPixelType>
 
   OutputIteratorType ot( outputImage, outputImage->GetBufferedRegion() );
 
-  InputPixelType * outData = (InputPixelType *)(pds->outData);
+  OutputPixelType * outData = static_cast< OutputPixelType * >( pds->outData );
 
   ot.GoToBegin(); 
   while( !ot.IsAtEnd() )
     {
-    *outData = static_cast< InputPixelType >( ot.Get() );
+    *outData = static_cast< OutputPixelType >( ot.Get() );
     ++ot;
     ++outData;
     }
