@@ -20,7 +20,7 @@ CellularSegmentationApplication
   m_ImageViewerCommand->SetCallbackFunction(this, &CellularSegmentationApplication::ProcessImageViewInteraction);
   m_ImageViewer.AddObserver(ClickedPointEvent(), m_ImageViewerCommand);
 
-  m_CellularAggregate = itk::bio::CellularAggregate::New();
+  m_CellularAggregate = CellularAggregateType::New();
   
   m_CellularAggregateViewer = itk::bio::CellularAggregateViewer::New();
 
@@ -142,9 +142,9 @@ void
 CellularSegmentationApplication
   ::CreateEgg( void )
 {
-  itk::bio::Cell * egg = itk::bio::Cell::CreateEgg();
-  itk::bio::Cell::PointType position;
-  for(unsigned int i=0; i<itk::bio::Cell::Dimension; i++)
+  CellType * egg = CellType::CreateEgg();
+  CellType::PointType position;
+  for(unsigned int i=0; i<CellType::PointDimension; i++)
     {
     position[i] = m_SeedPoint[i];
     }
@@ -230,7 +230,7 @@ void
 CellularSegmentationApplication
 ::Clear(void)
 {
-  m_CellularAggregate = itk::bio::CellularAggregate::New();
+  m_CellularAggregate = CellularAggregateType::New();
   m_CellularAggregate->AddSubstrate( m_ImageReader->GetOutput() );
   m_CellularAggregateViewer->SetCellularAggregate( m_CellularAggregate );
   m_CellularAggregateViewer->SetRenderer( m_ImageViewer.GetRenderer() );

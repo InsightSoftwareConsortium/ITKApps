@@ -174,7 +174,7 @@ CellularAggregateViewer
   vtkIdType pointId = 0;
   while( cellIt != end )
     {
-    Cell * cell = cellIt.Value();
+    BioCellType * cell = cellIt.Value();
     const IdentifierType id = cell->GetSelfIdentifier();
     if( cellPositions->GetElementIfIndexExists( id, &position ) )
       {
@@ -217,7 +217,7 @@ CellularAggregateViewer
   vtkIdType pointId = 0;
   while( cellIt != end )
     {
-    Cell * cell = cellIt.Value();
+    BioCellType * cell = cellIt.Value();
     const IdentifierType id = cell->GetSelfIdentifier();
     if( cellPositions->GetElementIfIndexExists( id, &position ) )
       {
@@ -240,7 +240,7 @@ CellularAggregateViewer
   cellIt = mesh->GetPointData()->Begin();
   while( cellIt != end )
     {
-    Cell * cell = cellIt.Value();
+    BioCellType * cell = cellIt.Value();
     const IdentifierType id1 = cell->GetSelfIdentifier();
 
     pointIds[0] = pointIdMap[id1];
@@ -312,7 +312,7 @@ CellularAggregateViewer
   vtkIdType pointId = 0;
   while( cellIt != end )
     {
-    Cell * cell = cellIt.Value();
+    BioCellType * cell = cellIt.Value();
     const IdentifierType id = cell->GetSelfIdentifier();
     if( cellPositions->GetElementIfIndexExists( id, &position ) )
       {

@@ -36,7 +36,11 @@ class CellularSegmentationApplication : public CellularSegmentationApplicationGU
    
   ImageSliceViewer  m_ImageViewer;
 
-  itk::bio::CellularAggregate::Pointer  m_CellularAggregate;
+  typedef itk::bio::CellularAggregate<2> CellularAggregateType;
+  
+  CellularAggregateType::Pointer m_CellularAggregate;
+
+  typedef CellularAggregateType::BioCellType  CellType;
 
   itk::bio::CellularAggregateViewer::Pointer  m_CellularAggregateViewer;
 

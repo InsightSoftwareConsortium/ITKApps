@@ -77,17 +77,18 @@ public:
 
   void SetRenderer( vtkRenderer * );
 
-  typedef CellularAggregate                             CellularAggregateType;
-  typedef CellularAggregate::ConstPointer               CellularAggregateConstPointer;
-  typedef CellularAggregate::MeshPointer                MeshPointer;
-  typedef CellularAggregate::MeshConstPointer           MeshConstPointer;
-  typedef CellularAggregate::PointType                  PointType;
-  typedef CellularAggregate::CellsIterator              CellsIterator;
-  typedef CellularAggregate::CellsConstIterator         CellsConstIterator;
-  typedef CellularAggregate::PointsContainer            PointsContainer;
-  typedef CellularAggregate::IdentifierType             IdentifierType;
-  typedef CellularAggregate::VoronoiRegionType          VoronoiRegionType;
-  typedef CellularAggregate::VoronoiRegionAutoPointer   VoronoiRegionAutoPointer;
+  typedef ::itk::bio::CellularAggregate<2>                  CellularAggregateType;
+  typedef CellularAggregateType::ConstPointer               CellularAggregateConstPointer;
+  typedef CellularAggregateType::MeshPointer                MeshPointer;
+  typedef CellularAggregateType::MeshConstPointer           MeshConstPointer;
+  typedef CellularAggregateType::PointType                  PointType;
+  typedef CellularAggregateType::CellsIterator              CellsIterator;
+  typedef CellularAggregateType::CellsConstIterator         CellsConstIterator;
+  typedef CellularAggregateType::PointsContainer            PointsContainer;
+  typedef CellularAggregateType::IdentifierType             IdentifierType;
+  typedef CellularAggregateType::VoronoiRegionType          VoronoiRegionType;
+  typedef CellularAggregateType::VoronoiRegionAutoPointer   VoronoiRegionAutoPointer;
+  typedef CellularAggregateType::BioCellType                BioCellType;
 
 
   itkSetConstObjectMacro(CellularAggregate,CellularAggregateType);
