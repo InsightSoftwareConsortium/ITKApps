@@ -27,7 +27,7 @@ class SNAPSegmentationROISettings
 public:
   // List of available interpolation methods
   enum InterpolationMethod {
-    NEAREST_NEIGHBOR, TRILINEAR, TRICUBIC
+    NEAREST_NEIGHBOR, TRILINEAR, TRICUBIC, SINC_WINDOW_05
   };
 
   SNAPSegmentationROISettings() {}

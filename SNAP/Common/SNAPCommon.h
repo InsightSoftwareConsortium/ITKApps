@@ -78,8 +78,9 @@ struct Bubble {
 // UnaryFunctorCache in the GreyImageWrapper type.  Greyscale instensities
 // 0 to MAXGREYVAL are used in a cache table, which would be too big with int
 typedef unsigned char LabelType;
-typedef unsigned short GreyType;
+typedef short GreyType;
 extern const GreyType MAXGREYVAL;
+extern const GreyType MINGREYVAL;
 #define MAX_COLOR_LABELS 256
 
 /************************************************************************/
