@@ -188,7 +188,7 @@ class EditorConsoleGUI {open : {public EditorConsoleBase}
       }
       Fl_Button {} {
         label {Show Help}
-        callback {helpWin->show();}
+        callback {ShowHelp();}
         xywh {32 342 85 25} labelsize 12
       }
       Fl_Button {} {
@@ -260,19 +260,6 @@ class EditorConsoleGUI {open : {public EditorConsoleBase}
         class BinaryViewer
       }
     }
-    Fl_Window helpWin {
-      label Help open
-      xywh {345 180 458 372} resizable visible
-    } {
-      Fl_Output helpOut {
-        xywh {12 10 430 310} type Multiline labeltype NO_LABEL resizable
-      }
-      Fl_Button {} {
-        label Close
-        callback {helpWin->hide();}
-        xywh {200 330 100 30}
-      }
-    }
     Fl_Window renderConsole {
       label Renderer open
       xywh {264 243 256 256} resizable visible
@@ -314,5 +301,7 @@ class EditorConsoleGUI {open : {public EditorConsoleBase}
   Function {SpecifySourceFile( void )} {return_type {virtual void}
   } {}
   Function {FlipSource( int )} {return_type {virtual void}
+  } {}
+  Function {ShowHelp( void )} {return_type {virtual void}
   } {}
 } 

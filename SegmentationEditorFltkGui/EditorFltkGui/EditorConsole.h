@@ -71,6 +71,8 @@ public:
   virtual void ReadBinaryVolume();
   virtual void FlipSource(int);
 
+  virtual void ShowHelp();
+
   double local_max(double, double);
   double local_min(double, double);
   double round(double min, double max, double step, double val);

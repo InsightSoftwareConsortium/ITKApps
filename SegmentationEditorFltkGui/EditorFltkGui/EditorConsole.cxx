@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <fstream>
 #include <FL/fl_file_chooser.H>
+#include <fltkUtils.h>
 
 /************************************
  *
@@ -50,8 +51,6 @@ EditorConsole
 
   (sourceWin->GetRenderer())->AddActor2D(overlayActor);
 
-  helpOut->value("Help Text To Be Updated Soon");
- 
   interactor->SetRenderWindow( renWin );
   interactor->Initialize();
   first_render = true;
@@ -63,150 +62,7 @@ EditorConsole
   flip->SetFlipAxes(SourceAxes);
 
   clearText->value("Warning! This will clear your binary volume.\n\n            Do you wish to continue?");
-/*
-  helpOut->value("SEGMENTATION EDITOR MODULE:
 
-This module allows you to manipulate the output
-of the segmentation module to produce labeled volumes.
-
-To begin the editing process, you must choose the source,
-segmentation, and tree (scale information) to use.  The 
-\"Source data\" is the original image data on which the 
-segmenation is based.  The \"Segmented\" data is the base 
-labeled image data produced by the watershed segmentation 
-algorithm.  The \"Tree File Name\" is the tree of merges 
-calculated by the watershed segmentation algorithm that 
-is used to visualize the output at different scales.
-
-Fill out the information for the Segmented and Source
-data and press the \"Load Images\" button.  You can
-save this session for future use by selecting the
-\"Save Session\" button from the console.  For future
-sessions, simply select \"Load Session\" and specify
-the .ws file.  
-
-SEGMENTATION EDITOR CONSOLE WINDOW
-
-This section describes the controls you will see in the 
-Editor window.
-
-INTRODUCTION
-
-The purpose of the editor is to facilitate a construction 
-of a labeled image using a combination of automatic and 
-hand labeling of voxels.  Think of the regions produced 
-by the watershed filter as pieces of a 3D puzzle which 
-you can assemble into a labeled image, which is then 
-fine-tuned or augmented by hand painting of regions.
-
-The controls of the editor are described in detail below,  
-but the basic idea is this: Regions in the \"Segmented\"  
-window can be selected with the mouse and their  
-corresponding pixels labeled (or unlabeled) in the image  
-in the \"Source\" window.  In addition to painting by region  
-(3D), you can paint by hand (2D) to fill in gaps or erase  
-unwanted areas.  At any point the resulting 3D volume can be  
-rendered in a separate window.  The labeled image is stored 
-as a binary volume which can be saved to disk and loaded 
-back into the editor.
-
-INTERACTING WITH WINDOWS
-
-There are three data windows, numbered below from the left 
-side of the screen.  
-
-Segmented Window -- This window displays the segmentation 
-data at whichever scale is selected via the \"Scale\" slider.   
-Left-Click will select one of the colored regions (after 
-selecting it will highlight in white).  Shift-Left-Click 
-allows you to select multiple regions at one time.
-
-Source Window -- This window displays the color data from 
-which the segmentation was constructed.  The binary mask of 
-the segmentation is overlayed in blue on this window. Left-Click 
-freehand draws pixels into the binary volume.  Right-Click 
-freehand erases pixels from the binary volume.  The size of 
-the paintbrush is controlled by the \"Paint Radius\" slider. 
-Middle-Click Selects the region at that location in the 
-Segmented Window.  Shift-Middle-Click allows you to select 
-multiple regions in the Segmentation Window.
-
-Binary Window --  This window displays the segmentation that 
-you are constructing.  No meaningful interaction can be had 
-or is necessary with this window.
-
-BUTTONS AND SLIDERS
-
-Save Session: Allows you to save the image information for 
-future use.
-
-Load Session: Allows you to reload the images from a previous 
-session.
-
-Save Binary:  Allows you to write the binary label volume 
-you are creating to disk.  You can use save to remember 
-the state of the volume and undo changes back to that saved 
-state.  The output of this tool is a binary volume with
- 1's at pixel locations inside the structure and 0's at 
-pixel locations outside the structure.
-
-Load Binary: Loads a binary volume, replacing current volume.
-
-Randomize Colors: Re-colorizes the regions in the segmentation 
-window.
-
-Render/Update 3D Image: Generate a three dimensional rendering 
-of the surface of the segmentation.  This spawns a new window 
-which can be raised/lowered and resized.  The rendering can be 
-manipulated in this window.
-
-Zoom: Change the scale at which you view the data.
-
-Toggle Zoom: Turns zooming on/off allowing you to view the 
-data at full resolution.
-
-Add Selected Region: Adds the highlighed region(s) in the 
-Segmentated Window to the binary volume.
-
-Subtract Selected Region: Subtracts the highlighed region(s) 
-in the Segmentated Window from the binary volume.
-
-Merge Selected (when selecting a single region in the 
-Segmentated Window): This function merges regions until the 
-next merge with the selected region occurs.  You can move 
-up the merge hierarchy in a non-linear fashion with this 
-button.
-
-Undo Last Merge:  Reverts the merge hierarchy to the state 
-before the last merge operation.
-
-Scale:  This slider moves the threshold value at which you
-are viewing the segmentation up or down.
-
-Scale units:  Changes the resolution of the Scale slider to 
-move in finer or coarser increments.
-
-Slice number:  Changes the 2D slice of the volume that you 
-are currently viewing.
-
-Clear All:  Erases the entire binary volume.
-
-Show Help: Display a small help window.
-
-Toggle Overlay: Toggles the display of the binary volume 
-overlay in the Source Window.
-
-Paint Radius:  Controls the size of the circle used to 
-free-hand paint/erase pixels in the binary volume.
-
-
-Known Bugs 7/26/02
-
-Re-colorizing when deselecting multiple regions.  When multiple 
-regions are deselected all at once, the distinct regions will 
-sometimes remain the same color.  You can press the Randomize 
-Colors button to recolor these regions.");
-*/  
 }
 
 
@@ -807,8 +663,8 @@ bool EditorConsole::LoadSegmented() {
     return false;
   }
 
-  std::string raw_file;
-  std::string tree_file;
+  char raw_file[256];
+  char tree_file[256];
   std::ifstream in;
   int x1, y1, z1;
   in.open(labeled_filename.c_str());
@@ -817,8 +673,8 @@ bool EditorConsole::LoadSegmented() {
     return false;
   }
 
-  in >> raw_file;
-  in >> tree_file;
+  in.getline(raw_file, 256, '\n');
+  in.getline(tree_file, 256, '\n');
   in >> x1 >> y1 >> z1;
   in.close();
     
@@ -834,7 +690,7 @@ bool EditorConsole::LoadSegmented() {
   labeledImgReader->SetFileNameSliceOffset(0);
   labeledImgReader->SetHeaderSize(0);
   labeledImgReader->SetFileDimensionality(3);    
-  labeledImgReader->SetFileName(raw_file.c_str()); 
+  labeledImgReader->SetFileName(raw_file); 
   labeledImgReader->FileLowerLeftOn();
   labeledImgReader->Modified();
   labeledImgReader->Update();
@@ -858,7 +714,7 @@ bool EditorConsole::LoadSegmented() {
 
   // configure the lookup table manager for colorizing
   manager->Initialize();
-  manager->LoadTreeFile( tree_file.c_str() );
+  manager->LoadTreeFile( tree_file );
   manager->SetNumberOfLabels(labeledImgReader->GetMaximumUnsignedLongValue());
   manager->GenerateColorTable();
 
@@ -973,17 +829,16 @@ void EditorConsole::LoadSession() {
   }
   std::ifstream data_in;
   data_in.open(filename); 
-  int temp;
-  std::string segmented_file;
-  std::string source_file;
+  char segmented_file[256];
+  char source_file[256];
 
   // read in segmented information
-  data_in >> segmented_file;
-  data_in >> source_file; 
+  data_in.getline(segmented_file, 256, '\n');
+  data_in.getline(source_file, 256, '\n'); 
   data_in.close();
   
-  fileSeg->value(segmented_file.c_str());
-  fileSor->value(source_file.c_str());
+  fileSeg->value(segmented_file);
+  fileSor->value(source_file);
 
   LoadImages();
 
@@ -1005,7 +860,7 @@ void EditorConsole::SaveSession() {
   data_out.open(filename); 
 
   // output segmented information
-  data_out << fileSeg->value() << " " << fileSor->value();
+  data_out << fileSeg->value() << "\n" << fileSor->value();
   data_out.close();
 
 }
@@ -1027,4 +882,159 @@ void EditorConsole::FlipSource(int a)
 
   flip->SetFlipAxes(SourceAxes);
   ViewSource();
+}
+
+
+/****************************************
+ *
+ * ShowHelp
+ *
+ ***************************************/
+void EditorConsole::ShowHelp()
+{
+  
+  ifuShowText("SEGMENTATION EDITOR MODULE:\n \
+This module allows you to manipulate the output\n \
+of the segmentation module to produce labeled volumes.\n \
+To begin the editing process, you must choose the source,\n \
+segmentation, and tree (scale information) to use.  The\n \
+\"Source data\" is the original image data on which the\n \
+segmenation is based.  The \"Segmented\" data is the base\n \
+labeled image data produced by the watershed segmentation\n \
+algorithm.  The \"Tree File Name\" is the tree of merges\n \
+calculated by the watershed segmentation algorithm that\n \
+is used to visualize the output at different scales.\n \
+\n \
+Fill out the information for the Segmented and Source\n \
+data and press the \"Load Images\" button.  You can\n \
+save this session for future use by selecting the\n \
+\"Save Session\" button from the console.  For future\n \
+sessions, simply select \"Load Session\" and specify\n \
+the .ws file.\n \
+\n \
+SEGMENTATION EDITOR CONSOLE WINDOW\n \
+\n \
+This section describes the controls you will see in the\n \
+Editor window.\n \
+\n \
+INTRODUCTION\n \
+\n \
+The purpose of the editor is to facilitate a construction\n \
+of a labeled image using a combination of automatic and\n \
+hand labeling of voxels.  Think of the regions produced\n \
+by the watershed filter as pieces of a 3D puzzle which\n \
+you can assemble into a labeled image, which is then\n \
+fine-tuned or augmented by hand painting of regions.\n \
+\n \
+The controls of the editor are described in detail below,\n \
+but the basic idea is this: Regions in the \"Segmented\"\n \
+window can be selected with the mouse and their\n \
+corresponding pixels labeled (or unlabeled) in the image\n \
+in the \"Source\" window.  In addition to painting by region\n \
+(3D), you can paint by hand (2D) to fill in gaps or erase\n \
+unwanted areas.  At any point the resulting 3D volume can be\n \
+rendered in a separate window.  The labeled image is stored\n \
+as a binary volume which can be saved to disk and loaded\n \
+back into the editor.\n \
+\n\n \
+Please see README for more information\n\n");
+/*
+INTERACTING WITH WINDOWS\n \
+\n \
+There are three data windows, numbered below from the left\n \
+side of the screen.\n \
+Segmented Window -- This window displays the segmentation\n \
+data at whichever scale is selected via the \"Scale\" slider.\n \
+Left-Click will select one of the colored regions (after\n \
+selecting it will highlight in white).  Shift-Left-Click\n \
+allows you to select multiple regions at one time.\n \
+\n \
+Source Window -- This window displays the color data from\n \
+which the segmentation was constructed.  The binary mask of \n \
+the segmentation is overlayed in blue on this window. Left-Click\n \
+freehand draws pixels into the binary volume.  Right-Click\n \
+freehand erases pixels from the binary volume.  The size of \n \
+the paintbrush is controlled by the \"Paint Radius\" slider.\n \
+Middle-Click Selects the region at that location in the\n \
+Segmented Window.  Shift-Middle-Click allows you to select \n \
+multiple regions in the Segmentation Window.\n \
+\n \
+Binary Window --  This window displays the segmentation that \n \
+you are constructing.  No meaningful interaction can be had \n \
+or is necessary with this window.\n \
+\n \
+BUTTONS AND SLIDERS\n \
+\n \
+Save Session: Allows you to save the image information for \n \
+future use.\n \
+\n \
+Load Session: Allows you to reload the images from a previous \n \
+session.\n \
+\n \
+Save Binary:  Allows you to write the binary label volume \n \
+you are creating to disk.  You can use save to remember \n \
+the state of the volume and undo changes back to that saved \n \
+state.  The output of this tool is a binary volume with\n \
+1's at pixel locations inside the structure and 0's at \n \
+pixel locations outside the structure.\n \
+\n \
+Load Binary: Loads a binary volume, replacing current volume.\n \
+\n \
+Randomize Colors: Re-colorizes the regions in the segmentation \n \
+window.\n \
+\n \
+Render/Update 3D Image: Generate a three dimensional rendering \n \
+of the surface of the segmentation.  This spawns a new window \n \
+which can be raised/lowered and resized.  The rendering can be \n \
+manipulated in this window.\n \
+\n \
+zoom: Change the scale at which you view the data.\n \
+\n \
+Toggle Zoom: Turns zooming on/off allowing you to view the \n \
+data at full resolution.\n \
+\n \
+Add Selected Region: Adds the highlighed region(s) in the \n \
+Segmentated Window to the binary volume.\n \
+\n \
+Subtract Selected Region: Subtracts the highlighed region(s) \n \
+\n \
+in the Segmentated Window from the binary volume.\n \
+\n \
+Merge Selected (when selecting a single region in the \n \
+Segmentated Window): This function merges regions until the \n \
+next merge with the selected region occurs.  You can move \n \
+up the merge hierarchy in a non-linear fashion with this \n \
+button.\n \
+\n \
+Undo Last Merge:  Reverts the merge hierarchy to the state \n \
+before the last merge operation.\n \
+\n \
+Scale:  This slider moves the threshold value at which you\n \
+are viewing the segmentation up or down.\n \
+\n \
+Scale units:  Changes the resolution of the Scale slider to \n \
+move in finer or coarser increments.\n \
+\n \
+Slice number:  Changes the 2D slice of the volume that you \n \
+are currently viewing.\n \
+\n \
+Clear All:  Erases the entire binary volume.\n \
+\n \
+Show Help: Display a small help window.\n \
+\n \
+Toggle Overlay: Toggles the display of the binary volume \n \
+overlay in the Source Window.\n \
+\n \
+Paint Radius:  Controls the size of the circle used to \n \
+free-hand paint/erase pixels in the binary volume.\n \
+\n \
+\n \
+Known Bugs 7/26/02\n \
+\n \
+Re-colorizing when deselecting multiple regions.  When multiple \n \
+regions are deselected all at once, the distinct regions will \n \
+sometimes remain the same color.  You can press the Randomize \n \
+Colors button to recolor these regions.\n \
+");  
+  */
 }

@@ -196,7 +196,7 @@ EditorConsoleBase
  *
  **********************************/
 bool EditorConsoleBase::StartEditor() {
-
+  return true;
 }
 
 
@@ -470,6 +470,7 @@ void EditorConsoleBase::LoadImages() {
  *
  ***********************************/
 bool EditorConsoleBase::LoadSegmented() {
+  return true;
 }
 
 /************************************
@@ -478,6 +479,7 @@ bool EditorConsoleBase::LoadSegmented() {
  *
  ***********************************/
 bool EditorConsoleBase::LoadSource() {
+  return true;
 }
 
 /************************************
