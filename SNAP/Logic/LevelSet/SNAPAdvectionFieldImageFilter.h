@@ -34,28 +34,33 @@ class SNAPAdvectionFieldImageFilter:
       ::itk::GetImageDimension<TInputImage>::ImageDimension> >
 {
 public:
-  /** Image dimension. */
-  itkStaticConstMacro(ImageDimension, unsigned int,
-                      TInputImage::ImageDimension);    
   
   /** Input image types */
   typedef TInputImage                                          InputImageType;
   typedef itk::SmartPointer<InputImageType>                 InputImagePointer;
+  
+  /** Standard class typedefs. */
+  typedef SNAPAdvectionFieldImageFilter                                  Self;
+  typedef itk::SmartPointer<Self>                                     Pointer;
+  typedef itk::SmartPointer<const Self>                          ConstPointer;  
+  
+
+  /** Image dimension. */
+  itkStaticConstMacro(ImageDimension, unsigned int,
+                      TInputImage::ImageDimension);    
+  
 
   /** Output image types */
   typedef itk::CovariantVector<
     TOutputValueType, 
-    itkGetStaticConstMacro(InputImageDimension)>                   VectorType;  
+    itkGetStaticConstMacro(ImageDimension)>                   VectorType;  
   typedef itk::Image<
     VectorType, 
-    itkGetStaticConstMacro(InputImageDimension)>              OutputImageType;
+    itkGetStaticConstMacro(ImageDimension)>              OutputImageType;
   typedef itk::SmartPointer<OutputImageType>               OutputImagePointer;
   
-  /** Standard class typedefs. */
-  typedef SNAPAdvectionFieldImageFilter                                  Self;
+  
   typedef itk::ImageToImageFilter<InputImageType,OutputImageType>  Superclass;
-  typedef itk::SmartPointer<Self>                                     Pointer;
-  typedef itk::SmartPointer<const Self>                          ConstPointer;  
   
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
