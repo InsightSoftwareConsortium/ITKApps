@@ -62,6 +62,7 @@ SET (PLUGINS
   vvITKGradientMagnitude
   vvITKGradientMagnitudeRecursiveGaussian
   vvITKIntensityWindowing
+  vvITKIsolatedConnected
   vvITKMedian
   vvITKSigmoid
   vvITKShapeDetectionModule
