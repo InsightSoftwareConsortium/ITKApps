@@ -9,6 +9,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "vvITKFilterModuleBase.h"
+
 #include "itkImage.h"
 #include "itkImportImageFilter.h"
 #include "itkGradientMagnitudeRecursiveGaussianImageFilter.h"
@@ -16,7 +18,6 @@
 #include "itkFastMarchingImageFilter.h"
 #include "itkIntensityWindowingImageFilter.h"
 #include "itkImageRegionConstIterator.h"
-#include "itkCommand.h"
 
 
 namespace VolView 
@@ -26,7 +27,7 @@ namespace PlugIn
 {
 
 template <class TInputPixelType >
-class FastMarchingModule {
+class FastMarchingModule : public FilterModuleBase {
 
 public:
 
@@ -96,11 +97,6 @@ public:
    typedef typename FastMarchingFilterType::NodeContainer    NodeContainerType;
 
 
-
-  // Command/Observer intended to update the progress
-  typedef itk::MemberCommand< FastMarchingModule >  CommandType;
-
-
 public:
     FastMarchingModule();
    ~FastMarchingModule();
@@ -115,8 +111,6 @@ public:
 
     void ProcessData( const vtkVVProcessDataStruct * pds );
     void PostProcessData( const vtkVVProcessDataStruct * pds );
-    void ProgressUpdate( itk::Object * caller, const itk::EventObject & event );
-    void SetPluginInfo( vtkVVPluginInfo * info );
 
     /** This methods allows to disable postprocessing. Useful when 
         this module is used for initializing other level set methods */
@@ -151,12 +145,6 @@ private:
  
     unsigned long                                   m_CurrentNumberOfSeeds;
 
-    typename CommandType::Pointer                   m_CommandObserver;
-
-    vtkVVPluginInfo                               * m_Info;
-
-    std::string                                     m_UpdateMessage;
-  
     float                                           m_LowestBasinValue;
     float                                           m_LowestBorderValue;
 

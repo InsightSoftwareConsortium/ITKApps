@@ -37,6 +37,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
                                             PixelType >   ModuleType;
       ModuleType  module;
       module.SetPluginInfo( info );
+      module.SetUpdateMessage("Computing Fast Marching Module...");
       module.SetStoppingValue( stoppingValue );
       module.SetSigma( sigma );
       module.SetLowestBasinValue( lowestBasinValue ); 
@@ -59,8 +60,8 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       typedef VolView::PlugIn::FastMarchingModule< 
                                             PixelType >   ModuleType;
       ModuleType  module;
-
       module.SetPluginInfo( info );
+      module.SetUpdateMessage("Computing Fast Marching Module...");
       module.SetStoppingValue( stoppingValue );
       module.SetSigma( sigma );
       module.SetLowestBasinValue( lowestBasinValue ); 

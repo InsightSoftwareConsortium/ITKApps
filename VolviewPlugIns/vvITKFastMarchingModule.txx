@@ -31,9 +31,6 @@ FastMarchingModule<TInputPixelType>
 
     m_PerformPostprocessing   = true;
 
-    m_CommandObserver         = CommandType::New();
-    m_Info                    = 0;
-
     m_NodeContainer->Initialize();
     m_FastMarchingFilter->SetTrialPoints( m_NodeContainer );
     m_FastMarchingFilter->SetNormalizationFactor( 255.0 );
@@ -101,29 +98,6 @@ FastMarchingModule<TInputPixelType>
 
 
 
-/*
- *    Method provided as a callback for the progress update.
- */
-template <class TInputPixelType >
-void 
-FastMarchingModule<TInputPixelType>
-::ProgressUpdate( itk::Object * caller, const itk::EventObject & event )
-{
-
-  if( typeid( itk::ProgressEvent ) != typeid( event ) )
-    {
-    return;
-    }
-
-  itk::ProcessObject::Pointer process =
-            dynamic_cast< itk::ProcessObject *>( caller );
-
-  const float progress = process->GetProgress();
-
-  m_Info->UpdateProgress( m_Info, progress, m_UpdateMessage.c_str() ); 
-
-}
-
 
 /*
  *  Set the initial value of the seed.
@@ -138,19 +112,6 @@ FastMarchingModule<TInputPixelType>
   m_InitialSeedValue = value;
 }
 
-
-
-
-/*
- *  Set the Plugin Info structure 
- */
-template <class TInputPixelType >
-void 
-FastMarchingModule<TInputPixelType>
-::SetPluginInfo( vtkVVPluginInfo * info )
-{
-  m_Info = info;
-}
 
 
 
@@ -282,9 +243,11 @@ FastMarchingModule<TInputPixelType>
   double     origin[3];
   double     spacing[3];
 
-  size[0]     =  m_Info->InputVolumeDimensions[0];
-  size[1]     =  m_Info->InputVolumeDimensions[1];
-  size[2]     =  m_Info->InputVolumeDimensions[2];
+  const vtkVVPluginInfo * info = this->GetPluginInfo();
+
+  size[0]     =  info->InputVolumeDimensions[0];
+  size[1]     =  info->InputVolumeDimensions[1];
+  size[2]     =  info->InputVolumeDimensions[2];
 
   m_FastMarchingFilter->SetOutputSize( size );
 
@@ -293,8 +256,8 @@ FastMarchingModule<TInputPixelType>
 
   for(unsigned int i=0; i<3; i++)
     {
-    origin[i]   =  m_Info->InputVolumeOrigin[i];
-    spacing[i]  =  m_Info->InputVolumeSpacing[i];
+    origin[i]   =  info->InputVolumeOrigin[i];
+    spacing[i]  =  info->InputVolumeSpacing[i];
     start[i]    =  0;
     }
 
@@ -322,10 +285,9 @@ FastMarchingModule<TInputPixelType>
                                     importFilterWillDeleteTheInputBuffer );
 
   // Set the Observer for updating progress in the GUI
-  m_CommandObserver->SetCallbackFunction( this, &FastMarchingModule::ProgressUpdate );
-  m_GradientMagnitudeFilter->AddObserver( itk::ProgressEvent(), m_CommandObserver );
-  m_SigmoidFilter->AddObserver( itk::ProgressEvent(), m_CommandObserver );
-  m_FastMarchingFilter->AddObserver( itk::ProgressEvent(), m_CommandObserver );
+  m_GradientMagnitudeFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
+  m_SigmoidFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
+  m_FastMarchingFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
 
   // Execute the filters and progressively remove temporary memory
   m_GradientMagnitudeFilter->Update();
