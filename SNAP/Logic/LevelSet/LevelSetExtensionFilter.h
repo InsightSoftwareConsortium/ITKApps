@@ -135,7 +135,7 @@ LevelSetExtensionFilter<TFilter>
   m_Barrier->Wait();
 
   // Get the thread ID from the thread info
-  int threadID = ((MultiThreader::ThreadInfoStruct *) threadInfo)->ThreadID;
+  int threadID = ((itk::MultiThreader::ThreadInfoStruct *) threadInfo)->ThreadID;
 
   if(threadID == 0)
     {
