@@ -309,6 +309,21 @@ liFilterConsole2DBase
 }
 
 
+ 
+/************************************
+ *
+ *  Execute
+ *
+ ***********************************/
+void
+liFilterConsole2DBase 
+::Cancel( void )
+{
+  m_Laplacian->AbortGenerateDataOn();
+  m_Smoothed->AbortGenerateDataOn();
+  m_Modulus->AbortGenerateDataOn();
+}
+
 
 
 

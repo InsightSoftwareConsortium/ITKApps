@@ -1,17 +1,13 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0011 
+version 1.0103 
 header_name {.h} 
-code_name {.cxx} 
-gridx 5 
-gridy 5 
-snap 3
+code_name {.cxx}
 class liFilterConsoleGUI {open : {public liFilterConsoleBase}
 } {
-  Function {liFilterConsoleGUI()} {open
-  } {
+  Function {liFilterConsoleGUI()} {} {
     Fl_Window consoleWindow {
-      label {Gaussian Filter Console} open selected
-      xywh {32 286 757 391}
+      label {Gaussian Filter Console} open
+      xywh {535 325 757 391}
       code0 {\#include <liFilterConsoleBase.h>}
       code1 {\#include <fltkLightButton.h>} visible
     } {
@@ -106,7 +102,7 @@ class liFilterConsoleGUI {open : {public liFilterConsoleBase}
           xywh {60 72 10 58} box UP_BOX color 4
         }
       }
-      Fl_Group controlsGroup {
+      Fl_Group controlsGroup {selected
         xywh {0 25 755 365} deactivate
       } {
         Fl_Light_Button inputButton {
@@ -176,27 +172,27 @@ class liFilterConsoleGUI {open : {public liFilterConsoleBase}
         Fl_Button {} {
           label {@2>}
           callback {WriteGradientX();}
-          xywh {505 44 18 24} labeltype SYMBOL_LABEL
+          xywh {505 44 18 24}
         }
         Fl_Button {} {
           label {@2>}
           callback {WriteGradientY();}
-          xywh {505 68 18 24} labeltype SYMBOL_LABEL
+          xywh {505 68 18 24}
         }
         Fl_Button {} {
           label {@2>}
           callback {WriteGradientZ();}
-          xywh {505 93 18 24} labeltype SYMBOL_LABEL
+          xywh {505 93 18 24}
         }
         Fl_Button {} {
           label {@2>}
           callback {WriteGradientModulus();}
-          xywh {664 68 19 25} labeltype SYMBOL_LABEL
+          xywh {664 68 19 25}
         }
         Fl_Button {} {
           label {@2>}
           callback {WriteLaplacian();}
-          xywh {665 163 19 25} labeltype SYMBOL_LABEL
+          xywh {665 163 19 25}
         }
         Fl_Light_Button HxButton {
           label {Smooth X}
@@ -228,6 +224,11 @@ class liFilterConsoleGUI {open : {public liFilterConsoleBase}
           xywh {254 140 98 25} type Normal value 1 selection_color 1
           class {fltk::LightButton}
         }
+        Fl_Button {} {
+          label Cancel
+          callback {Cancel();}
+          xywh {440 258 80 30} box ROUND_UP_BOX
+        }
       }
       Fl_Slider progressSlider {
         xywh {5 324 735 15} type {Horz Fill} selection_color 2
@@ -240,7 +241,7 @@ class liFilterConsoleGUI {open : {public liFilterConsoleBase}
       Fl_Button {} {
         label Quit
         callback {Quit();}
-        xywh {490 260 80 30} box ROUND_UP_BOX
+        xywh {605 260 80 30} box ROUND_UP_BOX
       }
       Fl_Light_Button loadButton {
         label Load

@@ -67,6 +67,7 @@ public:
   virtual void ShowProgress(float);
   virtual void ShowStatus(const char * text);
   virtual void Execute(void);
+  virtual void Cancel(void);
   virtual void SetSigma( RealType );
 
   virtual void WriteLaplacian(void) = 0;

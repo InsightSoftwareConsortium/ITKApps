@@ -337,3 +337,34 @@ liFilterConsoleBase
 
 
 
+ 
+/************************************
+ *
+ *  Execute
+ *
+ ***********************************/
+void
+liFilterConsoleBase 
+::Cancel( void )
+{
+  m_Hx->AbortGenerateDataOn();
+  m_Hy->AbortGenerateDataOn();
+  m_Hz->AbortGenerateDataOn();
+
+  m_Hxy->AbortGenerateDataOn();
+  m_Hyz->AbortGenerateDataOn();
+  m_Hzx->AbortGenerateDataOn();
+
+  m_H1x->AbortGenerateDataOn();
+  m_H1y->AbortGenerateDataOn();
+  m_H1z->AbortGenerateDataOn();
+
+  m_H2x->AbortGenerateDataOn();
+  m_H2y->AbortGenerateDataOn();
+  m_H2z->AbortGenerateDataOn();
+
+  m_Modulus->AbortGenerateDataOn();
+  m_Add->AbortGenerateDataOn();
+  m_H2z->AbortGenerateDataOn();
+}
+

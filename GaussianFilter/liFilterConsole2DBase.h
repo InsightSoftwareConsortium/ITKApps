@@ -82,6 +82,7 @@ public:
   virtual void ShowProgress(float);
   virtual void ShowStatus(const char * text);
   virtual void Execute(void);
+  virtual void Cancel(void);
   virtual void SetSigma( ComputationType );
   virtual void SaveSmoothed(void) = 0;
   virtual void SaveLaplacian(void) = 0;
