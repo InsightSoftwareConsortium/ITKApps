@@ -18,7 +18,7 @@
 #define _SimpleAppInputParser_txx
 
 #include "SimpleAppInputParser.h"
-#include "RawVolumeReader.h"
+#include "itkImageFileReader.h"
 #include <stdio.h>
 
 namespace itk
@@ -290,18 +290,16 @@ SimpleAppInputParser<TImage>
    * Read in the images
    ***********************/
    typedef typename ImageType::PixelType PixelType;
-   typedef itk::RawVolumeReader<PixelType,ImageType> ReaderType;
-   typename ReaderType::Pointer reader = ReaderType::New();
+   typedef itk::ImageFileReader<ImageType> ReaderType;
+   typename ReaderType::Pointer fixedReader  = ReaderType::New();
+   typename ReaderType::Pointer movingReader = ReaderType::New();
   
    try 
     {
-    reader->SetFileName( fixedImageFileName.c_str() );
-    reader->SetSize( fixedImageSize );
-    reader->SetSpacing( fixedImageSpacing );
-    reader->SetBigEndian( fixedImageBigEndian );
-    reader->Execute();
+    fixedReader->SetFileName( fixedImageFileName.c_str() );
+    fixedReader->Update();
     
-    m_FixedImage = reader->GetImage();
+    m_FixedImage = fixedReader->GetOutput();
     }
    catch(...)
     {
@@ -312,13 +310,10 @@ SimpleAppInputParser<TImage>
 
    try 
     {
-    reader->SetFileName( movingImageFileName.c_str() );
-    reader->SetSize( movingImageSize );
-    reader->SetSpacing( movingImageSpacing );
-    reader->SetBigEndian( movingImageBigEndian );
-    reader->Execute();
+    movingReader->SetFileName( movingImageFileName.c_str() );
+    movingReader->Update();
     
-    m_MovingImage = reader->GetImage();
+    m_MovingImage = movingReader->GetOutput();
     }
    catch(...)
     {

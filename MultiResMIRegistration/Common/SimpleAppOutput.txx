@@ -23,7 +23,7 @@
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkExceptionObject.h"
 
-#include "PGMVolumeWriter.h"
+#include "itkImageFileWriter.h"
 
 namespace itk
 {
@@ -82,34 +82,31 @@ SimpleAppOutput<TImage>
 
 
   // write out image as pgm files
-  typedef PGMVolumeWriter<ImageType> PGMWriterType;
-  typename PGMWriterType::Pointer writer = PGMWriterType::New();
+  typedef ImageFileWriter<ImageType> WriterType;
+  typename WriterType::Pointer fixedWriter          = WriterType::New();
+  typename WriterType::Pointer movingwriter         = WriterType::New();
+  typename WriterType::Pointer resampleMovingwriter = WriterType::New();
 
   try
     {
 
-    writer->SetImage( m_FixedImage );
-    writer->SetDirectoryName( m_DirectoryName.c_str() );
-    writer->SetFilePrefix( "target" );
-    writer->Execute();
+    fixedWriter->SetInput( m_FixedImage );
+    fixedWriter->SetFileName( "FixedImage.mhd" );
+    fixedWriter->Update();
 
-    writer->SetImage( m_MovingImage );
-    writer->SetDirectoryName( m_DirectoryName.c_str() );
-    writer->SetFilePrefix( "source" );
-    writer->Execute();
+    movingwriter->SetInput( m_MovingImage );
+    movingwriter->SetFileName( "MovingImage.mhd" );
+    movingwriter->Update();
 
-    writer->SetImage( m_ResampledImage );
-    writer->SetDirectoryName( m_DirectoryName.c_str() );
-    writer->SetFilePrefix( "register" );
-    writer->Execute();
-
+    resampleMovingwriter->SetInput( m_ResampledImage );
+    resampleMovingwriter->SetFileName( "ResampledMovingImage.mhd" );
+    resampleMovingwriter->Update();
 
     }
-  catch(...)
+  catch( itk::ExceptionObject & excp )
     {
-     std::cout << "Error occured while writing PGM files." << std::endl;
-     std::cout << "Please make sure path " << m_DirectoryName.c_str()
-               << " is valid. " << std::endl;              
+     std::cerr << "Error occured while writing output files." << std::endl;
+     std::cerr << excp << std::endl;              
      throw;
     }
 
