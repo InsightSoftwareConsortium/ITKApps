@@ -61,6 +61,7 @@ SET (PLUGINS
   vvITKIntensityWindowing
   vvITKMedian
   vvITKSigmoid
+  vvITKShapeDetectionModule
   )
 
 
