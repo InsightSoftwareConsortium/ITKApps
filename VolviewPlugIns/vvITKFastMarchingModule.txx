@@ -294,14 +294,24 @@ FastMarchingModule<TInputPixelType>
   m_FastMarchingFilter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
   m_FastMarchingFilter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
 
+  m_GradientMagnitudeFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
+  m_GradientMagnitudeFilter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
+  m_GradientMagnitudeFilter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
+
+  m_SigmoidFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
+  m_SigmoidFilter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
+  m_SigmoidFilter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
+
   // Execute the filters and progressively remove temporary memory
   this->SetUpdateMessage("Preprocessing with gradient magnitude...");
+  this->SetCurrentFilterProgressWeight( 0.5 * m_ProgressWeighting );
   m_GradientMagnitudeFilter->Update();
 
+  this->SetCurrentFilterProgressWeight( 0.1 * m_ProgressWeighting );
   this->SetUpdateMessage("Preprocessing with sigmoid...");
   m_SigmoidFilter->Update();
 
-  this->SetCurrentFilterProgressWeight( 1.0 * m_ProgressWeighting );
+  this->SetCurrentFilterProgressWeight( 0.4 * m_ProgressWeighting );
   this->SetUpdateMessage("Computing Fast Marching...");
   m_FastMarchingFilter->Update();
 
