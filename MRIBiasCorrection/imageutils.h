@@ -27,13 +27,18 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "myutils.h"
 
-typedef itk::Image<float, 3> ImageType ;
-typedef itk::Image<unsigned char, 3> MaskType ;
+typedef  float ImagePixelType;
+typedef  short WriteImagePixelType;
+typedef  unsigned char MaskPixelType;
+typedef itk::Image<ImagePixelType, 3> ImageType ;
+typedef itk::Image<MaskPixelType, 3> MaskType ;
+typedef itk::Image<WriteImagePixelType, 3> WriteImageType ;
 typedef ImageType::Pointer ImagePointer ;
 typedef MaskType::Pointer MaskPointer ;
 typedef itk::ImageFileReader< ImageType > ImageReaderType ;
 typedef itk::ImageFileReader< MaskType > MaskReaderType ;
-typedef itk::ImageFileWriter< ImageType > ImageWriterType ;
+typedef itk::ImageFileWriter< WriteImageType > ImageWriterType ;
+typedef itk::ImageFileWriter< MaskType > MaskWriterType ;
 
 void copyImage(ImagePointer source , ImagePointer target)
 {

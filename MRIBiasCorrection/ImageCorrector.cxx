@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "imageutils.h"
 #include "OptionList.h"
-#include "metaITKUtils.h"
 #include "itkMultivariateLegendrePolynomial.h"
+#include <itkCastImageFilter.h>
 
 typedef itk::MultivariateLegendrePolynomial BiasField ;
 
@@ -64,8 +64,8 @@ void print_usage()
 }
 
     
-void correctBias(ImagePointer input, MaskPointer mask,
-                 BiasField& biasField, ImagePointer output,
+void correctBias(ImagePointer& input, MaskPointer& mask,
+                 BiasField& biasField, ImagePointer& output,
                  bool useLog) 
 {
   std::cout << "Correcting bias..." << std::endl ;
@@ -81,7 +81,7 @@ void correctBias(ImagePointer input, MaskPointer mask,
   output->SetSpacing(input->GetSpacing()) ;
 
   bool maskAvailable = true ;
-  if (region.GetSize() != mask->GetLargestPossibleRegion().GetSize())
+  if (!mask || region.GetSize() != mask->GetLargestPossibleRegion().GetSize())
     {
       maskAvailable = false ;
     }
@@ -178,7 +178,7 @@ int main(int argc, char* argv[])
       options.GetStringOption("output-mask", &outputMaskFileName, false) ;
       
       // get bias field options
-      useLog = options.GetBooleanOption("use-log", true, true) ;
+      useLog = options.GetBooleanOption("use-log", true, false) ;
       std::vector<double> coefficients ;
       options.GetMultiDoubleOption("coefficients", &coefficients, true) ;
       int length = coefficients.size() ;
@@ -198,7 +198,7 @@ int main(int argc, char* argv[])
   
   // load images
   ImagePointer input ;
-  MaskPointer outputMask ;
+  MaskPointer outputMask = NULL;
 
   ImageReaderType::Pointer imageReader = ImageReaderType::New() ;
   MaskReaderType::Pointer maskReader = MaskReaderType::New() ;
@@ -265,8 +265,14 @@ int main(int argc, char* argv[])
 
   // writes the corrected image
   std::cout << "Writing corrected image..." << std::endl ;
-  metaITKUtilSaveImage<ImageType>(outputFileName.c_str(), NULL,
-                                  output, MET_FLOAT, 1, MET_FLOAT);
+  typedef itk::CastImageFilter< ImageType,  WriteImageType> castFilterType;
+  castFilterType::Pointer convFilter = castFilterType::New();
+  convFilter->SetInput(output);
+  convFilter->Update();
+  ImageWriterType::Pointer writer = ImageWriterType::New() ;
+  writer->SetInput(convFilter->GetOutput()) ;
+  writer->SetFileName(outputFileName.c_str()) ;
+  writer->Write() ;
                   
   std::cout << "Corrected image created." << std::endl ;
 

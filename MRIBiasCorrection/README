@@ -18,15 +18,15 @@ and his colleagues.
 
 For more details. refer to the following articles.
 "Parametric estimate of intensity inhomogeneities applied to MRI" 
-Martin Styner, G. Gerig, Christian Brechbuehler, Gabor Szekely,  
+Martin Styner, Guido Gerig, Christian Brechbuehler, Gabor Szekely,  
 IEEE TRANSACTIONS ON MEDICAL IMAGING; 19(3), pp. 153-165, 2000, 
 (http://www.ia.unc.edu/public/styner/docs/tmi00.pdf)
 
 "Evaluation of 2D/3D bias correction with 1+1ES-optimization" 
- Martin Styner, Prof. Dr. G. Gerig (IKT, BIWI, ETH Zuerich), TR-197
+ Martin Styner,  Guido Gerig (IKT, BIWI, ETH Zuerich), TR-197
 (http://www.ia.unc.edu/public/styner/docs/StynerTR97.pdf)
 
-NOTE: All utilities supports only metaimage file format (.mha or .mhd).
+NOTE: All utilities support all ITK 3D file formats 
 
 
 HOW TO USE UTILITIES
@@ -43,7 +43,7 @@ parameters which you will type in as a command line arguments. It
 returns some command line arguments values and the list of the best
 set of coefficients to screen. 
 
-2. ImageCorrector (previously named BiasCorrector)
+2. ImageCorrector 
 This utility creates a bias field corrected image using an image and a
 set of bias field estimate coefficients which will be the result from
 the BiasFieldEstimator.
@@ -68,7 +68,7 @@ This utility creates a list of pairs of intenisty and its energy
 value using class statistics given by users. Users can use the list to
 adjust to tissue class sigma. 
 
-7. SlabIdentifier (New)
+7. SlabIdentifier 
 This utility search for slabs in an MR ansiogram (MRA) image. 
 In many cases, a 3D MRA image is constructed by merging  smaller 3D 
 blocks (slabs) which were acquired with different settings such as magnetic
@@ -85,12 +85,15 @@ scheme that MRIBiasFieldCorrectionFilter uses might not adopt well.
 So, the MRIBiasFieldCorrectionFilter creates regions for slabs using the 
 MRASlabIdentifier and then apply its bias correction scheme to each slab.
 
-8. BiasCorrector (New)
-This utility performs slab identification, inter-slice intensity correction,
-, bias field estimation, and corrected image generation all together using 
+8. BiasCorrector 
+This utility performs slab identification, inter-slice intensity correction, 
+bias field estimation, and corrected image generation all together using 
 itkMRIBiasFieldCorrectionFilter (in the Code/BasicFilter directory). The main
-purpose of this utility is to show how to use the filter.
-The InterSliceIntensityCorrector utility also uses the same filter.
+purpose of this utility is to show how to use the filter, but it can also be 
+used as a standalone command-line operated application. Additionally, the 
+program automatically computes an output mask (using a 10% histogram threshold) 
+and an input mask (output mask - dilated edge mask computed via 
+ZeroCrossingBasedEdgeDetectionImageFilte).
 
 
 POSSIBLE USE SENARIOS
@@ -103,20 +106,11 @@ image
 reduction, coming soon) -> preprocessed image 
 
 
-1. Bias Field Estimation
+1. Bias Field Correction
 
-1) original image (or preprocessed image) -> BiasFieldEstimator ->
-coefficients of the bias field estimate
+0) Determine class model via manual sampling in ImageViewer or via IntensityHistogram3D
 
-2) original image (or preprocessed image) -> BiasFieldEstimator ->
-coefficients of the bias field estimate -> ... -> BiasFieldEstimator
--> coefficients of the bias field estimate 
+1) original image / preprocessed image -> BiasFieldEstimator ->
+coefficients of the bias field estimate -> BiasCorrector -> bias field corrected image
 
-2. Bias Correction
-
-1) original image + the coefficients of the bias field estimate (from
-BiasFieldEstimator) -> BiasCorrector -> bias field corrected image
-
-3. Bias Image Generation
-1) the coefficients of the bias field estimate + result image
-dimension and size -> BiasImageGenerator -> bias image
+2) original image / preprocessed image -> BiasCorrector -> bias field corrected image

@@ -34,10 +34,11 @@ void print_usage()
   print_line("       --class-sigma sigma(1) ... sigma(i)" ) ;
   print_line("       --use-log [yes|no]") ;
   print_line("       [--input-mask file]" ) ;
-  print_line("       [--degree int] [--coefficients c0,..,cn]" ) ;
+  print_line("       [--degree int] [--coefficients c0..cn]" ) ;
   print_line("       [--growth double] [--shrink double] ") ;
   print_line("       [--volume-max-iteration int]");
   print_line("       [--init-step-size double] ");
+  print_line("       [--schedule s0...sn] ");
 
   print_line("");
 
@@ -70,9 +71,12 @@ void print_usage()
   print_line("        [default 20]" ) ;
   print_line("--init-step-size double") ;
   print_line("        inital step size [default 1.02]" );
-  print_line("--coefficients c(0),..,c(n)") ;
+  print_line("--coefficients c(0) .. c(n)") ;
   print_line("        coefficients of the polynomial") ;
   print_line("        (used for generating bias field)") ;
+  print_line("--schedule s(0) .. s(n)") ;
+  print_line("        multires schedule (default 2 2 2 1 1 1)") ;
+  print_line("        n has to be a multiple of 3") ;
 
   print_line("");
 
@@ -83,6 +87,7 @@ void print_usage()
   print_line("         --degree 3 --grow 1.05 --shrink 0.9");
   print_line("         --max-iteration 2000 --init-step-size 1.02") ;
   print_line("         --coefficients 0.056789 -1.00004 0.78945 ... -0.02345");
+  print_line("         --schedule 4 4 2");
 }
 
 
@@ -96,16 +101,12 @@ void printResult(Corrector* filter, OptionList& options)
 
   std::cout << " --degree " << filter->GetBiasFieldDegree() ;
 
-  std::cout << "--grow " << filter->GetOptimizerGrowthFactor() ;
+  std::cout << " --grow " << filter->GetOptimizerGrowthFactor() ;
   std::cout << " --shrink " << filter->GetOptimizerShrinkFactor() ;
   std::cout << " --volume-max-iteration " << filter->GetVolumeCorrectionMaximumIteration();
   std::cout << " --inter-slice-max-iteration " << filter->GetInterSliceCorrectionMaximumIteration();
   
-  if (filter->IsBiasFieldMultiplicative())
-    std::cout << " --init-step-size " 
-              << exp(filter->GetOptimizerInitialRadius()) ;
-  else
-    std::cout << " --init-step-size " << filter->GetOptimizerInitialRadius() ;
+  std::cout << " --init-step-size " << filter->GetOptimizerInitialRadius() ;
 
 
   std::cout << " --coefficients " ;
@@ -140,13 +141,14 @@ int main(int argc, char* argv[])
   std::string inputMaskFileName = "" ;
   bool useLog = true;
   int degree = 3;
-  itk::Array<double> classMeans ;
-  itk::Array<double> classSigmas ;
+  std::vector<double> InclassMeans ;
+  std::vector<double> InclassSigmas ;
   int volumeMaximumIteration = 20; 
   double initialRadius = 1.02;
   double grow  = 1.05;
   double shrink = pow(grow, -0.25);
   std::vector<double> coefficients ;
+  std::vector<int> schedule ;
 
   try
     {
@@ -155,14 +157,17 @@ int main(int argc, char* argv[])
       options.GetStringOption("input-mask", &inputMaskFileName, false) ;
       
       // get bias field options
-      useLog = options.GetBooleanOption("use-log", true, true) ;
+      useLog = options.GetBooleanOption("use-log", true, false) ;
       degree = options.GetIntOption("degree", 3, false) ;
       
       options.GetMultiDoubleOption("coefficients", &coefficients, false) ;
 
+      //get schedule
+      options.GetMultiIntOption("schedule", &schedule, false) ;
+
       // get energyfunction options
-      options.GetMultiDoubleOption("class-mean", &classMeans, true) ;
-      options.GetMultiDoubleOption("class-sigma", &classSigmas, true) ;
+      options.GetMultiDoubleOption("class-mean", &InclassMeans, true) ;
+      options.GetMultiDoubleOption("class-sigma", &InclassSigmas, true) ;
 
       // get optimizer options
       volumeMaximumIteration = options.GetIntOption("volume-max-iteration", 20, false) ;
@@ -207,8 +212,45 @@ int main(int argc, char* argv[])
       exit(0) ;
     }
   
+  if (!coefficients.empty())
+    {
+      std::cout << "Setting initial coeffs" << std::endl ;
+      filter->SetInitialBiasFieldCoefficients(coefficients) ;
+    }
+  if (!schedule.empty())
+    {
+      if (schedule.size() % 3 == 0 )
+   {
+     int level = schedule.size() / 3;
+     std::cout << "Setting multires schedule :" << level << std::endl ;
+     filter->SetNumberOfLevels( level ) ;
+     Corrector::ScheduleType CorrSchedule ( level, 3) ;
+     for( int lev = 0; lev < level; lev++ ) // Copy schedule 
+       {
+         for( int dim = 0; dim < 3; dim++ )
+      {
+        CorrSchedule[lev][dim] = schedule[lev * 3 + dim];
+      }
+       }
+     
+     filter->SetSchedule(CorrSchedule) ;
+   }
+      else
+   {
+     std::cout << "Schedule: number of elements not divisible by 3, using default" << std::endl ;
+   }
+    }
+  //Copy class model
+  itk::Array<double> classMeans ;
+  itk::Array<double> classSigmas ;
+  classMeans.SetSize(InclassMeans.size());
+  classSigmas.SetSize(InclassSigmas.size());
+  for (int i = 0; i < InclassMeans.size(); i++) classMeans.SetElement(i, InclassMeans[i]);
+  for (int i = 0; i < InclassSigmas.size(); i++) classSigmas.SetElement(i, InclassSigmas[i]);
+  
+
+
   filter->IsBiasFieldMultiplicative(useLog) ;
-  filter->SetInitialBiasFieldCoefficients(coefficients) ;
   // sets tissue classes' statistics for creating the energy function
   filter->SetTissueClassStatistics(classMeans, classSigmas) ;
   // setting standard optimizer parameters 
@@ -216,9 +258,6 @@ int main(int argc, char* argv[])
   filter->SetOptimizerShrinkFactor(shrink) ;
   filter->SetVolumeCorrectionMaximumIteration(volumeMaximumIteration) ;
   filter->SetOptimizerInitialRadius(initialRadius) ;
-  // this member function call is not necessary since the filter's internal
-  // InterSliceIntensityCorrection() member sets the bias field degree to
-  // zero.
   filter->SetBiasFieldDegree(degree) ;
   // turn on inter-slice intensity correction 
   filter->SetUsingInterSliceIntensityCorrection(false) ;
@@ -226,12 +265,11 @@ int main(int argc, char* argv[])
   // the filter will think the largest possible region as the only one
   // slab.
   filter->SetUsingSlabIdentification(false) ;
-  // disable 3D bias correction
   filter->SetUsingBiasFieldCorrection(true) ;
   // disable output image generation
   filter->SetGeneratingOutput(false) ;
   filter->SetSlicingDirection(2) ;
-
+  
   std::cout << "Estimating the bias field..." << std::endl ;
   filter->Update() ;
 
