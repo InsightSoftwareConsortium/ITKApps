@@ -139,12 +139,12 @@ AppearanceDialogUILogic
   if(i == 6) return;
 
   // Start with stock orientations
-  string axes[3] = {string("RPS"),string("AIL"),string("RIP")};
+  string axes[3] = {string("LPS"),string("AIL"),string("LIP")};
 
   // Switch the configurable directions
   if(m_ChkOptionsViews2DRightIsLeft->value() == 0)
     {
-    axes[0][0] = axes[2][0] = 'L';
+    axes[0][0] = axes[2][0] = 'R';
     }
   if(m_ChkOptionsViews2DNoseLeft->value() == 0)
     {
@@ -235,7 +235,10 @@ AppearanceDialogUILogic
     m_InRenderOptionsMeshSmoothRelaxation->value());
 
   // Save the mesh options
-  m_GlobalState->SetMeshOptions(mops);  
+  m_GlobalState->SetMeshOptions(mops); 
+  
+  // Enable the update button on the 3D window
+  m_Parent->OnIRISMeshDisplaySettingsUpdate();
 }
 
 void  

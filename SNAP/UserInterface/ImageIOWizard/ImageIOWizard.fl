@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0105 
+version 1.0104 
 header_name {.h} 
 code_name {.cxx}
 class ImageIOWizard {open : ImageIOWizardBase
@@ -15,8 +15,8 @@ class ImageIOWizard {open : ImageIOWizardBase
         xywh {-5 -10 505 395}
       } {
         Fl_Group m_PageFile {
-          label {File Selection}
-          xywh {0 0 470 330} box PLASTIC_DOWN_BOX labelfont 2 labelsize 10 hide
+          label {File Selection} selected
+          xywh {0 0 470 330} box PLASTIC_DOWN_BOX labelfont 2 labelsize 10
         } {
           Fl_Group {} {
             label {Select a file that contains an image:}
@@ -203,7 +203,7 @@ class ImageIOWizard {open : ImageIOWizardBase
           }
         }
         Fl_Group m_PageOrientation {
-          label {Image Orientation}
+          label {Image Orientation} open
           xywh {0 0 470 330} box PLASTIC_DOWN_BOX labelfont 2 labelsize 10 hide
         } {
           Fl_Group {} {
@@ -216,23 +216,23 @@ class ImageIOWizard {open : ImageIOWizardBase
             xywh {35 70 200 25} down_box BORDER_BOX labelsize 12 align 5 textsize 12
           } {
             menuitem {} {
-              label {Default orientation (CT)}
+              label {Axial MRI}
               xywh {5 5 100 20} value 1 labelsize 12
             }
             menuitem {} {
-              label {Axial MR}
+              label {Sagittal MRI}
               xywh {15 15 100 20} labelsize 12
             }
             menuitem {} {
-              label {Sagittal MR}
+              label {Coronal MRI}
               xywh {25 25 100 20} labelsize 12
             }
             menuitem {} {
-              label {Coronal MR}
+              label CT
               xywh {35 35 100 20} labelsize 12
             }
             menuitem m_ItemOrientationPageCustom {
-              label {Use custom settings}
+              label Custom
               xywh {45 45 100 20} labelsize 12
             }
           }
@@ -338,7 +338,7 @@ class ImageIOWizard {open : ImageIOWizardBase
             Fl_Input m_InRAICode {
               label {RAI Code:}
               callback {this->OnOrientationPageRAIChange();}
-              xywh {160 245 60 25} labelsize 12 when 1 textsize 12
+              tooltip {The RAI code is a three-letter code indicating the orientation of the image in XYZ coordinates. Each letter stands for (R)ight, (Left), (A)nterior, (P)osterior, (I)nferior and (S)uperior. The first letter is the orientation of the X coordinate, the second of Y and the third of Z. So, RAI means X:Right to Left; Y:Anterior to Posterior; Z:Inferior to Superior.} xywh {160 245 60 25} labelsize 12 when 1 textsize 12
             }
           }
           Fl_Group m_GrpOrientationPageGraphic {
@@ -446,8 +446,8 @@ the selected image orientation} open
           }
         }
         Fl_Group m_PageSummary {
-          label Summary open
-          xywh {0 0 470 330} box PLASTIC_DOWN_BOX labelfont 2 labelsize 10
+          label Summary
+          xywh {0 0 470 330} box PLASTIC_DOWN_BOX labelfont 2 labelsize 10 hide
         } {
           Fl_Group {} {
             label {Image Summary:}
@@ -475,7 +475,7 @@ the selected image orientation} open
           }
           Fl_Value_Output m_OutSummarySize {
             label {Size in KB:}
-            xywh {100 255 95 20} color 54 labelsize 12 maximum 1e+008 textsize 12
+            xywh {100 255 95 20} color 54 labelsize 12 maximum 1e+08 textsize 12
           }
           Fl_Output m_OutSummaryFileName {
             label {File name:}
@@ -513,8 +513,8 @@ the selected image orientation} open
       }
     }
     Fl_Window m_WinOutput {
-      label {SnAP Save Image Wizard} open
-      xywh {1041 580 470 330} type Double modal visible
+      label {SnAP Save Image Wizard}
+      xywh {809 580 470 330} type Double modal visible
     } {
       Fl_Wizard m_WizOutput {
         xywh {-5 -10 505 395}

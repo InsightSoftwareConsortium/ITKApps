@@ -1868,10 +1868,14 @@ UserInterfaceLogic
     panels[1]->resize(x + (w >> 1), y, w - (w >> 1), h >> 1);
     panels[3]->resize(x, y + (h >> 1), w >> 1, h - (h >> 1));
     panels[2]->resize(x + (w >> 1), y + (h >> 1), w - (w >> 1), h - (h >> 1));
+    
+    // Remove the current panel
+    m_GrpIRISWindows->remove(panels[i]);
 
     // Show everything
     for(unsigned int j = 0; j < 4; j++)
       {
+      m_GrpIRISWindows->add(panels[j]);
       panels[j]->show();
       boxes[j]->show();
       panels[j]->redraw();
@@ -1885,15 +1889,14 @@ UserInterfaceLogic
         {
         panels[j]->hide();
         boxes[j]->hide();
-        //panels[j]->resize(
-        //  m_GrpIRISWindows->x(),m_GrpIRISWindows->y(),
-        //  0,0);
+        m_GrpIRISWindows->remove(panels[j]);
         }
       }
 
     panels[i]->resize(
       m_GrpIRISWindows->x(),m_GrpIRISWindows->y(),
       m_GrpIRISWindows->w(),m_GrpIRISWindows->h());
+    m_GrpIRISWindows->resizable(panels[i]);
     panels[i]->redraw();
     }
 }
@@ -1990,6 +1993,13 @@ UserInterfaceLogic
 ::OnIRISMeshEditingAction()
 {
   m_Activation->UpdateFlag(UIF_IRIS_MESH_ACTION_PENDING, true);
+}
+
+void
+UserInterfaceLogic
+::OnIRISMeshDisplaySettingsUpdate()
+{
+  m_Activation->UpdateFlag(UIF_IRIS_MESH_DIRTY, true);
 }
 
 void 
@@ -2180,7 +2190,7 @@ UserInterfaceLogic
   m_WizControlPane->value(m_GrpToolbarPage);
 
   // Enable some menu items
-  m_Activation->UpdateFlag(UIF_GRAY_LOADED, true);
+  m_Activation->UpdateFlag(UIF_IRIS_WITH_GRAY_LOADED, true);
 
   // Image geometry has changed
   OnImageGeometryUpdate();
@@ -2873,6 +2883,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.30  2004/09/21 15:50:40  jjomier
+ *FIX: vector_multiply_mixed requires template parameters otherwise MSVC cannot deduce them
+ *
  *Revision 1.29  2004/09/14 14:11:10  pauly
  *ENH: Added an activation manager to main UI class, improved snake code, various UI fixes and additions
  *

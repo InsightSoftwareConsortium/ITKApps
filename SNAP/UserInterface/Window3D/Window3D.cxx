@@ -330,7 +330,7 @@ Window3D
   m_TrackballMode = new Trackball3DInteractionMode(this);
   m_SpraypaintMode = new Spraypaint3DInteractionMode(this);
   m_ScalpelMode = new Scalpel3DInteractionMode(this);
-
+  
   // Start with the trackball mode, which is prevailing
   PushInteractionMode(m_TrackballMode);
 }
@@ -403,8 +403,6 @@ void
 Window3D
 ::Initialize()
 {
-  ResetView();
-
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glEnable( GL_DEPTH_TEST );
 
@@ -541,12 +539,20 @@ void
 Window3D
 ::draw()
 {
-  if ( !valid() || m_NeedsInitialization )
+  // Respond to a resize if necessary
+  if (!valid())
     {
-    glViewport(0,0,w(),h());
     Initialize();
-    m_NeedsInitialization = 0;
+    glViewport(0,0,w(),h());
     }
+  
+  // Initialize GL if necessary
+  if(m_NeedsInitialization)
+    {
+    ResetView();
+    Initialize();
+    m_NeedsInitialization = false;
+    }      
 
   // Get the properties for the background color
   Vector3d clrBack = 
@@ -867,13 +873,23 @@ Window3D
 {
   // Get the view extent 'radius'
   m_ViewHalf = m_DefaultHalf / m_Trackball.GetZoom();
+  
+  double x, y;
+  if(m_ViewHalf[X] * h() > m_ViewHalf[Y] * w())
+    {
+    x = m_ViewHalf[X]; 
+    y = h() * x / w();
+    }
+  else
+    {
+    y = m_ViewHalf[Y]; 
+    x = w() * y / h();
+    }
 
   // Set up the coordinate projection
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
-  glOrtho( -m_ViewHalf[X], m_ViewHalf[X], 
-           -m_ViewHalf[Y], m_ViewHalf[Y], 
-           -m_DefaultHalf[Z], m_DefaultHalf[Z]);
+  glOrtho(-x, x, -y, y, -m_DefaultHalf[Z], m_DefaultHalf[Z]);
 }
 
 // Get a copy of the viewport/m_Modelview/projection matrices OpenGL uses
@@ -1421,6 +1437,9 @@ Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.25  2004/12/31 17:34:04  lorensen
+ *COMP: gcc3.4 issues.
+ *
  *Revision 1.24  2004/10/04 17:41:46  pauly
  *FIX: Filename extensions for FLTK includes
  *

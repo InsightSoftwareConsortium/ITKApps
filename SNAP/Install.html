@@ -125,14 +125,18 @@ Create the following directory structure, which is recommended and will be assum
     tar -xzvf fltk-1.1.*-source.tar.gz 
   </pre></li>
 
-  <li> [Linux, optional]: to enable anti-aliased fonts on Linux, in the following step pass the option <b>--enable-xft</b> to the <b>./configure</b> command.</li><br>
+  <li> [Linux, optional]: to enable anti-aliased fonts on Linux, in the following step pass the option <b>--enable-xft</b> to the <b>./configure</b> command. <i> You will also need to specify the advanced option SNAP_USE_XFT_LIBRARY in Step 5. </i></li><br>
+  
+  <li> [Linux, optional]: if you don't have root access, in the following step pass the option <b>
+  --prefix=DIR</b> where DIR is the directory where you want FLTK installed. Make sure that this directory exists! If you do this, you don't need to execute the <b>su</b> command below.</li>
     
   <li> Go to the directory <i>basedir/fltk/fltk-1.1.*/</i> and execute the following commands:
   <pre>
-    ./configure 
+    ./configure                           # See notes above for options
     make
-    make fluid
-  </pre>
+    su                                    # Not required, see note above
+    make install
+  </pre></li>    
 </ol>
 
 <p> At this point, you will have a working installation of FLTK on your system.  Please refer to FLTK documentation (at <a href="http://www.fltk.org">www.fltk.org</a>) for troubleshooting information.</p>
@@ -168,9 +172,23 @@ Create the following directory structure, which is recommended and will be assum
   <li> Use the <b>c</b> command to configure InsightApplications.  More options will appear: </li>
   <pre>
     VTK_DIR = basedir/vtk/bingcc
-    FLTK_BASE_LIBRARY = basedir/fltk/fltk-1.1.*
-    FLTK_FLUID_EXECUTABLE = basedir/fltk/fltk-1.1.*/fluid/fluid
-  </pre></li>
+  </pre>
+  <li> [Linux, Optional]: If you installed FLTK in a non-system directory, you will need to point to it. You will probably
+  need to only specify the first of these options, the rest will likely be filled in for you. </li>
+  <pre>
+    FLTK_INCLUDE_DIR = dir/include                # dir = Directory where you installed fltk
+    FLTK_BASE_LIBRARY = dir/lib/libfltk.a
+    FLTK_FORMS_LIBRARY = dir/lib/libfltk_forms.a
+    FLTK_GL_LIBRARY = dir/lib/libfltk_gl.a
+    FLTK_IMAGES_LIBRARY = dir/lib/libfltk_images.a
+    FLTK_FLUID_EXECUTABLE = dir/bin/fluid
+  </pre>
+  <li> [Optional]: You can specify the following additional advanced options (press t to toggle advanced mode)</li>
+  <pre>
+    USE_VTK_PATENTED                # Whether to use patented code. You must have a license
+                                    # for using patented code from VTK to do this!
+    SNAP_USE_XFT_LIBRARY            # Use if you built FLTK with --enable-xft
+  </pre>
   <li> Use the <b>c</b> command to configure InsightApplications and 
   use the <b>g</b> command to generate makefiles </li><br>
   <li> To build all InsightApplications, including SNAP execute the following command.  Alternatively, to only build SNAP, first change directory to <i>basedir/app/bingcc/SNAP</i> and run the same command.
@@ -186,7 +204,7 @@ Create the following directory structure, which is recommended and will be assum
   <li> Change directory to <i>basedir/app/bingcc/SNAP</i></li><br>
   <li> Run the SNAP executable
   <pre>
-    ./SNAP
+    ./InsightSNAP
   </pre>
   </li>
 </ol>

@@ -396,28 +396,19 @@ SET(TESTING_TUTORIAL_SRCS
   ${TESTING_TUTORIAL_CXX}
 )
 
-# The Logic library
-# ADD_LIBRARY(SNAPLogic ${LOGIC_SRCS})
-
-# The SNAP executable
-SET(SNAP_EXE_PARAMETERS "WIN32" ${APPLICATION_SRCS})
-ADD_GUI_EXECUTABLE(InsightSNAP "${SNAP_EXE_PARAMETERS}")
-
-# The testing executable
-ADD_GUI_EXECUTABLE(SNAPTests "${TESTING_SRCS}")
-
-# Test/tutorial executable
-ADD_EXECUTABLE(SNAPTutorialTest ${TESTING_TUTORIAL_SRCS})
-
-# FLTK Wrapping
-FLTK_WRAP_UI(InsightSNAP ${APPLICATION_FLUIDS})
-
-# Disable FLTK warnings 
-ITK_DISABLE_FLTK_GENERATED_WARNINGS("${APPLICATION_FLUIDS}")
-
 #############################################
 # SYSTEM-SPECIFIC SETTINGS                  #
 #############################################
+SET(SYSTEM_LIBS)
+
+IF(UNIX)
+  # Include the XFT libary for nice fonts
+  OPTION(SNAP_USE_XFT_LIBRARY "Enable this option if you built FLTK with --enable-xft" OFF)
+  MARK_AS_ADVANCED(SNAP_USE_XFT_LIBRARY)
+  IF(SNAP_USE_XFT_LIBRARY)
+    SET(SYSTEM_LIBS ${SYSTEM_LIBS} Xft)
+  ENDIF(SNAP_USE_XFT_LIBRARY)
+ENDIF(UNIX)
     
 #############################################
 # LIBRARIES AND EXTERNAL CODE               #
@@ -488,12 +479,30 @@ SET(SNAP_FLTK_LIBS
 SET(SNAP_SYSTEM_LIBS
   ${OPENGL_LIBRARIES}
   ${OPENGL_glu_LIBRARY}
+  ${SYSTEM_LIBS}
 )
 
 # Assign libraries to targets
-TARGET_LINK_LIBRARIES(InsightSNAP      ${SNAP_ITK_LIBS} ${SNAP_VTK_LIBS} ${SNAP_FLTK_LIBS} ${SNAP_SYSTEM_LIBS})
-TARGET_LINK_LIBRARIES(SNAPTests        ${SNAP_ITK_LIBS} ${SNAP_VTK_LIBS} ${SNAP_FLTK_LIBS} ${SNAP_SYSTEM_LIBS})
-TARGET_LINK_LIBRARIES(SNAPTutorialTest ${SNAP_ITK_LIBS} ${SNAP_VTK_LIBS} ${SNAP_FLTK_LIBS} ${SNAP_SYSTEM_LIBS})
+LINK_LIBRARIES(${SNAP_ITK_LIBS} ${SNAP_VTK_LIBS} ${SNAP_FLTK_LIBS} ${SNAP_SYSTEM_LIBS})
+
+# *****************************************************
+# SNAP Executables
+# *****************************************************
+# The SNAP executable
+SET(SNAP_EXE_PARAMETERS "WIN32" ${APPLICATION_SRCS})
+ADD_GUI_EXECUTABLE(InsightSNAP "${SNAP_EXE_PARAMETERS}")
+
+# The testing executables
+IF(BUILD_TESTING)
+  ADD_GUI_EXECUTABLE(SNAPTests "${TESTING_SRCS}")
+  ADD_EXECUTABLE(SNAPTutorialTest ${TESTING_TUTORIAL_SRCS})
+ENDIF(BUILD_TESTING)
+  
+# FLTK Wrapping
+FLTK_WRAP_UI(InsightSNAP ${APPLICATION_FLUIDS})
+
+# Disable FLTK warnings 
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${APPLICATION_FLUIDS}")
 
 # ----------------------------------------------------------------
 # Miscelaneous tasks (not related to link and compilation)

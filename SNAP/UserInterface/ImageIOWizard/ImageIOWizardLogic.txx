@@ -685,11 +685,16 @@ ImageIOWizardLogic<TPixel>
       case ITK_COORDINATE_ORIENTATION_ASL : SetRAI("ASL"); break;
       default: SetRAI("RAI"); break;
       }
+      
+      // Set the preset to default
+      m_InOrientationPagePreset->value(4);
+      OnOrientationPageSelectPreset();
     }
   else
-    {
-    // Use the default RAI
-    SetRAI("RAI");
+    {      
+    // Set the preset to default
+    m_InOrientationPagePreset->value(0);
+    OnOrientationPageSelectPreset();
     }
 }
 
@@ -919,7 +924,7 @@ ImageIOWizardLogic<TPixel>
   
   // Plug the RAI code into the code editor
   m_InRAICode->value(rai);
-
+  
   // Set the state to valid, allowing user to continue to next page
   m_BtnOrientationPageNext->activate();
 };
@@ -937,11 +942,11 @@ ImageIOWizardLogic<TPixel>
   case 0 : 
     SetRAI("RAI");break;
   case 1 :
-    SetRAI("RAS");break;
-  case 2 : 
     SetRAI("ASR");break;
-  case 3:
+  case 2 : 
     SetRAI("RSP");break;
+  case 3:
+    SetRAI("RAI");break;
   case 4:
     useCustom = 1;
     break;

@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0105 
+version 1.0104 
 header_name {.h} 
 code_name {.cxx}
 class AppearanceDialogUI {open : AppearanceDialogUIBase
@@ -8,7 +8,7 @@ class AppearanceDialogUI {open : AppearanceDialogUIBase
   } {
     Fl_Window m_WinDisplayOptions {
       label {Display Options} open
-      xywh {944 395 420 415} type Double box PLASTIC_DOWN_BOX align 0
+      xywh {859 395 420 415} type Double box PLASTIC_DOWN_BOX align 0
       code0 {\#include "AppearanceDialogUIBase.h"}
       code1 {\#include <FL/Fl_Color_Chooser.H>} non_modal visible
     } {
@@ -16,8 +16,8 @@ class AppearanceDialogUI {open : AppearanceDialogUIBase
         xywh {10 10 400 360} box PLASTIC_THIN_UP_BOX color 41 labelsize 12 align 0
       } {
         Fl_Group {} {
-          label General selected
-          xywh {10 35 400 335} labelsize 12
+          label General
+          xywh {10 35 400 335} labelsize 12 hide
         } {
           Fl_Check_Button m_ChkOptionsSliceThumbnailOn {
             label {Show thumbnail when the slice does not fit in the window}
@@ -343,7 +343,7 @@ user interface elements} xywh {330 335 65 25} box PLASTIC_UP_BOX down_box PLASTI
         }
         Fl_Group {} {
           label {3D Rendering} open
-          xywh {10 35 400 335} labelsize 12 hide
+          xywh {10 35 400 335} labelsize 12
         } {
           Fl_Group {} {
             label {3D Rendering Options:}
@@ -435,12 +435,12 @@ user interface elements} xywh {330 335 65 25} box PLASTIC_UP_BOX down_box PLASTI
           }
           Fl_Button {} {
             label {&Apply}
-            callback {OnScreenLayoutApplyAction();}
+            callback {On3DRenderingApplyAction();}
             xywh {260 335 65 25} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX shortcut 0x80061 color 181 labelfont 1 labelsize 12
           }
           Fl_Button {} {
             label {&Reset}
-            callback {On3DRenderingResetAction();}
+            callback {On3DRenderingResetAction();} selected
             xywh {335 335 65 25} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX shortcut 0x80072 color 181 labelsize 12
           }
         }

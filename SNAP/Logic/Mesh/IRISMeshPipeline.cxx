@@ -147,6 +147,7 @@ IRISMeshPipeline
   bbWiderRegion.Crop(m_InputImage->GetLargestPossibleRegion()); 
   
   // Pass the region to the ROI filter and propagate the filter
+  cout << "Operating on region " << bbWiderRegion << endl;
   m_ROIFilter->SetInput(m_InputImage);
   m_ROIFilter->SetRegionOfInterest(bbWiderRegion);
   m_ROIFilter->Update();

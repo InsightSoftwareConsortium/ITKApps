@@ -563,6 +563,7 @@ public:
   void OnIRISMeshAcceptAction();
   void OnIRISMeshResetViewAction();
   void OnIRISMeshEditingAction();
+  void OnIRISMeshDisplaySettingsUpdate();
    
   // SNAP: 3D Window callbacks
   void OnSNAPMeshUpdateAction();
@@ -811,6 +812,9 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.22  2004/09/14 14:11:11  pauly
+ *ENH: Added an activation manager to main UI class, improved snake code, various UI fixes and additions
+ *
  *Revision 1.21  2004/09/08 12:09:46  pauly
  *ENH: Adapting SNAP to work with stop-n-go function in finite diff. framewk
  *
