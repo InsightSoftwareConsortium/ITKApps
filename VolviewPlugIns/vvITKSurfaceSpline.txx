@@ -250,7 +250,7 @@ SurfaceSpline<TInputPixelType>
 
   unsigned int landmarkId = 0;
 
-  const float * markersCoordinates = info->Markers;
+  const MarkersCoordinatesType * markersCoordinates = info->Markers;
 
   for( unsigned int i=0; i < numberOfSeeds; i++ )
     {

@@ -25,6 +25,8 @@ namespace VolView
 namespace PlugIn
 {
 
+typedef double  RealType;
+
 class FilterModuleBase {
 
 public:
@@ -35,6 +37,8 @@ public:
   typedef itk::ImageRegion<3>     RegionType;
   typedef itk::Index<3>           IndexType;
   typedef itk::Size<3>            SizeType;
+
+  typedef float                   MarkersCoordinatesType;
 
 public:
 
@@ -61,7 +65,7 @@ public:
   void Convert3DMarkerToIndex( const vtkVVPluginInfo  * info,
                                unsigned int markerId, IndexType & index )
   {
-    const float * coordinates = info->Markers + 3 * markerId;
+    const MarkersCoordinatesType * coordinates = info->Markers + 3 * markerId;
     for(unsigned int i=0; i<3; i++)
       { 
       index[i] =  static_cast< int >( 

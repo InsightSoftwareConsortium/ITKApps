@@ -12,6 +12,7 @@ class CannySegmentationLevelSetModuleRunner
   {
   public:
     typedef VolView::PlugIn::CannySegmentationLevelSetModule< InputPixelType >   ModuleType;
+    typedef float MarkersCoordinatesType;
 
   public:
     CannySegmentationLevelSetModuleRunner() {}
@@ -34,7 +35,7 @@ class CannySegmentationLevelSetModuleRunner
       itk::Index<3> seedPosition;
 
       // Take the first marker as the seed point
-      const float * seedCoordinates = info->Markers;
+      const MarkersCoordinatesType * seedCoordinates = info->Markers;
 
 
       ModuleType  module;
