@@ -59,7 +59,6 @@ void ReadRawImageFiles( RegistrationType* X)
 
   typedef  itk::ImageFileReader< fileImageType >      FileSourceType;
   typedef  fileImageType::PixelType PixType;
-  const unsigned int ImageDimension=fileImageType::ImageDimension;
 
   FileSourceType::Pointer reffilter = FileSourceType::New();
   reffilter->SetFileName( (X->GetMovingFile()).c_str() );
