@@ -18,7 +18,7 @@
 #include "itkDICOMImageIO2Factory.h"
 #include "itkPNGImageIO.h"
 #include "itkExceptionObject.h"
-#include "itkRawImageWriter.h"
+#include "itkRawImageIO.h"
 #include "itkRescaleIntensityImageFilter.h"
 
 #include <stdlib.h>
@@ -46,7 +46,10 @@ int main(int argc, char* argv[])
   itk::DICOMImageIO2::Pointer DICOMImage = 
     itk::DICOMImageIO2::New();
 
-  typedef itk::Image<short, 2 > imgType;
+  typedef signed short PixelType;
+  const unsigned int   Dimension = 2;
+
+  typedef itk::Image<PixelType, Dimension > imgType;
   // typedef itk::Image<itk::RGBPixel<unsigned char>, 2> pngType;
   typedef itk::Image<unsigned char, 2> pngType;
   
@@ -59,12 +62,17 @@ int main(int argc, char* argv[])
   rescaler->SetOutputMinimum( 0 );
   rescaler->SetOutputMaximum( 255 );
 
-  itk::ImageFileWriter<pngType>::Pointer pngWriter = itk::ImageFileWriter<pngType>::New();
+  typedef itk::ImageFileWriter<pngType> PNGImageWriterType;
+  PNGImageWriterType::Pointer pngWriter = PNGImageWriterType::New();
   pngWriter->SetInput(rescaler->GetOutput());
   
-  itk::RawImageWriter<imgType>::Pointer rawWriter = itk::RawImageWriter<imgType>::New();
-  rawWriter->SetInput(fileReader->GetOutput());
+  typedef itk::RawImageIO<PixelType,Dimension>  RAWImageIOType;
+  RAWImageIOType::Pointer rawImageIO = RAWImageIOType::New();
 
+  typedef itk::ImageFileWriter<imgType> RAWImageWriterType;
+  RAWImageWriterType::Pointer rawWriter = RAWImageWriterType::New();
+  rawWriter->SetInput(fileReader->GetOutput());
+  rawWriter->SetImageIO( rawImageIO );
 
   for (int i = 1; i < argc; i++)
     {
@@ -80,12 +88,13 @@ int main(int argc, char* argv[])
       fileReader->SetFileName(filename);
       fileReader->UpdateLargestPossibleRegion();
     
-      std::string rawFilename = std::string(filename) + ".raw";
-      rawWriter->SetFileName(rawFilename.c_str());
-      rawWriter->SetFileTypeToBinary();
-      rawWriter->SetByteOrderToLittleEndian();
+      rawImageIO->SetFileTypeToBinary();
+      rawImageIO->SetByteOrderToLittleEndian();
+
       std::cout << std::endl;
+      std::string rawFilename = std::string(filename) + ".raw";
       std::cout << "Writing: " << rawFilename << std::endl;
+      rawWriter->SetFileName(rawFilename.c_str());
       rawWriter->UpdateLargestPossibleRegion();
       rawWriter->Write();
       std::cout << std::endl;
