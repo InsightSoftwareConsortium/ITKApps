@@ -332,7 +332,7 @@ ImageRegistrationApp< TImage >
   }
 
 template< class TImage >
-ImageRegistrationApp< TImage >::ImagePointer
+typename ImageRegistrationApp< TImage >::ImagePointer
 ImageRegistrationApp< TImage >
 ::GetLandmarkRegisteredMovingImage()
   {
