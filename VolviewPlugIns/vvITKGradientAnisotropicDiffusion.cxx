@@ -45,7 +45,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       {
       VolView::PlugIn::FilterModuleWithCasting< unsigned short, 
                                                 FilterType,
-                                                unsigned char > module;
+                                                unsigned short > module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Smoothing with Gradient Anisotropic Diffusion...");
       // Set the parameters on it
@@ -119,6 +119,8 @@ extern "C" {
   
 void VV_PLUGIN_EXPORT vvITKGradientAnisotropicDiffusionInit(vtkVVPluginInfo *info)
 {
+  vvPluginVersionCheck();
+
   // setup information that never changes
   info->ProcessData = ProcessData;
   info->UpdateGUI = UpdateGUI;
