@@ -6,13 +6,13 @@ ${GaussianMinimumErrorClassifier_SOURCE_DIR}/../MRIBiasCorrection
 )
 
 LINK_LIBRARIES (
+ITKCommon
 ITKBasicFilters
 ITKIO
 )
 
 SET (GaussianMinimumErrorClassifier_SRCS
 ${GaussianMinimumErrorClassifier_SOURCE_DIR}/../MRIBiasCorrection/OptionList.cxx
-MaximumLikelihoodRatioDecisionRule.cxx
 GaussianMinimumErrorClassifier.cxx
 )
 
