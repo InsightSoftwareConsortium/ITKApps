@@ -1,22 +1,8 @@
 #ifndef __ConnectVTKITK_h
 #define __ConnectVTKITK_h
 
-// vtkFloatingPointType is defined by VTK 4.4 and above.  We need to
-// define it to float if it is not defined (VTK 4.2).  SWIG's
-// preprocessor does not include the definition from VTK's headers, so
-// we cannot let it's preprocessor see the float definition.
-// Therefore we let SWIG think the type is called vtkFloatingPointType
-// and then make sure the definition is correct when the compiler
-// builds the generated code.
-#ifndef SWIG
-# ifndef vtkFloatingPointType
-#  define vtkFloatingPointType float
-# endif
-#endif
-
 template <typename ImageType>
-void ConnectITKToVTK(itk::VTKImageExport<ImageType ,vtkFloatingPointType> *in, 
-                     vtkImageImport* out ) 
+void ConnectITKToVTK(itk::VTKImageExport<ImageType>* in, vtkImageImport* out)
 {
   out->SetUpdateInformationCallback(in->GetUpdateInformationCallback());
   out->SetPipelineModifiedCallback(in->GetPipelineModifiedCallback());
@@ -34,8 +20,7 @@ void ConnectITKToVTK(itk::VTKImageExport<ImageType ,vtkFloatingPointType> *in,
 
 
 template <typename ImageType>
-void ConnectVTKToITK (vtkImageExport* in, 
-                      itk::VTKImageImport<ImageType, vtkFloatingPointType > *out ) 
+void ConnectVTKToITK(vtkImageExport* in, itk::VTKImageImport<ImageType>* out)
 {
   out->SetUpdateInformationCallback(in->GetUpdateInformationCallback());
   out->SetPipelineModifiedCallback(in->GetPipelineModifiedCallback());
