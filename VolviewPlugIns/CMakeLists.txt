@@ -59,6 +59,7 @@ SET (PLUGINS
   vvITKThresholdSegmentationLevelSet
   vvITKVectorConfidenceConnected
   vvITKWatershedModule
+  vvITKWatershedRGBModule
   )
 
 
