@@ -6,71 +6,111 @@
 #include "vvITKFastMarchingModule.txx"
 
 
+template <class InputPixelType>
+class FastMarchingModuleRunner
+  {
+  public:
+    typedef VolView::PlugIn::FastMarchingModule< 
+                                            InputPixelType >   ModuleType;
+  public:
+    FastMarchingModuleRunner( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
+    {
+      const float stoppingValue         = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
+      const float sigma                 = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
+      const float lowestBasinValue      = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ));
+      const float lowestBorderValue     = atof( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ));
+      const bool  compositeOutput       = atoi( info->GetGUIProperty(info, 4, VVP_GUI_VALUE ) );
+
+      if( info->NumberOfMarkers < 1 )
+        {
+        info->SetProperty( info, VVP_ERROR, "Please select seed points using the 3D Markers in the Annotation menu" ); 
+        return;
+        }
+
+      ModuleType  module;
+      module.SetPluginInfo( info );
+      module.SetUpdateMessage("Computing Fast Marching Module...");
+      module.SetStoppingValue( stoppingValue );
+      module.SetSigma( sigma );
+      module.SetLowestBasinValue( lowestBasinValue ); 
+      module.SetLowestBorderValue( lowestBorderValue );
+
+      itk::Index<3> seedPosition;
+      const unsigned int numberOfSeeds = info->NumberOfMarkers;
+      for(unsigned int i=0; i< numberOfSeeds; i++)
+        {
+        VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, i, seedPosition );
+        module.AddSeed( seedPosition );
+        }
+      // Execute the filter
+      // module.SetProduceDoubleOutput( compositeOutput );
+      module.ProcessData( pds  );
+
+    }
+  };
+
+
+
+
 static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 {
 
   vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
-  const float stoppingValue         = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
-  const float sigma                 = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
-  const float lowestBasinValue      = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ));
-  const float lowestBorderValue     = atof( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ));
-
-  const unsigned int numberOfSeeds = info->NumberOfMarkers;
-  if( numberOfSeeds < 1 )
-    {
-    info->SetProperty( info, VVP_ERROR, "Please select points using the 3D Markers in the Annotation menu" ); 
-    return -1;
-    }
-
-  itk::Index<3> seedPosition;
-
   try 
   {
   switch( info->InputVolumeScalarType )
     {
+    case VTK_CHAR:
+      {
+      FastMarchingModuleRunner<signed char> runner( info, pds );
+      break; 
+      }
     case VTK_UNSIGNED_CHAR:
       {
-      typedef  unsigned char                              PixelType;
-      typedef VolView::PlugIn::FastMarchingModule< 
-                                            PixelType >   ModuleType;
-      ModuleType  module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Computing Fast Marching Module...");
-      module.SetStoppingValue( stoppingValue );
-      module.SetSigma( sigma );
-      module.SetLowestBasinValue( lowestBasinValue ); 
-      module.SetLowestBorderValue( lowestBorderValue );
-      for(unsigned int i=0; i< numberOfSeeds; i++)
-        {
-        VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, i, seedPosition );
-        module.AddSeed( seedPosition );
-        }
-      // Execute the filter
-      module.ProcessData( pds  );
+      FastMarchingModuleRunner<unsigned char> runner( info, pds );
+      break; 
+      }
+    case VTK_SHORT:
+      {
+      FastMarchingModuleRunner<signed short> runner( info, pds );
       break; 
       }
     case VTK_UNSIGNED_SHORT:
       {
-      typedef  unsigned short                             PixelType;
-      typedef VolView::PlugIn::FastMarchingModule< 
-                                            PixelType >   ModuleType;
-      ModuleType  module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Computing Fast Marching Module...");
-      module.SetStoppingValue( stoppingValue );
-      module.SetSigma( sigma );
-      module.SetLowestBasinValue( lowestBasinValue ); 
-      module.SetLowestBorderValue( lowestBorderValue );
-      for(unsigned int i=0; i< numberOfSeeds; i++)
-        {
-        VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, i, seedPosition );
-        module.AddSeed( seedPosition );
-        }
-      // Execute the filter
-      module.ProcessData( pds  );
+      FastMarchingModuleRunner<unsigned short> runner( info, pds );
       break; 
-      } 
+      }
+    case VTK_INT:
+      {
+      FastMarchingModuleRunner<signed int> runner( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_INT:
+      {
+      FastMarchingModuleRunner<unsigned int> runner( info, pds );
+      break; 
+      }
+    case VTK_LONG:
+      {
+      FastMarchingModuleRunner<signed long> runner( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_LONG:
+      {
+      FastMarchingModuleRunner<unsigned long> runner( info, pds );
+      break; 
+      }
+    case VTK_FLOAT:
+      {
+      FastMarchingModuleRunner<float> runner( info, pds );
+      break; 
+      }
+    case VTK_DOUBLE:
+      {
+      FastMarchingModuleRunner<double> runner( info, pds );
+      break; 
+      }
     }
   }
   catch( itk::ExceptionObject & except )
