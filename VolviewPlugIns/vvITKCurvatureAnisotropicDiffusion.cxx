@@ -86,7 +86,7 @@ static int UpdateGUI(void *inf)
   info->SetGUIProperty(info, 2, VVP_GUI_LABEL, "Conductance");
   info->SetGUIProperty(info, 2, VVP_GUI_TYPE, VVP_GUI_SCALE);
   info->SetGUIProperty(info, 2, VVP_GUI_DEFAULT, "3.0");
-  info->SetGUIProperty(info, 2, VVP_GUI_HELP, "Factor that multiplies the image gradient in order to compute the effective conductance locally. The higher the value of this parameter, the stronger the diffusion will be");
+  info->SetGUIProperty(info, 2, VVP_GUI_HELP, "Factor that multiplies the image iso-contours curvature in order to compute the effective conductance locally. The higher the value of this parameter, the stronger the diffusion will be");
   info->SetGUIProperty(info, 2, VVP_GUI_HINTS , "0.1 10.0 0.1");
 
   const char * stringValue = info->GetGUIProperty(info, 0, VVP_GUI_VALUE );
