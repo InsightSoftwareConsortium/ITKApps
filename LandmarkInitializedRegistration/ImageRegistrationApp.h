@@ -9,13 +9,12 @@
 #include "itkNormalizeImageFilter.h"
 #include "itkChangeInformationImageFilter.h"
 #include "itkMinimumMaximumImageFilter.h"
-//#include "itkHistogramMatchingImageFilter.h"
+#include "itkHistogramMatchingImageFilter.h"
 
 //#include "LandmarkRegistration.h"
 #include "LandmarkBasedRegistrator.h"
 #include "itkImageRegistrationMethod.h"
 #include "itkQuaternionRigidTransform.h"
-#include <itkNormalizedMutualInformationImageToImageMetric.h>
 #include <itkMutualInformationImageToImageMetric.h>
 #include <itkQuaternionRigidTransformGradientDescentOptimizer.h>
 #include "itkAffineTransform.h"
