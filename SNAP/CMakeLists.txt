@@ -193,6 +193,11 @@ SET(TESTING_CXX
   Testing/TestMain.cxx
 )
 
+# The source code for the tutorial test
+SET(TESTING_TUTORIAL_CXX
+  Testing/TutorialTest.cxx
+)
+
 # The headers for the testing code
 SET(TESTING_HEADERS
   Testing/SNAPTestDriver.h
@@ -349,6 +354,12 @@ SET(TESTING_SRCS
   ${TESTING_HEADERS}
 )
 
+# Combined sources for the testing application
+SET(TESTING_TUTORIAL_SRCS
+  ${LOGIC_SRCS}
+  ${TESTING_TUTORIAL_CXX}
+)
+
 # The Logic library
 # ADD_LIBRARY(SNAPLogic ${LOGIC_SRCS})
 
@@ -357,6 +368,9 @@ ADD_GUI_EXECUTABLE(SNAP "${APPLICATION_SRCS}")
 
 # The testing executable
 ADD_GUI_EXECUTABLE(SNAPTests "${TESTING_SRCS}")
+
+# Test/tutorial executable
+ADD_EXECUTABLE(SNAPTutorialTest ${TESTING_TUTORIAL_SRCS})
 
 # FLTK Wrapping
 FLTK_WRAP_UI(SNAP ${APPLICATION_FLUIDS})
@@ -420,9 +434,11 @@ SET(MY_ITK_LIBS
 IF(VTK_USE_PATENTED)
   TARGET_LINK_LIBRARIES(SNAP ${MY_ITK_LIBS} vtkPatented ${MY_GRAPHICS_LIBS} )
   TARGET_LINK_LIBRARIES(SNAPTests ${MY_ITK_LIBS} vtkPatented  ${MY_GRAPHICS_LIBS} )
+  TARGET_LINK_LIBRARIES(SNAPTutorialTest ${MY_ITK_LIBS} vtkPatented  ${MY_GRAPHICS_LIBS} )
 ELSE(VTK_USE_PATENTED)
   TARGET_LINK_LIBRARIES(SNAP ${MY_ITK_LIBS} ${MY_GRAPHICS_LIBS} )
   TARGET_LINK_LIBRARIES(SNAPTests ${MY_ITK_LIBS} ${MY_GRAPHICS_LIBS} )
+  TARGET_LINK_LIBRARIES(SNAPTutorialTest ${MY_ITK_LIBS} vtkPatented  ${MY_GRAPHICS_LIBS} )
 ENDIF(VTK_USE_PATENTED)
 
 # Copy documentation from the source tree to the build tree

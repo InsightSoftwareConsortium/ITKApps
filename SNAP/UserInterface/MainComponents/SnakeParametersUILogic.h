@@ -87,6 +87,9 @@ public:
   void OnLegacyGroundChange(Fl_Valuator *input);
   void OnSolverChange();
 
+  // Help System
+  void ShowHelp(const char *link);
+
 private:
   /** Called internally when the parameters change */
   void OnParameterUpdate();
@@ -109,6 +112,9 @@ private:
   
   /** Whether or not to warn if the user tries to change the solver */
   bool m_WarnOnSolverUpdate;
+
+  /** Parent user interface, needed for invoking the help system */
+  UserInterfaceLogic *m_ParentUI;
 
   /** A pointer to the system interface object */
   SystemInterface *m_SystemInterface;

@@ -106,11 +106,11 @@
   <li>Advection velocity</li>
 </ol>
 <p>Let us examine each velocity type in more detail.</p>
-<h4>Propagation Velocity</h4>
+<h4><a name="Propagation"></a>Propagation Velocity</h4>
 <p>This is the most common velocity used in SNAP. It is proportional to the value of the feature image. The constant of proportionality can be set to be positive, in which case positive values of the feature image cause this velocity to point outwards, or negative, in which case positive values of the feature image cause this velocity to point inwards. In a homogeneous region of the feature image, the propagation velocity is constant and causes the snake to expand (or contract) at a unit speed.</p>
-<h4>Curvature Velocity</h4>
+<h4><a name="Curvature"></a>Curvature Velocity</h4>
 <p>This velocity is used to control the shape of the evolving snake, and it can sometimes prevent the snake from <em>leaking</em> into adjacent structures. The curvature velocity acts inwards and is approximately proportional to the curvature of the snake at the point. Sharp corners in the snake's boundary have high curvature, while points where the snake is straight have low curvature. The effect of curvature velocity is to slow down the snake evolution at places of high curvature, effectively smoothing out the sharp corners that may otherwise be formed. </p>
-<h4>Advection Velocity</h4>
+<h4><a name="Advection"></a>Advection Velocity</h4>
 <p>The advection velocity is the most difficult of the three velocities to visualize, but it is very important because it can have a dramatic effect on the quality of the segmentation. The advection velocity is used only in conjunstion with the edge feature image; it is not used with the region competition feature image. In qualitative terms, it causes the snake to slow down or stop as it approaches edges in the greyscale image. More precisely, the velocity is defined by the dot product of the unit vector perpendicular to the snake and the gradient vector of the feature image. That means that when the snake is parallel to an image edges and close to it, the advection force acting inwards on the snake is greatest. The illustration below shows the gradient vectors of the feature image and the corresponding advection velocities.</p>
 <hr>
 <h3><a name="Init"></a>Step 4. Snake Initialization</h3>

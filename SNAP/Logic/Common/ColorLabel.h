@@ -52,7 +52,7 @@ public:
   irisSetMacro(DoMesh,bool);
 
   // Read the Label attribute
-  virtual const char *GetLabel()
+  virtual const char *GetLabel() const
   {
     return m_Label.c_str();
   }

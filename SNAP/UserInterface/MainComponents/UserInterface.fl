@@ -38,7 +38,7 @@ class UserInterface {open : {public UserInterfaceBase}
     Fl_Window m_WinMain {
       label {SnAP: IRIS}
       callback {OnMainWindowCloseAction();} open
-      xywh {472 133 878 710} type Double align 0 resizable
+      xywh {270 120 878 710} type Double align 0 resizable
       code0 {\#include "UserInterfaceBase.h"} visible
     } {
       Fl_Menu_Bar m_MenubarMain {
@@ -365,8 +365,8 @@ OnDrawOverLabelUpdate();} open
               xywh {5 195 135 35} labelfont 3 labelsize 24 align 0
             } {}
             Fl_Group {} {
-              label {Version 1.0 beta
-12.09.2003} open
+              label {Version 1.0
+01.20.2004} open
               xywh {5 225 135 35} labelsize 12 align 145
             } {}
             Fl_Group {} {
@@ -375,21 +375,12 @@ OnDrawOverLabelUpdate();} open
             } {
               Fl_Group {} {
                 label {Thank you for using
-this beta version of 
-ITK-SnAP software!
-
-You may encounter
-broken or missing fea-
-tures in this version.
-
-Please consult the file
-Readme.html for more
-information.} open
+ITK-SnAP software!} open
                 xywh {10 466 124 164} box DOWN_BOX color 52 labelsize 11 align 149
               } {}
               Fl_Button {} {
                 label {Launch Tutorial}
-                callback {this->OnLaunchTutorialAction();} selected
+                callback {this->OnLaunchTutorialAction();}
                 xywh {25 640 95 25} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 134 labelsize 12
               }
             }
@@ -1438,18 +1429,21 @@ RedrawWindows();}
     }
     Fl_Window m_WinSplash {
       label {Welcome to ITK-SnAP}
-      xywh {-32000 -32000 404 219} type Double color 52 hide
+      xywh {307 240 405 210} type Double color 52 visible
     } {
       Fl_Group {} {open
-        image {Artwork/itkLogoMediumTransparentBackground.gif} xywh {70 5 260 150} align 16
+        image {Artwork/logo.gif} xywh {35 15 338 105} box FLAT_BOX color 0 align 16
       } {}
       Fl_Group {} {
         label {ITK-SnAP Loading...} open
-        xywh {15 145 380 30} labeltype ENGRAVED_LABEL align 16
+        xywh {15 130 375 30} labeltype ENGRAVED_LABEL align 16
       } {}
       Fl_Group m_OutSplashMessage {
-        label {Loading progress} open
-        xywh {15 185 380 25} box BORDER_BOX color 55 labelsize 11 align 20
+        label {Loading progress} open selected
+        xywh {15 175 380 25} box BORDER_BOX color 55 labelsize 11 align 20
+      } {}
+      Fl_Group {} {open
+        image {Artwork/itkLogoSmallTransparentBackground.gif} xywh {5 95 115 80} color 0 align 16
       } {}
     }
     Fl_Window m_WinProgress {

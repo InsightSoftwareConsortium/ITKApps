@@ -556,6 +556,9 @@ public:
 
   // Method called when user tries to close the window
   void OnMainWindowCloseAction();
+  
+  // Show the help system
+  void ShowHTMLPage(const char *link);
 
 
 protected:
@@ -646,7 +649,6 @@ protected:
 
   // Help system callbacks
   void OnLaunchTutorialAction();
-  void ShowHTMLPage(const char *link);
 
   // Set the active page in the segmentation pipeline
   void SetActiveSegmentationPipelinePage(unsigned int page);
@@ -768,6 +770,9 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.12  2003/12/07 19:48:41  pauly
+ *ENH: Resampling, multiresolution
+ *
  *Revision 1.11  2003/11/29 17:06:48  pauly
  *ENH: Minor Help issues
  *

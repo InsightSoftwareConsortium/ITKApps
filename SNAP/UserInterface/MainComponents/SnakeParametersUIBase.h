@@ -45,6 +45,9 @@ public:
   virtual void OnLegacyClampChange(Fl_Check_Button *input) = 0;
   virtual void OnLegacyGroundChange(Fl_Valuator *input) = 0;
   virtual void OnSolverChange() = 0;
+
+  // Help System
+  virtual void ShowHelp(const char *link) = 0;
 };
 
 #endif // __SnakeParametersUIBase_h_

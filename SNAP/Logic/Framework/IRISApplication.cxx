@@ -147,6 +147,9 @@ IRISApplication
 
   // Initialize the speed image of the SNAP image data
   m_SNAPImageData->InitializeSpeed();
+
+  // Remember the ROI object
+  m_GlobalState->SetSegmentationROISettings(roi);
 }
 
 void 

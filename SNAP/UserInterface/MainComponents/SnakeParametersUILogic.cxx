@@ -518,6 +518,7 @@ void SnakeParametersUILogic
 ::Register(UserInterfaceLogic *parent)
 {
   // Get the parent's system object
+  m_ParentUI = parent;
   m_SystemInterface = parent->GetSystemInterface();
   
   // Get the edge and region example image file names
@@ -655,4 +656,11 @@ SnakeParametersUILogic
 {
   delete m_PreviewPipeline;
   delete m_IODialog;
+}
+
+void 
+SnakeParametersUILogic
+::ShowHelp(const char *link)
+{
+  m_ParentUI->ShowHTMLPage(link);
 }
