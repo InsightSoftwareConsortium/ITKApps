@@ -120,9 +120,9 @@ static int UpdateGUI(void *inf)
 
   info->SetGUIProperty(info, 1, VVP_GUI_LABEL, "Speed image normalization factor");
   info->SetGUIProperty(info, 1, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 1, VVP_GUI_DEFAULT, "1.0");
+  info->SetGUIProperty(info, 1, VVP_GUI_DEFAULT, VolView::PlugIn::FilterModuleBase::GetInputVolumeScalarMaximum( info ) );
   info->SetGUIProperty(info, 1, VVP_GUI_HELP, "Factor to be used for dividing the pixel values of the speed image. This allows to use images of integer pixel type for representing the speed. The normalization should map the values of the integer image into the range [0,1]");
-  info->SetGUIProperty(info, 1, VVP_GUI_HINTS , "1.0  1000.0  1.0");
+  info->SetGUIProperty(info, 1, VVP_GUI_HINTS , VolView::PlugIn::FilterModuleBase::GetInputVolumeScalarTypeRange( info ) );
 
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, "0");
   
@@ -160,7 +160,7 @@ void VV_PLUGIN_EXPORT vvITKFastMarchingInit(vtkVVPluginInfo *info)
   info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "0");
   info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "2");
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP,           "0");
-  info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "16");
+  info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "2");
 
 }
 
