@@ -100,6 +100,9 @@ private:
 
   // An object used to write large chunks of SNAP data to the registry
   SNAPRegistryIO *m_RegistryIO;
+
+  // Filename encoder
+  std::string EncodeFilename(const std::string &src);
 };
 
 

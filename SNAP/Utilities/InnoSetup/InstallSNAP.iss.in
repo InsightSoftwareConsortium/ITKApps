@@ -20,11 +20,18 @@ Name: "quicklaunchicon"; Description: "Create a &Quick Launch icon"; GroupDescri
 
 [Files]
 Source: "@MY_BINARY_DIR@\Release\SNAP.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "@MY_BINARY_DIR@\ProgramData\*.*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
+Source: "@MY_BINARY_DIR@\ProgramData\*.*"; DestDir: "{app}\ProgramData"; Flags: ignoreversion recursesubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [INI]
 Filename: "{app}\SNAP.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.cognitica.com/download/snap"
+
+[InstallDelete]
+Type: filesandordirs; Name: "{userappdata}\itk.org"
+Type: files; Name: "{app}\SNAPProgramDataDirectory.txt"
+Type: filesandordirs; Name: "{app}\HTMLHelp"
+Type: filesandordirs; Name: "{app}\Images2D"
+Type: filesandordirs; Name: "{app}\Presets"
 
 [Icons]
 Name: "{group}\InsightSNAP"; Filename: "{app}\SNAP.exe"
@@ -41,4 +48,5 @@ Filename: "{app}\SNAP.exe"; Description: "Launch InsightSNAP"; Flags: nowait pos
 
 [UninstallDelete]
 Type: files; Name: "{app}\SNAP.url"
+
 

@@ -173,12 +173,12 @@ SystemInterface
   string path(buffer);
   itksys::SystemTools::ConvertToUnixSlashes(path);
 
-  // Look for the file in the registry (may already exist, if not use the
-  // code just generated
-  string key = Key("ImageAssociation.Mapping.Element[%s]",path.c_str());
+  // Convert the filename to a numeric string (to prevent clashes with the Registry class)
+  path = EncodeFilename(path);
 
-  // Find the key in the registry
-  string code = Entry(key)[string("")];
+  // Get the key associated with this filename
+  string key = Key("ImageAssociation.Mapping.Element[%s]",path.c_str());
+  string code = Entry(key)[""];
 
   // If the code does not exist, return w/o success
   if(code.length() == 0) return false;
@@ -206,6 +206,18 @@ SystemInterface
     }
 }
 
+string
+SystemInterface
+::EncodeFilename(const string &src)
+{
+  IRISOStringStream sout;
+  
+  for(unsigned int i=0;i<src.length();i++)
+    sout << setw(2) << setfill('0') << hex << (int)src[i];
+
+  return sout.str();
+}
+
 bool 
 SystemInterface
 ::AssociateRegistryWithFile(const char *file, Registry &registry)
@@ -217,6 +229,7 @@ SystemInterface
   // Convert to unix slashes for consistency
   string path(buffer);
   itksys::SystemTools::ConvertToUnixSlashes(path);
+  path = EncodeFilename(path);
 
   // Compute a timestamp from the start of computer time
   time_t timestr = time(NULL);
@@ -228,8 +241,8 @@ SystemInterface
   // Look for the file in the registry (may already exist, if not use the
   // code just generated
   string key = Key("ImageAssociation.Mapping.Element[%s]",path.c_str());
-  string code = Entry(key)[scode.str()];
-
+  string code = Entry(key)[scode.str().c_str()];
+  
   // Put the key in the registry
   Entry(key) << code;
 

@@ -2920,6 +2920,7 @@ UserInterfaceLogic
   m_BtnAccept3D->deactivate();
   m_IRISWindow3D->Accept();
   m_BtnMeshUpdate->activate();
+  RedrawWindows();
 }
 
 void
@@ -2952,6 +2953,10 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.11  2003/11/10 00:27:26  pauly
+ *FIX: Bug with linear interpolation in PDE solver
+ *ENH: Help viewer and tutorial
+ *
  *Revision 1.10  2003/10/09 22:45:14  pauly
  *EMH: Improvements in 3D functionality and snake parameter preview
  *

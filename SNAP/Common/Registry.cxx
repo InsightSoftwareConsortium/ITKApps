@@ -170,6 +170,19 @@ Registry
     }
 }
 
+Registry::StringType 
+Registry
+::FindValue(const StringType& value)
+{
+  // Add the keys in this folder
+  for(EntryIterator ite = m_EntryMap.begin();ite != m_EntryMap.end(); ++ite)
+    {
+    if(ite->second.GetInternalString() == value)
+      return ite->first;
+    }
+  return "";
+}
+
 void 
 Registry
 ::RemoveKeys(const char *match)
@@ -195,7 +208,7 @@ Registry
   IRISOStringStream oss;
   for(unsigned int i=0; i < input.length() ; i++)
     {
-    if(!isprint(input[i]) || input[i]=='%')
+    if(!isprint(input[i]) || input[i]=='%' || isspace(input[i]))
       {
       // Replace character by a escape string
       oss << '%';
@@ -238,9 +251,17 @@ Registry::Decode(const StringType &input)
       }
     else 
       {
+      // A pair of chars
+      char c1,c2;
+      
       // Read the hex digit
-      int digit;
-      iss >> setw(2) >> hex >> setfill('0') >> digit;
+      iss >> c1;
+      iss >> c2;
+      
+      // Reconstruct the hex
+      int d1 = (c1 < 'a') ? c1 - '0' : c1 - 'a' + 10;
+      int d2 = (c2 < 'a') ? c2 - '0' : c2 - 'a' + 10;
+      int digit = d1 * 16 + d2;
 
       // See if the read succeeded, only then use the digit
       if(iss.good())

@@ -116,7 +116,10 @@ public:
   }
 
   std::string operator[](const std::string &defaultValue) { 
-    return GetValueWithDefault(m_String,m_Null,defaultValue);
+    if(IsNull())
+      return defaultValue;
+    else 
+      return m_String;
   }
 
   template <class T, int VSize> iris_vector_fixed<T,VSize>
@@ -204,6 +207,9 @@ public:
 
   /** Get a list of all subfolder keys, append it to keyList */
   int GetFolderKeys(StringListType &keyList);
+
+  /** Find a value in a folder or return "" */
+  StringType FindValue(const StringType& value);
 
   /** Get a list of all keys that have values contained in this registry 
    * and all subfolders (recursive operation).  Prefix is used internally,
