@@ -17,6 +17,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <fstream>   
 
 namespace VolView
 {
@@ -79,6 +80,19 @@ public:
     sprintf(tmp,"%f %f %f", lower, upper, 1.0 ); 
     return tmp;
   }
+
+  static 
+  const char * GetInputVolumeScalarRangeFraction( const vtkVVPluginInfo  * info , float fraction, float multiplier )
+  {
+    static char tmp[1024];
+    const float lower = info->InputVolumeScalarRange[0];
+    const float upper = info->InputVolumeScalarRange[1];
+    const float resolution = (upper - lower) * fraction;
+    const float maximumValue = resolution * multiplier;
+    sprintf(tmp,"%f %f %f", resolution,maximumValue,resolution); 
+    return tmp;
+  }
+
 
   static 
   const char * GetInputVolumeScalarMidValue( const vtkVVPluginInfo  * info )
@@ -223,7 +237,6 @@ public:
         {
         progressForGUI /= m_Info->InputVolumeNumberOfComponents;
         }
-      std::cout << "Progress = " << progressForGUI << std::endl;
       m_Info->UpdateProgress(m_Info, progressForGUI, m_UpdateMessage.c_str()); 
       // Test whether during the GUI update, the Abort button was pressed
       int abort = atoi( m_Info->GetProperty( m_Info, VVP_ABORT_PROCESSING ) );
