@@ -79,6 +79,11 @@
 %template(ConnectVTKToITKUS3) ConnectVTKToITK<itk::Image<short unsigned int, 3> >;
 %template(ConnectITKUS3ToVTK) ConnectITKToVTK<itk::Image<short unsigned int, 3> >;
 
+%template(ConnectVTKToITKUL2) ConnectVTKToITK<itk::Image<unsigned long, 2> >;
+%template(ConnectITKUL2ToVTK) ConnectITKToVTK<itk::Image<unsigned long, 2> >;
+%template(ConnectVTKToITKUL3) ConnectVTKToITK<itk::Image<unsigned long, 3> >;
+%template(ConnectITKUL3ToVTK) ConnectITKToVTK<itk::Image<unsigned long, 3> >;
+
 %template(ConnectVTKToITKF2) ConnectVTKToITK<itk::Image<float, 2> >;
 %template(ConnectITKF2ToVTK) ConnectITKToVTK<itk::Image<float, 2> >;
 %template(ConnectVTKToITKF3) ConnectVTKToITK<itk::Image<float, 3> >;
