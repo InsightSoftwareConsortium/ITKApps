@@ -261,7 +261,7 @@ liFilterConsole3DBase
  * Flip
  *
  ***********************************/
-void liFilterConsole3DBase::Flip(int a) {
+void liFilterConsole3DBase::Flip(int) {
   
 }
 
