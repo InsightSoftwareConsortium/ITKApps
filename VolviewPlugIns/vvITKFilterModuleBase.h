@@ -44,6 +44,9 @@ public:
     m_Info               = 0;
     m_UpdateMessage      = "Processing the filter...";
     m_CommandObserver->SetCallbackFunction( this, &FilterModuleBase::ProgressUpdate );
+    m_CumulatedProgress = 0.0;
+    m_CurrentFilterProgressWeight = 1.0;
+    m_ProcessComponentsIndependetly = true;
     }
 
 
@@ -162,6 +165,23 @@ public:
      m_UpdateMessage = message;
   }
 
+  void InitializeProgressValue()
+  {
+     m_CumulatedProgress = 0.0;
+     m_Info->UpdateProgress(m_Info, m_CumulatedProgress, m_UpdateMessage.c_str()); 
+  }
+
+
+  void SetCurrentFilterProgressWeight( float weight )
+  {
+     m_CurrentFilterProgressWeight = weight;
+  }
+
+
+  void SetProcessComponentsIndependetly( bool independentProcessing )
+  {
+     m_ProcessComponentsIndependetly = independentProcessing;
+  }
 
   CommandType *
   GetCommandObserver()
@@ -175,23 +195,42 @@ public:
   ProgressUpdate( itk::Object * caller, const itk::EventObject & event )
   {
 
-    if( typeid( itk::ProgressEvent ) != typeid( event ) )
-      {
-      return;
-      }
+    bool  updateGUI = false;
+    float progressForGUI;
 
     itk::ProcessObject::Pointer process =
               dynamic_cast< itk::ProcessObject *>( caller );
 
-    const float progress = process->GetProgress();
-
-    m_Info->UpdateProgress(m_Info, progress, m_UpdateMessage.c_str()); 
-
-    // Test whether during the GUI update, the Abort button was pressed
-    int abort = atoi( m_Info->GetProperty( m_Info, VVP_ABORT_PROCESSING ) );
-    if( abort )
+    if( typeid( itk::EndEvent ) == typeid( event ) )
       {
-      process->SetAbortGenerateData(true);
+      m_CumulatedProgress += m_CurrentFilterProgressWeight;
+      progressForGUI = m_CumulatedProgress;
+      updateGUI = true;
+      }
+
+    if( typeid( itk::ProgressEvent ) == typeid( event ) )
+      {
+      const float currentFilterProgress = process->GetProgress();
+      progressForGUI = m_CumulatedProgress + 
+                       currentFilterProgress * m_CurrentFilterProgressWeight;
+      updateGUI = true;
+      }
+
+
+    if( updateGUI )
+      {
+      if( m_ProcessComponentsIndependetly )
+        {
+        progressForGUI /= m_Info->InputVolumeNumberOfComponents;
+        }
+      std::cout << "Progress = " << progressForGUI << std::endl;
+      m_Info->UpdateProgress(m_Info, progressForGUI, m_UpdateMessage.c_str()); 
+      // Test whether during the GUI update, the Abort button was pressed
+      int abort = atoi( m_Info->GetProperty( m_Info, VVP_ABORT_PROCESSING ) );
+      if( abort )
+        {
+        process->SetAbortGenerateData(true);
+        }
       }
   }
 
@@ -216,6 +255,9 @@ private:
     CommandType::Pointer         m_CommandObserver;
     vtkVVPluginInfo            * m_Info;
     std::string                  m_UpdateMessage;
+    float                        m_CumulatedProgress;
+    float                        m_CurrentFilterProgressWeight;
+    bool                         m_ProcessComponentsIndependetly;
 };
 
 

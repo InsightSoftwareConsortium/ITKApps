@@ -60,6 +60,8 @@ public:
 
     // Set the Observer for updating progress in the GUI
     m_Filter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
+    m_Filter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
+    m_Filter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
     }
 
 
@@ -86,6 +88,9 @@ public:
   virtual void 
   ProcessData( const vtkVVProcessDataStruct * pds )
   {
+
+    this->InitializeProgressValue();
+    this->SetCurrentFilterProgressWeight( 1.0 );
 
     const unsigned int numberOfComponents = this->GetPluginInfo()->InputVolumeNumberOfComponents;
 
