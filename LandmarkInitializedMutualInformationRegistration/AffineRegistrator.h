@@ -36,8 +36,6 @@ class AffineRegistrator : public ImageRegistrationMethod < TImage, TImage >
 
     typedef ScaleSkewVersor3DTransform<double> TransformType ;
 
-    typedef typename Superclass::OptimizerType           OptimizerType;
-
     typedef enum { ONEPLUSONE, GRADIENT, ONEPLUSONEPLUSGRADIENT }
                                                 OptimizerMethodType;
 
