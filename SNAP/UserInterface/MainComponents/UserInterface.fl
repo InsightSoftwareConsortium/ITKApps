@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0102 
+version 1.0105 
 header_name {.h} 
 code_name {.cxx}
 decl {\#include <stdio.h>} {public
@@ -38,14 +38,14 @@ class UserInterface {open : {public UserInterfaceBase}
     Fl_Window m_WinMain {
       label {SnAP: IRIS}
       callback {OnMainWindowCloseAction();} open
-      xywh {130 242 877 710} type Double align 0 resizable
-      code0 {\#include "UserInterfaceBase.h"} visible
+      xywh {-32000 -32000 877 710} type Double align 0 hide resizable
+      code0 {\#include "UserInterfaceBase.h"}
     } {
-      Fl_Menu_Bar m_MenubarMain {open selected
+      Fl_Menu_Bar m_MenubarMain {
         xywh {0 0 146 25} labelsize 12 textsize 12
       } {
         submenu {} {
-          label {&File} open
+          label {&File}
           xywh {10 10 100 20} labelsize 12
         } {
           submenu {} {
@@ -133,21 +133,6 @@ class UserInterface {open : {public UserInterfaceBase}
             callback {this->OnMenuQuit();}
             xywh {45 45 100 20} shortcut 0x40071 labelsize 12
           }
-          menuitem m_MenuOpenProject {
-            label {&Open Project...}
-            callback {OnMenuOpenProject();}
-            xywh {40 40 100 20} shortcut 0x4006f labelsize 12 hide
-          }
-          menuitem m_MenuSaveProject {
-            label {&Save Project...    }
-            callback {this->OnMenuSaveProject();}
-            xywh {50 50 100 20} shortcut 0x40073 labelsize 12 hide
-          }
-          menuitem m_MenuCloseProject {
-            label {&Close Project}
-            callback {OnMenuCloseProject();}
-            xywh {50 50 100 20} labelsize 12 hide divider
-          }
         }
         submenu {} {
           label {&Options} open
@@ -192,7 +177,7 @@ class UserInterface {open : {public UserInterfaceBase}
           label {Control Pane} open
           xywh {0 25 145 680} box NO_BOX color 22 align 16
         } {
-          Fl_Group m_GrpToolbarPage {
+          Fl_Group m_GrpToolbarPage {open
             xywh {0 25 145 679} color 53 labelsize 12 hide
           } {
             Fl_Group m_GrpInteractionModes {
@@ -713,14 +698,14 @@ this->OnSNAPLabelOpacityChange();}
           xywh {0 704 145 5} color 53 labeltype NO_LABEL resizable
         } {}
       }
-      Fl_Wizard m_WizWindows {
+      Fl_Wizard m_WizWindows {open
         xywh {147 0 730 710} resizable
       } {
         Fl_Group m_GrpIRISWindows {open
           xywh {147 0 730 710} resizable
         } {
           Fl_Group {m_GrpIRISSlicePanel[0]} {
-            label {m_GrpIRISSlicePanel[0]} open
+            label {m_GrpIRISSlicePanel[0]}
             xywh {147 0 365 355} box UP_BOX
           } {
             Fl_Box {m_IRISWindow2D[0]} {
@@ -732,7 +717,7 @@ this->OnSNAPLabelOpacityChange();}
             Fl_Group {} {open
               xywh {147 325 365 30} color 48
             } {
-              Fl_Button {} {
+              Fl_Button {m_BtnIRISPanelResetView[0]} {
                 label {reset view}
                 callback {this->OnResetView2DAction(0);}
                 xywh {372 330 60 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146
@@ -782,7 +767,7 @@ this->OnSNAPLabelOpacityChange();}
               xywh {489 30 18 295} box THIN_DOWN_BOX labelcolor 0 minimum 1 maximum 0
             }
           }
-          Fl_Group {m_GrpIRISSlicePanel[1]} {open
+          Fl_Group {m_GrpIRISSlicePanel[1]} {
             xywh {512 0 365 355} box UP_BOX
           } {
             Fl_Box {m_IRISWindow2D[1]} {
@@ -798,7 +783,7 @@ this->OnSNAPLabelOpacityChange();}
             Fl_Group {} {
               xywh {517 325 355 30}
             } {
-              Fl_Button {} {
+              Fl_Button {m_BtnIRISPanelResetView[1]} {
                 label {reset view}
                 callback {this->OnResetView2DAction(1);}
                 xywh {737 330 60 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146
@@ -844,7 +829,7 @@ this->OnSNAPLabelOpacityChange();}
               }
             }
           }
-          Fl_Group {m_GrpIRISSlicePanel[2]} {open
+          Fl_Group {m_GrpIRISSlicePanel[2]} {
             xywh {512 355 365 355} box UP_BOX
           } {
             Fl_Box {m_IRISWindow2D[2]} {
@@ -856,7 +841,7 @@ this->OnSNAPLabelOpacityChange();}
             Fl_Group {} {open
               xywh {512 680 365 30}
             } {
-              Fl_Button {} {
+              Fl_Button {m_BtnIRISPanelResetView[2]} {
                 label {reset view}
                 callback {this->OnResetView2DAction(2);}
                 xywh {737 685 60 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146
@@ -906,7 +891,7 @@ this->OnSNAPLabelOpacityChange();}
               xywh {854 385 18 295} box THIN_DOWN_BOX labelcolor 0 minimum 1 maximum 0
             }
           }
-          Fl_Group m_GrpIRISView3D {
+          Fl_Group m_GrpIRISView3D {open
             xywh {147 355 365 355} box UP_BOX
           } {
             Fl_Box m_IRISWindow3D {
@@ -920,18 +905,17 @@ this->OnSNAPLabelOpacityChange();}
             } {
               Fl_Button m_BtnMeshUpdate {
                 label {update mesh}
-                callback {m_IRISWindow3D->UpdateMesh();}
+                callback {OnIRISMeshUpdateAction();}
                 xywh {265 685 70 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146
               }
               Fl_Button m_BtnAccept3D {
                 label accept
-                callback {OnAcceptIRIS3DAction();}
+                callback {OnIRISMeshAcceptAction();}
                 xywh {340 685 70 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146 deactivate
               }
-              Fl_Button {} {
+              Fl_Button {m_BtnIRISPanelResetView[3]} {
                 label {reset view}
-                callback {m_IRISWindow3D->ResetView();
-m_IRISWindow3D->redraw();}
+                callback {OnIRISMeshResetViewAction();}
                 xywh {415 685 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146
               }
               Fl_Group {} {open
@@ -945,7 +929,7 @@ m_IRISWindow3D->redraw();}
             }
           }
         }
-        Fl_Group m_GrpSNAPWindows {
+        Fl_Group m_GrpSNAPWindows {open
           xywh {147 0 730 710} hide
         } {
           Fl_Group m_GrpSNAPAxial {
@@ -1049,18 +1033,17 @@ m_IRISWindow3D->redraw();}
             } {
               Fl_Button m_BtnSNAPMeshUpdate {
                 label {update mesh}
-                callback {m_SNAPWindow3D->UpdateMesh();}
+                callback {OnSNAPMeshUpdateAction();}
                 xywh {237 685 65 20} box PLASTIC_UP_BOX color 140 labelsize 9 labelcolor 0 align 128 deactivate
               }
-              Fl_Button {} {
+              Fl_Button m_BtnSNAPMeshResetView {
                 label {reset view}
-                callback {m_SNAPWindow3D->ResetView();
-m_SNAPWindow3D->redraw();}
+                callback {OnSNAPMeshResetViewAction();}
                 xywh {432 685 65 20} box PLASTIC_UP_BOX color 140 labelsize 9 labelcolor 0 align 128
               }
               Fl_Check_Button m_ChkContinuousView3DUpdate {
                 label {update continuously}
-                callback {OnContinuousViewUpdateChange();}
+                callback {OnSNAPMeshContinuousUpdateAction();} selected
                 xywh {307 685 25 20} down_box DOWN_BOX labelsize 11 deactivate
               }
               Fl_Group {} {

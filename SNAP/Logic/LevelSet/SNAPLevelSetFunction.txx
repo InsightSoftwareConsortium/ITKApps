@@ -31,6 +31,7 @@ SNAPLevelSetFunction<TImageType>
   m_AdvectionSpeedExponent = 0;
   m_PropagationSpeedExponent = 0;
   m_LaplacianSmoothingSpeedExponent = 0;
+  m_UseExternalAdvectionField = false;
 
   m_PropagationSpeedInterpolator = ImageInterpolatorType::New();
   m_CurvatureSpeedInterpolator = ImageInterpolatorType::New();

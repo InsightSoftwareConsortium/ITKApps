@@ -18,6 +18,7 @@
 #include "SNAPCommon.h"
 
 #include <assert.h>
+#include <list>
     
 
 /**
@@ -46,16 +47,14 @@ public:
   irisSetMacro(Valid,bool);
 
   // Read the DoMesh attribute
-  irisIsMacro(DoMesh);
+  irisIsMacro(VisibleIn3D);
 
   // Set the DoMesh attribute
-  irisSetMacro(DoMesh,bool);
+  irisSetMacro(VisibleIn3D,bool);
 
   // Read the Label attribute
   virtual const char *GetLabel() const
-  {
-    return m_Label.c_str();
-  }
+    { return m_Label.c_str(); }
 
   // Set the Label attribute
   irisSetMacro(Label,const char *);
@@ -67,9 +66,8 @@ public:
   irisSetMacro(Alpha,unsigned char);
 
   // Check Opaqueness
-  bool IsOpaque() const {
-    return m_Alpha == 255;
-  }
+  bool IsOpaque() const 
+    { return m_Alpha == 255; }
 
   // Read the RGB attributes
   unsigned char GetRGB(unsigned int index) const {
@@ -120,15 +118,42 @@ public:
     m_Alpha  = array[3];
   }
 
-private:  
-  bool m_Visible;
-  bool m_Valid;
-  bool m_DoMesh;
-
+private:
+  // The descriptive text of the label
   std::string m_Label;
 
+  // The intensity assigned to the label in the segmentation image
+  LabelType m_Value;
+
+  // The ID of the label in some external database.
+  std::string m_DatabaseId;
+
+  // The internal ID of the label. By default it's equal to the value
+  unsigned int m_Id;
+
+  // Whether the label is visible in 2D views
+  bool m_Visible;
+
+  // Whether the mesh for the label is computed
+  bool m_VisibleIn3D;
+
+  // The system timestamp when the data marked with this label was last updated
+  unsigned long m_UpdateTime;
+
+  // Whether the label is valid (has been added)
+  bool m_Valid;
+
+  // The transparency level of the label
   unsigned char m_Alpha;
+
+  // The color of the label
   unsigned char m_RGB[3];
+
+  // A list of labels that contain this label
+  std::list< unsigned int > m_Parents;
+
+  // A list of labels that this label contains
+  std::list< unsigned int > m_Children;
 };
 
 

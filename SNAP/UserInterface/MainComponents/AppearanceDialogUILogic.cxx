@@ -32,6 +32,8 @@ AppearanceDialogUILogic
     SNAPAppearanceSettings::BACKGROUND_2D,
     SNAPAppearanceSettings::BACKGROUND_3D,
     SNAPAppearanceSettings::CROSSHAIRS_3D,
+    SNAPAppearanceSettings::IMAGE_BOX_3D,
+    SNAPAppearanceSettings::ROI_BOX_3D,
     SNAPAppearanceSettings::ZOOM_THUMBNAIL,
     SNAPAppearanceSettings::CROSSHAIRS_THUMB
   };

@@ -27,7 +27,7 @@ Source: "@MY_BINARY_DIR@\ProgramData\*.*"; DestDir: "{app}\ProgramData"; Flags: 
 Filename: "{app}\SNAP.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.cognitica.com/download/snap"
 
 [InstallDelete]
-Type: filesandordirs; Name: "{userappdata}\itk.org"
+; Type: filesandordirs; Name: "{userappdata}\itk.org"
 Type: files; Name: "{app}\SNAPProgramDataDirectory.txt"
 Type: filesandordirs; Name: "{app}\HTMLHelp"
 Type: filesandordirs; Name: "{app}\Images2D"

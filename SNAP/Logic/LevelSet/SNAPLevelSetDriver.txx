@@ -171,9 +171,15 @@ SNAPLevelSetDriver<VDimension>
     filter->SetDifferenceFunction(m_LevelSetFunction);
     }
 
-  // Common initialization
+  // This code is common to all filters. It causes the filter to initialize
+  // the necessary memory and sets the iteration counter to 0
   m_LevelSetFilter->SetManualReinitialization(true);
   m_LevelSetFilter->SetNumberOfIterations(0);
+  
+  // Update the largest possible region. The slicer may be changing the 
+  // requested region on this image, so it's important that we always 
+  // update the entire image
+  m_LevelSetFilter->UpdateLargestPossibleRegion();
 }
 
 template<unsigned int VDimension>
@@ -182,12 +188,14 @@ SNAPLevelSetDriver<VDimension>
 ::Restart()
 { 
   // Tell the filter to reinitialize next time that an update will 
-  // be performed
+  // be performed, and set the number of iterations to 0
   m_LevelSetFilter->SetStateToUninitialized();
-
-  // Update the filter with zero iterations
   m_LevelSetFilter->SetNumberOfIterations(0);
-  m_LevelSetFilter->Update();  
+
+  // Update the largest possible region. The slicer may be changing the 
+  // requested region on this image, so it's important that we always 
+  // update the entire image
+  m_LevelSetFilter->UpdateLargestPossibleRegion();
 }
 
 template<unsigned int VDimension>
@@ -195,8 +203,14 @@ void
 SNAPLevelSetDriver<VDimension>
 ::Run(unsigned int nIterations)
 {
-  m_LevelSetFilter->SetNumberOfIterations(nIterations);
-  m_LevelSetFilter->Update();
+  // Increment the number of iterations 
+  unsigned int nElapsed = m_LevelSetFilter->GetElapsedIterations();
+  m_LevelSetFilter->SetNumberOfIterations(nElapsed + nIterations);
+  
+  // Update the largest possible region. The slicer may be changing the 
+  // requested region on this image, so it's important that we always 
+  // update the entire image
+  m_LevelSetFilter->UpdateLargestPossibleRegion();
 }
 
 template<unsigned int VDimension>
@@ -209,6 +223,14 @@ SNAPLevelSetDriver<VDimension>
 
   // Return the filter's output
   return m_LevelSetFilter->GetOutput();
+}
+
+template<unsigned int VDimension>
+unsigned int
+SNAPLevelSetDriver<VDimension>
+::GetElapsedIterations() const
+{
+  return m_LevelSetFilter->GetElapsedIterations();
 }
 
 template<unsigned int VDimension>

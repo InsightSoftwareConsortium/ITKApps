@@ -30,7 +30,13 @@ public:
     NEAREST_NEIGHBOR, TRILINEAR, TRICUBIC, SINC_WINDOW_05
   };
 
-  SNAPSegmentationROISettings() {}
+  SNAPSegmentationROISettings() 
+    {
+    m_ResampleFlag = false;
+    m_VoxelScale.fill(1.0);
+    m_InterpolationMethod = NEAREST_NEIGHBOR;
+    }
+
   virtual ~SNAPSegmentationROISettings() {}
 
   // Get the region of interest, in the main IRIS image

@@ -43,6 +43,11 @@ SNAPRegistryIO
 
   m_EnumMapSnakeType.AddPair(SnakeParameters::EDGE_SNAKE,"EdgeStopping");
   m_EnumMapSnakeType.AddPair(SnakeParameters::REGION_SNAKE,"RegionCompetition");
+
+  m_EnumMapROI.AddPair(SNAPSegmentationROISettings::NEAREST_NEIGHBOR,"Nearest");
+  m_EnumMapROI.AddPair(SNAPSegmentationROISettings::TRILINEAR,"TriLinear");
+  m_EnumMapROI.AddPair(SNAPSegmentationROISettings::TRICUBIC,"Cubic");
+  m_EnumMapROI.AddPair(SNAPSegmentationROISettings::SINC_WINDOW_05,"Sinc05");
 }
 
 /** Read snake parameters from a registry */
@@ -280,6 +285,50 @@ SNAPRegistryIO
   registry["UpperThresholdEnabled"] << in.IsUpperThresholdEnabled();
 }
 
+/** Write region of interest settings to a registry folder */
+void
+SNAPRegistryIO
+::WriteSegmentationROISettings(
+  const SNAPSegmentationROISettings &in, Registry &folder)
+{
+  folder["ResampleFlag"] << in.GetResampleFlag();
+  folder["VoxelScale"] << in.GetVoxelScale();  
+  for(unsigned int d = 0; d < 3; d++)
+    {
+    Registry &sub = folder.Folder(folder.Key("ROIBox[%d]",d));
+    sub["Index"] << in.GetROI().GetIndex(d);
+    sub["Size"] << in.GetROI().GetSize(d);
+    }
+  folder["InterpolationMethod"].PutEnum(m_EnumMapROI,in.GetInterpolationMethod());
+}
+
+SNAPSegmentationROISettings 
+SNAPRegistryIO
+::ReadSegmentationROISettings(
+  Registry &folder, const SNAPSegmentationROISettings &dfl)
+{
+  SNAPSegmentationROISettings out;
+
+  // Read resampling properties
+  out.SetResampleFlag(folder["ResampleFlag"][dfl.GetResampleFlag()]);
+  out.SetVoxelScale(folder["VoxelScale"][dfl.GetVoxelScale()]);
+  out.SetInterpolationMethod(
+    folder["InterpolationMethod"].GetEnum(
+      m_EnumMapROI, dfl.GetInterpolationMethod()));
+
+  // Read in the bounding box information
+  itk::ImageRegion<3> dflRegion = dfl.GetROI();
+  itk::ImageRegion<3> outRegion;
+  for(unsigned int d = 0; d < 3; d++)
+    {
+    Registry &sub = folder.Folder(folder.Key("ROIBox[%d]",d));
+    outRegion.SetIndex(d, sub["Index"][dflRegion.GetIndex(d)]);
+    outRegion.SetSize(d,  sub["Size"][(long) dflRegion.GetSize(d)]);    
+    }
+  out.SetROI(outRegion);
+
+  return out;
+}  
 
 void 
 SNAPRegistryIO
@@ -324,6 +373,10 @@ SNAPRegistryIO
   registry["IRIS.LabelState.OverallAlpha"] << 
     (int) gs->GetSegmentationAlpha();
 
+  // Write the information about the bounding box and ROI sub-sampling
+  WriteSegmentationROISettings(
+    gs->GetSegmentationROISettings(), registry.Folder("IRIS.BoundingBox"));
+
   // Write the labels themselves
   unsigned int validLabels = 0;
   for(unsigned int i=1;i < MAX_COLOR_LABELS; i++)
@@ -342,7 +395,7 @@ SNAPRegistryIO
     folder["Alpha"] << (int) cl.GetAlpha();
     folder["Label"] << cl.GetLabel();
     folder["Color"] << Vector3i(cl.GetRGB(0),cl.GetRGB(1),cl.GetRGB(2));
-    folder["Flags"] << Vector2i(cl.IsDoMesh(),cl.IsVisible());
+    folder["Flags"] << Vector2i(cl.IsVisibleIn3D(),cl.IsVisible());
 
     // Increment the valid label counter
     validLabels++;
@@ -405,6 +458,11 @@ SNAPRegistryIO
         gs->GetMeshOptions()));
     }
 
+  // Read the information about the bounding box and ROI sub-sampling
+  gs->SetSegmentationROISettings(
+    SNAPRegistryIO::ReadSegmentationROISettings(
+      registry.Folder("IRIS.BoundingBox"), gs->GetSegmentationROISettings()));
+
   // Read the label info
   if(restoreLabels) 
     {
@@ -443,7 +501,7 @@ SNAPRegistryIO
         
         // Read the flag property
         Vector2i flags = folder["Flags"][Vector2i(0,0)];
-        cl.SetDoMesh(flags[0] > 0);
+        cl.SetVisibleIn3D(flags[0] > 0);
         cl.SetVisible(flags[1] > 0);
         cl.SetValid(true);
 

@@ -41,6 +41,7 @@ class ResizeRegionDialogLogic;
 class SNAPAppearanceSettings;
 class AppearanceDialogUILogic;
 
+template <class TFlag> class FLTKWidgetActivationManager;
 //template<class TPixel> class ImageIOWizardLogic;
 //class SegmentationImageIOWizardLogic;
 
@@ -485,10 +486,9 @@ public:
   
   void RedrawWindows();
   void ResetScrollbars();
-  void MakeSegTexturesCurrent();
   void UpdateImageProbe();
   void UpdateMainLabel();
-  void Activate3DAccept(bool on);
+  // void Activate3DAccept(bool on);
   void UpdateEditLabelWindow();
   void UpdatePositionDisplay(int id);
 
@@ -558,10 +558,16 @@ public:
   void OnPastePolygonAction(unsigned int window);
   void OnPolygonStateUpdate(unsigned int id);
 
-  // 3D Window callbacks
-  void OnAcceptIRIS3DAction();
-  void OnUpdateIRIS3DAction();
-  void OnResetIRIS3DAction();
+  // IRIS: 3D Window callbacks
+  void OnIRISMeshUpdateAction();
+  void OnIRISMeshAcceptAction();
+  void OnIRISMeshResetViewAction();
+  void OnIRISMeshEditingAction();
+   
+  // SNAP: 3D Window callbacks
+  void OnSNAPMeshUpdateAction();
+  void OnSNAPMeshResetViewAction();
+  void OnSNAPMeshContinuousUpdateAction();
 
   // Method called when user tries to close the window
   void OnMainWindowCloseAction();
@@ -618,17 +624,12 @@ protected:
   // Callbacks to the simple file dialog
   void OnLoadLabelsAction();
   void OnSaveLabelsAction();
-  void OnOpenProjectAction();
-  void OnSaveProjectAction();
   void OnWriteVoxelCountsAction();
 
   void ChangeLabelsCallback();
   void OnSliceSliderChange(int id);
 
   // Menu item callbacks
-  void OnMenuOpenProject();
-  void OnMenuSaveProject();
-  void OnMenuCloseProject();
   void OnMenuLoadGrey();
   void OnMenuLoadSegmentation();
   void OnMenuLoadLabels();
@@ -682,17 +683,42 @@ private:
   // Settings related to the cosmetic appearance of the application
   SNAPAppearanceSettings *m_AppearanceSettings;
 
+  // Set of logical states that the UI may encounter
+  enum UIStateFlags {
+    UIF_NULL,
+    UIF_GRAY_LOADED,
+    UIF_IRIS_ACTIVE,
+    UIF_IRIS_WITH_GRAY_LOADED,
+    UIF_IRIS_MESH_DIRTY,
+    UIF_IRIS_MESH_ACTION_PENDING, 
+    UIF_IRIS_ROI_VALID,
+    UIF_LINKED_ZOOM,
+
+    UIF_SNAP_ACTIVE,
+    UIF_SNAP_PAGE_PREPROCESSING,
+    UIF_SNAP_PAGE_BUBBLES,
+    UIF_SNAP_PAGE_SEGMENTATION,
+    UIF_SNAP_PREPROCESSING_ACTIVE,
+    UIF_SNAP_PREPROCESSING_DONE,
+    UIF_SNAP_DIALOG_PARAMETERS,
+    UIF_SNAP_DIALOG_PREPROCESSING,
+    UIF_SNAP_SNAKE_RUNNING,
+    UIF_SNAP_SNAKE_INITIALIZED,
+    UIF_SNAP_SNAKE_EDITABLE,
+    UIF_SNAP_SPEED_AVAILABLE,
+    UIF_SNAP_MESH_DIRTY,
+    UIF_SNAP_MESH_CONTINUOUS_UPDATE
+  };
+
+  // Widget activation manager - simplifies the headache of keeping widgets
+  // activated and deactivated
+  FLTKWidgetActivationManager<UIStateFlags> *m_Activation; 
+
   // Bubble highlighted in the browser
   int m_HighlightedBubble;
 
-  // current iteration of the snake
-  int m_SnakeIteration;
-
   // how many snake iterations per step
   int m_SnakeStepSize;
-
-  // flag for the play button to know when to stop
-  int m_SnakeIsRunning;
 
   // The callback command used in the (complicated) snake VCR pipeline
   itk::SmartPointer<SimpleCommandType> m_PostSnakeCommand;
@@ -745,8 +771,8 @@ private:
   // Intensity curve update callback (uses ITK event system)
   void OnIntensityCurveUpdate();
 
-  /** Update snake iteration output field */
-  void UpdateIterationOutput();
+  /** Initialization subroutine that sets up the activation manager */
+  void InitializeActivationFlags();
 
   /**
    * Some GUI state is shared between the windows, like opacity settings, 
@@ -771,14 +797,23 @@ private:
    * the bar as necessary */
   void OnITKProgressEvent(itk::Object *source, const itk::EventObject &event);
 
+  // This method is called when the snake image has changed.
+  void OnSnakeUpdate();
+
   /* Command used for progress tracking */
   itk::SmartPointer<ProgressCommandType> m_ProgressCommand;
+
+  // A function used to run the snake in the background
+  friend void fnSnakeIdleFunction(void *userData);
 };
 
 #endif
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.21  2004/09/08 12:09:46  pauly
+ *ENH: Adapting SNAP to work with stop-n-go function in finite diff. framewk
+ *
  *Revision 1.20  2004/08/26 18:29:19  pauly
  *ENH: New user interface for configuring the UI options
  *

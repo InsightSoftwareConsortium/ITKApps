@@ -113,9 +113,14 @@ public:
   RegionType GetImageRegion() const;
 
   /**
-   * Get the scaling of the voxels
+   * Get the spacing of the gray scale image (and all the associated images) 
    */
-  Vector3f GetVoxelScaleFactor();
+  Vector3d GetImageSpacing();
+
+  /**
+   * Get the origin of the gray scale image (and all the associated images) 
+   */
+  Vector3d GetImageOrigin();
 
   /**
    * Set the grey image (read important note).

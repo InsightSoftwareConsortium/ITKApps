@@ -44,9 +44,6 @@ public:
   virtual void SetToolbarMode3D(ToolbarMode3DType mode) = 0;
   
   // Menu item callbacks
-  virtual void OnMenuOpenProject() = 0;
-  virtual void OnMenuSaveProject() = 0;
-  virtual void OnMenuCloseProject() = 0;
   virtual void OnMenuLoadGrey() = 0;
   virtual void OnMenuSaveGreyROI() = 0;
   virtual void OnMenuLoadSegmentation() = 0;
@@ -89,9 +86,9 @@ public:
   virtual void OnPastePolygonAction(unsigned int window) = 0;
 
   // IRIS: 3D Window callbacks
-  virtual void OnAcceptIRIS3DAction() = 0;
-  virtual void OnUpdateIRIS3DAction() = 0;
-  virtual void OnResetIRIS3DAction() = 0;
+  virtual void OnIRISMeshUpdateAction() = 0;
+  virtual void OnIRISMeshAcceptAction() = 0;
+  virtual void OnIRISMeshResetViewAction() = 0;
   
   // IRIS: ROI manipulation callbacks
   virtual void OnResetROIAction() = 0;
@@ -124,20 +121,22 @@ public:
   virtual void OnRestartPreprocessingAction() = 0;
   virtual void OnCancelSegmentationAction() = 0;
   
-  // SNAP display interaction actions  
+  // SNAP: display interaction actions  
   virtual void OnSNAPViewOriginalSelect() = 0;
   virtual void OnViewPreprocessedSelect() = 0;
   
-  virtual void MakeSegTexturesCurrent() = 0;
   virtual void UpdateMainLabel() = 0;
 
   // Opacity sliders  
   virtual void OnIRISLabelOpacityChange() = 0;
   virtual void OnSNAPLabelOpacityChange() = 0;
 
-  // 3D window related callbacks  
-  virtual void OnContinuousViewUpdateChange() = 0;
-  virtual void Activate3DAccept(bool on) = 0;
+  // SNAP: 3D window related callbacks  
+  virtual void OnSNAPMeshUpdateAction() = 0;
+  virtual void OnSNAPMeshResetViewAction() = 0;
+  virtual void OnSNAPMeshContinuousUpdateAction() = 0;
+
+  // virtual void Activate3DAccept(bool on) = 0;
 
   // Help related callbacks
   virtual void OnLaunchTutorialAction() = 0;

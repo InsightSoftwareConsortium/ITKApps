@@ -141,3 +141,33 @@ vector_multiply(const vnl_vector_fixed<T,VSize> &x,
   return z;
 }
 
+/**
+ * Multiply two inhomogeneous vectors, returning the result in the
+ * type of the first vector
+ */
+template <class T1, class T2, unsigned int VSize> 
+inline iris_vector_fixed<T1,VSize> 
+vector_multiply_mixed(const vnl_vector_fixed<T1,VSize> &x,
+                      const vnl_vector_fixed<T2,VSize> &y)
+{
+  iris_vector_fixed<T1,VSize> z;
+  for(unsigned int i=0;i<VSize;i++)
+    z(i) = x(i) * y(i);
+  return z;
+}
+
+/**
+ * Compute x*y+z for three inhomogeneous vectors, returning result in the 
+ * same type as x
+ */
+template <class T1, class T2, class T3, unsigned int VSize> 
+inline iris_vector_fixed<T1,VSize> 
+vector_multiply_add_mixed(const vnl_vector_fixed<T1,VSize> &x,
+                          const vnl_vector_fixed<T2,VSize> &y,
+                          const vnl_vector_fixed<T3,VSize> &z)
+{
+  iris_vector_fixed<T1,VSize> r;
+  for(unsigned int i=0;i<VSize;i++)
+    r(i) = x(i) * y(i) + z(i);
+  return r; 
+}

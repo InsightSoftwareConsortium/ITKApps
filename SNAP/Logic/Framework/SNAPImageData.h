@@ -143,6 +143,9 @@ public:
   bool IsSegmentationActive() const
     { return m_LevelSetDriver != NULL; }
 
+  /** Get the number of elapsed iterations */
+  unsigned int GetElapsedSegmentationIterations() const;
+
   /** Release the resources associated with the level set segmentation.  This 
    * method must be called once the segmentation pipeline has terminated, or 
    * else it would create a nasty crash */

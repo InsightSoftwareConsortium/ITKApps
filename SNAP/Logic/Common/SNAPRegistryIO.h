@@ -52,7 +52,6 @@ public:
   /** Write snake parameters to a registry */
   void WriteSnakeParameters(
     const SnakeParameters &in,Registry &registry);
-
   
   /** Read mesh options from a registry */
   MeshOptions ReadMeshOptions(
@@ -61,7 +60,6 @@ public:
   /** Write mesh options to a registry */
   void WriteMeshOptions(
     const MeshOptions &in,Registry &registry);
-
   
   /** Read edge preprocessing settings from a registry */
   EdgePreprocessingSettings ReadEdgePreprocessingSettings(
@@ -79,11 +77,20 @@ public:
   void WriteThresholdSettings(
     const ThresholdSettings &in,Registry &registry);
 
+  /** Read ROI settings from a registry */
+  SNAPSegmentationROISettings ReadSegmentationROISettings(
+    Registry &folder, const SNAPSegmentationROISettings &defaultSet);
+  
+  /** Write ROI settings to a registry */
+  void WriteSegmentationROISettings(
+    const SNAPSegmentationROISettings &in, Registry &folder);
+
 private:
   // Some enumeraticns used by this class
   RegistryEnumMap<CoverageModeType> m_EnumMapCoverage;
   RegistryEnumMap<SnakeParameters::SolverType> m_EnumMapSolver;
   RegistryEnumMap<SnakeParameters::SnakeType> m_EnumMapSnakeType;
+  RegistryEnumMap<SNAPSegmentationROISettings::InterpolationMethod> m_EnumMapROI;
 
 };
 

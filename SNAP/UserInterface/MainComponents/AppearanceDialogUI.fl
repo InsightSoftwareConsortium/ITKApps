@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0102 
+version 1.0105 
 header_name {.h} 
 code_name {.cxx}
 class AppearanceDialogUI {open : AppearanceDialogUIBase
@@ -16,8 +16,8 @@ class AppearanceDialogUI {open : AppearanceDialogUIBase
         xywh {10 10 400 360} box PLASTIC_THIN_UP_BOX color 41 labelsize 12 align 0
       } {
         Fl_Group {} {
-          label General
-          xywh {10 35 400 335} labelsize 12 hide
+          label General selected
+          xywh {10 35 400 335} labelsize 12
         } {
           Fl_Check_Button m_ChkOptionsSliceThumbnailOn {
             label {Show thumbnail when the slice does not fit in the window}
@@ -51,11 +51,11 @@ class AppearanceDialogUI {open : AppearanceDialogUIBase
           }
         }
         Fl_Group {} {
-          label {View Arrangement}
+          label Layout
           xywh {10 35 400 335} labelsize 12 hide
         } {
           Fl_Group {} {
-            label {Select 2-d slice arrangement:} open
+            label {Available layouts:} open
             xywh {190 85 205 85} box PLASTIC_DOWN_BOX labelsize 12 align 5
           } {
             Fl_Group {} {
@@ -185,36 +185,36 @@ class AppearanceDialogUI {open : AppearanceDialogUIBase
           }
           Fl_Group {} {
             label {Additional options:}
-            xywh {190 190 205 50} box PLASTIC_DOWN_BOX labelsize 12 align 5
+            xywh {190 200 205 53} box PLASTIC_DOWN_BOX labelsize 12 align 5
           } {
             Fl_Check_Button m_ChkOptionsViews2DNoseLeft {
               label {Display the nose to the left}
-              xywh {200 197 175 18} down_box DOWN_BOX value 1 labelsize 12
+              xywh {200 208 175 18} down_box DOWN_BOX value 1 labelsize 12
             }
             Fl_Check_Button m_ChkOptionsViews2DRightIsLeft {
               label {Patient right is screen left}
-              xywh {200 217 175 18} down_box DOWN_BOX value 1 labelsize 12
+              xywh {200 228 175 18} down_box DOWN_BOX value 1 labelsize 12
             }
           }
           Fl_Group {} {
-            label {Screen Layout:}
-            xywh {20 72 155 168} box PLASTIC_DOWN_BOX labeltype NO_LABEL labelsize 12 align 5
+            label {Current screen layout:}
+            xywh {20 85 155 168} box PLASTIC_DOWN_BOX labelsize 12 align 5
           } {
             Fl_Output {m_OutDisplayOptionsPanel[0]} {
               label {2D View 1}
-              xywh {30 82 60 60} box BORDER_BOX color 30 selection_color 0 labelsize 11 labelcolor 0 align 2 textsize 12 textcolor 7
+              xywh {30 97 60 60} box BORDER_BOX color 30 selection_color 0 labelsize 11 labelcolor 0 align 2 textsize 12 textcolor 7
             }
             Fl_Output {m_OutDisplayOptionsPanel[1]} {
               label {2D View 2}
-              xywh {105 82 60 60} box BORDER_BOX color 30 selection_color 0 labelsize 11 labelcolor 0 align 2 textsize 12 textcolor 7
+              xywh {105 97 60 60} box BORDER_BOX color 30 selection_color 0 labelsize 11 labelcolor 0 align 2 textsize 12 textcolor 7
             }
             Fl_Output {m_OutDisplayOptionsPanel[2]} {
               label {2D View 3}
-              xywh {105 162 60 60} box BORDER_BOX color 30 selection_color 0 labelsize 11 labelcolor 0 align 2 textsize 12 textcolor 7
+              xywh {105 177 60 60} box BORDER_BOX color 30 selection_color 0 labelsize 11 labelcolor 0 align 2 textsize 12 textcolor 7
             }
             Fl_Output {} {
               label {3D View}
-              xywh {30 162 60 60} box BORDER_BOX color 30 selection_color 0 labelsize 11 labelcolor 0 align 2 textsize 12 textcolor 7
+              xywh {30 177 60 60} box BORDER_BOX color 30 selection_color 0 labelsize 11 labelcolor 0 align 2 textsize 12 textcolor 7
             }
           }
           Fl_Group {} {
@@ -234,11 +234,11 @@ class AppearanceDialogUI {open : AppearanceDialogUIBase
         }
         Fl_Group {} {
           label Appearance open
-          xywh {10 35 400 335} labelsize 12
+          xywh {10 35 400 335} labelsize 12 hide
         } {
           Fl_Choice m_InUIElement {
             label {Select a user interface element to edit:}
-            callback {OnUIElementSelection(o->value())} open selected
+            callback {OnUIElementSelection(o->value())} open
             xywh {25 75 370 25} down_box BORDER_BOX labelsize 12 align 5 textsize 12
           } {
             menuitem {} {
@@ -263,7 +263,15 @@ class AppearanceDialogUI {open : AppearanceDialogUIBase
             }
             menuitem {} {
               label {3D window crosshairs}
-              xywh {20 20 100 20} labelsize 12 divider
+              xywh {20 20 100 20} labelsize 12
+            }
+            menuitem {} {
+              label {3D window image cube}
+              xywh {30 30 100 20} labelsize 12
+            }
+            menuitem {} {
+              label {3D window region of interest}
+              xywh {40 40 100 20} labelsize 12 divider
             }
             menuitem {} {
               label {Zoom thumbnail}

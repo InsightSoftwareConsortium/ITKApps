@@ -49,7 +49,8 @@ public:
     { 
     CROSSHAIRS = 0, MARKERS, ROI_BOX, 
     BACKGROUND_2D, BACKGROUND_3D, 
-    ZOOM_THUMBNAIL, CROSSHAIRS_3D, CROSSHAIRS_THUMB, ELEMENT_COUNT
+    ZOOM_THUMBNAIL, CROSSHAIRS_3D, CROSSHAIRS_THUMB, 
+    IMAGE_BOX_3D, ROI_BOX_3D, ELEMENT_COUNT
     };  
 
   /** An enumeration of the fields that an element may possess */

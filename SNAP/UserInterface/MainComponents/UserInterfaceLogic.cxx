@@ -46,6 +46,7 @@
 #include "SimpleFileDialogLogic.h"
 #include "SliceWindowCoordinator.h"
 #include "SNAPAppearanceSettings.h"
+#include "FLTKWidgetActivationManager.h"
 
 #include "FL/Fl_File_Chooser.H"
 
@@ -63,6 +64,100 @@
 
 using namespace itk;
 using namespace std;
+
+void UserInterfaceLogic
+::InitializeActivationFlags()
+{
+  // ---------------------------------------------------------
+  //    Intialize activation object
+  // ---------------------------------------------------------
+  m_Activation = new FLTKWidgetActivationManager<UIStateFlags>;
+  
+  // ---------------------------------------------------------
+  //    Configure Flag Relationships
+  // ---------------------------------------------------------
+  
+  // Set the parent-child relationships between flags
+  m_Activation->SetFlagImplies(UIF_SNAP_SPEED_AVAILABLE, UIF_SNAP_ACTIVE);
+  m_Activation->SetFlagImplies(UIF_SNAP_MESH_CONTINUOUS_UPDATE, UIF_SNAP_SNAKE_INITIALIZED);
+  m_Activation->SetFlagImplies(UIF_IRIS_WITH_GRAY_LOADED, UIF_GRAY_LOADED);
+  m_Activation->SetFlagImplies(UIF_IRIS_WITH_GRAY_LOADED, UIF_IRIS_ACTIVE);
+  m_Activation->SetFlagImplies(UIF_IRIS_MESH_DIRTY, UIF_IRIS_WITH_GRAY_LOADED);
+  m_Activation->SetFlagImplies(UIF_IRIS_MESH_ACTION_PENDING, UIF_IRIS_WITH_GRAY_LOADED);
+  m_Activation->SetFlagImplies(UIF_IRIS_ROI_VALID, UIF_GRAY_LOADED);
+  m_Activation->SetFlagImplies(UIF_LINKED_ZOOM, UIF_GRAY_LOADED);
+  m_Activation->SetFlagImplies(UIF_SNAP_PREPROCESSING_ACTIVE, UIF_SNAP_ACTIVE);
+
+  m_Activation->SetFlagImplies(UIF_SNAP_PAGE_PREPROCESSING, UIF_SNAP_ACTIVE);
+  m_Activation->SetFlagImplies(UIF_SNAP_PAGE_BUBBLES, UIF_SNAP_ACTIVE);
+  m_Activation->SetFlagImplies(UIF_SNAP_PAGE_SEGMENTATION, UIF_SNAP_ACTIVE);
+
+  m_Activation->SetFlagImplies(UIF_SNAP_SNAKE_RUNNING, UIF_SNAP_SNAKE_INITIALIZED);
+  m_Activation->SetFlagImplies(UIF_SNAP_SNAKE_EDITABLE, UIF_SNAP_SNAKE_INITIALIZED);
+  m_Activation->SetFlagImplies(UIF_SNAP_SNAKE_EDITABLE, UIF_SNAP_SNAKE_RUNNING, true, false);
+
+  // Set up the exclusive relationships between flags
+  m_Activation->SetFlagImplies( UIF_SNAP_ACTIVE, UIF_IRIS_ACTIVE, true, false );
+  m_Activation->SetFlagImplies(UIF_SNAP_PREPROCESSING_DONE, 
+    UIF_SNAP_PREPROCESSING_ACTIVE, true, false );  
+  m_Activation->SetFlagsMutuallyExclusive( 
+    UIF_SNAP_PAGE_SEGMENTATION, 
+    UIF_SNAP_PAGE_BUBBLES, 
+    UIF_SNAP_PAGE_PREPROCESSING );
+  
+  // ---------------------------------------------------------
+  //    Relate flags to widgets
+  // ---------------------------------------------------------
+  
+  // Link widget activation to flags
+  m_Activation->AddWidget(m_BtnAcceptPreprocessing, UIF_SNAP_PREPROCESSING_DONE);
+  m_Activation->AddWidget(m_GrpImageOptions, UIF_SNAP_SPEED_AVAILABLE);
+  m_Activation->AddWidget(m_BtnSNAPMeshUpdate, UIF_SNAP_SNAKE_INITIALIZED);
+  m_Activation->AddWidget(m_BtnMeshUpdate, UIF_IRIS_MESH_DIRTY);
+  m_Activation->AddWidget(m_BtnStartSnake, UIF_IRIS_ROI_VALID);
+  m_Activation->AddWidget(m_InZoomPercentage, UIF_LINKED_ZOOM);
+  m_Activation->AddWidget(m_BtnAccept3D, UIF_IRIS_MESH_ACTION_PENDING);
+
+  m_Activation->AddWidget(m_BtnAcceptSegmentation, UIF_SNAP_SNAKE_INITIALIZED);
+  m_Activation->AddWidget(m_BtnRestartInitialization, UIF_SNAP_SNAKE_INITIALIZED);
+  m_Activation->AddWidget(m_BtnSnakePlay, UIF_SNAP_SNAKE_EDITABLE);
+  m_Activation->AddWidget(m_BtnSnakeRewind, UIF_SNAP_SNAKE_INITIALIZED);
+  m_Activation->AddWidget(m_BtnSnakeStop, UIF_SNAP_SNAKE_INITIALIZED);
+  m_Activation->AddWidget(m_BtnSnakeStep, UIF_SNAP_SNAKE_INITIALIZED);
+  
+  // Add more complex relationships
+  m_Activation->AddCheckBox(m_ChkContinuousView3DUpdate, 
+    UIF_SNAP_SNAKE_INITIALIZED, false, false);
+
+  // Activate widgets indexed by dimension
+  for(unsigned int i = 0; i < 3; i++)
+    {
+    m_Activation->AddWidget(m_InSNAPSliceSlider[i], UIF_SNAP_ACTIVE);
+    m_Activation->AddWidget(m_OutSNAPSliceIndex[i], UIF_SNAP_ACTIVE);
+    m_Activation->AddWidget(m_InIRISSliceSlider[i], UIF_IRIS_WITH_GRAY_LOADED);
+    m_Activation->AddWidget(m_OutIRISSliceIndex[i], UIF_IRIS_WITH_GRAY_LOADED);
+    m_Activation->AddWidget(m_BtnIRISPanelResetView[i], UIF_IRIS_WITH_GRAY_LOADED);
+    m_Activation->AddWidget(m_BtnIRISPanelZoom[i], UIF_IRIS_WITH_GRAY_LOADED);
+    }
+
+  // The 3D controls that are indexed by i
+  m_Activation->AddWidget(m_BtnIRISPanelResetView[3], UIF_IRIS_WITH_GRAY_LOADED);
+  m_Activation->AddWidget(m_BtnIRISPanelZoom[3], UIF_IRIS_WITH_GRAY_LOADED);
+
+  // Link menu items to flags
+  m_Activation->AddMenuItem(m_MenuLoadGrey, UIF_IRIS_ACTIVE);
+  m_Activation->AddMenuItem(m_MenuLoadSegmentation, UIF_IRIS_WITH_GRAY_LOADED);
+  m_Activation->AddMenuItem(m_MenuSaveGreyROI, UIF_SNAP_ACTIVE);
+  m_Activation->AddMenuItem(m_MenuSaveSegmentation, UIF_IRIS_WITH_GRAY_LOADED);
+  m_Activation->AddMenuItem(m_MenuSaveLabels, UIF_IRIS_WITH_GRAY_LOADED);
+  m_Activation->AddMenuItem(m_MenuLoadLabels, UIF_IRIS_WITH_GRAY_LOADED);
+  m_Activation->AddMenuItem(m_MenuSaveVoxelCounts, UIF_IRIS_WITH_GRAY_LOADED);
+  m_Activation->AddMenuItem(m_MenuIntensityCurve, UIF_GRAY_LOADED);
+  m_Activation->AddMenuItem(m_MenuExportSlice, UIF_GRAY_LOADED);
+  m_Activation->AddMenuItem(m_MenuSavePreprocessed, UIF_SNAP_SPEED_AVAILABLE);
+  m_Activation->AddMenuItem(m_MenuLoadPreprocessed, UIF_SNAP_PAGE_PREPROCESSING);
+  m_Activation->AddMenuItem(m_MenuLoadAdvection, UIF_SNAP_PAGE_PREPROCESSING);
+}
 
 UserInterfaceLogic
 ::UserInterfaceLogic(IRISApplication *iris, SystemInterface *system)
@@ -166,7 +261,11 @@ UserInterfaceLogic
   // Set the welcome page to display
   m_WizControlPane->value(m_GrpWelcomePage);
 
+  InitializeActivationFlags();
   InitializeUI();
+
+  // Enter the IRIS-ACTiVE state
+  m_Activation->UpdateFlag(UIF_IRIS_ACTIVE, true);
 }
 
 UserInterfaceLogic
@@ -194,6 +293,9 @@ UserInterfaceLogic
 
   // Delete the appearance settings
   delete m_AppearanceSettings;
+
+  // Delete the activation manager
+  delete m_Activation;
 }
 
 void 
@@ -287,10 +389,8 @@ UserInterfaceLogic
 
   // Set bubble radius range according to volume dimensions (world dimensions)
   Vector3ui size = m_Driver->GetCurrentImageData()->GetVolumeExtents();
-  Vector3f voxdims = m_Driver->GetSNAPImageData()->GetVoxelScaleFactor();
-  float mindim = size[0]*voxdims[0];
-  if (size[1]*voxdims[1] < mindim) mindim = size[1]*voxdims[1];
-  if (size[2]*voxdims[2] < mindim) mindim = size[2]*voxdims[2];
+  Vector3d voxdims = m_Driver->GetSNAPImageData()->GetImageSpacing();
+  double mindim = vector_multiply_mixed(voxdims, size).min_value();
 
   m_InBubbleRadius->value(1);
   if ((int)(mindim/2) < 1)
@@ -335,33 +435,12 @@ UserInterfaceLogic
   // This method basically sends the current button state from IRIS to SNAP
   SyncSnakeToIRIS();
 
-  //initialize GUI widgets
-  m_BtnPreprocess->activate();
-  m_BtnAcceptPreprocessing->deactivate();
-  m_GrpSnakeChoiceRadio->activate();
-  m_GrpSNAPStepInitialize->activate();
-  m_GrpSnakeControl->deactivate();
-  m_GrpImageOptions->deactivate();
+  // Initialize GUI widgets 
+  // TODO: WTF is this?
   m_RadioSNAPViewPreprocessed->value(0);
   m_RadioSNAPViewOriginal->value(1);
   m_BtnAcceptInitialization->show();
   m_BtnRestartInitialization->hide();
-  m_ChkContinuousView3DUpdate->deactivate();
-  m_ChkContinuousView3DUpdate->value(0);
-  m_BtnSNAPMeshUpdate->deactivate();
-
-  // Menu items
-  m_MenuLoadGrey->deactivate();
-  m_MenuLoadSegmentation->deactivate();
-  m_MenuSaveSegmentation->deactivate();
-  m_MenuSaveGreyROI->activate();
-  m_MenuLoadLabels->deactivate();
-  m_MenuSaveLabels->deactivate();
-  m_MenuSavePreprocessed->deactivate();
-  m_MenuLoadPreprocessed->activate();
-  m_MenuLoadAdvection->activate();
-  m_MenuSaveVoxelCounts->deactivate();
-
 
   m_GlobalState->SetShowSpeed(false);
 
@@ -374,8 +453,6 @@ UserInterfaceLogic
 
   m_SnakeStepSize = 1;
   m_InStepSize->value(0);
-
-  m_BtnAcceptSegmentation->deactivate();
 
   // reset Mesh in IRIS window
   m_IRISWindow3D->ClearScreen();
@@ -401,7 +478,7 @@ UserInterfaceLogic
 ::OnPreprocessAction()
 {
   // Disable the 'Next' button on the preprocessing page
-  m_BtnAcceptPreprocessing->deactivate();
+  m_Activation->UpdateFlag(UIF_SNAP_PREPROCESSING_ACTIVE, true);
 
   // Display the right window
   if(m_GlobalState->GetSnakeMode() == EDGE_SNAKE)
@@ -420,10 +497,9 @@ UserInterfaceLogic
 {
   // Check if the preprocessing image has been computed
   if(m_GlobalState->GetSpeedValid())
-    {
-    // Enable the 'Next' button on the preprocessing page
-    m_BtnAcceptPreprocessing->activate();
-    }
+    m_Activation->UpdateFlag(UIF_SNAP_PREPROCESSING_DONE, true);
+  else
+    m_Activation->UpdateFlag(UIF_SNAP_PREPROCESSING_ACTIVE, false);    
 }
 
 void 
@@ -601,9 +677,9 @@ UserInterfaceLogic
   m_Driver->GetSNAPImageData()->ClearSpeed();
 
   m_GlobalState->SetSpeedValid(false);
-  m_GrpImageOptions->deactivate();
-  m_MenuSavePreprocessed->deactivate();
-  m_BtnAcceptPreprocessing->deactivate();
+
+  // Update widget state
+  m_Activation->UpdateFlag(UIF_SNAP_SPEED_AVAILABLE, false);
 
   m_PreprocessingUI->HidePreprocessingWindows();
 
@@ -638,42 +714,24 @@ UserInterfaceLogic
 
   if (m_Driver->GetSNAPImageData()) m_Driver->GetSNAPImageData()->ClearSpeed();
   m_GlobalState->SetSpeedValid(false);
-  m_GrpImageOptions->deactivate();
-  m_BtnAcceptPreprocessing->deactivate();
-  m_MenuSavePreprocessed->deactivate();
+  
+  // Update widget state
+  m_Activation->UpdateFlag(UIF_SNAP_SPEED_AVAILABLE, false);
+  
   m_PreprocessingUI->HidePreprocessingWindows();
   m_RadioSNAPViewOriginal->setonly();
 
   OnSNAPViewOriginalSelect();
 }
 
-//--------------------------------------------
-//
-//
-// SNAKE CONTROLS
-//
-//
-//--------------------------------------------
-
+/*
+ * This method is called when the user has finished adding bubbles
+ */
 void 
 UserInterfaceLogic
 ::OnAcceptInitializationAction()
 {
-  if (!m_Driver->GetSNAPImageData()->IsSpeedLoaded()) 
-    {
-    m_OutMessage->value("Must preprocess image first!!");
-    return;
-    }
-
-  m_BtnPreprocess->deactivate();
-  m_GrpSnakeChoiceRadio->deactivate();
-  m_GrpSNAPStepInitialize->deactivate();
-  m_MenuLoadPreprocessed->deactivate();
-  m_MenuLoadAdvection->deactivate();
-
-  m_PreprocessingUI->HidePreprocessingWindows();
-
-  //get bubbles, turn them into segmentation
+  // Get bubbles, turn them into segmentation
   Bubble * bubbles = GetBubbles();
   int numbubbles = GetNumberOfBubbles();
 
@@ -692,17 +750,13 @@ UserInterfaceLogic
   // Restore the cursor
   fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
   
-  // Check if we need to bail
+  // Check if we need to bail out
   if (!rc) 
     {    
     // There were no voxels selected in the end
     fl_alert("Can not proceed without an initialization\n"
              "Please place a bubble into the image!");
     
-    m_BtnPreprocess->activate();
-    m_GrpSnakeChoiceRadio->activate();
-    m_GrpSNAPStepInitialize->activate();
-
     // Clear bubble array
     if (bubbles)
       delete [] bubbles;
@@ -713,20 +767,11 @@ UserInterfaceLogic
   m_BtnAcceptInitialization->hide();
   m_BtnRestartInitialization->show();
 
-
-  m_GrpSnakeControl->activate();
-  m_ChkContinuousView3DUpdate->activate();
-  m_ChkContinuousView3DUpdate->value(0);
-  m_BtnSNAPMeshUpdate->activate();
-
-  // Reset the snake iteration counter
-  m_SnakeIteration = 0;
-  UpdateIterationOutput();
-
-  m_BtnAcceptSegmentation->activate();
-  RedrawWindows();
-  m_SNAPWindow3D->ClearScreen();// reset Mesh object in Window3D_s
-  m_SNAPWindow3D->ResetView();  // reset cursor
+  // Set the UI for the segmentation state
+  m_Activation->UpdateFlag(UIF_SNAP_SNAKE_EDITABLE, true);
+  
+  m_SNAPWindow3D->ClearScreen(); // reset Mesh object in Window3D_s
+  m_SNAPWindow3D->ResetView();   // reset cursor
 
   // Flip to the next page in the wizard
   SetActiveSegmentationPipelinePage(2);
@@ -734,6 +779,8 @@ UserInterfaceLogic
   m_OutMessage->value("Snake initialized successfully");
 
   m_GlobalState->SetSnakeActive(true);
+
+  OnSnakeUpdate();
 }
 
 
@@ -745,32 +792,28 @@ UserInterfaceLogic
     {
     case 0 : 
       m_WizSegmentationPipeline->value(m_GrpSNAPStepPreprocess);
+      m_Activation->UpdateFlag(UIF_SNAP_PAGE_PREPROCESSING, true);
       break;
 
     case 1 :
       m_WizSegmentationPipeline->value(m_GrpSNAPStepInitialize);
+      m_Activation->UpdateFlag(UIF_SNAP_PAGE_BUBBLES, true);
       break;
 
     case 2 :
       m_WizSegmentationPipeline->value(m_GrpSNAPStepSegment);
+      m_Activation->UpdateFlag(UIF_SNAP_PAGE_SEGMENTATION, true);
       break;
     }
-}
-
-
-void 
-UserInterfaceLogic
-::UpdateIterationOutput()
-{
-  char iterstr[16];
-  sprintf(iterstr,"%d",m_SnakeIteration);
-  m_OutCurrentIteration->value(iterstr);
 }
 
 void 
 UserInterfaceLogic
 ::OnRestartInitializationAction()
 {
+  // Stop the segmentation if it's running
+  OnSnakeStopAction();
+  
   // If the segmentation pipeline is active, deactivate it
   if(m_Driver->GetSNAPImageData()->IsSegmentationActive())
     {
@@ -778,20 +821,12 @@ UserInterfaceLogic
     m_Driver->GetSNAPImageData()->TerminateSegmentation();
     }
 
-  m_SnakeIsRunning = 0;
+  // Tell the UI to activate related widgets
+  m_Activation->UpdateFlag(UIF_SNAP_SNAKE_INITIALIZED, false);
+
   m_GlobalState->SetSnakeActive(false);
-  m_GrpSnakeControl->deactivate();
-  m_BtnPreprocess->activate();
-  m_GrpSnakeChoiceRadio->activate();
-  m_GrpSNAPStepInitialize->activate();
-  m_MenuLoadPreprocessed->activate();
-  m_MenuLoadAdvection->activate();
   m_BtnRestartInitialization->hide();
   m_BtnAcceptInitialization->show();
-  m_ChkContinuousView3DUpdate->value(0);
-  m_ChkContinuousView3DUpdate->deactivate();
-  m_BtnSNAPMeshUpdate->deactivate();
-  m_BtnAcceptSegmentation->deactivate();
 
   m_SNAPWindow3D->ClearScreen(); // reset Mesh object in Window3D_s
   m_SNAPWindow3D->ResetView();   // reset cursor
@@ -829,7 +864,8 @@ UserInterfaceLogic
 
   // Chech whether we need to warn user about changing the solver in the 
   // process of evolution
-  m_SnakeParametersUI->SetWarnOnSolverUpdate(m_SnakeIteration > 1);
+  m_SnakeParametersUI->SetWarnOnSolverUpdate(
+    m_Driver->GetSNAPImageData()->GetElapsedSegmentationIterations() > 0);
   
   // Show the snake parameters window
   CenterChildWindowInParentWindow(m_SnakeParametersUI->GetWindow(),m_WinMain);
@@ -862,52 +898,75 @@ UserInterfaceLogic
 
 void 
 UserInterfaceLogic
-::OnContinuousViewUpdateChange()
-{
-  if (m_ChkContinuousView3DUpdate->value()) 
-    {
-    m_BtnSNAPMeshUpdate->deactivate();
-    m_SNAPWindow3D->UpdateMesh();
-    }
-  else 
-    {
-    m_BtnSNAPMeshUpdate->activate();
-    }
-}
-
-void 
-UserInterfaceLogic
 ::OnSnakeRewindAction()
 {
-  // Stop the play button, if it's running
-  m_SnakeIsRunning = 0;
-  m_SnakeIteration = 0;
+  // Stop the snake if it's running
+  OnSnakeStopAction();
 
   // Basically, we tell the level set driver that we want a restart
   m_Driver->GetSNAPImageData()->RestartSegmentation();
+
+  // Update the display
+  OnSnakeUpdate();
+}
+
+void fnSnakeIdleFunction(void *userData)
+{
+  // Get the instance of the calling class
+  UserInterfaceLogic *uiLogic = (UserInterfaceLogic *) userData;
+
+  // Request that the desired number of iterations be executed
+  uiLogic->GetDriver()->GetSNAPImageData()->RunSegmentation(
+    uiLogic->m_SnakeStepSize);
+  
+  // Update the display
+  uiLogic->OnSnakeUpdate();
 }
 
 void 
 UserInterfaceLogic
 ::OnSnakeStopAction()
 {
-  // Stop the play button, if it's running
-  m_SnakeIsRunning = 0;
+  Fl::remove_idle(fnSnakeIdleFunction, this);
+  m_Activation->UpdateFlag(UIF_SNAP_SNAKE_EDITABLE, true);
 }
 
 void 
 UserInterfaceLogic
 ::OnSnakePlayAction()
 {
-  if (!m_GlobalState->GetSnakeActive()) return;
+  m_Activation->UpdateFlag(UIF_SNAP_SNAKE_RUNNING, true);
+  Fl::add_idle(fnSnakeIdleFunction, this);
+}
+
+void 
+UserInterfaceLogic
+::OnSnakeUpdate()
+{
+  // Update the number of elapsed iterations
+  std::ostringstream oss;
+  oss << m_Driver->GetSNAPImageData()->GetElapsedSegmentationIterations();
+  m_OutCurrentIteration->value(oss.str().c_str());
+
+  // Update the mesh if necessary
+  if(m_ChkContinuousView3DUpdate->value())
+    m_SNAPWindow3D->UpdateMesh();
+  else
+    m_Activation->UpdateFlag(UIF_SNAP_MESH_DIRTY, true);
+
+  // Redraw the windows
+  RedrawWindows();
 }
 
 void 
 UserInterfaceLogic
 ::OnSnakeStepAction()
 {
-  // Request that the desired number of iterations be executed
-  m_Driver->GetSNAPImageData()->RunSegmentation(m_SnakeStepSize);
+  // Stop the snake if it's running
+  OnSnakeStopAction();
+
+  // Call the idle function directly
+  fnSnakeIdleFunction(this);
 }
 
 void 
@@ -974,13 +1033,13 @@ UserInterfaceLogic
   // This makes no sense if there is no SNAP
   assert(m_Driver->GetSNAPImageData());
 
-  // Snake is no longer running
-  m_SnakeIsRunning = 0;
-
   // Clean up SNAP image data
   m_Driver->SetCurrentImageDataToIRIS();
   m_Driver->ReleaseSNAPImageData();
 
+  // The segmentation has changed, so the mesh should be updatable
+  m_Activation->UpdateFlag(UIF_IRIS_MESH_DIRTY, true);
+  
   // Inform the global state that we're not in sNAP
   m_GlobalState->SetSNAPActive(false);
 
@@ -999,25 +1058,12 @@ UserInterfaceLogic
   // Image geometry has changed
   OnImageGeometryUpdate();
 
-  // Make sure that the SNAP 'wizard' is in the right state for 
-  // returning to the application
-  SetActiveSegmentationPipelinePage(0);
-
   // Clear the list of bubbles
   m_BrsActiveBubbles->clear();
   m_HighlightedBubble = 0;  
 
   // Activate/deactivate menu items
-  m_MenuLoadGrey->activate();
-  m_MenuLoadSegmentation->activate();
-  m_MenuSaveGreyROI->deactivate();
-  m_MenuSaveSegmentation->activate();
-  m_MenuLoadLabels->activate();
-  m_MenuSaveLabels->activate();
-  m_MenuSavePreprocessed->deactivate();
-  m_MenuLoadPreprocessed->deactivate();
-  m_MenuLoadAdvection->deactivate();
-  m_MenuSaveVoxelCounts->activate();
+  m_Activation->UpdateFlag(UIF_IRIS_ACTIVE, true);
   
   // Show IRIS window, Hide the snake window
   ShowIRIS();
@@ -1030,6 +1076,9 @@ void
 UserInterfaceLogic
 ::OnAcceptSegmentationAction()
 {
+  // Stop the segmentation if it's running
+  OnSnakeStopAction();
+  
   // Turn off segmentation if it's active
   if(m_Driver->GetSNAPImageData()->IsSegmentationActive())
     {
@@ -1078,6 +1127,9 @@ void
 UserInterfaceLogic
 ::OnCancelSegmentationAction()
 {
+  // Stop the segmentation if it's running
+  OnSnakeStopAction();
+  
   // This callback has double functionality, depending on whether the 
   // level set update loop is active or not
   if(m_Driver->GetSNAPImageData()->IsSegmentationActive())
@@ -1087,7 +1139,7 @@ UserInterfaceLogic
     }
 
   // Clean up SNAP image data
-  this->CloseSegmentationCommon();
+  CloseSegmentationCommon();
 
   // Message to the user
   m_OutMessage->value("Snake segmentation cancelled");
@@ -1177,6 +1229,10 @@ UserInterfaceLogic
   // Reset the view in the snap window
   m_SNAPWindow3D->ResetView();
 
+  // Go to the first page in the SNAP wizard
+  SetActiveSegmentationPipelinePage( 0 );
+
+  // Repaint everything
   RedrawWindows();
 }
 
@@ -1198,7 +1254,6 @@ UserInterfaceLogic
   // Set local variables
   m_FileLoaded = 0;
   m_SegmentationLoaded = 0;
-  m_SnakeIsRunning = 0;
 
   // Sync global state to GUI
   m_BtnCrosshairsMode->setonly();
@@ -1356,19 +1411,6 @@ UserInterfaceLogic
 {
   this->ResetScrollbars();
   this->UpdateImageProbe();
-}
-
-void 
-UserInterfaceLogic
-::MakeSegTexturesCurrent() 
-{
-  /*
-  m_IRISWindow2D[0]->MakeSegTextureCurrent();
-  m_IRISWindow2D[1]->MakeSegTextureCurrent();
-  m_IRISWindow2D[2]->MakeSegTextureCurrent();
-  */
-  m_BtnAccept3D->activate();
-  this->RedrawWindows();
 }
 
 void 
@@ -1554,7 +1596,7 @@ UserInterfaceLogic
   m_InEditLabelName->value(cl.GetLabel());
   m_InEditLabelAlpha->value(cl.GetAlpha() / 255.0);
   m_InEditLabelVisibility->value(!cl.IsVisible());
-  m_InEditLabelMesh->value(!cl.IsDoMesh());
+  m_InEditLabelMesh->value(!cl.IsVisibleIn3D());
   m_BtnEditLabelChange->setonly();
 
   // convert from uchar [0,255] to double [0.0,1.0]
@@ -1629,7 +1671,7 @@ UserInterfaceLogic
   cl.SetRGBVector(rgb);
   cl.SetAlpha(static_cast<unsigned char>(255 * m_InEditLabelAlpha->value()));
   cl.SetVisible(!m_InEditLabelVisibility->value());
-  cl.SetDoMesh(!m_InEditLabelMesh->value());
+  cl.SetVisibleIn3D(!m_InEditLabelMesh->value());
   cl.SetLabel(new_name);
   cl.SetValid(true);
 
@@ -1639,8 +1681,10 @@ UserInterfaceLogic
   // Set the new current color in the GUI
   m_GrpCurrentColor->color(fl_rgb_color(rgb[0], rgb[1], rgb[2]));
 
-  MakeSegTexturesCurrent();
   m_GlobalState->SetDrawingColorLabel((unsigned char) m_ColorMap[offset]);
+
+  // The segmentation has become dirty
+  m_Activation->UpdateFlag(UIF_IRIS_MESH_DIRTY, true);
 
   // Redraw the windows 
   this->RedrawWindows();
@@ -1709,8 +1753,9 @@ UserInterfaceLogic
     {
     // The polygon update was successful
     OnPolygonStateUpdate(window);
-    MakeSegTexturesCurrent();
-    m_BtnMeshUpdate->activate();
+
+    // The segmentation has been dirtied
+    m_Activation->UpdateFlag(UIF_IRIS_MESH_DIRTY, true);
     }
   else
     {
@@ -1789,6 +1834,9 @@ UserInterfaceLogic
       m_BtnPolygonInsert[id]->deactivate();
       }
     }
+
+  // Redraw the windows
+  RedrawWindows();
 }
 
 void 
@@ -1882,7 +1930,6 @@ UserInterfaceLogic
       m_InSNAPSliceSlider[i]->range( 1.0 - size[imageAxis], 0.0 );
       m_InSNAPSliceSlider[i]->slider_size( 1.0/ size[imageAxis] );
       m_InSNAPSliceSlider[i]->linesize(1);
-      m_OutSNAPSliceIndex[i]->activate();
       }
     }
   else
@@ -1898,7 +1945,6 @@ UserInterfaceLogic
       m_InIRISSliceSlider[i]->range( 1.0 - size[imageAxis], 0.0 );
       m_InIRISSliceSlider[i]->slider_size( 1.0/size[imageAxis] );
       m_InIRISSliceSlider[i]->linesize(1);
-      m_OutIRISSliceIndex[i]->activate();
       }      
     }
 
@@ -1912,10 +1958,71 @@ UserInterfaceLogic
   
 void 
 UserInterfaceLogic
-::Activate3DAccept(bool on) 
+::OnIRISMeshResetViewAction()
 {
-  if (on) m_BtnAccept3D->activate();
-  else m_BtnAccept3D->deactivate();
+  m_IRISWindow3D->ResetView();
+  m_IRISWindow3D->redraw();
+}
+
+void 
+UserInterfaceLogic
+::OnIRISMeshAcceptAction()
+{
+  m_IRISWindow3D->Accept();
+  m_IRISWindow3D->redraw();
+  
+  m_Activation->UpdateFlag(UIF_IRIS_MESH_ACTION_PENDING, false);
+  m_Activation->UpdateFlag(UIF_IRIS_MESH_DIRTY, true);
+}
+
+void 
+UserInterfaceLogic
+::OnIRISMeshUpdateAction()
+{
+  m_IRISWindow3D->UpdateMesh();
+  m_IRISWindow3D->redraw();
+  
+  m_Activation->UpdateFlag(UIF_IRIS_MESH_DIRTY, false);
+}
+
+void
+UserInterfaceLogic
+::OnIRISMeshEditingAction()
+{
+  m_Activation->UpdateFlag(UIF_IRIS_MESH_ACTION_PENDING, true);
+}
+
+void 
+UserInterfaceLogic
+::OnSNAPMeshResetViewAction()
+{
+  m_SNAPWindow3D->ResetView();
+  m_SNAPWindow3D->redraw();
+}
+
+void
+UserInterfaceLogic
+::OnSNAPMeshUpdateAction()
+{
+  m_SNAPWindow3D->UpdateMesh();
+  m_SNAPWindow3D->redraw();
+
+  m_Activation->UpdateFlag(UIF_SNAP_MESH_DIRTY, false);
+}
+
+void 
+UserInterfaceLogic
+::OnSNAPMeshContinuousUpdateAction()
+{
+  if (m_ChkContinuousView3DUpdate->value()) 
+    {
+    m_SNAPWindow3D->UpdateMesh();
+    m_Activation->UpdateFlag(UIF_SNAP_MESH_CONTINUOUS_UPDATE, true);
+    }
+  else 
+    {
+    m_Activation->UpdateFlag(UIF_SNAP_MESH_CONTINUOUS_UPDATE, false);
+    }
 }
 
 void 
@@ -2073,11 +2180,7 @@ UserInterfaceLogic
   m_WizControlPane->value(m_GrpToolbarPage);
 
   // Enable some menu items
-  m_MenuLoadSegmentation->activate();
-  m_MenuSaveSegmentation->activate();
-  m_MenuSaveVoxelCounts->activate(); 
-  m_MenuIntensityCurve->activate();
-  m_MenuExportSlice->activate();
+  m_Activation->UpdateFlag(UIF_GRAY_LOADED, true);
 
   // Image geometry has changed
   OnImageGeometryUpdate();
@@ -2101,16 +2204,14 @@ UserInterfaceLogic
   // Check if the region is real
   if (roi.GetNumberOfPixels() == 0) 
     {
-    m_BtnStartSnake->deactivate();
+    m_Activation->UpdateFlag( UIF_IRIS_ROI_VALID, false );
     m_GlobalState->SetIsValidROI(false);
     } 
   else 
     {
+    m_Activation->UpdateFlag( UIF_IRIS_ROI_VALID, true );
     m_GlobalState->SetSegmentationROI(roi);
     m_GlobalState->SetIsValidROI(true);
-
-    m_BtnResetROI->activate();
-    m_BtnStartSnake->activate();
     }   
 
   // Update the polygon buttons
@@ -2177,19 +2278,17 @@ void
 UserInterfaceLogic
 ::OnSegmentationImageUpdate()
 {
-  m_OutMessage->value("Loading Seg successful");
-
-  m_SegmentationLoaded =1; //now have valid grey data
+  m_SegmentationLoaded =1; 
 
   // Re-init other UserInterfaceLogic components
   InitColorMap(false);
 
   // Re-Initialize the 2D windows
-  for (unsigned int i=0; i<3; i++) 
-      m_IRISWindow2D[i]->InitializeSlice(m_Driver->GetCurrentImageData());
+  // for (unsigned int i=0; i<3; i++) 
+  //   m_IRISWindow2D[i]->InitializeSlice(m_Driver->GetCurrentImageData());
 
   m_IRISWindow3D->ResetView();
-  m_BtnMeshUpdate->activate();
+  m_Activation->UpdateFlag(UIF_IRIS_MESH_DIRTY, true);
   
   UpdateMainLabel();
   
@@ -2202,11 +2301,10 @@ UserInterfaceLogic
 ::OnSegmentationLabelsUpdate(bool resetCurrentAndDrawOverLabels)
 {
   InitColorMap(resetCurrentAndDrawOverLabels);
-  m_BtnMeshUpdate->activate();
-  MakeSegTexturesCurrent();
-  m_WinMain->redraw();        
+  m_Activation->UpdateFlag(UIF_IRIS_MESH_DIRTY, true);
+  
+  m_WinMain->redraw();          
   m_OutMessage->value("Loading Label file successful");
-
 }
 
 void 
@@ -2215,37 +2313,25 @@ UserInterfaceLogic
 {
   if(m_GlobalState->GetSpeedValid())
     {
-    // Can flip between preprocessed and grey images
-    m_GrpImageOptions->activate();
+    // Set UI state
+    m_Activation->UpdateFlag(UIF_SNAP_SPEED_AVAILABLE, true);
 
     // Choose to view the preprocessed image
     m_RadioSNAPViewPreprocessed->setonly();
 
     // Run the callback associated with that change
     OnViewPreprocessedSelect();
-    
-    // Allow preprocessing to be saved
-    m_MenuSavePreprocessed->activate();
-
-    // Allow progression to the next stage
-    m_BtnAcceptPreprocessing->activate();
     }
   else
     {
+    // Set UI state
+    m_Activation->UpdateFlag(UIF_SNAP_SPEED_AVAILABLE, false);
+
     // Choose to view the grey image
     m_RadioSNAPViewOriginal->setonly();
 
     // Run the callback associated with that change
     OnViewPreprocessedSelect();
-    
-    // Can't flip between preprocessed and grey images
-    m_GrpImageOptions->deactivate();
-
-    // Disallow preprocessing to be saved
-    m_MenuSavePreprocessed->deactivate();
-
-    // Block progression to the next stage
-    m_BtnAcceptPreprocessing->deactivate();
     }
 }
 
@@ -2747,12 +2833,12 @@ UserInterfaceLogic
   if(m_ChkLinkedZoom->value() > 0)
     {
     m_SliceCoordinator->SetLinkedZoom(true);
-    m_InZoomPercentage->activate();
+    m_Activation->UpdateFlag(UIF_LINKED_ZOOM, true);
     }
   else
     {
     m_SliceCoordinator->SetLinkedZoom(false);
-    m_InZoomPercentage->deactivate();
+    m_Activation->UpdateFlag(UIF_LINKED_ZOOM, false);
     }
   
   // Update the zoom level display
@@ -2785,76 +2871,11 @@ UserInterfaceLogic
     }
 }
 
-void 
-UserInterfaceLogic
-::OnMenuOpenProject()
-{
-}
-
-void 
-UserInterfaceLogic
-::OnMenuSaveProject()
-{
-}
-
-void 
-UserInterfaceLogic
-::OnMenuCloseProject()
-{
-}
-
-void 
-UserInterfaceLogic
-::OnOpenProjectAction()
-{
-}
-
-void 
-UserInterfaceLogic
-::OnSaveProjectAction()
-{
-}
-
-void
-UserInterfaceLogic
-::OnAcceptIRIS3DAction()
-{
-  m_BtnAccept3D->deactivate();
-  m_IRISWindow3D->Accept();
-  m_BtnMeshUpdate->activate();
-  RedrawWindows();
-}
-
-void
-UserInterfaceLogic
-::OnUpdateIRIS3DAction()
-{
-  m_IRISWindow3D->UpdateMesh();
-}
-
-void
-UserInterfaceLogic
-::OnResetIRIS3DAction()
-{
-  m_IRISWindow3D->ResetView();
-  m_IRISWindow3D->redraw();
-}
-
-/*
-void UserInterfaceLogic
-::OnCursorPositionUpdate()
-{
-// Tell the application that the cursor position has changed
-m_Driver->SetCursorPosition(m_GlobalState)
-
-// Request the update of the windows
-
-// Recalculate the probe position
-}
-*/
-
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.28  2004/09/08 12:09:45  pauly
+ *ENH: Adapting SNAP to work with stop-n-go function in finite diff. framewk
+ *
  *Revision 1.27  2004/08/26 19:43:27  pauly
  *ENH: Moved the Borland code into Common folder
  *

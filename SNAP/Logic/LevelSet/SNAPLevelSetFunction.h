@@ -131,7 +131,6 @@ public:
     m_AdvectionField = pointer;
     }
 
-  
   /** Compute speed and advection images from feature image. */
   virtual void CalculateInternalImages();
                                                                                 

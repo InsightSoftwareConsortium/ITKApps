@@ -49,6 +49,9 @@ SNAPImageData
   m_LinkedWrappers.push_back(&m_SnakeInitializationWrapper);
   m_LinkedWrappers.push_back(&m_SnakeWrapper);
 
+  // Initialize the level set driver to NULL
+  m_LevelSetDriver = NULL;
+
   // Set the initial label color
   m_SnakeColorLabel = 0;
 }
@@ -395,6 +398,7 @@ SNAPImageData
   // driver and other settings from the other wrappers
   m_SnakeWrapper.InitializeToWrapper(
     &m_GreyWrapper,m_LevelSetDriver->GetCurrentState());
+  m_SnakeWrapper.GetImage()->SetOrigin( m_GreyWrapper.GetImage()->GetOrigin() );
   
   // Make sure that the correct color label is being used
   m_SnakeWrapper.SetColorLabel(m_ColorLabels[m_SnakeColorLabel]);
@@ -420,6 +424,9 @@ SNAPImageData
 
   // Pass through to the level set driver
   m_LevelSetDriver->Restart();
+
+  // Update the image pointed to by the snake wrapper
+  m_SnakeWrapper.SetImage(m_LevelSetDriver->GetCurrentState());
 }
 
 void 
@@ -442,6 +449,13 @@ SNAPImageData
 
   // Pass through to the level set driver
   m_LevelSetDriver->SetSnakeParameters(parameters);
+}
+
+unsigned int 
+SNAPImageData::
+GetElapsedSegmentationIterations() const
+{
+  return m_LevelSetDriver->GetElapsedIterations();
 }
 
 SNAPImageData::LevelSetImageType *

@@ -1,0 +1,102 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0105 
+header_name {.h} 
+code_name {.cxx}
+class LabelEditorUI {open : LabelEditorUIBase
+} {
+  Function {MakeWindow()} {open
+  } {
+    Fl_Window m_WinMain {
+      label {SnAP Label Editor} open
+      xywh {911 181 322 538} type Double
+      code0 {\#include "LabelEditorUIBase.h"} visible
+    } {
+      Fl_Button {} {
+        label {Apply Changes}
+        callback {m_WinEditLabel->hide();
+this->ChangeLabelsCallback();}
+        xywh {45 500 110 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12
+      }
+      Fl_Button {} {
+        label Copy
+        callback {m_WinEditLabel->hide();}
+        xywh {25 190 65 25} box PLASTIC_UP_BOX color 180 labelsize 12
+      }
+      Fl_Button {} {
+        label New
+        callback {m_WinEditLabel->hide();
+this->ChangeLabelsCallback();}
+        xywh {165 190 65 25} box PLASTIC_UP_BOX color 180 labelsize 12
+      }
+      Fl_Button {} {
+        label Delete
+        callback {m_WinEditLabel->hide();
+this->ChangeLabelsCallback();}
+        xywh {235 190 65 25} box PLASTIC_UP_BOX color 180 labelsize 12
+      }
+      Fl_Group {} {
+        label {Available labels:} open
+        xywh {10 25 300 160} box BORDER_BOX selection_color 0 labelfont 1 labelsize 12 align 5
+      } {}
+      Fl_Tabs {} {
+        label {Selected Label:} open
+        xywh {10 250 300 240} box PLASTIC_THIN_UP_BOX labelfont 1 labelsize 12 align 5
+      } {
+        Fl_Group {} {
+          label Appearance open selected
+          xywh {10 275 300 215} labelsize 12
+        } {
+          Fl_Input m_InEditLabelName {
+            label {Description:}
+            xywh {20 300 280 20} color 53 labelsize 12 align 5 textsize 12
+          }
+          Fl_Value_Slider m_InEditLabelAlpha {
+            label {Opacity:}
+            xywh {195 340 105 20} type Horizontal color 53 selection_color 12 labelsize 12 align 5 value 0.2
+          }
+          Fl_Group m_GrpEditLabelColorChooser {
+            label {Color:} open
+            xywh {20 340 170 95} box UP_BOX labelsize 12 align 5
+            code0 {\#include <FL/Fl_Color_Chooser.H>}
+            class Fl_Color_Chooser
+          } {}
+          Fl_Check_Button {} {
+            label Visible
+            xywh {200 370 105 25} down_box DOWN_BOX labelsize 12
+          }
+          Fl_Check_Button {} {
+            label {Visible in 3D}
+            xywh {200 395 105 25} down_box DOWN_BOX labelsize 12
+          }
+        }
+        Fl_Group {} {
+          label Statistics open
+          xywh {10 275 300 215} labelsize 12 hide
+        } {}
+        Fl_Group {} {
+          label Advanced open
+          xywh {10 275 300 215} labelsize 12 hide
+        } {
+          Fl_Input m_InEditLabelName {
+            label {External database id:}
+            xywh {215 320 85 20} color 53 labelsize 12 textsize 12
+          }
+          Fl_Input m_InEditLabelName {
+            label {Value in the segmentation image:}
+            xywh {215 290 85 20} color 53 labelsize 12 textsize 12
+          }
+        }
+      }
+      Fl_Button {} {
+        label Paste
+        callback {m_WinEditLabel->hide();}
+        xywh {95 190 65 25} box PLASTIC_UP_BOX color 180 labelsize 12
+      }
+      Fl_Button {} {
+        label {Close Window}
+        callback {m_WinEditLabel->hide();}
+        xywh {165 500 110 25} box PLASTIC_UP_BOX color 180 labelsize 12
+      }
+    }
+  }
+} 

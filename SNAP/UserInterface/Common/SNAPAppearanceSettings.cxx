@@ -27,6 +27,8 @@ SNAPAppearanceSettings
     { 1, 1, 1, 1, 0, 1, 1 },    // Zoom thumbnail
     { 1, 0, 1, 1, 0, 1, 1 },    // 3D Crosshairs
     { 1, 0, 1, 1, 0, 1, 1 },    // Thumbnail Crosshairs
+    { 1, 1, 1, 1, 0, 1, 1 },    // 3D Image Box
+    { 1, 1, 1, 1, 0, 1, 1 },    // 3D ROI Box
     };
 
 SNAPAppearanceSettings::Element 
@@ -119,13 +121,34 @@ SNAPAppearanceSettings
   elt->FontSize = 0;
   elt->Visible = true;
   elt->AlphaBlending = false;
+
+  // Thumbnail crosshairs
+  elt = &m_DefaultElementSettings[IMAGE_BOX_3D];
+  elt->NormalColor = Vector3d(0.2, 0.2, 0.2);
+  elt->ActiveColor = Vector3d(0.4, 0.4, 0.4);
+  elt->LineThickness = 1.0;
+  elt->DashSpacing = 1.0;
+  elt->FontSize = 0;
+  elt->Visible = true;
+  elt->AlphaBlending = false;
+
+  // Thumbnail crosshairs
+  elt = &m_DefaultElementSettings[ROI_BOX_3D];
+  elt->NormalColor = Vector3d(1.0, 0.0, 0.2);
+  elt->ActiveColor = Vector3d(1.0, 1.0, 0.2);
+  elt->LineThickness = 1.0;
+  elt->DashSpacing = 3.0;
+  elt->FontSize = 0;
+  elt->Visible = true;
+  elt->AlphaBlending = false;
 }
 
 const char *
 SNAPAppearanceSettings
 ::m_ElementNames[SNAPAppearanceSettings::ELEMENT_COUNT] = 
   { "CROSSHAIRS", "MARKERS", "ROI_BOX", "BACKGROUND_2D", "BACKGROUND_3D", 
-    "ZOOM_THUMBNAIL", "CROSSHAIRS_3D", "CROSSHAIRS_THUMB" };
+    "ZOOM_THUMBNAIL", "CROSSHAIRS_3D", "CROSSHAIRS_THUMB", "IMAGE_BOX_3D",
+    "ROI_BOX_3D"};
 
 SNAPAppearanceSettings
 ::SNAPAppearanceSettings()

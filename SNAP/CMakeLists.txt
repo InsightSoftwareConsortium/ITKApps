@@ -400,7 +400,8 @@ SET(TESTING_TUTORIAL_SRCS
 # ADD_LIBRARY(SNAPLogic ${LOGIC_SRCS})
 
 # The SNAP executable
-ADD_GUI_EXECUTABLE(InsightSNAP "${APPLICATION_SRCS}")
+SET(SNAP_EXE_PARAMETERS "WIN32" ${APPLICATION_SRCS})
+ADD_GUI_EXECUTABLE(InsightSNAP "${SNAP_EXE_PARAMETERS}")
 
 # The testing executable
 ADD_GUI_EXECUTABLE(SNAPTests "${TESTING_SRCS}")
@@ -414,6 +415,10 @@ FLTK_WRAP_UI(InsightSNAP ${APPLICATION_FLUIDS})
 # Disable FLTK warnings 
 ITK_DISABLE_FLTK_GENERATED_WARNINGS("${APPLICATION_FLUIDS}")
 
+#############################################
+# SYSTEM-SPECIFIC SETTINGS                  #
+#############################################
+    
 #############################################
 # LIBRARIES AND EXTERNAL CODE               #
 #############################################

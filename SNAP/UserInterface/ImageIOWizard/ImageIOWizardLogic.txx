@@ -16,6 +16,7 @@
 #define __ImageIOWizardLogic_txx_
 
 #include "FL/fl_file_chooser.h"
+#include "FL/FL_Text_Buffer.H"
 #include <limits>
 #include <stdio.h>
 #include <cmath>
@@ -34,23 +35,23 @@
 #include "itkVTKImageIO.h"
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
+#include "itkMetaDataObject.h"
 
 using std::map;
+using namespace itk;
+using namespace itk::SpatialOrientation;
 
 template <class TRawPixel> 
 itk::ImageIOBase::Pointer 
 CreateRawImageIO(TRawPixel itkNotUsed(dummy),unsigned int header)
 {
-  typedef itk::RawImageIO<TRawPixel,3> IOType;
+  typedef RawImageIO<TRawPixel,3> IOType;
   
   typename IOType::Pointer rawIO = IOType::New();
   
   rawIO->SetHeaderSize(header);
 
-  cout << rawIO->GetComponentSize() << endl;
-  cout << sizeof(TRawPixel) << endl;
-
-  itk::ImageIOBase::Pointer baseIO = rawIO.GetPointer();
+  ImageIOBase::Pointer baseIO = rawIO.GetPointer();
   
   return baseIO;
 }
@@ -87,7 +88,7 @@ ImageIOWizardLogic<TPixel>
   m_FileFormatPattern[FORMAT_MHA] = "mha,mhd";
   m_FileFormatPattern[FORMAT_GIPL] = "gipl";
   m_FileFormatPattern[FORMAT_RAW] = "raw*";
-  m_FileFormatPattern[FORMAT_ANALYZE] = "hdr";  
+  m_FileFormatPattern[FORMAT_ANALYZE] = "hdr,img,img.gz";  
   m_FileFormatPattern[FORMAT_DICOM] = "dcm";
   m_FileFormatPattern[FORMAT_GE4] = "ge4";
   m_FileFormatPattern[FORMAT_GE5] = "ge5";
@@ -104,6 +105,9 @@ ImageIOWizardLogic<TPixel>
   m_FileFormatDescription[FORMAT_GE5] = "GE Version 5";
   m_FileFormatDescription[FORMAT_SIEMENS] = "Siemens Vision";
   m_FileFormatDescription[FORMAT_VTK] = "VTK";
+  
+  // Initialize the text buffers
+  m_SummaryTextBuffer = new Fl_Text_Buffer();
 }
 
 template <class TPixel>
@@ -130,11 +134,10 @@ void ImageIOWizardLogic<TPixel>
                                   0 : FL_MENU_INACTIVE);
     }
 
-  // Add a dummy menu item
-  //m_InSaveFilePageFormat->add("Select a format",NULL,NULL,NULL,
-  //                            FL_MENU_INVISIBLE);
   m_InSaveFilePageFormat->value(0);
-
+  
+  // Add the buffer to the summary text widget
+  m_OutSummaryMetaData->buffer(m_SummaryTextBuffer);
 }
 
 template <class TPixel>
@@ -491,11 +494,15 @@ bool
 ImageIOWizardLogic<TPixel>
 ::LoadImage(ImageIOType *customIO)
 {
+  bool rc = true;
+
+  // Show a wait cursor
   fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
   
+  // Try to load a file
   try 
     {
-    typedef itk::ImageFileReader<ImageType> ReaderType;
+    typedef ImageFileReader<ImageType> ReaderType;
     typedef typename ReaderType::Pointer ReaderPointer;
 
     // Create a reader
@@ -519,23 +526,30 @@ ImageIOWizardLogic<TPixel>
      
     // Store the image IO
     m_ImageIO = reader->GetImageIO();
+
+    // Check if the image is really valid
+    if(rc = CheckImageValidity())
+      {
+      // Try to determine the RAI code
+      GuessImageOrientation();
+      }
     }
-  catch(itk::ExceptionObject &exc)
+  catch(ExceptionObject &exc)
   {
     // Clear the image and image IO
     m_Image = NULL;
     m_ImageIO = NULL;
 
     // Show the error
-    fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
     fl_alert("Error reading image: %s.",exc.GetDescription());
-    return false;
+    rc = false;
   }
 
+  // Fix the cursor
   fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
-  
+
   // Check if the image is valid (subclasses can perform extra tasks here)
-  return CheckImageValidity();
+  return rc;
 }
 
 template <class TPixel>
@@ -603,6 +617,85 @@ ImageIOWizardLogic<TPixel>
 template <class TPixel>
 void 
 ImageIOWizardLogic<TPixel>
+::GuessImageOrientation()
+{
+  // Get the meta data for the image
+  MetaDataDictionary &mdd = m_Image->GetMetaDataDictionary();
+
+  // Find the entry dealing with orientation
+  typedef typename MetaDataObject<ValidCoordinateOrientationFlags> ObjectType;
+  ObjectType *entry = 
+    reinterpret_cast<ObjectType *> ( mdd[ITK_CoordinateOrientation].GetPointer() );
+
+  // If the entry has a value, map it to RAI
+  if(entry)
+    {
+    // This is a really dumb way to process the flag, but it's the only way that
+    // is guaranteed to stay up to date with ITK's flags. Thanks, VIM, for macros! 
+    ValidCoordinateOrientationFlags flag = entry->GetMetaDataObjectValue();
+    switch(flag) 
+      {
+      case ITK_COORDINATE_ORIENTATION_RIP : SetRAI("RIP"); break;
+      case ITK_COORDINATE_ORIENTATION_LIP : SetRAI("LIP"); break;
+      case ITK_COORDINATE_ORIENTATION_RSP : SetRAI("RSP"); break;
+      case ITK_COORDINATE_ORIENTATION_LSP : SetRAI("LSP"); break;
+      case ITK_COORDINATE_ORIENTATION_RIA : SetRAI("RIA"); break;
+      case ITK_COORDINATE_ORIENTATION_LIA : SetRAI("LIA"); break;
+      case ITK_COORDINATE_ORIENTATION_RSA : SetRAI("RSA"); break;
+      case ITK_COORDINATE_ORIENTATION_LSA : SetRAI("LSA"); break;
+      case ITK_COORDINATE_ORIENTATION_IRP : SetRAI("IRP"); break;
+      case ITK_COORDINATE_ORIENTATION_ILP : SetRAI("ILP"); break;
+      case ITK_COORDINATE_ORIENTATION_SRP : SetRAI("SRP"); break;
+      case ITK_COORDINATE_ORIENTATION_SLP : SetRAI("SLP"); break;
+      case ITK_COORDINATE_ORIENTATION_IRA : SetRAI("IRA"); break;
+      case ITK_COORDINATE_ORIENTATION_ILA : SetRAI("ILA"); break;
+      case ITK_COORDINATE_ORIENTATION_SRA : SetRAI("SRA"); break;
+      case ITK_COORDINATE_ORIENTATION_SLA : SetRAI("SLA"); break;
+      case ITK_COORDINATE_ORIENTATION_RPI : SetRAI("RPI"); break;
+      case ITK_COORDINATE_ORIENTATION_LPI : SetRAI("LPI"); break;
+      case ITK_COORDINATE_ORIENTATION_RAI : SetRAI("RAI"); break;
+      case ITK_COORDINATE_ORIENTATION_LAI : SetRAI("LAI"); break;
+      case ITK_COORDINATE_ORIENTATION_RPS : SetRAI("RPS"); break;
+      case ITK_COORDINATE_ORIENTATION_LPS : SetRAI("LPS"); break;
+      case ITK_COORDINATE_ORIENTATION_RAS : SetRAI("RAS"); break;
+      case ITK_COORDINATE_ORIENTATION_LAS : SetRAI("LAS"); break;
+      case ITK_COORDINATE_ORIENTATION_PRI : SetRAI("PRI"); break;
+      case ITK_COORDINATE_ORIENTATION_PLI : SetRAI("PLI"); break;
+      case ITK_COORDINATE_ORIENTATION_ARI : SetRAI("ARI"); break;
+      case ITK_COORDINATE_ORIENTATION_ALI : SetRAI("ALI"); break;
+      case ITK_COORDINATE_ORIENTATION_PRS : SetRAI("PRS"); break;
+      case ITK_COORDINATE_ORIENTATION_PLS : SetRAI("PLS"); break;
+      case ITK_COORDINATE_ORIENTATION_ARS : SetRAI("ARS"); break;
+      case ITK_COORDINATE_ORIENTATION_ALS : SetRAI("ALS"); break;
+      case ITK_COORDINATE_ORIENTATION_IPR : SetRAI("IPR"); break;
+      case ITK_COORDINATE_ORIENTATION_SPR : SetRAI("SPR"); break;
+      case ITK_COORDINATE_ORIENTATION_IAR : SetRAI("IAR"); break;
+      case ITK_COORDINATE_ORIENTATION_SAR : SetRAI("SAR"); break;
+      case ITK_COORDINATE_ORIENTATION_IPL : SetRAI("IPL"); break;
+      case ITK_COORDINATE_ORIENTATION_SPL : SetRAI("SPL"); break;
+      case ITK_COORDINATE_ORIENTATION_IAL : SetRAI("IAL"); break;
+      case ITK_COORDINATE_ORIENTATION_SAL : SetRAI("SAL"); break;
+      case ITK_COORDINATE_ORIENTATION_PIR : SetRAI("PIR"); break;
+      case ITK_COORDINATE_ORIENTATION_PSR : SetRAI("PSR"); break;
+      case ITK_COORDINATE_ORIENTATION_AIR : SetRAI("AIR"); break;
+      case ITK_COORDINATE_ORIENTATION_ASR : SetRAI("ASR"); break;
+      case ITK_COORDINATE_ORIENTATION_PIL : SetRAI("PIL"); break;
+      case ITK_COORDINATE_ORIENTATION_PSL : SetRAI("PSL"); break;
+      case ITK_COORDINATE_ORIENTATION_AIL : SetRAI("AIL"); break;
+      case ITK_COORDINATE_ORIENTATION_ASL : SetRAI("ASL"); break;
+      default: SetRAI("RAI"); break;
+      }
+    }
+  else
+    {
+    // Use the default RAI
+    SetRAI("RAI");
+    }
+}
+
+template <class TPixel>
+void 
+ImageIOWizardLogic<TPixel>
 ::OnOrientationPageEnter()
 {
   // Check if the currently selected RAI is valid
@@ -633,62 +726,91 @@ ImageIOWizardLogic<TPixel>
   // itk::ImageIOBase *ioBase = m_Image->GetImageIO();
 
   // The object better not be NULL!
-  if(m_ImageIO)
+  if(m_ImageIO && m_Image)
     {
+    // A stream to simplify converting to string
+    IRISOStringStream sout;    
+
     // Print file name
     m_OutSummaryFileName->value(m_ImageIO->GetFileName());
 
     // Print file dimensions
-    m_OutSummaryDimensionX->value(m_ImageIO->GetDimensions(0));
-    m_OutSummaryDimensionY->value(m_ImageIO->GetDimensions(1));
-    m_OutSummaryDimensionZ->value(m_ImageIO->GetDimensions(2));
+    sout << m_Image->GetBufferedRegion().GetSize();
+    m_OutSummaryDimensions->value(sout.str().c_str());
 
     // Print file size in bytes
     m_OutSummarySize->value((int)(m_ImageIO->GetImageSizeInBytes() / (1024.0)));
     
     // Print pixel spacing 
-    m_OutSummarySpacingX->value(m_ImageIO->GetSpacing(0));
-    m_OutSummarySpacingY->value(m_ImageIO->GetSpacing(1));
-    m_OutSummarySpacingZ->value(m_ImageIO->GetSpacing(2));
+    sout.str(""); sout << m_Image->GetSpacing();
+    m_OutSummarySpacing->value(sout.str().c_str());
 
-    // Dump out the file type info
+    // Print the image origin
+    sout.str(""); sout << m_Image->GetOrigin();
+    m_OutSummaryOrigin->value(sout.str().c_str());
     
     // TODO: This is a workaround on an itk bug with RawImageIO
-    if(m_ImageIO->GetComponentType() != itk::ImageIOBase::UNKNOWNCOMPONENTTYPE)
+    if(m_ImageIO->GetComponentType() != ImageIOBase::UNKNOWNCOMPONENTTYPE)
       {
       // There actually is a type in the IO object
       m_OutSummaryPixelType->value(
-        m_ImageIO->GetPixelTypeAsString(m_ImageIO->GetPixelType()).c_str());
+        m_ImageIO->GetComponentTypeAsString(m_ImageIO->GetComponentType()).c_str());
       }
     else
       {
       m_OutSummaryPixelType->value(m_InHeaderPageVoxelType->text());
       }
     
+    // Print the byte order
     m_OutSummaryByteOrder->value(
        boTypes[(unsigned int)(m_ImageIO->GetByteOrder() - ImageIOType::BigEndian)]);
 
-    // Create a string stream for the dictionary
-    // IRISOStringStream sout;    
-    //
-    // Dump out the image data to the browser
-    // m_Image->GetMetaDataDictionary().Print(sout);
-    // sout.flush();
-    // m_OutSummaryMetaData->buffer()->text(sout.str().c_str());
+    // Dump the contents of the meta data dictionary
+    m_SummaryTextBuffer->text("");
+    MetaDataDictionary &mdd = m_ImageIO->GetMetaDataDictionary();
+    MetaDataDictionary::ConstIterator itMeta = mdd.Begin();
+    while(itMeta != mdd.End())
+      {
+      // Get the metadata as a generic object
+      std::string key = itMeta->first;
+      itk::MetaDataObjectBase *meta = itMeta->second;
+
+      // Check if the meta data string is a 
+      if( typeid(std::string) == meta->GetMetaDataObjectTypeInfo() )
+        {
+        // Cast the value to a string and print it
+        typedef MetaDataObject<std::string> ObjectType;
+        std::string value = ((ObjectType *)(meta))->GetMetaDataObjectValue();
+
+        // For some weird reason, some of the strings returned by this method 
+        // contain '\0' characters. We will replace them by spaces
+        sout.str("");
+        for(unsigned int i=0;i<value.length();i++)
+          if(value[i] >= ' ') sout << value[i];
+        value = sout.str();
+
+        // Make sure the value has more than blanks
+        if(value.find_first_not_of(" ") != value.npos)
+          {
+          m_SummaryTextBuffer->append(key.c_str());
+          m_SummaryTextBuffer->append(" = ");
+          m_SummaryTextBuffer->append(value.c_str());
+          m_SummaryTextBuffer->append("\n");
+          }
+        }
+      ++itMeta;
+      }
     }
   else 
     {
     m_OutSummaryFileName->value("Error loading image.");
-    m_OutSummaryDimensionX->value(0);
-    m_OutSummaryDimensionY->value(0);
-    m_OutSummaryDimensionZ->value(0);
+    m_OutSummaryDimensions->value("n/a");
     m_OutSummarySize->value(0);
-    m_OutSummaryDimensionX->value(0);
-    m_OutSummaryDimensionY->value(0);
-    m_OutSummaryDimensionZ->value(0);
+    m_OutSummarySpacing->value("n/a");
+    m_OutSummaryOrigin->value("n/a");
     m_OutSummaryPixelType->value("n/a");
     m_OutSummaryByteOrder->value("n/a");
-    // m_OutSummaryMetaData->value("n/a");
+    m_SummaryTextBuffer->text("");
     }
 }
 
@@ -906,7 +1028,9 @@ ImageIOWizardLogic<TPixel>
 
 
 template <class TPixel>
-ImageIOWizardLogic<TPixel>::~ImageIOWizardLogic() {
+ImageIOWizardLogic<TPixel>::~ImageIOWizardLogic() 
+{
+  delete m_SummaryTextBuffer;
 }
 
 template <class TPixel>
@@ -1064,28 +1188,28 @@ ImageIOWizardLogic<TPixel>
   switch(fmt)
     {
     case FORMAT_MHA:
-      m_ImageIO = itk::MetaImageIO::New();
+      m_ImageIO = MetaImageIO::New();
       break;
     case FORMAT_ANALYZE:
-      m_ImageIO = itk::AnalyzeImageIO::New();
+      m_ImageIO = AnalyzeImageIO::New();
       break;
     case FORMAT_GIPL:
-      m_ImageIO = itk::GiplImageIO::New();
+      m_ImageIO = GiplImageIO::New();
       break;
     case FORMAT_DICOM:
-      m_ImageIO = itk::DicomImageIO::New();
+      m_ImageIO = DicomImageIO::New();
       break;
     case FORMAT_GE4:
-      m_ImageIO = itk::GE4ImageIO::New();
+      m_ImageIO = GE4ImageIO::New();
       break;
     case FORMAT_GE5:
-      m_ImageIO = itk::GE5ImageIO::New();
+      m_ImageIO = GE5ImageIO::New();
       break;
     case FORMAT_SIEMENS:
-      m_ImageIO = itk::SiemensVisionImageIO::New();
+      m_ImageIO = SiemensVisionImageIO::New();
       break;
     case FORMAT_VTK:
-      m_ImageIO = itk::VTKImageIO::New();
+      m_ImageIO = VTKImageIO::New();
       break;
     case FORMAT_RAW:
       if(forLoading)
@@ -1128,7 +1252,7 @@ ImageIOWizardLogic<TPixel>
   CreateImageIO((FileFormat)(m_InSaveFilePageFormat->value()-1),false);
 
   // Try to save the image using the current format
-  typedef itk::ImageFileWriter<ImageType> WriterType;
+  typedef ImageFileWriter<ImageType> WriterType;
   typename WriterType::Pointer writer = WriterType::New();
   writer->SetFileName(m_InSaveFilePageBrowser->value());
   writer->SetImageIO(m_ImageIO);
@@ -1142,7 +1266,7 @@ ImageIOWizardLogic<TPixel>
     m_ImageSaved = true;
     m_WinOutput->hide();
     }
-  catch(itk::ExceptionObject &exc)
+  catch(ExceptionObject &exc)
     {
     fl_alert("Error saving file: %s",exc.GetDescription());
     }

@@ -15,6 +15,8 @@
 #ifndef __SNAPOpenGL_h_
 #define __SNAPOpenGL_h_
 
+#include "IRISVectorTypes.h"
+
 // Include OpenGL headers according to the platform
 #ifdef __APPLE__
   #include <glu.h>
@@ -23,5 +25,20 @@
   #include <FL/gl.h>
   #include <GL/glu.h>
 #endif
+
+// Inline functions for use with vector classes
+inline void glVertex( const Vector3f &x ) { glVertex3fv(x.data_block()); }
+inline void glVertex( const Vector3d &x ) { glVertex3dv(x.data_block()); }
+inline void glVertex( const Vector3i &x ) { glVertex3iv(x.data_block()); }
+inline void glVertex( const Vector2f &x ) { glVertex2fv(x.data_block()); }
+inline void glVertex( const Vector2d &x ) { glVertex2dv(x.data_block()); }
+inline void glVertex( const Vector2i &x ) { glVertex2iv(x.data_block()); }
+
+inline void glTranslate( const Vector3f &x ) { glTranslatef(x[0],x[1],x[2]); }
+inline void glTranslate( const Vector3d &x ) { glTranslated(x[0],x[1],x[2]); }
+
+inline void glScale( const Vector3f &x ) { glScalef(x[0],x[1],x[2]); }
+inline void glScale( const Vector3d &x ) { glScaled(x[0],x[1],x[2]); }
+
 
 #endif // __SNAPOpenGL_h_

@@ -45,6 +45,9 @@ protected:
   // size of the greyscale image
   virtual bool CheckImageValidity();
 
+  // The image orientation is set to match the orientation of the source image
+  virtual void GuessImageOrientation() {};
+
 private:
   /** Grey image template */
   GreyImagePointer m_GreyImage;

@@ -6,7 +6,9 @@
 1. New Features
 -----------------
 
-1.1 New in Version 1.2
+1.1. New in Version 1.2
+
+1.1.1. User Interface Improvements
 
  -  The ability to switch between 4-view mode and single view mode. Each of the 
     slice views and the 3D view can be expanded to occupy the entire SNAP window.
@@ -17,22 +19,40 @@
  -  User can specify whether he/she prefers to start in linked zoom mode or in 
     unlinked zoom mode.
 
+ -  User can change the appearance of various display elements, including the crosshairs, 
+    the region of interest selection box, the window background and more. 
 
+ -  SNAP automatically determines the image orientation (RAI) when that information
+    is available in the image file
 
-2. Bug Fixes
------------------
+ -  SNAP remembers the last ROI used for each image.
+
+1.1.2. Programmatic Improvements
+
+ -  The level set segmentation pipeline has been rewritten, taking advantage of the stop
+    and go functionality of ITK finite difference filters. This means fewer unexplained 
+    crashes and simpler code.
+
+ -  A state-machine has been added to the user interface logic code. This machine automatically
+    activates and deactivates UI widgets based on a set of flags. Rules such as Flag A => Flag B
+    can be added to the state machine.
+
+1.1.3 Bug Fixes
 
  -  Slice views update correctly when the SNAP window is resized
 
  -  Accepting a polygon now works for high resolution images.
 
+ -  Fixed a crash on some systems when running edge-based snake segmentation with an
+    advection term.
 
-3. Known Issues
+
+2. Known Issues
 -----------------
  -  
 
 
-4. Wish List
+3. Wish List
 -----------------
  -  The ability to perform 2D level set segmentation in each slice view.
 

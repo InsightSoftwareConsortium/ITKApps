@@ -386,17 +386,18 @@ IRISImageData
   return 0;
 }
 
-Vector3f 
+Vector3d 
 IRISImageData
-::GetVoxelScaleFactor() 
+::GetImageSpacing() 
 {
-  const double *spacing = this->m_GreyWrapper.GetImage()->GetSpacing().GetDataPointer();
-  Vector3f rtn;
-  rtn[0]=(float)spacing[0];
-  rtn[1]=(float)spacing[1];
-  rtn[2]=(float)spacing[2];
+  return m_GreyWrapper.GetImage()->GetSpacing().Get_vnl_vector();
+}
 
-  return rtn;
+Vector3d 
+IRISImageData
+::GetImageOrigin() 
+{
+  return m_GreyWrapper.GetImage()->GetOrigin().Get_vnl_vector();
 }
 
 void 
@@ -477,7 +478,7 @@ IRISImageData
   m_ColorLabels[0].SetAlpha(0);
   m_ColorLabels[0].SetValid(true);
   m_ColorLabels[0].SetVisible(false);
-  m_ColorLabels[0].SetDoMesh(false);
+  m_ColorLabels[0].SetVisibleIn3D(false);
   m_ColorLabels[0].SetLabel("Clear");
 
   // Some well-spaced sample colors to work with
@@ -520,7 +521,7 @@ IRISImageData
     m_ColorLabels[i].SetAlpha(255);
     m_ColorLabels[i].SetValid(i < m_ColorLabelCount);
     m_ColorLabels[i].SetVisible(true);
-    m_ColorLabels[i].SetDoMesh(true);
+    m_ColorLabels[i].SetVisibleIn3D(true);
 
     IRISOStringStream sout;
     sout << "Label" << i;

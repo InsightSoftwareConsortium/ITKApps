@@ -32,11 +32,13 @@
 #include <string>
 #include <vector>
 
+class Fl_Text_Buffer;
 namespace itk 
 {
   template <class TPixel,unsigned int VDimensions> class Image;
   template <class TPixel,unsigned int VDimensions> class RAWImageIO;
   template <unsigned int VDimensions> class Size;
+  template <unsigned int VDimensions> class ImageBase;
   class ImageIOBase;  
 }
 
@@ -53,7 +55,7 @@ public:
   // typedef ImageWrapper<TPixel> WrapperType;
 
   // Image type definition
-  typedef itk::Image<TPixel,3> ImageType;
+  typedef itk::Image<TPixel, 3> ImageType;
   typedef typename itk::SmartPointer<ImageType> ImagePointer;
 
   // Image IO type definition
@@ -202,6 +204,9 @@ protected:
    * on the doll image */
   unsigned int m_OrientationIndexToDollVertex[3][3][3];
 
+  /** Text buffer for one of the summary widgets */
+  Fl_Text_Buffer *m_SummaryTextBuffer;
+
   // -- Stuff dealing with file formats --
 
   /** Enumerations of file formats supported by the wizard and its children */
@@ -257,6 +262,9 @@ protected:
 
   // Check image validity after the initial load
   virtual bool CheckImageValidity() { return true; }
+
+  // Try to determine the RAI code of the image
+  virtual void GuessImageOrientation();
 
   // Check if the image is valid
   virtual bool CheckFinalValidity() 

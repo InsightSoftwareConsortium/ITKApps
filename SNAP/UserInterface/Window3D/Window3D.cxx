@@ -319,6 +319,7 @@ Window3D
 
   // Reset the vectors to zero
   m_Spacing.fill(1.0);
+  m_Origin.fill(0.0);
   m_ImageSize.fill(0);
   m_Center.fill(0);
   m_DefaultHalf.fill(0);
@@ -455,12 +456,11 @@ Window3D
     m_ImageSize = m_Driver->GetCurrentImageData()->GetVolumeExtents();  
 
     // voxel m_Spacing        
-    m_Spacing = m_Driver->GetCurrentImageData()->GetVoxelScaleFactor(); 
+    m_Spacing = to_float(m_Driver->GetCurrentImageData()->GetImageSpacing()); 
+    m_Origin = to_float(m_Driver->GetCurrentImageData()->GetImageOrigin());
 
     // Volume size
-    m_VolumeSize[0] = m_Spacing[0] * m_ImageSize[0];
-    m_VolumeSize[1] = m_Spacing[1] * m_ImageSize[1];
-    m_VolumeSize[2] = m_Spacing[2] * m_ImageSize[2];
+    m_VolumeSize = vector_multiply_mixed(m_Spacing, m_ImageSize);
     } 
   else
     {
@@ -557,9 +557,8 @@ Window3D
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
   // Compute the center of rotation  
-  Vector3ui crosshair = m_GlobalState->GetCrosshairsPosition();
-  for (int i=0; i<3; i++) 
-    m_CenterOfRotation[i] = m_Spacing[i] * crosshair[i];
+  m_CenterOfRotation = m_Origin + 
+    vector_multiply_mixed(m_Spacing, m_GlobalState->GetCrosshairsPosition());
 
   // Set up the projection matrix
   SetupProjection();
@@ -572,11 +571,12 @@ Window3D
   // Update the screen geometry
   glTranslatef( m_Trackball.GetPanX(), m_Trackball.GetPanY(), 0.0 );
   glMultMatrixf( m_Trackball.GetRot() );
-  glTranslatef( -m_CenterOfRotation[0], -m_CenterOfRotation[1], -m_CenterOfRotation[2] );
+  glTranslate( - m_CenterOfRotation );
 
   // Scale by the voxel spacing
   glPushMatrix();
-  glScalef( m_Spacing[X], m_Spacing[Y], m_Spacing[Z] );
+  glTranslate(m_Origin);
+  glScale(m_Spacing);
 
   // Draw things in pixel coords
   DrawCrosshairs();
@@ -826,7 +826,7 @@ Window3D
   if (this->IntersectSegData(x, y, hit))
     {
     AddSample( hit );
-    m_ParentUI->Activate3DAccept(true);
+    m_ParentUI->OnIRISMeshEditingAction();
     redraw();
     }
 }
@@ -845,7 +845,7 @@ Window3D
   if(ComputeCutPlane(x1,y1,x2,y2)) 
     {
     m_Plane.valid = 1;
-    m_ParentUI->Activate3DAccept(true);
+    m_ParentUI->OnIRISMeshEditingAction();
     }
         
   redraw();
@@ -865,14 +865,12 @@ void
 Window3D
 ::SetupProjection()
 {
-  // make_current();
+  // Get the view extent 'radius'
+  m_ViewHalf = m_DefaultHalf / m_Trackball.GetZoom();
 
+  // Set up the coordinate projection
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
-  float zoom = m_Trackball.GetZoom();
-  m_ViewHalf[X] = m_DefaultHalf[X]/zoom;
-  m_ViewHalf[Y] = m_DefaultHalf[Y]/zoom;
-  m_ViewHalf[Z] = m_DefaultHalf[Z]/zoom;
   glOrtho( -m_ViewHalf[X], m_ViewHalf[X], 
            -m_ViewHalf[Y], m_ViewHalf[Y], 
            -m_DefaultHalf[Z], m_DefaultHalf[Z]);
@@ -881,10 +879,9 @@ Window3D
 // Get a copy of the viewport/m_Modelview/projection matrices OpenGL uses
 void Window3D::ComputeMatricies( GLint *vport, double *mview, double *proj )
 {
-  // Compute the center of rotation  
-  Vector3ui crosshair = m_GlobalState->GetCrosshairsPosition();
-  for (int i=0; i<3; i++) 
-    m_CenterOfRotation[i] = m_Spacing[i] * crosshair[i];
+  // Compute the center of rotation
+  m_CenterOfRotation = m_Origin + 
+    vector_multiply_mixed(m_Spacing, m_GlobalState->GetCrosshairsPosition());
 
   // Set up the model view matrix
   glMatrixMode(GL_MODELVIEW);
@@ -894,8 +891,8 @@ void Window3D::ComputeMatricies( GLint *vport, double *mview, double *proj )
   // Update the screen geometry
   glTranslatef( m_Trackball.GetPanX(), m_Trackball.GetPanY(), 0.0 );
   glMultMatrixf( m_Trackball.GetRot() );
-  glTranslatef( -m_CenterOfRotation[0], -m_CenterOfRotation[1], -m_CenterOfRotation[2] );
-  glScalef( m_Spacing[X], m_Spacing[Y], m_Spacing[Z] );
+  glTranslate( -m_CenterOfRotation );
+  glScale( m_Spacing );
 
   glGetIntegerv( GL_VIEWPORT, vport );
   glGetDoublev( GL_MODELVIEW_MATRIX, mview );
@@ -974,10 +971,10 @@ Window3D
   // plane.
 
   // Compute the points on the plane in world space
-  Vector3d x1World(x1[0] * m_Spacing[0],x1[1] * m_Spacing[1],x1[2] * m_Spacing[2]);
-  Vector3d x2World(x2[0] * m_Spacing[0],x2[1] * m_Spacing[1],x2[2] * m_Spacing[2]);
-  Vector3d p1World(p1[0] * m_Spacing[0],p1[1] * m_Spacing[1],p1[2] * m_Spacing[2]);
-  Vector3d p2World(p2[0] * m_Spacing[0],p2[1] * m_Spacing[1],p2[2] * m_Spacing[2]);
+  Vector3d x1World = vector_multiply_add_mixed(x1, m_Spacing, m_Origin);
+  Vector3d x2World = vector_multiply_add_mixed(x2, m_Spacing, m_Origin);
+  Vector3d p1World = vector_multiply_add_mixed(p1, m_Spacing, m_Origin);
+  Vector3d p2World = vector_multiply_add_mixed(p2, m_Spacing, m_Origin);
   
   // Compute the normal in world coordinates
   Vector3d nWorld = - itk_cross_3d((vnl_vector<double>) (x2World - x1World),
@@ -1186,46 +1183,117 @@ void Window3D::AddSample( Vector3i s )
   m_Samples.push_back(s);
 }
 
+void DrawCube( Vector3f &x, Vector3f &y )
+  {
+  glBegin(GL_LINE_LOOP);
+  glVertex3f( x[0], x[1], x[2] );
+  glVertex3f( x[0], y[1], x[2] );
+  glVertex3f( x[0], y[1], y[2] );
+  glVertex3f( x[0], x[1], y[2] );
+  glEnd();
+
+  glBegin(GL_LINE_LOOP);
+  glVertex3f( y[0], x[1], x[2] );
+  glVertex3f( y[0], y[1], x[2] );
+  glVertex3f( y[0], y[1], y[2] );
+  glVertex3f( y[0], x[1], y[2] );
+  glEnd();
+
+  glBegin(GL_LINES);
+  glVertex3f( x[0], x[1], x[2] );
+  glVertex3f( y[0], x[1], x[2] );
+  glVertex3f( x[0], y[1], x[2] );
+  glVertex3f( y[0], y[1], x[2] );
+  glVertex3f( x[0], x[1], y[2] );
+  glVertex3f( y[0], x[1], y[2] );
+  glVertex3f( x[0], y[1], y[2] );
+  glVertex3f( y[0], y[1], y[2] );
+  glEnd();
+  }
+
+void DrawCutPlanes( Vector3f &a, Vector3f &b, Vector3f &x)
+  {
+  glBegin(GL_LINE_LOOP);
+  glVertex3f( x[0], a[1], a[2] );
+  glVertex3f( x[0], a[1], b[2] );
+  glVertex3f( x[0], b[1], b[2] );
+  glVertex3f( x[0], b[1], a[2] );
+  glEnd();
+
+  glBegin(GL_LINE_LOOP);
+  glVertex3f( a[0], x[1], a[2] );
+  glVertex3f( a[0], x[1], b[2] );
+  glVertex3f( b[0], x[1], b[2] );
+  glVertex3f( b[0], x[1], a[2] );
+  glEnd();
+
+  glBegin(GL_LINE_LOOP);
+  glVertex3f( a[0], a[1], x[2] );
+  glVertex3f( a[0], b[1], x[2] );
+  glVertex3f( b[0], b[1], x[2] );
+  glVertex3f( b[0], a[1], x[2] );
+  glEnd();
+  }
+
 void Window3D::DrawCrosshairs()
 {
   if ( !m_CursorVisible ) return;
-
-  // Get the UI element properties for the crosshairs
-  SNAPAppearanceSettings::Element &elt = 
-    m_ParentUI->GetAppearanceSettings()->GetUIElement(
-    SNAPAppearanceSettings::CROSSHAIRS_3D);
-
-  // Exit if crosshairs are to be ignored
-  if(!elt.Visible) return;
-
-  // Get the crosshair position
-  Vector3ui crosshair = m_GlobalState->GetCrosshairsPosition();
 
   // Set up the GL state
   glPushAttrib(GL_LINE_BIT | GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT);
   glDisable(GL_LIGHTING);
 
-  // Set up the line properties
-  glColor3dv(elt.NormalColor.data_block());
-  SNAPAppearanceSettings::ApplyUIElementLineSettings(elt);
+  // Get the crosshair position
+  Vector3f xCross = 
+    to_float(m_GlobalState->GetCrosshairsPosition()) + Vector3f(0.5f);
 
-  // Draw the lines
-  glBegin( GL_LINES );
+  // Get the UI element properties for the image box
+  SNAPAppearanceSettings::Element &eltBox = 
+    m_ParentUI->GetAppearanceSettings()->GetUIElement(
+    SNAPAppearanceSettings::IMAGE_BOX_3D);
 
-  for (int i=0; i<3; i++)
+  // Draw the image box
+  if(eltBox.Visible)
     {
-    float end1[3], end2[3];
-    for (int j=0; j<3; j++)
-      end1[j] = end2[j] = crosshair[j];
-    end1[i] = m_Center[i] - m_ImageSize[i]*0.7+1;
-    end2[i] = m_Center[i] + m_ImageSize[i]*0.7+1;
+    // Set the line properties
+    SNAPAppearanceSettings::ApplyUIElementLineSettings(eltBox);
 
-    glVertex3fv(end1);
-    glVertex3fv(end2);
+    // The cube around the image
+    glColor3dv(eltBox.NormalColor.data_block());
+    DrawCube( Vector3f(0.0f), to_float(m_ImageSize) );
+
+    // The slice planes
+    glColor3dv(eltBox.ActiveColor.data_block());
+    DrawCutPlanes( Vector3f(0.0f), to_float(m_ImageSize), xCross );
     }
 
-  glEnd();
-  glPopAttrib();
+  // Get the UI element properties for the crosshairs
+  SNAPAppearanceSettings::Element &eltCross = 
+    m_ParentUI->GetAppearanceSettings()->GetUIElement(
+    SNAPAppearanceSettings::CROSSHAIRS_3D);
+
+  // Exit if crosshairs are to be ignored
+  if(eltCross.Visible) 
+    {
+    // Set up the line properties
+    glColor3dv(eltCross.NormalColor.data_block());
+    SNAPAppearanceSettings::ApplyUIElementLineSettings(eltCross);
+
+    // Draw the lines
+    glBegin( GL_LINES );
+    for (int i=0; i<3; i++)
+      {
+      float end1[3], end2[3];
+      for (int j=0; j<3; j++)
+        end1[j] = end2[j] = xCross[j];
+      end1[i] = m_Center[i] - m_ImageSize[i]*0.7+1;
+      end2[i] = m_Center[i] + m_ImageSize[i]*0.7+1;
+
+      glVertex3fv(end1);
+      glVertex3fv(end2);
+      }
+    glEnd();
+    }
 
 #if DEBUGGING
   glColor3f( 1.0, 1.0, 0.0 );
@@ -1240,6 +1308,8 @@ void Window3D::DrawCrosshairs()
   << ", " << m_Point[2]+m_Ray[2] << " )" << endl;
 #endif
 
+  // Finish
+  glPopAttrib();
 }
 
 void Window3D::DrawSamples()
@@ -1252,7 +1322,7 @@ void Window3D::DrawSamples()
   for (SampleListIterator it=m_Samples.begin();it!=m_Samples.end();it++)
     {
     glPushMatrix(); 
-    glTranslatef( (*it)[X], (*it)[Y], (*it)[Z] );
+    glTranslate(to_float(*it));
 
     GLUquadric *quad = gluNewQuadric();
     gluSphere(quad,1.0,4,4);
@@ -1307,14 +1377,14 @@ void Window3D
 
     // Create a parallel plane to create a moving effect
     Vector3d vOffset = planeUnitNormal * (1.0 * i);
-    glTranslated(vOffset[0],vOffset[1],vOffset[2]);
+    glTranslate(vOffset);
 
     // Draw a line loop
     glBegin(GL_LINE_LOOP);
-    glVertex3dv(corner[0].data_block());
-    glVertex3dv(corner[1].data_block());
-    glVertex3dv(corner[2].data_block());
-    glVertex3dv(corner[3].data_block());
+    glVertex(corner[0]);
+    glVertex(corner[1]);
+    glVertex(corner[2]);
+    glVertex(corner[3]);
     glEnd();
 
     // Switch to new color
@@ -1349,6 +1419,9 @@ Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.20  2004/08/26 18:29:20  pauly
+ *ENH: New user interface for configuring the UI options
+ *
  *Revision 1.19  2004/07/29 14:02:05  pauly
  *ENH: An interface for changing SNAP appearance settings
  *

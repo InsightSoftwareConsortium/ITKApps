@@ -189,7 +189,7 @@ private:
   Vector3ui m_ImageSize;   
 
   // Dimensions of a voxel, in mm
-  Vector3f m_Spacing;   
+  Vector3f m_Spacing, m_Origin;   
 
   // Dimensions of the image (dimensions * spacing)
   Vector3f m_VolumeSize;
@@ -245,6 +245,9 @@ private:
 
 /*
  *Log: Window3D.h
+ *Revision 1.8  2004/08/26 18:29:21  pauly
+ *ENH: New user interface for configuring the UI options
+ *
  *Revision 1.7  2004/01/27 18:05:38  pauly
  *FIX: More MAC OSX fixes. Also removed old snake code no longer in use
  *

@@ -143,7 +143,7 @@ GenericSliceWindow
   
   // Get the volume extents & voxel scale factors
   Vector3ui imageSizeInImageSpace = m_ImageData->GetVolumeExtents();
-  Vector3f imageScalingInImageSpace = m_ImageData->GetVoxelScaleFactor();
+  Vector3f imageScalingInImageSpace = to_float(m_ImageData->GetImageSpacing());
 
   // Initialize quantities that depend on the image and its transform
   for(unsigned int i = 0;i < 3;i++) 

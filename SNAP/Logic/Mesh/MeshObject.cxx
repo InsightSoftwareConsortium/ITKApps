@@ -163,7 +163,7 @@ MeshObject
     for(unsigned int i=1;i<MAX_COLOR_LABELS;i++) 
       {
       ColorLabel cl = m_Driver->GetCurrentImageData()->GetColorLabel(i);
-      if(cl.IsDoMesh() && meshPipeline->CanComputeMesh(i))
+      if(cl.IsVisibleIn3D() && meshPipeline->CanComputeMesh(i))
         {
         vtkPolyData *mesh = vtkPolyData::New();
         meshPipeline->ComputeMesh(i,mesh);
@@ -236,7 +236,7 @@ bool
 MeshObject
 ::ApplyColorLabel(const ColorLabel &label) 
 {
-  if (label.IsVisible() && label.IsDoMesh()) 
+  if (label.IsVisible() && label.IsVisibleIn3D()) 
     {
     // Adjust the label color to reduce the saturation. This in necessary
     // in order to see the highlights on the object
@@ -334,6 +334,9 @@ MeshObject
 
 /*
  *Log: MeshObject.cxx
+ *Revision 1.14  2004/08/26 19:43:23  pauly
+ *ENH: Moved the Borland code into Common folder
+ *
  *Revision 1.13  2004/08/03 23:26:32  ibanez
  *ENH: Modification for building in multple platforms. By Julien Jomier.
  *

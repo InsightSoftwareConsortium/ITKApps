@@ -518,7 +518,7 @@ void IRISApplication
       cl.SetRGB(2,(unsigned char) blue);
       cl.SetAlpha( (unsigned char) (255 * alpha) );
       cl.SetVisible(visible != 0);
-      cl.SetDoMesh(mesh != 0);
+      cl.SetVisibleIn3D(mesh != 0);
       cl.SetLabel(label);
 
       // Store the color label
@@ -588,7 +588,7 @@ void IRISApplication
       fout << "  "  << right << std::setw(7) << std::setprecision(2) 
            << (cl.GetAlpha() / 255.0f);
       fout << "  "  << right << std::setw(1) << (cl.IsVisible() ? 1 : 0);
-      fout << "  "  << right << std::setw(1) << (cl.IsDoMesh() ? 1 : 0);
+      fout << "  "  << right << std::setw(1) << (cl.IsVisibleIn3D() ? 1 : 0);
       fout << "    \"" << cl.GetLabel() << "\"" << endl;
       }
     }

@@ -111,6 +111,9 @@ public:
   /** Get the current state of the snake (level set and narrow band) */
   FloatImageType *GetCurrentState();
 
+  /** Get the number of elapsed iterations */
+  unsigned int GetElapsedIterations() const;
+
   /** Clean up the snake's state */
   void CleanUp();
   

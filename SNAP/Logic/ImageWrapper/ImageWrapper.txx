@@ -142,25 +142,6 @@ ImageWrapper<TPixel>
   m_Initialized = true;
 }
 
-/*
-template <class TPixel> 
-void 
-ImageWrapper<TPixel>
-::InitializeToSize(unsigned int x, unsigned int y, unsigned int z) 
-{
-  itk::Size<3> size;
-  size[0] = x;
-  size[1] = y;
-  size[2] = z;
-
-  ImagePointer newImage = ImageType::New();
-  newImage->SetRegions(size);
-  newImage->Allocate();
-
-  UpdateImagePointer(newImage);
-}
-*/
-
 template <class TPixel>
 void 
 ImageWrapper<TPixel>
@@ -538,7 +519,6 @@ ImageWrapper<TPixel>
   SetImageToDisplayTransform(1,id[1]);
   SetImageToDisplayTransform(2,id[2]);
 }
-
 
 template <class TPixel>    
 const ImageCoordinateTransform&
