@@ -24,6 +24,7 @@
 #include "vtkImageImport.h"
 #include "vtkImageShiftScale.h"
 #include "vtkImageActor.h"
+#include "vtkImageData.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"

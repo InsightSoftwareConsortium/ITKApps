@@ -23,6 +23,7 @@
 
 #include "vtkImageImport.h"
 #include "vtkImageExport.h"
+#include "vtkImageData.h"
 #include "vtkImageShiftScale.h"
 #include "vtkImageNoiseSource.h"
 #include "vtkImageActor.h"

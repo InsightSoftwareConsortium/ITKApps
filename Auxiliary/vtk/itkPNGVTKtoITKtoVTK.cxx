@@ -26,6 +26,7 @@
 
 #include "vtkImageImport.h"
 #include "vtkImageExport.h"
+#include "vtkImageData.h"
 #include "vtkImageShiftScale.h"
 #include "vtkPNGReader.h"
 #include "vtkImageLuminance.h"
