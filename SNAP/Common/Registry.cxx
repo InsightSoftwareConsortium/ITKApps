@@ -194,7 +194,7 @@ Registry
   EntryMapType newMap;
   for(EntryIterator it=m_EntryMap.begin(); it != m_EntryMap.end(); it++)
     {
-    if(it->first.compare(0,sMatch.length(),sMatch) != 0)
+    if(it->first.find(sMatch) != 0)
       newMap[it->first] = it->second;
     }
 
@@ -395,10 +395,10 @@ Registry
 ::WriteToFile(const char *pathname, const char *header) 
 {
   // Open the file
-  ofstream sout(pathname,ios_base::out);
+  ofstream sout(pathname,std::ios::out);
 
   // Set the stream to be picky
-  sout.exceptions(ios_base::failbit);
+  sout.exceptions(std::ios::failbit);
 
   // Write the header
   if(header)
@@ -419,7 +419,7 @@ Registry
   IRISOStringStream serr;
       
   // Create output stream
-  ifstream sin(pathname,ios_base::in);
+  ifstream sin(pathname,std::ios::in);
   if(!sin.good())
     throw IOException("Unable to open the Registry file");
 

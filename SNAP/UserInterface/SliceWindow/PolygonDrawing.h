@@ -84,7 +84,7 @@ private:
 
   float m_StartX, m_StartY;
 
-  GLUtesselatorObj *m_Tesselator;
+  struct GLUtesselatorObj *m_Tesselator;
 
   void ComputeEditBox();
   void Add(float x, float y, int selected);
@@ -103,6 +103,9 @@ private:
 
 /*
  *Log: PolygonDrawing.h
+ *Revision 1.8  2004/07/22 19:22:51  pauly
+ *ENH: Large image support for SNAP. This includes being able to use more screen real estate to display a slice, a fix to the bug with manual segmentation of images larger than the window size, and a thumbnail used when zooming into the image.
+ *
  *Revision 1.7  2004/01/27 17:34:00  pauly
  *FIX: Compiling on Mac OSX, issue with GLU include file
  *

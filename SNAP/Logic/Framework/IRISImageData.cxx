@@ -153,10 +153,10 @@ IRISImageData
       {
       if(m_ColorLabels[i].IsValid() && data[i].count > 0)
         {
-        fout << std::left << std::setw(40) << m_ColorLabels[i].GetLabel() << ": ";
-        fout << std::right << std::setw(10) << data[i].count << " / ";
+        fout << std::ios::left << std::setw(40) << m_ColorLabels[i].GetLabel() << ": ";
+        fout << std::ios::right << std::setw(10) << data[i].count << " / ";
         fout << std::setw(10) << (data[i].count * volVoxel) << " / ";
-        fout << std::internal << std::setw(10) << data[i].mean << " / ";
+        fout << std::ios::internal << std::setw(10) << data[i].mean << " / ";
         fout << std::setw(10) << data[i].stddev << std::endl;
         }      
       }

@@ -17,7 +17,7 @@
 
 #include "FL/Fl_File_Chooser.H"
 #include "FL/Fl_Text_Buffer.H"
-#include <limits>
+//#include <limits>
 #include <stdio.h>
 #include <cmath>
 #include <map>
