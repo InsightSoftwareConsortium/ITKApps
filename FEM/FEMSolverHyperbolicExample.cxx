@@ -436,7 +436,7 @@ for (unsigned int n=0; n < (*ee)->GetNumberOfNodes(); n++) {
       // Interpolate to get the vector field
       FieldType::IndexType index = fieldIter.GetIndex();
       vnl_vector<double> gloPt, locPt, solVec;
-      Element::ConstPointer elem = 0;
+      Element::ConstPointer elem;
 
       gloPt.resize(2);
       locPt.resize(2);
