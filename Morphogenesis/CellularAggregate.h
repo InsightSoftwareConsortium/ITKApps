@@ -156,6 +156,7 @@ private:
   unsigned long  m_Iteration;
   unsigned long  m_ClosestPointComputationInterval;
 
+  bool           m_DrawLines;
 };
 
 } // end namespace bio
