@@ -87,7 +87,22 @@ ThresholdSegmentationLevelSetBase
 
   m_ImageReader->SetFileName( filename );
   m_ImageReader->Update();
-  
+
+  InputImageType::RegionType region 
+            = m_ImageReader->GetOutput()->GetBufferedRegion();
+
+  InputImageType::SizeType size = region.GetSize();
+
+  for(unsigned int i=0; i<ImageDimension; i++)
+    {
+    if( size[i] < 10 )
+      {
+      this->ShowStatus("Image must be 3D and with at least 10 pixels along each Dimension.");
+      }
+      return;
+    }
+
+
   m_InputImageIsLoaded = true;
 
   m_SeedImage->SetRegions( m_ImageReader->GetOutput()->GetBufferedRegion() );
