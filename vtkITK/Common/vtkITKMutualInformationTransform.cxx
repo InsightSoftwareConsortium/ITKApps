@@ -49,6 +49,8 @@
 #include "itkQuaternionRigidTransform.h"
 #include "itkQuaternionRigidTransformGradientDescentOptimizer.h"
 #include "itkMutualInformationImageToImageMetric.h"
+#include "itkMattesMutualInformationImageToImageMetric.h"
+#include "itkRegularStepGradientDescentOptimizer.h"
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkImageRegistrationMethod.h"
 #include "itkNumericTraits.h"
@@ -61,7 +63,7 @@
 typedef itk::Size<3> SizeType;
 typedef itk::Index<3> IndexType;
 
-vtkCxxRevisionMacro(vtkITKMutualInformationTransform, "$Revision: 1.17 $");
+vtkCxxRevisionMacro(vtkITKMutualInformationTransform, "$Revision: 1.18 $");
 vtkStandardNewMacro(vtkITKMutualInformationTransform);
 
 //----------------------------------------------------------------------------
@@ -76,6 +78,13 @@ vtkITKMutualInformationTransform::vtkITKMutualInformationTransform()
   this->NumberOfIterations = 500;  
   this->NumberOfSamples = 50;
   this->Matrix->Identity();
+
+  this->NumberOfHistogramBins = 20;   
+
+  this->MaximumStepLength = 4.00; 
+  this->MinimumStepLength = 0.005;   
+
+  this->UseMattes = false;
 }
 
 //----------------------------------------------------------------------------
@@ -103,6 +112,12 @@ void vtkITKMutualInformationTransform::PrintSelf(ostream& os, vtkIndent indent)
   os << "NumberOfSamples: " << this->NumberOfSamples  << endl;
   os << "NumberOfIterations: " << this->NumberOfIterations  << endl;
 
+  os << "NumberOfHistogramBins: " << this->NumberOfHistogramBins << endl;   
+  os << "MaximumStepLength: " << this->MaximumStepLength << endl; 
+  os << "MinimumStepLength: " << this->MinimumStepLength << endl;   
+
+  os << "UseMattes: " << this->UseMattes << endl;
+
   os << "SourceImage: " << this->SourceImage << "\n";
   if(this->SourceImage) 
     {
@@ -125,136 +140,265 @@ static void vtkITKMutualInformationExecute(vtkITKMutualInformationTransform *sel
                                T vtkNotUsed(dummy2))
                                
 {
-  // Declare the input and output types
-  typedef itk::Image<T,3> OutputType;
-
-  // Declare the registration types
-  typedef itk::QuaternionRigidTransform<double> TransformType;
-  typedef itk::QuaternionRigidTransformGradientDescentOptimizer OptimizerType;
-  typedef itk::MutualInformationImageToImageMetric<OutputType, OutputType> MetricType;
-  typedef itk::LinearInterpolateImageFunction<OutputType, double> InterpolatorType;
-  typedef itk::ImageRegistrationMethod<OutputType,OutputType> RegistrationType;
-
-  // Source
-  vtkImageExport *movingVtkExporter = vtkImageExport::New();
-    movingVtkExporter->SetInput(source);
-
-  typedef itk::VTKImageImport<OutputType> ImageImportType;
-
-  typename ImageImportType::Pointer movingItkImporter = ImageImportType::New();
-  ConnectPipelines(movingVtkExporter, movingItkImporter);
-
-  // Target
-  vtkImageExport *fixedVtkExporter = vtkImageExport::New();
-    fixedVtkExporter->SetInput(target);
-
-  typename ImageImportType::Pointer fixedItkImporter = ImageImportType::New();
-  ConnectPipelines(fixedVtkExporter, fixedItkImporter);
-
-//-----------------------------------------------------------
-// Set up the registrator
-//-----------------------------------------------------------
-  typename MetricType::Pointer metric = MetricType::New();
-  typename TransformType::Pointer transform = TransformType::New();
-  typename OptimizerType::Pointer optimizer = OptimizerType::New();
-  typename InterpolatorType::Pointer interpolator  = InterpolatorType::New();
-  typename RegistrationType::Pointer registration  = RegistrationType::New();
-  typename RegistrationType::ParametersType guess(transform->GetNumberOfParameters() );
-
-  // the guess is derived from the current matrix.
-  vnl_matrix<double> matrix3x4(3,4);
-  matrix3x4[0][0] = matrix->Element[0][0];
-  matrix3x4[0][1] = matrix->Element[1][0];
-  matrix3x4[0][2] = matrix->Element[2][0];
-  matrix3x4[0][3] = matrix->Element[0][3];
-  matrix3x4[1][0] = matrix->Element[0][1];
-  matrix3x4[1][1] = matrix->Element[1][1];
-  matrix3x4[1][2] = matrix->Element[2][1];
-  matrix3x4[1][3] = matrix->Element[1][3];
-  matrix3x4[2][0] = matrix->Element[0][2];
-  matrix3x4[2][1] = matrix->Element[1][2];
-  matrix3x4[2][2] = matrix->Element[2][2];
-  matrix3x4[2][3] = matrix->Element[2][3];
-
-  vnl_quaternion<double> matrixAsQuaternion(matrix3x4);
-  
-  guess[0]= matrixAsQuaternion.x();
-  guess[1]= matrixAsQuaternion.y();
-  guess[2]= matrixAsQuaternion.z();
-  guess[3]= matrixAsQuaternion.r();
-  guess[4] = matrix->Element[0][3];
-  guess[5] = matrix->Element[1][3];
-  guess[6] = matrix->Element[2][3];
-  
-  // The guess is: a quaternion followed by a translation
-  registration->SetInitialTransformParameters (guess);
-  
-  // Set translation scale
-  typedef OptimizerType::ScalesType ScaleType;
-
-  ScaleType scales(transform->GetNumberOfParameters());
-  scales.Fill( 1.0 );
-  for( unsigned j = 4; j < 7; j++ )
+  if (self->GetMattes() == false)
     {
-    scales[j] = 1.0 / vnl_math_sqr(self->GetTranslateScale());
+    // Declare the input and output types
+    typedef itk::Image<T,3> OutputType;
+    
+    // Declare the registration types
+    typedef itk::QuaternionRigidTransform<double> TransformType;
+    typedef itk::LinearInterpolateImageFunction<OutputType, double> InterpolatorType;
+    typedef itk::ImageRegistrationMethod<OutputType,OutputType> RegistrationType;
+    typedef itk::MutualInformationImageToImageMetric<OutputType, OutputType> MetricType; 
+    typedef itk::QuaternionRigidTransformGradientDescentOptimizer OptimizerType;
+          
+    // Source
+    vtkImageExport *movingVtkExporter = vtkImageExport::New();
+    movingVtkExporter->SetInput(source);
+    
+    typedef itk::VTKImageImport<OutputType> ImageImportType;
+    
+    typename ImageImportType::Pointer movingItkImporter = ImageImportType::New();
+    ConnectPipelines(movingVtkExporter, movingItkImporter);
+    
+    // Target
+    vtkImageExport *fixedVtkExporter = vtkImageExport::New();
+    fixedVtkExporter->SetInput(target);
+    
+    typename ImageImportType::Pointer fixedItkImporter = ImageImportType::New();
+    ConnectPipelines(fixedVtkExporter, fixedItkImporter);
+    
+    //-----------------------------------------------------------
+    // Set up the registrator
+    //-----------------------------------------------------------
+    typename MetricType::Pointer metric = MetricType::New();
+    typename TransformType::Pointer transform = TransformType::New();
+    typename OptimizerType::Pointer optimizer = OptimizerType::New();
+    typename InterpolatorType::Pointer interpolator  = InterpolatorType::New();
+    typename RegistrationType::Pointer registration  = RegistrationType::New();
+    typename RegistrationType::ParametersType guess(transform->GetNumberOfParameters() );
+    
+    // the guess is derived from the current matrix.
+    vnl_matrix<double> matrix3x4(3,4);
+    matrix3x4[0][0] = matrix->Element[0][0];
+    matrix3x4[0][1] = matrix->Element[1][0];
+    matrix3x4[0][2] = matrix->Element[2][0];
+    matrix3x4[0][3] = matrix->Element[0][3];
+    matrix3x4[1][0] = matrix->Element[0][1];
+    matrix3x4[1][1] = matrix->Element[1][1];
+    matrix3x4[1][2] = matrix->Element[2][1];
+    matrix3x4[1][3] = matrix->Element[1][3];
+    matrix3x4[2][0] = matrix->Element[0][2];
+    matrix3x4[2][1] = matrix->Element[1][2];
+    matrix3x4[2][2] = matrix->Element[2][2];
+    matrix3x4[2][3] = matrix->Element[2][3];
+    
+    vnl_quaternion<double> matrixAsQuaternion(matrix3x4);
+    
+    guess[0]= matrixAsQuaternion.x();
+    guess[1]= matrixAsQuaternion.y();
+    guess[2]= matrixAsQuaternion.z();
+    guess[3]= matrixAsQuaternion.r();
+    guess[4] = matrix->Element[0][3];
+    guess[5] = matrix->Element[1][3];
+    guess[6] = matrix->Element[2][3];
+    
+    // The guess is: a quaternion followed by a translation
+    registration->SetInitialTransformParameters (guess);
+    
+    // Set translation scale
+    typedef OptimizerType::ScalesType ScaleType;
+    
+    ScaleType scales(transform->GetNumberOfParameters());
+    scales.Fill( 1.0 );
+    for( unsigned j = 4; j < 7; j++ )
+      {
+      scales[j] = 1.0 / vnl_math_sqr(self->GetTranslateScale());
+      }
+    
+    // Set metric related parameters
+    metric->SetMovingImageStandardDeviation( self->GetSourceStandardDeviation() );
+    metric->SetFixedImageStandardDeviation( self->GetTargetStandardDeviation() );
+    metric->SetFixedImageRegion( self->GetFixedImageExtent() );
+    metric->SetNumberOfSpatialSamples( self->GetNumberOfSamples() );
+    
+    fixedItkImporter->Update();
+    movingItkImporter->Update();
+    
+    // Connect up the components
+    registration->SetMetric(metric);
+    registration->SetOptimizer(optimizer);
+    registration->SetTransform(transform);
+    registration->SetInterpolator(interpolator);
+    registration->SetFixedImage(fixedItkImporter->GetOutput());
+    registration->SetMovingImage(movingItkImporter->GetOutput());
+    
+    // Setup the optimizer
+    optimizer->SetScales(scales);
+    optimizer->MaximizeOn();   
+    optimizer->SetLearningRate( self->GetLearningRate() );      
+    optimizer->SetNumberOfIterations( self->GetNumberOfIterations() );
+    
+    // Start registration
+    
+    registration->StartRegistration();
+    
+    // Get the results
+    typename RegistrationType::ParametersType solution = 
+      registration->GetLastTransformParameters();
+    
+    vnl_quaternion<double> quat(solution[0],solution[1],solution[2],solution[3]);
+    vnl_matrix_fixed<double,3,3> mat = quat.rotation_matrix_transpose();
+    
+    // Convert the vnl matrix to a vtk mtrix
+    matrix->Element[0][0] = mat(0,0);
+    matrix->Element[0][1] = mat(1,0);
+    matrix->Element[0][2] = mat(2,0);
+    matrix->Element[0][3] = solution[4];
+    matrix->Element[1][0] = mat(0,1);
+    matrix->Element[1][1] = mat(1,1);
+    matrix->Element[1][2] = mat(2,1);
+    matrix->Element[1][3] = solution[5];
+    matrix->Element[2][0] = mat(0,2);
+    matrix->Element[2][1] = mat(1,2);
+    matrix->Element[2][2] = mat(2,2);
+    matrix->Element[2][3] = solution[6];
+    matrix->Element[3][0] = 0;
+    matrix->Element[3][1] = 0;
+    matrix->Element[3][2] = 0;
+    matrix->Element[3][3] = 1;
+    
+    self->Modified();
     }
+  else 
+    {
+    // Declare the input and output types
+    typedef itk::Image<T,3> OutputType;
+    
+    // Declare the registration types
+    typedef itk::QuaternionRigidTransform<double> TransformType;
+    typedef itk::LinearInterpolateImageFunction<OutputType, double> InterpolatorType;
+    typedef itk::ImageRegistrationMethod<OutputType,OutputType> RegistrationType;
+    typedef itk::MattesMutualInformationImageToImageMetric<OutputType, OutputType> MetricType; 
+    typedef itk::RegularStepGradientDescentOptimizer OptimizerType;
+    //typedef itk::QuaternionRigidTransformGradientDescentOptimizer OptimizerType;    
 
-  // Set metric related parameters
-  metric->SetMovingImageStandardDeviation( self->GetSourceStandardDeviation() );
-  metric->SetFixedImageStandardDeviation( self->GetTargetStandardDeviation() );
-  metric->SetNumberOfSpatialSamples( self->GetNumberOfSamples() );
-  metric->SetFixedImageRegion( self->GetFixedImageRegion() );
-
-  fixedItkImporter->Update();
-  movingItkImporter->Update();
-
-  // Connect up the components
-  registration->SetMetric(metric);
-  registration->SetOptimizer(optimizer);
-  registration->SetTransform(transform);
-  registration->SetInterpolator(interpolator);
-  registration->SetFixedImage(fixedItkImporter->GetOutput());
-  registration->SetMovingImage(movingItkImporter->GetOutput());
-
-  // Setup the optimizer
-  optimizer->SetScales(scales);
-  optimizer->MaximizeOn();
-
-  optimizer->SetNumberOfIterations( self->GetNumberOfIterations() );
-  optimizer->SetLearningRate( self->GetLearningRate() );
-
-  // Start registration
-
-  registration->StartRegistration();
-
-  // Get the results
-  typename RegistrationType::ParametersType solution = 
-    registration->GetLastTransformParameters();
-
-  vnl_quaternion<double> quat(solution[0],solution[1],solution[2],solution[3]);
-  vnl_matrix_fixed<double,3,3> mat = quat.rotation_matrix_transpose();
-  
-  // Convert the vnl matrix to a vtk mtrix
-  matrix->Element[0][0] = mat(0,0);
-  matrix->Element[0][1] = mat(1,0);
-  matrix->Element[0][2] = mat(2,0);
-  matrix->Element[0][3] = solution[4];
-  matrix->Element[1][0] = mat(0,1);
-  matrix->Element[1][1] = mat(1,1);
-  matrix->Element[1][2] = mat(2,1);
-  matrix->Element[1][3] = solution[5];
-  matrix->Element[2][0] = mat(0,2);
-  matrix->Element[2][1] = mat(1,2);
-  matrix->Element[2][2] = mat(2,2);
-  matrix->Element[2][3] = solution[6];
-  matrix->Element[3][0] = 0;
-  matrix->Element[3][1] = 0;
-  matrix->Element[3][2] = 0;
-  matrix->Element[3][3] = 1;
-
-  self->Modified();
+    // Source
+    vtkImageExport *movingVtkExporter = vtkImageExport::New();
+    movingVtkExporter->SetInput(source);
+    
+    typedef itk::VTKImageImport<OutputType> ImageImportType;
+    
+    typename ImageImportType::Pointer movingItkImporter = ImageImportType::New();
+    ConnectPipelines(movingVtkExporter, movingItkImporter);
+    
+    // Target
+    vtkImageExport *fixedVtkExporter = vtkImageExport::New();
+    fixedVtkExporter->SetInput(target);
+    
+    typename ImageImportType::Pointer fixedItkImporter = ImageImportType::New();
+    ConnectPipelines(fixedVtkExporter, fixedItkImporter);
+    
+    //-----------------------------------------------------------
+    // Set up the registrator
+    //-----------------------------------------------------------
+    typename MetricType::Pointer metric = MetricType::New();
+    typename TransformType::Pointer transform = TransformType::New();
+    typename OptimizerType::Pointer optimizer = OptimizerType::New();
+    typename InterpolatorType::Pointer interpolator  = InterpolatorType::New();
+    typename RegistrationType::Pointer registration  = RegistrationType::New();
+    typename RegistrationType::ParametersType guess(transform->GetNumberOfParameters() );
+    
+    // the guess is derived from the current matrix.
+    vnl_matrix<double> matrix3x4(3,4);
+    matrix3x4[0][0] = matrix->Element[0][0];
+    matrix3x4[0][1] = matrix->Element[1][0];
+    matrix3x4[0][2] = matrix->Element[2][0];
+    matrix3x4[0][3] = matrix->Element[0][3];
+    matrix3x4[1][0] = matrix->Element[0][1];
+    matrix3x4[1][1] = matrix->Element[1][1];
+    matrix3x4[1][2] = matrix->Element[2][1];
+    matrix3x4[1][3] = matrix->Element[1][3];
+    matrix3x4[2][0] = matrix->Element[0][2];
+    matrix3x4[2][1] = matrix->Element[1][2];
+    matrix3x4[2][2] = matrix->Element[2][2];
+    matrix3x4[2][3] = matrix->Element[2][3];
+    
+    vnl_quaternion<double> matrixAsQuaternion(matrix3x4);
+    
+    guess[0]= matrixAsQuaternion.x();
+    guess[1]= matrixAsQuaternion.y();
+    guess[2]= matrixAsQuaternion.z();
+    guess[3]= matrixAsQuaternion.r();
+    guess[4] = matrix->Element[0][3];
+    guess[5] = matrix->Element[1][3];
+    guess[6] = matrix->Element[2][3];
+    
+    // The guess is: a quaternion followed by a translation
+    registration->SetInitialTransformParameters (guess);
+    
+    // Set translation scale
+    typedef OptimizerType::ScalesType ScaleType;
+    
+    ScaleType scales(transform->GetNumberOfParameters());
+    scales.Fill( 1.0 );
+    for( unsigned j = 4; j < 7; j++ )
+      {
+      scales[j] = 1.0 / vnl_math_sqr(self->GetTranslateScale());
+      }
+    
+    // Set metric related parameters
+    metric->SetNumberOfHistogramBins( self->GetNumberOfHistogramBins() );
+    metric->SetNumberOfSpatialSamples( self->GetNumberOfSamples() );
+    
+    fixedItkImporter->Update();
+    movingItkImporter->Update();
+    
+    // Connect up the components
+    registration->SetMetric(metric);
+    registration->SetOptimizer(optimizer);
+    registration->SetTransform(transform);
+    registration->SetInterpolator(interpolator);
+    registration->SetFixedImage(fixedItkImporter->GetOutput());
+    registration->SetMovingImage(movingItkImporter->GetOutput());
+    
+    // Setup the optimizer
+    optimizer->SetMaximumStepLength( self->GetMaximumStepLength() );
+    optimizer->SetMinimumStepLength( self->GetMinimumStepLength() );
+    optimizer->SetNumberOfIterations( self->GetNumberOfIterations() );
+    
+    // Start registration
+    
+    registration->StartRegistration();
+    
+    // Get the results
+    typename RegistrationType::ParametersType solution = 
+      registration->GetLastTransformParameters();
+    
+    vnl_quaternion<double> quat(solution[0],solution[1],solution[2],solution[3]);
+    vnl_matrix_fixed<double,3,3> mat = quat.rotation_matrix_transpose();
+    
+    // Convert the vnl matrix to a vtk mtrix
+    matrix->Element[0][0] = mat(0,0);
+    matrix->Element[0][1] = mat(1,0);
+    matrix->Element[0][2] = mat(2,0);
+    matrix->Element[0][3] = solution[4];
+    matrix->Element[1][0] = mat(0,1);
+    matrix->Element[1][1] = mat(1,1);
+    matrix->Element[1][2] = mat(2,1);
+    matrix->Element[1][3] = solution[5];
+    matrix->Element[2][0] = mat(0,2);
+    matrix->Element[2][1] = mat(1,2);
+    matrix->Element[2][2] = mat(2,2);
+    matrix->Element[2][3] = solution[6];
+    matrix->Element[3][0] = 0;
+    matrix->Element[3][1] = 0;
+    matrix->Element[3][2] = 0;
+    matrix->Element[3][3] = 1;
+    
+    self->Modified();
+    }
 }
-
 //----------------------------------------------------------------------------
 // Update the 4x4 matrix. Updates are only done as necessary.
  
@@ -398,7 +542,7 @@ void vtkITKMutualInformationTransform::SetTargetImage(vtkImageData *target)
   this->Modified();
 }
 
-void vtkITKMutualInformationTransform::SetFixedImageRegion(int xMin, int xMax, int yMin, int yMax, int zMin, int zMax)
+void vtkITKMutualInformationTransform::SetFixedImageExtent(int xMin, int xMax, int yMin, int yMax, int zMin, int zMax)
 {
   int sizeX = xMax-xMin+1;
   int sizeY = yMax-yMin+1;
@@ -406,8 +550,8 @@ void vtkITKMutualInformationTransform::SetFixedImageRegion(int xMin, int xMax, i
 
   SizeType size = {sizeX, sizeY, sizeX};
   IndexType index = {{xMin, yMin, zMin}};
-  FixedImageRegion.SetIndex(index);
-  FixedImageRegion.SetSize(size);
+  FixedImageExtent.SetIndex(index);
+  FixedImageExtent.SetSize(size);
 }
 
 

@@ -36,7 +36,7 @@
 
 class vtkImageData;
 
-typedef itk::ImageRegion<3> ImageRegionType;
+typedef itk::ImageRegion<3> ImageExtentType;
 
 class VTK_EXPORT vtkITKMutualInformationTransform : public vtkLinearTransform
 {
@@ -68,10 +68,40 @@ public:
   vtkGetMacro(TargetStandardDeviation, double);
   
   // Description:
-  // Set/Get the region over which the metric will be computed
-  void SetFixedImageRegion(int xMin, int xMax, int yMin, int yMax, int zMin, int zMax);
-  ImageRegionType GetFixedImageRegion() 
-    { return FixedImageRegion; }
+  // Set/Get the extent over which the metric will be computed
+  void SetFixedImageExtent(int xMin, int xMax, int yMin, int yMax, int zMin, int zMax);
+  ImageExtentType GetFixedImageExtent() 
+    { return FixedImageExtent; }
+
+  // Description:
+  // Set/Get the number of histogram bins
+  void SetNumberOfHistogramBins(int numBins)
+    { NumberOfHistogramBins = numBins; }
+  int GetNumberOfHistogramBins()
+    { return NumberOfHistogramBins; }
+
+  // Description:
+  // Set/Get maximum step length
+  void SetMaximumStepLength(float maxStepLength)
+    { MaximumStepLength = maxStepLength; }  
+  float GetMaximumStepLength()
+    { return MaximumStepLength; }  
+
+  // Description:
+  // Set/Get minimum step length
+  void SetMinimumStepLength(float minStepLength)
+    { MinimumStepLength = minStepLength; }   
+  float GetMinimumStepLength()
+    { return MinimumStepLength; }   
+
+  // Description:
+  // Set/Unset/Get use of Mattes Mutual Information 
+  void MattesOn()
+    { UseMattes = true; }
+  void MattesOff()
+    { UseMattes = false; }
+  bool GetMattes()
+    { return UseMattes; }
 
   // Description:
   // Set the number of iterations
@@ -128,10 +158,16 @@ protected:
   double TargetStandardDeviation;
   double TranslateScale;
   
-  int NumberOfIterations;
   int NumberOfSamples;
-  
-  ImageRegionType FixedImageRegion;
+  int NumberOfIterations;
+  int NumberOfHistogramBins;   //For Mattes Mutual Information
+
+  float MaximumStepLength;   //For Mattes Mutual Information Optimizer 
+  float MinimumStepLength;   //For Mattes Mutual Information Optimizer
+
+  bool UseMattes;
+
+  ImageExtentType FixedImageExtent;
 
 private:
   vtkITKMutualInformationTransform(const vtkITKMutualInformationTransform&);  // Not implemented.
