@@ -149,7 +149,7 @@ void VV_PLUGIN_EXPORT vvITKMaskInit(vtkVVPluginInfo *info)
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
                                     "Remove regions by masking with another image.");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,
-    "This filter sets to zero all the pixels that are non-zero in a mask image provided as second input. It is commonly used for removing regions of the image when performing progressive segmentation.");
+    "This filter sets to zero all the pixels that are zero in a mask image provided as second input. It is commonly used for removing regions of the image when performing progressive segmentation.");
 
   info->SetProperty(info, VVP_SUPPORTS_IN_PLACE_PROCESSING, "0");
   info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "0");
