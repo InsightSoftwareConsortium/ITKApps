@@ -42,29 +42,16 @@ public:
   /** Set snake parameters */
   virtual void SetSnakeParameters(const SnakeParameters &parms) = 0;
 
-  /** Tell the update loop to execute.  Halts until the execution has ended */
-  virtual void BeginUpdate(itk::Command *pauseCallback) = 0;
-
-  /** Request the update loop to end execution */
-  virtual void RequestEndUpdate() = 0;
-
-  /** Check whether the driver is currently withing the update loop */
-  virtual bool IsInUpdateLoop() = 0;
-  
-  /** This method will run the evolution for N iterations.  Afterwards, it
-   * will call the pauseCallback command repeatedly (unless the command is
-   * NULL, in which case, it will return to caller).  The callback is provided
-   * so that the filter may be updated in stages, with user interation.  You 
-   * may call Run repeatedly from the callback or call Restart or CleanUp */
-  virtual void RequestIterations(int nIterations) = 0;
+  /** Run the snake for a number of iterations */
+  virtual void Run(unsigned int nIterations) = 0;
 
   /** Restart the snake */
-  virtual void RequestRestart() = 0;
+  virtual void Restart() = 0;
 
   /** Clean up the snake's state */
   virtual void CleanUp() = 0;
 };
- 
+
 /**
  * \class SNAPLevelSetDriver
  * \brief A generic interface between the SNAP application and ITK level set
@@ -81,11 +68,11 @@ class SNAPLevelSetDriver : public SNAPLevelSetDriverBase
 public:
 
   typedef SNAPLevelSetDriver Self;
+
   // A callback type
   typedef itk::SmartPointer<itk::Command> CommandPointer;
   typedef itk::SimpleMemberCommand<Self> SelfCommandType;
   typedef itk::SmartPointer<SelfCommandType> SelfCommandPointer;
-
 
   /** Floating point image type used internally */
   typedef itk::Image<float, VDimension> FloatImageType;
@@ -112,24 +99,11 @@ public:
   /** Set snake parameters */
   void SetSnakeParameters(const SnakeParameters &parms);
 
-  /** Tell the update loop to execute.  Halts until the execution has ended */
-  void BeginUpdate(itk::Command *pauseCallback);
-
-  /** Request the update loop to end execution */
-  void RequestEndUpdate();
-
-  /** Check whether the driver is currently withing the update loop */
-  bool IsInUpdateLoop();
-  
-  /** This method will run the evolution for N iterations.  Afterwards, it
-   * will call the pauseCallback command repeatedly (unless the command is
-   * NULL, in which case, it will return to caller).  The callback is provided
-   * so that the filter may be updated in stages, with user interation.  You 
-   * may call Run repeatedly from the callback or call Restart or CleanUp */
-  void RequestIterations(int nIterations);
+  /** Run the filter */
+  void Run(unsigned int nIterations);
 
   /** Restart the snake */
-  void RequestRestart();
+  void Restart();
 
   /** Get the level set function */
   irisGetMacro(LevelSetFunction,LevelSetFunctionType *);
@@ -149,13 +123,10 @@ private:
   };
 
   /** Type definition for the level set filter */
-  typedef itk::ImageToImageFilter<FloatImageType,FloatImageType> FilterType;
+  typedef itk::FiniteDifferenceImageFilter<FloatImageType,FloatImageType> FilterType;
 
   /** Level set filter wrapped by this object */
   typename FilterType::Pointer m_LevelSetFilter;
-
-  /** A pointer to the filter, but veiwed as a level set extension interface */
-  LevelSetExtensionFilterInterface *m_ExtensionView;
 
   /** Level set function used by the level set filter */
   typename LevelSetFunctionType::Pointer m_LevelSetFunction;
@@ -169,14 +140,7 @@ private:
   /** Assign the values of snake parameters to a snake function */
   void AssignParametersToPhi(const SnakeParameters &parms, bool firstTime);
 
-  /** Internal command pointer */
-  SelfCommandPointer m_CommandAfterUpdate;
-
-  /** Idle (pause) command pointer */
-  CommandPointer m_CommandOnPause;
-
   /** Internal routines */
-  void DoRestart();
   void DoCreateLevelSetFilter();
 };
 

@@ -54,7 +54,6 @@ SNAPLevelSetDriver<VDimension>
 {
   // Create the level set function
   m_LevelSetFunction = LevelSetFunctionType::New();
-  // m_LevelSetFunction = FastSNAPLevelSetFunction::New();
 
   // Pass the speed image to the function
   m_LevelSetFunction->SetSpeedImage(speed);  
@@ -118,50 +117,35 @@ SNAPLevelSetDriver<VDimension>
   // NarrowBand, ParallelSparseField, even Dense.  
   if(m_Parameters.GetSolver() == SnakeParameters::PARALLEL_SPARSE_FIELD_SOLVER)
     {
-    typedef itk::Image<float,3> FloatImageType;
     // Define an extension to the appropriate filter class
     typedef ParallelSparseFieldLevelSetImageFilter<
-      itk::Image<float,3> ,itk::Image<float,3> > LevelSetFilterType;
-    typedef LevelSetExtensionFilter<LevelSetFilterType> ExtensionFilterType;
-      
-    // Create a new extended filter
-    typename ExtensionFilterType::Pointer filter = ExtensionFilterType::New();
-/*
+      FloatImageType, FloatImageType> LevelSetFilterType;
+    typedef typename LevelSetFilterType::Pointer LevelSetFilterPointer;
+    LevelSetFilterPointer filter = LevelSetFilterType::New();
+
     // Cast this specific filter down to the lowest common denominator that is
     // a filter
     m_LevelSetFilter = filter.GetPointer();
 
-    // Cast the specific filter to a generic interface, so we can call the 
-    // extended operations without knowing exactly what the filter is (this 
-    // is the beauty of polymorphism!)
-    m_ExtensionView = filter.GetPointer();
-    
     // Perform the special configuration tasks on the filter
     filter->SetInput(m_InitializationImage);
     filter->SetNumberOfLayers(3);
     filter->SetIsoSurfaceValue(0.0f);
     filter->SetDifferenceFunction(m_LevelSetFunction);
- */
-   }
- /* else if(m_Parameters.GetSolver() == SnakeParameters::NARROW_BAND_SOLVER)
+    }
+
+  else if(m_Parameters.GetSolver() == SnakeParameters::NARROW_BAND_SOLVER)
     {
     // Define an extension to the appropriate filter class
-    typedef NarrowBandLevelSetImageFilter<
+    typedef itk::NarrowBandLevelSetImageFilter<
       FloatImageType,FloatImageType> LevelSetFilterType;
-    typedef LevelSetExtensionFilter<LevelSetFilterType> ExtensionFilterType;
-    
-    // Create a new extended filter
-    typename ExtensionFilterType::Pointer filter = ExtensionFilterType::New();
+    typedef LevelSetExtensionFilter<LevelSetFilterType> ExtensionFilter;
+    typename ExtensionFilter::Pointer filter = ExtensionFilter::New();
 
     // Cast this specific filter down to the lowest common denominator that is
     // a filter
     m_LevelSetFilter = filter.GetPointer();
 
-    // Cast the specific filter to a generic interface, so we can call the 
-    // extended operations without knowing exactly what the filter is (this 
-    // is the beauty of polymorphism!)
-    m_ExtensionView = filter.GetPointer();
-    
     // Perform the special configuration tasks on the filter
     filter->SetSegmentationFunction(m_LevelSetFunction);
     filter->SetInput(m_InitializationImage);
@@ -169,142 +153,50 @@ SNAPLevelSetDriver<VDimension>
     filter->SetNarrowBandInnerRadius(3);
     filter->SetFeatureImage(m_LevelSetFunction->GetSpeedImage());  
     }
+
   else if(m_Parameters.GetSolver() == SnakeParameters::DENSE_SOLVER)
     {
     // Define an extension to the appropriate filter class
     typedef DenseFiniteDifferenceImageFilter<
       FloatImageType,FloatImageType> LevelSetFilterType;
-    typedef LevelSetExtensionFilter<LevelSetFilterType> ExtensionFilterType;
+    typedef LevelSetExtensionFilter<LevelSetFilterType> ExtensionFilter;
+    typename ExtensionFilter::Pointer filter = ExtensionFilter::New();
     
-    // Create a new extended filter
-    typename ExtensionFilterType::Pointer filter = ExtensionFilterType::New();
-
     // Cast this specific filter down to the lowest common denominator that is
     // a filter
     m_LevelSetFilter = filter.GetPointer();
 
-    // Cast the specific filter to a generic interface, so we can call the 
-    // extended operations without knowing exactly what the filter is (this 
-    // is the beauty of polymorphism!)
-    m_ExtensionView = filter.GetPointer();
-    
     // Perform the special configuration tasks on the filter
     filter->SetInput(m_InitializationImage);
     filter->SetDifferenceFunction(m_LevelSetFunction);
     }
-*/
+
+  // Common initialization
+  m_LevelSetFilter->SetManualReinitialization(true);
+  m_LevelSetFilter->SetNumberOfIterations(0);
 }
 
 template<unsigned int VDimension>
 void
 SNAPLevelSetDriver<VDimension>
-::RequestRestart()
+::Restart()
 { 
-  // Makes no sense to call this if not in update cycle
-  assert(this->IsInUpdateLoop());
+  // Tell the filter to reinitialize next time that an update will 
+  // be performed
+  m_LevelSetFilter->SetStateToUninitialized();
 
-  // Request a stop in the update
-  m_ExtensionView->RequestStop();
-
-  // Tell the method that called Update that it needs to call DoRestart()
-  m_CommandAfterUpdate = SelfCommandType::New();
-  m_CommandAfterUpdate->SetCallbackFunction(this,&SNAPLevelSetDriver::DoRestart);
-}
-
-template<unsigned int VDimension>
-void
-SNAPLevelSetDriver<VDimension>
-::DoRestart()
-{
-  // To be on the safe side, just create a new filter (alternative is commented
-  // out below, but seems to be unstable)
-  DoCreateLevelSetFilter();
-
-  // Update the image currently in the filter
-  // m_LevelSetFilter->SetInput(m_InitializationImage);
-
-  // Reset the filter, so the next time it is Updated, it will run again, even
-  // if the input image has not changed
-  // m_LevelSetFilter->Modified();
+  // Update the filter with zero iterations
+  m_LevelSetFilter->SetNumberOfIterations(0);
+  m_LevelSetFilter->Update();  
 }
 
 template<unsigned int VDimension>
 void 
 SNAPLevelSetDriver<VDimension>
-::BeginUpdate(Command *pauseCallback)
+::Run(unsigned int nIterations)
 {
-  // This call may not nest
-  assert(!this->IsInUpdateLoop());
-
-  // This call loops until the filter returns from an update with no consequent
-  // request specified
-  while(true)
-    {
-    // Tell the filter how many iterations to perform
-    m_ExtensionView->SetIterationsUntilPause(0);
-
-    // Tell the filter to call back to the command passed in here.  If the 
-    // command is NULL, the filter will return after executing the iterations
-    m_ExtensionView->SetPauseCommand(pauseCallback);
-
-    // Clear the post-update command
-    m_CommandAfterUpdate = NULL;
-    
-    // Run the filter (at this point, we're stuck in this method, and rely on
-    // the callback function to handle user interaction)
-    m_LevelSetFilter->UpdateLargestPossibleRegion();
-
-    // The control returns here after the filter finishes updating.  
-    if(m_CommandAfterUpdate)
-      {          
-      // The callback may have set the post-update command pointer, asking us to 
-      // execute another action before returning control to the parent
-      m_CommandAfterUpdate->Execute(m_LevelSetFilter,AnyEvent());
-      }      
-    else
-      {
-      // There was no subsequent command requested, hence there was no  
-      // reason for aborting Update() other that the user wants us to quit and
-      // return control
-      break;
-      }      
-    }
-}
-
-template<unsigned int VDimension>
-bool
-SNAPLevelSetDriver<VDimension>
-::IsInUpdateLoop()
-{
-  return ((m_ExtensionView != NULL) && m_ExtensionView->IsUpdating());
-}
-
-template<unsigned int VDimension>
-void 
-SNAPLevelSetDriver<VDimension>
-::RequestEndUpdate()
-{
-  // Makes no sense to call this if not in update cycle
-  assert(this->IsInUpdateLoop());
-
-  // Tell the filter it has to stop
-  m_ExtensionView->RequestStop();
-}
-
-
-template<unsigned int VDimension>
-void 
-SNAPLevelSetDriver<VDimension>
-::RequestIterations(int nIterations)
-{
-  // This method should only be called once the filter is updating, from the
-  // pause callback
-  assert(this->IsInUpdateLoop());
-    
-  // Since the filter is already running, so Run is being called from the 
-  // pause callback.  In this case, we just tell the filter to run for more 
-  // iterations once the pause callback returns
-  m_ExtensionView->SetIterationsUntilPause(nIterations);
+  m_LevelSetFilter->SetNumberOfIterations(nIterations);
+  m_LevelSetFilter->Update();
 }
 
 template<unsigned int VDimension>
@@ -312,7 +204,7 @@ typename SNAPLevelSetDriver<VDimension>::FloatImageType *
 SNAPLevelSetDriver<VDimension>
 ::GetCurrentState()
 {
-  // Fix the spacing of the level set filter's output
+  // Fix the spacing of the level set filter's output (huh?)
   m_LevelSetFilter->GetOutput()->SetSpacing(m_InitializationImage->GetSpacing());
 
   // Return the filter's output
@@ -324,10 +216,6 @@ void
 SNAPLevelSetDriver<VDimension>
 ::CleanUp()
 {
-  // This method should not be called within the pause callback, or else
-  // we would trash memory
-  assert(!this->IsInUpdateLoop());
-
   // Basically, the filter is finished, and we can finally return 
   // from running the filter.  Let's clear the level set and the 
   // function to free memory
@@ -348,26 +236,10 @@ SNAPLevelSetDriver<VDimension>
   // may not cause it to recompute it's images
   AssignParametersToPhi(sparms,false);
 
+  // Create a new level set filter
   if(destructive)
     {
-    // We need to reinitialize the internal filter.  However, if the filter
-    // is already running, all we can do is schedule that update
-    if(this->IsInUpdateLoop())
-      {
-      // Tell the filter to stop when it regains control from the pause callback
-      m_ExtensionView->RequestStop();
-
-      // Schedule a subsequent call to create a new filter
-      m_CommandAfterUpdate = SelfCommandType::New();
-      m_CommandAfterUpdate->SetCallbackFunction(
-        this,&SNAPLevelSetDriver::DoCreateLevelSetFilter);
-      }
-    else
-      {
-      // We are not in an update loop, but between updates, so just recreate the 
-      // level set filter
-      DoCreateLevelSetFilter();
-      }
+    DoCreateLevelSetFilter();
     }
 }
 
