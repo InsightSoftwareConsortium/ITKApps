@@ -91,7 +91,7 @@ public:
   template <class T> void SetLoadCallback(T *object, void (T::*member)())
   {
     typedef itk::SimpleMemberCommand<T> CommandType;
-    CommandType::Pointer cmd = CommandType::New();
+    typename CommandType::Pointer cmd = CommandType::New();
     cmd->SetCallbackFunction(object,member);
     m_LoadCallback = cmd;
   }
@@ -100,7 +100,7 @@ public:
   template <class T> void SetSaveCallback(T *object, void (T::*member)())
   {
     typedef itk::SimpleMemberCommand<T> CommandType;
-    CommandType::Pointer cmd = CommandType::New();
+    typename CommandType::Pointer cmd = CommandType::New();
     cmd->SetCallbackFunction(object,member);
     m_SaveCallback = cmd;
   }

@@ -478,20 +478,23 @@ TestCompareLevelSets
   // Get the snake mode
   bool edgeMode = registry["Image.SpeedIsEdge"][false];
 
+  // A registry IO object to read/write SNAP properties
+  SNAPRegistryIO regio;
+
   // Pass in the speed image
   // Preprocess the image and initialize the level set image
   SnakeParameters parameters;
   if(edgeMode)
     {
     app->UpdateSNAPSpeedImage(speed,EDGE_SNAKE);
-    parameters = SNAPRegistryIO::ReadSnakeParameters(
+    parameters = regio.ReadSnakeParameters(
       registry.Folder("SnakeParameters.Edge"),
       SnakeParameters::GetDefaultEdgeParameters());
     }    
   else
     {
     app->UpdateSNAPSpeedImage(speed,IN_OUT_SNAKE);
-    parameters = SNAPRegistryIO::ReadSnakeParameters(
+    parameters = regio.ReadSnakeParameters(
       registry.Folder("SnakeParameters.InOut"),
       SnakeParameters::GetDefaultInOutParameters());
     }
@@ -653,20 +656,23 @@ TestCompareLevelSets
   // We will use a registry to save orload configuration parameters
   Registry registry;
 
+  // A registry IO object to read/write SNAP properties
+  SNAPRegistryIO regio;
+
   // Check if the user wants to generate a config file
   if(m_Command.IsOptionPresent("generate"))
     {
     // Store the options in the registry
-    SNAPRegistryIO::WriteSnakeParameters(
+    regio.WriteSnakeParameters(
       parmSnakeEdge,registry.Folder("SnakeParameters.Edge"));
 
-    SNAPRegistryIO::WriteSnakeParameters(
+    regio.WriteSnakeParameters(
       parmSnakeInOut,registry.Folder("SnakeParameters.InOut"));
 
-    SNAPRegistryIO::WriteEdgePreprocessingSettings(
+    regio.WriteEdgePreprocessingSettings(
       parmPreprocessEdge,registry.Folder("Preprocessing.Edge"));
 
-    SNAPRegistryIO::WriteThresholdSettings(
+    regio.WriteThresholdSettings(
       parmPreprocessInOut,registry.Folder("Preprocessing.InOut"));
 
     // Store the default position (center of image, kinda-dumb)
@@ -694,17 +700,17 @@ TestCompareLevelSets
   }
 
   // Read snake parameters from the registry
-  parmSnakeEdge = SNAPRegistryIO::ReadSnakeParameters(
+  parmSnakeEdge = regio.ReadSnakeParameters(
     registry.Folder("SnakeParameters.Edge"),parmSnakeEdge);
   
-  parmSnakeInOut = SNAPRegistryIO::ReadSnakeParameters(
+  parmSnakeInOut = regio.ReadSnakeParameters(
     registry.Folder("SnakeParameters.InOut"),parmSnakeInOut);
 
   // Read preprocessing settings from the registry
-  parmPreprocessEdge = SNAPRegistryIO::ReadEdgePreprocessingSettings(
+  parmPreprocessEdge = regio.ReadEdgePreprocessingSettings(
     registry.Folder("Preprocessing.Edge"),parmPreprocessEdge);
 
-  parmPreprocessInOut = SNAPRegistryIO::ReadThresholdSettings(
+  parmPreprocessInOut = regio.ReadThresholdSettings(
     registry.Folder("Preprocessing.InOut"),parmPreprocessInOut);
 
   // Read the seed position 
