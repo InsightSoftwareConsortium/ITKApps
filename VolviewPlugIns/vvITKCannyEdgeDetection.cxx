@@ -67,6 +67,9 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     info->SetProperty( info, VVP_ERROR, except.what() ); 
     return -1;
   }
+
+  info->SetProperty(info,VVP_RESULTING_COMPONENT_1_UNITS,"Canny Edges");
+  
   return 0;
 }
 
