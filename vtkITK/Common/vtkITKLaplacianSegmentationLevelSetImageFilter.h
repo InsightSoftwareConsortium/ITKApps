@@ -40,7 +40,7 @@ class VTK_EXPORT vtkITKLaplacianSegmentationLevelSetImageFilter : public vtkITKI
     DelegateITKInputMacro ( SetNumberOfIterations, value );
   };
 
-  int GetNumberOfIterations( int value )
+  int GetNumberOfIterations( )
   {
     DelegateITKOutputMacro ( GetNumberOfIterations );
   };
@@ -159,7 +159,7 @@ private:
   
 };
 
-vtkCxxRevisionMacro(vtkITKLaplacianSegmentationLevelSetImageFilter, "$Revision: 1.8 $");
+vtkCxxRevisionMacro(vtkITKLaplacianSegmentationLevelSetImageFilter, "$Revision: 1.9 $");
 vtkStandardNewMacro(vtkITKLaplacianSegmentationLevelSetImageFilter);
 
 #endif

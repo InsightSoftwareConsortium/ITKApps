@@ -70,7 +70,7 @@ class VTK_EXPORT vtkITKThresholdSegmentationLevelSetImageFilter : public vtkITKI
     DelegateITKInputMacro( SetMaximumIterations, value );
   };
 
-  int GetMaximumIterations( int value )
+  int GetMaximumIterations( )
   {
     DelegateITKOutputMacro( GetMaximumIterations );
   };
@@ -180,7 +180,7 @@ private:
   
 };
 
-vtkCxxRevisionMacro(vtkITKThresholdSegmentationLevelSetImageFilter, "$Revision: 1.9 $");
+vtkCxxRevisionMacro(vtkITKThresholdSegmentationLevelSetImageFilter, "$Revision: 1.10 $");
 vtkStandardNewMacro(vtkITKThresholdSegmentationLevelSetImageFilter);
 
 #endif
