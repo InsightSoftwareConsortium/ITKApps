@@ -8,10 +8,10 @@ decl {\#include <stdio.h>} {public
 decl {\#include <string.h>} {public
 } 
 
-decl {\#include <Fl/fl_ask.h>} {public
+decl {\#include <FL/fl_ask.H>} {public
 } 
 
-decl {\#include <Fl/fl_file_chooser.h>} {public
+decl {\#include <FL/Fl_File_Chooser.H>} {public
 } 
 
 class UserInterface {open : {public UserInterfaceBase}
