@@ -30,6 +30,8 @@ ADD_EXECUTABLE(AnisotropicDiffusionFltkGui2D ${AnisotropicDiffusionFltkGui2D_SRC
 
 FLTK_WRAP_UI(AnisotropicDiffusionFltkGui3D   ${AnisotropicDiffusionFltkGui3D_GUI_SRCS})
 FLTK_WRAP_UI(AnisotropicDiffusionFltkGui2D   ${AnisotropicDiffusionFltkGui2D_GUI_SRCS})
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${AnisotropicDiffusionFltkGui3D_GUI_SRCS}")
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${AnisotropicDiffusionFltkGui2D_GUI_SRCS}")
 
 TARGET_LINK_LIBRARIES(AnisotropicDiffusionFltkGui2D ITKFltkImageViewer ITKIO
                       ITKBasicFilters)

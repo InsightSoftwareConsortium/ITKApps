@@ -58,3 +58,4 @@ ENDIF(WIN32)
 ADD_EXECUTABLE(WatershedSegmentationFltkGui3D ${WatershedSegmentationFltkGui3D_SRCS})
 
 FLTK_WRAP_UI(WatershedSegmentationFltkGui3D   ${WatershedSegmentationFltkGui3D_GUI_SRCS})
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${WatershedSegmentationFltkGui3D_GUI_SRCS}")

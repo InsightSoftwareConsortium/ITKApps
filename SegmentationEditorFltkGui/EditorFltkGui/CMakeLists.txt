@@ -89,3 +89,4 @@ ENDIF(WIN32)
 ADD_EXECUTABLE(EditorFltkGui ${EditorFltkGui_SRCS})
 
 FLTK_WRAP_UI(EditorFltkGui   ${EditorFltkGui_GUI_SRCS})
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${EditorFltkGui_GUI_SRCS}")
