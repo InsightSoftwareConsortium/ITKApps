@@ -26,7 +26,6 @@ public:
   typedef TransformType::PointSetType         PointSetType;
   typedef PointSetType::PointsContainer       LandmarkContainer;
   typedef LandmarkContainer::Pointer          LandmarkContainerPointer;
-  typedef LandmarkContainer::Iterator         LandmarkIterator;
   typedef PointSetType::PointType             LandmarkType;
 
   typedef float                   MarkersCoordinatesType;
@@ -179,7 +178,7 @@ CopyOutputData( vtkVVPluginInfo *info, const vtkVVProcessDataStruct * pds )
   PixelType * outData = static_cast< PixelType * >( pds->outData );
     
   // do we append or replace
-  const char *result = info->GetGUIProperty(info, 1, VVP_GUI_VALUE);
+  const char *result = info->GetGUIProperty(info, 0, VVP_GUI_VALUE);
   if (result && !strcmp(result,"Append The Volumes"))
     {
     // Copy the data (with casting) to the output buffer
@@ -221,30 +220,27 @@ Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
 {
   m_Info = info;
 
-  const unsigned int numberOfLandmarks = info->NumberOfMarkers;
+  const unsigned int numberOfMarkers = info->NumberOfMarkers;
 
-  if( numberOfLandmarks == 0 )
+  if( numberOfMarkers == 0 )
     {
     info->SetProperty( info, VVP_ERROR, "This plugins requires the user to provide a set of 3D markers pairs"); 
     return -1;
     }
 
-  if( ( numberOfLandmarks & 1 ) == 0 )
+  if( ( numberOfMarkers & 1 ) == 1 )
     {
     info->SetProperty( info, VVP_ERROR, "The number of 3D markers must be even. They should form pairs"); 
     return -1;
     }
 
+  const unsigned int numberOfLandmarks = numberOfMarkers / 2;
 
   LandmarkContainerPointer sourceLandmarks   = m_SourceLandmarks->GetPoints();
   LandmarkContainerPointer targetLandmarks   = m_TargetLandmarks->GetPoints();
 
-  sourceLandmarks->Reserve( numberOfLandmarks / 2 );
-  targetLandmarks->Reserve( numberOfLandmarks / 2 );
-
-  LandmarkIterator         sourceLandmarkItr = sourceLandmarks->Begin();
-  LandmarkIterator         targetLandmarkItr = targetLandmarks->Begin();
-
+  sourceLandmarks->Reserve( numberOfLandmarks );
+  targetLandmarks->Reserve( numberOfLandmarks );
 
   LandmarkType landmark;
 
@@ -257,11 +253,13 @@ Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
     landmark[0] = *markersCoordinates++; 
     landmark[1] = *markersCoordinates++;
     landmark[2] = *markersCoordinates++;
-    sourceLandmarks->InsertElement( landmarkId, landmark );
+    targetLandmarks->InsertElement( landmarkId, landmark );
+
     landmark[0] = *markersCoordinates++; 
     landmark[1] = *markersCoordinates++;
     landmark[2] = *markersCoordinates++;
-    targetLandmarks->InsertElement( landmarkId, landmark );
+    sourceLandmarks->InsertElement( landmarkId, landmark );
+
     landmarkId++;
     }
 
@@ -334,7 +332,6 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       result = runner.Execute( info, pds );
       break; 
       }
-/*   ONLY DO A COUPLE OF TYPES WHILE WE DEBUG THIS
     case VTK_SHORT:
       {
       LandmarkWarpingRunner<signed short> runner;
@@ -377,7 +374,6 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       result = runner.Execute( info, pds );
       break; 
       }
-*/
     }
   }
   catch( itk::ExceptionObject & except )
@@ -409,15 +405,12 @@ static int UpdateGUI(void *inf)
   memcpy(info->OutputVolumeOrigin,info->InputVolumeOrigin,
          3*sizeof(float));
 
-  // really the memory consumption is one copy of the resampled output for
-  // the resample filter plus the gradient for the 1/8th res volume plus the
-  // two 1/8th res resampled inputs
-  sprintf(tmp,"%f",
-          info->InputVolumeScalarSize + 3.0*sizeof(float)/8.0 + 0.5);
+  // really the memory consumption is double of the input image
+  sprintf(tmp,"%f", info->InputVolumeScalarSize * 2);
   info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED, tmp); 
 
   // what output format is selected
-  const char *result = info->GetGUIProperty(info, 1, VVP_GUI_VALUE);
+  const char *result = info->GetGUIProperty(info, 0, VVP_GUI_VALUE);
   if (result && !strcmp(result,"Append The Volumes"))
     {
     info->OutputVolumeNumberOfComponents = 
