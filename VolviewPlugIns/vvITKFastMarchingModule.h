@@ -50,9 +50,9 @@ public:
   typedef itk::ImportImageFilter< InputPixelType, 
                                   Dimension       > ImportFilterType;
 
-  typedef ImportFilterType::SizeType      SizeType;
-  typedef ImportFilterType::IndexType     IndexType;
-  typedef ImportFilterType::RegionType    RegionType;
+  typedef itk::ImageRegion<Dimension>    RegionType;
+  typedef RegionType::IndexType          IndexType;
+  typedef RegionType::SizeType           SizeType;
 
   // Instantiate the GradientMagnitude filter.
   // This filter is the first stage in 
