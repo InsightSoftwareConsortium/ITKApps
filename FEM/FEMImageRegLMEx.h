@@ -19,9 +19,6 @@
 
 #include "itkImageFileReader.h" 
 #include "itkImageFileWriter.h"
-#include "itkImageFileReader.h"
-#include "itkRawImageIO.h"
-#include "itkRawImageWriter.h"
 #include "itkRescaleIntensityImageFilter.h"
 #include "itkHistogramMatchingImageFilter.h"
 #include "itkFEMRegistrationFilter.h"
