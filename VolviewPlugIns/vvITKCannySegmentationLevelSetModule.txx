@@ -5,7 +5,6 @@
 #define _itkVVCannySegmentationLevelSetModule_txx
 
 #include "vvITKCannySegmentationLevelSetModule.h"
-#include <fstream>
 
 namespace VolView 
 {
@@ -47,6 +46,8 @@ CannySegmentationLevelSetModule<TInputPixelType>
   m_CannySegmentationLevelSetFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
   m_FastMarchingImageFilter->AddObserver(              itk::ProgressEvent(), this->GetCommandObserver() );
   m_IntensityWindowingFilter->AddObserver(        itk::ProgressEvent(), this->GetCommandObserver() );
+
+  m_FastMarchingImageFilter->SetTrialPoints( m_NodeContainer );
 
   m_InitialSeedValue     = 0.0;
   m_CurrentNumberOfSeeds =   0;
@@ -272,6 +273,7 @@ CannySegmentationLevelSetModule<TInputPixelType>
 
   // Execute the filters and progressively remove temporary memory
   m_FastMarchingImageFilter->Update();
+
   m_CannySegmentationLevelSetFilter->Update();
 
   if( m_PerformPostprocessing )
@@ -316,14 +318,6 @@ CannySegmentationLevelSetModule<TInputPixelType>
       m_IntensityWindowingFilter->SetWindowMaximum( -minimum );
       m_IntensityWindowingFilter->SetWindowMinimum(  minimum );
       }
-    }
-  else
-    {
-    std::ofstream ofs("Azucar.txt");
-    ofs << "Minimum < 0 && Maximum > 0 assertion failed";
-    ofs << "Minimum = " << minimum << std::endl;
-    ofs << "Maximum = " << maximum << std::endl;
-    ofs.close(); 
     }
 
   m_IntensityWindowingFilter->Update();
