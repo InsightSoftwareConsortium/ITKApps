@@ -427,7 +427,7 @@ void LiverTumorSegmentation::OnSegmentationParametersOk( int module )
 
      case CONFIDENCE_CONNECTED:
       this->m_ConfidenceConnectedModule.SetMultiplier( atof(m_Parameter001->value() ) );
-      this->m_ConfidenceConnectedModule.SetNumberOfIterations( atof(m_Parameter002->value() ) );
+      this->m_ConfidenceConnectedModule.SetNumberOfIterations( (unsigned int)atof(m_Parameter002->value() ) );
       this->m_ConfidenceConnectedModule.SetInitialNeighborhoodRadius( (unsigned int)atof(m_Parameter003->value() ) );
       this->m_ConfidenceConnectedModule.SetSmoothingTimeStep( atof(m_Parameter101->value() ) );
       this->m_ConfidenceConnectedModule.SetSmoothingIterations( atoi(m_Parameter102->value() ) );
