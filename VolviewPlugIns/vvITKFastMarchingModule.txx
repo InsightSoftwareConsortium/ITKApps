@@ -31,12 +31,14 @@ FastMarchingModule<TInputPixelType>
 
     m_PerformPostprocessing   = true;
 
+    const float couplingFactor = 1.0;
+
     m_NodeContainer->Initialize();
     m_FastMarchingFilter->SetTrialPoints( m_NodeContainer );
-    m_FastMarchingFilter->SetNormalizationFactor( 255.0 );
+    m_FastMarchingFilter->SetNormalizationFactor( couplingFactor );
 
-    m_SigmoidFilter->SetOutputMinimum(   0 );
-    m_SigmoidFilter->SetOutputMaximum( 255 );
+    m_SigmoidFilter->SetOutputMinimum( 0.0 );
+    m_SigmoidFilter->SetOutputMaximum( couplingFactor );
 
     m_CurrentNumberOfSeeds    = 0;
 
