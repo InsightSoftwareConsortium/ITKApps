@@ -40,7 +40,7 @@ class UserInterface {open : {public UserInterfaceBase}
       xywh {273 68 875 710} align 0 resizable
       code0 {\#include "UserInterfaceBase.h"} visible
     } {
-      Fl_Group Controls {
+      Fl_Group Controls {open
         xywh {0 0 145 710} box FLAT_BOX color 53
       } {
         Fl_Menu_Bar m_MenubarMain {
@@ -128,7 +128,7 @@ class UserInterface {open : {public UserInterfaceBase}
           }
         }
         Fl_Wizard m_WizControlPane {
-          label {Control Pane}
+          label {Control Pane} open
           xywh {0 25 145 680} box NO_BOX align 16
         } {
           Fl_Group m_GrpToolbarPage {
@@ -295,7 +295,7 @@ m_GlobalState->SetCoverageMode(PAINT_OVER_ONE);}
               }
             }
           }
-          Fl_Group m_GrpWelcomePage {
+          Fl_Group m_GrpWelcomePage {open
             xywh {0 25 145 680} color 53 hide
           } {
             Fl_Group {} {
@@ -303,7 +303,7 @@ m_GlobalState->SetCoverageMode(PAINT_OVER_ONE);}
               xywh {5 195 135 35} labelfont 3 labelsize 24 align 0
             } {}
             Fl_Group {} {
-              label {Version 0.2 - (Pre-Alpha)} open
+              label {Version 0.4 - (Alpha)} open
               xywh {5 225 135 20} labelsize 12 align 145
             } {}
             Fl_Group {} {
@@ -311,7 +311,8 @@ m_GlobalState->SetCoverageMode(PAINT_OVER_ONE);}
               xywh {10 525 125 165} box PLASTIC_UP_BOX labeltype EMBOSSED_LABEL labelsize 12 labelcolor 4 align 129
             } {
               Fl_Group {} {
-                label {Choose File->Load->Grey Data from the menu above to get started!} open
+                label {Disclaimer:
+This is an early alpha version of the software.  Some features are missing and broken.  Please refer to README.html for more information! } open selected
                 xywh {15 535 115 110} labelsize 11 align 149
               } {}
               Fl_Button {} {
@@ -795,7 +796,7 @@ m_SNAPWindow2D[1]->redraw();}
             xywh {510 355 365 355} box UP_BOX
           } {
             Fl_Scrollbar {m_InSNAPSliceSlider[2]} {
-              callback {this->OnSNAPSliceSliderChange(2);} selected
+              callback {this->OnSNAPSliceSliderChange(2);}
               xywh {855 360 15 320} minimum 1 maximum 0
             }
             Fl_Box {m_SNAPWindow2D[2]} {
