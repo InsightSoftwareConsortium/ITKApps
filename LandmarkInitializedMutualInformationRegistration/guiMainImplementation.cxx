@@ -1504,12 +1504,12 @@ guiMainImplementation
     {
     this->ChangeStatusDisplay("Registering using the rigid method...") ;
   
-    if ( tkRigidUseUserRegion->value() == true 
+    if ( tkRigidUseUserRegion->value() == 1
          && tkFixedImageViewer->IsRegionOfInterestAvailable() )
       {
       region = tkFixedImageViewer->GetRegionOfInterest() ;
       }
-    else if ( tkRigidUseLandmarkRegion->value() == true 
+    else if ( tkRigidUseLandmarkRegion->value() == 1 
               && tkFixedImageViewer->GetNumberOfLandmarks() == 4 )
       {
       region = tkFixedImageViewer->ComputeLandmarkRegion
@@ -1524,12 +1524,12 @@ guiMainImplementation
     case 1: // affine
     {
     this->ChangeStatusDisplay("Registering using the affine method...") ;
-    if ( tkAffineUseUserRegion->value() == true 
+    if ( tkAffineUseUserRegion->value() == 1
          && tkFixedImageViewer->IsRegionOfInterestAvailable() )
       {
       region = tkFixedImageViewer->GetRegionOfInterest() ;
       }
-    else if ( tkAffineUseLandmarkRegion->value() == true 
+    else if ( tkAffineUseLandmarkRegion->value() == 1 
               && tkFixedImageViewer->GetNumberOfLandmarks() == 4 )
       {
       region = tkFixedImageViewer->ComputeLandmarkRegion
