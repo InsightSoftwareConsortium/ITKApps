@@ -75,10 +75,10 @@ Load( const char * )
   Fl_Button cancel(40, 240, 60, 25, "cancel");
   Fl_Return_Button ok(120, 240, 60, 25, "OK");
   Fl_Menu_Item pulldown[] = {
-    {"Unsigned Char"},
-    {"Unsigned Short"},
-    {"Float"},
-    {0}
+    {"Unsigned Char", 0, 0, 0, 0, 0, 0, 0, 0},
+    {"Unsigned Short", 0, 0, 0, 0, 0, 0, 0, 0},
+    {"Float", 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0}
   };
   Fl_Choice ch(45,140,140,25,"Data:"); ch.menu(pulldown);
 
