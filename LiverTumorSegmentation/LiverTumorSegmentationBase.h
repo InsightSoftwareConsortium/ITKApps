@@ -31,10 +31,6 @@
 
 const int NUMBER_OF_ALGORITHMS = 7;
 
-static char *ModuleNames[] = { "Threshold Module", "Threshold Level Set Module", "Confidence Connected Module", 
-    "Connected Threshold Module", "Isolated Connected Module", "Fast Marching Module",
-    "Geodesic Active Contour Module", "Watershed Module"
-    }; 
 
 typedef enum { THRESHOLD = 1, THRESHOLD_LEVEL_SET, CONFIDENCE_CONNECTED, CONNECTED_THRESHOLD, 
   ISOLATED_CONNECTED, FAST_MARCHING, GEODESIC_ACTIVE_CONTOUR, WATERSHED} SegmentationModuleType;

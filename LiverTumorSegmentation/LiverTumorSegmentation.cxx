@@ -11,6 +11,12 @@
 
 #include "vtkImageBlend.h"
 
+static char *LiverTumorSegmentationModuleNames[] = { "Threshold Module",
+  "Threshold Level Set Module", "Confidence Connected Module", 
+  "Connected Threshold Module", "Isolated Connected Module", 
+  "Fast Marching Module", "Geodesic Active Contour Module", "Watershed Module"
+    }; 
+
 LiverTumorSegmentation::LiverTumorSegmentation()
   {
   m_AxialViewer.SetOrientation(    ISIS::ImageSliceViewer::Axial    );
@@ -60,7 +66,7 @@ LiverTumorSegmentation::LiverTumorSegmentation()
   
   for(unsigned int i=0; i<NUMBER_OF_ALGORITHMS; i++)
     {
-    m_Module->add( ModuleNames[i] );
+    m_Module->add( LiverTumorSegmentationModuleNames[i] );
     }
 }
 
