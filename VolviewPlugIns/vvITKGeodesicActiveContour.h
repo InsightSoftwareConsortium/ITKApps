@@ -118,14 +118,13 @@ public:
 
     vtkVVPluginInfo *info = this->GetPluginInfo();
 
-    const float zeroSetValue          = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
-    const float gaussianSigma         = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
-    const float curvatureScaling      = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ));
-    const float propagationScaling    = atof( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ));
-    const float advectionScaling      = atof( info->GetGUIProperty(info, 4, VVP_GUI_VALUE ));
-    const float maximumRMSError       = atof( info->GetGUIProperty(info, 5, VVP_GUI_VALUE ));
+    const float gaussianSigma         = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
+    const float curvatureScaling      = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
+    const float propagationScaling    = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ));
+    const float advectionScaling      = atof( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ));
+    const float maximumRMSError       = atof( info->GetGUIProperty(info, 4, VVP_GUI_VALUE ));
 
-    const unsigned int maximumNumberOfIterations = atoi( info->GetGUIProperty(info, 6, VVP_GUI_VALUE ));
+    const unsigned int maximumNumberOfIterations = atoi( info->GetGUIProperty(info, 5, VVP_GUI_VALUE ));
 
 
     filter->SetDerivativeSigma( gaussianSigma );
