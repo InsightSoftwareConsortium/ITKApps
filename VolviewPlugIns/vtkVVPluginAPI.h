@@ -77,11 +77,16 @@ VVP_ABORT_PROCESSING
   a flag indicating that the plugin should abort processing
 
 VVP_REPORT_TEXT
-  a stirng to be displayed in the GUI. This string can be used to provide
+  a string to be displayed in the GUI. This string can be used to provide
   information on the execution of the plugin. Exmaples of output include
   factors such as run time, number of polygons produced, number of iterations
   run, resulting error etc.
-  
+
+VVP_REQUIRES_SECOND_INPUT
+  indicates that this plugin requires a second volume input to be
+  provided. When set this will cause VolView to prompt for the second input
+  and use it to fill in the plugin structure members for the second input.
+
 =========================================================================*/
 
   
@@ -124,6 +129,7 @@ VVP_REPORT_TEXT
 #define VVP_ABORT_PROCESSING             10  
 #define VVP_REPORT_TEXT                  11
 #define VVP_GROUP                        12
+#define VVP_REQUIRES_SECOND_INPUT        13
   
 #define VVP_GUI_LABEL   0
 #define VVP_GUI_TYPE    1
@@ -150,6 +156,8 @@ gets passed into the ProcessData function.
   typedef struct {
     /* the input data pointer */
     void *inData; 
+    /* the second input data pointer (for two input plugins) */
+    void *inData2; 
     /* the output data pointer */
     void *outData; 
     /* what slice to start processing on (used for pieces) */    
@@ -177,14 +185,29 @@ gets passed into the ProcessData function.
 
     /* these are the characteristics of the input data */
     int InputVolumeScalarType;
+    int InputVolumeScalarSize;
     int InputVolumeNumberOfComponents;
     int InputVolumeDimensions[3];
     float InputVolumeSpacing[3];
     float InputVolumeOrigin[3];
     double InputVolumeScalarRange[2]; /* actual scalar range */
     double InputVolumeScalarTypeRange[2]; /* possible scalar range */
+
+    /* if there is a second input here are its characteristics */
+    int InputVolume2ScalarType;
+    int InputVolume2ScalarSize;
+    int InputVolume2NumberOfComponents;
+    int InputVolume2Dimensions[3];
+    float InputVolume2Spacing[3];
+    float InputVolume2Origin[3];
+    double InputVolume2ScalarRange[2]; /* actual scalar range */
+    double InputVolume2ScalarTypeRange[2]; /* possible scalar range */
+    
     int NumberOfMarkers;
-    float *Markers;
+    float *Markers; /* the xyz positions of the seed points/markers */
+    /* the -x x -y y -z z clopping planes in world coordinates, */
+    /* there will be six values */
+    float *CroppingPlanes; 
     
     /* specify the charateristics of the output data */
     int OutputVolumeScalarType;
