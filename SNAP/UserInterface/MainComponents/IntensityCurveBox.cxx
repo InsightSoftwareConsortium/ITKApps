@@ -58,7 +58,7 @@ IntensityCurveBox
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    double modelMatrix[16], projMatrix[16];
+    GLdouble modelMatrix[16], projMatrix[16];
     GLint viewport[4];
     glGetDoublev(GL_MODELVIEW_MATRIX, modelMatrix);
     glGetDoublev(GL_PROJECTION_MATRIX, projMatrix);

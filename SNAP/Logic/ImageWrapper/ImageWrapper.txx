@@ -149,12 +149,12 @@ ImageWrapper<TPixel>
   // Call the common update method
   UpdateImagePointer(image);
 
-  // Update the slice index
-  SetSliceIndex(source->GetSliceIndex());
-
   // Update the image-display transforms
   for(unsigned int d=0;d<3;d++)
     SetImageToDisplayTransform(d,source->GetImageToDisplayTransform(d));
+
+  // Update the slice index
+  SetSliceIndex(source->GetSliceIndex());
 }
 
 template <class TPixel>
@@ -173,12 +173,12 @@ ImageWrapper<TPixel>
   // Call the common update method
   UpdateImagePointer(newImage);
 
-  // Update the slice index
-  SetSliceIndex(source->GetSliceIndex());
-
   // Update the image-display transforms
   for(unsigned int d=0;d<3;d++)
     SetImageToDisplayTransform(d,source->GetImageToDisplayTransform(d));
+
+  // Update the slice index
+  SetSliceIndex(source->GetSliceIndex());
 }
 
 template <class TPixel>
