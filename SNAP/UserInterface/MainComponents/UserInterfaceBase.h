@@ -130,12 +130,6 @@ public:
   virtual void MakeSegTexturesCurrent() = 0;
   virtual void UpdateMainLabel() = 0;
 
-  // Display options callbacks
-  virtual void OnSliceAnatomyOptionsChange(unsigned int order) = 0;
-  virtual void OnDisplayOptionsCancelAction() = 0;
-  virtual void OnDisplayOptionsOkAction() = 0;
-  virtual void OnDisplayOptionsApplyAction() = 0;
-  
   // Opacity sliders  
   virtual void OnIRISLabelOpacityChange() = 0;
   virtual void OnSNAPLabelOpacityChange() = 0;

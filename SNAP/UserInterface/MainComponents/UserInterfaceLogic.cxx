@@ -28,6 +28,7 @@
 #include "SystemInterface.h"
 
 // Additional UI component inludes
+#include "AppearanceDialogUILogic.h"
 #include "HelpViewerLogic.h"
 #include "PreprocessingUILogic.h"
 #include "SnakeParametersUILogic.h"
@@ -117,6 +118,11 @@ UserInterfaceLogic
   m_DlgResampleRegion = new ResizeRegionDialogLogic;
   m_DlgResampleRegion->MakeWindow();
 
+  // Initialize the appearance dialog
+  m_DlgAppearance = new AppearanceDialogUILogic;
+  m_DlgAppearance->MakeWindow();
+  m_DlgAppearance->Register(this);
+
   // Initialize the slice window coordinator object
   m_SliceCoordinator = new SliceWindowCoordinator();
   
@@ -173,6 +179,7 @@ UserInterfaceLogic
   delete m_PreprocessingUI;
   delete m_DlgRestoreSettings;
   delete m_DlgResampleRegion;
+  delete m_DlgAppearance;
 
   // Delete the window coordinator
   delete m_SliceCoordinator;
@@ -1351,11 +1358,9 @@ UserInterfaceLogic
   if(m_AppearanceSettings->GetFlagLinkedZoomByDefault())
     {
     m_ChkLinkedZoom->value(1);
+    m_InZoomPercentage->value(100.0);
     OnLinkedZoomChange();
     }
-
-  // Apply the appearance settings to the user interface
-  ApplyAppearanceSettings();
 }
 
 void 
@@ -1905,167 +1910,11 @@ UserInterfaceLogic
 
 void 
 UserInterfaceLogic
-::ApplyRenderingOptions() 
-{
-  // Get the current mesh options
-  MeshOptions mops;
-
-  // Set the Gaussian properties
-  mops.SetGaussianStandardDeviation(
-    m_InRenderOptionsGaussianStandardDeviation->value());
-  mops.SetUseGaussianSmoothing(
-    m_InUseGaussianSmoothing->value());
-  mops.SetGaussianError(
-    m_InRenderOptionsGaussianError->value());
-
-  // Triangle Decimation
-  mops.SetUseDecimation(
-    m_InUseDecimate->value());
-  mops.SetDecimateAspectRatio(
-    m_InRenderOptionsDecimateAspectRatio->value());
-  mops.SetDecimateErrorIncrement(
-    m_InRenderOptionsDecimateErrorIncrement->value());
-  mops.SetDecimateFeatureAngle(
-    m_InRenderOptionsDecimateFeatureAngle->value());
-  mops.SetDecimateInitialError(
-    m_InRenderOptionsDecimateInitialError->value());
-  mops.SetDecimateMaximumIterations(
-    (unsigned int)m_InRenderOptionsDecimateIterations->value());
-  mops.SetDecimatePreserveTopology(
-    m_InRenderOptionsDecimateTopology->value());
-  mops.SetDecimateTargetReduction(
-    m_InRenderOptionsDecimateReductions->value());
-
-  // Mesh Smoothing
-  mops.SetUseMeshSmoothing(
-    m_InUseMeshSmoothing->value());  
-  mops.SetMeshSmoothingBoundarySmoothing(
-    m_InRenderOptionsMeshSmoothBoundarySmoothing->value());
-  mops.SetMeshSmoothingConvergence(
-    m_InRenderOptionsMeshSmoothConvergence->value());
-  mops.SetMeshSmoothingFeatureAngle(
-    m_InRenderOptionsMeshSmoothFeatureAngle->value());
-  mops.SetMeshSmoothingFeatureEdgeSmoothing(
-    m_InRenderOptionsMeshSmoothFeatureEdge->value());
-  mops.SetMeshSmoothingIterations(
-    (unsigned int)m_InRenderOptionsMeshSmoothIterations->value());
-  mops.SetMeshSmoothingRelaxationFactor(
-    m_InRenderOptionsMeshSmoothRelaxation->value());
-
-  // Save the mesh options
-  m_GlobalState->SetMeshOptions(mops);
-}
-
-void 
-UserInterfaceLogic
-::FillRenderingOptions() 
-{
-  // Get the current mesh options
-  MeshOptions mops = m_GlobalState->GetMeshOptions();
-
-  // Set the Gaussian properties
-  m_InRenderOptionsGaussianStandardDeviation->value(
-    mops.GetGaussianStandardDeviation());
-  m_InUseGaussianSmoothing->value(
-    mops.GetUseGaussianSmoothing());
-  m_InRenderOptionsGaussianError->value(
-    mops.GetGaussianError());
-
-  // Triangle Decimation
-  m_InUseDecimate->value(
-    mops.GetUseDecimation());
-  m_InRenderOptionsDecimateAspectRatio->value(
-    mops.GetDecimateAspectRatio());
-  m_InRenderOptionsDecimateErrorIncrement->value(
-    mops.GetDecimateErrorIncrement());
-  m_InRenderOptionsDecimateFeatureAngle->value(
-    mops.GetDecimateFeatureAngle());
-  m_InRenderOptionsDecimateInitialError->value(
-    mops.GetDecimateInitialError());
-  m_InRenderOptionsDecimateIterations->value(
-    (double)mops.GetDecimateMaximumIterations());
-  m_InRenderOptionsDecimateTopology->value(
-    mops.GetDecimatePreserveTopology());
-  m_InRenderOptionsDecimateReductions->value(
-    mops.GetDecimateTargetReduction());
-
-  // Mesh Smoothing
-  m_InUseMeshSmoothing->value(
-    mops.GetUseMeshSmoothing());  
-  m_InRenderOptionsMeshSmoothBoundarySmoothing->value(
-    mops.GetMeshSmoothingBoundarySmoothing());
-  m_InRenderOptionsMeshSmoothConvergence->value(
-    mops.GetMeshSmoothingConvergence());
-  m_InRenderOptionsMeshSmoothFeatureAngle->value(
-    mops.GetMeshSmoothingFeatureAngle());
-  m_InRenderOptionsMeshSmoothFeatureEdge->value(
-    mops.GetMeshSmoothingFeatureEdgeSmoothing());
-  m_InRenderOptionsMeshSmoothIterations->value(
-    (double)mops.GetMeshSmoothingIterations());
-  m_InRenderOptionsMeshSmoothRelaxation->value(
-    mops.GetMeshSmoothingRelaxationFactor());
-}
-
-void 
-UserInterfaceLogic
-::FillSliceLayoutOptions() 
-{
-  // Hack
-  if(!m_OutDisplayOptionsPanel[0]->value() ||
-     strlen(m_OutDisplayOptionsPanel[0]->value()) == 0)
-    {
-    OnSliceAnatomyOptionsChange(0);
-    }
-}
-
-void 
-UserInterfaceLogic
 ::OnMenuShowDisplayOptions()
 {
-  FillSliceLayoutOptions();
-  FillRenderingOptions();
-  m_WinDisplayOptions->show();
+  m_DlgAppearance->ShowDialog();
 }
 
-void 
-UserInterfaceLogic
-::OnDisplayOptionsCancelAction()
-{
-  this->m_WinDisplayOptions->hide();
-}
-
-void 
-UserInterfaceLogic
-::OnDisplayOptionsOkAction()
-{
-  OnDisplayOptionsApplyAction();
-  this->m_WinDisplayOptions->hide();
-}
-
-void 
-UserInterfaceLogic
-::OnDisplayOptionsApplyAction()
-{
-  // Store the appearance options
-  m_AppearanceSettings->SetFlagDisplayZoomThumbnail(
-    m_ChkOptionsSliceThumbnailOn->value() != 0);
-  m_AppearanceSettings->SetFlagLinkedZoomByDefault(
-    m_ChkOptionsSliceLinkedZoom->value() != 0);
-  m_AppearanceSettings->SetZoomThumbnailSizeInPercent(
-    m_InOptionsSliceThumbnailPercent->value());
-  m_AppearanceSettings->SetZoomThumbnailMaximumSize(
-    (int) m_InOptionsSliceThumbnailMaxSize->value());
-
-  // Place the options in the registry
-  m_AppearanceSettings->SaveToRegistry(
-    m_SystemInterface->Folder("UserInterface.AppearanceSettings"));
-
-  // Apply the options 
-  ApplyAppearanceSettings();
-
-  // Also, apply the rendering options
-  ApplyRenderingOptions();
-}
 
 void
 UserInterfaceLogic
@@ -2116,85 +1965,6 @@ UserInterfaceLogic
       m_GrpIRISWindows->w(),m_GrpIRISWindows->h());
     panels[i]->redraw();
     }
-}
-
-void 
-UserInterfaceLogic
-::ApplyAppearanceSettings()
-{
-  // Propagate the settings to the controls 
-  m_ChkOptionsSliceThumbnailOn->value(
-    m_AppearanceSettings->GetFlagDisplayZoomThumbnail() ? 1 : 0);
-  m_ChkOptionsSliceLinkedZoom->value(
-    m_AppearanceSettings->GetFlagLinkedZoomByDefault() ? 1 : 0);
-  m_InOptionsSliceThumbnailPercent->value(
-    m_AppearanceSettings->GetZoomThumbnailSizeInPercent());
-  m_InOptionsSliceThumbnailMaxSize->value(
-    (double) m_AppearanceSettings->GetZoomThumbnailMaximumSize());
-
-  // Cause a refresh
-  RedrawWindows();
-
-  // The slice layout options are pushed
-  ApplySliceLayoutOptions();
-}
-
-void 
-UserInterfaceLogic
-::ApplySliceLayoutOptions()
-{
-  unsigned int order[6][3] = 
-    {{0,1,2},{0,2,1},{1,0,2},{1,2,0},{2,0,1},{2,1,0}};
-
-  // Search for the selected orientation toggle
-  unsigned int i;
-  for(i=0;i<6;i++)
-    if(m_BtnOptionsViews2D[i]->value())
-      break;
-
-  // Make sure something is selected
-  if(i == 6) return;
-
-  // Start with stock orientations
-  string axes[3] = {string("RPS"),string("AIL"),string("RIP")};
-
-  // Switch the configurable directions
-  if(m_ChkOptionsViews2DRightIsLeft->value() == 0)
-    {
-    axes[0][0] = axes[2][0] = 'L';
-    }
-  if(m_ChkOptionsViews2DNoseLeft->value() == 0)
-    {
-    axes[1][0] = 'P';
-    }
-
-  // Check if the configuration is different
-  if(axes[order[i][0]] != string(m_Driver->GetDisplayToAnatomyRAI(0)) ||
-     axes[order[i][1]] != string(m_Driver->GetDisplayToAnatomyRAI(1)) ||
-     axes[order[i][2]] != string(m_Driver->GetDisplayToAnatomyRAI(2)))
-    {
-    // Assign the configuration
-    m_Driver->SetDisplayToAnatomyRAI(axes[order[i][0]].c_str(),
-                                     axes[order[i][1]].c_str(),
-                                     axes[order[i][2]].c_str());
-    // Reassign slices to windows
-    OnImageGeometryUpdate();
-
-    // Redraw the windows
-    RedrawWindows();
-    }
-}
-
-void 
-UserInterfaceLogic
-::OnSliceAnatomyOptionsChange(unsigned int option)
-{
-  static const char *labels[3] = {"Axial","Sagittal","Coronal"};
-  unsigned int order[6][3] = 
-    {{0,1,2},{0,2,1},{1,0,2},{1,2,0},{2,0,1},{2,1,0}};
-
-  for(unsigned int i=0;i<3;i++)
-    m_OutDisplayOptionsPanel[i]->value(labels[order[option][i]]);
 }
 
 void
@@ -2497,10 +2267,10 @@ UserInterfaceLogic
         }          
 
       // Update the mesh options display if necessary
-      if(m_DlgRestoreSettings->GetRestoreDisplayOptions())
-        {
-        FillRenderingOptions();
-        }
+      // if(m_DlgRestoreSettings->GetRestoreDisplayOptions())
+      //  {
+      //  FillRenderingOptions();
+      //  }
       }
     
     // The associated settings may have been updated in the dialog.
@@ -3190,6 +2960,9 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.23  2004/07/24 19:00:06  pauly
+ *ENH: Thumbnail UI for slice zooming
+ *
  *Revision 1.22  2004/07/22 19:22:49  pauly
  *ENH: Large image support for SNAP. This includes being able to use more screen real estate to display a slice, a fix to the bug with manual segmentation of images larger than the window size, and a thumbnail used when zooming into the image.
  *

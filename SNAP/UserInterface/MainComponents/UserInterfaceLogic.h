@@ -35,6 +35,7 @@ class SliceWindowCoordinator;
 class SimpleFileDialogLogic;
 class ResizeRegionDialogLogic;
 class SNAPAppearanceSettings;
+class AppearanceDialogUILogic;
 
 //template<class TPixel> class ImageIOWizardLogic;
 //class SegmentationImageIOWizardLogic;
@@ -639,15 +640,6 @@ protected:
 
   // Display options callbacks
   void OnMenuShowDisplayOptions();
-  void OnSliceAnatomyOptionsChange(unsigned int order);
-  void OnDisplayOptionsCancelAction();
-  void OnDisplayOptionsOkAction();
-  void OnDisplayOptionsApplyAction();
-  void ApplyRenderingOptions();
-  void ApplySliceLayoutOptions();
-  void ApplyAppearanceSettings();
-  void FillRenderingOptions();
-  void FillSliceLayoutOptions();
   
   // Opacity slider callbacks
   void OnSNAPLabelOpacityChange();
@@ -725,6 +717,9 @@ private:
   /** A dialog for resampling the image */
   ResizeRegionDialogLogic *m_DlgResampleRegion;
 
+  /** A dialog for showing display options */
+  AppearanceDialogUILogic *m_DlgAppearance;
+
   /** Help window */
   HelpViewerLogic *m_HelpUI;
 
@@ -782,6 +777,9 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.16  2004/07/24 19:00:06  pauly
+ *ENH: Thumbnail UI for slice zooming
+ *
  *Revision 1.15  2004/07/21 18:17:45  pauly
  *ENH: Enhancements to the way that the slices are displayed
  *
