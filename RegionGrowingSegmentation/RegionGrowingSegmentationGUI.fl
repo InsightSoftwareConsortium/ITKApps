@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0103 
+version 1.0104 
 header_name {.h} 
 code_name {.cxx}
 class RegionGrowingSegmentationGUI {open : {public RegionGrowingSegmentationBase}
@@ -7,7 +7,7 @@ class RegionGrowingSegmentationGUI {open : {public RegionGrowingSegmentationBase
   Function {RegionGrowingSegmentationGUI()} {} {
     Fl_Window consoleWindow {
       label {Region Growing Segmentation}
-      xywh {240 576 970 455}
+      xywh {240 576 970 455} type Double
       code0 {\#include <RegionGrowingSegmentationBase.h>}
       code1 {\#include <fltkLightButton.h>} visible
     } {
@@ -314,7 +314,7 @@ class RegionGrowingSegmentationGUI {open : {public RegionGrowingSegmentationBase
         }
         Fl_Button {} {
           label Save
-          callback {this->WriteFuzzyConnectedImage();} selected
+          callback {this->WriteFuzzyConnectedImage();}
           xywh {790 259 65 27} box ROUND_UP_BOX labelsize 12
         }
       }
@@ -346,15 +346,10 @@ class RegionGrowingSegmentationGUI {open : {public RegionGrowingSegmentationBase
         callback {m_FuzzyConnectedImageFilter->SetVariance( o->value() );}
         xywh {700 291 55 25} labelsize 12 minimum 1 maximum 100 value 2.5 textsize 12
       }
-      Fl_Value_Input fuzzyDiffMeanValueInput {
-        label {Diff Mean}
-        callback {m_FuzzyConnectedImageFilter->SetDiff_Mean( o->value() );}
-        xywh {700 317 55 25} labelsize 12 minimum 1 maximum 100 value 2.5 textsize 12
-      }
-      Fl_Value_Input fuzzyDiffVarianceValueInput {
-        label {Diff Variance}
-        callback {m_FuzzyConnectedImageFilter->SetDiff_Variance( o->value() );}
-        xywh {700 344 55 25} labelsize 12 minimum 1 maximum 100 value 2.5 textsize 12
+      Fl_Value_Input fuzzyThresholdValueInput {
+        label Threshold
+        callback {m_FuzzyConnectedImageFilter->SetDiff_Mean( o->value() );} selected
+        xywh {700 317 55 25} labelsize 12 step 0.01 value 0.5 textsize 12
       }
       Fl_Button {} {
         label Quit

@@ -92,8 +92,7 @@ RegionGrowingSegmentation
 
   m_FuzzyConnectedImageFilter->SetMean( fuzzyMeanValueInput->value() );
   m_FuzzyConnectedImageFilter->SetVariance( fuzzyVarianceValueInput->value() );
-  m_FuzzyConnectedImageFilter->SetDiff_Mean( fuzzyDiffMeanValueInput->value() );
-  m_FuzzyConnectedImageFilter->SetDiff_Variance( fuzzyDiffVarianceValueInput->value() );
+  m_FuzzyConnectedImageFilter->SetThreshold( fuzzyThresholdValueInput->value() );
 
 
   m_VTKSegmentedImageViewer = VTKImageViewerType::New();
@@ -543,6 +542,7 @@ RegionGrowingSegmentation
 
   m_ConnectedThresholdImageFilter->SetSeed( seed );
   m_ConfidenceConnectedImageFilter->SetSeed( seed );
+  m_FuzzyConnectedImageFilter->SetObjectSeed( seed );
 
 }
 
