@@ -41,9 +41,11 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     {
     case VTK_UNSIGNED_CHAR:
       {
-      typedef  unsigned char                        PixelType;
-      typedef  itk::Image< PixelType, Dimension >   ImageType; 
-      typedef  itk::FastMarchingImageFilter< ImageType,  ImageType >   FilterType;
+      typedef  unsigned short                         TimePixelType;
+      typedef  unsigned char                          PixelType;
+      typedef  itk::Image< PixelType, Dimension >     ImageType; 
+      typedef  itk::Image< TimePixelType, Dimension > TimeImageType;
+      typedef  itk::FastMarchingImageFilter< TimeImageType,  ImageType >   FilterType;
       typedef  FilterType::NodeContainer            NodeContainer;
       typedef  FilterType::NodeType                 NodeType;
       NodeContainer::Pointer seeds = NodeContainer::New();
@@ -73,9 +75,11 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       }
     case VTK_UNSIGNED_SHORT:
       {
-      typedef  unsigned short                       PixelType;
-      typedef  itk::Image< PixelType, Dimension >   ImageType; 
-      typedef  itk::FastMarchingImageFilter< ImageType,  ImageType >   FilterType;
+      typedef  unsigned short                         TimePixelType;
+      typedef  unsigned short                          PixelType;
+      typedef  itk::Image< PixelType, Dimension >     ImageType; 
+      typedef  itk::Image< TimePixelType, Dimension > TimeImageType;
+      typedef  itk::FastMarchingImageFilter< TimeImageType,  ImageType >   FilterType;
       typedef  FilterType::NodeContainer            NodeContainer;
       typedef  FilterType::NodeType                 NodeType;
       NodeContainer::Pointer seeds = NodeContainer::New();
