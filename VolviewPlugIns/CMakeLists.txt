@@ -59,7 +59,6 @@ SET (PLUGINS
   vvITKLandmarkWarping
   vvITKSigmoid
   vvITKShapeDetectionModule
-  vvITKSimpleFuzzyConnectedness
   vvITKSurfaceSpline
   vvITKThresholdSegmentationLevelSet
   vvITKVectorConfidenceConnected
