@@ -12,7 +12,24 @@
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
+
+/** Borland compiler is very lazy so we need to instantiate the template
+ *  by hand */
+#include <itkImage.h>
+#include <itkImageRegionConstIterator.h>
+#include <itkFixedArray.h>
+typedef itk::Image<unsigned char,3> IRISApplicationBorlandDummyImageType;
+typedef itk::ImageRegionConstIterator<IRISApplicationBorlandDummyImageType> IRISApplicationBorlandDummyConstIteratorType;
+typedef itk::Image<short,3> IRISApplicationBorlandDummyImageType2;
+typedef itk::Image<float,3> IRISApplicationBorlandDummyImageType3;
+typedef itk::ImageRegionConstIterator<IRISApplicationBorlandDummyImageType3> IRISApplicationBorlandDummyConstIteratorType2;
+typedef itk::Image<unsigned short,3> IRISApplicationBorlandDummyImageType4;
+typedef itk::Image<double,3> IRISApplicationBorlandDummyImageType5;
+typedef itk::ImageRegionConstIterator<IRISApplicationBorlandDummyImageType5> IRISApplicationBorlandDummyConstIteratorType3;
+typedef itk::Image<itk::FixedArray<float,3>,3> IRISApplicationBorlandDummyImageType6;
+
 #include "IRISApplication.h"
+
 #include "GlobalState.h"
 #include "IRISImageData.h"
 #include "IRISVectorTypesToITKConversion.h"
@@ -34,7 +51,6 @@
 
 using namespace itk;
 using namespace std;
-
 
 IRISApplication
 ::IRISApplication() 

@@ -18,9 +18,39 @@
 #include "itkImageRegionIterator.h"
 #include "itkImageRegionConstIterator.h"
 #include "itkImageRegionIteratorWithIndex.h"
+#include "itkMinimumMaximumImageCalculator.h"
+#include "itkUnaryFunctorImageFilter.h"
+#include "UnaryFunctorCache.h"
+#include "itkRGBAPixel.h"
+#include "IRISSlicer.h"
+
+typedef IRISSlicer<unsigned char> IRISIMageDataDummyIRISSlicerTypeUchar;
+typedef itk::SmartPointer<IRISIMageDataDummyIRISSlicerTypeUchar> IRISIMageDataDummySmartPointerSlicerType;
+typedef IRISSlicer<short> IRISIMageDataDummyIRISSlicerTypeShort;
+typedef itk::SmartPointer<IRISIMageDataDummyIRISSlicerTypeShort> IRISIMageDataDummySmartPointerSlicerShortType;
+
+/** Borland compiler is very lazy so we need to instantiate the template
+ *  by hand */
+typedef itk::ImageRegion<3> IRISImageDataBorlandDummyImageRegionType;
+typedef itk::ImageRegion<2> IRISImageDataBorlandDummyImageRegionType2;
+typedef itk::ImageBase<3> IRISImageDataBorlandDummyImageBaseType;
+typedef itk::ImageBase<2> IRISImageDataBorlandDummyImageBaseType2;
+typedef itk::Image<unsigned char,3> IRISImageDataBorlandDummyImageType;
+typedef itk::Image<unsigned char,2> IRISImageDataBorlandDummyImageType2;
+typedef itk::ImageRegionConstIterator<IRISImageDataBorlandDummyImageType> IRISImageDataBorlandDummyConstIteratorType;
+typedef itk::Image<short,3> IRISImageDataBorlandDummyShortImageType;
+typedef itk::Image<short,2> IRISImageDataBorlandDummyShortImageType2;
+typedef itk::Image<itk::RGBAPixel<unsigned char>,2> IRISImageDataBorlandDummyShortImageTypeRGBA;
+typedef itk::ImageRegionConstIterator<IRISImageDataBorlandDummyShortImageType> IRISImageDataBorlandDummyConstIteratorShortType;
+typedef itk::MinimumMaximumImageCalculator<IRISImageDataBorlandDummyShortImageType> IRISImageDataBorlandDummyMinMaxCalc;
+
+#include "GreyImageWrapper.h"
+typedef CachingUnaryFunctor<short,unsigned char,GreyImageWrapper::IntensityFunctor> IRISImageDataBorlamdCachingUnaryFunctor;
+typedef itk::UnaryFunctorImageFilter<IRISImageDataBorlandDummyShortImageType,IRISImageDataBorlandDummyImageType2,IRISImageDataBorlamdCachingUnaryFunctor> IRISIMageDataDummyFunctorType;
+typedef itk::SmartPointer<IRISIMageDataDummyFunctorType> IRISIMageDataDummyFunctorTypePointerType;
 
 #include "IRISImageData.h"
-#include "GreyImageWrapper.h"
+
 #include "LabelImageWrapper.h"
 
 // System includes
