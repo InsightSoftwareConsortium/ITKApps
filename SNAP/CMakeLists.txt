@@ -220,8 +220,35 @@ SET(PROGRAM_DATA_FILES
   ProgramData/HTMLHelp/TutorialSectionIntroductionToAutomatic.html
   ProgramData/HTMLHelp/TutorialSectionLoadingImages.html
   ProgramData/HTMLHelp/TutorialSectionManualSegmentation.html
+  ProgramData/HTMLHelp/TutorialSectionRegionSegmentation.html
+  ProgramData/HTMLHelp/TutorialSectionTipsAndTricks.html
   ProgramData/HTMLHelp/TutorialSectionViewingImages.html
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroEdgesPicture.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroEdgesPipeline01.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroEdgesPipeline02.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroEdgesPipeline03.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroEdgesPipeline04.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroEdgesScale.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroRegionScale.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroRegionsExample.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroRegionsHisto.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroRegionsRemapFunction.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroRegionsSegment01.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroRegionsSegment02.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroRegionsSegment03.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroRegionsSegment04.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroSnakeConcept01.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroSnakeConcept02.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroSnakeConcept03.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroSnakeConcept04.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroSnakeMerge01.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroSnakeMerge02.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroSnakeMerge03.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroSnakeMerge04.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroSnakeVelocities.gif
+  ProgramData/HTMLHelp/Artwork/ttAutoIntroSnakeVelocitiesMotion01.gif
   ProgramData/HTMLHelp/Artwork/ttIconAction.gif
+  ProgramData/HTMLHelp/Artwork/ttIconAttention.gif
   ProgramData/HTMLHelp/Artwork/ttIconExpert.gif
   ProgramData/HTMLHelp/Artwork/ttIconTip.gif
   ProgramData/HTMLHelp/Artwork/ttIntroScreenLayout.gif
@@ -238,9 +265,28 @@ SET(PROGRAM_DATA_FILES
   ProgramData/HTMLHelp/Artwork/ttManualSegmentLabelSubPanel.gif
   ProgramData/HTMLHelp/Artwork/ttManualSegmentLabelSubPanel02.gif
   ProgramData/HTMLHelp/Artwork/ttManualSegmentPaintClosePath.gif
+  ProgramData/HTMLHelp/Artwork/ttManualSegmentPaintFill.gif
+  ProgramData/HTMLHelp/Artwork/ttManualSegmentPaintPaste.gif
+  ProgramData/HTMLHelp/Artwork/ttManualSegmentPaintSelectSome.gif
   ProgramData/HTMLHelp/Artwork/ttManualSegmentPaintStart.gif
+  ProgramData/HTMLHelp/Artwork/ttManualSegmentResult.gif
   ProgramData/HTMLHelp/Artwork/ttManualSegmentRightCaudate.gif
+  ProgramData/HTMLHelp/Artwork/ttManualSegmentSaveWizard.gif
+  ProgramData/HTMLHelp/Artwork/ttManualSegmentSaveWizardFilled.gif
   ProgramData/HTMLHelp/Artwork/ttManualSegmentToolbarManual.gif
+  ProgramData/HTMLHelp/Artwork/ttRegionAddBubble01.gif
+  ProgramData/HTMLHelp/Artwork/ttRegionAddBubble02.gif
+  ProgramData/HTMLHelp/Artwork/ttRegionNewInterface.gif
+  ProgramData/HTMLHelp/Artwork/ttRegionParameterWindow.gif
+  ProgramData/HTMLHelp/Artwork/ttRegionPreprocessor01.gif
+  ProgramData/HTMLHelp/Artwork/ttRegionPreprocessor02.gif
+  ProgramData/HTMLHelp/Artwork/ttRegionResult.gif
+  ProgramData/HTMLHelp/Artwork/ttRegionROISelection01.gif
+  ProgramData/HTMLHelp/Artwork/ttRegionROISelection02.gif
+  ProgramData/HTMLHelp/Artwork/ttRegionROISelectionFinal.gif
+  ProgramData/HTMLHelp/Artwork/ttRegionToolbar.gif
+  ProgramData/HTMLHelp/Artwork/ttRegionWizard02.gif
+  ProgramData/HTMLHelp/Artwork/ttRegionWizard03.gif
   ProgramData/HTMLHelp/Artwork/ttViewImageControlPanel.gif
   ProgramData/HTMLHelp/Artwork/ttViewImageControlPanelToolbox01.gif
   ProgramData/HTMLHelp/Artwork/ttViewImageControlPanelToolbox02.gif
