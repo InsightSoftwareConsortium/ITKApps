@@ -37,6 +37,7 @@ public:
   typedef itk::SmartPointer<EventSystemType> EventSystemPointer;
 
   IntensityCurveUILogic();
+  virtual ~IntensityCurveUILogic() {}
 
   /**
    * Assign a grey image wrapper to the object.  This is necessary in order

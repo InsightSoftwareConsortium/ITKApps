@@ -43,6 +43,9 @@ namespace itk {
 class PreprocessingUILogic : public PreprocessingUI
 {
 public:
+
+  // A virtual destructor to make gcc happy
+  virtual ~PreprocessingUILogic() {}
   
   // Callbacks for the Edge snake preprocessing window
   void OnEdgeSettingsChange();

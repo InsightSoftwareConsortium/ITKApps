@@ -669,7 +669,7 @@ PreprocessingUILogic
   float x[nSamples];
   float y[nSamples];
 
-  for(int i=0;i<nSamples;i++) 
+  for(unsigned int i=0;i<nSamples;i++) 
     {
     x[i] = i * 1.0f / (nSamples-1);
     y[i] = functor(x[i]);
@@ -705,7 +705,7 @@ PreprocessingUILogic
   float x[nSamples];
   float y[nSamples];
 
-  for(int i=0;i<nSamples;i++) 
+  for(unsigned int i=0;i<nSamples;i++) 
     {
     x[i] = iMin + i * (iMax-iMin) / (nSamples-1.0f);
     y[i] = functor(x[i]);

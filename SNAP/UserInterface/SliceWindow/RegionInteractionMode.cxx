@@ -157,10 +157,6 @@ void RegionInteractionMode
   Vector2f uvSlicePress = 
     m_Parent->MapWindowToSlice(pressEvent.XSpace.extract(2));
 
-  // Get the corresponding positions in the image coordinates
-  Vector3f xImageNow = m_Parent->MapSliceToImage(uvSliceNow);
-  Vector3f xImagePress = m_Parent->MapSliceToImage(uvSlicePress);
-
   // Get the current bounds and extents of the region of interest 
   Vector3f xCornerImage[2] = 
   {

@@ -60,7 +60,11 @@ Support/Maintenance team: \n\
 
 #endif // __Credits_h_
 
-/*Log: Credits.h
+/*
+ *Log: Credits.h
+ *Revision 1.2  2003/08/27 04:57:45  pauly
+ *FIX: A large number of bugs has been fixed for 1.4 release
+ *
  *Revision 1.1  2003/07/12 04:53:16  pauly
  *Initial checkin of SNAP application to the InsightApplications tree
  *
@@ -95,4 +99,4 @@ Support/Maintenance team: \n\
  *
  *Revision 1.2  2002/03/08 14:06:20  moon
  *Added Header and Log tags to all files
- **/
+ */

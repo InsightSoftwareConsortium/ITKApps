@@ -30,6 +30,9 @@
  */
 class ColorLabel {
 public:
+  // Dummy constructor and destructor (to make gcc happy)
+  ColorLabel() {}
+  virtual ~ColorLabel() {}
 
   // Read the Visible attribute
   irisIsMacro(Visible);

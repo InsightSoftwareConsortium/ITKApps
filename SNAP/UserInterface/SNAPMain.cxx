@@ -85,7 +85,11 @@ int main(int argc, char **argv)
   return 0;
 }
 
-/*Log: SNAPMain.cxx
+/*
+ *Log: SNAPMain.cxx
+ *Revision 1.2  2003/08/27 04:57:47  pauly
+ *FIX: A large number of bugs has been fixed for 1.4 release
+ *
  *Revision 1.1  2003/07/12 04:46:50  pauly
  *Initial checkin of the SNAP application into the InsightApplications tree.
  *

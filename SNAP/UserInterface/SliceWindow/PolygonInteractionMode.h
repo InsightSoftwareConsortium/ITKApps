@@ -28,7 +28,7 @@ class PolygonInteractionMode : public GenericSliceWindow::EventHandler
 {
 public:
   PolygonInteractionMode(GenericSliceWindow *parent);
-  ~PolygonInteractionMode();
+  virtual ~PolygonInteractionMode();
 
   int OnMousePress(const FLTKEvent &event)
   {

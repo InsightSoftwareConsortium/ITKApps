@@ -157,7 +157,8 @@ public:
 unsigned int 
 SNAPImageData
 ::InitializeLevelSet(int snakeMode, const SnakeParameters &parameters,
-                     Bubble *bubbles, int nBubbles, unsigned int labelColor) 
+                     Bubble *bubbles, unsigned int nBubbles, 
+                     unsigned int labelColor) 
 {
   assert(m_GreyWrapper && m_LabelWrapper);
   

@@ -60,7 +60,7 @@ CommandLineArgumentParser
   outResult.Clear();
 
   // Go through the arguments
-  for(unsigned int i=1; i < argc; i++)
+  for(int i=1; i < argc; i++)
     {
     // Get the next argument
     string arg(argv[i]);
@@ -74,7 +74,7 @@ CommandLineArgumentParser
       }
 
     // Check if the number of parameters is correct
-    unsigned int nParameters = m_OptionMap[arg].NumberOfParameters;
+    int nParameters = m_OptionMap[arg].NumberOfParameters;
     if(i+nParameters >= argc) 
       {
       // Too few parameters
@@ -87,7 +87,7 @@ CommandLineArgumentParser
     outResult.AddOption(m_OptionMap[arg].CommonName,nParameters);
 
     // Pass in the parameters
-    for(unsigned int j=0;j<nParameters;j++,i++)
+    for(int j=0;j<nParameters;j++,i++)
       outResult.AddParameter(m_OptionMap[arg].CommonName,string(argv[i+1]));
     
     }

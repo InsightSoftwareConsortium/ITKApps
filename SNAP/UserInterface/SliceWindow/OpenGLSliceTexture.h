@@ -44,7 +44,7 @@ public:
   void SetImage(ImagePointer inImage);
 
   /** Get the dimensions of the texture image, which are powers of 2 */
-  irisGetMacro(TextureSize,Vector2i);
+  irisGetMacro(TextureSize,Vector2ui);
 
   /** Get the GL texture number automatically allocated by this object */
   irisGetMacro(TextureIndex,int);
@@ -81,7 +81,7 @@ private:
   typedef typename itk::SmartPointer<FilterType> FilterPointer;
 
   // The dimensions of the texture as stored in memory
-  Vector2i m_TextureSize;
+  Vector2ui m_TextureSize;
 
   // The pointer to the image from which the texture is computed
   ImagePointer m_Image;
@@ -164,7 +164,7 @@ OpenGLSliceTexture<TPixel>
 
   // Promote the image dimensions to powers of 2
   itk::Size<2> szImage = m_Image->GetLargestPossibleRegion().GetSize();
-  m_TextureSize = Vector2i(1);
+  m_TextureSize = Vector2ui(1);
 
   // Use shift to quickly double the coordinates
   for (unsigned int i=0;i<2;i++)

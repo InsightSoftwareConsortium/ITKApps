@@ -276,12 +276,6 @@ void ImageIOWizardLogic<TPixel>
     m_OutSummarySpacingY->value(ioBase->GetSpacing(1));
     m_OutSummarySpacingZ->value(ioBase->GetSpacing(2));
 
-    // Strings for the ENUM values
-    const static char *fileTypes[] = 
-      {
-      "ASCII","Binary","Type Not Applicable"
-      };
-    
     const static char *boTypes[] = 
       {
       "Big Endian", "Little Endian","Order Not Applicable"

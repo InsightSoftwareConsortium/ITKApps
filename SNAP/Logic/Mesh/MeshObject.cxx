@@ -112,7 +112,6 @@ MeshObject
     meshPipeline->SetImage(snapData->GetLevelSetImage());
     
     // Compute the mesh only for the current segmentation color
-    LabelType label = m_GlobalState->GetDrawingColorLabel();
     vtkPolyData *mesh = vtkPolyData::New();
     meshPipeline->ComputeMesh(mesh);
     meshes.push_back(mesh);
@@ -201,7 +200,7 @@ MeshObject
     for ( triStrips->InitTraversal(); triStrips->GetNextCell(npts,pts); ) {
       ntris += npts-2;
       glBegin( GL_TRIANGLE_STRIP );
-      for (unsigned int j = 0; j < npts; j++) {
+      for (vtkIdType j = 0; j < npts; j++) {
         glNormal3fv( norms->GetTuple( pts[j] ) ); // Specify normal.
         glVertex3fv( verts->GetPoint ( pts[j] ) );  // Specify vertex.
       }
@@ -240,7 +239,7 @@ void
 MeshObject
 ::Display() 
 {
-  int i;
+  unsigned int i;
 
   // Define a shorthand pointer to the image data
   IRISImageData *irisData = m_Driver->GetCurrentImageData();  
@@ -309,7 +308,11 @@ MeshObject
   }
 }
 
-/*Log: MeshObject.cxx
+/*
+ *Log: MeshObject.cxx
+ *Revision 1.3  2003/08/27 04:57:46  pauly
+ *FIX: A large number of bugs has been fixed for 1.4 release
+ *
  *Revision 1.2  2003/08/14 13:37:07  pauly
  *FIX: Error with using int instead of vtkIdType in calling vtkCellArray::GetNextCell
  *

@@ -125,7 +125,9 @@ GlobalState
       }
 
     // Get rid of all path information
-    if(basename = strrchr(fname, '/'))
+    // TODO: This is platform specific!!!
+    basename = strrchr(fname, '/');
+    if(basename)
       {
       basename++;
       }
@@ -137,7 +139,8 @@ GlobalState
     // Find the first period and count everything
     // to the right of it as path.  Allows for
     // multiple periods (ie .hdr.gz)
-    if(basename = strchr(basename, '.'))
+    basename = strchr(basename, '.');
+    if(basename)
       {
       m_GreyFileExtension = new char[strlen(basename) + 1];
       strcpy(m_GreyFileExtension, basename);

@@ -58,7 +58,7 @@ private:
 public:
   MeshObject();
   MeshObject( const MeshObject& M ) { *this=M; } 
-  MeshObject& operator= ( const MeshObject& M ) { *this=M; }
+  MeshObject& operator= ( const MeshObject& M ) { *this=M; return *this; }
   ~MeshObject() {};
 
   void Reset();
@@ -119,7 +119,12 @@ public:
 };
 
 #endif // __MeshObject_h_
-/*Log: MeshObject.h
+
+/*
+ *Log: MeshObject.h
+ *Revision 1.2  2003/08/27 04:57:46  pauly
+ *FIX: A large number of bugs has been fixed for 1.4 release
+ *
  *Revision 1.1  2003/07/12 04:52:25  pauly
  *Initial checkin of SNAP application  to the InsightApplications tree
  *

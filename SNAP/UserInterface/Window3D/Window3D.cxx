@@ -872,10 +872,10 @@ void Window3D::DrawSamples()
 void Window3D::DrawCutPlane() {
   if (m_Plane.valid != 1) return;
 
-  GLdouble clipbottom[4]={0.0,1.0,0.0,0.0};
-  GLdouble cliptop[4]={0.0,-1/m_ImageSize[1],0.0,1};
-  GLdouble clipright[4]={1/m_ImageSize[0],0.0,0.0,1.0};
-  GLdouble clipleft[4]={1,0,0,0};
+  // GLdouble clipbottom[4]={0.0,1.0,0.0,0.0};
+  // GLdouble cliptop[4]={0.0,-1/m_ImageSize[1],0.0,1};
+  // GLdouble clipright[4]={1/m_ImageSize[0],0.0,0.0,1.0};
+  // GLdouble clipleft[4]={1,0,0,0};
   //glClipPlane(GL_CLIP_PLANE0,clipbottom);
   //glClipPlane(GL_CLIP_PLANE1,cliptop);
   //glClipPlane(GL_CLIP_PLANE2,clipright);
@@ -927,7 +927,11 @@ void Window3D::DrawCutPlane() {
   glEnd();
 };
 
-/*Log: Window3D.cxx
+/*
+ *Log: Window3D.cxx
+ *Revision 1.2  2003/08/27 04:57:47  pauly
+ *FIX: A large number of bugs has been fixed for 1.4 release
+ *
  *Revision 1.1  2003/07/12 04:46:51  pauly
  *Initial checkin of the SNAP application into the InsightApplications tree.
  *

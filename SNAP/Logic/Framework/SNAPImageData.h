@@ -91,7 +91,7 @@ public:
    */
   unsigned int InitializeLevelSet(int snakeMode, 
                                   const SnakeParameters &parameters,
-                                  Bubble *bubbles, int nBubbles, 
+                                  Bubble *bubbles, unsigned int nBubbles, 
                                   unsigned int labelColor);
 
   /**

@@ -58,7 +58,7 @@ public:
    * - IRIS window is ready to be shown
    */
   UserInterfaceLogic(IRISApplication *iris);
-  ~UserInterfaceLogic();
+  virtual ~UserInterfaceLogic();
 
   /**
    * DESCRIPTION
@@ -871,7 +871,12 @@ private:
 };
 
 #endif
-/*Log: UserInterfaceLogic.h
+
+/*
+ *Log: UserInterfaceLogic.h
+ *Revision 1.2  2003/08/27 04:57:47  pauly
+ *FIX: A large number of bugs has been fixed for 1.4 release
+ *
  *Revision 1.1  2003/07/12 04:46:50  pauly
  *Initial checkin of the SNAP application into the InsightApplications tree.
  *

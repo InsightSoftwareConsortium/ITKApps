@@ -12,7 +12,7 @@
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
-/*Header*/
+
 /**********************
  * Wrapper class for the snake code, taken
  * from the AVS module general_isnake_3D
@@ -251,20 +251,24 @@ void interp_border(float *u, int xsize, int ysize, int zsize);
 //taken from AVS module
 int edt3ddan(const unsigned char *input,int six,int siy,int siz,unsigned char metric,short **odx,short **ody,short **odz,unsigned char **oclass);
 
-/*Log: SnakeWrapper.h
-/*Revision 1.1  2003/07/11 23:26:58  pauly
-/**** empty log message ***
 /*
-/*Revision 1.1  2003/03/07 19:29:47  pauly
-/*Initial checkin
-/*
-/*Revision 1.1.1.1  2002/12/10 01:35:36  pauly
-/*Started the project repository
-/*
-/*
-/*Revision 1.4  2002/05/08 17:34:44  moon
-/*Don't remember
-/*
-/*Revision 1.3  2002/04/10 21:21:10  moon
-/*added RCS tags (finally!  I didn't realize they weren't on)
-/**/
+ *Log: SnakeWrapper.h
+ *Revision 1.1  2003/07/12 04:50:42  pauly
+ *Initial checkin of SNAP testing code to the InsightApplications tree
+ *
+ *Revision 1.1  2003/07/11 23:26:58  pauly
+ **** empty log message ***
+ *
+ *Revision 1.1  2003/03/07 19:29:47  pauly
+ *Initial checkin
+ *
+ *Revision 1.1.1.1  2002/12/10 01:35:36  pauly
+ *Started the project repository
+ *
+ *
+ *Revision 1.4  2002/05/08 17:34:44  moon
+ *Don't remember
+ *
+ *Revision 1.3  2002/04/10 21:21:10  moon
+ *added RCS tags (finally!  I didn't realize they weren't on)
+ **/

@@ -489,7 +489,7 @@ int snake3D::run(int num_steps)
           float ux2 = ux*ux;
           float uy2 = uy*uy;
           float uz2 = uz*uz;
-          float grad_u = sqrt(ux2 + uy2 + uz2);
+          // float grad_u = sqrt(ux2 + uy2 + uz2);
 
           // Forward and backward differences (added by paul)
           float ufx = u[i+1] - u[i];
@@ -574,7 +574,7 @@ int snake3D::run(int num_steps)
 
   //#ifdef DEBUG
   //  printf("%d u = %p outdt1 = %p outdt2 = %p\n", iter_count, u, outdt1->data, outdt2->data);
-  printf("%d u = %p outdt1 = %p outdt2 = %p\n", iter_count, u, *outdt1, *outdt2);
+  printf("%d u = %p outdt1 = %p outdt2 = %p\n", iter_count, u, outdt1, outdt2);
   //#endif
 
   return 1;
@@ -1282,37 +1282,41 @@ int edt3ddan(const unsigned char *input,int six,int siy,int siz,unsigned char me
 
 
 
-/*Log: SnakeWrapper.cxx
-/*Revision 1.1  2003/07/11 23:26:58  pauly
-/**** empty log message ***
 /*
-/*Revision 1.2  2003/07/10 14:30:26  pauly
-/*Integrated ITK into SNAP level set segmentation
-/*
-/*Revision 1.1  2003/03/07 19:29:47  pauly
-/*Initial checkin
-/*
-/*Revision 1.1.1.1  2002/12/10 01:35:36  pauly
-/*Started the project repository
-/*
-/*
-/*Revision 1.12  2002/05/08 17:34:43  moon
-/*Don't remember
-/*
-/*Revision 1.11  2002/04/27 18:30:29  moon
-/*Finished commenting
-/*
-/*Revision 1.10  2002/04/25 14:13:47  moon
-/*Fiddled.  Didn't fix anything.
-/*
-/*Revision 1.9  2002/04/24 19:52:44  moon
-/*Found a bug with reallocation of memory.
-/*
-/*Revision 1.8  2002/04/16 13:09:05  moon
-/*Changed code so that modifying parameters doesn't start the snake over.
-/*Was recalculating some things that I didn't need to recalc when the calcflag
-/*was set.  This was a pretty big bug.
-/*
-/*Revision 1.7  2002/04/10 21:21:09  moon
-/*added RCS tags (finally!  I didn't realize they weren't on)
-/**/
+ *Log: SnakeWrapper.cxx
+ *Revision 1.1  2003/07/12 04:50:42  pauly
+ *Initial checkin of SNAP testing code to the InsightApplications tree
+ *
+ *Revision 1.1  2003/07/11 23:26:58  pauly
+ **** empty log message ***
+ *
+ *Revision 1.2  2003/07/10 14:30:26  pauly
+ *Integrated ITK into SNAP level set segmentation
+ *
+ *Revision 1.1  2003/03/07 19:29:47  pauly
+ *Initial checkin
+ *
+ *Revision 1.1.1.1  2002/12/10 01:35:36  pauly
+ *Started the project repository
+ *
+ *
+ *Revision 1.12  2002/05/08 17:34:43  moon
+ *Don't remember
+ *
+ *Revision 1.11  2002/04/27 18:30:29  moon
+ *Finished commenting
+ *
+ *Revision 1.10  2002/04/25 14:13:47  moon
+ *Fiddled.  Didn't fix anything.
+ *
+ *Revision 1.9  2002/04/24 19:52:44  moon
+ *Found a bug with reallocation of memory.
+ *
+ *Revision 1.8  2002/04/16 13:09:05  moon
+ *Changed code so that modifying parameters doesn't start the snake over.
+ *Was recalculating some things that I didn't need to recalc when the calcflag
+ *was set.  This was a pretty big bug.
+ *
+ *Revision 1.7  2002/04/10 21:21:09  moon
+ *added RCS tags (finally!  I didn't realize they weren't on)
+ **/

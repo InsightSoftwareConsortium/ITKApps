@@ -53,7 +53,7 @@ public:
 
   Window3D( int x, int y, int w, int h, const char *l=0 );
   ~Window3D();
-  Window3D& operator= ( const Window3D& W ) {};
+  Window3D& operator= ( const Window3D& W ) { return *this; };
 
   /**
    * Register the parent classes with this application
@@ -150,7 +150,11 @@ private:
 
 #endif // __Window3D_h_
 
-/*Log: Window3D.h
+/*
+ *Log: Window3D.h
+ *Revision 1.2  2003/08/27 04:57:47  pauly
+ *FIX: A large number of bugs has been fixed for 1.4 release
+ *
  *Revision 1.1  2003/07/12 04:46:51  pauly
  *Initial checkin of the SNAP application into the InsightApplications tree.
  *

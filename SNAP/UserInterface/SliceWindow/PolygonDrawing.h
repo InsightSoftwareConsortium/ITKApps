@@ -84,8 +84,11 @@ private:
 
 #endif // __PolygonDrawing_h_
 
-
-/*Log: PolygonDrawing.h
+/*
+ *Log: PolygonDrawing.h
+ *Revision 1.2  2003/08/27 04:57:47  pauly
+ *FIX: A large number of bugs has been fixed for 1.4 release
+ *
  *Revision 1.1  2003/07/12 04:46:51  pauly
  *Initial checkin of the SNAP application into the InsightApplications tree.
  *

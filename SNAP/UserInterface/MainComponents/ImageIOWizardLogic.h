@@ -37,7 +37,7 @@ public:
   ImageIOWizardLogic();
 
   /** A descructor */
-  ~ImageIOWizardLogic();
+  virtual ~ImageIOWizardLogic();
 
   // Callback methods overridden from the Base class
   void OnCancel();

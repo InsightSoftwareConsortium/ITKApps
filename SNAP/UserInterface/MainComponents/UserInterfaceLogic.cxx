@@ -1816,7 +1816,7 @@ UserInterfaceLogic
 ::InitColorMap() 
 {
   // invalidate all colormap entries
-  int i,j;
+  unsigned int i,j;
   for (i=0; i<256; i++) m_ColorMap[i] = -1;
 
   // Always have the Clear color
@@ -1955,7 +1955,8 @@ UserInterfaceLogic
 
   if (greyImg) 
     {
-    if (basename = strrchr(greyImg, '/')) 
+    basename = strrchr(greyImg, '/');
+    if (basename) 
       {
       strncpy(greyImage, basename+1, imgLength-1);
       }
@@ -1967,7 +1968,8 @@ UserInterfaceLogic
 
   if (segImg) 
     {
-    if (basename = strrchr(segImg, '/')) 
+    basename = strrchr(segImg, '/'); 
+    if (basename) 
       {
       strncpy(segImage, basename+1, imgLength-1);
       }
@@ -2809,8 +2811,11 @@ m_Driver->SetCursorPosition(m_GlobalState)
 }
 */
 
-
-/*Log: UserInterfaceLogic.cxx
+/*
+ *Log: UserInterfaceLogic.cxx
+ *Revision 1.2  2003/08/27 04:57:46  pauly
+ *FIX: A large number of bugs has been fixed for 1.4 release
+ *
  *Revision 1.1  2003/07/12 04:46:50  pauly
  *Initial checkin of the SNAP application into the InsightApplications tree.
  *

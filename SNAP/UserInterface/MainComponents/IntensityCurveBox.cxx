@@ -281,7 +281,8 @@ IntensityCurveBox::DefaultHandler
     {
     fl_cursor(FL_CURSOR_DEFAULT);
     }   
-  else if (cp == 0 || cp == m_Parent->GetCurve()->GetControlPointCount()-1) 
+  else if (cp == 0 || 
+           cp == (int)(m_Parent->GetCurve()->GetControlPointCount()-1)) 
     {
     fl_cursor(FL_CURSOR_WE);
     } 

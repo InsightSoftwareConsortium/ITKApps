@@ -47,7 +47,7 @@ public:
   /**
    * Destructor for the application
    */
-  ~IRISApplication();
+  virtual ~IRISApplication();
 
   /**
    * Get image data related to IRIS operations

@@ -175,7 +175,11 @@ public:
 #define MAX_COLOR_LABELS 256
 
 #endif // __IrisTypes_h_
-/*Log: IRISTypes.h
+/*
+ *Log: IRISTypes.h
+ *Revision 1.2  2003/08/27 04:57:45  pauly
+ *FIX: A large number of bugs has been fixed for 1.4 release
+ *
  *Revision 1.1  2003/07/12 04:53:17  pauly
  *Initial checkin of SNAP application to the InsightApplications tree
  *

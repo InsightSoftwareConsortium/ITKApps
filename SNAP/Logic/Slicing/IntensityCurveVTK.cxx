@@ -46,11 +46,12 @@ IntensityCurveVTK
   m_ControlPoints.clear();
   m_Spline->RemoveAllPoints();
 
-  for(int i=0;i<nControlPoints;i++,t+=interval) {
+  for(unsigned int i=0;i<nControlPoints;i++,t+=interval) 
+    {
     ControlPoint c = {t,t};
     m_ControlPoints.push_back(c);
     m_Spline->AddPoint(t,t);
-  }
+    }
 
   m_Spline->Compute();
 }
@@ -91,14 +92,14 @@ IntensityCurveVTK
   // The simple thing is to check each interval a bunch of
   // times.  There ought to be an upper limit on the length of non-monotonic
   // regions.
-  int nRegions = 8;
+  unsigned int nRegions = 8;
 
-  for(int i=0;i<m_ControlPoints.size()-1;i++) {
+  for(unsigned int i=0;i<m_ControlPoints.size()-1;i++) {
     float t =  m_ControlPoints[i].t;
     double tStep = (m_ControlPoints[i+1].t - t) / (nRegions - 1);
     float t1 = t + tStep;
 
-    for(int j=0;j<nRegions-1;j++) {
+    for(unsigned int j=0;j<nRegions-1;j++) {
       if(m_Spline->Evaluate(t) >= m_Spline->Evaluate(t1))
         return false;
       t = t1;

@@ -584,7 +584,7 @@ void
 IRISImageData
 ::InitializeColorLabels() 
 {
-  int i;
+  unsigned int i;
 
   // Set up the clear color
   m_ColorLabels[0].SetRGB(0,0,0);

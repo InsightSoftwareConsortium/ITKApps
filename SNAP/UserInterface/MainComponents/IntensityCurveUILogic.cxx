@@ -84,7 +84,6 @@ IntensityCurveUILogic
   // intensity in the whole image
   GreyType iAbsMin = m_ImageWrapper->GetImageMin();
   GreyType iAbsMax = m_ImageWrapper->GetImageMax();
-  GreyType iAbsSpan = (iAbsMax - iAbsMin);
 
   // Get the new values of min and max
   int iMin = (int) m_InLevel->value();
