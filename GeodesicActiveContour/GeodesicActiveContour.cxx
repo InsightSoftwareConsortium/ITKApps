@@ -54,7 +54,7 @@ GeodesicActiveContour
   m_GeodesicActiveContourFilter->SetMaximumRMSError( 
                          geodesicActiveContourRMSErrorValueInput->value() );
 
-  m_GeodesicActiveContourFilter->SetMaximumIterations( 
+  m_GeodesicActiveContourFilter->SetNumberOfIterations( 
         static_cast<unsigned int>( geodesicActiveContourIterationsValueInput->value() ) );
 
   m_GeodesicActiveContourFilter->SetCurvatureScaling( 

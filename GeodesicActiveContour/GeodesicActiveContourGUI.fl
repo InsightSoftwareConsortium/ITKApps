@@ -161,7 +161,7 @@ class GeodesicActiveContourGUI {open : {public GeodesicActiveContourBase}
         }
         Fl_Value_Input geodesicActiveContourIterationsValueInput {
           label Iterations
-          callback {m_GeodesicActiveContourFilter->SetMaximumIterations( static_cast<unsigned int>( o->value() ) );} selected
+          callback {m_GeodesicActiveContourFilter->SetNumberOfIterations( static_cast<unsigned int>( o->value() ) );} selected
           xywh {447 43 44 23} labelsize 12 maximum 500 step 1 value 50 textsize 12
         }
         Fl_Value_Input fastMarchingStoppingValueInput {
