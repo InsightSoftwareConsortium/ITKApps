@@ -327,22 +327,19 @@ IRISApplication
         break;  
       };
 
-    // Compute the origin of the region
-    Vector3d origin;
-    for(unsigned int i=0;i<3;i++)
-      origin[i] = roi.GetROI().GetIndex(i) * source->GetSpacing()[i];
-
     // Set the image sizes and spacing
     fltSample->SetSize(roi.GetROI().GetSize());
     fltSample->SetOutputSpacing(target->GetSpacing());
-    fltSample->SetOutputOrigin(origin.data_block());
 
     // Watch the segmentation progress
     if(progressCommand) 
-      fltSample->AddObserver(itk::ProgressEvent(),progressCommand);
+      fltSample->AddObserver(itk::AnyEvent(),progressCommand);
 
-  // Perform resampling
-  fltSample->UpdateLargestPossibleRegion();
+    // Set the unknown intensity to positive value
+    fltSample->SetDefaultPixelValue(4.0f);
+
+    // Perform resampling
+    fltSample->UpdateLargestPossibleRegion();
 
     // Change the source to the output
     source = fltSample->GetOutput();

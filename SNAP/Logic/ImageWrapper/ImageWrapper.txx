@@ -273,7 +273,7 @@ ImageWrapper<TPixel>
 
     // Set the progress bar
     if(progressCommand)
-      fltSample->AddObserver(itk::ProgressEvent(),progressCommand);
+      fltSample->AddObserver(itk::AnyEvent(),progressCommand);
 
   // Perform resampling
     fltSample->GetOutput()->SetRequestedRegion(vNewROI);

@@ -280,6 +280,9 @@ SNAPLevelSetDriver::FloatImageType *
 SNAPLevelSetDriver
 ::GetCurrentState()
 {
+  // Fix the spacing of the level set filter's output
+  m_LevelSetFilter->GetOutput()->SetSpacing(m_InitializationImage->GetSpacing());
+
   // Return the filter's output
   return m_LevelSetFilter->GetOutput();
 }

@@ -37,9 +37,9 @@ class UserInterface {open : {public UserInterfaceBase}
   } {
     Fl_Window m_WinMain {
       label {SnAP: IRIS}
-      callback {OnMainWindowCloseAction();}
-      xywh {-32000 -32000 878 710} type Double align 0 hide resizable
-      code0 {\#include "UserInterfaceBase.h"}
+      callback {OnMainWindowCloseAction();} open
+      xywh {472 133 878 710} type Double align 0 resizable
+      code0 {\#include "UserInterfaceBase.h"} visible
     } {
       Fl_Menu_Bar m_MenubarMain {
         xywh {0 0 146 25} labelsize 12 textsize 12
@@ -167,8 +167,8 @@ class UserInterface {open : {public UserInterfaceBase}
           label {Control Pane} open
           xywh {0 25 145 680} box NO_BOX color 22 align 16
         } {
-          Fl_Group m_GrpToolbarPage {open
-            xywh {0 25 145 679} color 53 labelsize 12
+          Fl_Group m_GrpToolbarPage {
+            xywh {0 25 145 679} color 53 labelsize 12 hide
           } {
             Fl_Group m_GrpInteractionModes {
               label {IRIS Toolbox}
@@ -225,7 +225,7 @@ class UserInterface {open : {public UserInterfaceBase}
                 } {}
                 Fl_Group m_GrpToolOptionSnAP {
                   label 5 open
-                  xywh {5 165 135 135} labelsize 10
+                  xywh {5 165 135 135} labelsize 10 hide
                 } {
                   Fl_Button m_BtnStartSnake {
                     label {Segment 3D}
@@ -272,7 +272,7 @@ class UserInterface {open : {public UserInterfaceBase}
                 }
                 Fl_Group m_GrpToolOptionCrosshairs {
                   label 1 open
-                  xywh {5 165 135 135} labeltype NO_LABEL labelfont 1 labelsize 12 align 17 hide
+                  xywh {5 165 135 135} labeltype NO_LABEL labelfont 1 labelsize 12 align 17
                 } {
                   Fl_Output m_OutGreyProbe {
                     label {Intensity:}
@@ -357,8 +357,8 @@ OnDrawOverLabelUpdate();} open
               tooltip {3D paint tool: spray paint and scalpel tools} image {Artwork/scalpel.gif} xywh {95 545 35 35} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 180 align 16
             }
           }
-          Fl_Group m_GrpWelcomePage {open
-            xywh {0 25 145 680} color 53 hide
+          Fl_Group m_GrpWelcomePage {
+            xywh {0 25 145 680} color 53
           } {
             Fl_Group {} {
               label {ITK+SnAP} open
@@ -366,7 +366,7 @@ OnDrawOverLabelUpdate();} open
             } {}
             Fl_Group {} {
               label {Version 1.0 beta
-11.26.2003} open
+12.07.2003} open
               xywh {5 225 135 35} labelsize 12 align 145
             } {}
             Fl_Group {} {
@@ -389,7 +389,7 @@ information.} open
               } {}
               Fl_Button {} {
                 label {Launch Tutorial}
-                callback {this->OnLaunchTutorialAction();}
+                callback {this->OnLaunchTutorialAction();} selected
                 xywh {25 640 95 25} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 134 labelsize 12
               }
             }
@@ -1453,21 +1453,22 @@ RedrawWindows();}
       } {}
     }
     Fl_Window m_WinProgress {
-      label {SNAP Progress Meter} open selected
-      xywh {730 264 488 100} type Double box PLASTIC_DOWN_BOX visible
+      label {SNAP Progress Meter} open
+      xywh {434 461 488 70} type Double box BORDER_BOX color 53 modal noborder visible
     } {
       Fl_Group {} {
         label {Working... Please Wait!} open
-        xywh {5 5 480 30} labeltype EMBOSSED_LABEL align 16
+        xywh {5 0 480 25} labeltype EMBOSSED_LABEL labelfont 1 labelsize 12 align 16
       } {}
       Fl_Group {} {open
-        xywh {10 40 470 50} box PLASTIC_UP_BOX
+        xywh {10 25 470 40} box ENGRAVED_BOX
       } {
         Fl_Slider m_OutProgressMeter {
-          xywh {20 50 395 30} type {Horz Fill} box PLASTIC_DOWN_BOX color 7 selection_color 180 maximum 100 step 0.1 value 50
+          xywh {20 35 395 20} type {Horz Fill} box PLASTIC_DOWN_BOX selection_color 62 align 16 maximum 100 step 0.1 value 50
         }
         Fl_Value_Output m_OutProgressCounter {
-          xywh {420 50 50 30} color 7 maximum 100 step 0.1 value 50
+          label {%}
+          xywh {420 35 40 20} color 7 labelsize 12 align 8 maximum 100 step 0.1 value 50 textsize 12
         }
       }
     }

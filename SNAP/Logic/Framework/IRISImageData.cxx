@@ -96,9 +96,9 @@ IRISImageData
   std::fstream fout(filename);
 
   // Check if the file is readable
-  if(!fout.good())
-    throw itk::ExceptionObject(__FILE__, __LINE__,
-                               "File can not be opened for writing");
+  // if(!fout.good())
+  //  throw itk::ExceptionObject(__FILE__, __LINE__,
+  //                             "File can not be opened for writing");
   try 
     {
     // Write voxel volumes to the file

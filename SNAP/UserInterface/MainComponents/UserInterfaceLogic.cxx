@@ -2811,7 +2811,7 @@ UserInterfaceLogic
 ::ShowHTMLPage(const char *link)
 {
   // Get the path to the file name
-  string completeLink = string("HTMLHelp") +  link;
+  string completeLink = string("HTMLHelp/") +  link;
   string file = 
     m_SystemInterface->GetFileInRootDirectory(completeLink.c_str());
 
@@ -3016,6 +3016,9 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.14  2003/12/07 19:48:41  pauly
+ *ENH: Resampling, multiresolution
+ *
  *Revision 1.13  2003/11/29 17:06:48  pauly
  *ENH: Minor Help issues
  *
