@@ -246,8 +246,7 @@ Registry::Decode(const StringType &input)
   while(iss.good())
     {  
     // Read the next character
-    char c = '\0'; 
-    c = (char) iss.get();
+    char c = (char) iss.get();
 
     // Check if the character needs to be translated
     if(!isprint(c))
@@ -330,8 +329,12 @@ Registry
 
     // Extract the value
     StringType::size_type iValue = line.find_first_not_of(" \t\v\r\n=",iOper);
-    string value = (iValue == line.npos) ? "" : line.substr(iValue);
-    
+    string value = "";
+    if (iValue != line.npos) 
+      {
+      line.substr(iValue);
+      }
+ 
     // Now the key-value pair is present.  Add it using the normal interface
     Entry(key) = RegistryValue(Decode(value));
 
