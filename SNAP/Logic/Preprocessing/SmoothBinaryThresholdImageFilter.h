@@ -33,7 +33,7 @@ public:
   /**
    * Initialize the function
    */
-  void SetParameters(TInput imageMin,TInput imageMax,
+  void SetParameters(TInput,TInput,
                      const ThresholdSettings &settings)
   {
     // At least one threshold should be used
