@@ -28,7 +28,7 @@
 //  a vtkPolyData structure into an itk::Mesh.
 //  
 //  The example is tailored for the case in which the vtkPolyData
-//  only containes triangle strips.
+//  only containes triangle strips and triangles.
 //
 //
 #include <iostream>
@@ -124,9 +124,6 @@ int main( int argc, char * argv [] )
   //
   vtkCellArray * triangleStrips = polyData->GetStrips();
 
-  const unsigned int numberOfCells = triangleStrips->GetNumberOfCells();
-
-  
 
   vtkIdType  * cellPoints;
   vtkIdType    numberOfCellPoints;
@@ -144,11 +141,29 @@ int main( int argc, char * argv [] )
     }
 
 
+  vtkCellArray * polygons = polyData->GetPolys();
+
+  polygons->InitTraversal();
+
+  while( polygons->GetNextCell( numberOfCellPoints, cellPoints ) )
+    {
+    if( numberOfCellPoints == 3 )
+      {
+      numberOfTriangles ++;
+      }
+    }
+
+
+
+
 
   //
   // Reserve memory in the itk::Mesh for all those triangles
   //
   mesh->GetCells()->Reserve( numberOfTriangles );
+
+
+  
 
 
   
@@ -163,23 +178,49 @@ int main( int argc, char * argv [] )
 
   int cellId = 0;
 
+  // first copy the triangle strips
   triangleStrips->InitTraversal();
   while( triangleStrips->GetNextCell( numberOfCellPoints, cellPoints ) )
     {
     
     unsigned int numberOfTrianglesInStrip = numberOfCellPoints - 2;
 
+    unsigned long pointIds[3];
+    pointIds[0] = cellPoints[0];
+    pointIds[1] = cellPoints[1];
+    pointIds[2] = cellPoints[2];
+
     for( unsigned int t=0; t < numberOfTrianglesInStrip; t++ )
       {
       MeshType::CellAutoPointer c;
-      TriangleCellType * t = new TriangleCellType;
-      t->SetPointIds( (unsigned long*)cellPoints );
-      c.TakeOwnership( t );
+      TriangleCellType * tcell = new TriangleCellType;
+      tcell->SetPointIds( pointIds );
+      c.TakeOwnership( tcell );
       mesh->SetCell( cellId, c );
       cellId++;
+      pointIds[0] = pointIds[1];
+      pointIds[1] = pointIds[2];
+      pointIds[2] = cellPoints[t+3];
       }
 
     
+    }
+
+
+  // then copy the normal triangles
+  polygons->InitTraversal();
+  while( polygons->GetNextCell( numberOfCellPoints, cellPoints ) )
+    {
+    if( numberOfCellPoints !=3 ) // skip any non-triangle.
+      {
+      continue;
+      }
+    MeshType::CellAutoPointer c;
+    TriangleCellType * t = new TriangleCellType;
+    t->SetPointIds( (unsigned long*)cellPoints );
+    c.TakeOwnership( t );
+    mesh->SetCell( cellId, c );
+    cellId++;
     }
 
 
