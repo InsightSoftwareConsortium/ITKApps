@@ -1,6 +1,6 @@
 #!/bin/sh
 #  Program:   Insight Segmentation & Registration Toolkit
-#  Module:    testScript
+#  Module:    testScript.in
 #  Language:  C++
 #  Date:      $Date$
 #  Version:   $Revision$
@@ -11,15 +11,15 @@
 #     This software is distributed WITHOUT ANY WARRANTY; without even 
 #     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
 #     PURPOSE.  See the above copyright notices for more information.
-
-# This script assumes that it's running in the build directory for
+#
+# This script assumes that it's running in the binary directory for
 # InverseConsistentRegistration, if not, you need to edit in the proper
 # path
 
+@CLReg_BINARY_DIR@/CLReg \
+    @CLReg_SOURCE_DIR@/TestInputs/grids.hdr \
+    @CLReg_SOURCE_DIR@/TestInputs/grids.hdr \
+    @CLReg_SOURCE_DIR@/TestInputs/set1.lmk \
+    @CLReg_SOURCE_DIR@/TestInputs/set2.lmk
 
-if [ $# == 0 ] ; then echo need source directory for CLReg as parameter ; fi
-
-./CLReg $1/TestInputs/grids.hdr $1/TestInputs/grids.hdr \
-        $1/TestInputs/set1.lmk $1/TestInputs/set2.lmk
-
-./CLRegTest $1/BaselineResults .
+@CLReg_BINARY_DIR@/CLRegTest @CLReg_SOURCE_DIR@/BaselineResults .
