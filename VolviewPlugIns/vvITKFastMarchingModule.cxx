@@ -74,7 +74,9 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
         module.AddSeed( seedx, seedy, seedz );
         seedCoordinates += 3; // pass to next point
         }
-
+      // Execute the filter
+      module.ProcessData( pds  );
+      break; 
       } 
     }
   }
