@@ -16,10 +16,11 @@ class ITKFlFileWriter : public Fl_File_ChooserModified
 public:
   ITKFlFileWriter(ImageType *imP, const char *d, const char *p, int t, const char *title);
   int GetITKPixelType();
+  bool GetITKCompressFile();
 
 protected:
   Fl_Choice *guiITKPixelType;
-  Fl_Check_Button *guiITKSingleFile;
+  Fl_Check_Button *guiITKCompressFile;
   static void cb_okButton(Fl_Return_Button *o, void *d);
 };
 
@@ -56,8 +57,9 @@ ITKFlFileWriter(ImageType * imP, const char *d, const char *p, int t, const char
   window -> add(o);
 
   
-  Fl_Check_Button* oo = guiITKSingleFile = new Fl_Check_Button(215, 345, 105, 25, "Single File");
+  Fl_Check_Button* oo = guiITKCompressFile = new Fl_Check_Button(200, 345, 85, 25, "Compress");
   oo -> down_box(FL_DOWN_BOX);
+  oo -> value(1);
   window -> add(oo);
 
   window -> end();
@@ -79,6 +81,13 @@ GetITKPixelType()
   return guiITKPixelType -> value();
   }
 
+template<class ImageType>
+bool ITKFlFileWriter<ImageType>::
+GetITKCompressFile()
+  {
+  return guiITKCompressFile -> value();
+  }
+
 
 
 template <class TImage, class TPixelType>
@@ -92,7 +101,7 @@ public:
   itkStaticConstMacro(ImageDimension,unsigned int, ImageType::ImageDimension);
   
 template <class ImageType, class PixelType>
-itkFlWriteFile( ImageType * img, PixelType val, char * filename )
+itkFlWriteFile( ImageType * img, PixelType val, char * filename, bool compress )
   {
   typedef itk::Image< PixelType, itkGetStaticConstMacro(ImageDimension)>  SavedImageType;
   typedef itk::ImageFileWriter< SavedImageType  >             WriterType;
@@ -108,6 +117,7 @@ itkFlWriteFile( ImageType * img, PixelType val, char * filename )
 
   writer -> SetFileName( filename );
   writer -> SetInput( mCastImageFilter -> GetOutput() );
+  writer -> SetUseCompression( compress );
 
   try
     {
@@ -160,31 +170,33 @@ itkFlFileWriter( ImageType *imP,       // O - Filename or NULL
     else 
       return false;
 
+  bool compress = fc -> GetITKCompressFile();
+
   switch(fc -> GetITKPixelType())
     {
     case 0 :
-        itkFlWriteFile<ImageType, char>( imP, (char)0, retname );
+        itkFlWriteFile<ImageType, char>( imP, (char)0, retname, compress );
         break;
     case 1 :
-        itkFlWriteFile<ImageType, unsigned char>( imP, (unsigned char)0, retname );
+        itkFlWriteFile<ImageType, unsigned char>( imP, (unsigned char)0, retname, compress );
         break;
     case 2 :
-        itkFlWriteFile<ImageType, short>( imP, (short)0, retname );
+        itkFlWriteFile<ImageType, short>( imP, (short)0, retname, compress );
         break;
     case 3 :
-        itkFlWriteFile<ImageType, unsigned short>( imP, (unsigned short)0, retname );
+        itkFlWriteFile<ImageType, unsigned short>( imP, (unsigned short)0, retname, compress );
         break;
     case 4 :
-        itkFlWriteFile<ImageType, int>( imP, (int)0, retname );
+        itkFlWriteFile<ImageType, int>( imP, (int)0, retname, compress );
         break;
     case 5 :
-        itkFlWriteFile<ImageType, unsigned int>( imP, (unsigned int)0, retname );
+        itkFlWriteFile<ImageType, unsigned int>( imP, (unsigned int)0, retname, compress );
         break;
     case 6 :
-        itkFlWriteFile<ImageType, float>( imP, (float)0, retname );
+        itkFlWriteFile<ImageType, float>( imP, (float)0, retname, compress );
         break;
     case 7 :
-        itkFlWriteFile<ImageType, double>( imP, (double)0, retname );
+        itkFlWriteFile<ImageType, double>( imP, (double)0, retname, compress );
         break;
     };
   return true;
