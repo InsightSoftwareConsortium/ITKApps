@@ -41,7 +41,7 @@ liFilterConsole2DBase
 
   m_FilterC = CurvatureAnisotropicDiffusionFilterType::New();
   m_FilterC->SetNumberOfIterations( 10 );
-  m_FilterC->SetTimeStep( 0.25 );
+  m_FilterC->SetTimeStep( 0.12 );
   m_FilterC->SetConductanceParameter( 1.0 );
   m_FilterC->SetInput( m_Reader->GetOutput() );
 
