@@ -66,7 +66,7 @@ IF(ITK_CSWIG_PYTHON)
     SOURCE ${ConnectVTKITK_SOURCE_DIR}/ConnectVTKITK.i
     COMMAND ${CableSwig_cswig_EXE}
     ARGS -I${ConnectVTKITK_SOURCE_DIR}
-         -nocable -c ${IGNORE_WARNINGS}
+         -nocable -noruntime ${IGNORE_WARNINGS}
          -o ConnectVTKITK_wrapPython.cxx
 #         -bindir "${EXECUTABLE_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}"
          -python -c++ ${ConnectVTKITK_SOURCE_DIR}/ConnectVTKITK.i
