@@ -168,6 +168,12 @@ int main()
       }
     }
 
+  std::cout << "Number of interior, exterior and error pixels: "
+            << numInteriorPixels << ", "
+            << numExteriorPixels << ", "
+            << numErrorPixels << std::endl;
+
+
   // Volume of ellipsoid using V=(4/3)*pi*(a/2)*(b/2)*(c/2)
   double volume = 4.18879013333*(uniqueAxisLength/2)*(symmetricAxesLength/2)*(symmetricAxesLength/2);
 

@@ -186,9 +186,14 @@ int main()
        }
     }
  
+  std::cout << "Number of interior, exterior and error pixels: "
+            << numInteriorPixels2 << ", "
+            << numExteriorPixels << ", "
+            << numErrorPixels << std::endl;
+
   // Check to see that number of pixels within ellipsoid are equal 
   // for different iteration loops.
-  int numInteriorPixels = 0;
+  int numInteriorPixels;
   if(numInteriorPixels1 == numInteriorPixels2)
     {
     std::cerr << "numInteriorPixels1 != numInteriorPixels2" << std::endl;
