@@ -23,6 +23,7 @@
 #include "itkCastImageFilter.h"
 #include "itkRGBPixel.h"
 #include "itkImageFileReader.h"
+#include "itkImageFileWriter.h"
 
 #include "vtkImageImport.h"
 #include "vtkImageExport.h"
@@ -138,6 +139,30 @@ int main(int argc, char * argv [] )
     vtkImageImport* vtkImporter = vtkImageImport::New();  
     ConnectPipelines(itkExporter, vtkImporter);
     
+
+    // Just for double checking export it from VTK back into ITK 
+    // and save it into a file.
+    typedef itk::VTKImageImport< ImageType > ImportFilterType;
+    ImportFilterType::Pointer itkImporter = ImportFilterType::New();
+
+
+    vtkImageExport* vtkExporter = vtkImageExport::New();  
+    ConnectPipelines(vtkExporter, itkImporter);
+    
+    vtkExporter->SetInput( vtkImporter->GetOutput() );
+    
+    typedef itk::ImageFileWriter< ImageType > WriterType;
+    WriterType::Pointer itkWriter = WriterType::New();
+    itkWriter->SetInput( itkImporter->GetOutput() );
+    
+    if( argc > 2 )
+      {
+      const char * filename = argv[2];
+      std::cout << "Writing file " << filename << std::endl;
+      itkWriter->SetFileName( filename );
+      itkWriter->Update();
+      }
+
     //------------------------------------------------------------------------
     // VTK pipeline.
     //------------------------------------------------------------------------
