@@ -154,7 +154,7 @@ void VV_PLUGIN_EXPORT vvITKScalarImageKMeansClassifierInit(vtkVVPluginInfo *info
   info->ProcessData = ProcessData;
   info->UpdateGUI   = UpdateGUI;
   info->SetProperty(info, VVP_NAME, "Scalar Image K-Means");
-  info->SetProperty(info, VVP_GROUP, "Segmentation Statistics");
+  info->SetProperty(info, VVP_GROUP, "Segmentation - Statistics");
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
     "Performs classification of a Scalar image using the K-Means algorithm");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,
