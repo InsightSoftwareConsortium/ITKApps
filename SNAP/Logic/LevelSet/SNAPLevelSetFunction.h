@@ -207,10 +207,10 @@ public:
   
   /** Set/Get the time step. For this filter the time-step is supplied 
       by the user and remains fixed for all updates. */
-  void SetTimeStep(const TimeStepType &t)
-    { m_TimeStep = t; }
-  const TimeStepType &GetTimeStep() const
-    { return m_TimeStep; }
+  void SetTimeStepFactor(const TimeStepType &t)
+    { m_TimeStepFactor = t; }
+  const TimeStepType &GetTimeStepFactor() const
+    { return m_TimeStepFactor; }
 
   /** Returns the time step supplied by the user.  If the time step value
       passed on to this filter is equal to zero, this method will use the
@@ -218,9 +218,9 @@ public:
       is non-zero, the fixed time step will be returned. */
   virtual TimeStepType ComputeGlobalTimeStep(void *GlobalData) const
     { 
-    return m_TimeStep == 0
+    return m_TimeStepFactor == 0
       ? Superclass::ComputeGlobalTimeStep(GlobalData)
-      : m_TimeStep; 
+      : m_TimeStepFactor * Superclass::ComputeGlobalTimeStep(GlobalData); 
     }
 
 protected:
@@ -273,7 +273,7 @@ private:
   typename VectorInterpolatorType::Pointer m_AdvectionFieldInterpolator;
 
   /** The constant time step */
-  TimeStepType m_TimeStep;
+  TimeStepType m_TimeStepFactor;
   
   /** A trivial functor to square the g() image */
   class SquareFunctor

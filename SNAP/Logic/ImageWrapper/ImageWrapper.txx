@@ -213,7 +213,7 @@ ImageWrapper<TPixel>
 
   // Check if there is a difference in voxel size, i.e., user wants resampling
   Vector3ul vOldSize(m_Image->GetLargestPossibleRegion().GetSize().GetSize());
-  Vector3d vOldSpacing(m_Image->GetSpacing());//.GetDataPointer());
+  Vector3d vOldSpacing(m_Image->GetSpacing().GetDataPointer());
   
   if(roi.GetResampleFlag())
     {

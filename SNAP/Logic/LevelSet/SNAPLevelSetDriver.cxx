@@ -85,8 +85,8 @@ SNAPLevelSetDriver
   m_LevelSetFunction->Initialize(to_itkSize(Vector3i(1)));
 
   // Set the time step
-  m_LevelSetFunction->SetTimeStep(
-    p.GetAutomaticTimeStep() ? 0.0 : p.GetTimeStep());
+  m_LevelSetFunction->SetTimeStepFactor(
+    p.GetAutomaticTimeStep() ? 1.0 : p.GetTimeStepFactor());
 
   // Remember the parameters
   m_Parameters = p;

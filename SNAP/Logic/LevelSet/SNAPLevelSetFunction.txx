@@ -25,7 +25,7 @@ SNAPLevelSetFunction<TImageType>
 ::SNAPLevelSetFunction()
 : Superclass()
 {
-  m_TimeStep = 1.0f;
+  m_TimeStepFactor = 1.0f;
   
   m_CurvatureSpeedExponent = 0;
   m_AdvectionSpeedExponent = 0;

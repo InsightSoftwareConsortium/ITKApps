@@ -22,7 +22,7 @@ SnakeParameters
   SnakeParameters p;
 
   p.m_AutomaticTimeStep = true;
-  p.m_TimeStep = 0.1f;
+  p.m_TimeStepFactor = 1.0f;
   p.m_Ground = 5.0;
 
   p.m_SnakeType = EDGE_SNAKE;
@@ -52,7 +52,7 @@ SnakeParameters
   SnakeParameters p;
 
   p.m_AutomaticTimeStep = true;
-  p.m_TimeStep = 0.1f;
+  p.m_TimeStepFactor = 1.0f;
   p.m_Ground = 5.0;
 
   p.m_SnakeType = REGION_SNAKE;
@@ -82,7 +82,7 @@ SnakeParameters
   SnakeParameters p;
 
   p.m_AutomaticTimeStep = true;
-  p.m_TimeStep = 0.1f;
+  p.m_TimeStepFactor = 0.1f;
   p.m_Ground = 5.0;
 
   p.m_SnakeType = REGION_SNAKE;
@@ -111,7 +111,7 @@ SnakeParameters
 {
   return(
     m_AutomaticTimeStep == p.m_AutomaticTimeStep &&
-    (m_AutomaticTimeStep || (m_TimeStep == p.m_TimeStep)) &&
+    (m_AutomaticTimeStep || (m_TimeStepFactor == p.m_TimeStepFactor)) &&
     m_Ground == p.m_Ground &&
     m_SnakeType == p.m_SnakeType &&
     m_Clamp == p.m_Clamp &&

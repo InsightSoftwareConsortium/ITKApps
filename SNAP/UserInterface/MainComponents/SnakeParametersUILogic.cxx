@@ -88,7 +88,7 @@ void
 SnakeParametersUILogic
 ::OnTimeStepChange(Fl_Valuator *input)
 {
-  m_Parameters.SetTimeStep(input->value());
+  m_Parameters.SetTimeStepFactor(input->value());
   this->OnParameterUpdate();
 }
 
@@ -371,7 +371,7 @@ void SnakeParametersUILogic
     m_InSmoothingWeight->activate();
     }
 
-  m_InTimeStep->value(m_Parameters.GetTimeStep());
+  m_InTimeStep->value(m_Parameters.GetTimeStepFactor());
   m_InSmoothingWeight->value(m_Parameters.GetLaplacianWeight());
 
   // Update the parameter display windows

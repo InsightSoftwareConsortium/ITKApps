@@ -142,12 +142,13 @@ public:
     return GetValueWithDefault(m_String,m_Null,defaultValue);
   }
 
-
+/*
   template <class T, int VSize> iris_vector_fixed<T,VSize>
     operator[](const iris_vector_fixed<T,VSize> &defaultValue)
   {
     return GetValueWithDefault(m_String,m_Null,defaultValue);
   }
+*/
 
   /**
    * An operator that allows us to write a value using different formats

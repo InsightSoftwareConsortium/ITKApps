@@ -26,7 +26,7 @@ RestrictedImageIOWizardLogic<TPixel>
   // Get the size and spacing of the grey image
   SizeType requiredSize = m_GreyImage->GetBufferedRegion().GetSize();
 
-  const double *requiredSpacing = m_GreyImage->GetSpacing();//.GetDataPointer();
+  const double *requiredSpacing = m_GreyImage->GetSpacing().GetDataPointer();
 
   // Prepare the header page of the wizard UI
   m_InHeaderPageDimX->value(requiredSize[0]);

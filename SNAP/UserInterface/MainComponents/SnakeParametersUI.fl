@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0102 
+version 1.0104 
 header_name {.h} 
 code_name {.cxx}
 class SnakeParametersUI {open : SnakeParametersUIBase
@@ -8,7 +8,7 @@ class SnakeParametersUI {open : SnakeParametersUIBase
   } {
     Fl_Window m_Window {
       label {Snake Parameters} open
-      xywh {256 218 716 447} box PLASTIC_DOWN_BOX
+      xywh {256 218 716 447} type Double box PLASTIC_DOWN_BOX
       code0 {\#include "SnakeParametersUIBase.h"} non_modal visible
     } {
       Fl_Tabs m_TabsMode {open
@@ -264,10 +264,10 @@ OnPropagationWeightChange(o);}
             xywh {20 185 320 100} box PLASTIC_DOWN_BOX color 22 selection_color 245 labelsize 12 align 5
           } {
             Fl_Value_Slider m_InTimeStep {
-              label {Time step:}
+              label {Speed-up factor:}
               callback {o->take_focus();
 OnTimeStepChange(o);}
-              xywh {185 230 145 20} type Horizontal labelsize 11 align 4 value 0.1 textsize 11 deactivate
+              tooltip {Specify how much faster the snake evolution should be performed} xywh {185 230 145 20} type Horizontal labelsize 11 align 4 minimum 1 maximum 10 step 0.25 value 2 textsize 11 deactivate
             }
             Fl_Round_Button {m_BtnTimeStepAuto[0]} {
               callback {this->OnTimeStepAutoAction();}
@@ -282,15 +282,15 @@ OnTimeStepChange(o);}
               xywh {45 190 200 20} labelsize 11 align 20
             } {}
             Fl_Group {} {
-              label {Supply time step manually:}
+              label {Override optimal time step (faster but less robust):}
               callback {this->OnTimeStepAutoAction();} open
-              xywh {45 210 135 20} labelsize 11 align 20
+              xywh {45 210 285 20} labelsize 11 align 20
             } {}
             Fl_Value_Slider m_InSmoothingWeight {
               label {Noise reduction:}
               callback {o->take_focus();
 OnSmoothingWeightChange(o);}
-              xywh {185 255 145 20} type Horizontal labelsize 11 align 4 value 0.1 textsize 11 deactivate
+              tooltip {Experimental feature: additional smoothing of the snake} xywh {185 255 145 20} type Horizontal labelsize 11 align 4 value 0.1 textsize 11 deactivate
             }
           }
           Fl_Group {} {
@@ -424,7 +424,7 @@ OnSmoothingWeightChange(o);}
     }
     Fl_Window {} {
       label {Junk box} open
-      xywh {70 117 378 423} hide
+      xywh {70 117 378 423} type Double hide
     } {
       Fl_Group m_GrpClassic {
         label {Classic Mode} open

@@ -67,10 +67,11 @@ public:
   irisGetMacro(AutomaticTimeStep,bool);
   irisSetMacro(AutomaticTimeStep,bool);
 
-  /** Time step in level snake propagation.  This is is only used if the
-   * automatic computation is off */
-  irisGetMacro(TimeStep,float);
-  irisSetMacro(TimeStep,float);
+  /** Time step factor in level snake propagation.  This is is only used if the
+   * automatic computation is off, and represents the factor by which the auto
+   * time step is multiplied */
+  irisGetMacro(TimeStepFactor,float);
+  irisSetMacro(TimeStepFactor,float);
 
   /** Clamp-to-ground parameter.  Obsolete in ITK implementation, kept for
     backward compatibility and regression testing */
@@ -115,7 +116,7 @@ public:
   irisSetMacro(AdvectionSpeedExponent,int);
 
 private:
-  float m_TimeStep;
+  float m_TimeStepFactor;
   float m_Ground;
 
   SnakeType m_SnakeType;

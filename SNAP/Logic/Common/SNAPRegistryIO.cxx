@@ -56,8 +56,8 @@ SNAPRegistryIO
   out.SetAutomaticTimeStep(
     registry["AutomaticTimeStep"][defaultSet.GetAutomaticTimeStep()]);
 
-  out.SetTimeStep(
-    registry["TimeStep"][defaultSet.GetTimeStep()]);
+  out.SetTimeStepFactor(
+    registry["TimeStepFactor"][defaultSet.GetTimeStepFactor()]);
 
   out.SetGround(
     registry["Ground"][defaultSet.GetGround()]);
@@ -106,7 +106,7 @@ SNAPRegistryIO
 ::WriteSnakeParameters(const SnakeParameters &in,Registry &registry)
 {
   registry["AutomaticTimeStep"] << in.GetAutomaticTimeStep();
-  registry["TimeStep"] << in.GetTimeStep();
+  registry["TimeStepFactor"] << in.GetTimeStepFactor();
   registry["Ground"] << in.GetGround();
   registry["Clamp"] << in.GetClamp();
   registry["PropagationWeight"] << in.GetPropagationWeight();
