@@ -25,7 +25,7 @@ DeformableModelApplicationBase
 
   m_SphereMeshSource->SetCenter(center);
   m_SphereMeshSource->SetScale( sphereRadius );
-  m_SphereMeshSource->SetResolution(2); 
+  m_SphereMeshSource->SetResolution(3); 
 
   m_SimplexFilter  = SimplexFilterType::New();
   m_SimplexFilter->SetInput( m_SphereMeshSource->GetOutput() );

@@ -54,8 +54,21 @@ DeformableModelApplication
   m_SurfaceViewerCommand = itk::SimpleMemberCommand<DeformableModelApplication>::New();
   m_SurfaceViewerCommand->SetCallbackFunction(this, &DeformableModelApplication::ProcessAxialViewInteraction);
   m_SimplexMeshViewer.AddObserver(ClickedPointEvent(), m_SurfaceViewerCommand);
-  
-   m_InternalForcesComputed = false;
+
+  const float alpha = 0.2;
+  const float beta  = 0.1;
+  const float kappa = 0.0;
+
+  m_InternalForceValueInput->value( alpha );
+  m_ExternalForceValueInput->value( beta );
+  m_BalloonForceValueInput->value( kappa );
+
+  m_DeformFilter->SetAlpha( alpha );
+  m_DeformFilter->SetBeta( beta );
+  m_DeformFilter->SetKappa( kappa );
+  m_DeformFilter->SetRigidity( 0 );
+ 
+  m_InternalForcesComputed = false;
 }
 
 
@@ -256,17 +269,10 @@ DeformableModelApplication
   
   m_SimplexMesh->DisconnectPipeline();
 
-  m_DeformFilter->SetAlpha(0.2);
-  m_DeformFilter->SetBeta(0.0);
-  m_DeformFilter->SetKappa(1.0);
-  m_DeformFilter->SetRigidity(2);
-
-  for (unsigned int i=0; i< 100; i++ ) 
+  for (unsigned int i=0; i< 10; i++ ) 
     {
-    std::cout << "I is " << i << std::endl;
-
     m_DeformFilter->SetInput( m_SimplexMesh );
-    m_DeformFilter->SetIterations(1); 
+    m_DeformFilter->SetIterations(10); 
     m_DeformFilter->Update();
 
     m_SimplexMesh =  m_DeformFilter->GetOutput();
