@@ -43,6 +43,15 @@ DeformableModelModule<TInputPixelType>
     m_GradientMagnitudeFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
     m_DeformableModelFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
 
+    m_MeshSource->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
+    m_GradientFilter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
+    m_GradientMagnitudeFilter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
+    m_DeformableModelFilter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
+
+    m_MeshSource->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
+    m_GradientFilter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
+    m_GradientMagnitudeFilter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
+    m_DeformableModelFilter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
 }
 
 
@@ -162,9 +171,20 @@ DeformableModelModule<TInputPixelType>
                                     importFilterWillDeleteTheInputBuffer );
 
   // Execute the filters and progressively remove temporary memory
+  this->SetCurrentFilterProgressWeight( 0.02 );
+  this->SetUpdateMessage("Preprocessing: Generating Initial Mesh...");
   m_MeshSource->Update();
+  
+  this->SetCurrentFilterProgressWeight( 0.19 );
+  this->SetUpdateMessage("Preprocessing: computing gradient magnitude...");
   m_GradientMagnitudeFilter->Update();
+
+  this->SetCurrentFilterProgressWeight( 0.19 );
+  this->SetUpdateMessage("Preprocessing: computing gradient...");
   m_GradientFilter->Update();
+  
+  this->SetCurrentFilterProgressWeight( 0.60 );
+  this->SetUpdateMessage("Computing Deformable Model...");
   m_DeformableModelFilter->Update();
 
   this->PostProcessData( pds );
