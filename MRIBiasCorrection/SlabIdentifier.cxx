@@ -57,12 +57,12 @@ int main(int argc, char* argv[])
 
   std::string inputFileName ;
   int sliceDirection ;
-  int samplesPerSlice ;
+  int numberOfSamples ;
   try
     {
       // get image file options
       options.GetStringOption("input", &inputFileName, true) ;
-      samplesPerSlice = options.GetIntOption("samples-per-slice", 10, true) ;
+      numberOfSamples = options.GetIntOption("samples-per-slice", 10, true) ;
       sliceDirection = options.GetIntOption("slice-direction", 2, true) ;
     }
   catch(OptionList::RequiredOptionMissing e)
@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
   SlabIdentifier::Pointer identifier = SlabIdentifier::New() ;
 
   identifier->SetImage(image) ;
-  identifier->SetNumberOfMinimumsPerSlice(samplesPerSlice) ;
+  identifier->SetNumberOfSamples(numberOfSamples) ;
   identifier->SetSlicingDirection(sliceDirection) ;
   std::cout << "Searching slabs..." << std::endl ;
   identifier->GenerateSlabRegions() ;
