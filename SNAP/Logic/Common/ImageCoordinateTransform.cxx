@@ -16,6 +16,11 @@
 #include "vnl/vnl_inverse.h"
 
 #include <cmath>
+#include <IRISVectorTypes.h>
+
+Vector3ui IRISSNAPdummyVector;
+iris_vector_fixed<float,3> irissnapdummyvector = to_float<unsigned int,3>(IRISSNAPdummyVector);
+
 
 ImageCoordinateTransform
 ::ImageCoordinateTransform()

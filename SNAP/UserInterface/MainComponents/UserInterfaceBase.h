@@ -17,6 +17,11 @@
 
 #include "SNAPCommonUI.h"
 
+/** Borland Compiler is tricky */
+#include <itkImage.h>
+typedef itk::ImageBase<2> SNAPDummyImageBaseType;
+typedef itk::Image<unsigned char,2> SNAPDummyImageType;
+
 // TODO: this is a hack.  Clean all code out of GUI!!!
 #include "GlobalState.h"
 
