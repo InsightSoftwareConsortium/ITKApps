@@ -31,5 +31,8 @@ ENDIF(NOT UNIX)
 # Create project files for all examples
 ADD_EXECUTABLE(FEMRead FEMRead.cxx)
 ADD_EXECUTABLE(FEMTruss FEMTruss.cxx)
+IF(NOT BORLAND)
 ADD_EXECUTABLE(FEMImageRegLMEx ${FEMImageRegLMEx_SRCS})
+ENDIF(NOT BORLAND)
 ADD_EXECUTABLE(FEMSolverHyperbolicExample FEMSolverHyperbolicExample.cxx)
+
