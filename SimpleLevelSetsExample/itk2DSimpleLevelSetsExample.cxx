@@ -105,6 +105,8 @@ public:
    */
   itkNewMacro(Self);
 
+  typedef Superclass::GlobalDataStruct GlobalDataStruct;
+  
 protected:
   ~MorphFunction() {}
 
@@ -120,7 +122,7 @@ private:
  
   virtual ScalarValueType PropagationSpeed(
                             const NeighborhoodType& neighborhood,
-                            const FloatOffsetType &
+                            const FloatOffsetType &, GlobalDataStruct *
                           ) const
     {
       Index<2> idx = neighborhood.GetIndex();
