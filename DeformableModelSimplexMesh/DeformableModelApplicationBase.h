@@ -11,16 +11,14 @@
 #include "itkVector.h"
 #include "itkImageFileReader.h"
 #include "itkCastImageFilter.h"
-#include "itkCurvatureAnisotropicDiffusionImageFilter.h"
+
 #include "itkGradientAnisotropicDiffusionImageFilter.h"
 #include "itkGradientMagnitudeRecursiveGaussianImageFilter.h"
-#include "itkMinimumMaximumImageCalculator.h"
+
 #include "itkShiftScaleImageFilter.h"
-#include "itkVectorRescaleIntensityImageFilter.h"
-#include "itkVectorGradientMagnitudeImageFilter.h"
+
 #include "itkVTKImageExport.h"
 #include "itkSigmoidImageFilter.h"
-#include "itkBinaryMask3DMeshSource.h"
 
 #include "itkImageToVTKImageFilter.h"
 #include "itkRescaleIntensityImageFilter.h"
@@ -37,23 +35,12 @@
 #include "itkGradientRecursiveGaussianImageFilter.h"
 #include "itkSobelEdgeDetectionImageFilter.h"
 
-class Leila
-{
- public:
-  int a;
-
- protected:
-  double b;
-};
-
-
 
 class DeformableModelApplicationBase 
 {
 
 public:
   
-  //typedef unsigned short   PixelType;
   typedef float   PixelType;
 
   typedef unsigned char  VisualizationPixelType;
@@ -62,31 +49,19 @@ public:
   
   typedef itk::Image< float, 3 >                      CastType;
   typedef itk::Image<unsigned char, 3>               MeshPixelType;
-  typedef itk::Mesh < double >           BinaryMeshType;
 
-  typedef itk::Vector<float, 3>          VectorPixelType;
-  typedef itk::Image<VectorPixelType, 3> VectorImageType;
-  
-  //typedef itk::Vector< float, 3 >                     VectorType;
-  
-  //typedef itk::Image< PixelType, 2 >                  ImageType;
+  typedef itk::Vector<float, 3>                      VectorPixelType;
+  typedef itk::Image<VectorPixelType, 3>             VectorImageType;
   
   typedef itk::ImageFileReader< VolumeType >          VolumeReaderType;
 
   typedef itk::CastImageFilter < VolumeType, CastType > CastImageType;
-
-  typedef itk::BinaryMask3DMeshSource < BinaryMeshType > BinaryMaskType;
-
-  typedef itk::CurvatureAnisotropicDiffusionImageFilter < CastType, CastType >  AnisotropicImageType;
 
   typedef itk::GradientAnisotropicDiffusionImageFilter < CastType, CastType >  GradientAnisotropicImageType;
   typedef itk::GradientMagnitudeRecursiveGaussianImageFilter < CastType, CastType >  GradientMagnitudeType;
 
   
   typedef itk::ImageToVTKImageFilter < MeshPixelType > ImageToVTKImageType;
-  
-  typedef itk::MinimumMaximumImageCalculator < CastType > ImageCalculatorType;
-
   
   typedef itk::SigmoidImageFilter< CastType, CastType > SigmoidImageType;
  
@@ -131,24 +106,17 @@ public:
   typedef SimplexMeshType::LineType  lineType;
   typedef SimplexMeshType::CellType  cellType;
 
-  //deformation stuff
+  // Deformable Models
 
-   typedef itk::DeformableSimplexMesh3DFilter<SimplexMeshType,SimplexMeshType> DeformFilterType;
+  typedef itk::DeformableSimplexMesh3DFilter<SimplexMeshType,SimplexMeshType> DeformFilterType;
  
-   typedef itk::SobelEdgeDetectionImageFilter<CastType,CastType> EdgeFilterType;
+  typedef itk::SobelEdgeDetectionImageFilter<CastType,CastType> EdgeFilterType;
 
-   typedef DeformFilterType::GradientImageType       GradientImageType;
+  typedef DeformFilterType::GradientImageType       GradientImageType;
 
-   //typedef itk::GradientRecursiveGaussianImageFilter<CastType,GradientImageType> GradientFilterType;
-   
-   typedef itk::GradientRecursiveGaussianImageFilter<CastType,GradientImageType> GradientFilterType;
-   
-   typedef itk::VectorRescaleIntensityImageFilter < GradientImageType, GradientImageType> VectorRescaleIntensity;
-   // typedef itk::ShiftScaleImageFilter < CastType, CastType > ShiftScaleType;
-
-   typedef itk::VectorGradientMagnitudeImageFilter < GradientImageType >  VectorGradientMagnitudeType;
-
-   typedef itk::SimpleMemberCommand< DeformableModelApplicationBase >         IterationObserverType;
+  typedef itk::GradientRecursiveGaussianImageFilter<CastType,GradientImageType> GradientFilterType;
+  
+  typedef itk::SimpleMemberCommand< DeformableModelApplicationBase >  IterationObserverType;
 
 public:
   
@@ -169,22 +137,12 @@ protected:
   VolumeReaderType::Pointer               m_VolumeReader;
 
   CastImageType::Pointer                  m_CastImage;
-
-  AnisotropicImageType::Pointer           m_AnisotropicImage;
   
   GradientAnisotropicImageType::Pointer   m_GradientAnisotropicImage;
 
   GradientMagnitudeType::Pointer          m_GradientMagnitude;
 
-  VectorGradientMagnitudeType::Pointer    m_VectorGradientMagnitude;
-
-  VectorRescaleIntensity::Pointer         m_VectorRescale;
-
   SigmoidImageType::Pointer               m_SigmoidImage;
-
-  ImageCalculatorType::Pointer            m_ImageCalculator;
-
-  //  ShiftScaleType::Pointer                 m_ShiftScale;
   
   RescaleIntensityFilterType::Pointer     m_RescaleIntensity;
 
@@ -204,8 +162,6 @@ protected:
  
   DeformFilterType::Pointer               m_DeformFilter;
 
-  EdgeFilterType::Pointer                 m_EdgeFilter;
-
   GradientFilterType::Pointer             m_GradientFilter;
   
   IterationObserverType::Pointer          m_IterationObserver;
@@ -216,7 +172,6 @@ protected:
   SimplexFilterType::Pointer              m_SimplexMeshFilter;
   SimplexMeshType::Pointer                m_SimplexMeshLoaded;
 
-  BinaryMaskType::Pointer                 m_BinaryMask;
 };
 
 

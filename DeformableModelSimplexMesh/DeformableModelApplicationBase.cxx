@@ -11,21 +11,11 @@ DeformableModelApplicationBase
 
   m_CastImage         = CastImageType::New();
 
-  m_AnisotropicImage  = AnisotropicImageType::New();
-
   m_GradientAnisotropicImage  = GradientAnisotropicImageType::New();
 
   m_GradientMagnitude = GradientMagnitudeType::New();
 
   m_SigmoidImage = SigmoidImageType::New();
-
-  m_VectorRescale = VectorRescaleIntensity::New();
-
-  m_ImageCalculator   = ImageCalculatorType::New();
-
-  m_BinaryMask = BinaryMaskType::New();
-
-  //m_ShiftScale        = ShiftScaleType::New();
 
   m_RescaleIntensity  = RescaleIntensityFilterType::New();
 
@@ -59,16 +49,8 @@ DeformableModelApplicationBase
   m_TriangleMesh = TriangleMeshType::New();
 
   m_SimplexMeshFilter  = SimplexFilterType::New();
-  //m_SimplexMeshFilter->SetInput( m_SphereMeshSource->GetOutput() );
-  
-  m_EdgeFilter = EdgeFilterType::New();
-  //m_EdgeFilter->SetInput( m_VolumeReader->GetOutput() );
 
   m_GradientFilter = GradientFilterType::New();
-  //m_GradientFilter->SetInput( m_VolumeReader->GetOutput() );
-  //m_GradientFilter->SetInput( m_EdgeFilter->GetOutput() );
-  //m_GradientFilter->SetSigma( 5.0 );
-   m_VectorGradientMagnitude = VectorGradientMagnitudeType::New();
 
   m_IterationObserver = IterationObserverType::New();
   m_IterationObserver->SetCallbackFunction( this, & DeformableModelApplicationBase::IterationCallback );
@@ -79,14 +61,10 @@ DeformableModelApplicationBase
 }
 
 
-
-
 DeformableModelApplicationBase
 ::~DeformableModelApplicationBase()
 {
 }
-
-
 
 
 void  
@@ -103,9 +81,9 @@ void
 DeformableModelApplicationBase::GetSeedPoint(double data[3])
 {
   for(int i=0; i<3; i++)
-  {
-    data[i] = m_SeedPoint[i];
-  }
+    {
+      data[i] = m_SeedPoint[i];
+    }
 }
 
 

@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0102
+version 1.0104 
 header_name {.h} 
 code_name {.cxx}
 class DeformableModelApplicationGUI {open : {public DeformableModelApplicationBase}
@@ -7,7 +7,7 @@ class DeformableModelApplicationGUI {open : {public DeformableModelApplicationBa
   Function {DeformableModelApplicationGUI()} {open
   } {
     Fl_Window mainWindow {
-      label DeformableModelApplication
+      label DeformableModelApplication open
       xywh {195 100 870 850} type Double resizable
       code0 {\#include "DeformableModelApplicationBase.h"} visible
     } {
@@ -15,6 +15,11 @@ class DeformableModelApplicationGUI {open : {public DeformableModelApplicationBa
         label Quit
         callback {this->Quit();}
         xywh {491 765 75 40}
+      }
+      Fl_Button {} {
+        label SaveMesh
+        callback {this->SaveMesh();}
+        xywh {413 765 75 40}
       }
       Fl_Button {} {
         label SaveMesh
@@ -30,6 +35,11 @@ class DeformableModelApplicationGUI {open : {public DeformableModelApplicationBa
         label {Prepare Forces}
         callback {this->ComputeInternalForces();}
         xywh {257 765 75 40} align 128
+      }
+      Fl_Button {} {
+        label {Load Mesh}
+        callback {this->LoadMesh();}
+        xywh {179 765 75 40} align 128
       }
       Fl_Button {} {
         label {Load Mesh}
@@ -104,8 +114,8 @@ class DeformableModelApplicationGUI {open : {public DeformableModelApplicationBa
       }
     }
     Fl_Window creditsWindow {
-      label Credits
-      xywh {595 428 405 215} type Double visible
+      label Credits selected
+      xywh {595 428 405 215} type Double modal visible
     } {
       Fl_Box {} {
         label Author
@@ -115,9 +125,21 @@ class DeformableModelApplicationGUI {open : {public DeformableModelApplicationBa
         label {Leila Bagdadi}
         xywh {105 55 170 25} align 20
       }
+      Fl_Box {} {
+        label {Mouse Imaging Centre (MICe)}
+        xywh {105 80 170 25} align 20
+      }
+      Fl_Box {} {
+        label {Hospital for Sick Children}
+        xywh {105 105 170 25} align 20
+      }
+      Fl_Box {} {
+        label {Toronto, Ontario, Canada}
+        xywh {105 130 170 25} align 20
+      }
       Fl_Button {} {
         label Close
-        callback {creditsWindow->hide();} selected
+        callback {creditsWindow->hide();}
         xywh {155 175 105 25}
       }
     }
