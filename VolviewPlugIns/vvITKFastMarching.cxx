@@ -37,11 +37,6 @@ class FastMarchingRunner
       const float normalizationFactor   = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
 
       const unsigned int numberOfSeeds = info->NumberOfMarkers;
-      if( numberOfSeeds < 1 )
-        {
-        info->SetProperty( info, VVP_ERROR, "Please select points using the 3D Markers in the Annotation menu" ); 
-        return;
-        }
 
       const double seedValue = 0.0;
       IndexType seedPosition;
@@ -93,6 +88,11 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     return -1;
     }
 
+  if( info->NumberOfMarkers < 1 )
+    {
+    info->SetProperty( info, VVP_ERROR, "Please select points using the 3D Markers in the Annotation menu" ); 
+    return -1;
+    }
 
   try 
   {

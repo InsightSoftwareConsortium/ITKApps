@@ -27,11 +27,6 @@ class IsolatedConnectedRunner
       const int   replaceValue    = atoi( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ) );
       const bool  compositeOutput = atoi( info->GetGUIProperty(info, 4, VVP_GUI_VALUE ) );
 
-      if( info->NumberOfMarkers < 2 )
-        {
-        info->SetProperty( info, VVP_ERROR, "Please select two seed point using the 3D Markers in the Annotation menu. The first seed point in the region to segment, the second seed point in the region to reject." ); 
-        return;
-        }
 
       itk::Index<Dimension> seed1;
       itk::Index<Dimension> seed2;
@@ -71,6 +66,12 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
   if( info->InputVolumeNumberOfComponents != 1 )
     {
     info->SetProperty( info, VVP_ERROR, "This filter requires a single-component data set as input" ); 
+    return -1;
+    }
+
+  if( info->NumberOfMarkers < 2 )
+    {
+    info->SetProperty( info, VVP_ERROR, "Please select two seed point using the 3D Markers in the Annotation menu. The first seed point in the region to segment, the second seed point in the region to reject." ); 
     return -1;
     }
 

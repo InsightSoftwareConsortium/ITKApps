@@ -31,11 +31,6 @@ class ShapeDetectionModuleRunner
 
 
       const unsigned int numberOfSeeds = info->NumberOfMarkers;
-      if( numberOfSeeds < 1 )
-        {
-        info->SetProperty( info, VVP_ERROR, "Please select points using the 3D Markers in the Annotation menu" ); 
-        return;
-        }
 
       itk::Index<3> seedPosition;
 
@@ -73,6 +68,17 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 
   vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
+  if( info->InputVolumeNumberOfComponents != 1 )
+    {
+    info->SetProperty( info, VVP_ERROR, "This filter requires a single-component data set as input" ); 
+    return -1;
+    }
+
+  if( info->NumberOfMarkers < 1 )
+    {
+    info->SetProperty( info, VVP_ERROR, "Please select points using the 3D Markers in the Annotation menu" ); 
+    return -1;
+    }
 
   try 
   {
