@@ -185,7 +185,7 @@ public:
     const unsigned int numberOfPixelsPerSlice2 = size[0] * size[1];
 
     Input2PixelType * dataBlock2Start = 
-                          static_cast< Input2PixelType * >( pds->inData )  
+                          static_cast< Input2PixelType * >( pds->inData2 )  
                         + numberOfPixelsPerSlice2 * pds->StartSlice;
 
     m_ImportFilter2->SetImportPointer( dataBlock2Start, 
