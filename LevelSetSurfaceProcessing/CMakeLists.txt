@@ -1,0 +1,18 @@
+LINK_LIBRARIES (
+ITKAlgorithms
+ITKBasicFilters
+ITKCommon
+ITKIO
+)
+
+ADD_EXECUTABLE(itk3DIsotropicFourthOrderLevelSetImageFilter itk3DIsotropicFourthOrderLevelSetImageFilter.cxx)
+ADD_EXECUTABLE(itk3DAnisotropicFourthOrderLevelSetImageFilter itk3DAnisotropicFourthOrderLevelSetImageFilter.cxx)
+ADD_EXECUTABLE(itk3DUnsharpMaskLevelSetImageFilter itk3DUnsharpMaskLevelSetImageFilter.cxx)
+
+
+
+
+
+
+
+
