@@ -74,11 +74,10 @@ public:
     const RealImageType * GetLevelSet();
 
 private:
-    FastMarchingModuleType                          m_FastMarchingModule;
-    typename GeodesicActiveContourFilterType::Pointer      m_GeodesicActiveContourFilter;
-    typename IntensityWindowingFilterType::Pointer  m_IntensityWindowingFilter;
-
-    bool                                            m_PerformPostprocessing;
+    FastMarchingModuleType                              m_FastMarchingModule;
+    typename GeodesicActiveContourFilterType::Pointer   m_GeodesicActiveContourFilter;
+    typename IntensityWindowingFilterType::Pointer      m_IntensityWindowingFilter;
+    bool                                                m_PerformPostprocessing;
 
 };
 
