@@ -47,6 +47,7 @@ SET(LOGIC_HEADERS
   Common/IRISVectorTypes.txx
   Common/Registry.h
   Common/SNAPCommon.h
+  Common/SNAPOpenGL.h
   Common/SystemInterface.h
   Logic/Common/ColorLabel.h
   Logic/Common/ImageCoordinateGeometry.h

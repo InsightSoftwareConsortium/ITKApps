@@ -16,7 +16,7 @@
 #include "SnakeParametersPreviewBox.h"
 #include "SnakeParametersPreviewPipeline.h"
 #include "OpenGLSliceTexture.h"
-#include "GL/glu.h"
+#include "SNAPOpenGL.h"
 
 
 using namespace itk;                              

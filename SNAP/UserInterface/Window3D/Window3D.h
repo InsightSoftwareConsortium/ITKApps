@@ -17,8 +17,7 @@
 
 #include <FL/Fl.H>
 #include <FL/Fl_Gl_Window.H>
-#include <FL/gl.h>
-#include <GL/glu.h>
+#include "SNAPOpenGL.h"
 #include <stdlib.h>
 #include "FLTKCanvas.h"
 #include "SNAPCommonUI.h"
@@ -244,6 +243,9 @@ private:
 
 /*
  *Log: Window3D.h
+ *Revision 1.5  2003/10/09 22:45:15  pauly
+ *EMH: Improvements in 3D functionality and snake parameter preview
+ *
  *Revision 1.4  2003/10/02 14:55:53  pauly
  *ENH: Development during the September code freeze
  *

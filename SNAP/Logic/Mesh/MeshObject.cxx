@@ -48,8 +48,7 @@
 
 // System includes
 #include <cstdlib>
-#include <FL/gl.h>
-#include <GL/glu.h>
+#include "SNAPOpenGL.h"
 
 using namespace itk;
 using namespace std;
@@ -328,6 +327,9 @@ MeshObject
 
 /*
  *Log: MeshObject.cxx
+ *Revision 1.10  2004/01/20 00:17:42  pauly
+ *FIX: VTK float compatibility
+ *
  *Revision 1.9  2004/01/17 18:39:07  lorensen
  *ENH: changes to accomodate VTK api changes.
  *

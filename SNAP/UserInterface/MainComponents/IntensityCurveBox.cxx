@@ -22,9 +22,8 @@
 #include <iostream>
 
 #include <FL/Fl.h>
-#include <FL/gl.h>
+#include "SNAPOpenGL.h"
 #include <FL/fl_draw.h>
-#include <GL/glu.h>
 
 unsigned int IntensityCurveBox::CURVE_RESOLUTION = 64;
 

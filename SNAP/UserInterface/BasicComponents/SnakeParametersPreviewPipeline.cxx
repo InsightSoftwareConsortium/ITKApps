@@ -15,7 +15,7 @@
 #include "SnakeParametersPreviewPipeline.h"
 
 #include "FL/Fl_Gl_Window.h"
-#include "GL/glu.h"
+#include "SNAPOpenGL.h"
 
 #include "LevelSetExtensionFilter.h"
 #include "SignedDistanceFilter.h"

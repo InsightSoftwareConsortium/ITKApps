@@ -18,8 +18,7 @@
 #include "FLTKCanvas.h"
 
 #include <FL/Fl.H>
-#include <FL/gl.h>
-#include <GL/glu.h>
+#include "SNAPOpenGL.h"
 
 using namespace std;
 

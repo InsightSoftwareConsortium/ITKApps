@@ -16,8 +16,7 @@
 #define __PolygonDrawing_h_
 
 #include <FL/Fl.H>
-#include <FL/gl.h>
-#include <GL/glu.h>
+#include "SNAPOpenGL.h"
 
 #include <iostream>
 #include "SNAPCommonUI.h"
@@ -91,6 +90,9 @@ private:
 
 /*
  *Log: PolygonDrawing.h
+ *Revision 1.6  2003/10/09 22:45:15  pauly
+ *EMH: Improvements in 3D functionality and snake parameter preview
+ *
  *Revision 1.5  2003/10/02 20:57:46  pauly
  *FIX: Made sure that the previous check-in compiles on Linux
  *

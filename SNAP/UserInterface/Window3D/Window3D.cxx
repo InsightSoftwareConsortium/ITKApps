@@ -21,13 +21,6 @@
 #include "IRISApplication.h"
 #include "ImageRayIntersectionFinder.h"
 
-//#ifdef WIN32
-//#  include <glut.h>
-//#  include <GL/glu.h>
-//#else
-//#  include <FL/glut.h>
-//#endif
-
 #include <FL/glut.h>
                          
 /** These classes are used internally for m_Ray intersection testing */
@@ -1313,6 +1306,9 @@ void Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.12  2003/11/25 23:32:48  pauly
+ *FIX: Snake evolution did not work in multiprocessor mode
+ *
  *Revision 1.11  2003/11/10 00:24:50  pauly
  **** empty log message ***
  *

@@ -13,8 +13,7 @@
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "FunctionPlot2DBox.h"
-#include "FL/gl.h"
-#include "GL/glu.h"
+#include "SNAPOpenGL.h"
 
 FunctionPlot2DBox
 ::FunctionPlot2DBox(int x,int y,int w,int h,const char *label)
