@@ -34,7 +34,7 @@ public:
 
   typedef typename FilterType::OutputImageType    OutputImageType;
 
-  typedef typename TFinalPixelType                FinalPixelType;
+  typedef TFinalPixelType                         FinalPixelType;
 
   itkStaticConstMacro( Dimension, unsigned int, 
          itk::GetImageDimension< InternalImageType >::ImageDimension );
