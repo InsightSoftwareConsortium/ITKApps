@@ -25,19 +25,11 @@ namespace itk {
   template <class TPixel,unsigned int VDimension> class Image;
   template <class TInputImage, class TOutputImage> class RegionOfInterestImageFilter;
   template <class TInputImage, class TOutputImage> class BinaryThresholdImageFilter;
-  template <class TInputImage, class TOutputImage> class DiscreteGaussianImageFilter;
-  template <class TInputImage> class VTKImageExport;
 }
 
-// Forward references to vtk classes
-class vtkImageImport;
-class vtkContourFilter;
-class vtkSmoothPolyDataFilter;
-class vtkDecimatePro;
-class vtkStripper;
+// Forward references
+class VTKMeshPipeline;
 class vtkPolyData;
-class vtkPolyDataNormals;
-class vtkImageGaussianSmooth;
 
 /**
  * \class IRISMeshPipeline
@@ -91,13 +83,6 @@ private:
     InputImageType,InternalImageType>                ThresholdFilter;
   typedef itk::SmartPointer<ThresholdFilter>         ThresholdFilterPointer;
   
-  typedef itk::DiscreteGaussianImageFilter<
-    InternalImageType,InternalImageType>             GaussianFilter;
-  typedef itk::SmartPointer<GaussianFilter>          GaussianFilterPointer;
-  
-  typedef itk::VTKImageExport<InternalImageType>     VTKExportType;
-  typedef itk::SmartPointer<VTKExportType>           VTKExportPointer;
-  
   // Current set of mesh options
   MeshOptions                 m_MeshOptions;
 
@@ -107,43 +92,18 @@ private:
   // The ROI extraction filter used for constructing a bounding box
   ROIFilterPointer            m_ROIFilter;
 
-  // The Gaussian smoothing filter
-  GaussianFilterPointer       m_GaussianFilter;
-
   // The thresholding filter used to map intensity in the bounding box to
   // standardized range
   ThresholdFilterPointer      m_ThrehsoldFilter;
-
-  // The VTK exporter for the data
-  VTKExportPointer            m_VTKExporter;
-
-  // The VTK importer for the data
-  vtkImageImport *            m_VTKImporter;
-
-  // VTK Gaussian (because we care about the speed and not so much about
-  // precision
-  vtkImageGaussianSmooth *    m_VTKGaussianFilter;
-
-  // The contour filter
-  vtkContourFilter *          m_ContourFilter;
-
-  // A filter that computes normals
-  vtkPolyDataNormals *        m_NormalsFilter;
-  
-  // The triangle decimation driver
-  vtkDecimatePro *            m_DecimateFilter;
-
-  // The polygon smoothing filter
-  vtkSmoothPolyDataFilter *   m_PolygonSmoothingFilter;
-
-  // Triangle stripper
-  vtkStripper *               m_StripperFilter;
 
   // Set of bounding boxes
   itk::ImageRegion<3>         m_BoundingBox[MAX_COLOR_LABELS];
 
   // Histogram of the image
   long                        m_Histogram[MAX_COLOR_LABELS];
+
+  // The VTK pipeline
+  VTKMeshPipeline *           m_VTKPipeline;
 };
 
 #endif

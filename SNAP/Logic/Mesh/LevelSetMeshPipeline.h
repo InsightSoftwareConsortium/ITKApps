@@ -25,14 +25,9 @@ namespace itk {
   template <class TInputImage> class VTKImageExport;
 }
 
-// Forward references to vtk classes
-class vtkImageImport;
-class vtkContourFilter;
-class vtkSmoothPolyDataFilter;
-class vtkDecimatePro;
-class vtkStripper;
+// Forward reference to our own VTK pipeline
+class VTKMeshPipeline;
 class vtkPolyData;
-class vtkPolyDataNormals;
 
 /**
  * \class LevelSetMeshPipeline
@@ -57,7 +52,6 @@ public:
   /** Compute the mesh for the segmentation level set */
   void ComputeMesh(vtkPolyData *outData);
   
-  
   /** Constructor, which builds the pipeline */
   LevelSetMeshPipeline();
 
@@ -66,38 +60,17 @@ public:
 
 private:
   // Type definitions for the various filters used by this object
-  typedef InputImageType                             InternalImageType;
-  typedef itk::SmartPointer<InternalImageType>       InternalImagePointer;
-
-  typedef itk::VTKImageExport<InternalImageType>     VTKExportType;
-  typedef itk::SmartPointer<VTKExportType>           VTKExportPointer;
+  typedef InputImageType InternalImageType;
+  typedef itk::SmartPointer<InternalImageType> InternalImagePointer;
   
   // Current set of mesh options
-  MeshOptions                 m_MeshOptions;
+  MeshOptions m_MeshOptions;
 
   // The input image
-  InputImagePointer           m_InputImage;
+  InputImagePointer m_InputImage;
 
-  // The VTK exporter for the data
-  VTKExportPointer            m_VTKExporter;
-
-  // The VTK importer for the data
-  vtkImageImport *            m_VTKImporter;
-
-  // The contour filter
-  vtkContourFilter *          m_ContourFilter;
-
-  // A filter that computes normals
-  vtkPolyDataNormals *        m_NormalsFilter;
-  
-  // The triangle decimation driver
-  vtkDecimatePro *            m_DecimateFilter;
-
-  // The polygon smoothing filter
-  vtkSmoothPolyDataFilter *   m_PolygonSmoothingFilter;
-
-  // Triangle stripper
-  vtkStripper *               m_StripperFilter;
+  // The VTK pipeline
+  VTKMeshPipeline *m_VTKPipeline;
 };
 
 #endif //__LevelSetMeshPipeline_h_

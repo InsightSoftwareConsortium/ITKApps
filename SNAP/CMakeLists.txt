@@ -31,6 +31,7 @@ SET(LOGIC_CXX
   Logic/Mesh/LevelSetMeshPipeline.cxx
   Logic/Mesh/MeshObject.cxx
   Logic/Mesh/MeshOptions.cxx
+  Logic/Mesh/VTKMeshPipeline.cxx
   Logic/Preprocessing/EdgePreprocessingSettings.cxx
   Logic/Preprocessing/ThresholdSettings.cxx
   Logic/Slicing/IntensityCurveVTK.cxx
@@ -80,6 +81,7 @@ SET(LOGIC_HEADERS
   Logic/Mesh/LevelSetMeshPipeline.h
   Logic/Mesh/MeshObject.h
   Logic/Mesh/MeshOptions.h
+  Logic/Mesh/VTKMeshPipeline.h
   Logic/Preprocessing/EdgePreprocessingImageFilter.h
   Logic/Preprocessing/EdgePreprocessingImageFilter.txx
   Logic/Preprocessing/EdgePreprocessingSettings.h

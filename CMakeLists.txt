@@ -53,6 +53,18 @@ IF(USE_VTK)
               "trying to use it with ITK.")
       SET(VTK_FOUND 0)
     ENDIF(NOT VTK_USE_HYBRID)
+
+    # If VTK was built using Patented, add an option for using patented code
+    # in InsightApplications (SNAP in particular)
+    IF(VTK_USE_PATENTED)
+      OPTION(USE_VTK_PATENTED "Use VTK Patented Libraries (optional)" OFF)
+      MARK_AS_ADVANCED(USE_VTK_PATENTED)
+      IF(USE_VTK_PATENTED)
+        ADD_DEFINITIONS(-DUSE_VTK_PATENTED)
+        LINK_LIBRARIES(VTKPatented)
+      ENDIF(USE_VTK_PATENTED)
+    ENDIF(VTK_USE_PATENTED)
+    
   ENDIF (VTK_FOUND)
 ENDIF(USE_VTK)
 
