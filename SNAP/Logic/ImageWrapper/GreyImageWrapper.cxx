@@ -94,15 +94,9 @@ GreyImageWrapper::IntensityFunctor
 {
   // Map the input value to range of 0 to 1
   float inZeroOne = (in - m_IntensityMin) * m_IntensityFactor;
-
-  // Input must be in range
-  assert(inZeroOne >= 0.0f && inZeroOne <= 1.0f);
-
+  
   // Compute the mapping
   float outZeroOne = m_IntensityMap->Evaluate(inZeroOne);
-
-  // Output must be in range
-  assert(0.0f <= outZeroOne && 1.0f >= outZeroOne);
 
   // Map the output to a byte
   return (unsigned char)(255.0f * outZeroOne);

@@ -469,3 +469,6 @@ CONFIGURE_FILE(
   ${MY_SOURCE_DIR}/Utilities/InnoSetup/InstallSNAP.iss.in
   ${MY_BINARY_DIR}/Utilities/InnoSetup/InstallSNAP.iss)
 
+# Add an option to install SNAP into /usr/local or something
+INSTALL_TARGETS(/bin SNAP)
+INSTALL_FILES(/doc/snap FILES ${PROGRAM_DATA_FILES})
