@@ -27,20 +27,22 @@ class PreprocessingImageIOWizardLogic :
   public RestrictedImageIOWizardLogic<float> 
 {
 public:
-  typedef ImageIOWizardLogic<float>::FileFormat FileFormat;
+  typedef RestrictedImageIOWizardLogic<float> Superclass;
+  typedef Superclass::FileFormat FileFormat;
 
   /** Not all file types support saving and loading floating 
    * point images. This method returns the allowed types */
   virtual bool CanLoadFileFormat(FileFormat type) const
   {
-    return (type != FORMAT_GIPL);
+    return Superclass::CanLoadFileFormat(type) && 
+      (type == FORMAT_MHA || type == FORMAT_ANALYZE || type == FORMAT_RAW);
   }
 
   /** Not all file types support saving and loading floating 
    * point images. This method returns the allowed types */
   virtual bool CanSaveFileFormat(FileFormat type) const
   {
-    return CanLoadFileFormat(type);
+    return Superclass::CanSaveFileFormat(type) && CanLoadFileFormat(type);
   }
 
 };

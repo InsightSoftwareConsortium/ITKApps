@@ -27,6 +27,11 @@
 #include "itkGiplImageIO.h"
 #include "itkMetaImageIO.h"
 #include "itkRawImageIO.h"
+#include "itkDicomImageIO.h"
+#include "itkGE4ImageIO.h"
+#include "itkGE5ImageIO.h"
+#include "itkSiemensVisionImageIO.h"
+#include "itkVTKImageIO.h"
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 
@@ -82,13 +87,23 @@ ImageIOWizardLogic<TPixel>
   m_FileFormatPattern[FORMAT_MHA] = "mha,mhd";
   m_FileFormatPattern[FORMAT_GIPL] = "gipl";
   m_FileFormatPattern[FORMAT_RAW] = "raw*";
-  m_FileFormatPattern[FORMAT_ANALYZE] = "img";
+  m_FileFormatPattern[FORMAT_ANALYZE] = "img";  
+  m_FileFormatPattern[FORMAT_DICOM] = "dcm";
+  m_FileFormatPattern[FORMAT_GE4] = "ge4";
+  m_FileFormatPattern[FORMAT_GE5] = "ge5";
+  m_FileFormatPattern[FORMAT_SIEMENS] = "ima";
+  m_FileFormatPattern[FORMAT_VTK] = "vtk";
 
   // Initialize the file format descriptions
   m_FileFormatDescription[FORMAT_MHA] = "MetaImage";
   m_FileFormatDescription[FORMAT_GIPL] = "GIPL";
   m_FileFormatDescription[FORMAT_RAW] = "Raw Binary";
   m_FileFormatDescription[FORMAT_ANALYZE] = "Analyze"; 
+  m_FileFormatDescription[FORMAT_DICOM] = "DICOM";
+  m_FileFormatDescription[FORMAT_GE4] = "GE Version 4";
+  m_FileFormatDescription[FORMAT_GE5] = "GE Version 5";
+  m_FileFormatDescription[FORMAT_SIEMENS] = "Siemens Vision";
+  m_FileFormatDescription[FORMAT_VTK] = "VTK";
 }
 
 template <class TPixel>
@@ -299,9 +314,13 @@ bool ImageIOWizardLogic<TPixel>
 
 template <class TPixel>
 bool ImageIOWizardLogic<TPixel>
-::CanSaveFileFormat(FileFormat irisNotUsed(format)) const 
+::CanSaveFileFormat(FileFormat format) const 
 { 
-  return true; 
+  return (
+    format != FORMAT_DICOM &&
+    format != FORMAT_GE4 &&
+    format != FORMAT_GE5 &&
+    format != FORMAT_SIEMENS);
 }
 
 template <class TPixel>
@@ -1072,6 +1091,21 @@ ImageIOWizardLogic<TPixel>
       break;
     case FORMAT_GIPL:
       m_ImageIO = itk::GiplImageIO::New();
+      break;
+    case FORMAT_DICOM:
+      m_ImageIO = itk::DicomImageIO::New();
+      break;
+    case FORMAT_GE4:
+      m_ImageIO = itk::GE4ImageIO::New();
+      break;
+    case FORMAT_GE5:
+      m_ImageIO = itk::GE5ImageIO::New();
+      break;
+    case FORMAT_SIEMENS:
+      m_ImageIO = itk::SiemensVisionImageIO::New();
+      break;
+    case FORMAT_VTK:
+      m_ImageIO = itk::VTKImageIO::New();
       break;
     case FORMAT_RAW:
       if(forLoading)

@@ -201,6 +201,15 @@ Registry
   m_EntryMap = newMap;
 }
 
+void
+Registry
+::Clear()
+{
+  m_EntryMap.clear();
+  m_FolderMap.clear();
+}
+
+
 Registry::StringType
 Registry
 ::Encode(const StringType &input) 

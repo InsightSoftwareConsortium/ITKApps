@@ -211,6 +211,9 @@ public:
   /** Find a value in a folder or return "" */
   StringType FindValue(const StringType& value);
 
+  /** Empty the contents of the registry */
+  void Clear();
+
   /** Get a list of all keys that have values contained in this registry 
    * and all subfolders (recursive operation).  Prefix is used internally,
    * but can be specified to prepend a string to all keys */

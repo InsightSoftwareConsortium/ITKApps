@@ -37,11 +37,11 @@ class UserInterface {open : {public UserInterfaceBase}
   } {
     Fl_Window m_WinMain {
       label {SnAP: IRIS}
-      callback {OnMainWindowCloseAction();} open
-      xywh {270 66 878 710} type Double align 0 resizable
-      code0 {\#include "UserInterfaceBase.h"} visible
+      callback {OnMainWindowCloseAction();}
+      xywh {-32000 -32000 878 710} type Double align 0 hide resizable
+      code0 {\#include "UserInterfaceBase.h"}
     } {
-      Fl_Menu_Bar m_MenubarMain {selected
+      Fl_Menu_Bar m_MenubarMain {
         xywh {0 0 146 25} labelsize 12 textsize 12
       } {
         submenu {} {
@@ -167,8 +167,8 @@ class UserInterface {open : {public UserInterfaceBase}
           label {Control Pane} open
           xywh {0 25 145 680} box NO_BOX color 22 align 16
         } {
-          Fl_Group m_GrpToolbarPage {
-            xywh {0 25 145 679} color 53 labelsize 12 hide
+          Fl_Group m_GrpToolbarPage {open
+            xywh {0 25 145 679} color 53 labelsize 12
           } {
             Fl_Group m_GrpInteractionModes {
               label {IRIS Toolbox}
@@ -198,7 +198,7 @@ class UserInterface {open : {public UserInterfaceBase}
               }
             }
             Fl_Group {} {
-              label {Tool Options}
+              label {Tool Options} open
               xywh {5 164 135 137} box PLASTIC_UP_BOX color 22 labeltype EMBOSSED_LABEL labelsize 12 labelcolor 4
             } {
               Fl_Wizard m_TabsToolOptions {
@@ -225,22 +225,26 @@ class UserInterface {open : {public UserInterfaceBase}
                 } {}
                 Fl_Group m_GrpToolOptionSnAP {
                   label 5 open
-                  xywh {5 165 135 135} labelsize 10 hide
+                  xywh {5 165 135 135} labelsize 10
                 } {
                   Fl_Button m_BtnStartSnake {
                     label {Segment 3D}
                     callback {OnSnakeStartAction();}
-                    xywh {20 264 105 25} box PLASTIC_UP_BOX color 181 labelfont 1 labelsize 11
+                    xywh {20 265 105 25} box PLASTIC_UP_BOX color 181 labelfont 1 labelsize 11
                   }
                   Fl_Button m_BtnResetROI {
                     label {Reset Region}
                     callback {OnResetROIAction();}
-                    tooltip {Set region of interest to entire volume} xywh {20 234 105 25} box PLASTIC_UP_BOX color 181 labelsize 11
+                    tooltip {Set region of interest to entire volume} xywh {20 235 105 25} box PLASTIC_UP_BOX color 181 labelsize 11
                   }
                   Fl_Group {} {
                     label {SnAP Region Tool} open
                     xywh {10 170 125 25} box PLASTIC_DOWN_BOX color 178 labelsize 12 align 16
                   } {}
+                  Fl_Check_Button m_ChkResampleRegion {
+                    label { Resample region}
+                    xywh {20 200 110 25} down_box DOWN_BOX labelsize 11
+                  }
                 }
                 Fl_Group m_GrpToolOptionZoomPan {
                   label 2 open
@@ -268,7 +272,7 @@ class UserInterface {open : {public UserInterfaceBase}
                 }
                 Fl_Group m_GrpToolOptionCrosshairs {
                   label 1 open
-                  xywh {5 165 135 135} labeltype NO_LABEL labelfont 1 labelsize 12 align 17
+                  xywh {5 165 135 135} labeltype NO_LABEL labelfont 1 labelsize 12 align 17 hide
                 } {
                   Fl_Output m_OutGreyProbe {
                     label {Intensity:}
@@ -327,7 +331,7 @@ OnDrawOverLabelUpdate();} open
               } {}
             }
             Fl_Group {} {
-              label {3D Toolbox} open
+              label {3D Toolbox}
               xywh {5 535 135 95} box PLASTIC_UP_BOX color 22 labeltype EMBOSSED_LABEL labelsize 12 labelcolor 4
             } {}
             Fl_Button {} {
@@ -354,7 +358,7 @@ OnDrawOverLabelUpdate();} open
             }
           }
           Fl_Group m_GrpWelcomePage {open
-            xywh {0 25 145 680} color 53
+            xywh {0 25 145 680} color 53 hide
           } {
             Fl_Group {} {
               label {ITK+SnAP} open
@@ -1447,6 +1451,25 @@ RedrawWindows();}
         label {Loading progress} open
         xywh {15 185 380 25} box BORDER_BOX color 55 labelsize 11 align 20
       } {}
+    }
+    Fl_Window m_WinProgress {
+      label {SNAP Progress Meter} open selected
+      xywh {730 264 488 100} type Double box PLASTIC_DOWN_BOX visible
+    } {
+      Fl_Group {} {
+        label {Working... Please Wait!} open
+        xywh {5 5 480 30} labeltype EMBOSSED_LABEL align 16
+      } {}
+      Fl_Group {} {open
+        xywh {10 40 470 50} box PLASTIC_UP_BOX
+      } {
+        Fl_Slider m_OutProgressMeter {
+          xywh {20 50 395 30} type {Horz Fill} box PLASTIC_DOWN_BOX color 7 selection_color 180 maximum 100 step 0.1 value 50
+        }
+        Fl_Value_Output m_OutProgressCounter {
+          xywh {420 50 50 30} color 7 maximum 100 step 0.1 value 50
+        }
+      }
     }
   }
 } 

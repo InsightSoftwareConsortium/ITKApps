@@ -33,6 +33,7 @@
 #include "SnakeParametersUILogic.h"
 #include "GreyImageIOWizardLogic.h"
 #include "PreprocessingImageIOWizardLogic.h"
+#include "ResizeRegionDialogLogic.h"
 #include "RestoreSettingsDialogLogic.h"
 #include "SegmentationImageIOWizardLogic.h"
 #include "SimpleFileDialogLogic.h"
@@ -87,6 +88,11 @@ UserInterfaceLogic
   m_IntensityCurveUI->GetEventSystem()->AddObserver(
     IntensityCurveUILogic::CurveUpdateEvent(),cmd);
   
+  // Initialize the progress command
+  m_ProgressCommand = ProgressCommandType::New();
+  m_ProgressCommand->SetCallbackFunction(
+    this,&UserInterfaceLogic::OnITKProgressEvent);
+
   // Initialize the preprocessing windows
   m_PreprocessingUI = new PreprocessingUILogic;
   m_PreprocessingUI->MakeWindow();
@@ -100,6 +106,10 @@ UserInterfaceLogic
   // Initialize the restore settings dialog
   m_DlgRestoreSettings = new RestoreSettingsDialogLogic;
   m_DlgRestoreSettings->MakeWindow();
+
+  // Initialize the resample dialog
+  m_DlgResampleRegion = new ResizeRegionDialogLogic;
+  m_DlgResampleRegion->MakeWindow();
 
   // Initialize the slice window coordinator object
   m_SliceCoordinator = new SliceWindowCoordinator();
@@ -152,6 +162,7 @@ UserInterfaceLogic
   delete m_SnakeParametersUI;
   delete m_PreprocessingUI;
   delete m_DlgRestoreSettings;
+  delete m_DlgResampleRegion;
 
   // Delete the window coordinator
   delete m_SliceCoordinator;
@@ -215,16 +226,32 @@ UserInterfaceLogic
     }
 
   // Get the region of interest
-  GlobalState::RegionType roi = m_GlobalState->GetSegmentationROI();
+  SNAPSegmentationROISettings roi = m_GlobalState->GetSegmentationROISettings();
+
+  // The voxel size for the resampled region
+  Vector3d voxelSizeSrc(
+    m_Driver->GetCurrentImageData()->GetGrey()->GetImage()->GetSpacing());
+
+  // Check if the user wants to resample the image
+  if(m_ChkResampleRegion->value())
+    {
+    // Show the resampling dialog, updating the ROI object
+    m_DlgResampleRegion->DisplayDialog(voxelSizeSrc.data_block(), roi);
+    }
+  else
+    {
+    roi.SetVoxelScale(Vector3d(1.0));
+    roi.SetResampleFlag(false);
+    }
+
+  // Update the segmentation ROI
+  m_GlobalState->SetSegmentationROISettings(roi);
 
   // The region can not be empty
-  assert(roi.GetNumberOfPixels() > 0);
-
-  // This is where a chunk of data (ROI) gets copied
-  // TODO: Clean ROI chunking up!   
+  assert(roi.GetROI().GetNumberOfPixels() > 0);
 
   // Set the current application image mode to SNAP data
-  m_Driver->InitializeSNAPImageData(roi);
+  m_Driver->InitializeSNAPImageData(roi,m_ProgressCommand);
   m_Driver->SetCurrentImageDataToSNAP();
 
   // Inform the global state that we're in sNAP
@@ -1081,7 +1108,7 @@ UserInterfaceLogic
   else
     {
     // Get data from SNAP back into IRIS
-    m_Driver->UpdateIRISWithSnapImageData();
+    m_Driver->UpdateIRISWithSnapImageData(m_ProgressCommand);
 
     // Close up SNAP
     this->CloseSegmentationCommon();
@@ -1089,6 +1116,33 @@ UserInterfaceLogic
     // Message to the user
     m_OutMessage->value("Accepted snake segmentation");
     }  
+}
+
+void 
+UserInterfaceLogic
+::OnITKProgressEvent(itk::Object *source, const EventObject &event)
+{
+  // Get the elapsed progress
+  itk::ProcessObject *po = reinterpret_cast<ProcessObject *>(source);
+  float progress = po->GetProgress();
+
+  // Update the progress bar and value
+  m_OutProgressMeter->value(100 * progress);
+  m_OutProgressCounter->value(100 * progress);
+
+  // Show or hide progress bar if necessary
+  if(progress < 1.0f && !m_WinProgress->visible())
+    {
+    this->CenterChildWindowInMainWindow(m_WinProgress);
+    m_WinProgress->show();
+    }
+  else if (progress == 1.0f && m_WinProgress->visible())
+    {
+    m_WinProgress->hide();
+    }
+
+  // Update the screen
+  Fl::check();
 }
 
 void 
@@ -2962,6 +3016,9 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.13  2003/11/29 17:06:48  pauly
+ *ENH: Minor Help issues
+ *
  *Revision 1.12  2003/11/29 14:02:42  pauly
  *FIX: History list and file associations faili with spaces in filenames
  *

@@ -205,7 +205,10 @@ protected:
   // -- Stuff dealing with file formats --
 
   /** Enumerations of file formats supported by the wizard and its children */
-  enum FileFormat {FORMAT_MHA=0,FORMAT_GIPL,FORMAT_RAW,FORMAT_ANALYZE,FORMAT_COUNT};
+  enum FileFormat {
+    FORMAT_MHA=0,FORMAT_GIPL,FORMAT_RAW,FORMAT_ANALYZE,
+    FORMAT_DICOM, FORMAT_GE4, FORMAT_GE5, FORMAT_SIEMENS, FORMAT_VTK,    
+    FORMAT_COUNT};
   
   /** Extensions for different file formats */
   StringType m_FileFormatPattern[FORMAT_COUNT];

@@ -16,8 +16,8 @@
 #define __ImageWrapper_h_
 
 // Smart pointers have to be included from ITK, can't forward reference them
-#include <SNAPCommon.h>
-#include <ImageCoordinateTransform.h>
+#include "SNAPCommon.h"
+#include "ImageCoordinateTransform.h"
 
 // Forward declarations of the ITK classes
 namespace itk {
@@ -34,6 +34,7 @@ namespace itk {
 
 // Forward declarations to IRIS classes
 template <class TPixel> class IRISSlicer;
+class SNAPSegmentationROISettings;
 
 /**
  * \class ImageWrapper
@@ -212,9 +213,11 @@ public:
 
   /**
    * This method is used to perform a deep copy of a region of this image 
-   * into another image
+   * into another image, potentially resampling the region to use a different
+   * voxel size
    */
-  ImagePointer DeepCopyRegion(const itk::ImageRegion<3> region) const;
+  ImagePointer DeepCopyRegion(const SNAPSegmentationROISettings &roi,
+                              itk::Command *progressCommand = NULL) const;
 
   /**
    * Get an iterator for traversing the image.  The iterator is initialized

@@ -33,6 +33,7 @@ class SegmentationImageIOWizardLogic;
 class PreprocessingImageIOWizardLogic;
 class SliceWindowCoordinator;
 class SimpleFileDialogLogic;
+class ResizeRegionDialogLogic;
 
 //template<class TPixel> class ImageIOWizardLogic;
 //class SegmentationImageIOWizardLogic;
@@ -42,6 +43,7 @@ class SimpleFileDialogLogic;
 // ITK forward references
 namespace itk {
   template <class TObject> class SimpleMemberCommand;
+  template <class TObject> class MemberCommand;
 };
 
 
@@ -659,6 +661,7 @@ private:
 
   // Typedef for event callback commands
   typedef itk::SimpleMemberCommand<UserInterfaceLogic> SimpleCommandType;
+  typedef itk::MemberCommand<UserInterfaceLogic> ProgressCommandType;
 
   // Pointer to the driving IRIS application object
   IRISApplication *m_Driver;
@@ -705,6 +708,9 @@ private:
   /** A restore settings dialog */
   RestoreSettingsDialogLogic *m_DlgRestoreSettings;
 
+  /** A dialog for resampling the image */
+  ResizeRegionDialogLogic *m_DlgResampleRegion;
+
   /** Help window */
   HelpViewerLogic *m_HelpUI;
 
@@ -749,12 +755,22 @@ private:
   /** This method is used to figure out which image axis corresponds to a
    * given display window */
   unsigned int GetImageAxisForDisplayWindow(unsigned int window);
+
+  /** Progress callback for ITK methods. Will show the progress bar and fill
+   * the bar as necessary */
+  void OnITKProgressEvent(itk::Object *source, const itk::EventObject &event);
+
+  /* Command used for progress tracking */
+  itk::SmartPointer<ProgressCommandType> m_ProgressCommand;
 };
 
 #endif
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.11  2003/11/29 17:06:48  pauly
+ *ENH: Minor Help issues
+ *
  *Revision 1.10  2003/11/10 00:27:26  pauly
  *FIX: Bug with linear interpolation in PDE solver
  *ENH: Help viewer and tutorial

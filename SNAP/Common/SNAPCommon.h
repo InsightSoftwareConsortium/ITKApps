@@ -52,6 +52,13 @@ static const char SNAPVersion[] = "@(#) Id";
 // Non-cvs version
 static const char SNAPSoftVersion[] = "ITK-SnAP 1.0 beta [2003.11.26]";
 
+// Release date of the current version
+static const char SNAPCurrentVersionReleaseDate[] = "20031126";
+
+// Release date of the latest version whose user preference files are
+// incompatible with the current version and will be erased
+static const char SNAPLastIncompatibleReleaseDate[] = "20031109";
+
 /**
  * Bubble structure
  * an object of this class stores information about an individual bubble 

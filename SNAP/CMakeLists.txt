@@ -53,6 +53,7 @@ SET(LOGIC_HEADERS
   Logic/Common/ImageRayIntersectionFinder.h
   Logic/Common/ImageRayIntersectionFinder.txx
   Logic/Common/SNAPRegistryIO.h
+  Logic/Common/SNAPSegmentationROISettings.h
   Logic/Framework/GlobalState.h
   Logic/Framework/IRISApplication.h
   Logic/Framework/IRISImageData.h
@@ -107,6 +108,7 @@ SET(UI_CXX
   UserInterface/MainComponents/IntensityCurveBox.cxx
   UserInterface/MainComponents/IntensityCurveUILogic.cxx
   UserInterface/MainComponents/PreprocessingUILogic.cxx
+  UserInterface/MainComponents/ResizeRegionDialogLogic.cxx
   UserInterface/MainComponents/RestoreSettingsDialogLogic.cxx
   UserInterface/MainComponents/SimpleFileDialogLogic.cxx
   UserInterface/MainComponents/SnakeParametersUILogic.cxx
@@ -150,6 +152,8 @@ SET(UI_HEADERS
   UserInterface/MainComponents/IntensityCurveUILogic.h
   UserInterface/MainComponents/PreprocessingUIBase.h
   UserInterface/MainComponents/PreprocessingUILogic.h
+  UserInterface/MainComponents/ResizeRegionDialogBase.h
+  UserInterface/MainComponents/ResizeRegionDialogLogic.h
   UserInterface/MainComponents/RestoreSettingsDialogBase.h
   UserInterface/MainComponents/RestoreSettingsDialogLogic.h
   UserInterface/MainComponents/SnakeParametersUIBase.h
@@ -202,6 +206,7 @@ SET(APPLICATION_FLUIDS
   UserInterface/MainComponents/HelpViewer.fl
   UserInterface/MainComponents/IntensityCurveUI.fl
   UserInterface/MainComponents/PreprocessingUI.fl
+  UserInterface/MainComponents/ResizeRegionDialog.fl
   UserInterface/MainComponents/RestoreSettingsDialog.fl
   UserInterface/MainComponents/SimpleFileDialog.fl
   UserInterface/MainComponents/SnakeParametersUI.fl

@@ -20,8 +20,14 @@
 #include "itkNumericTraits.h"
 #include "itkRegionOfInterestImageFilter.h"
 #include "itkRescaleIntensityImageFilter.h"
-
+#include "itkIdentityTransform.h"
+#include "itkResampleImageFilter.h"
+#include "itkNearestNeighborInterpolateImageFunction.h"
+#include "itkBSplineInterpolateImageFunction.h"
+#include "itkLinearInterpolateImageFunction.h"
 #include "IRISSlicer.h"
+#include "SNAPSegmentationROISettings.h"
+#include "itkCommand.h"
 
 #include <iostream>
 using namespace std;
@@ -67,9 +73,17 @@ ImageWrapper<TPixel>
   // If the source contains an image, make a copy of that image
   if (copy.IsInitialized() && copy.GetImage())
     {
-    ImagePointer newImage = 
-      copy.DeepCopyRegion(copy.GetImage()->GetLargestPossibleRegion());
+    // Create and allocate the image
+    ImagePointer newImage = ImageType::New();
+    newImage->SetRegions(copy.GetImage()->GetBufferedRegion());
+    newImage->Allocate();
 
+    // Copy the image contents
+    TPixel *ptrTarget = newImage->GetBufferPointer();
+    TPixel *ptrSource = copy.GetImage()->GetBufferPointer();
+    memcpy(ptrTarget,ptrSource,
+           sizeof(TPixel) * newImage->GetBufferedRegion().GetNumberOfPixels());
+    
     UpdateImagePointer(newImage);
     }
 }
@@ -190,18 +204,101 @@ ImageWrapper<TPixel>
 template <class TPixel>
 typename ImageWrapper<TPixel>::ImagePointer
 ImageWrapper<TPixel>
-::DeepCopyRegion(const itk::ImageRegion<3> region) const
+::DeepCopyRegion(const SNAPSegmentationROISettings &roi,
+                 itk::Command *progressCommand) const
 {
-  typedef itk::RegionOfInterestImageFilter <ImageType,ImageType> FilterType;
+  // The filter used to chop off the region of interest
+  typedef itk::RegionOfInterestImageFilter <ImageType,ImageType> ChopFilterType;
+  typename ChopFilterType::Pointer fltChop = ChopFilterType::New();
 
-  // Create a filter to 'cut' the image
-  typename FilterType::Pointer filter = FilterType::New();
-  filter->SetInput(m_Image);
-  filter->SetRegionOfInterest(region);
-  filter->Update();
+  // Check if there is a difference in voxel size, i.e., user wants resampling
+  Vector3ul vOldSize(m_Image->GetLargestPossibleRegion().GetSize().GetSize());
+  Vector3d vOldSpacing(m_Image->GetSpacing());
+  
+  if(roi.GetResampleFlag())
+    {
+    // Compute the number of voxels in the output
+    typedef typename itk::ImageRegion<3> RegionType;
+    typedef typename itk::Size<3> SizeType;
+
+    SizeType vNewSize;
+    RegionType vNewROI;
+    Vector3d vNewSpacing;
+
+    for(unsigned int i = 0; i < 3; i++) 
+      {
+      double scale = roi.GetVoxelScale()[i];
+      vNewSize.SetElement(i, (unsigned long) (vOldSize[i] / scale));
+      vNewROI.SetSize(i,(unsigned long) (roi.GetROI().GetSize(i) / scale));
+      vNewROI.SetIndex(i,(long) (roi.GetROI().GetIndex(i) / scale));
+      vNewSpacing[i] = scale * vOldSpacing[i];
+      }
+
+    // Create a filter for resampling the image
+    typedef itk::ResampleImageFilter<ImageType,ImageType> ResampleFilterType;
+    typename ResampleFilterType::Pointer fltSample = ResampleFilterType::New();
+
+    // Initialize the resampling filter
+    fltSample->SetInput(m_Image);
+    fltSample->SetTransform(itk::IdentityTransform<double,3>::New());
+
+    // Typedefs for interpolators
+    typedef itk::NearestNeighborInterpolateImageFunction<
+      ImageType,double> NNInterpolatorType;
+    typedef itk::LinearInterpolateImageFunction<
+      ImageType,double> LinearInterpolatorType;
+    typedef itk::BSplineInterpolateImageFunction<
+      ImageType,double> CubicInterpolatorType;
+
+    // Choose the interpolator
+    switch(roi.GetInterpolationMethod())
+      {
+      case SNAPSegmentationROISettings::NEAREST_NEIGHBOR :
+        fltSample->SetInterpolator(NNInterpolatorType::New());
+        break;
+
+      case SNAPSegmentationROISettings::TRILINEAR : 
+        fltSample->SetInterpolator(LinearInterpolatorType::New());
+        break;
+
+      case SNAPSegmentationROISettings::TRICUBIC :
+        fltSample->SetInterpolator(CubicInterpolatorType::New());
+        break;  
+      };
+
+    // Set the image sizes and spacing
+    fltSample->SetSize(vNewSize);
+    fltSample->SetOutputSpacing(vNewSpacing.data_block());
+    fltSample->SetOutputOrigin(m_Image->GetOrigin());
+
+    // Set the progress bar
+    if(progressCommand)
+      fltSample->AddObserver(itk::ProgressEvent(),progressCommand);
+
+  // Perform resampling
+    fltSample->GetOutput()->SetRequestedRegion(vNewROI);
+  fltSample->Update();  
+
+    // Pipe into the chopper
+    fltChop->SetInput(fltSample->GetOutput());
+
+    // Update the region of interest
+    fltChop->SetRegionOfInterest(vNewROI);
+    }
+  else
+    {
+    // Pipe image into the chopper
+    fltChop->SetInput(m_Image);    
+    
+    // Set the region of interest
+    fltChop->SetRegionOfInterest(roi.GetROI());
+    }
+
+  // Update the pipeline
+  fltChop->Update();
 
   // Return the resulting image
-  return filter->GetOutput();
+  return fltChop->GetOutput();
 }
 
 template <class TPixel>

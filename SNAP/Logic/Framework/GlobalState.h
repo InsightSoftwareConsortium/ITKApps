@@ -20,6 +20,7 @@
 #include "MeshOptions.h"
 #include "SnakeParameters.h"
 #include "ThresholdSettings.h"
+#include "SNAPSegmentationROISettings.h"
 #include "itkImageRegion.h"
 
 enum ToolbarModeType 
@@ -234,12 +235,25 @@ public:
   /** Set the current mesh rendering options */
   irisSetMacro(MeshOptions,MeshOptions);
 
-  /** Set the region of interest for the segmentation (drawn by the user) */
-  irisSetMacro(SegmentationROI,RegionType);
+  /** Set the settings associated with the region of interest extracted for
+   segmentation */
+  irisSetMacro(SegmentationROISettings,const SNAPSegmentationROISettings &);
 
-  /** Get the region of interest for the segmentation (drawn by the user) */
-  irisGetMacro(SegmentationROI,RegionType);
+  /** Set the settings associated with the region of interest extracted for
+   segmentation */
+  irisGetMacro(SegmentationROISettings,const SNAPSegmentationROISettings &);
 
+  /** Shortcut ot set the actual bounding box in the ROI from the settings */
+  void SetSegmentationROI(const RegionType &roi)
+  {
+    m_SegmentationROISettings.SetROI(roi);
+  }
+
+  /** Shortcut ot get the actual bounding box in the ROI from the settings */
+  RegionType GetSegmentationROI()
+  {
+    return m_SegmentationROISettings.GetROI();
+  }
 
 #ifdef DRAWING_LOCK
   int GetDrawingLock( short );
@@ -335,7 +349,7 @@ private:
   char * m_GreyFileExtension; 
 
   /** The region of interest for the segmentation (drawn by the user) */
-  RegionType m_SegmentationROI;
+  SNAPSegmentationROISettings m_SegmentationROISettings;
   
   int m_LockHeld; 
   int m_LockOwner;
@@ -373,6 +387,9 @@ private:
 
 /*
  *Log: GlobalState.h
+ *Revision 1.5  2003/10/09 22:45:12  pauly
+ *EMH: Improvements in 3D functionality and snake parameter preview
+ *
  *Revision 1.4  2003/10/02 14:54:52  pauly
  *ENH: Development during the September code freeze
  *
@@ -468,7 +485,7 @@ private:
  *Changed the IRIS window ROI stuff.  Now the ROI is always valid if an image is
  *loaded, but there is a toggle to show it or not.  This will work better with
  *Konstantin's addition of being able to drag the roi box.  Added global state
- *as appropriate.
+ *as appropIriate.
  *
  *Revision 1.5  2002/04/01 22:31:30  moon
  *Added snakeMode and snakeActive to global state

@@ -63,7 +63,22 @@ SystemInterface
   // Check if the file exists, may throw an exception here
   if(itksys::SystemTools::FileExists(m_UserPreferenceFile.c_str()))
   {
+    // Read the contents of the preferences from file
     ReadFromFile(m_UserPreferenceFile.c_str());
+
+    // Check if the preferences contain a version string
+    string version = Entry("System.CreatedBySNAPVersion")["00000000"];
+
+    // If the version is less than the latest incompatible version, delete the
+    // contents of the version
+    if(atoi(version.c_str()) < atoi(SNAPLastIncompatibleReleaseDate))
+      {
+      // Clear the contents of the registry since it's incompatible
+      this->Clear();
+      }
+
+    // Enter the current SNAP version into the registry
+    Entry("System.CreatedBySNAPVersion") << SNAPCurrentVersionReleaseDate;
   }
 }
 
@@ -83,60 +98,79 @@ SystemInterface
   // This is the directory we're trying to set
   StringType sRootDir = "";
 
-  // The first possibility is that the user has specified the data path
-  // manually.  Get the path from the registry
-  StringType sUserPath = (*this)["System.ProgramDataDirectory"][""];
-  StringType sSearchName = sUserPath  + "/" + GetProgramDataDirectoryTokenFileName();
-  if(sUserPath.length() && 
-    SystemTools::FileIsDirectory(sUserPath.c_str()) &&
-    SystemTools::FileExists(sSearchName.c_str()))
+  // This is a key that we will use to represent the executable location
+  StringType sCodedExePath;
+
+  // First of all, find the executable file.  Since the program may have been
+  // in the $PATH variable, we don't know for sure where the data is
+  // Create a vector of paths that will be searched for 
+  // the file SNAPProgramDataDirectory.txt
+  StringType sExeFullPath = SystemTools::FindProgram(pathToExe);
+  if(sExeFullPath.length())
     {
-    // We've found the path
-    sRootDir = sUserPath;
+    // Encode the path to the executable so that we can search for an associated
+    // program data path
+    sCodedExePath = EncodeFilename(sExeFullPath);    
     }
   else
     {
-    // First of all, find the executable file.  Since the program may have been
-    // in the $PATH variable, we don't know for sure where the data is
-    // Create a vector of paths that will be searched for 
-    // the file SNAPProgramDataDirectory.txt
+    // Use a dummy token, so that next time the user runs without an executable,
+    // we can find a data directory
+    sCodedExePath = "00000000";
+    }
+
+  // Check if there is a path associated with the code
+  StringType sAssociationKey = 
+    Key("System.ProgramDataDirectory.Element[%s]",sCodedExePath.c_str());
+  StringType sAssociatedPath = Entry(sAssociationKey)[""];
+
+  // If the associated path exists, prepemd the path to the search list
+  if(sAssociatedPath.length())
+    {
+    // Check that the associated path is a real path containing the required 
+    // file
+    StringType sSearchName = sAssociatedPath + "/" + 
+      GetProgramDataDirectoryTokenFileName();
+
+    // Perform a sanity check on the directory
+    if(SystemTools::FileIsDirectory(sAssociatedPath.c_str()) && 
+       SystemTools::FileExists(sSearchName.c_str()))
+      {
+      // We've found the path
+      sRootDir = sAssociatedPath;
+      }
+    }
+  
+  // If the associated path check failed, but the executable has been found,
+  // which should be the case the first time the program is run, look around
+  // the executable to find the path
+  if(!sRootDir.length() && sExeFullPath.length())
+    {
+    // Create a search list for the filename
     vector<StringType> vPathList;
 
-    // Nevertheless, we'll search for the SNAP executable
-    StringType sExeFullPath = SystemTools::FindProgram(pathToExe);
+    // Look at the directory where the exe sits
+    vPathList.push_back(
+      SystemTools::GetFilenamePath(sExeFullPath) + "/ProgramData");
 
-    // If the exe could not be found, we can't use it to construct a list of
-    // potential search program data search paths
-    if(sExeFullPath.length())
-      {
-      // Look in the path right off the EXE
-      StringType sExePath = SystemTools::GetFilenamePath(sExeFullPath);
-      if(sExePath.length())
-        {
-        vPathList.push_back(sExePath + "/" + "ProgramData");
-        }
+    // Look one directory up from that
+    vPathList.push_back(
+      SystemTools::GetFilenamePath(SystemTools::GetFilenamePath(sExeFullPath)) + 
+      "/ProgramData");
 
-      // Look in the path just above the EXE (windows)
-      StringType sExePathUp = SystemTools::GetFilenamePath(sExePath);
-      if(sExePathUp.length()) 
-        {
-        vPathList.push_back(sExePathUp + "/" + "ProgramData");
-        }
-      }
-
-    // Now that we have the path list, search for the token file
+    // Search for the token file in the path list
     StringType sFoundFile = 
       SystemTools::FindFile(GetProgramDataDirectoryTokenFileName(),vPathList);
     if(sFoundFile.length())
       sRootDir = SystemTools::GetFilenamePath(sFoundFile);
     }
 
-  // If a directory was not found, prompt the user
+  // If we still don't have a root path, there's no home
   if(!sRootDir.length())
     return false;
 
   // Store the property, so the next time we don't have to search at all
-  (*this)["System.ProgramDataDirectory"] << sRootDir;
+  Entry(sAssociationKey) << sRootDir;
   
   // Set the root directory and relative paths
   m_DataDirectory = sRootDir;

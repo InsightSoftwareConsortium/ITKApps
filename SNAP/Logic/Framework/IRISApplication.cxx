@@ -18,11 +18,15 @@
 #include "IRISVectorTypesToITKConversion.h"
 #include "SNAPImageData.h"
 #include "IntensityCurveVTK.h"
-
 #include "itkImageRegionIterator.h"
 #include "itkImageRegionConstIterator.h"
 #include "itkPasteImageFilter.h"
 #include "itkImageRegionIterator.h"
+#include "itkIdentityTransform.h"
+#include "itkResampleImageFilter.h"
+#include "itkNearestNeighborInterpolateImageFunction.h"
+#include "itkBSplineInterpolateImageFunction.h"
+#include "itkLinearInterpolateImageFunction.h"
 
 #include <cstdio>
 #include <sstream>
@@ -86,7 +90,8 @@ IRISApplication
 
 void 
 IRISApplication
-::InitializeSNAPImageData(const RegionType &roi) 
+::InitializeSNAPImageData(const SNAPSegmentationROISettings &roi,
+                          CommandType *progressCommand) 
 {
   assert(m_SNAPImageData == NULL);
 
@@ -95,10 +100,11 @@ IRISApplication
 
   // Get the roi chunk from the grey image
   GreyImageType::Pointer imgNewGrey = 
-    m_IRISImageData->GetGrey()->DeepCopyRegion(roi);
+    m_IRISImageData->GetGrey()->DeepCopyRegion(roi,progressCommand);
 
   // Get the size of the region
-  Vector3ui size = to_unsigned_int(Vector3ul(roi.GetSize().GetSize()));
+  Vector3ui size = to_unsigned_int(
+    Vector3ul(imgNewGrey->GetLargestPossibleRegion().GetSize().GetSize()));
 
   // Compute an image coordinate geometry for the region of interest
   ImageCoordinateGeometry icg(m_ImageToAnatomyRAI,m_DisplayToAnatomyRAI,size);
@@ -106,9 +112,14 @@ IRISApplication
   // Assign the new wrapper to the target
   m_SNAPImageData->SetGreyImage(imgNewGrey,icg);
   
+  // Override the interpolator in ROI for label interpolation, or we will get
+  // nonsense
+  SNAPSegmentationROISettings roiLabel = roi;
+  roiLabel.SetInterpolationMethod(SNAPSegmentationROISettings::NEAREST_NEIGHBOR);
+
   // Get chunk of the label image
   LabelImageType::Pointer imgNewLabel = 
-    m_IRISImageData->GetSegmentation()->DeepCopyRegion(roi);
+    m_IRISImageData->GetSegmentation()->DeepCopyRegion(roiLabel,progressCommand);
 
   // Filter the segmentation image to only allow voxels of 0 intensity and 
   // of the current drawing color
@@ -265,25 +276,83 @@ IRISApplication
 
 void 
 IRISApplication
-::UpdateIRISWithSnapImageData()
+::UpdateIRISWithSnapImageData(CommandType *progressCommand)
 {
   assert(m_SNAPImageData != NULL);
 
   // Get pointers to the source and destination images
   typedef LevelSetImageWrapper::ImageType SourceImageType;
   typedef LabelImageWrapper::ImageType TargetImageType;
-  
-  SourceImageType *source = m_SNAPImageData->GetSnake()->GetImage();
-  TargetImageType *target = m_IRISImageData->GetSegmentation()->GetImage();
+
+  // If the voxel size of the image does not match the voxel size of the 
+  // main image, we need to resample the region  
+  SourceImageType::Pointer source = m_SNAPImageData->GetSnake()->GetImage();
+  TargetImageType::Pointer target = m_IRISImageData->GetSegmentation()->GetImage();
 
   // Construct are region of interest into which the result will be pasted
-  SourceImageType::RegionType roi = m_GlobalState->GetSegmentationROI();
+  SNAPSegmentationROISettings roi = m_GlobalState->GetSegmentationROISettings();
 
+  // If the ROI has been resampled, resample the segmentation in reverse direction
+  if(roi.GetResampleFlag())
+    {
+    // Create a resampling filter
+    typedef itk::ResampleImageFilter<SourceImageType,SourceImageType> ResampleFilterType;
+    ResampleFilterType::Pointer fltSample = ResampleFilterType::New();
+
+    // Initialize the resampling filter with an identity transform
+    fltSample->SetInput(source);
+    fltSample->SetTransform(itk::IdentityTransform<double,3>::New());
+
+    // Typedefs for interpolators
+    typedef itk::NearestNeighborInterpolateImageFunction<
+      SourceImageType,double> NNInterpolatorType;
+    typedef itk::LinearInterpolateImageFunction<
+      SourceImageType,double> LinearInterpolatorType;
+    typedef itk::BSplineInterpolateImageFunction<
+      SourceImageType,double> CubicInterpolatorType;
+
+    // Choose the interpolator
+    switch(roi.GetInterpolationMethod())
+      {
+      case SNAPSegmentationROISettings::NEAREST_NEIGHBOR :
+        fltSample->SetInterpolator(NNInterpolatorType::New());
+        break;
+
+      case SNAPSegmentationROISettings::TRILINEAR : 
+        fltSample->SetInterpolator(LinearInterpolatorType::New());
+        break;
+
+      case SNAPSegmentationROISettings::TRICUBIC :
+        fltSample->SetInterpolator(CubicInterpolatorType::New());
+        break;  
+      };
+
+    // Compute the origin of the region
+    Vector3d origin;
+    for(unsigned int i=0;i<3;i++)
+      origin[i] = roi.GetROI().GetIndex(i) * source->GetSpacing()[i];
+
+    // Set the image sizes and spacing
+    fltSample->SetSize(roi.GetROI().GetSize());
+    fltSample->SetOutputSpacing(target->GetSpacing());
+    fltSample->SetOutputOrigin(origin.data_block());
+
+    // Watch the segmentation progress
+    if(progressCommand) 
+      fltSample->AddObserver(itk::ProgressEvent(),progressCommand);
+
+  // Perform resampling
+  fltSample->UpdateLargestPossibleRegion();
+
+    // Change the source to the output
+    source = fltSample->GetOutput();
+    }  
+  
   // Create iterators for copying from one to the other
   typedef ImageRegionConstIterator<SourceImageType> SourceIteratorType;
   typedef ImageRegionIterator<TargetImageType> TargetIteratorType;
   SourceIteratorType itSource(source,source->GetLargestPossibleRegion());
-  TargetIteratorType itTarget(target,roi);
+  TargetIteratorType itTarget(target,roi.GetROI());
 
   // Figure out which color draws and which color is clear
   unsigned int iClear = m_GlobalState->GetPolygonInvert() ? 1 : 0;

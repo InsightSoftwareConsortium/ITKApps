@@ -17,6 +17,7 @@
 #include "itkImageRegion.h"
 #include "itkExceptionObject.h"
 #include "GlobalState.h"
+#include "itkCommand.h"
 
 // Forward reference to the classes pointed at
 class IRISImageData;
@@ -55,6 +56,8 @@ public:
   typedef itk::Image<GreyType,3> GreyImageType;
   typedef itk::Image<LabelType,3> LabelImageType;
   typedef itk::Image<float,3> SpeedImageType;
+  typedef itk::Command CommandType;
+
 
 
   /**
@@ -113,15 +116,17 @@ public:
   void UpdateSNAPSpeedImage(SpeedImageType *newSpeedImage, SnakeType snakeMode);
   
   /**
-   * Initialize SNAP Image data using region of interest extents
+   * Initialize SNAP Image data using region of interest extents, and a new
+   * voxel size.
    */
-  void InitializeSNAPImageData(const RegionType &roi);
+  void InitializeSNAPImageData(const SNAPSegmentationROISettings &roi,
+                               CommandType *progressCommand = NULL);
 
   /**
    * Update IRIS image data with the segmentation contained in the SNAP image
    * data.
    */
-  void UpdateIRISWithSnapImageData();
+  void UpdateIRISWithSnapImageData(CommandType *progressCommand = NULL);
 
   /**
    * Load label descriptions from a file in ASCII space separated format
