@@ -14,7 +14,7 @@
 
 #include "itkImportImageFilter.h"
 
-#include "itkThinPlateSplineKernelTransform.h"
+#include "itkElasticBodySplineKernelTransform.h"
 
 namespace VolView 
 {
@@ -52,9 +52,10 @@ public:
   typedef typename PointListType::iterator         PointIterator;
   typedef typename PointListType::const_iterator   ConstPointIterator;
 
-  typedef itk::ThinPlateSplineKernelTransform< 
+  typedef itk::ElasticBodySplineKernelTransform< 
                             CoordinateRepresentationType,
                             Dimension >            SplineType;                
+
   typedef typename SplineType::Pointer             SplinePointer;
 
   typedef typename SplineType::PointSetType        PointSetType;
