@@ -19,12 +19,12 @@ int main( int argc, char **argv )
   typedef itk::Image < PixelType, 3 >  ImageType;
   typedef itk::ImageFileReader < ImageType > FileReaderType;
   typedef itk::ImageFileWriter < ImageType > FileWriterType;
-  typedef itk::IsotropicFourthOrderLevelSetImageFilter
-    <ImageType, ImageType> FilterType;
+  typedef itk::IsotropicFourthOrderLevelSetImageFilter<ImageType,
+    ImageType> FilterType;
   
   FilterType::Pointer filter = FilterType::New();
-  filter->SetIsoSurfaceValue( atof(argv[3]) );
-  filter->SetMaxFilterIteration ( atoi(argv[4]) );
+  filter->SetIsoSurfaceValue( ::atof(argv[3]) );
+  filter->SetMaxFilterIteration ( ::atoi(argv[4]) );
   
   FileReaderType::Pointer reader = FileReaderType::New();
   reader->SetFileName(argv[1]);
