@@ -155,7 +155,7 @@ static int UpdateGUI(void *inf)
   info->SetGUIProperty(info, 7, VVP_GUI_TYPE, VVP_GUI_SCALE);
   info->SetGUIProperty(info, 7, VVP_GUI_DEFAULT, "100.0");
   info->SetGUIProperty(info, 7, VVP_GUI_HELP, "The maximum number of iteration to apply the time step in the partial differental equation.");
-  info->SetGUIProperty(info, 7, VVP_GUI_HINTS , "1.0 500.0 1.0");
+  info->SetGUIProperty(info, 7, VVP_GUI_HINTS , "1.0 1000.0 1.0");
 
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, "0");
   
