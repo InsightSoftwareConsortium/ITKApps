@@ -23,11 +23,6 @@ ITKIO
 ITKBasicFilters
 )
 
-IF(WIN32)
-  LINK_LIBRARIES(
-  wsock32
-  )
-ENDIF(WIN32)
 
 IF(UNIX)
   LINK_LIBRARIES (
