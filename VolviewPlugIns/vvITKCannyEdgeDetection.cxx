@@ -25,7 +25,6 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
   const float        maximumError       = atof(  info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
   const float        threshold          = atof(  info->GetGUIProperty(info, 2, VVP_GUI_VALUE ) );
 
-  const InternalPixelType outputEdgeValue  = 255.0;
 
   try 
   {
@@ -42,7 +41,6 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.GetFilter()->SetVariance( variance );
       module.GetFilter()->SetMaximumError( maximumError );
       module.GetFilter()->SetThreshold( threshold );
-      module.GetFilter()->SetOutputEdgeValue( outputEdgeValue );
       // Execute the filter
       module.ProcessData( pds  );
       break; 
@@ -58,7 +56,6 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.GetFilter()->SetVariance( variance );
       module.GetFilter()->SetMaximumError( maximumError );
       module.GetFilter()->SetThreshold( threshold );
-      module.GetFilter()->SetOutputEdgeValue( outputEdgeValue );
       // Execute the filter
       module.ProcessData( pds );
       break; 
