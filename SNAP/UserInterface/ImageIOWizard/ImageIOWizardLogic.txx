@@ -17,7 +17,7 @@
 
 #include "FL/fl_file_chooser.h"
 #include <limits>
-#include <cstdio>
+#include <stdio.h>
 #include <cmath>
 #include <map>
 

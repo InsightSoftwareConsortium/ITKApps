@@ -15,7 +15,7 @@
 #include "Registry.h"
 #include "IRISVectorTypes.h"
 
-#include <cstdio>
+#include <stdio.h>
 #include <cstdlib>
 #include <cstdarg>
 #include <fstream>

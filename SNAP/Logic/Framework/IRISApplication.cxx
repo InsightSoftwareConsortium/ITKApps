@@ -49,7 +49,7 @@ typedef itk::Image<itk::FixedArray<float,3>,3> IRISApplicationBorlandDummyImageT
 #include "itkWindowedSincInterpolateImageFunction.h"
 #include "itkImageFileWriter.h"
 
-#include <cstdio>
+#include <stdio.h>
 #include <sstream>
 
 using namespace itk;

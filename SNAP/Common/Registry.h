@@ -19,7 +19,7 @@
 # pragma warning(disable:4786)  // '255' characters in the debug information
 #endif //_MSC_VER
 
-#include <cstdio>
+#include <stdio.h>
 #include <iostream>
 #include <list>
 #include <map>

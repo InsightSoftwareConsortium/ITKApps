@@ -16,7 +16,7 @@
 #define __UnaryFunctorCache_h_
 
 #include <assert.h>
-#include <cstdio>
+#include <stdio.h>
 
 #include "SNAPCommon.h"
 #include "itkMacro.h"

@@ -18,7 +18,7 @@
 #include "itkImageRegionConstIterator.h"
 
 #include <assert.h>
-#include <cstdio>
+#include <stdio.h>
 #include <iostream>
 
 #include <FL/Fl.h>
