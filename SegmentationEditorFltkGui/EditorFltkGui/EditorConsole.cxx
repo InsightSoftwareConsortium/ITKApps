@@ -257,6 +257,7 @@ bool EditorConsole::StartEditor() {
   binaryVolume->SetExtent(0, x, 0, y , 0, z);
   binaryVolume->SetUpdateExtent(0, x, 0, y, 0, z);
   binaryVolume->AllocateScalars();
+  binaryVolume->Clear();
 
   resamplerBin->SetInput(binaryVolume);
 
