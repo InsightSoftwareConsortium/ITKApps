@@ -15,6 +15,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
   const float        multiplier         = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
   const int          replaceValue       = atoi( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ) );
   const unsigned int initialRadius      = atoi( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ) );
+  const bool         compositeOutput    = atoi( info->GetGUIProperty(info, 4, VVP_GUI_VALUE ) );
   
   if( info->NumberOfMarkers < 1 )
     {
@@ -47,6 +48,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.GetFilter()->SetReplaceValue(              replaceValue       );
       module.GetFilter()->SetInitialNeighborhoodRadius( initialRadius      );
       module.GetFilter()->SetSeed(                      seed               );
+      module.SetProduceDoubleOutput( compositeOutput          );
       // Execute the filter
       module.ProcessData( pds  );
       break; 
@@ -69,6 +71,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.GetFilter()->SetReplaceValue(              replaceValue       );
       module.GetFilter()->SetInitialNeighborhoodRadius( initialRadius      );
       module.GetFilter()->SetSeed(                      seed               );
+      module.SetProduceDoubleOutput( compositeOutput          );
       // Execute the filter
       module.ProcessData( pds );
       break; 
@@ -112,10 +115,38 @@ static int UpdateGUI(void *inf)
   info->SetGUIProperty(info, 3, VVP_GUI_HELP, "Size of the initial neighborhood used to compute the statistics of the region. If the region in which the seed point is placed happens to be a homogeneous intensity distribution, increasing this radius will safely improve the statistical estimation of mean and variance. Make sure that the radius is not large enough to make contours participate in the computation of the estimation. That is, from the seed point to the nearest important edge, there should be a distance larger than this radius.");
   info->SetGUIProperty(info, 3, VVP_GUI_HINTS , "1 20.0 1.0");
 
+  info->SetGUIProperty(info, 4, VVP_GUI_LABEL, "Produce composite output");
+  info->SetGUIProperty(info, 4, VVP_GUI_TYPE, VVP_GUI_CHECKBOX);
+  info->SetGUIProperty(info, 4, VVP_GUI_DEFAULT, "0");
+  info->SetGUIProperty(info, 4, VVP_GUI_HELP, "This filter produce by default a binary image as output. Enabling this option will instead generate a composite output combining the input image and the binary mask as an image of two components. This is convenient for evaluating the quality of a segmentation.");
+
+
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, "0");
   
-  info->OutputVolumeScalarType = info->InputVolumeScalarType;
-  info->OutputVolumeNumberOfComponents = 2; // original input in first component and segmentation in second component
+
+  // Depending on this option, the filter will produce a 
+  // single component or a double component output.
+  // When single component is used, the output type is 'unsigned char'
+
+  info->OutputVolumeScalarType = VTK_UNSIGNED_CHAR;
+  info->OutputVolumeNumberOfComponents = 1;
+  info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "1");
+
+  const char * compositeOutputProperty = info->GetGUIProperty(info, 4, VVP_GUI_VALUE ); 
+
+  // During the startup of the application this string is not yet defined.
+  // We should then check for it before trying to use it.
+  if( compositeOutputProperty )
+    {
+    const bool compositeOutput  = atoi( compositeOutputProperty );
+    if( compositeOutput )
+      {
+      info->OutputVolumeScalarType = info->InputVolumeScalarType;
+      info->OutputVolumeNumberOfComponents = 2;
+      info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "2");
+      }
+    }
+
 
   memcpy(info->OutputVolumeDimensions,info->InputVolumeDimensions,
          3*sizeof(int));
@@ -144,11 +175,14 @@ void VV_PLUGIN_EXPORT vvITKConfidenceConnectedInit(vtkVVPluginInfo *info)
     "This filter applies an region growing algorithm for segmentation. The criterion for including new pixels in the region is defined by an intensity range around the mean value of the pixels existing in the region. The extent of the intensity interval is computed as the product of the variance and a multiplier provided by the user. The coordinates of a seed point are used as the initial position for start growing the region.");
   info->SetProperty(info, VVP_SUPPORTS_IN_PLACE_PROCESSING, "0");
   info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "0");
-  info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "4");
+  info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "5");
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP,           "0");
+
+  info->OutputVolumeScalarType = VTK_UNSIGNED_CHAR;
+  info->OutputVolumeNumberOfComponents = 1;
   info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "1");
 
-  
+
 }
 
 }
