@@ -73,5 +73,88 @@ IF(ITK_CSWIG_PYTHON)
     TARGET _ConnectVTKITKPython
     OUTPUTS ${ConnectVTKITK_BINARY_DIR}/ConnectVTKITK_wrapPython.cxx
     DEPENDS ${ConnectVTKITK_SOURCE_DIR}/ConnectVTKITK.i)
+  
+  FIND_PROGRAM(PYTHON_EXECUTABLE
+    NAMES python2.3 python2.2 python2.1 python2.0 python1.6 python1.5 python
+    PATHS
+    [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.3\\InstallPath]
+    [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.2\\InstallPath]
+    [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.1\\InstallPath]
+    [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.0\\InstallPath]
+    [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\1.6\\InstallPath]
+    [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\1.5\\InstallPath]
+    )
+  MARK_AS_ADVANCED(PYTHON_EXECUTABLE)
+  IF(PYTHON_EXECUTABLE)
+    # Add a target to copy the ConnectVTKITK.py module to the build tree.
+    ADD_CUSTOM_TARGET(connectvtkitk_copy ALL echo "...")
 
+    # Now create a list of Python files.
+    SET(ITK_PYTHON_FILES ConnectVTKITK)
+
+    # Now copy these files if necessary.
+    SET(ITK_PYTHON_SOURCE_FILES)
+    SET(ITK_PYTHON_OUTPUT_FILES)
+    IF(CMAKE_CONFIGURATION_TYPES)
+      FOREACH(file ${ITK_PYTHON_FILES})
+        SET(src "${ConnectVTKITK_BINARY_DIR}/${CMAKE_CFG_INTDIR}/${file}.py")
+        SET(ITK_PYTHON_SOURCE_FILES ${ITK_PYTHON_SOURCE_FILES} ${src})
+      ENDFOREACH(file)
+    ELSE(CMAKE_CONFIGURATION_TYPES)
+      FOREACH(file ${ITK_PYTHON_FILES})
+        SET(src "${ConnectVTKITK_BINARY_DIR}/${file}.py")
+        SET(ITK_PYTHON_SOURCE_FILES ${ITK_PYTHON_SOURCE_FILES} ${src})
+      ENDFOREACH(file)
+    ENDIF(CMAKE_CONFIGURATION_TYPES)
+    IF ("${ConnectVTKITK_BINARY_DIR}" MATCHES "^${ConnectVTKITK_SOURCE_DIR}$")
+      #MESSAGE("In source build -- no need to copy Python files.")
+    ELSE ("${ConnectVTKITK_BINARY_DIR}" MATCHES "^${ConnectVTKITK_SOURCE_DIR}$")
+      IF(CMAKE_CONFIGURATION_TYPES)
+        FOREACH(file ${ITK_PYTHON_FILES})
+          SET(src "${ConnectVTKITK_SOURCE_DIR}/${file}.py")
+          SET(tgt "${ConnectVTKITK_BINARY_DIR}/${CMAKE_CFG_INTDIR}/${file}.py")
+          ADD_CUSTOM_COMMAND(SOURCE ${src}
+                             COMMAND ${CMAKE_COMMAND}
+                             ARGS -E copy ${src} ${tgt}
+                             OUTPUTS ${tgt}
+                             TARGET connectvtkitk_copy
+                             COMMENT "source copy")
+        ENDFOREACH(file)
+      ELSE(CMAKE_CONFIGURATION_TYPES)
+        FOREACH(file ${ITK_PYTHON_FILES})
+          SET(src "${ConnectVTKITK_SOURCE_DIR}/${file}.py")
+          SET(tgt "${ConnectVTKITK_BINARY_DIR}/${file}.py")
+          ADD_CUSTOM_COMMAND(SOURCE ${src}
+   		         COMMAND ${CMAKE_COMMAND}
+                            ARGS -E copy ${src} ${tgt}
+                            OUTPUTS ${tgt}
+   			 TARGET connectvtkitk_copy
+                            COMMENT "source copy")
+        ENDFOREACH(file)
+      ENDIF(CMAKE_CONFIGURATION_TYPES)
+    ENDIF ("${ConnectVTKITK_BINARY_DIR}" MATCHES "^${ConnectVTKITK_SOURCE_DIR}$")  
+
+    # Byte compile the Python files.
+    WRITE_FILE(${ConnectVTKITK_BINARY_DIR}/compile_all_connectvtkitk
+          "import compileall\n"
+          "compileall.compile_dir('${ConnectVTKITK_BINARY_DIR}')\n"
+  	"file = open('${ConnectVTKITK_BINARY_DIR}/connectvtkitk_compile_complete', 'w')\n"
+  	"file.write('Done')\n")
+
+    ADD_CUSTOM_COMMAND(
+      SOURCE ${ConnectVTKITK_BINARY_DIR}/compile_all_connectvtkitk
+      COMMAND ${PYTHON_EXECUTABLE}
+      ARGS ${ConnectVTKITK_BINARY_DIR}/compile_all_connectvtkitk
+      DEPENDS ${ITK_PYTHON_SOURCE_FILES}
+      OUTPUTS "${ConnectVTKITK_BINARY_DIR}/connectvtkitk_compile_complete"
+      TARGET itkpython_pyc
+      )
+
+    # Add a driver target.
+    ADD_CUSTOM_COMMAND(
+      SOURCE connectvtkitk_copy
+      DEPENDS "${ConnectVTKITK_BINARY_DIR}/connectvtkitk_compile_complete"
+      TARGET connectvtkitk_copy
+      )
+  ENDIF(PYTHON_EXECUTABLE)
 ENDIF(ITK_CSWIG_PYTHON)
