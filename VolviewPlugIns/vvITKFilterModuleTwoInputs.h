@@ -84,6 +84,11 @@ public:
     }
 
 
+  /** Give access to the second input image */
+  const Input2ImageType * GetSecondInput() 
+    {  return m_ImportFilter2->GetOutput(); }
+
+
   /**  ProcessData performs the actual filtering on the data.
        In this class, this method only initialize the import
        filter for the second input, then it lets the ProcessData
