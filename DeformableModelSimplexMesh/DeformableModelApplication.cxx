@@ -20,6 +20,7 @@
 #include "ClickedPointEvent.h"
 
 #include "itkImageFileWriter.h"
+#include "itkTimeProbe.h"
 
 #ifndef vtkDoubleType
 #define vtkDoubleType double
@@ -96,6 +97,7 @@ void
 DeformableModelApplication
 ::Show()
 {
+  creditsWindow->show();
   mainWindow->show();
   axialView->show();
   coronalView->show();
@@ -112,7 +114,6 @@ DeformableModelApplication
   sagittalView->Initialize();
   surfaceView->Initialize();
 
-  creditsWindow->show();
 }
 
 void 
@@ -146,6 +147,7 @@ DeformableModelApplication
   meshReader->SetFileName(filename);
   meshReader->Update();
  
+  // convert ITK image to VTK image to send to marching cubes
   m_ImageToVTKImage->SetInput(meshReader->GetOutput());
   m_ImageToVTKImage->Update();
   
@@ -178,7 +180,10 @@ DeformableModelApplication
   for(int p =0; p < numberOfPoints; p++)
     {
 
-     vtkFloatingPointType * apoint = vtkpoints->GetPoint( p );
+      vtkFloatingPointType * apoint = vtkpoints->GetPoint( p );
+      m_TriangleMesh->SetPoint( p, TriangleMeshType::PointType( apoint ));
+
+      
 
     // Need to convert the point to PoinType
     TriangleMeshType::PointType pt;
@@ -280,11 +285,10 @@ DeformableModelApplication
        cellId++;
      }
   
-   std::cout << "Number of Points =   " << m_TriangleMesh->GetNumberOfPoints() << std::endl;
-   std::cout << "Number of Cells  =   " << m_TriangleMesh->GetNumberOfCells()  << std::endl;
- 
    m_SimplexMeshFilter->SetInput( m_TriangleMesh);
    m_SimplexMeshFilter->Update();
+
+  
   
    m_SimplexMesh = m_SimplexMeshFilter->GetOutput();
 
@@ -315,6 +319,7 @@ DeformableModelApplication
   m_SimplexFilter->Update();
   
   m_SimplexMesh = m_SimplexFilter->GetOutput();
+  m_SimplexMesh->DisconnectPipeline();
 
   m_SimplexMeshToShow = m_SimplexMesh;
 
@@ -375,7 +380,7 @@ DeformableModelApplication
       // Set the vtk point at the index with the the coord array from itk
       // itk returns a const pointer, but vtk is not const correct, so
       // we have to use a const cast to get rid of the const
-      vtkDoubleType * pp = const_cast<vtkDoubleType*>(i->Value().GetDataPointer());
+      vtkFloatingPointType * pp = const_cast<vtkFloatingPointType*>(i->Value().GetDataPointer());
       vpoints->SetPoint(idx, pp);
     }
 
@@ -408,8 +413,8 @@ DeformableModelApplication
 
   vgrid->SetLines(cells);
 
-  cells->Delete();
-  vpoints->Delete();
+  //cells->Delete();
+  //vpoints->Delete();
 
   m_AxialViewer.SetSimplexMesh(vgrid);
   m_CoronalViewer.SetSimplexMesh(vgrid);
@@ -427,33 +432,25 @@ DeformableModelApplication
   
   m_CastImage->SetInput( m_VolumeReader->GetOutput() );
   m_CastImage->Update();
-  std::cout << "Casting Image is DONE!" << std::endl;
 
   m_GradientAnisotropicImage->SetInput( m_CastImage->GetOutput());
   m_GradientAnisotropicImage->SetNumberOfIterations(5);
   m_GradientAnisotropicImage->SetTimeStep(0.0625);
   m_GradientAnisotropicImage->SetConductanceParameter(3);
-  std::cout << "GradientAnisotropicDiffusion is DONE!" << std::endl;
  
   m_GradientMagnitude->SetInput( m_GradientAnisotropicImage->GetOutput() );
   m_GradientMagnitude->SetSigma(0.5);
-  std::cout << "GradientMagnitude is DONE!" << std::endl;
   
   m_SigmoidImage->SetInput( m_GradientMagnitude->GetOutput());
   m_SigmoidImage->SetOutputMinimum(0);
   m_SigmoidImage->SetOutputMaximum(1);
   m_SigmoidImage->SetAlpha(230);
   m_SigmoidImage->SetBeta(1300);
-  std::cout << "gradient mag is DONE!" << std::endl;
   
   m_GradientFilter->SetInput( m_SigmoidImage->GetOutput());
   m_GradientFilter->SetSigma( 0.5);
 
   m_GradientFilter->Update();
-  std::cout << "Gradient is DONE!" << std::endl;
-
-  
-  std::cout << "Saving the Sigmoid Image ..." << std::endl;
 
   
   typedef itk::ImageFileWriter< CastType > WriterType;
@@ -465,8 +462,6 @@ DeformableModelApplication
   m_DeformFilter->SetGradient( m_GradientFilter->GetOutput() );
   m_InternalForcesComputed = true;
 
-  std::cout << " Computed Image Force" << std::endl;
- 
 }
 
 
@@ -492,7 +487,6 @@ DeformableModelApplication
     {
     return;
     }
-  std::cout << "implement saving mesh" << filename << std::endl;
 
   vtkPolyDataWriter *vpolywriter = vtkPolyDataWriter::New();
   vpolywriter->SetInput(m_SimplexMeshViewer.GetSimplexMesh());
@@ -511,20 +505,20 @@ DeformableModelApplication
     {
       this->ComputeInternalForces();
     }
- 
+ SimplexMeshType::Pointer simplexMesh2 = m_SimplexMesh;
   const unsigned int numberOfIterationsToGo = (unsigned int)(m_IterationsValueInput->value());
-  std::cout << " Please Wait ..." << std::endl;
+  
   for( unsigned int i=0; i<numberOfIterationsToGo; i++ )
     {
       m_SimplexMesh->DisconnectPipeline();
-
+      
       m_DeformFilter->SetInput( m_SimplexMesh );
 
       m_DeformFilter->SetIterations(1); 
       m_DeformFilter->Update();
 
-      m_SimplexMesh =  m_DeformFilter->GetOutput();
-    
+      simplexMesh2 =  m_DeformFilter->GetOutput();
+     
       m_SimplexMeshToShow  = m_SimplexMesh;
 
       this->RefreshMeshVisualization();
@@ -538,7 +532,7 @@ DeformableModelApplication
       Fl::check(); 
     }
 
-  std::cout << " Done Deformation " << std::endl;
+  
 }
    
 
