@@ -8,7 +8,7 @@ class guiMain {open
   } {
     Fl_Window tkWindow {
       label {Landmarkd Initialized Mutual Information 3D Registration Tool } open
-      xywh {284 225 1060 705} type Double box PLASTIC_UP_BOX color 159 resizable
+      xywh {187 318 1060 705} type Double box PLASTIC_UP_BOX color 159 resizable
       code0 {itk::ImageRegion< 3 > tempRegion ;} visible
     } {
       Fl_Group tkMainGroup {open
@@ -84,7 +84,7 @@ Register();}
           }
           Fl_Button tkSelectMovingImageButton {
             label {Select Moving Image...}
-            callback {SelectMovingImage();} selected
+            callback {SelectMovingImage();}
             xywh {9 361 131 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 selection_color 247 labelsize 10
           }
           Fl_Output tkMovingImageFile {
@@ -248,8 +248,8 @@ Register();}
           Fl_Round_Button tkViewAxisZ {
             label Z
             user_data 2
-            callback {SetViewAxis(2) ;}
-            xywh {345 30 25 20} type Radio down_box ROUND_DOWN_BOX labelsize 10
+            callback {SetViewAxis(2) ;} selected
+            xywh {345 30 25 20} type Radio down_box ROUND_DOWN_BOX value 1 labelsize 10
           }
         }
         Fl_Output tkStatusDisplay {
@@ -453,7 +453,7 @@ tkFixedImageViewer->DrawRegionOfInterest() ;}
     }
     Fl_Window tkAdvancedOptionsWindow {
       label {Advanced Registration Options} open
-      xywh {1342 158 405 520} type Double box PLASTIC_UP_BOX color 159 labeltype NORMAL_LABEL labelsize 10 resizable visible
+      xywh {1342 158 405 520} type Double box PLASTIC_UP_BOX color 159 labelsize 10 resizable visible
     } {
       Fl_Tabs {} {open
         xywh {15 15 385 465} labelsize 12
