@@ -90,7 +90,7 @@ MomentRegistrator< TImage >
       fixedImageAxesTransform = 
             momCalc->GetPhysicalAxesToPrincipalAxesTransform();
       typename TransformType::InputPointType fixedImageCenterOfMass;
-      for(int i=0; i<ImageDimension; i++)
+      for(unsigned int i=0; i<ImageDimension; i++)
         {
         fixedImageCenterOfMass[i] = momCalc->GetCenterOfGravity()[i];
         }
@@ -102,7 +102,7 @@ MomentRegistrator< TImage >
       movingImageAxesTransform = 
             momCalc->GetPrincipalAxesToPhysicalAxesTransform();
       typename TransformType::InputPointType movingImageCenterOfMass;
-      for(int i=0; i<ImageDimension; i++)
+      for(unsigned int i=0; i<ImageDimension; i++)
         {
         movingImageCenterOfMass[i] = momCalc->GetCenterOfGravity()[i];
         }

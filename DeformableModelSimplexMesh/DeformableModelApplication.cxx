@@ -343,7 +343,7 @@ DeformableModelApplication
     cellType * cell = cellIterator.Value();
     if (cell->GetType() == cellType::LINE_CELL)
       {
-  lineType * line = static_cast<lineType *>( cell );
+      lineType * line = static_cast<lineType *>( cell );
       }
     ++cellIterator;
     }

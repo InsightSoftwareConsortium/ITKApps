@@ -55,7 +55,7 @@
 #include "itkDICOMImageIO2.h"
 #include <itksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.5 $");
+vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.6 $");
 vtkStandardNewMacro(vtkITKArchetypeImageSeriesReader);
 
 //----------------------------------------------------------------------------
@@ -147,10 +147,10 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
     std::vector <std::string> seriesUIDs = inputImageFileGenerator->GetSeriesUIDs();
     inputImageFileGenerator->SetFileNameSortingOrderToSortByImagePositionPatient();
     int archetypeSeries = -1;
-    for (int s = 0; s < seriesUIDs.size(); s++)
+    for (unsigned int s = 0; s < seriesUIDs.size(); s++)
       {
       candidateFiles = inputImageFileGenerator->GetFileNames( seriesUIDs[s] );
-      for (int f = 0; f < candidateFiles.size(); f++)
+      for (unsigned int f = 0; f < candidateFiles.size(); f++)
         {
         if (candidateFiles[f] == (fileNamePath + "/" + fileNameName))
           {

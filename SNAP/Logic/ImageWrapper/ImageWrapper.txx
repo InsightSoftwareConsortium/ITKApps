@@ -258,7 +258,7 @@ ImageWrapper<TPixel>
       ImageType,double> CubicInterpolatorType;
 
     // More typedefs are needed for the sinc interpolator
-    const static unsigned int VRadius = 5;
+    static const unsigned int VRadius = 5;
     typedef itk::Function::HammingWindowFunction<VRadius> WindowFunction;
     typedef itk::ConstantBoundaryCondition<ImageType> Condition;
     typedef itk::WindowedSincInterpolateImageFunction<

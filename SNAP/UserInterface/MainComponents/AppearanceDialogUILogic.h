@@ -29,7 +29,7 @@ class AppearanceDialogUILogic : public AppearanceDialogUI
 {
 public:
   AppearanceDialogUILogic();
-  ~AppearanceDialogUILogic();
+  virtual ~AppearanceDialogUILogic();
 
   void Register( UserInterfaceLogic *parent );
 

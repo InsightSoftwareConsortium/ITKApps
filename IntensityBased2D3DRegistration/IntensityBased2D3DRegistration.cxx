@@ -248,7 +248,7 @@ int main( int argc, char *argv[] )
   bool verbose = false;
   bool debug = false;
 
-  int nScales = 2;
+  unsigned int nScales = 2;
   int maxScale = 1;
 
   double rx = 0.;

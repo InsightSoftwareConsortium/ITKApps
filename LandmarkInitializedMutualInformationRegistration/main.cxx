@@ -45,9 +45,6 @@ int main(int argc, char **argv)
       return usage();
       }
 
-    unsigned long iterations = 1000;
-    unsigned long samples = 1000;
-
     int initializationMethod = 2;
     int registrationMethod = 1;
     int optimizationMethod = 0;
