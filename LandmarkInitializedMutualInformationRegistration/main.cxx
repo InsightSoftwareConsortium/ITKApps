@@ -326,6 +326,7 @@ int main(int argc, char **argv)
       {
       ImageWriterType::Pointer imageWriter = ImageWriterType::New();
       imageWriter->SetFileName( outputImageFilename );
+      imageWriter->SetUseCompression(true);
       imageWriter->SetInput( 
                    imageRegistrationApp->GetFinalRegisteredMovingImage() );
       try
