@@ -16,10 +16,19 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
   const int          replaceValue       = atoi( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ) );
   const unsigned int initialRadius      = atoi( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ) );
   
+  if( info->NumberOfMarkers < 1 )
+    {
+    info->SetProperty( info, VVP_ERROR, "Please select a seed point using the 3D Markers in the Annotation menu" ); 
+    return -1;
+    }
+
+  // Take the first marker as the seed point
+  const float * seedCoordinates = info->Markers;
+
   itk::Index<Dimension> seed;
-  seed[0] =  atoi( info->GetGUIProperty(info, 4, VVP_GUI_VALUE ) );
-  seed[1] =  atoi( info->GetGUIProperty(info, 5, VVP_GUI_VALUE ) );
-  seed[2] =  atoi( info->GetGUIProperty(info, 6, VVP_GUI_VALUE ) );
+  seed[0] =  static_cast< int >( seedCoordinates[0] );
+  seed[1] =  static_cast< int >( seedCoordinates[1] );
+  seed[2] =  static_cast< int >( seedCoordinates[2] );
 
   try 
   {
@@ -103,27 +112,6 @@ static int UpdateGUI(void *inf)
   info->SetGUIProperty(info, 3, VVP_GUI_HELP, "Size of the initial neighborhood used to compute the statistics of the region. If the region in which the seed point is placed happens to be a homogeneous intensity distribution, increasing this radius will safely improve the statistical estimation of mean and variance. Make sure that the radius is not large enough to make contours participate in the computation of the estimation. That is, from the seed point to the nearest important edge, there should be a distance larger than this radius.");
   info->SetGUIProperty(info, 3, VVP_GUI_HINTS , "1 20.0 1.0");
 
-  info->SetGUIProperty(info, 4, VVP_GUI_LABEL, "X coordinate of the seed");
-  info->SetGUIProperty(info, 4, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 4, VVP_GUI_DEFAULT, "0");
-  info->SetGUIProperty(info, 4, VVP_GUI_HELP, "X coordinate of the seed point. The seed should be placed in the middle of the region to be segmented.");
-  info->SetGUIProperty(info, 4, VVP_GUI_HINTS , 
-            VolView::PlugIn::FilterModuleBase::GetInputVolumeDimension( info, 0 ) );
-
-  info->SetGUIProperty(info, 5, VVP_GUI_LABEL, "Y coordinate of the seed");
-  info->SetGUIProperty(info, 5, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 5, VVP_GUI_DEFAULT, "0");
-  info->SetGUIProperty(info, 5, VVP_GUI_HELP, "Y coordinate of the seed point. The seed should be placed in the middle of the region to be segmented.");
-  info->SetGUIProperty(info, 5, VVP_GUI_HINTS , 
-            VolView::PlugIn::FilterModuleBase::GetInputVolumeDimension( info, 1 ) );
-
-  info->SetGUIProperty(info, 6, VVP_GUI_LABEL, "Z coordinate of the seed");
-  info->SetGUIProperty(info, 6, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 6, VVP_GUI_DEFAULT, "0");
-  info->SetGUIProperty(info, 6, VVP_GUI_HELP, "Z coordinate of the seed point. The seed should be placed in the middle of the region to be segmented.");
-  info->SetGUIProperty(info, 6, VVP_GUI_HINTS , 
-            VolView::PlugIn::FilterModuleBase::GetInputVolumeDimension( info, 2 ) );
-
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, "0");
   
   info->OutputVolumeScalarType = info->InputVolumeScalarType;
@@ -152,7 +140,7 @@ void VV_PLUGIN_EXPORT vvITKConfidenceConnectedInit(vtkVVPluginInfo *info)
     "This filter applies an region growing algorithm for segmentation. The criterion for including new pixels in the region is defined by an intensity range around the mean value of the pixels existing in the region. The extent of the intensity interval is computed as the product of the variance and a multiplier provided by the user. The coordinates of a seed point are used as the initial position for start growing the region.");
   info->SetProperty(info, VVP_SUPPORTS_IN_PLACE_PROCESSING, "0");
   info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "0");
-  info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "7");
+  info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "4");
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP,           "0");
   info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,    "1");
 
@@ -160,3 +148,4 @@ void VV_PLUGIN_EXPORT vvITKConfidenceConnectedInit(vtkVVPluginInfo *info)
 }
 
 }
+
