@@ -144,7 +144,8 @@ CellularSegmentationApplication
 {
   CellType * egg = CellType::CreateEgg();
   CellType::PointType position;
-  for(unsigned int i=0; i<CellType::PointDimension; i++)
+  const unsigned int spaceDimension = CellType::GetDimension();
+  for(unsigned int i=0; i<spaceDimension; i++)
     {
     position[i] = m_SeedPoint[i];
     }
