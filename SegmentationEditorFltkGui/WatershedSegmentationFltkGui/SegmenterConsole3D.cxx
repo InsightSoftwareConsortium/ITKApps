@@ -61,7 +61,7 @@ SegmenterConsole3D
 
   this->ShowStatus("Let's start by loading an image...");
 
-  instructTextOutput->value("Help Text to be Updated Soon");
+  instructTextOutput->value("Please read the README");
   /*
   instructTextOutput->value( 
 "This module runs data through the actual watershed segmentation algorithm.  
@@ -418,7 +418,7 @@ void SegmenterConsole3D::SaveSegmentedData()
    // write out filename.ws header
    std::ofstream out;
    out.open( header.c_str() );
-   out << raw_data << " " << tree_data << " " << x << " " << y << " " << z << std::endl;
+   out << raw_data << "\n" << tree_data << "\n" << x << " " << y << " " << z << std::endl;
 
    out.close();
 
