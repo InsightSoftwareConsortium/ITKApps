@@ -492,8 +492,15 @@ liFilterConsole
 
   this->ShowStatus("Filtering Image with a Gaussian...");
 
-  liFilterConsoleBase::Execute();
-
+  try
+    {
+    liFilterConsoleBase::Execute();
+    }
+  catch( ProcessAborted  & except )
+    {
+    this->ShowStatus("Process cancelled by the User !");
+    return;
+    }
 
   this->ShowStatus("Filtering done ");
   

@@ -407,7 +407,16 @@ liFilterConsole2D
 
   this->ShowStatus("Filtering Image with a Gaussian...");
 
-  liFilterConsole2DBase::Execute();
+  try
+    {
+    liFilterConsole2DBase::Execute();
+    }
+  catch( ProcessAborted  & except )
+    {
+    this->ShowStatus("Process cancelled by the User !");
+    return;
+    }
+
 
 
   this->ShowStatus("Filtering done ");
