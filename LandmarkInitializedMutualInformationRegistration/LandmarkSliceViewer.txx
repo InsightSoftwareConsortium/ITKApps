@@ -27,10 +27,10 @@ LandmarkSliceViewer<TImagePixel>
   m_RegionOfInterest.SetIndex(index);
   m_RegionOfInterest.SetSize(size);
 
-  cColorTable->SetColor(0, 0, 0, 1, "Blue");
-  cColorTable->SetColor(1, 1, 0, 0, "Red");
-  cColorTable->SetColor(2, 0, 1, 0, "Green");
-  cColorTable->SetColor(3, 0.741, 0.86, 0.84, "Yellow");
+  this->cColorTable->SetColor(0, 0, 0, 1, "Blue");
+  this->cColorTable->SetColor(1, 1, 0, 0, "Red");
+  this->cColorTable->SetColor(2, 0, 1, 0, "Green");
+  this->cColorTable->SetColor(3, 0.741, 0.86, 0.84, "Yellow");
   }
 
 /**
@@ -183,9 +183,9 @@ LandmarkSliceViewer<TImagePixel>
 ::AddLandmark(unsigned int id, ViewerColorType color)
   {
   m_LandmarkCandidateId = id;
-  m_LandmarkCandidate.SetColor( cColorTable->GetColorComponent(color, 'r'),
-                                cColorTable->GetColorComponent(color, 'g'),
-                                cColorTable->GetColorComponent(color, 'b'), 1 );
+  m_LandmarkCandidate.SetColor( this->cColorTable->GetColorComponent(color, 'r'),
+                                this->cColorTable->GetColorComponent(color, 'g'),
+                                this->cColorTable->GetColorComponent(color, 'b'), 1 );
   m_Mode = Selection;
   m_Action = Add;
   }
@@ -233,7 +233,7 @@ LandmarkSliceViewer<TImagePixel>
         switch( m_Action )
           {
           case Add:
-            cImData->TransformContinuousIndexToPhysicalPoint( index, point );
+            this->cImData->TransformContinuousIndexToPhysicalPoint( index, point );
             m_LandmarkCandidate.SetPosition( point );
             m_LandmarkCandidate.SetID(m_LandmarkCandidateId);
             this->SetLandmark(m_LandmarkCandidateId, m_LandmarkCandidate);
@@ -318,11 +318,11 @@ LandmarkSliceViewer<TImagePixel>
   RegionType      region;
   ViewerColorType       color;
 
-  region = cOverlayData->GetLargestPossibleRegion();
+  region = this->cOverlayData->GetLargestPossibleRegion();
   size = region.GetSize();
 
 
-  cImData->TransformPhysicalPointToIndex(landmark.GetPosition(), index);
+  this->cImData->TransformPhysicalPointToIndex(landmark.GetPosition(), index);
   if(landmark.GetColor().GetRed() == 0 &&
      landmark.GetColor().GetGreen() == 0 &&
      landmark.GetColor().GetBlue() == 0)
@@ -331,7 +331,7 @@ LandmarkSliceViewer<TImagePixel>
     }
   else
     {
-    color = cColorTable->GetClosestColorTableId(landmark.GetColor().GetRed(),
+    color = this->cColorTable->GetClosestColorTableId(landmark.GetColor().GetRed(),
                                             landmark.GetColor().GetGreen(),
                                             landmark.GetColor().GetBlue()) + 1;
     }
@@ -346,7 +346,7 @@ LandmarkSliceViewer<TImagePixel>
 
     if (region.IsInside(modifiedIndex))
       {
-      cOverlayData->SetPixel(modifiedIndex, color );
+      this->cOverlayData->SetPixel(modifiedIndex, color );
       }
     }
 
@@ -360,7 +360,7 @@ LandmarkSliceViewer<TImagePixel>
 
     if (region.IsInside(modifiedIndex))
       {
-      cOverlayData->SetPixel(modifiedIndex, color);
+      this->cOverlayData->SetPixel(modifiedIndex, color);
       }
     }
 
@@ -374,7 +374,7 @@ LandmarkSliceViewer<TImagePixel>
 
     if (region.IsInside(modifiedIndex))
       {
-      cOverlayData->SetPixel(modifiedIndex, color);
+      this->cOverlayData->SetPixel(modifiedIndex, color);
       }
     }
 
@@ -402,7 +402,7 @@ LandmarkSliceViewer<TImagePixel>
   OverlayImageType::IndexType endIndex;
   OverlayImageType::SizeType size;
   OverlayImageType::RegionType largestRegion;
-  largestRegion = cImData->GetLargestPossibleRegion();
+  largestRegion = this->cImData->GetLargestPossibleRegion();
   beginIndex = largestRegion.GetIndex();
   for ( unsigned int axis = 0; axis < 3; ++axis )
     {
@@ -432,7 +432,7 @@ void
 LandmarkSliceViewer<TImagePixel>
 ::InitializeRegionOfInterestWithLargestPossibleRegion()
   {
-  m_TempRegionOfInterest = cImData->GetLargestPossibleRegion();
+  m_TempRegionOfInterest = this->cImData->GetLargestPossibleRegion();
   }
 
 template<class TImagePixel>
@@ -466,7 +466,7 @@ LandmarkSliceViewer<TImagePixel>
     LandmarkPointListType::iterator iter = m_LandmarkPointList->begin();
     while ( iter != m_LandmarkPointList->end() )
       {
-      cImData->TransformPhysicalPointToIndex(iter->GetPosition(), index);
+      this->cImData->TransformPhysicalPointToIndex(iter->GetPosition(), index);
       for ( unsigned int axis = 0; axis < 3; ++axis )
         {
         if ( index[axis] < lowerBound[axis] )
@@ -641,11 +641,11 @@ LandmarkSliceViewer<TImagePixel>
     
     if ( tempSize[dim] !=0 )
       {
-      ImageIteratorType iter(cOverlayData, piece);
+      ImageIteratorType iter(this->cOverlayData, piece);
       iter.GoToBegin();
       while ( !iter.IsAtEnd() )
         {
-        cOverlayData->SetPixel(iter.GetIndex(), color);
+        this->cOverlayData->SetPixel(iter.GetIndex(), color);
         ++iter;
         }
       leftoverSize[dim] = leftover.GetSize()[dim] - tempSize[dim];
@@ -692,11 +692,11 @@ LandmarkSliceViewer<TImagePixel>
   {
   typedef itk::ImageRegionIteratorWithIndex< OverlayImageType >
     ImageIteratorType;
-  ImageIteratorType c_iter(cOverlayData, m_TempPreviousRegionOfInterest);
+  ImageIteratorType c_iter(this->cOverlayData, m_TempPreviousRegionOfInterest);
   
   while ( !c_iter.IsAtEnd() )
     {
-    cOverlayData->SetPixel(c_iter.GetIndex(), 0);
+    this->cOverlayData->SetPixel(c_iter.GetIndex(), 0);
     ++c_iter;
     }
   this->update();
@@ -733,12 +733,12 @@ LandmarkSliceViewer<TImagePixel>
     }
   else
     {
-    ImageIteratorType c_iter(cOverlayData, m_TempRegionOfInterest);
+    ImageIteratorType c_iter(this->cOverlayData, m_TempRegionOfInterest);
     
     color = 1;
     while ( !c_iter.IsAtEnd() )
       {
-      cOverlayData->SetPixel(c_iter.GetIndex(), color);
+      this->cOverlayData->SetPixel(c_iter.GetIndex(), color);
       ++c_iter;
       }
     }
