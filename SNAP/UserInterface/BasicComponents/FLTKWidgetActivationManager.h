@@ -22,7 +22,6 @@
 #include <set>
 #include <list>
 
-using namespace std;
 
 /**
  * \class WidgetActivationManager 
@@ -143,10 +142,10 @@ protected:
     {
     // A list of rules that are triggered when the flag is set to true
     // and false states
-    list<Rule> Rules[2];
+    std::list<Rule> Rules[2];
 
     // A list of widget controllers that are affected by the flag's state
-    set<WidgetWrapper *> Widgets;
+    std::set<WidgetWrapper *> Widgets;
 
     // The state of the menu item
     bool State;
@@ -168,10 +167,10 @@ protected:
 
 private:
   // A list of flags and associated flag data
-  map<TFlag, FlagData> m_Flags;
+  std::map<TFlag, FlagData> m_Flags;
 
   // A list of widget wrappers, to be deleted
-  set<WidgetWrapper *> m_AllWidgets;
+  std::set<WidgetWrapper *> m_AllWidgets;
 };
 
 

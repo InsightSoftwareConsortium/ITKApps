@@ -31,7 +31,6 @@
 #include "itkCommand.h"
 
 #include <iostream>
-using namespace std;
 
 template <class TPixel> 
 ImageWrapper<TPixel>

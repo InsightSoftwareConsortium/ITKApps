@@ -41,7 +41,6 @@
 #include <sstream>
 
 using namespace itk;
-using namespace std;
 
 IRISApplication
 ::IRISApplication() 
@@ -472,7 +471,7 @@ void IRISApplication
 
     // Create a stream to parse that string
     IRISIStringStream iss(line);
-    iss.exceptions(ios_base::badbit | ios_base::failbit);
+    iss.exceptions(std::ios_base::badbit | std::ios_base::failbit);
 
     try 
       {
@@ -515,7 +514,7 @@ void IRISApplication
       // Clean up the label
       delete label;      
       }
-    catch(ios_base::failure)
+    catch(std::ios_base::failure)
       {
       // Close the input stream
       fin.close();
@@ -569,14 +568,14 @@ void IRISApplication
     ColorLabel cl = m_IRISImageData->GetColorLabel(i);
     if(cl.IsValid())
       {
-      fout << "  "  << right << std::setw(3) << i;
-      fout << "   " << right << std::setw(3) << (int) cl.GetRGB(0);
-      fout << "  "  << right << std::setw(3) << (int) cl.GetRGB(1);
-      fout << "  "  << right << std::setw(3) << (int) cl.GetRGB(2);
-      fout << "  "  << right << std::setw(7) << std::setprecision(2) 
+      fout << "  "  << std::right << std::setw(3) << i;
+      fout << "   " << std::right << std::setw(3) << (int) cl.GetRGB(0);
+      fout << "  "  << std::right << std::setw(3) << (int) cl.GetRGB(1);
+      fout << "  "  << std::right << std::setw(3) << (int) cl.GetRGB(2);
+      fout << "  "  << std::right << std::setw(7) << std::setprecision(2) 
            << (cl.GetAlpha() / 255.0f);
-      fout << "  "  << right << std::setw(1) << (cl.IsVisible() ? 1 : 0);
-      fout << "  "  << right << std::setw(1) << (cl.IsVisibleIn3D() ? 1 : 0);
+      fout << "  "  << std::right << std::setw(1) << (cl.IsVisible() ? 1 : 0);
+      fout << "  "  << std::right << std::setw(1) << (cl.IsVisibleIn3D() ? 1 : 0);
       fout << "    \"" << cl.GetLabel() << "\"" << endl;
       }
     }

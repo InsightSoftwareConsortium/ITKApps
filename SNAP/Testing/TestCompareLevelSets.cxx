@@ -40,8 +40,6 @@
 #include <ctime>
 #include <iomanip>
 
-using namespace std;
-
 void 
 TestCompareLevelSets
 ::PrintUsage() 
@@ -852,7 +850,7 @@ TestCompareLevelSets
   double progress = 
     reinterpret_cast<itk::ProcessObject *>(object)->GetProgress();
 
-  cout << setw(20) << progress << setw(20) << delta * 1000 << endl;
+  std::cout << std::setw(20) << progress << std::setw(20) << delta * 1000 << std::endl;
 }
 
 
