@@ -6,10 +6,37 @@
 #include "vvITKDeformableModelModule.txx"
 
 
+
+template <class InputPixelType>
+class DeformableModelModuleRunner
+  {
+  public:
+      typedef VolView::PlugIn::DeformableModelModule< 
+                                            InputPixelType >   ModuleType;
+  public:
+    DeformableModelModuleRunner() {}
+    void Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
+    {
+      ModuleType  module;
+      module.SetPluginInfo( info );
+      module.SetUpdateMessage("Computing Deformable Model...");
+      // Execute the filter
+      module.ProcessData( pds  );
+    }
+  };
+
+
+
 static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 {
 
   vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
+
+  if( info->InputVolumeNumberOfComponents != 1 )
+    {
+    info->SetProperty( info, VVP_ERROR, "This filter requires a single-component data set as input" ); 
+    return -1;
+    }
 
   const unsigned int numberOfSeeds = info->NumberOfMarkers;
   if( numberOfSeeds < 1 )
@@ -22,26 +49,66 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
   {
   switch( info->InputVolumeScalarType )
     {
+    case VTK_CHAR:
+      {
+      DeformableModelModuleRunner<signed char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
     case VTK_UNSIGNED_CHAR:
       {
-      typedef  unsigned char                              PixelType;
-      typedef VolView::PlugIn::DeformableModelModule< 
-                                            PixelType >   ModuleType;
-      ModuleType  module;
-      module.SetPluginInfo( info );
-      module.ProcessData( pds  );
+      DeformableModelModuleRunner<unsigned char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_SHORT:
+      {
+      DeformableModelModuleRunner<signed short> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_SHORT:
       {
-      typedef  unsigned short                             PixelType;
-      typedef VolView::PlugIn::DeformableModelModule< 
-                                            PixelType >   ModuleType;
-      ModuleType  module;
-      module.SetPluginInfo( info );
-      module.ProcessData( pds  );
+      DeformableModelModuleRunner<unsigned short> runner;
+      runner.Execute( info, pds );
       break; 
-      } 
+      }
+    case VTK_INT:
+      {
+      DeformableModelModuleRunner<signed int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_INT:
+      {
+      DeformableModelModuleRunner<unsigned int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_LONG:
+      {
+      DeformableModelModuleRunner<signed long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_LONG:
+      {
+      DeformableModelModuleRunner<unsigned long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_FLOAT:
+      {
+      DeformableModelModuleRunner<float> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_DOUBLE:
+      {
+      DeformableModelModuleRunner<double> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
     }
   }
   catch( itk::ExceptionObject & except )
@@ -135,7 +202,7 @@ void VV_PLUGIN_EXPORT vvITKDeformableModelModuleInit(vtkVVPluginInfo *info)
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
                                     "Deformable Model Module");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,
-    "This module implements a Deformable Model. A initial surface is deformed under the effect of internal and external forces. The external forces are excerted by the image attracting the surface to the contour of anatomical structures. The internal forces preserve the smoothness and continuity of the surface during its evolution.");
+    "This module implements a Deformable Model. An initial surface is deformed under the effect of internal and external forces. The external forces are excerted by the image and attract the surface to the contour of anatomical structures. The internal forces preserve the smoothness and continuity of the surface during its evolution.");
 
   info->SetProperty(info, VVP_SUPPORTS_IN_PLACE_PROCESSING, "0");
   info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "0");
