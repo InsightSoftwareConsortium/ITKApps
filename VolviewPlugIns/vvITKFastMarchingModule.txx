@@ -286,10 +286,30 @@ FastMarchingModule<TInputPixelType>
   m_GradientMagnitudeFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
   m_SigmoidFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
   m_FastMarchingFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
+  m_IntensityWindowingFilter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
+
+  m_GradientMagnitudeFilter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
+  m_SigmoidFilter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
+  m_FastMarchingFilter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
+  m_IntensityWindowingFilter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
+
+  m_GradientMagnitudeFilter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
+  m_SigmoidFilter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
+  m_FastMarchingFilter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
+  m_IntensityWindowingFilter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
 
   // Execute the filters and progressively remove temporary memory
+  this->SetCurrentFilterProgressWeight( 0.3 );
+  this->SetUpdateMessage("Preprocessing with gradient magnitude...");
   m_GradientMagnitudeFilter->Update();
+
+  this->SetCurrentFilterProgressWeight( 0.1 );
+  this->SetUpdateMessage("Preprocessing with sigmoid...");
   m_SigmoidFilter->Update();
+
+  // note that there is 10% of progress left for Postprocessing
+  this->SetCurrentFilterProgressWeight( 0.5 );
+  this->SetUpdateMessage("Computing Fast Marching...");
   m_FastMarchingFilter->Update();
 
   if( m_PerformPostprocessing )
@@ -311,6 +331,9 @@ void
 FastMarchingModule<TInputPixelType>
 ::PostProcessData( const vtkVVProcessDataStruct * pds )
 {
+  // note that there is 10% of progress left for Postprocessing
+  this->SetCurrentFilterProgressWeight( 0.5 );
+  this->SetUpdateMessage("Postprocessing output...");
   m_IntensityWindowingFilter->Update();
 
   // Copy the data (with casting) to the output buffer provided by the Plug In API
