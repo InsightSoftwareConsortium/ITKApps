@@ -36,6 +36,7 @@ vtkITKTobogganImageFilter.h
 vtkITKWatershedImageFilter.h
 vtkITKWatershedImageFilterSUL.h
 vtkITKRelabelComponentImageFilter.h
+vtkITKArchetypeImageSeriesReader.cxx
 )
 
 SET_SOURCE_FILES_PROPERTIES ( 
