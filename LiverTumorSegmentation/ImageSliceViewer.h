@@ -14,6 +14,11 @@
 #include "itkEventObject.h"
 #include "itkCommand.h"
 
+#ifndef vtkFloatingPointType
+# define vtkFloatingPointType vtkFloatingPointType
+typedef float vtkFloatingPointType;
+#endif
+
 namespace ISIS
 {
   /** 

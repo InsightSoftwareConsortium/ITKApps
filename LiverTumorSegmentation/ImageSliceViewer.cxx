@@ -124,8 +124,8 @@ ImageSliceViewer
     return;
     }
 
-  float spacing[3];
-  float origin[3];
+  vtkFloatingPointType spacing[3];
+  vtkFloatingPointType origin[3];
   int   dimensions[3];
 
   image->GetSpacing(spacing);
@@ -288,8 +288,8 @@ ImageSliceViewer
   m_Renderer->GetWorldPoint( wpoint );
 
   // Fix camera Z coorinate to match the current slice
-  float spacing[3]={1,1,1};
-  float origin[3] ={0,0,0};
+  vtkFloatingPointType spacing[3]={1,1,1};
+  vtkFloatingPointType origin[3] ={0,0,0};
 
   int dimensions[3] = { 100, 100, 100 };
   if ( m_Actor->GetInput() )
