@@ -1,29 +1,27 @@
 /* perform smoothing using an anisotropic diffusion filter */
 
-#include "vvITKFilterModuleWithCasting.h"
+#include "vvITKFilterModuleWithRescaling.h"
 
 #include "itkAntiAliasBinaryImageFilter.h"
 
 
 
-template <class InputPixelType>
+template <class TInputPixelType>
 class AntiAliasRunner
   {
   public:
-      typedef  InputPixelType                       PixelType;
-      typedef  itk::Image< PixelType, 3 >           ImageType; 
-
-      typedef   float       InternalPixelType;
-      typedef   itk::Image< InternalPixelType,3 > InternalImageType; 
+      typedef  TInputPixelType                           InputPixelType;
+      typedef  itk::Image< InputPixelType, 3 >           InputImageType; 
+      typedef   float                                    InternalPixelType;
+      typedef   itk::Image< InternalPixelType,3 >        InternalImageType; 
 
       typedef   itk::AntiAliasBinaryImageFilter< 
-                                    InternalImageType,  
-                                    InternalImageType >   FilterType;
+                                    InputImageType,  
+                                    InternalImageType >  FilterType;
      
-      typedef  InputPixelType                        OutputPixelType;
+      typedef  unsigned char                             OutputPixelType;
 
-      typedef  VolView::PlugIn::FilterModuleWithCasting< 
-                                                InputPixelType,
+      typedef  VolView::PlugIn::FilterModuleWithRescaling< 
                                                 FilterType,
                                                 OutputPixelType > ModuleType;
 
@@ -40,7 +38,8 @@ class AntiAliasRunner
       // Set the parameters on it
       module.GetFilter()->SetMaximumIterations(     maxNumberOfIterations );
       module.GetFilter()->SetMaximumRMSError(       maximumRMSError    );
-      module.GetFilter()->SetNumberOfLayers(  3 );
+      module.SetOutputMinimum(  0  );
+      module.SetOutputMaximum( 255 );
       // Execute the filter
       module.ProcessData( pds  );
     }
@@ -167,12 +166,12 @@ static int UpdateGUI(void *inf)
     }
   
 
-  info->OutputVolumeScalarType = info->InputVolumeScalarType;
+  info->OutputVolumeScalarType = VTK_UNSIGNED_CHAR;
   info->OutputVolumeNumberOfComponents = 1;
 
-  info->OutputVolumeDimensions[0] = info->InputVolumeDimensions[0]; // + 2 * numberOfIterations;
-  info->OutputVolumeDimensions[1] = info->InputVolumeDimensions[1]; // + 2 * numberOfIterations;
-  info->OutputVolumeDimensions[2] = info->InputVolumeDimensions[2]; // + 2 * numberOfIterations;
+  info->OutputVolumeDimensions[0] = info->InputVolumeDimensions[0]; 
+  info->OutputVolumeDimensions[1] = info->InputVolumeDimensions[1];
+  info->OutputVolumeDimensions[2] = info->InputVolumeDimensions[2];
 
   memcpy(info->OutputVolumeSpacing,info->InputVolumeSpacing,
          3*sizeof(float));
@@ -196,7 +195,7 @@ void VV_PLUGIN_EXPORT vvITKAntiAliasInit(vtkVVPluginInfo *info)
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
                                   "Reduction of aliasing effects");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,
-    "This filter applies a level set evolution over a binary image in order to produce a smoother contour that is suitable for extracting iso-surfaces. The resulting contour is encoded as the zero-set of the output level set. The zero set will be rescaled as the mid-value of the intensity range corresponding to the pixel type used. This filter processes the whole image in one piece, and does not change the dimensions, data type, or spacing of the volume.");
+    "This filter applies a level set evolution over a binary image in order to produce a smoother contour that is suitable for extracting iso-surfaces. The resulting contour is encoded as the zero-set of the output level set. The zero set will be rescaled as the mid-value of the intensity range corresponding to the pixel type used. This filter processes the whole image in one piece, and does not change the dimensions, or spacing of the volume. The pixel type however, is converted to unsigned 8 bits since it is enough for representing the implicit smoothed surface.");
 
   info->SetProperty(info, VVP_SUPPORTS_IN_PLACE_PROCESSING, "0");
   info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "0");
