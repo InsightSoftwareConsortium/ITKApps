@@ -227,32 +227,39 @@ ComputeStats(void)
   float totalvv=0;
   float currp=0;
   IndexType idx;
-  for(i=0;i<numPoints;i++){
-    ClickPoint *point=m_Viewer->getClickedPoint(i);
-    x=(int)(point->x);
-    y=(int)(point->y);
-    z=(int)(point->z);
-    bx=x-halfr;ex=bx+m_SampleRegion;
-    by=y-halfr;ey=by+m_SampleRegion;
-    bz=z-halfr;ez=bz+m_SampleRegion;
-    if(bx<0) bx=0;
-    if(by<0) by=0;
-    if(bz<0) bz=0;
-    if(ex>m_Cols) ex=m_Cols;
-    if(ey>m_Rows) ey=m_Rows;
-    if(ez>m_Pages) ez=m_Pages;
-    for(l=bz;l<ez;l++){
-      for(j=by;j<ey;j++){
-        for(k=bx;k<ex;k++){
-          totalp++;
-          idx[0]=k;idx[1]=j;idx[2]=l;
-          currp= m_DataImage->GetPixel(idx);
-          totalv+=currp;
-          totalvv+=currp*currp;      
+  for(i=0;i<numPoints;i++)
+    {
+    ClickPoint point;
+    if( m_Viewer->getClickedPoint(i,point) )
+      {
+      x=(int)(point.x);
+      y=(int)(point.y);
+      z=(int)(point.z);
+      bx=x-halfr;ex=bx+m_SampleRegion;
+      by=y-halfr;ey=by+m_SampleRegion;
+      bz=z-halfr;ez=bz+m_SampleRegion;
+      if(bx<0) bx=0;
+      if(by<0) by=0;
+      if(bz<0) bz=0;
+      if(ex>m_Cols) ex=m_Cols;
+      if(ey>m_Rows) ey=m_Rows;
+      if(ez>m_Pages) ez=m_Pages;
+      for(l=bz;l<ez;l++)
+        {
+        for(j=by;j<ey;j++)
+          {
+          for(k=bx;k<ex;k++)
+            {
+            totalp++;
+            idx[0]=k;idx[1]=j;idx[2]=l;
+            currp= m_DataImage->GetPixel(idx);
+            totalv+=currp;
+            totalvv+=currp*currp;      
+            }
+          }
         }
       }
     }
-  }
   m_Mean=totalv/(totalp-1);
   m_STD=(totalvv-totalv*totalv/totalp)/(totalp-1);
   m_STD=sqrt(m_STD);
