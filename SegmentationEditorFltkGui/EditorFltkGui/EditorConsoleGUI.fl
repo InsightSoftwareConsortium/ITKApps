@@ -387,7 +387,7 @@ class EditorConsoleGUI {open : {public EditorConsoleBase}
     }
     Fl_Window segmentedConsole {
       label {Segmented Image} open
-      xywh {786 50 256 256} labeltype NORMAL_LABEL resizable visible
+      xywh {786 50 256 256} labeltype NORMAL_LABEL visible
     } {
       Fl_Box segmentedWin {
         label label
@@ -398,22 +398,22 @@ class EditorConsoleGUI {open : {public EditorConsoleBase}
     }
     Fl_Window sourceConsole {
       label {Source Image} open
-      xywh {784 116 256 256} labeltype NORMAL_LABEL resizable visible
+      xywh {784 116 256 256} labeltype NORMAL_LABEL visible
     } {
       Fl_Box sourceWin {
         label label
-        xywh {0 0 256 256} labeltype NO_LABEL resizable
+        xywh {0 0 256 256} labeltype NO_LABEL
         code0 {\#include <SourceViewer.h>}
         class SourceViewer
       }
     }
     Fl_Window binaryConsole {
       label {Binary Image} open
-      xywh {833 71 256 256} labeltype NORMAL_LABEL resizable visible
+      xywh {833 71 256 256} labeltype NORMAL_LABEL visible
     } {
       Fl_Box binaryWin {
         label label
-        xywh {0 0 25 25} labeltype NO_LABEL resizable
+        xywh {0 0 25 25} labeltype NO_LABEL
         code0 {\#include <BinaryViewer.h>}
         class BinaryViewer
       }
