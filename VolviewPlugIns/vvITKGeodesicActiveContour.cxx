@@ -2,9 +2,7 @@
    It does not perform any preprocessing. The user should provide
    the speed image and the initial level set as inputs. */
 
-#include "vvITKFilterModuleTwoInputs.h"
-#include "itkGeodesicActiveContourLevelSetImageFilter.h"
-#include "itkImage.h"
+#include "vvITKGeodesicActiveContour.h"
 
 
 static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
@@ -12,14 +10,6 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 
   vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
-  const float zeroSetValue          = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
-  const float gaussianSigma         = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
-  const float curvatureScaling      = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ));
-  const float propagationScaling    = atof( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ));
-  const float advectionScaling      = atof( info->GetGUIProperty(info, 4, VVP_GUI_VALUE ));
-  const float maximumRMSError       = atof( info->GetGUIProperty(info, 5, VVP_GUI_VALUE ));
-
-  const unsigned int maximumNumberOfIterations = atoi( info->GetGUIProperty(info, 6, VVP_GUI_VALUE ));
 
   char tmp[1024];
   const unsigned int Dimension = 3;
@@ -32,28 +22,10 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     {
     case VTK_UNSIGNED_CHAR:
       {
-      typedef unsigned char                               InputPixelType;
-      typedef float                                       InternalPixelType;
-      typedef itk::Image< InputPixelType, Dimension >     InputImageType; 
-      typedef itk::Image< InternalPixelType, Dimension >  InternalImageType;
-      typedef itk::GeodesicActiveContourLevelSetImageFilter<
-                                              InternalImageType,
-                                              InternalImageType> FilterType;
-      typedef VolView::PlugIn::FilterModuleTwoInputs< 
-                                              FilterType, 
-                                              InternalImageType, 
-                                              InternalImageType >   ModuleType;
+      typedef VolView::PlugIn::GeodesicActiveContour  ModuleType;
       ModuleType  module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Computing Geodesic Active Contour...");
-      module.GetFilter()->SetDerivativeSigma( gaussianSigma );
-      module.GetFilter()->SetCurvatureScaling( curvatureScaling );
-      module.GetFilter()->SetPropagationScaling( propagationScaling );
-      module.GetFilter()->SetAdvectionScaling( advectionScaling );
-      module.GetFilter()->SetMaximumRMSError( maximumRMSError );
-      module.GetFilter()->SetMaximumIterations( maximumNumberOfIterations );
-      module.GetFilter()->SetFeatureImage( module.GetSecondInput() );
-      // Execute the filter
       module.ProcessData( pds  );
       sprintf(tmp,"Total number of iterations = %d \n Final RMS error = %f",
                          module.GetFilter()->GetElapsedIterations(),
@@ -61,37 +33,8 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       info->SetProperty( info, VVP_REPORT_TEXT, tmp );
       break; 
       }
-    case VTK_UNSIGNED_SHORT:
-      {
-      typedef unsigned short                              InputPixelType;
-      typedef float                                       InternalPixelType;
-      typedef itk::Image< InputPixelType, Dimension >     InputImageType; 
-      typedef itk::Image< InternalPixelType, Dimension >  InternalImageType;
-      typedef itk::GeodesicActiveContourLevelSetImageFilter<
-                                              InternalImageType,
-                                              InternalImageType> FilterType;
-      typedef VolView::PlugIn::FilterModuleTwoInputs< 
-                                              FilterType, 
-                                              InternalImageType, 
-                                              InternalImageType >   ModuleType;
-      ModuleType  module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Computing Geodesic Active Contour...");
-      module.GetFilter()->SetDerivativeSigma( gaussianSigma );
-      module.GetFilter()->SetCurvatureScaling( curvatureScaling );
-      module.GetFilter()->SetPropagationScaling( propagationScaling );
-      module.GetFilter()->SetAdvectionScaling( advectionScaling );
-      module.GetFilter()->SetMaximumRMSError( maximumRMSError );
-      module.GetFilter()->SetMaximumIterations( maximumNumberOfIterations );
-      module.GetFilter()->SetFeatureImage( module.GetSecondInput() );
-      // Execute the filter
-      module.ProcessData( pds  );
-      sprintf(tmp,"Total number of iterations = %d \n Final RMS error = %f",
-                         module.GetFilter()->GetElapsedIterations(),
-                         module.GetFilter()->GetRMSChange());
-      info->SetProperty( info, VVP_REPORT_TEXT, tmp );
-      break; 
-      } 
+    default:
+      info->SetProperty( info, VVP_ERROR, "This filter is intended to operate only on Unsigned Char data since the input is a binary mask");
     }
   }
   catch( itk::ExceptionObject & except )
