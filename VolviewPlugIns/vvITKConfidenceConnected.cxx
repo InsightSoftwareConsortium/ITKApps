@@ -28,12 +28,9 @@ class ConfidenceConnectedRunner
 
       if( info->NumberOfMarkers < 1 )
         {
-        info->SetProperty( info, VVP_ERROR, "Please select a seed point using the 3D Markers in the Annotation menu" ); 
+        info->SetProperty( info, VVP_ERROR, "Please select seed points using the 3D Markers in the Annotation menu" ); 
         return;
         }
-
-      itk::Index<Dimension> seed;
-      VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, 0, seed );
 
       VolView::PlugIn::FilterModuleDoubleOutput< FilterType > module;
       module.SetPluginInfo( info );
@@ -43,7 +40,15 @@ class ConfidenceConnectedRunner
       module.GetFilter()->SetMultiplier(                multiplier         );
       module.GetFilter()->SetReplaceValue(              replaceValue       );
       module.GetFilter()->SetInitialNeighborhoodRadius( initialRadius      );
-      module.GetFilter()->SetSeed(                      seed               );
+
+      itk::Index<Dimension> seed;
+      const unsigned int numberOfSeeds = info->NumberOfMarkers;
+      for( unsigned int i=0; i<numberOfSeeds; i++)
+        {
+        VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, i, seed );
+        module.GetFilter()->AddSeed( seed );
+        }
+
       module.SetProduceDoubleOutput( compositeOutput          );
       // Execute the filter
       module.ProcessData( pds  );
@@ -147,7 +152,7 @@ static int UpdateGUI(void *inf)
   info->SetGUIProperty(info, 3, VVP_GUI_LABEL, "Initial Neighborhood Radius");
   info->SetGUIProperty(info, 3, VVP_GUI_TYPE, VVP_GUI_SCALE);
   info->SetGUIProperty(info, 3, VVP_GUI_DEFAULT, "2");
-  info->SetGUIProperty(info, 3, VVP_GUI_HELP, "Size of the initial neighborhood used to compute the statistics of the region. If the region in which the seed point is placed happens to be a homogeneous intensity distribution, increasing this radius will safely improve the statistical estimation of mean and variance. Make sure that the radius is not large enough to make contours participate in the computation of the estimation. That is, from the seed point to the nearest important edge, there should be a distance larger than this radius.");
+  info->SetGUIProperty(info, 3, VVP_GUI_HELP, "Size of the initial neighborhood used to compute the statistics of the region. If the region in which the seed points are placed happens to be a homogeneous intensity distribution, increasing this radius will safely improve the statistical estimation of mean and variance. Make sure that the radius is not large enough to make contours participate in the computation of the estimation. That is, from any seed point to the nearest important edge, there should be a distance larger than this radius.");
   info->SetGUIProperty(info, 3, VVP_GUI_HINTS , "1 20.0 1.0");
 
   info->SetGUIProperty(info, 4, VVP_GUI_LABEL, "Produce composite output");
@@ -207,7 +212,7 @@ void VV_PLUGIN_EXPORT vvITKConfidenceConnectedInit(vtkVVPluginInfo *info)
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
                                 "Confidence Connected Segmentation");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,
-    "This filter applies an region growing algorithm for segmentation. The criterion for including new pixels in the region is defined by an intensity range around the mean value of the pixels existing in the region. The extent of the intensity interval is computed as the product of the variance and a multiplier provided by the user. The coordinates of a seed point are used as the initial position for start growing the region.");
+    "This filter applies an region growing algorithm for segmentation. The criterion for including new pixels in the region is defined by an intensity range around the mean value of the pixels existing in the region. The extent of the intensity interval is computed as the product of the variance and a multiplier provided by the user. The coordinates of the seed points are used as the initial position for start growing the region.");
   info->SetProperty(info, VVP_SUPPORTS_IN_PLACE_PROCESSING, "0");
   info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "0");
   info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "5");
