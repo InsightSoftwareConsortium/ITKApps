@@ -9,32 +9,37 @@
 #include "itkOnePlusOneEvolutionaryOptimizer.h"
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkNormalVariateGenerator.h"
+#include "itkStatisticsImageFilter.h"
+#include "itkRegionOfInterestImageFilter.h"
 
+namespace itk
+{
 
 template< class TImage >
-class RigidRegistrator : public itk::ImageRegistrationMethod < TImage, TImage >
+class RigidRegistrator : public ImageRegistrationMethod < TImage, TImage >
   {
   public:
     typedef RigidRegistrator Self;
-    typedef itk::ImageRegistrationMethod< TImage, TImage> Superclass;
+    typedef ImageRegistrationMethod< TImage, TImage> Superclass;
     typedef SmartPointer<Self> Pointer;
     typedef SmartPointer<const Self> ConstPointer;
 
-    itkTypeMacro(RigidRegistrator, ImageRegistrationmethod);
+    itkTypeMacro(RigidRegistrator, ImageRegistrationMethod);
+
     itkNewMacro(Self);
   
     typedef typename TImage::PixelType PixelType ;
     typedef typename TImage::RegionType RegionType ;
 
     /** preprocessing related typedefs */
-    typedef itk::VersorRigid3DTransform<double> TransformType ;
-    typedef itk::OnePlusOneEvolutionaryOptimizer OptimizerType ;
-    typedef itk::Statistics::NormalVariateGenerator  OptimizerNormalGeneratorType;
+    typedef VersorRigid3DTransform<double> TransformType ;
+    typedef OnePlusOneEvolutionaryOptimizer OptimizerType ;
+    typedef Statistics::NormalVariateGenerator  OptimizerNormalGeneratorType;
     typedef TransformType::ParametersType ParametersType ;
     typedef TransformType::ParametersType ScalesType ;
-    typedef itk::LinearInterpolateImageFunction< TImage, double > 
+    typedef LinearInterpolateImageFunction< TImage, double > 
                  InterpolatorType ;
-    typedef itk::MattesMutualInformationImageToImageMetric< 
+    typedef MattesMutualInformationImageToImageMetric< 
                  TImage, TImage > MetricType ;
 
     void StartRegistration() ;
@@ -76,7 +81,7 @@ class RigidRegistrator : public itk::ImageRegistrationMethod < TImage, TImage >
 
     void PrintUncaughtError() ;
 
-    void PrintError(itk::ExceptionObject &e) ;
+    void PrintError(ExceptionObject &e) ;
 
   private:
     unsigned int  m_OptimizerNumberOfIterations;
@@ -92,6 +97,8 @@ class RigidRegistrator : public itk::ImageRegistrationMethod < TImage, TImage >
 #ifndef ITK_MANUAL_INSTANTIATION
 #include "RigidRegistrator.txx"
 #endif
+
+} // end namespace itk
 
 #endif //__RigidRegistrator_H
 

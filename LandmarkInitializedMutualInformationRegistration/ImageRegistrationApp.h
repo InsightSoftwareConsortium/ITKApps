@@ -23,17 +23,20 @@
 // including all the type of transform that could possibly be used
 // as templated type.
 
+namespace itk
+{
+
 template< class TImage >
-class ImageRegistrationApp : public itk::Object
+class ImageRegistrationApp : public Object
 {
 public:
   typedef ImageRegistrationApp Self;
-  typedef itk::Object Superclass;
+  typedef Object Superclass;
   typedef SmartPointer<Self> Pointer;
   typedef SmartPointer<const Self> ConstPointer;
 
   itkNewMacro(Self);
-  itkTypeMacro(ImageRegistrationApp, itk::Object);
+  itkTypeMacro(ImageRegistrationApp, Object);
 
   typedef typename TImage::PixelType    ImagePixelType ;
   typedef typename TImage::RegionType   RegionType ;
@@ -56,7 +59,7 @@ public:
   typedef typename AffineRegistratorType::ScalesType     AffineScalesType;
   typedef typename AffineRegistratorType::TransformType  AffineRegTransformType;
 
-  typedef itk::AffineTransform<double, 3>                AffineTransformType;
+  typedef AffineTransform<double, 3>                AffineTransformType;
 
   void RegisterUsingLandmarks(LandmarkSetType* fixedImageLandmarks,
                               LandmarkSetType* movingImageLandmarks) ;
@@ -113,7 +116,7 @@ protected:
 
   void PrintUncaughtError() ;
 
-  void PrintError(itk::ExceptionObject &e) ;
+  void PrintError(ExceptionObject &e) ;
 
 private:
   typename LandmarkRegTransformType::Pointer   m_LandmarkRegTransform ;
@@ -139,12 +142,14 @@ private:
   double              m_RigidMovingImageStandardDeviation ;
   unsigned int        m_RigidNumberOfSpatialSamples ;
   RigidScalesType     m_RigidScales ;
+  bool                m_RigidRegValid;
 
   unsigned int        m_AffineNumberOfIterations ;
   double              m_AffineFixedImageStandardDeviation ;
   double              m_AffineMovingImageStandardDeviation ;
   unsigned int        m_AffineNumberOfSpatialSamples ;
   AffineScalesType    m_AffineScales ;
+  bool                m_AffineRegValid;
 
 } ; // end of class
 
@@ -152,6 +157,8 @@ private:
 #ifndef ITK_MANUAL_INSTANTIATION
 #include "ImageRegistrationApp.txx"
 #endif
+
+} // end namespace itk
 
 #endif //__ImageRegistrationApp_h
 

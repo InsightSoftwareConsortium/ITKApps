@@ -2,8 +2,6 @@
 #define __AffineRegistrator_txx
 
 #include "AffineRegistrator.h"
-#include "itkStatisticsImageFilter.h"
-#include "itkRegionOfInterestImageFilter.h"
 
 template< class TImage >
 AffineRegistrator< TImage >
@@ -43,7 +41,7 @@ AffineRegistrator< TImage >
                              OptimizerNormalGeneratorType::New());
   
   this->SetMetric(MetricType::New());
-  m_MetricNumberOfSpatialSamples = 20000 ;
+  m_MetricNumberOfSpatialSamples = 40000 ;
 
   m_MovingImageRegionDefined = false;
   }
@@ -72,8 +70,8 @@ AffineRegistrator< TImage >
 
   this->GetTypedOptimizer()->SetScales( m_OptimizerScales );
   this->GetTypedOptimizer()->SetMaximumIteration(m_OptimizerNumberOfIterations);
-  this->GetTypedOptimizer()->Initialize(4.0, 1.1, 0.9); // Initial search radius
-  this->GetTypedOptimizer()->SetEpsilon(0.00000001);
+  this->GetTypedOptimizer()->Initialize(1.01); // Initial search radius
+  this->GetTypedOptimizer()->SetEpsilon(0.0000000000001);
 
   this->GetTypedMetric()->SetNumberOfSpatialSamples( 
                           m_MetricNumberOfSpatialSamples );
@@ -97,7 +95,7 @@ AffineRegistrator< TImage >
     {   
     Superclass::StartRegistration();
     }
-  catch(itk::ExceptionObject &e)
+  catch(ExceptionObject &e)
     {
     this->PrintError(e) ;
     }
@@ -123,7 +121,7 @@ AffineRegistrator< TImage >
 template< class TImage >
 void
 AffineRegistrator< TImage >
-::PrintError(itk::ExceptionObject &e)
+::PrintError(ExceptionObject &e)
 {
   std::cout << "-------------------------------------------------" 
             << std::endl;

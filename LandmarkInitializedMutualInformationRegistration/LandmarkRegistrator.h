@@ -9,31 +9,35 @@
 #include "itkArray.h"
 #include "itkObject.h"
 
-class LandmarkRegistrator : public itk::Object
+namespace itk
+{
+
+class LandmarkRegistrator : public Object
   {
 
   public:
 
     typedef LandmarkRegistrator                           Self;
-    typedef itk::Object                                   Superclass;
-    typedef itk::SmartPointer<Self>                       Pointer;
-    typedef itk::SmartPointer<const Self>                 ConstPointer;
+    typedef Object                                   Superclass;
+    typedef SmartPointer<Self>                       Pointer;
+    typedef SmartPointer<const Self>                 ConstPointer;
 
-    typedef itk::VersorRigid3DTransform< double >         TransformType;
-    typedef itk::LeastSquaredDistanceCostFunction<
+    typedef VersorRigid3DTransform< double >         TransformType;
+    typedef LeastSquaredDistanceCostFunction<
                                       TransformType >     MetricType;
 
     typedef MetricType::PointType                         LandmarkType ;
     typedef MetricType::PointSetType                      LandmarkSetType;
 
-    typedef itk::OnePlusOneEvolutionaryOptimizer          OptimizerType;
-    typedef itk::Statistics::NormalVariateGenerator       NormalGeneratorType;
+    typedef OnePlusOneEvolutionaryOptimizer          OptimizerType;
+    typedef Statistics::NormalVariateGenerator       NormalGeneratorType;
     typedef TransformType::ParametersType                 ParametersType;
     typedef TransformType::ParametersType                 ScalesType;
 
+    itkTypeMacro(LandmarkRegistrator,Object);
+
     itkNewMacro(LandmarkRegistrator);
 
-    itkTypeMacro(LandmarkRegistrator,Object);
 
     //
     itkSetObjectMacro(Metric,MetricType);
@@ -66,7 +70,7 @@ class LandmarkRegistrator : public itk::Object
 
   protected:
 
-    virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
+    virtual void PrintSelf( std::ostream &os, Indent indent ) const;
 
     LandmarkRegistrator();
 
@@ -90,6 +94,8 @@ class LandmarkRegistrator : public itk::Object
     LandmarkRegistrator(const Self&);  //purposely not implemented
     void operator=(const Self&);  //purposely not implemented
   };
+
+} // end namespace itk
 
 #endif //__LandmarkRegistrator_h
 

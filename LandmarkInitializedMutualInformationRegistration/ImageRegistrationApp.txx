@@ -40,9 +40,10 @@ ImageRegistrationApp< TImage >
   m_RigidRegTransform->SetIdentity() ;
   m_RigidAffineTransform = AffineTransformType::New() ;
   m_RigidAffineTransform->SetIdentity() ;
+  m_RigidRegValid = false;
 
   m_AffineNumberOfIterations = 2000 ;
-  m_AffineNumberOfSpatialSamples = 20000 ;
+  m_AffineNumberOfSpatialSamples = 40000 ;
   m_AffineScales.resize(18) ;
   m_AffineScales[0] = 200; // rotations
   m_AffineScales[1] = 200;
@@ -66,6 +67,7 @@ ImageRegistrationApp< TImage >
   m_AffineRegTransform->SetIdentity();
   m_AffineAffineTransform = AffineTransformType::New();
   m_AffineAffineTransform->SetIdentity();
+  m_AffineRegValid = false;
 
   m_FixedImage = NULL;
   m_MovingImage = NULL;
@@ -84,6 +86,8 @@ ImageRegistrationApp< TImage >
   {
   m_FixedImage = image;
   m_LandmarkRegValid = false;
+  m_RigidRegValid = false;
+  m_AffineRegValid = false;
   }
 
 template< class TImage >
@@ -93,6 +97,8 @@ ImageRegistrationApp< TImage >
   {
   m_MovingImage = image;
   m_LandmarkRegValid = false;
+  m_RigidRegValid = false;
+  m_AffineRegValid = false;
   }
 
 template< class TImage >
@@ -113,7 +119,7 @@ ImageRegistrationApp< TImage >
     {
       registrator->StartRegistration();
     }
-  catch( itk::ExceptionObject &e )
+  catch( ExceptionObject &e )
     {
       this->PrintError(e) ;
     }
@@ -162,7 +168,7 @@ ImageRegistrationApp< TImage >
     {
     typename TImage::SizeType size;
     typename TImage::IndexType fixedCenterIndex;
-    itk::Point<double, 3> fixedCenterPoint;
+    Point<double, 3> fixedCenterPoint;
     size = m_FixedImage->GetLargestPossibleRegion().GetSize();
     fixedCenterIndex[0] = size[0]/2;
     fixedCenterIndex[1] = size[1]/2;
@@ -170,7 +176,7 @@ ImageRegistrationApp< TImage >
     m_FixedImage->TransformIndexToPhysicalPoint(fixedCenterIndex,
                                                 fixedCenterPoint);
     typename TImage::IndexType movingCenterIndex;
-    itk::Point<double, 3> movingCenterPoint;
+    Point<double, 3> movingCenterPoint;
     size = m_MovingImage->GetLargestPossibleRegion().GetSize();
     movingCenterIndex[0] = size[0]/2;
     movingCenterIndex[1] = size[1]/2;
@@ -197,7 +203,7 @@ ImageRegistrationApp< TImage >
     {   
       registrator->StartRegistration();
     }
-  catch(itk::ExceptionObject &e)
+  catch(ExceptionObject &e)
     {
       this->PrintError(e) ;
     }
@@ -206,6 +212,7 @@ ImageRegistrationApp< TImage >
       this->PrintUncaughtError() ;
     }
 
+  m_RigidRegValid = true;
   m_RigidRegTransform  = registrator->GetTypedTransform();
   m_RigidAffineTransform->SetMatrix( m_RigidRegTransform->GetRotationMatrix());
   m_RigidAffineTransform->SetOffset(m_RigidRegTransform->GetOffset());
@@ -234,7 +241,23 @@ ImageRegistrationApp< TImage >
   registrator->SetOptimizerScales( m_AffineScales );
   registrator->SetOptimizerNumberOfIterations(m_AffineNumberOfIterations);
 
-  if(m_LandmarkRegValid)
+  if(m_RigidRegValid)
+    {
+    m_AffineRegTransform->SetIdentity();
+    AffineParametersType params = m_AffineRegTransform->GetParameters();
+    RigidParametersType rigidParams = m_RigidRegTransform->GetParameters();
+    params[0] = rigidParams[0];
+    params[1] = rigidParams[1];
+    params[2] = rigidParams[2];
+    params[3] = rigidParams[3];
+    params[4] = rigidParams[4];
+    params[5] = rigidParams[5];
+    params[6] = rigidParams[6];
+    params[7] = rigidParams[7];
+    params[8] = rigidParams[8];
+    registrator->SetInitialTransformParameters( params );
+    }
+  else if(m_LandmarkRegValid)
     {
     m_AffineRegTransform->SetIdentity();
     AffineParametersType params = m_AffineRegTransform->GetParameters();
@@ -254,7 +277,7 @@ ImageRegistrationApp< TImage >
     {
     typename TImage::SizeType size;
     typename TImage::IndexType fixedCenterIndex;
-    itk::Point<double, 3> fixedCenterPoint;
+    Point<double, 3> fixedCenterPoint;
     size = m_FixedImage->GetLargestPossibleRegion().GetSize();
     fixedCenterIndex[0] = size[0]/2;
     fixedCenterIndex[1] = size[1]/2;
@@ -262,7 +285,7 @@ ImageRegistrationApp< TImage >
     m_FixedImage->TransformIndexToPhysicalPoint(fixedCenterIndex,
                                                 fixedCenterPoint);
     typename TImage::IndexType movingCenterIndex;
-    itk::Point<double, 3> movingCenterPoint;
+    Point<double, 3> movingCenterPoint;
     size = m_MovingImage->GetLargestPossibleRegion().GetSize();
     movingCenterIndex[0] = size[0]/2;
     movingCenterIndex[1] = size[1]/2;
@@ -288,7 +311,7 @@ ImageRegistrationApp< TImage >
     {   
       registrator->StartRegistration();
     }
-  catch(itk::ExceptionObject &e)
+  catch(ExceptionObject &e)
     {
       this->PrintError(e) ;
     }
@@ -324,7 +347,7 @@ ImageRegistrationApp< TImage >
 template< class TImage >
 void
 ImageRegistrationApp< TImage >
-::PrintError(itk::ExceptionObject &e)
+::PrintError(ExceptionObject &e)
   {
   std::cout << "-------------------------------------------------" 
             << std::endl;

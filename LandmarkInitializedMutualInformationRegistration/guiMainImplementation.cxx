@@ -849,8 +849,8 @@ guiMainImplementation
   {
 
   // set landmark advance option values
-  ImageRegistrationAppType::RigidScalesType landmarkScales = 
-        m_ImageRegistrationApp->GetLandmarkScales();
+  ImageRegistrationAppType::RigidScalesType landmarkScales;
+  landmarkScales.resize(9);
   landmarkScales[0] = tkLandmarkRotationScale->value();
   landmarkScales[1] = tkLandmarkRotationScale->value();
   landmarkScales[2] = tkLandmarkRotationScale->value();
@@ -865,8 +865,8 @@ guiMainImplementation
                (unsigned int) tkLandmarkNumberOfIterations->value());
 
   // set rigid advance option values
-  ImageRegistrationAppType::RigidScalesType rigidScales = 
-          m_ImageRegistrationApp->GetRigidScales();
+  ImageRegistrationAppType::RigidScalesType rigidScales;
+  rigidScales.resize(9);
   rigidScales[0] = tkRigidRotationScale->value();
   rigidScales[1] = tkRigidRotationScale->value();
   rigidScales[2] = tkRigidRotationScale->value();
@@ -888,8 +888,8 @@ guiMainImplementation
   m_RigidRegionScale = tkRigidRegionScale->value();
 
   // set affine advance option values
-  ImageRegistrationAppType::AffineScalesType affineScales = 
-        m_ImageRegistrationApp->GetAffineScales();
+  ImageRegistrationAppType::AffineScalesType affineScales;
+  affineScales.resize(18);
   affineScales[0] = tkAffineRotationScale->value();
   affineScales[1] = tkAffineRotationScale->value();
   affineScales[2] = tkAffineRotationScale->value();
@@ -908,7 +908,6 @@ guiMainImplementation
   affineScales[15] = tkAffineSkewScale->value();
   affineScales[16] = tkAffineSkewScale->value();
   affineScales[17] = tkAffineSkewScale->value();
-  affineScales[18] = tkAffineSkewScale->value();
   m_ImageRegistrationApp->SetAffineScales(affineScales);
   m_ImageRegistrationApp->SetAffineNumberOfIterations(
                (unsigned int) tkAffineNumberOfIterations->value());
@@ -1200,58 +1199,50 @@ guiMainImplementation
     tkLandmarkRegisteredView->deactivate();
     }
   
+  this->ChangeStatusDisplay("Registering using the rigid method...");
+
   RegionType region;
   region = m_MovingImage->GetLargestPossibleRegion();
-    
-  switch( tkRegistrationMethodChoice->value() )
+
+  if ( tkRigidUseUserRegion->value() == 1
+        && tkMovingImageViewer->IsRegionOfInterestAvailable() )
     {
-    case 0: // rigid 
-      {
-      this->ChangeStatusDisplay("Registering using the rigid method...");
-    
-      if ( tkRigidUseUserRegion->value() == 1
-           && tkMovingImageViewer->IsRegionOfInterestAvailable() )
-        {
-        region = tkMovingImageViewer->GetRegionOfInterest();
-        }
-      else if ( tkRigidUseLandmarkRegion->value() == 1 
-                && tkMovingImageViewer->GetNumberOfLandmarks() == 4 
-                && tkFixedImageViewer->GetNumberOfLandmarks() == 4)
-        {
-        region = tkMovingImageViewer->ComputeLandmarkRegion
-          (tkRigidRegionScale->value());
-        }
-  
-      m_ImageRegistrationApp->SetFixedImageRegion(region); // actually moving image region
-      m_ImageRegistrationApp->RegisterUsingRigidMethod();
-      break;
-      }
-    case 1: // affine
-      {
-      this->ChangeStatusDisplay("Registering using the affine method...");
-      if ( tkAffineUseUserRegion->value() == 1
-           && tkMovingImageViewer->IsRegionOfInterestAvailable() )
-        {
-        region = tkMovingImageViewer->GetRegionOfInterest();
-        }
-      else if ( tkAffineUseLandmarkRegion->value() == 1 
-                && tkFixedImageViewer->GetNumberOfLandmarks() == 4 
-                && tkMovingImageViewer->GetNumberOfLandmarks() == 4)
-        {
-        region = tkMovingImageViewer->ComputeLandmarkRegion
-          (tkAffineRegionScale->value());
-        }
-      m_ImageRegistrationApp->SetFixedImageRegion(region); // actually moving image region
-      m_ImageRegistrationApp->RegisterUsingAffineMethod();
-      break;
-      }
-    //     case 2: // deformable
-    //       m_ImageRegistrationApp->RegisterUsingDeformableMethod();
-    //       break;
-    default:
-      break;
+    std::cout << "Rigid registration using user roi." << std::endl;
+    region = tkMovingImageViewer->GetRegionOfInterest();
+    }
+  else if ( tkRigidUseLandmarkRegion->value() == 1 
+            && tkMovingImageViewer->GetNumberOfLandmarks() == 4 
+            && tkFixedImageViewer->GetNumberOfLandmarks() == 4)
+    {
+    std::cout << "Rigid registration using landmark roi." << std::endl;
+    region = tkMovingImageViewer->ComputeLandmarkRegion
+      (tkRigidRegionScale->value());
     }
 
+    m_ImageRegistrationApp->SetFixedImageRegion(region); // actually moving image region
+    m_ImageRegistrationApp->RegisterUsingRigidMethod();
+
+  if( tkRegistrationMethodChoice->value() > 0 ) // also do affine
+    {
+    this->ChangeStatusDisplay("Registering using the affine method...");
+    if ( tkAffineUseUserRegion->value() == 1
+          && tkMovingImageViewer->IsRegionOfInterestAvailable() )
+      {
+      std::cout << "Affine registration using user roi." << std::endl;
+      region = tkMovingImageViewer->GetRegionOfInterest();
+      }
+    else if ( tkAffineUseLandmarkRegion->value() == 1 
+              && tkFixedImageViewer->GetNumberOfLandmarks() == 4 
+              && tkMovingImageViewer->GetNumberOfLandmarks() == 4)
+      {
+      std::cout << "Affine registration using landmark roi." << std::endl;
+      region = tkMovingImageViewer->ComputeLandmarkRegion
+        (tkAffineRegionScale->value());
+      }
+    m_ImageRegistrationApp->SetFixedImageRegion(region); // actually moving image region
+    m_ImageRegistrationApp->RegisterUsingAffineMethod();
+    }
+  
   this->TransformLandmarks( & m_MovingLandmarkSpatialObject->GetPoints(),
                         & m_RegisteredMovingLandmarkSpatialObject->GetPoints(),
                         m_ImageRegistrationApp->GetFinalTransform() );

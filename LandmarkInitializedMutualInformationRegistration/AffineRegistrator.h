@@ -1,14 +1,6 @@
 #ifndef __AffineRegistrator_h
 #define __AffineRegistrator_h
 
-// MUST CALL IN ORDER (especially first 3)
-// SetFixedImage
-// SetMovingImage
-// SetLearningRate and other parameters
-// SetFixedImageRegion()
-// StartRegistration()
-// GetTransform()
-
 #include "itkImage.h"
 
 #include "itkImageRegistrationMethod.h"
@@ -17,31 +9,36 @@
 #include "itkOnePlusOneEvolutionaryOptimizer.h"
 #include "itkNormalVariateGenerator.h"
 #include "itkLinearInterpolateImageFunction.h"
+#include "itkStatisticsImageFilter.h"
+#include "itkRegionOfInterestImageFilter.h"
+
+namespace itk
+{
 
 template< class TImage >
-class AffineRegistrator : public itk::ImageRegistrationMethod < TImage, TImage >
+class AffineRegistrator : public ImageRegistrationMethod < TImage, TImage >
   {
   public:
     typedef AffineRegistrator Self;
-    typedef itk::ImageRegistrationMethod< TImage, TImage> Superclass;
+    typedef ImageRegistrationMethod< TImage, TImage> Superclass;
     typedef SmartPointer<Self> Pointer;
     typedef SmartPointer<const Self> ConstPointer;
 
-    itkNewMacro(Self);
-    itkTypeMacro(AffineRegistrator, itk::ImageRegistrationmethod);
+    itkTypeMacro(AffineRegistrator, ImageRegistrationMethod);
 
+    itkNewMacro(Self);
   
     typedef typename TImage::PixelType PixelType ;
     typedef typename TImage::RegionType RegionType ;
 
-    typedef itk::ScaleSkewVersor3DTransform<double> TransformType ;
-    typedef itk::OnePlusOneEvolutionaryOptimizer OptimizerType ;
-    typedef itk::Statistics::NormalVariateGenerator  OptimizerNormalGeneratorType;
+    typedef ScaleSkewVersor3DTransform<double> TransformType ;
+    typedef OnePlusOneEvolutionaryOptimizer OptimizerType ;
+    typedef Statistics::NormalVariateGenerator  OptimizerNormalGeneratorType;
     typedef OptimizerType::ParametersType ParametersType ;
     typedef typename OptimizerType::ScalesType ScalesType ;
-    typedef itk::LinearInterpolateImageFunction< TImage, double > 
+    typedef LinearInterpolateImageFunction< TImage, double > 
                  InterpolatorType ;
-    typedef itk::MattesMutualInformationImageToImageMetric< 
+    typedef MattesMutualInformationImageToImageMetric< 
                  TImage, TImage > MetricType ;
 
     void StartRegistration() ;
@@ -82,7 +79,7 @@ class AffineRegistrator : public itk::ImageRegistrationMethod < TImage, TImage >
 
     void PrintUncaughtError() ;
 
-    void PrintError(itk::ExceptionObject &e) ;
+    void PrintError(ExceptionObject &e) ;
 
   private:
 
@@ -99,6 +96,8 @@ class AffineRegistrator : public itk::ImageRegistrationMethod < TImage, TImage >
 #ifndef ITK_MANUAL_INSTANTIATION
 #include "AffineRegistrator.txx"
 #endif
+
+} // end namespace itk
 
 #endif //__AffineRegistrator_H
 

@@ -1,5 +1,8 @@
 #include "LandmarkRegistrator.h"
 
+namespace itk
+{
+
 LandmarkRegistrator::LandmarkRegistrator()
   {
   m_FixedLandmarkSet = LandmarkSetType::New();
@@ -135,3 +138,6 @@ LandmarkRegistrator
     dest->InsertElement(i,source->GetElement(i));
     }
   }
+
+} // end namespace itk
+

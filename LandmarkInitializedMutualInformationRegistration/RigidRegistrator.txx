@@ -2,8 +2,6 @@
 #define __RigidRegistrator_txx
 
 #include "RigidRegistrator.h"
-#include "itkStatisticsImageFilter.h"
-#include "itkRegionOfInterestImageFilter.h"
 
 template< class TImage >
 RigidRegistrator< TImage >
@@ -87,7 +85,7 @@ RigidRegistrator< TImage >
     {   
     Superclass::StartRegistration();
     }
-  catch(itk::ExceptionObject &e)
+  catch(ExceptionObject &e)
     {
     this->PrintError(e) ;
     }
@@ -113,7 +111,7 @@ RigidRegistrator< TImage >
 template< class TImage >
 void
 RigidRegistrator< TImage >
-::PrintError(itk::ExceptionObject &e)
+::PrintError(ExceptionObject &e)
 {
   std::cout << "-------------------------------------------------" 
             << std::endl;

@@ -56,7 +56,7 @@ public:
 
   typedef itk::ImageRegionIterator<ImageType> ImageRegionIteratorType;
   
-  typedef ImageRegistrationApp< ImageType >   ImageRegistrationAppType ;
+  typedef itk::ImageRegistrationApp< ImageType >   ImageRegistrationAppType ;
 
   typedef itk::AffineTransform<double, 3>     AffineTransformType ;
   typedef itk::LinearInterpolateImageFunction< ImageType, double > 
