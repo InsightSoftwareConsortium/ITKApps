@@ -355,7 +355,7 @@ public:
   typedef itk::ImageRegionConstIterator<ImageType> IteratorType;
   typedef itk::ImageToImageFilter<ImageType,ImageType> FilterType;
 
-  IterationReporter(FilterType *source,ofstream &fout)
+  IterationReporter(FilterType *source,std::ofstream &fout)
   : m_Iteration(0), m_Out(fout), m_Source(source) 
   {
     m_Command = CommandType::New();
@@ -395,7 +395,7 @@ public:
 private:
   int m_Iteration;
   clock_t m_LastClock;
-  ofstream &m_Out;
+  std::ofstream &m_Out;
 
   typedef itk::MemberCommand<IterationReporter> CommandType;
   CommandType::Pointer m_Command;
@@ -513,7 +513,7 @@ TestCompareLevelSets
 
   // Done with the initialization.  Open an output dump file
   string targetPath = registry["OutputPath"]["."] + string("/");
-  ofstream fout((targetPath + "report." + expID + ".txt").c_str());
+  std::ofstream fout((targetPath + "report." + expID + ".txt").c_str());
 
   // Now, we have a speed image and a level set image.  We are ready to
   // test different segmenters

@@ -463,7 +463,7 @@ void IRISApplication
   for(unsigned int iLine=0;!fin.eof();iLine++)
     {
     // Read the line into a string
-    getline(fin,line);
+    std::getline(fin,line);
 
     // Check if the line is a comment or a blank line
     if(line[0] == '#' || line.length() == 0)

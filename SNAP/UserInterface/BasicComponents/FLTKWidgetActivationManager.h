@@ -88,7 +88,7 @@ public:
 
     // Trigger all the rules for this flag. We do this before updating the widgets 
     // so that the settings related to the actual flag being updated are applied last
-    typename list<Rule>::iterator itRule = fd.Rules[ value ? 1 : 0 ].begin();   
+    typename std::list<Rule>::iterator itRule = fd.Rules[ value ? 1 : 0 ].begin();   
     while( itRule != fd.Rules[ value ? 1 : 0 ].end() )
       {
       UpdateFlag( itRule->Target, itRule->Value, recursionCount + 1 );
@@ -96,7 +96,7 @@ public:
       }
 
     // Activate all the widgets tied to this flag
-    typename set<WidgetWrapper *>::iterator itWidget = fd.Widgets.begin();    
+    typename std::set<WidgetWrapper *>::iterator itWidget = fd.Widgets.begin();    
     while( itWidget != fd.Widgets.end() )
       (*itWidget++)->OnStateChange(value);
         
@@ -105,7 +105,7 @@ public:
   /** Destructor, deletes widget wrappers */
   virtual ~WidgetActivationManager()
     {
-    typename set<WidgetWrapper *>::iterator itWidget = m_AllWidgets.begin();
+    typename std::set<WidgetWrapper *>::iterator itWidget = m_AllWidgets.begin();
     while(itWidget != m_AllWidgets.end())
       delete *(itWidget++);
     }
