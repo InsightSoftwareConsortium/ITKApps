@@ -9,8 +9,8 @@
 #include "itkImportImageFilter.h"
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkNormalizedCorrelationImageToImageMetric.h"
-#include "itkQuaternionRigidTransform.h"
-#include "itkRegularStepGradientDescentOptimizer.h"
+#include "itkVersorRigid3DTransform.h"
+#include "itkVersorRigid3DTransformOptimizer.h"
 #include "itkResampleImageFilter.h"
 #include "itkShrinkImageFilter.h"
 
@@ -25,11 +25,11 @@ template <class PixelType> class ImageRegistrationRunner
 {
 public:
   // define our typedefs
-  typedef itk::Image< PixelType, 3 >                 ImageType; 
-  typedef itk::ImportImageFilter< PixelType, 3>      ImportFilterType;
+  typedef itk::Image< PixelType, 3 >                   ImageType; 
+  typedef itk::ImportImageFilter< PixelType, 3>        ImportFilterType;
   typedef itk::ShrinkImageFilter<ImageType, ImageType> ShrinkFilterType;
-  typedef itk::QuaternionRigidTransform< double >    TransformType;
-  typedef itk::RegularStepGradientDescentOptimizer   OptimizerType;
+  typedef itk::VersorRigid3DTransform< double >        TransformType;
+  typedef itk::VersorRigid3DTransformOptimizer         OptimizerType;
   typedef itk::NormalizedCorrelationImageToImageMetric<
     ImageType, ImageType> MetricType;
   typedef itk::LinearInterpolateImageFunction<ImageType, double> 
@@ -315,12 +315,11 @@ Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
   optimizerScales[0] = 1.0;
   optimizerScales[1] = 1.0;
   optimizerScales[2] = 1.0;
-  optimizerScales[3] = 1.0;
-  optimizerScales[4] = 1.0/
+  optimizerScales[3] = 1.0/
     (10.0*info->InputVolumeSpacing[0]*info->InputVolumeDimensions[0]);
-  optimizerScales[5] = 1.0/
+  optimizerScales[4] = 1.0/
     (10.0*info->InputVolumeSpacing[1]*info->InputVolumeDimensions[1]);
-  optimizerScales[6] = 1.0/
+  optimizerScales[5] = 1.0/
     (10.0*info->InputVolumeSpacing[2]*info->InputVolumeDimensions[2]);
   m_Optimizer->SetScales(optimizerScales);
   
@@ -392,18 +391,22 @@ Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
   
   // set some output information,
   char results[1024];
-  TransformType::VnlQuaternionType quat = finalTransform->GetRotation();
+
+  typedef TransformType::VersorType VersorType;
+  VersorType versor = finalTransform->GetVersor();
   TransformType::OffsetType offset = finalTransform->GetOffset();
-    
+  typedef VersorType::VectorType   AxisType;
+  AxisType axis = versor.GetAxis();
+
   sprintf(results,"Number of Iterations Used: %d\nTranslation: %g %g %g\nRotation Axis %f %f %f %f\nOffset: %g %g %g", 
           m_Optimizer->GetCurrentIteration(),
-          finalParameters[0],
-          finalParameters[1],
-          finalParameters[2],
-          quat.axis()[0],
-          quat.axis()[1],
-          quat.axis()[2],
-          quat.angle(),
+          finalParameters[3],
+          finalParameters[4],
+          finalParameters[5],
+          axis[0],
+          axis[1],
+          axis[2],
+          versor.GetAngle(),
           offset[0],
           offset[1],
           offset[2]
