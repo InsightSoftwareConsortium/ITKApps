@@ -22,6 +22,7 @@
 #include "ImageRayIntersectionFinder.h"
 
 #include <FL/glut.h>
+#include <vnl/vnl_cross.h>
                          
 /** These classes are used internally for m_Ray intersection testing */
 class LabelImageHitTester 
@@ -946,8 +947,7 @@ Window3D
   // Now we have two orthogonal vectors laying on the cut plane.  All we have
   // to do is take the cross product
   Vector3d delta = x2-x1;
-  Vector3d n = - cross_3d((vnl_vector<double>) delta,
-                            (vnl_vector<double>) w);
+  Vector3d n = - vnl_cross_3d(delta, w);
 
   // Compute the length of the normal and exit if it's zero
   double l = n.two_norm();
@@ -1306,6 +1306,9 @@ void Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.15  2004/01/27 18:18:44  pauly
+ *FIX: Last MAC OSX fix
+ *
  *Revision 1.14  2004/01/27 18:05:38  pauly
  *FIX: More MAC OSX fixes. Also removed old snake code no longer in use
  *

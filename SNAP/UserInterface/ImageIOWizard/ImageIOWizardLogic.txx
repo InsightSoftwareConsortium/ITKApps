@@ -87,7 +87,7 @@ ImageIOWizardLogic<TPixel>
   m_FileFormatPattern[FORMAT_MHA] = "mha,mhd";
   m_FileFormatPattern[FORMAT_GIPL] = "gipl";
   m_FileFormatPattern[FORMAT_RAW] = "raw*";
-  m_FileFormatPattern[FORMAT_ANALYZE] = "img";  
+  m_FileFormatPattern[FORMAT_ANALYZE] = "hdr";  
   m_FileFormatPattern[FORMAT_DICOM] = "dcm";
   m_FileFormatPattern[FORMAT_GE4] = "ge4";
   m_FileFormatPattern[FORMAT_GE5] = "ge5";
