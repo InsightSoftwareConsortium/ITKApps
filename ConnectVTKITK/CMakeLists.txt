@@ -87,7 +87,7 @@ IF(ITK_CSWIG_PYTHON)
   MARK_AS_ADVANCED(PYTHON_EXECUTABLE)
   IF(PYTHON_EXECUTABLE)
     # Add a target to copy the ConnectVTKITK.py module to the build tree.
-    ADD_CUSTOM_TARGET(connectvtkitk_copy ALL echo "...")
+    ADD_CUSTOM_TARGET(connectvtkitk_pyc ALL echo "...")
 
     # Now create a list of Python files.
     SET(ITK_PYTHON_FILES ConnectVTKITK)
@@ -117,7 +117,7 @@ IF(ITK_CSWIG_PYTHON)
                              COMMAND ${CMAKE_COMMAND}
                              ARGS -E copy ${src} ${tgt}
                              OUTPUTS ${tgt}
-                             TARGET connectvtkitk_copy
+                             TARGET connectvtkitk_pyc
                              COMMENT "source copy")
         ENDFOREACH(file)
       ELSE(CMAKE_CONFIGURATION_TYPES)
@@ -128,7 +128,7 @@ IF(ITK_CSWIG_PYTHON)
    		         COMMAND ${CMAKE_COMMAND}
                             ARGS -E copy ${src} ${tgt}
                             OUTPUTS ${tgt}
-   			 TARGET connectvtkitk_copy
+   			 TARGET connectvtkitk_pyc
                             COMMENT "source copy")
         ENDFOREACH(file)
       ENDIF(CMAKE_CONFIGURATION_TYPES)
@@ -136,10 +136,10 @@ IF(ITK_CSWIG_PYTHON)
 
     # Byte compile the Python files.
     WRITE_FILE(${ConnectVTKITK_BINARY_DIR}/compile_all_connectvtkitk
-          "import compileall\n"
-          "compileall.compile_dir('${ConnectVTKITK_BINARY_DIR}')\n"
-  	"file = open('${ConnectVTKITK_BINARY_DIR}/connectvtkitk_compile_complete', 'w')\n"
-  	"file.write('Done')\n")
+      "import compileall\n"
+      "compileall.compile_dir('${ConnectVTKITK_BINARY_DIR}')\n"
+      "file = open('${ConnectVTKITK_BINARY_DIR}/connectvtkitk_compile_complete', 'w')\n"
+      "file.write('Done')\n")
 
     ADD_CUSTOM_COMMAND(
       SOURCE ${ConnectVTKITK_BINARY_DIR}/compile_all_connectvtkitk
@@ -147,14 +147,14 @@ IF(ITK_CSWIG_PYTHON)
       ARGS ${ConnectVTKITK_BINARY_DIR}/compile_all_connectvtkitk
       DEPENDS ${ITK_PYTHON_SOURCE_FILES}
       OUTPUTS "${ConnectVTKITK_BINARY_DIR}/connectvtkitk_compile_complete"
-      TARGET itkpython_pyc
+      TARGET connectvtkitk_pyc
       )
 
     # Add a driver target.
     ADD_CUSTOM_COMMAND(
-      SOURCE connectvtkitk_copy
+      SOURCE connectvtkitk_pyc
       DEPENDS "${ConnectVTKITK_BINARY_DIR}/connectvtkitk_compile_complete"
-      TARGET connectvtkitk_copy
+      TARGET connectvtkitk_pyc
       )
   ENDIF(PYTHON_EXECUTABLE)
 ENDIF(ITK_CSWIG_PYTHON)
