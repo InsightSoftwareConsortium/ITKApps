@@ -58,16 +58,13 @@ public:
     m_ProduceDoubleOutput = value;
     }
 
+
+
+
   /**  Copy the result of the processing to the output */
-  virtual void CopyOutputData( unsigned int component, const vtkVVProcessDataStruct * pds )
+  virtual void CopyOutputData( const vtkVVProcessDataStruct * pds )
     {
-
-    if( !m_ProduceDoubleOutput )
-      {
-      this->Superclass::CopyOutputData( component, pds );
-      return;
-      }
-
+    
     // Copy the data (with casting) to the output buffer provided by the PlugIn API
     typename OutputImageType::ConstPointer outputImage =
                                                this->GetFilter()->GetOutput();
@@ -75,26 +72,39 @@ public:
     typedef itk::ImageRegionConstIterator< OutputImageType >  OutputIteratorType;
 
     OutputIteratorType ot( outputImage, outputImage->GetBufferedRegion() );
-
-   typename InputImageType::ConstPointer inputImage =
-                                               this->GetFilter()->GetInput();
-
-    typedef itk::ImageRegionConstIterator< InputImageType >  InputIteratorType;
-
-    InputIteratorType it( inputImage, inputImage->GetBufferedRegion() );
-
+    ot.GoToBegin(); 
 
     OutputPixelType * outData = (OutputPixelType *)(pds->outData);
 
-    ot.GoToBegin(); 
-    while( !ot.IsAtEnd() )
+    if( m_ProduceDoubleOutput )
       {
-      *outData = static_cast< OutputPixelType >( it.Get() );  // copy input pixel
-      ++outData;
-      *outData = ot.Get();  // copy output pixel
-      ++outData;
-      ++ot;
-      ++it;
+      typename InputImageType::ConstPointer inputImage =
+                                                 this->GetFilter()->GetInput();
+
+      typedef itk::ImageRegionConstIterator< InputImageType >  InputIteratorType;
+
+      InputIteratorType it( inputImage, inputImage->GetBufferedRegion() );
+      it.GoToBegin();
+
+      while( !ot.IsAtEnd() )
+        {
+        *outData = static_cast< OutputPixelType >( it.Get() );  // copy input pixel
+        ++outData;
+        *outData = ot.Get();  // copy output pixel
+        ++outData;
+        ++ot;
+        ++it;
+        }
+      }
+    else
+      {
+      while( !ot.IsAtEnd() )
+        {
+        *outData = ot.Get();  // copy output pixel
+        ++outData;
+        ++ot;
+        }
+
       }
     }
 
@@ -104,7 +114,37 @@ public:
   virtual void 
   ProcessData( const vtkVVProcessDataStruct * pds )
   {
-    this->Superclass::ProcessData( pds );
+    this->InitializeProgressValue();
+    this->SetCurrentFilterProgressWeight( 1.0 );
+
+    const unsigned int numberOfComponents = this->GetPluginInfo()->InputVolumeNumberOfComponents;
+
+    if( numberOfComponents != 1 )
+      {
+      itk::ExceptionObject excp;
+      excp.SetDescription("This filter is intendended to be used with single-componente data only");
+      throw excp;
+      }
+
+    this->ImportPixelBuffer( 0, pds );
+
+    if( !m_ProduceDoubleOutput )
+      {
+      this->ExportPixelBuffer( 0, pds );
+      }
+
+    // Execute the filter
+    try
+      {
+      this->GetFilter()->Update();
+      }
+    catch( itk::ProcessAborted & )
+      {
+      return;
+      }
+
+    this->CopyOutputData( pds );
+
   }
 
 
