@@ -15,6 +15,7 @@ INCLUDE_DIRECTORIES(
   ${ITK_SOURCE_DIR}/Utilities/MetaIO/SaptialObject
   ${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer
   ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
+  ${InsightApplications_SOURCE_DIR}/Auxiliary/ITKFlFileWriter
   ${InsightApplications_SOURCE_DIR}/LandmarkInitializedMutualInformationRegistration
   ${InsightApplications_BINARY_DIR}/LandmarkInitializedMutualInformationRegistration
 )
@@ -30,5 +31,7 @@ ITK_DISABLE_FLTK_GENERATED_WARNINGS(guiMain.fl)
 
 TARGET_LINK_LIBRARIES (LandmarkInitializedMutualInformationRegistration
                        ITKIO ITKMetaIO ITKBasicFilters ITKStatistics
-ITKFltkImageViewer)
+ITKFltkImageViewer
+ITKFlFileWriter
+)
 
