@@ -96,7 +96,7 @@ public:
     filter->SetPropagationScaling( propagationScaling );
     filter->SetAdvectionScaling( advectionScaling );
     filter->SetMaximumRMSError( maximumRMSError );
-    filter->SetMaximumIterations( maximumNumberOfIterations );
+    filter->SetNumberOfIterations( maximumNumberOfIterations );
 
     filter->SetInput(        this->GetInput1() );
     filter->SetFeatureImage( this->GetInput2() );
@@ -105,7 +105,6 @@ public:
     try
       {
       filter->Update();
-      filter->ReleaseDataFlagOn();
       }
     catch( itk::ProcessAborted & )
       {
@@ -113,8 +112,7 @@ public:
       }
 
     // Copy the data (with casting) to the output buffer provided by the PlugIn API
-    OutputImageType::ConstPointer outputImage =
-                                     filter->GetOutput();
+    OutputImageType::ConstPointer outputImage = filter->GetOutput();
 
     typedef itk::ImageRegionConstIterator< OutputImageType >  OutputIteratorType;
 
@@ -125,11 +123,10 @@ public:
     ot.GoToBegin(); 
     while( !ot.IsAtEnd() )
       {
-      *outData = ot.Get();
+      *outData = static_cast<unsigned char>( ( ot.Get() + 5.0 ) * 255.0 / 10.0 );
       ++ot;
       ++outData;
       }
-
   } // end of ProcessData
 
 

@@ -107,12 +107,6 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       runner.Execute( info, pds );
       break; 
       }
-    case VTK_DOUBLE:
-      {
-      ThresholdSegmentationLevelSeteRunner<double> runner;
-      runner.Execute( info, pds );
-      break; 
-      }
     }
   }
   catch( itk::ExceptionObject & except )
@@ -175,7 +169,8 @@ static int UpdateGUI(void *inf)
 
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, "0");
   
-  info->OutputVolumeScalarType = VTK_UNSIGNED_CHAR;
+  info->OutputVolumeScalarType = VTK_UNSIGNED_CHAR; 
+
   info->OutputVolumeNumberOfComponents = 1;
 
   memcpy(info->OutputVolumeDimensions,info->InputVolumeDimensions,
