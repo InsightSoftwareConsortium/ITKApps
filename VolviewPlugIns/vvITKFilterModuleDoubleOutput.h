@@ -43,8 +43,8 @@ public:
   /**  Constructor */
   FilterModuleDoubleOutput() 
     {
+    m_ProduceDoubleOutput = false;
     }
-
 
 
   /**  Destructor */
@@ -52,10 +52,22 @@ public:
     {
     }
 
+  /** Enable/Disable the production of the second output */
+  void SetProduceDoubleOutput( bool value )
+    {
+    m_ProduceDoubleOutput = value;
+    }
 
   /**  Copy the result of the processing to the output */
   virtual void CopyOutputData( const vtkVVProcessDataStruct * pds )
     {
+
+    if( !m_ProduceDoubleOutput )
+      {
+      this->Superclass::CopyOutputData( pds );
+      return;
+      }
+
     // Copy the data (with casting) to the output buffer provided by the PlugIn API
     typename OutputImageType::ConstPointer outputImage =
                                                this->GetFilter()->GetOutput();
@@ -86,7 +98,19 @@ public:
       }
     }
 
+
+
+  /**  ProcessData performs the actual filtering on the data */
+  virtual void 
+  ProcessData( const vtkVVProcessDataStruct * pds )
+  {
+    this->Superclass::ProcessData( pds );
+  }
+
+
 private:
+
+  bool m_ProduceDoubleOutput;
 
 };
 
