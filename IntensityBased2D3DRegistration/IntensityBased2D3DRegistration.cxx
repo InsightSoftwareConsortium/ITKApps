@@ -242,9 +242,9 @@ int main( int argc, char *argv[] )
   char *fileImage2D = NULL;
   char *fileVolume3D = NULL;
   char *fileOutput = NULL;
-  char *fileDifference = NULL;
+//  char *fileDifference;
 
-  bool ok = false;
+  bool ok;
   bool verbose = false;
   bool debug = false;
 
@@ -408,7 +408,7 @@ int main( int argc, char *argv[] )
       {
       argc--; argv++;
       ok = true;
-      fileDifference = argv[1];
+//      fileDifference = argv[1];
       argc--; argv++;
       }
 
