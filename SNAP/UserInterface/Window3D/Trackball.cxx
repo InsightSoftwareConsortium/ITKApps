@@ -118,7 +118,7 @@ Trackball
     dy = y - m_LastPosition[0];
     //        m_Zoom = m_OldZoom - dy/h;
     //        m_Zoom = m_OldZoom - dy;
-    m_Zoom = m_OldZoom * (float)pow(1.01,-dy);
+    m_Zoom = m_OldZoom * (float)pow((float)1.01,(float)-dy);
     if ( m_Zoom < 0.0 ) m_Zoom = 0.0;
   }
 }
@@ -205,6 +205,10 @@ Trackball
 
 /*
  *Log: Trackball.cxx
+ *Revision 1.3  2003/08/27 14:03:23  pauly
+ *FIX: Made sure that -Wall option in gcc generates 0 warnings.
+ *FIX: Removed 'comment within comment' problem in the cvs log.
+ *
  *Revision 1.2  2003/08/27 04:57:47  pauly
  *FIX: A large number of bugs has been fixed for 1.4 release
  *

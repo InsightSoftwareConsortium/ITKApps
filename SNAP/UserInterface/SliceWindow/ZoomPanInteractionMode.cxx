@@ -60,7 +60,7 @@ ZoomPanInteractionMode
     // Under the right button, the tool causes us to zoom based on the vertical
     // motion
     float zoom = 
-      m_StartViewZoom * pow(1.02,event.XSpace(1) - dragEvent.XSpace(1));
+      m_StartViewZoom * pow((float)1.02,(float)(event.XSpace(1) - dragEvent.XSpace(1)));
 
     // We are not allowed to zoom past certain limits
     m_Parent->m_ViewZoom = 
