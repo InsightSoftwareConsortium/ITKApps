@@ -36,7 +36,7 @@ ${VTK_BINARY_DIR}/Patented
 ${SegmentationEditorFltkGui_BINARY_DIR}
 ${FLTK_LIBRARY}
 ${OPENGL_LIBRARY}
-${GLU_LIBRARY}
+${OPENGL_glu_LIBRARY}
 )
 
 SET(SegmentationEditorFltkGui_SRCS
@@ -75,7 +75,7 @@ ITKVtkFltk
 ITKFltkImageViewer
 ${FLTK_LIBRARY}
 ${OPENGL_LIBRARY}
-${GLU_LIBRARY}
+${OPENGL_glu_LIBRARY}
 )
 
 IF(WIN32)

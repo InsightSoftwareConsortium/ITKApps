@@ -31,7 +31,7 @@ ITKIO
 FltkImageViewer
 ${FLTK_LIBRARY}
 ${OPENGL_LIBRARY}
-${GLU_LIBRARY}
+${OPENGL_glu_LIBRARY}
 )
 
 

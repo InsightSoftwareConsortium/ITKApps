@@ -22,7 +22,7 @@ ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
 ${WatershedSegmentationFltkGui_BINARY_DIR}
 ${FLTK_LIBRARY}
 ${OPENGL_LIBRARY}
-${GLU_LIBRARY}
+${OPENGL_glu_LIBRARY}
 )
 
 SET(WatershedSegmentationFltkGui3D_SRCS
@@ -46,7 +46,7 @@ ITKNumerics
 ITKFltkImageViewer
 ${FTLK_LIBRARY}
 ${OPENGL_LIBRARY}
-${GLU_LIBRARY}
+${OPENGL_glu_LIBRARY}
 )
 
 IF(WIN32)
