@@ -31,8 +31,8 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       // Set the parameters on it
       module.GetFilter()->SetAlpha( alpha );         
       module.GetFilter()->SetBeta(  beta  );
-      module.GetFilter()->SetOutputMinimum( minimum ); 
-      module.GetFilter()->SetOutputMaximum( maximum );
+      module.GetFilter()->SetOutputMinimum( static_cast<PixelType>( minimum ) ); 
+      module.GetFilter()->SetOutputMaximum( static_cast<PixelType>( maximum ) );
       // Execute the filter
       module.ProcessData( pds  );
       break; 
@@ -48,8 +48,8 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       // Set the parameters on it
       module.GetFilter()->SetAlpha( alpha );         
       module.GetFilter()->SetBeta(  beta  );
-      module.GetFilter()->SetOutputMinimum( minimum ); 
-      module.GetFilter()->SetOutputMaximum( maximum );
+      module.GetFilter()->SetOutputMinimum( static_cast<PixelType>( minimum ) ); 
+      module.GetFilter()->SetOutputMaximum( static_cast<PixelType>( maximum ) );
       // Execute the filter
       module.ProcessData( pds );
       break; 
