@@ -29,7 +29,7 @@ ${FEMAtlasSegmentation_SOURCE_DIR}/../Common
 ${FEMAtlasSegmentation_SOURCE_DIR}/../FEMAtlasSegmentation
 )
 
-SOURCE_GROUP("Source Files Template" ./*.txx)
+SOURCE_GROUP("Source Files Template" REGULAR_EXPRESSION ./*.txx)
 
 
 IF(FEM_VISUALIZATION)
