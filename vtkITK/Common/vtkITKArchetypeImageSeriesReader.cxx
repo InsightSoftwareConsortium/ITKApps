@@ -55,7 +55,7 @@
 #include "itkDICOMImageIO2.h"
 #include <itksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.4 $");
+vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.5 $");
 vtkStandardNewMacro(vtkITKArchetypeImageSeriesReader);
 
 //----------------------------------------------------------------------------
@@ -199,29 +199,6 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
   vtkFloatingPointType spacing[3];
   vtkFloatingPointType origin[3];
   
-#define vtkITKOutputInformationFromFile(typeN, type) \
-    case typeN: \
-    {\
-      typedef itk::Image<type,3> image2##typeN;\
-      itk::ImageFileReader<image2##typeN>::Pointer reader2##typeN = \
-            itk::ImageFileReader<image2##typeN>::New(); \
-      reader2##typeN->SetFileName(this->FileNames[0].c_str()); \
-      reader2##typeN->GenerateOutputInformation(); \
-      for (int i = 0; i < 3; i++) \
-        { \
-        spacing[i] = reader2##typeN->GetOutput()->GetSpacing()[i]; \
-        origin[i] = reader2##typeN->GetOutput()->GetOrigin()[i]; \
-        } \
-      itk::ImageRegion<3> region2##typeN = reader2##typeN->GetOutput()->GetLargestPossibleRegion();\
-      extent[0] = region2##typeN.GetIndex()[0];\
-      extent[1] = region2##typeN.GetIndex()[0] + region2##typeN.GetSize()[0] - 1;\
-      extent[2] = region2##typeN.GetIndex()[1];\
-      extent[3] = region2##typeN.GetIndex()[1] + region2##typeN.GetSize()[1] - 1;\
-      extent[4] = region2##typeN.GetIndex()[2];\
-      extent[5] = region2##typeN.GetIndex()[2] + region2##typeN.GetSize()[2] - 1;\
-    }\
-    break
-
   // Since we only need origin, spacing and extents, we can use one
   // image type.
   typedef itk::Image<float,3> ImageType;
@@ -317,8 +294,8 @@ void vtkITKArchetypeImageSeriesReader::ExecuteData(vtkDataObject *output)
       reader##typeN->UpdateLargestPossibleRegion();\
       itk::ImportImageContainer<unsigned long, type>::Pointer PixelContainer##typeN;\
       PixelContainer##typeN = reader##typeN->GetOutput()->GetPixelContainer();\
-      this->Ptr = static_cast<void *> (PixelContainer##typeN->GetBufferPointer());\
-      (dynamic_cast<vtkImageData *>( output))->GetPointData()->GetScalars()->SetVoidArray(this->Ptr, PixelContainer##typeN->Size(), 0);\
+      void *ptr = static_cast<void *> (PixelContainer##typeN->GetBufferPointer());\
+      (dynamic_cast<vtkImageData *>( output))->GetPointData()->GetScalars()->SetVoidArray(ptr, PixelContainer##typeN->Size(), 0);\
       PixelContainer##typeN->ContainerManageMemoryOff();\
     }\
     break
@@ -333,8 +310,8 @@ void vtkITKArchetypeImageSeriesReader::ExecuteData(vtkDataObject *output)
       reader2##typeN->UpdateLargestPossibleRegion();\
       itk::ImportImageContainer<unsigned long, type>::Pointer PixelContainer2##typeN;\
       PixelContainer2##typeN = reader2##typeN->GetOutput()->GetPixelContainer();\
-      this->Ptr = static_cast<void *> (PixelContainer2##typeN->GetBufferPointer());\
-      (dynamic_cast<vtkImageData *>( output))->GetPointData()->GetScalars()->SetVoidArray(this->Ptr, PixelContainer2##typeN->Size(), 0);\
+      void *ptr = static_cast<void *> (PixelContainer2##typeN->GetBufferPointer());\
+      (dynamic_cast<vtkImageData *>( output))->GetPointData()->GetScalars()->SetVoidArray(ptr, PixelContainer2##typeN->Size(), 0);\
       PixelContainer2##typeN->ContainerManageMemoryOff();\
     }\
     break
