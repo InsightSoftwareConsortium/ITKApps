@@ -24,10 +24,10 @@ ImageRegistrationApp< TImage >
   m_LandmarkAffineTransform->SetIdentity() ;
   m_LandmarkRegValid = false;
   
-  m_RigidNumberOfIterations = 500 ;
+  m_RigidNumberOfIterations = 2000 ;
   m_RigidFixedImageStandardDeviation = 0.4 ;
   m_RigidMovingImageStandardDeviation = 0.4 ;
-  m_RigidNumberOfSpatialSamples = 50 ;
+  m_RigidNumberOfSpatialSamples = 200 ;
   m_RigidScales.resize(9);
   m_RigidScales[0] = 500;
   m_RigidScales[1] = 500;
@@ -43,10 +43,10 @@ ImageRegistrationApp< TImage >
   m_RigidAffineTransform = AffineTransformType::New() ;
   m_RigidAffineTransform->SetIdentity() ;
 
-  m_AffineNumberOfIterations = 500 ;
+  m_AffineNumberOfIterations = 2000 ;
   m_AffineFixedImageStandardDeviation = 0.4 ;
   m_AffineMovingImageStandardDeviation = 0.4 ;
-  m_AffineNumberOfSpatialSamples = 50 ;
+  m_AffineNumberOfSpatialSamples = 200 ;
   m_AffineScales.resize(15) ;
   m_AffineScales[0] = 500 ; // scale for M11
   m_AffineScales[1] = 500 ; // scale for M12

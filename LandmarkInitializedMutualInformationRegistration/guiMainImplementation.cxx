@@ -37,6 +37,7 @@ guiMainImplementation
 
   m_FixedImageSize.Fill(0);
   m_MovingImageSize.Fill(0);
+
   }
 
 guiMainImplementation
@@ -133,9 +134,6 @@ guiMainImplementation
     tkFixedImageViewer->redraw();
     tkFixedImageViewer->activate();
     tkResultImageViewer->SetInputImage(m_FixedImage.GetPointer());
-    tkResultImageViewer->update();
-    tkResultImageViewer->redraw();
-    tkResultImageViewer->activate();
     tkFixedImageLandmarkGroup->activate();
     Fl_Group* grp = tkFixedImageLandmarkGroup;
     for(int i=0; i < grp->children(); i++)
@@ -164,9 +162,6 @@ guiMainImplementation
     tkMovingImageViewer->redraw();
     tkMovingImageViewer->activate();
     tkResultImageViewer->SetSecondInputImage(m_MovingImage.GetPointer());
-    tkResultImageViewer->update();
-    tkResultImageViewer->redraw();
-    tkResultImageViewer->activate();
     tkMovingImageLandmarkGroup->activate();
     for(int i=0; i < tkMovingImageLandmarkGroup->children(); i++)
       {
@@ -174,7 +169,12 @@ guiMainImplementation
       ((Fl_Button *)tkMovingImageLandmarkGroup->child(i))->activate();
       }
     } // end of if-else
-  
+
+  tkResultImageViewer->imageMode(IMG_LOG);
+  tkResultImageViewer->update();
+  tkResultImageViewer->redraw();
+  tkResultImageViewer->activate();
+
   tkLandmarkRegisteredView->deactivate();
   tkRegisteredView->deactivate();
   this->SelectImageSet(0);
