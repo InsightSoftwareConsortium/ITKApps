@@ -288,15 +288,15 @@ int main(int argc, char **argv)
   // Convert the vnl matrix to a vtk mtrix
   double result[16];
   result[0] = mat(0,0);
-  result[1] = mat(0,1);
-  result[2] = mat(0,2);
+  result[1] = mat(1,0);
+  result[2] = mat(2,0);
   result[3] = solution[4];
-  result[4] = mat(1,0);
+  result[4] = mat(0,1);
   result[5] = mat(1,1);
-  result[6] = mat(1,2);
+  result[6] = mat(2,1);
   result[7] = solution[5];
-  result[8] = mat(2,0);
-  result[9] = mat(2,1);
+  result[8] = mat(0,2);
+  result[9] = mat(1,2);
   result[10] = mat(2,2);
   result[11] = solution[6];
   result[12] = 0;
@@ -372,7 +372,7 @@ int main(int argc, char **argv)
 
 void print_usage()
 {
-  std::cerr << "RegisterAD $Revision: 1.6 $  $Date: 2004-01-16 23:10:14 $"  << std::endl;
+  std::cerr << "RegisterAD $Revision: 1.7 $  $Date: 2004-02-10 22:27:05 $"  << std::endl;
 
   std::cerr <<  " usage: RegisterAD" << std::endl;
   std::cerr <<  "    --study1Prefix prefix" << std::endl;
