@@ -131,7 +131,7 @@ LandmarkSliceViewer<TImagePixel>
 ::IsLandmarkAvailable(unsigned int id)
   {
   if ( id < m_LandmarkPointList->size() &&
-       m_LandmarkPointList->at(id).GetID() == (int)(id))
+       (*m_LandmarkPointList)[id].GetID() == (int)(id))
     {
     return true;
     }
@@ -145,7 +145,7 @@ LandmarkSliceViewer<TImagePixel>
   {
   if ( id < m_LandmarkPointList->size() )
     {
-    landmark = m_LandmarkPointList->at(id);
+    landmark = (*m_LandmarkPointList)[id];
     return true;
     }
   return false;
@@ -197,15 +197,15 @@ LandmarkSliceViewer<TImagePixel>
   {
   if( id < m_LandmarkPointList->size() )
     {
-    if( m_LandmarkPointList->at(id).GetID() == (int)(id) )
+    if( (*m_LandmarkPointList)[id].GetID() == (int)(id) )
       {
       LandmarkPointType::ColorType color;
       color.SetRed(0);
       color.SetGreen(0);
       color.SetBlue(0);
-      m_LandmarkPointList->at(id).SetColor( color );
-      DrawLandmark( m_LandmarkPointList->at(id) );
-      m_LandmarkPointList->at(id).SetID( -1 );
+      (*m_LandmarkPointList)[id].SetColor( color );
+      DrawLandmark( (*m_LandmarkPointList)[id] );
+      (*m_LandmarkPointList)[id].SetID( -1 );
       }
     }
   }
