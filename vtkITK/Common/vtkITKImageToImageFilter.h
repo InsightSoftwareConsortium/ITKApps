@@ -25,7 +25,7 @@
   { \
   ::itk::OStringStream message; \
   message << "itk::ERROR: " << this->GetNameOfClass() \
-          << "(" << this << "): "; \
+          << "(" << this << "): " x; \
   std::cerr << message.str().c_str() << std::endl; \
   }
 
