@@ -99,9 +99,6 @@ private:
    /*** Parameters  */
    double               m_ObjectMean;
    double               m_ObjectVariance;
-   double               m_DiffMean;
-   double               m_DiffVariance;
-   double               m_Weight;
 
    /*** Dump pgm files flag  */
    bool                 m_DumpPGMFiles;

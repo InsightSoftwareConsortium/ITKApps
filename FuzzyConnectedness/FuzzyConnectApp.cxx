@@ -16,9 +16,11 @@
 =========================================================================*/
 #include <fstream>
 #include "FuzzyConnectApp.h"
-
 #include "RawVolumeReader.h"
 #include "PGMVolumeWriter.h"
+
+#include "itkImageRegionConstIterator.h"
+
 #include <string>
 #include <stdio.h>
 
@@ -38,9 +40,6 @@ FuzzyConnectApp
   m_InputImage = InputImageType::New();
   m_Filter = FilterType::New();
   m_ObjectVariance = 2500.0;
-  m_DiffMean = 1.0;
-  m_DiffVariance = 1.0;
-  m_Weight = 1.0;
 
   m_DumpPGMFiles = true;
 
@@ -203,7 +202,7 @@ FuzzyConnectApp
          break;
         break;
       case 'd':
-        std::cout << "Seed: " << m_Seed << "Threshold: " << m_Threshold << std::endl;
+        std::cout << "Seed: " << m_Seed << " Threshold: " << m_Threshold << std::endl;
         break;
       case 'x' :
         std::cout << "Goodbye. " << std::endl;
@@ -228,10 +227,47 @@ FuzzyConnectApp
   m_Filter->SetInput( m_InputImage );
   m_Filter->SetObjectsSeed( m_Seed );
 
-  m_ObjectMean = double( m_InputImage->GetPixel( m_Seed ) );
+  // set up a 5 x 5 neighborhood around seed
+  IndexType startIndex;
+  unsigned long radius = 2;
+  InputImageType::SizeType size;
+  InputImageType::RegionType sampleRegion;
 
-  m_Filter->SetParameters( m_ObjectMean, m_ObjectVariance,
-    m_DiffMean, m_DiffVariance, m_Weight );
+  size.Fill( 2 * radius + 1 );
+  for( int j = 0; j < ImageDimension; j ++ )
+    {
+    startIndex[j] = m_Seed[j] - radius;
+    }
+  sampleRegion.SetSize( size );
+  sampleRegion.SetIndex( startIndex );
+  sampleRegion.Crop( m_InputImage->GetBufferedRegion() );
+
+  // compute mean and variance
+  typedef itk::ImageRegionConstIterator<InputImageType> Iterator;
+  Iterator iter( m_InputImage, sampleRegion );
+
+  unsigned int counter = 0;
+  double sum = 0;
+  double sumsqr = 0;
+
+  while (!iter.IsAtEnd())
+    {
+    double value = static_cast<double>( iter.Get() );
+    sum += value;
+    sumsqr += value * value;
+    counter++;
+    ++iter;
+    }
+
+  m_ObjectMean = sum / static_cast<double>( counter );
+  m_ObjectVariance = static_cast<double>( counter ) * m_ObjectMean * m_ObjectMean;
+  m_ObjectVariance = ( sumsqr - m_ObjectVariance ) / static_cast<double>( counter - 1 );
+
+  std::cout << "mean: " << m_ObjectMean << std::endl;
+  std::cout << "variance: " << m_ObjectVariance << std::endl;
+
+  m_Filter->SetMean( m_ObjectMean );
+  m_Filter->SetVariance( m_ObjectVariance );
 
   m_Filter->SetThreshold( m_Threshold );
 
