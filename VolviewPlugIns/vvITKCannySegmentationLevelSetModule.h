@@ -38,9 +38,9 @@ public:
   // the data passed in a buffer.
   typedef itk::ImportImageFilter< InputPixelType, Dimension > ImportFilterType;
 
-  typedef typename ImportFilterType::SizeType      SizeType;
-  typedef typename ImportFilterType::IndexType     IndexType;
-  typedef typename ImportFilterType::RegionType    RegionType;
+  typedef typename FilterModuleBase::SizeType      SizeType;
+  typedef typename FilterModuleBase::IndexType     IndexType;
+  typedef typename FilterModuleBase::RegionType    RegionType;
 
   // Instantiate the CastImageFilter
   // This filter is used for converting the pixel type from the input
@@ -77,7 +77,7 @@ public:
    ~CannySegmentationLevelSetModule();
 
     void ClearSeeds();
-    void AddSeed( float x, float y, float z );
+    void AddSeed( const IndexType & seedPosition );
     void SetDistanceFromSeeds( float value );
 
     void SetCurvatureScaling(  float value );

@@ -66,6 +66,8 @@ CannySegmentationLevelSetModule<TInputPixelType>
 }
 
 
+
+
 /*
  *    Add a seed point to the node container.
  *    There is a node per seed.
@@ -73,21 +75,14 @@ CannySegmentationLevelSetModule<TInputPixelType>
 template <class TInputPixelType >
 void 
 CannySegmentationLevelSetModule<TInputPixelType>
-::AddSeed( float x, float y, float z )
+::AddSeed( const IndexType & seedPosition )
 {
   NodeType node;
-  typedef typename NodeType::IndexType          IndexType;
-  typedef typename IndexType::IndexValueType    IndexValueType;
-  IndexType seedPosition;
-  seedPosition[0] = static_cast<IndexValueType>( x );
-  seedPosition[1] = static_cast<IndexValueType>( y );
-  seedPosition[2] = static_cast<IndexValueType>( z );
   node.SetValue( m_InitialSeedValue );
   node.SetIndex( seedPosition );
   m_NodeContainer->InsertElement( m_CurrentNumberOfSeeds, node );
   m_CurrentNumberOfSeeds++;
 }
-
 
 
 

@@ -6,102 +6,149 @@
 #include "vvITKCannySegmentationLevelSetModule.txx"
 
 
+
+template <class InputPixelType>
+class CannySegmentationLevelSetModuleRunner
+  {
+  public:
+    typedef VolView::PlugIn::CannySegmentationLevelSetModule< InputPixelType >   ModuleType;
+
+  public:
+    CannySegmentationLevelSetModuleRunner() {}
+    void Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
+    {
+      const float distanceFromSeeds     = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
+      const float cannyVariance         = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
+      const float cannyThreshold        = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ));
+      const float curvatureScaling      = atof( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ));
+      const float propagationScaling    = atof( info->GetGUIProperty(info, 4, VVP_GUI_VALUE ));
+      const float advectionScaling      = atof( info->GetGUIProperty(info, 5, VVP_GUI_VALUE ));
+      const float maximumRMSError       = atof( info->GetGUIProperty(info, 6, VVP_GUI_VALUE ));
+
+      const unsigned int maximumNumberOfIterations = atoi( info->GetGUIProperty(info, 7, VVP_GUI_VALUE ));
+
+      const unsigned int numberOfSeeds = info->NumberOfMarkers;
+
+      char tmp[1024];
+
+      itk::Index<3> seedPosition;
+
+      // Take the first marker as the seed point
+      const float * seedCoordinates = info->Markers;
+
+
+      ModuleType  module;
+      module.SetPluginInfo( info );
+      module.SetUpdateMessage("Computing Canny Segmentation LevelSet Module...");
+      module.SetDistanceFromSeeds( distanceFromSeeds );
+      module.SetVariance( cannyVariance );
+      module.SetThreshold( cannyThreshold );
+      module.SetCurvatureScaling( curvatureScaling );
+      module.SetPropagationScaling( propagationScaling );
+      module.SetAdvectionScaling( advectionScaling );
+      module.SetMaximumRMSError( maximumRMSError );
+      module.SetMaximumIterations( maximumNumberOfIterations );
+      for(unsigned int i=0; i< numberOfSeeds; i++)
+        {
+        VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, i, seedPosition );
+        module.AddSeed( seedPosition );
+        }
+      // Execute the filter
+      module.ProcessData( pds  );
+      sprintf(tmp,"Total number of iterations = %d \n Final RMS error = %f",
+                         module.GetElapsedIterations(),
+                         module.GetRMSChange());
+      info->SetProperty( info, VVP_REPORT_TEXT, tmp );
+
+    }
+  };
+
+
+
 static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 {
 
   vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
-  const float distanceFromSeeds     = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
-  const float cannyVariance         = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
-  const float cannyThreshold        = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ));
-  const float curvatureScaling      = atof( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ));
-  const float propagationScaling    = atof( info->GetGUIProperty(info, 4, VVP_GUI_VALUE ));
-  const float advectionScaling      = atof( info->GetGUIProperty(info, 5, VVP_GUI_VALUE ));
-  const float maximumRMSError       = atof( info->GetGUIProperty(info, 6, VVP_GUI_VALUE ));
+  if( info->InputVolumeNumberOfComponents != 1 )
+    {
+    info->SetProperty( info, VVP_ERROR, "This filter requires a single-component data set as input" ); 
+    return -1;
+    }
 
-  const unsigned int maximumNumberOfIterations = atoi( info->GetGUIProperty(info, 7, VVP_GUI_VALUE ));
-
-  const unsigned int numberOfSeeds = info->NumberOfMarkers;
-  if( numberOfSeeds < 1 )
+  if( info->NumberOfMarkers < 1 )
     {
     info->SetProperty( info, VVP_ERROR, "Please select points using the 3D Markers in the Annotation menu" ); 
     return -1;
     }
 
-  // Take the first marker as the seed point
-  const float * seedCoordinates = info->Markers;
-
-  char tmp[1024];
-
   try 
   {
   switch( info->InputVolumeScalarType )
     {
+    case VTK_CHAR:
+      {
+      CannySegmentationLevelSetModuleRunner<signed char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
     case VTK_UNSIGNED_CHAR:
       {
-      typedef  unsigned char                              PixelType;
-      typedef VolView::PlugIn::CannySegmentationLevelSetModule< 
-                                            PixelType >   ModuleType;
-      ModuleType  module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Computing Canny Segmentation LevelSet Module...");
-      module.SetDistanceFromSeeds( distanceFromSeeds );
-      module.SetVariance( cannyVariance );
-      module.SetThreshold( cannyThreshold );
-      module.SetCurvatureScaling( curvatureScaling );
-      module.SetPropagationScaling( propagationScaling );
-      module.SetAdvectionScaling( advectionScaling );
-      module.SetMaximumRMSError( maximumRMSError );
-      module.SetMaximumIterations( maximumNumberOfIterations );
-      for(unsigned int i=0; i< numberOfSeeds; i++)
-        {
-        const float seedx =  static_cast< int >( seedCoordinates[0] );
-        const float seedy =  static_cast< int >( seedCoordinates[1] );
-        const float seedz =  static_cast< int >( seedCoordinates[2] );
-        module.AddSeed( seedx, seedy, seedz );
-        seedCoordinates += 3; // pass to next point
-        }
-      // Execute the filter
-      module.ProcessData( pds  );
-      sprintf(tmp,"Total number of iterations = %d \n Final RMS error = %f",
-                         module.GetElapsedIterations(),
-                         module.GetRMSChange());
-      info->SetProperty( info, VVP_REPORT_TEXT, tmp );
+      CannySegmentationLevelSetModuleRunner<unsigned char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_SHORT:
+      {
+      CannySegmentationLevelSetModuleRunner<signed short> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_SHORT:
       {
-      typedef  unsigned short                             PixelType;
-      typedef VolView::PlugIn::CannySegmentationLevelSetModule< 
-                                            PixelType >   ModuleType;
-      ModuleType  module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Computing Canny Segmentation LevelSet Module...");
-      module.SetDistanceFromSeeds( distanceFromSeeds );
-      module.SetVariance( cannyVariance );
-      module.SetThreshold( cannyThreshold );
-      module.SetCurvatureScaling( curvatureScaling );
-      module.SetPropagationScaling( propagationScaling );
-      module.SetAdvectionScaling( advectionScaling );
-      module.SetMaximumRMSError( maximumRMSError );
-      module.SetMaximumIterations( maximumNumberOfIterations );
-      for(unsigned int i=0; i< numberOfSeeds; i++)
-        {
-        const float seedx =  static_cast< int >( seedCoordinates[0] );
-        const float seedy =  static_cast< int >( seedCoordinates[1] );
-        const float seedz =  static_cast< int >( seedCoordinates[2] );
-        module.AddSeed( seedx, seedy, seedz );
-        seedCoordinates += 3; // pass to next point
-        }
-      // Execute the filter
-      module.ProcessData( pds  );
-      sprintf(tmp,"Total number of iterations = %d \n Final RMS error = %f",
-                         module.GetElapsedIterations(),
-                         module.GetRMSChange());
-      info->SetProperty( info, VVP_REPORT_TEXT, tmp );
+      CannySegmentationLevelSetModuleRunner<unsigned short> runner;
+      runner.Execute( info, pds );
       break; 
-      } 
+      }
+    case VTK_INT:
+      {
+      CannySegmentationLevelSetModuleRunner<signed int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_INT:
+      {
+      CannySegmentationLevelSetModuleRunner<unsigned int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_LONG:
+      {
+      CannySegmentationLevelSetModuleRunner<signed long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_LONG:
+      {
+      CannySegmentationLevelSetModuleRunner<unsigned long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_FLOAT:
+      {
+      CannySegmentationLevelSetModuleRunner<float> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_DOUBLE:
+      {
+      CannySegmentationLevelSetModuleRunner<double> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
     }
+
+
   }
   catch( itk::ExceptionObject & except )
   {
