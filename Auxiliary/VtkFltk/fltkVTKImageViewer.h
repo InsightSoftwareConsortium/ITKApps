@@ -46,8 +46,8 @@ public:
   /** 
    * Smart pointer typedef support.
    */
-  typedef SmartPointer<Self>        Pointer;
-  typedef SmartPointer<const Self>  ConstPointer;
+  typedef itk::SmartPointer<Self>        Pointer;
+  typedef itk::SmartPointer<const Self>  ConstPointer;
 
   typedef itk::Image< ImagePixelType, 3 >   ImageType;
  
@@ -92,7 +92,7 @@ private:
 } // end namespace fltk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include <fltkVTKImageViewer.txx>
+#include "fltkVTKImageViewer.txx"
 #endif
 
 
