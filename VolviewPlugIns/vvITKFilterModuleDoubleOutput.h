@@ -74,7 +74,6 @@ public:
     OutputIteratorType ot( outputImage, outputImage->GetBufferedRegion() );
     ot.GoToBegin(); 
 
-    OutputPixelType * outData = (OutputPixelType *)(pds->outData);
 
     if( m_ProduceDoubleOutput )
       {
@@ -85,6 +84,11 @@ public:
 
       InputIteratorType it( inputImage, inputImage->GetBufferedRegion() );
       it.GoToBegin();
+
+      // When producing composite output, the output image must have the same
+      // type as the input image. Therefore, we use InputPixelType instead of
+      // OutputPixelType.
+      InputPixelType * outData = (InputPixelType *)(pds->outData);
 
       while( !ot.IsAtEnd() )
         {
@@ -98,6 +102,8 @@ public:
       }
     else
       {
+      OutputPixelType * outData = (OutputPixelType *)(pds->outData);
+
       while( !ot.IsAtEnd() )
         {
         *outData = ot.Get();  // copy output pixel
