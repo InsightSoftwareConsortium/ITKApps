@@ -4,28 +4,32 @@
 
 #include "itkSigmoidImageFilter.h"
 
-static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
-{
 
-  vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
-
-  const unsigned int Dimension = 3;
-
-  const float alpha   = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
-  const float beta    = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
-  const float minimum = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ));
-  const float maximum = atof( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ));
-
-  try 
+template <class InputPixelType>
+class SigmoidRunner
   {
-  switch( info->InputVolumeScalarType )
-    {
-    case VTK_UNSIGNED_CHAR:
-      {
-      typedef  unsigned char                        PixelType;
-      typedef  itk::Image< PixelType, Dimension >   ImageType; 
+  public:
+      typedef  InputPixelType                       PixelType;
+      typedef  itk::Image< PixelType, 3 >           ImageType; 
       typedef  itk::SigmoidImageFilter< ImageType,  ImageType >   FilterType;
-      VolView::PlugIn::FilterModule< FilterType > module;
+      typedef  VolView::PlugIn::FilterModule< FilterType >        ModuleType;
+
+  public:
+    SigmoidRunner() {}
+    void Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
+    {
+      const float alpha   = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
+      const float beta    = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
+      const float minimum = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ));
+      const float maximum = atof( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ));
+
+      if( info->NumberOfMarkers < 1 )
+        {
+        info->SetProperty( info, VVP_ERROR, "Please select seed points using the 3D Markers in the Annotation menu" ); 
+        return;
+        }
+
+      ModuleType  module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Transforming intensities with a Sigmoid function...");
       // Set the parameters on it
@@ -35,23 +39,79 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.GetFilter()->SetOutputMaximum( static_cast<PixelType>( maximum ) );
       // Execute the filter
       module.ProcessData( pds  );
+    }
+  };
+
+
+
+static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
+{
+
+  vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
+
+
+  try 
+  {
+  switch( info->InputVolumeScalarType )
+    {
+    case VTK_CHAR:
+      {
+      SigmoidRunner<signed char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_CHAR:
+      {
+      SigmoidRunner<unsigned char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_SHORT:
+      {
+      SigmoidRunner<signed short> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_SHORT:
       {
-      typedef  unsigned short                       PixelType;
-      typedef  itk::Image< PixelType, Dimension >   ImageType; 
-      typedef  itk::SigmoidImageFilter< ImageType,  ImageType >   FilterType;
-      VolView::PlugIn::FilterModule< FilterType > module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Transforming intensities with a Sigmoid function...");
-      // Set the parameters on it
-      module.GetFilter()->SetAlpha( alpha );         
-      module.GetFilter()->SetBeta(  beta  );
-      module.GetFilter()->SetOutputMinimum( static_cast<PixelType>( minimum ) ); 
-      module.GetFilter()->SetOutputMaximum( static_cast<PixelType>( maximum ) );
-      // Execute the filter
-      module.ProcessData( pds );
+      SigmoidRunner<unsigned short> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_INT:
+      {
+      SigmoidRunner<signed int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_INT:
+      {
+      SigmoidRunner<unsigned int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_LONG:
+      {
+      SigmoidRunner<signed long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_LONG:
+      {
+      SigmoidRunner<unsigned long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_FLOAT:
+      {
+      SigmoidRunner<float> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_DOUBLE:
+      {
+      SigmoidRunner<double> runner;
+      runner.Execute( info, pds );
       break; 
       }
     }
@@ -63,6 +123,8 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
   }
   return 0;
 }
+
+
 
 
 static int UpdateGUI(void *inf)

@@ -4,28 +4,33 @@
 
 #include "itkIntensityWindowingImageFilter.h"
 
-static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
-{
 
-  vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
-  const unsigned int Dimension = 3;
-
-  const float windowMinimum  = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
-  const float windowMaximum  = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
-  const float outputMinimum  = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ) );
-  const float outputMaximum  = atof( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ) );
-
-  try 
+template <class InputPixelType>
+class IntensityWindowingRunner
   {
-  switch( info->InputVolumeScalarType )
-    {
-    case VTK_UNSIGNED_CHAR:
-      {
-      typedef  unsigned char                        PixelType;
-      typedef  itk::Image< PixelType, Dimension >   ImageType; 
+  public:
+      typedef  InputPixelType                       PixelType;
+      typedef  itk::Image< PixelType, 3 >           ImageType; 
       typedef  itk::IntensityWindowingImageFilter< ImageType,  ImageType >   FilterType;
-      VolView::PlugIn::FilterModule< FilterType > module;
+      typedef  VolView::PlugIn::FilterModule< FilterType >        ModuleType;
+
+  public:
+    IntensityWindowingRunner() {}
+    void Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
+    {
+      const float windowMinimum  = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
+      const float windowMaximum  = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
+      const float outputMinimum  = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ) );
+      const float outputMaximum  = atof( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ) );
+
+      if( info->NumberOfMarkers < 1 )
+        {
+        info->SetProperty( info, VVP_ERROR, "Please select seed points using the 3D Markers in the Annotation menu" ); 
+        return;
+        }
+
+      ModuleType  module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Transforming intensities with a IntensityWindowing function...");
       // Set the parameters on it
@@ -35,23 +40,79 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       module.GetFilter()->SetOutputMaximum( static_cast<PixelType>( outputMaximum  ) );
       // Execute the filter
       module.ProcessData( pds  );
+    }
+  };
+
+
+
+
+static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
+{
+
+  vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
+
+  try 
+  {
+  switch( info->InputVolumeScalarType )
+  {
+    case VTK_CHAR:
+      {
+      IntensityWindowingRunner<signed char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_CHAR:
+      {
+      IntensityWindowingRunner<unsigned char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_SHORT:
+      {
+      IntensityWindowingRunner<signed short> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_SHORT:
       {
-      typedef  unsigned short                       PixelType;
-      typedef  itk::Image< PixelType, Dimension >   ImageType; 
-      typedef  itk::IntensityWindowingImageFilter< ImageType,  ImageType >   FilterType;
-      VolView::PlugIn::FilterModule< FilterType > module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Transforming intensities with a IntensityWindowing function...");
-      // Set the parameters on it
-      module.GetFilter()->SetWindowMinimum( static_cast<PixelType>( windowMinimum  ) );
-      module.GetFilter()->SetWindowMaximum( static_cast<PixelType>( windowMaximum  ) );
-      module.GetFilter()->SetOutputMinimum( static_cast<PixelType>( outputMinimum  ) );
-      module.GetFilter()->SetOutputMaximum( static_cast<PixelType>( outputMaximum  ) );
-      // Execute the filter
-      module.ProcessData( pds );
+      IntensityWindowingRunner<unsigned short> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_INT:
+      {
+      IntensityWindowingRunner<signed int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_INT:
+      {
+      IntensityWindowingRunner<unsigned int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_LONG:
+      {
+      IntensityWindowingRunner<signed long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_LONG:
+      {
+      IntensityWindowingRunner<unsigned long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_FLOAT:
+      {
+      IntensityWindowingRunner<float> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_DOUBLE:
+      {
+      IntensityWindowingRunner<double> runner;
+      runner.Execute( info, pds );
       break; 
       }
     }
