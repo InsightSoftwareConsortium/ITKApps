@@ -5,47 +5,107 @@
 
 #include "itkGradientMagnitudeRecursiveGaussianImageFilter.h"
 
+
+
+template <class InputPixelType>
+class GradientMagnitudeRecursiveGaussianRunner
+  {
+  public:
+      typedef  InputPixelType                       PixelType;
+      typedef  itk::Image< PixelType, 3 >           ImageType; 
+      
+      typedef  itk::GradientMagnitudeRecursiveGaussianImageFilter< 
+                                                    ImageType,  
+                                                    ImageType >   FilterType;
+
+      typedef  VolView::PlugIn::FilterModule< FilterType >        ModuleType;
+
+  public:
+    GradientMagnitudeRecursiveGaussianRunner() {}
+    void Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
+    {
+      const float sigma     = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
+
+      ModuleType  module;
+      module.SetPluginInfo( info );
+      module.SetUpdateMessage("Computing the gradient magnitude...");
+      module.GetFilter()->SetSigma( sigma ); 
+      module.GetFilter()->SetNormalizeAcrossScale( true );
+      // Execute the filter
+      module.ProcessData( pds  );
+    }
+  };
+
+
+
 static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 {
 
   vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
-  const unsigned int Dimension = 3;
- 
-  const float sigma     = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
 
   try 
   {
   switch( info->InputVolumeScalarType )
     {
+    case VTK_CHAR:
+      {
+      GradientMagnitudeRecursiveGaussianRunner<signed char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
     case VTK_UNSIGNED_CHAR:
       {
-      typedef  unsigned char                        PixelType;
-      typedef  itk::Image< PixelType, Dimension >   ImageType; 
-      typedef  itk::GradientMagnitudeRecursiveGaussianImageFilter< ImageType,  ImageType >   FilterType;
-      VolView::PlugIn::FilterModule< FilterType > module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Computing the gradient magnitude...");
-      // Set the parameters on it
-      module.GetFilter()->SetSigma( sigma ); 
-      module.GetFilter()->SetNormalizeAcrossScale( true );
-      // Execute the filter
-      module.ProcessData( pds  );
+      GradientMagnitudeRecursiveGaussianRunner<unsigned char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_SHORT:
+      {
+      GradientMagnitudeRecursiveGaussianRunner<signed short> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_SHORT:
       {
-      typedef  unsigned short                       PixelType;
-      typedef  itk::Image< PixelType, Dimension >   ImageType; 
-      typedef  itk::GradientMagnitudeRecursiveGaussianImageFilter< ImageType,  ImageType >   FilterType;
-      VolView::PlugIn::FilterModule< FilterType > module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Computing the gradient magnitude...");
-      // Set the parameters on it
-      module.GetFilter()->SetSigma( sigma ); 
-      module.GetFilter()->SetNormalizeAcrossScale( true );
-      // Execute the filter
-      module.ProcessData( pds );
+      GradientMagnitudeRecursiveGaussianRunner<unsigned short> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_INT:
+      {
+      GradientMagnitudeRecursiveGaussianRunner<signed int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_INT:
+      {
+      GradientMagnitudeRecursiveGaussianRunner<unsigned int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_LONG:
+      {
+      GradientMagnitudeRecursiveGaussianRunner<signed long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_LONG:
+      {
+      GradientMagnitudeRecursiveGaussianRunner<unsigned long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_FLOAT:
+      {
+      GradientMagnitudeRecursiveGaussianRunner<float> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_DOUBLE:
+      {
+      GradientMagnitudeRecursiveGaussianRunner<double> runner;
+      runner.Execute( info, pds );
       break; 
       }
     }
