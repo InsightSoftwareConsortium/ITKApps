@@ -153,8 +153,8 @@ DeformableModelModule<TInputPixelType>
 
   // Execute the filters and progressively remove temporary memory
   m_MeshSource->Update();
-  m_GradientMagnitudeFilter->Update();
-  m_DeformableModelFilter->Update();
+ // m_GradientMagnitudeFilter->Update();
+ // m_DeformableModelFilter->Update();
 
   this->PostProcessData( pds );
 
@@ -187,18 +187,20 @@ DeformableModelModule<TInputPixelType>
   opds->NumberOfMeshPoints = numberOfPoints;
 
   float * points = new float[ numberOfPoints * 3 ];
+  opds->MeshPoints = points;
+  float * outputPointsItr = points;
   typedef typename MeshType::PointsContainer::ConstIterator PointIterator;
   PointIterator pointItr  = mesh->GetPoints()->Begin();
   PointIterator pointsEnd = mesh->GetPoints()->End();
+
   while( pointItr != pointsEnd )
     {
-    *points++ = pointItr.Value()[0]; 
-    *points++ = pointItr.Value()[1]; 
-    *points++ = pointItr.Value()[2]; 
+    *outputPointsItr++ = pointItr.Value()[0]; 
+    *outputPointsItr++ = pointItr.Value()[1]; 
+    *outputPointsItr++ = pointItr.Value()[2]; 
     ++pointItr;
     }
 
-  opds->MeshPoints = points;
 
   opds->NumberOfMeshCells = mesh->GetNumberOfCells();
   unsigned int numEntries = 0;
@@ -219,28 +221,31 @@ DeformableModelModule<TInputPixelType>
     }
 
   int * cellsTopology = new int [ numEntries ];
+  opds->MeshCells = cellsTopology;
 
   typedef typename MeshType::CellType               CellType;
   typedef typename CellType::PointIdConstIterator   PointIdIterator;
 
   cellItr = mesh->GetCells()->Begin();
-   while( cellItr != cellEnd )
+  int * cellsTopItr = cellsTopology;
+
+  while( cellItr != cellEnd )
     {
     const CellType * cell = cellItr.Value();
     const unsigned int np = cell->GetNumberOfPoints();
-    *cellsTopology++ = np;
+    *cellsTopItr = np;
+    ++cellsTopItr;
     PointIdIterator pointIdItr = cell->PointIdsBegin();
     PointIdIterator pointIdEnd = cell->PointIdsEnd();
     while( pointIdItr != pointIdEnd )
       {
-      *cellsTopology = *pointIdItr;
-      ++cellsTopology;
+      *cellsTopItr = *pointIdItr;
+      ++cellsTopItr;
       ++pointIdItr;
       }
     ++cellItr;
     }
-
-  opds->MeshCells = cellsTopology;
+    
 
 
   // return the polygonal data
