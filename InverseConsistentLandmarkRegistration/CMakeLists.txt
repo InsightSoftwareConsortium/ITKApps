@@ -1,0 +1,21 @@
+PROJECT(CLReg)
+
+INCLUDE_DIRECTORIES(
+${ITK_SOURCE_DIR}/Code/Common
+${ITK_SOURCE_DIR}/Code/IO
+${ITK_SOURCE_DIR}/Code/BasicFilters
+${ITK_SOURCE_DIR}/Code/Numerics
+)
+
+LINK_DIRECTORIES(
+${ITK_BINARY_DIR}/Code/Common
+${ITK_BINARY_DIR}/Code/IO
+${ITK_BINARY_DIR}/Code/BasicFilters
+${ITK_BINARY_DIR}/Code/Numerics
+)
+
+LINK_LIBRARIES( ITKCommon ITKBasicFilters ITKNumerics ITKIO )
+
+ADD_EXECUTABLE(CLReg CLReg.cxx)
+ADD_EXECUTABLE(CLRegTest CLRegTest.cxx)
+
