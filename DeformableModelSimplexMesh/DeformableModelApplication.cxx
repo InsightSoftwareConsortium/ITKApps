@@ -27,6 +27,10 @@
 #define vtkDoubleType double
 #endif
 
+#ifndef vtkFloatingPointType
+# define vtkFloatingPointType vtkFloatingPointType
+typedef float vtkFloatingPointType;
+#endif
 
 DeformableModelApplication
 ::DeformableModelApplication()
@@ -206,7 +210,7 @@ DeformableModelApplication
   for(int p =0; p < numberOfPoints; p++)
     {
 
-    vtkDoubleType * apoint = vtkpoints->GetPoint( p );
+    vtkFloatingPointType * apoint = vtkpoints->GetPoint( p );
     
     m_TriangleMesh->SetPoint( p, TriangleMeshType::PointType( apoint ));
     
