@@ -34,7 +34,8 @@ PolygonInteractionMode
 
 int
 PolygonInteractionMode
-::OnEitherEvent(const FLTKEvent &event, const FLTKEvent &pressEvent)
+::OnEitherEvent(const FLTKEvent &event, 
+                const FLTKEvent &irisNotUsed(pressEvent))
 {
   // We'll need these shorthands
   int id = m_Parent->m_Id;

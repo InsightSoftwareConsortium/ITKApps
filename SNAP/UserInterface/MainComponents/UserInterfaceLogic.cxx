@@ -58,7 +58,7 @@ UserInterfaceLogic
 }
 
 void UserInterfaceLogic
-::CloseCallback(Fl_Window* wind,void* blah)
+::CloseCallback(Fl_Window* wind,void* itkNotUsed(blah))
 {
   cerr << "CloseCallback" << endl;
   Fl_Window * temp = Fl::next_window(wind);
@@ -1037,7 +1037,7 @@ UserInterfaceLogic
 
 int 
 UserInterfaceLogic
-::RunSnake(int numsteps)
+::RunSnake()
 {
   try 
     {
@@ -1079,7 +1079,7 @@ UserInterfaceLogic
 
   while (m_SnakeIsRunning) 
     {
-    if (0 == RunSnake(m_SnakeStepSize)) 
+    if (0 == RunSnake()) 
       {
       m_OutMessage->value("Error running snake!");
       return;
@@ -1098,7 +1098,7 @@ UserInterfaceLogic
   m_SnakeIsRunning = 0;//stop the play button, if it's running
 
   //step the snake
-  if (0 == RunSnake(m_SnakeStepSize)) 
+  if (0 == RunSnake()) 
     {
     m_OutMessage->value("Error running snake!");
     return;
@@ -2147,9 +2147,9 @@ UserInterfaceLogic
 
   // Set widgets in EditLabel window
   m_InEditLabelName->value(cl.GetLabel());
-  m_InEditLabelAlpha->value(cl.GetAlpha());
-  m_InEditLabelVisibility->value(cl.IsVisible());
-  m_InEditLabelMesh->value(cl.IsDoMesh());
+  m_InEditLabelAlpha->value(cl.GetAlpha() / 255.0);
+  m_InEditLabelVisibility->value(!cl.IsVisible());
+  m_InEditLabelMesh->value(!cl.IsDoMesh());
   m_BtnEditLabelChange->setonly();
 
   // convert from uchar [0,255] to double [0.0,1.0]
@@ -2161,8 +2161,8 @@ UserInterfaceLogic
     m_BtnEditLabelAdd->setonly();
     m_InEditLabelName->value("New Label");
     m_InEditLabelAlpha->value(1.0);
-    m_InEditLabelVisibility->set();
-    m_InEditLabelMesh->set();
+    m_InEditLabelVisibility->clear();
+    m_InEditLabelMesh->clear();
     }
 
   char title[100];
@@ -2223,15 +2223,22 @@ UserInterfaceLogic
   ColorLabel cl = m_Driver->GetCurrentImageData()->GetColorLabel(m_ColorMap[offset]);
   cl.SetRGBVector(rgb);
   cl.SetAlpha(static_cast<unsigned char>(255 * m_InEditLabelAlpha->value()));
-  cl.SetVisible(m_InEditLabelVisibility->value());
-  cl.SetDoMesh(m_InEditLabelMesh->value());
+  cl.SetVisible(!m_InEditLabelVisibility->value());
+  cl.SetDoMesh(!m_InEditLabelMesh->value());
   cl.SetLabel(new_name);
+  cl.SetValid(true);
+
+  // Make sure that the display windows get the updated color labels
+  m_Driver->GetCurrentImageData()->SetColorLabel(m_ColorMap[offset],cl);
 
   // Set the new current color in the GUI
   m_GrpCurrentColor->color(fl_rgb_color(rgb[0], rgb[1], rgb[2]));
 
   MakeSegTexturesCurrent();
   m_GlobalState->SetDrawingColorLabel((unsigned char) m_ColorMap[offset]);
+
+  // Redraw the windows 
+  this->RedrawWindows();
   m_WinMain->redraw();
 }
 
@@ -2813,6 +2820,10 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.3  2003/08/27 14:03:22  pauly
+ *FIX: Made sure that -Wall option in gcc generates 0 warnings.
+ *FIX: Removed 'comment within comment' problem in the cvs log.
+ *
  *Revision 1.2  2003/08/27 04:57:46  pauly
  *FIX: A large number of bugs has been fixed for 1.4 release
  *

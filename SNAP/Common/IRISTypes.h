@@ -171,12 +171,22 @@ public:
     return this->m_##name; \
 } 
 
+/** 
+ * A rip off from the ITK not used macro to eliminate 'parameter not used'
+ * warnings 
+ */
+#define irisNotUsed(x)
+
 // Number of color labels
 #define MAX_COLOR_LABELS 256
 
 #endif // __IrisTypes_h_
 /*
  *Log: IRISTypes.h
+ *Revision 1.3  2003/08/27 14:03:20  pauly
+ *FIX: Made sure that -Wall option in gcc generates 0 warnings.
+ *FIX: Removed 'comment within comment' problem in the cvs log.
+ *
  *Revision 1.2  2003/08/27 04:57:45  pauly
  *FIX: A large number of bugs has been fixed for 1.4 release
  *

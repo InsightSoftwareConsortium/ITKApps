@@ -291,7 +291,7 @@ public:
  * This module compares the ITK snake implementation with the
  * older implementation from SNAP
  */
-void EdgeSnakeTest(const char *inputImageFile)
+void EdgeSnakeTest(const char *irisNotUsed(inputImageFile))
 {
   /* TODO: Fix this test to reflect the changes to the code 
 

@@ -37,12 +37,12 @@ public:
 
   int OnMouseRelease(const FLTKEvent &event, const FLTKEvent &pressEvent)
   {
-    return OnEitherEvent(event,event);
+    return OnEitherEvent(event,pressEvent);
   }
 
   int OnMouseDrag(const FLTKEvent &event, const FLTKEvent &pressEvent)
   {
-    return OnEitherEvent(event,event);
+    return OnEitherEvent(event,pressEvent);
   }
 
   int OnShortcut(const FLTKEvent &event)

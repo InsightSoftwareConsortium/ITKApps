@@ -718,9 +718,6 @@ protected:
    * DESCRIPTION
    * Runs the snake, and updates the GUI
    *
-   * PARAMETERS
-   * numsteps   = input, number of iterations to run the snake
-   *
    * PRE
    * snake must be ready to run
    *
@@ -729,7 +726,7 @@ protected:
    * RETURNS
    * 1 if running is successful, 0 if an error occurred
    */
-  int RunSnake(int numsteps);
+  int RunSnake();
 
   void LoadLabelsCallback();
   void ChangeLabelsCallback();
@@ -874,6 +871,10 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.3  2003/08/27 14:03:23  pauly
+ *FIX: Made sure that -Wall option in gcc generates 0 warnings.
+ *FIX: Removed 'comment within comment' problem in the cvs log.
+ *
  *Revision 1.2  2003/08/27 04:57:47  pauly
  *FIX: A large number of bugs has been fixed for 1.4 release
  *

@@ -179,6 +179,7 @@ private:
 
   // Current snake mode (in/out or edge)
   int m_CurrentSnakeMode;
+
 };
 
 

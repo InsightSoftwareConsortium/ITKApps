@@ -13,6 +13,7 @@
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "PolygonDrawing.h"
+#include "IRISTypes.h"
 
 #include <GL/glu.h>
 #include <iostream>
@@ -65,8 +66,10 @@ void
 #ifdef WIN32
 CALLBACK 
 #endif
-CombineCallback(GLdouble coords[3], GLdouble *vertex_data[4],  
-                GLfloat weight[4], GLdouble **dataOut) 
+CombineCallback(GLdouble coords[3], 
+                GLdouble **irisNotUsed(vertex_data),  
+                GLfloat *irisNotUsed(weight), 
+                GLdouble **dataOut) 
 {
   GLdouble *vertex;
 
@@ -763,6 +766,10 @@ PolygonDrawing
 
 /*
  *Log: PolygonDrawing.cxx
+ *Revision 1.3  2003/08/27 14:03:23  pauly
+ *FIX: Made sure that -Wall option in gcc generates 0 warnings.
+ *FIX: Removed 'comment within comment' problem in the cvs log.
+ *
  *Revision 1.2  2003/08/27 04:57:47  pauly
  *FIX: A large number of bugs has been fixed for 1.4 release
  *

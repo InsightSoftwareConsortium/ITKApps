@@ -77,7 +77,7 @@ public:
   virtual void TweakROI(Vector3i &pt1, Vector3i &pt2) = 0;
   virtual void init() = 0;
   virtual void ShowSNAP() = 0;
-  virtual int RunSnake(int numsteps) = 0;
+  virtual int RunSnake() = 0;
   virtual void InitColorMap() = 0;
   virtual void RedrawWindows() = 0;
   virtual void ResetScrollbars() = 0;

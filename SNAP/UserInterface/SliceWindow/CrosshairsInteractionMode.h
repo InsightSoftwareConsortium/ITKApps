@@ -35,13 +35,15 @@ public:
     return 1;
   }
 
-  int OnMouseRelease(const FLTKEvent &event, const FLTKEvent &pressEvent)
+  int OnMouseRelease(const FLTKEvent &event, 
+                     const FLTKEvent &irisNotUsed(pressEvent))
   {
     UpdateCrosshairs(event);
     return 1;
   }
 
-  int OnMouseDrag(const FLTKEvent &event, const FLTKEvent &pressEvent)
+  int OnMouseDrag(const FLTKEvent &event, 
+                  const FLTKEvent &irisNotUsed(pressEvent))
   {
     UpdateCrosshairs(event);
     m_Parent->m_GlobalState->SetUpdateSliceFlag(1);

@@ -254,6 +254,9 @@ template <class TPixel>
 void ImageIOWizardLogic<TPixel>
 ::UpdateSummaryPage()
 {
+  const char *boTypes[] = 
+    {"Big Endian", "Little Endian","Order Not Applicable"};
+
   // Get the IO base object
   itk::ImageIOBase *ioBase = m_Image->GetImageIO();
 
@@ -275,11 +278,6 @@ void ImageIOWizardLogic<TPixel>
     m_OutSummarySpacingX->value(ioBase->GetSpacing(0));
     m_OutSummarySpacingY->value(ioBase->GetSpacing(1));
     m_OutSummarySpacingZ->value(ioBase->GetSpacing(2));
-
-    const static char *boTypes[] = 
-      {
-      "Big Endian", "Little Endian","Order Not Applicable"
-      };
 
     // Dump out the file type info
     // fileTypes[(unsigned int)(ioBase->GetFileType() - ioBase->ASCII)]);

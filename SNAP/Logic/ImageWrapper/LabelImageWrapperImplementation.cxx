@@ -80,7 +80,9 @@ LabelImageWrapperImplementation
   // Reinitialize the cache
   // TODO: Constant for 255
   m_IntensityMapCache->SetEvaluationRange(0,255);
-  m_IntensityMapCache->ComputeCache();
+
+  // Update the color mapping cache and the filters
+  UpdateColorMappingCache();
 }
 
 void 

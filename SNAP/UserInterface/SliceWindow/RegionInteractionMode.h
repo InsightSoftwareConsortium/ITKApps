@@ -34,7 +34,7 @@ public:
 private:  
 
   // The click detection radius (delta)
-  const static unsigned int m_PixelDelta;
+  static const unsigned int m_PixelDelta;
 
   // Four vertices in the region box (correspond to the two corners 
   // of the 3D region of interest

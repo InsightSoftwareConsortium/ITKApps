@@ -51,6 +51,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <FL/gl.h>
+#include <GL/glu.h>
 
 using namespace itk;
 using namespace std;
@@ -218,17 +219,17 @@ MeshObject
  */
 bool 
 MeshObject
-::ApplyColorLabel(ColorLabel &label) 
+::ApplyColorLabel(const ColorLabel &label) 
 {
   if (label.IsVisible() && label.IsDoMesh()) 
     {
     if (label.IsOpaque()) 
       {
-      glColor3ub(label.GetRGB(0),label.GetRGB(1),label.GetRGB(2));
+      glColor3ub(label.GetRGB(0),label.GetRGB(1),label.GetRGB(2)); 
       } 
     else 
       {
-      glColor4ub(label.GetRGB(0),label.GetRGB(1),label.GetRGB(2), label.GetAlpha());
+      glColor4ub(label.GetRGB(0),label.GetRGB(1),label.GetRGB(2), label.GetAlpha()); 
       }
     return true;
     }
@@ -253,7 +254,7 @@ MeshObject
     // First render all the fully opaque objects
     for (i=0; i < m_DisplayListNumber; i++) 
       {
-      ColorLabel &cl = irisData->GetColorLabel(m_Labels[i]);
+      const ColorLabel &cl = irisData->GetColorLabel(m_Labels[i]);
       if (cl.IsOpaque() && ApplyColorLabel(cl)) 
       {
         glCallList(m_DisplayListIndex + i);
@@ -263,19 +264,22 @@ MeshObject
     // Now render all the translucent objects, with depth buffer read-only
     // Ideally we should sort polygons from back to front
     // TODO: Utilize VTK!
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDepthMask(GL_FALSE);
+    glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
+    
+    glEnable(GL_BLEND);     
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);     
+    glDepthMask(GL_FALSE); 
+    
     for (i=0; i < m_DisplayListNumber; i++) 
       {
-      ColorLabel &cl = irisData->GetColorLabel(m_Labels[i]);
+      const ColorLabel &cl = irisData->GetColorLabel(m_Labels[i]);
       if (!cl.IsOpaque() && ApplyColorLabel(cl)) 
       {
-        glCallList(i);
+        glCallList(m_DisplayListIndex + i); 
       }
     }
-    glDepthMask(GL_TRUE);
-    glDisable(GL_BLEND);
+
+    glPopAttrib();
   }
 
   // if the snake is active render only the current segmentation
@@ -287,7 +291,7 @@ MeshObject
 
     // first check if the segmentation is fully opaque
     // and render it
-    ColorLabel &cl = irisData->GetColorLabel(currentcolor);
+    const ColorLabel &cl = irisData->GetColorLabel(currentcolor);
     if (cl.IsOpaque() && ApplyColorLabel(cl)) 
     {
       glCallList(m_DisplayListIndex);
@@ -295,6 +299,8 @@ MeshObject
 
     // now check if the segmentation is translucent 
     // and render it with depth buffer read-only
+    glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDepthMask(GL_FALSE);
@@ -303,13 +309,18 @@ MeshObject
     {
       glCallList(m_DisplayListIndex);  
     }
-    glDepthMask(GL_TRUE);
-    glDisable(GL_BLEND);
+
+    glPopAttrib();
+    
   }
 }
 
 /*
  *Log: MeshObject.cxx
+ *Revision 1.4  2003/08/27 14:03:21  pauly
+ *FIX: Made sure that -Wall option in gcc generates 0 warnings.
+ *FIX: Removed 'comment within comment' problem in the cvs log.
+ *
  *Revision 1.3  2003/08/27 04:57:46  pauly
  *FIX: A large number of bugs has been fixed for 1.4 release
  *

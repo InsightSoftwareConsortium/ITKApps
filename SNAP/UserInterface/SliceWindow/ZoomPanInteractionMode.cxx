@@ -26,7 +26,7 @@ ZoomPanInteractionMode
 
 int
 ZoomPanInteractionMode
-::OnMousePress(const FLTKEvent &event)
+::OnMousePress(const FLTKEvent &irisNotUsed(event))
 {
   // Record the current zoom and view position
   m_StartViewZoom = m_Parent->m_ViewZoom;
@@ -77,7 +77,8 @@ ZoomPanInteractionMode
 
 int 
 ZoomPanInteractionMode
-::OnMouseRelease(const FLTKEvent &event,const FLTKEvent &dragEvent)
+::OnMouseRelease(const FLTKEvent &irisNotUsed(event),
+                 const FLTKEvent &irisNotUsed(dragEvent))
 {
   // Nothing to do here!
   return 1;

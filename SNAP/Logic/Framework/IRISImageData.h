@@ -43,18 +43,15 @@ public:
   /**
    * Returns a reference to color label at specified index.
    */
-  ColorLabel &GetColorLabel(unsigned int index) {
+  const ColorLabel &GetColorLabel(unsigned int index) const {
     assert(index < MAX_COLOR_LABELS);
     return m_ColorLabels[index];
   }
 
-  /**
-   * Returns a reference to color label at specified index.
+  /** 
+   * Update a color label
    */
-  ColorLabel GetColorLabel(unsigned int index) const {
-    assert(index < MAX_COLOR_LABELS);
-    return m_ColorLabels[index];
-  }
+  virtual void SetColorLabel(unsigned int index, const ColorLabel &label);  
 
   /**
    * Returns the number of allocated color labels

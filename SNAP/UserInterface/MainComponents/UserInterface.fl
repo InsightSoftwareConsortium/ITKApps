@@ -37,13 +37,13 @@ class UserInterface {open : {public UserInterfaceBase}
   } {
     Fl_Window m_WinMain {
       label {SnAP: IRIS} open
-      xywh {239 120 875 710} align 0 resizable
+      xywh {273 68 875 710} align 0 resizable
       code0 {\#include "UserInterfaceBase.h"} visible
     } {
       Fl_Group Controls {open
         xywh {0 0 145 710} box FLAT_BOX color 53
       } {
-        Fl_Menu_Bar m_MenubarMain {
+        Fl_Menu_Bar m_MenubarMain {selected
           xywh {0 0 145 25} box PLASTIC_UP_BOX
         } {
           submenu {} {
@@ -128,7 +128,7 @@ class UserInterface {open : {public UserInterfaceBase}
           }
         }
         Fl_Wizard m_WizControlPane {
-          label {Control Pane} open
+          label {Control Pane}
           xywh {0 25 145 680} box NO_BOX align 16
         } {
           Fl_Group m_GrpToolbarPage {
@@ -421,7 +421,7 @@ m_GlobalState->SetCoverageMode(PAINT_OVER_ONE);}
                 }
                 Fl_Button m_BtnAcceptPreprocessing {
                   label {  Next @-1>}
-                  callback {OnAcceptPreprocessingAction();} selected
+                  callback {OnAcceptPreprocessingAction();}
                   tooltip {Accept initialization, begin running snake} xywh {75 520 55 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12 labelcolor 0 align 16
                 }
                 Fl_Button {} {
@@ -557,7 +557,7 @@ m_GlobalState->SetCoverageMode(PAINT_OVER_ONE);}
             }
           }
         }
-        Fl_Group {} {open
+        Fl_Group {} {
           xywh {0 705 145 5} color 154 resizable
         } {}
       }
@@ -911,58 +911,75 @@ m_InSaveLabelFilename->value((const char*)m_ChosedFile);}
       }
     }
     Fl_Window m_WinEditLabel {
-      label {Edit Color Label}
-      xywh {664 370 245 215} labelsize 12 hide
+      label {Edit Color Label} open
+      xywh {499 319 217 403} labelsize 12 visible
     } {
       Fl_Group m_GrpEditLabelColorChooser {
-        label {Choose New Label Color} open
-        xywh {5 5 200 95} box UP_BOX align 0
+        label {Color Chooser} open
+        xywh {10 10 200 95} box UP_BOX labeltype NO_LABEL align 0
         code0 {\#include <FL/Fl_Color_Chooser.H>}
         class Fl_Color_Chooser
       } {}
       Fl_Value_Slider m_InEditLabelAlpha {
-        label alpha
-        xywh {215 15 20 85} type {Vert Fill} selection_color 12 labelsize 10 align 1 minimum 1 maximum 0 value 0.2 textsize 8
+        label {Transparency (alpha):}
+        xywh {10 125 195 20} type Horizontal color 53 selection_color 12 labelsize 12 align 5 value 0.2
       }
       Fl_Input m_InEditLabelName {
-        label {Label Name}
-        xywh {25 125 115 25} labeltype ENGRAVED_LABEL labelsize 12 align 5 textfont 1
-      }
-      Fl_Check_Button m_InEditLabelVisibility {
-        label visible
-        xywh {20 150 65 25} down_box DIAMOND_DOWN_BOX value 1 selection_color 14
-      }
-      Fl_Check_Button m_InEditLabelMesh {
-        label mesh
-        xywh {85 150 65 25} down_box DIAMOND_DOWN_BOX value 1 selection_color 60
+        label {Description:}
+        xywh {10 170 195 20} color 53 labelsize 12 align 5 textsize 12
       }
       Fl_Group {} {open
-        xywh {165 125 70 45}
+        xywh {30 300 155 55}
       } {
         Fl_Round_Button m_BtnEditLabelAdd {
-          label add
-          xywh {165 125 70 25} type Radio down_box ROUND_DOWN_BOX selection_color 4
+          xywh {30 325 150 25} type Radio down_box ROUND_DOWN_BOX selection_color 180 labelsize 13
         }
         Fl_Round_Button m_BtnEditLabelChange {
-          label change
-          xywh {165 145 70 25} type Radio down_box ROUND_DOWN_BOX value 1 selection_color 4
+          xywh {30 305 150 25} type Radio down_box ROUND_DOWN_BOX value 1 selection_color 180 labelsize 13
         }
+        Fl_Group {} {
+          label {Add as a new label} open
+          xywh {45 325 120 20} labelsize 12 align 22
+        } {}
+        Fl_Group {} {
+          label {Modify the current label} open
+          xywh {45 305 135 20} labelsize 12 align 22
+        } {}
       }
       Fl_Button {} {
         label Okay
         callback {m_WinEditLabel->hide();
 this->ChangeLabelsCallback();}
-        xywh {15 180 65 25} labelfont 1
+        xywh {5 370 65 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12
       }
       Fl_Button {} {
         label Apply
         callback {this->ChangeLabelsCallback();}
-        xywh {90 180 65 25} shortcut 0x1ff0d labelfont 1
+        xywh {75 370 65 25} box PLASTIC_UP_BOX shortcut 0x1ff0d color 180 labelsize 12
       }
       Fl_Button {} {
         label Close
         callback {m_WinEditLabel->hide();}
-        xywh {165 180 65 25} labelfont 1
+        xywh {145 370 65 25} box PLASTIC_UP_BOX color 180 labelsize 12
+      }
+      Fl_Group {} {
+        label {Visibility:} open
+        xywh {10 215 195 45} box ENGRAVED_FRAME labelsize 12 align 5
+      } {
+        Fl_Check_Button m_InEditLabelVisibility {
+          xywh {25 235 180 25} down_box DOWN_BOX selection_color 180 labelsize 13
+        }
+        Fl_Check_Button m_InEditLabelMesh {
+          xywh {25 215 180 25} down_box DOWN_BOX selection_color 180 labelsize 13
+        }
+        Fl_Group {} {
+          label {Hide in all windows} open
+          xywh {40 235 165 20} labelsize 12 align 22
+        } {}
+        Fl_Group {} {
+          label {Hide in 3D mesh window} open
+          xywh {40 215 165 20} labelsize 12 align 22
+        } {}
       }
     }
     Fl_Window m_WinRenderOptions {

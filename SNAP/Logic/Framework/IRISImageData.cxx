@@ -51,7 +51,7 @@ public:
  */
 void 
 IRISImageData
-::ReadASCIIColorLabels(const char* filename)
+::ReadASCIIColorLabels(const char* irisNotUsed(filename))
 {
   /*
   // FILE* fp = fopen(filename, "r");
@@ -114,7 +114,7 @@ IRISImageData
  */
 void 
 IRISImageData
-::WriteASCIIColorLabels(const char* filename)
+::WriteASCIIColorLabels(const char* irisNotUsed(filename))
 {
   /*    int c = 0;
 
@@ -147,7 +147,7 @@ IRISImageData
 
 int 
 IRISImageData
-::CountVoxels(const char *filename) 
+::CountVoxels(const char *irisNotUsed(filename)) 
 {
   /*
 
@@ -660,3 +660,19 @@ IRISImageData
   return m_GreyWrapper->GetImage()->GetLargestPossibleRegion();
 }
 
+void
+IRISImageData
+::SetColorLabel(unsigned int index, const ColorLabel &label)
+{
+  assert(index < MAX_COLOR_LABELS);
+
+  // Update the counter
+  m_ColorLabelCount -= (m_ColorLabels[index].IsValid() ? 1 : 0);
+  m_ColorLabelCount += (label.IsValid() ? 1 : 0);
+  
+  // Copy the label
+  m_ColorLabels[index] = label;
+
+  // Propagate the change to the label wrapper
+  m_LabelWrapper->SetLabelColorTable(m_ColorLabels);
+}

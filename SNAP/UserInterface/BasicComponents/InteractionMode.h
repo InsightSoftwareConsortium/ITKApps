@@ -36,7 +36,8 @@ public:
   /**
    * Called when mouse button is pressed.
    */
-  virtual int OnMousePress(const FLTKEvent &event) {
+  virtual int OnMousePress(const FLTKEvent &irisNotUsed(event)) 
+  {
     return 0;
   }
 
@@ -44,7 +45,9 @@ public:
    * Called when mouse is pressed.  The event generated when the mouse
    * was pressed is also passed in for reference.
    */
-  virtual int OnMouseRelease(const FLTKEvent &event,const FLTKEvent &pressEvent) {
+  virtual int OnMouseRelease(const FLTKEvent &irisNotUsed(event),
+                             const FLTKEvent &irisNotUsed(pressEvent)) 
+  {
     return 0;
   }
 
@@ -52,56 +55,65 @@ public:
    * Called when the mouse is dragged.  The event generated when the mouse
    * was pressed is also passed in for reference.
    */
-  virtual int OnMouseDrag(const FLTKEvent &event,const FLTKEvent &pressEvent) {
+  virtual int OnMouseDrag(const FLTKEvent &irisNotUsed(event),
+                          const FLTKEvent &irisNotUsed(pressEvent)) 
+  {
     return 0;
   }
 
   /**
    * Called when mouse enters the canvas.  Return 1 to track motion events.
    */
-  virtual int OnMouseEnter(const FLTKEvent &event) {
+  virtual int OnMouseEnter(const FLTKEvent &irisNotUsed(event)) 
+  {
     return 0;
   }
 
   /**
    * Called when mouse exits the canvas.  
    */
-  virtual int OnMouseLeave(const FLTKEvent &event) {
+  virtual int OnMouseLeave(const FLTKEvent &irisNotUsed(event)) 
+  {
     return 0;
   }
 
   /**
    * Called when mouse moves in the canvas
    */
-  virtual int OnMouseMotion(const FLTKEvent &event) {
+  virtual int OnMouseMotion(const FLTKEvent &irisNotUsed(event)) 
+  {
     return 0;
   }
 
   /**
    * Called when a key on the keyboard is pressed.
    */
-  virtual int OnKeyDown(const FLTKEvent &event) {
+  virtual int OnKeyDown(const FLTKEvent &irisNotUsed(event)) 
+  {
     return 0;
   }
 
   /**
    * Called when a key on the keyboard is released.
    */
-  virtual int OnKeyUp(const FLTKEvent &event) {
+  virtual int OnKeyUp(const FLTKEvent &irisNotUsed(event)) 
+  {
     return 0;
   }
 
   /**
    * Called for FLTK short-cut events
    */
-  virtual int OnShortcut(const FLTKEvent &event) {
+  virtual int OnShortcut(const FLTKEvent &irisNotUsed(event)) 
+  {
     return 0;
   }
 
   /**
    * Called for all other FLTK events
    */
-  virtual int OnOtherEvent(const FLTKEvent &event) {
+  virtual int OnOtherEvent(const FLTKEvent &irisNotUsed(event)) 
+  {
     return 0;
   }
 
@@ -109,7 +121,8 @@ public:
    * Can be called when the canvas is redrawing itself. 
    * This is not really an event but a convenience method.
    */
-  virtual void OnDraw() {
+  virtual void OnDraw() 
+  {
     return;
   }
 

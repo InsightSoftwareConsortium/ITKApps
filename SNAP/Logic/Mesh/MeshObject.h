@@ -47,7 +47,7 @@ private:
    * This method applies the settings in a color label if color label 
    * is displayable
    */
-  bool ApplyColorLabel(ColorLabel &label);
+  bool ApplyColorLabel(const ColorLabel &label);
 
   // Back pointer to the application object
   IRISApplication *m_Driver;
@@ -122,6 +122,10 @@ public:
 
 /*
  *Log: MeshObject.h
+ *Revision 1.3  2003/08/27 14:03:21  pauly
+ *FIX: Made sure that -Wall option in gcc generates 0 warnings.
+ *FIX: Removed 'comment within comment' problem in the cvs log.
+ *
  *Revision 1.2  2003/08/27 04:57:46  pauly
  *FIX: A large number of bugs has been fixed for 1.4 release
  *

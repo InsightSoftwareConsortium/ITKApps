@@ -207,7 +207,8 @@ IntensityCurveBox::DefaultHandler
 
 int 
 IntensityCurveBox::DefaultHandler
-::OnMouseRelease(const FLTKEvent &event,const FLTKEvent &dragEvent)
+::OnMouseRelease(const FLTKEvent &event,
+                 const FLTKEvent &irisNotUsed(dragEvent))
 {
   if (m_MovingControlPoint >= 0) {
     // Update the control point
@@ -229,7 +230,8 @@ IntensityCurveBox::DefaultHandler
 
 int 
 IntensityCurveBox::DefaultHandler
-::OnMouseDrag(const FLTKEvent &event,const FLTKEvent &dragEvent)
+::OnMouseDrag(const FLTKEvent &event,
+              const FLTKEvent &irisNotUsed(dragEvent))
 {
   if (m_MovingControlPoint >= 0) 
     {
@@ -249,14 +251,14 @@ IntensityCurveBox::DefaultHandler
 
 int 
 IntensityCurveBox::DefaultHandler
-::OnMouseEnter(const FLTKEvent &event)
+::OnMouseEnter(const FLTKEvent &irisNotUsed(event))
 {
   return 1;
 }
 
 int 
 IntensityCurveBox::DefaultHandler
-::OnMouseLeave(const FLTKEvent &event)
+::OnMouseLeave(const FLTKEvent &irisNotUsed(event))
 {
   return 1;
 }
