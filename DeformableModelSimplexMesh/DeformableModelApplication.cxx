@@ -13,7 +13,7 @@
 #include "vtkLine.h"
 #include "ClickedPointEvent.h"
 
-
+#include "itkImageFileWriter.h"
 
 #ifndef vtkDoubleType
 #define vtkDoubleType double
@@ -61,7 +61,7 @@ DeformableModelApplication
   m_SphereMeshSource->SetScale( sphereRadius );
   m_SphereMeshSource->SetResolution(2); 
 
- 
+  m_InternalForcesComputed = false;
 }
 
 
@@ -236,10 +236,6 @@ DeformableModelApplication
  cells->Delete();
  vpoints->Delete();
 
- //std::cout << vgrid->GetNumberOfPoints() << std::endl;
- //std::cout << vgrid->GetNumberOfLines() << std::endl;
- //std::cout << vgrid->GetNumberOfCells() << std::endl;
-
  m_AxialViewer.SetSimplexMesh(vgrid);
  m_CoronalViewer.SetSimplexMesh(vgrid);
  m_SagittalViewer.SetSimplexMesh(vgrid);
@@ -251,25 +247,38 @@ DeformableModelApplication
 
 void 
 DeformableModelApplication
-::DeformMesh()
+::ComputeInternalForces()
 {
-
-  int i;
-  m_DistanceMap->SetInput( m_VolumeReader->GetOutput() );
-
-  m_GradientFilter->SetInput( m_DistanceMap->GetOutput() );
   m_GradientFilter->SetSigma( 1.0);
   m_GradientFilter->Update();
+  m_DeformFilter->SetGradient( m_GradientFilter->GetOutput() );
+  m_InternalForcesComputed = true;
 
+  typedef itk::ImageFileWriter< GradientImageType > WriterType;
+  WriterType::Pointer gradientWriter = WriterType::New();
+  gradientWriter->SetInput( m_GradientFilter->GetOutput() );
+  gradientWriter->SetFileName("GradientImage.mhd");
+  gradientWriter->Update();
+}
+
+
+void 
+DeformableModelApplication
+::DeformMesh()
+{
+  if( !m_InternalForcesComputed )
+    {
+    this->ComputeInternalForces();
+    }
+  
   m_SimplexMesh->DisconnectPipeline();
 
-  m_DeformFilter->SetGradient( m_GradientFilter->GetOutput() );
   m_DeformFilter->SetAlpha(0.2);
   m_DeformFilter->SetBeta(0.0);
   m_DeformFilter->SetKappa(1.0);
   m_DeformFilter->SetRigidity(2);
 
-  for (i=0; i< 100; i++ ) 
+  for (unsigned int i=0; i< 100; i++ ) 
     {
     std::cout << "I is " << i << std::endl;
 
@@ -397,23 +406,12 @@ DeformableModelApplication
 }
 
 
-void
-DeformableModelApplication
-::UpdateSimplexMesh()
-{
-if (m_SimplexMesh) {
-  /*
- */
-  }
-  
-}
 
 void 
 DeformableModelApplication
 ::ProcessAxialViewInteraction( void )
 {
   m_AxialViewer.GetSelectPoint( m_SeedPoint );
-  this->UpdateSimplexMesh();
   this->SyncAllViews();
 }
 
@@ -424,7 +422,6 @@ DeformableModelApplication
 {
   
   m_CoronalViewer.GetSelectPoint( m_SeedPoint );
-  this->UpdateSimplexMesh();
   this->SyncAllViews();
 }
 
@@ -435,7 +432,6 @@ DeformableModelApplication
 {
   
   m_SagittalViewer.GetSelectPoint( m_SeedPoint );
-  this->UpdateSimplexMesh();
   this->SyncAllViews();
 }
 

@@ -4,31 +4,37 @@ header_name {.h}
 code_name {.cxx}
 class DeformableModelApplicationGUI {open : {public DeformableModelApplicationBase}
 } {
-  Function {DeformableModelApplicationGUI()} {} {
+  Function {DeformableModelApplicationGUI()} {open
+  } {
     Fl_Window mainWindow {
-      label {ISIS - DeformableModelApplication} open
-      xywh {251 84 870 815} type Double resizable
+      label {ISIS - DeformableModelApplication} open selected
+      xywh {195 100 870 815} type Double resizable
       code0 {\#include "DeformableModelApplicationBase.h"} visible
     } {
       Fl_Button {} {
         label Quit
         callback {this->Quit();}
-        xywh {311 765 75 35}
+        xywh {335 765 75 40}
       }
       Fl_Button {} {
-        label Deform
+        label {Deform Mesh}
         callback {this->DeformMesh();}
-        xywh {221 765 75 35}
+        xywh {257 765 75 40} align 128
       }
       Fl_Button {} {
-        label Mesh
+        label {Create Mesh}
         callback {this->LoadMesh();}
-        xywh {131 765 75 35}
+        xywh {101 765 75 40} align 128
       }
       Fl_Button {} {
-        label Load
+        label {Prepare Forces}
+        callback {this->ComputeInternalForces();}
+        xywh {179 765 75 40} align 128
+      }
+      Fl_Button {} {
+        label {Load Image}
         callback {this->Load();}
-        xywh {41 765 75 35}
+        xywh {24 765 75 40} align 128
       }
       Fl_Box axialView {
         label Axial
@@ -78,7 +84,7 @@ class DeformableModelApplicationGUI {open : {public DeformableModelApplicationBa
       }
       Fl_Value_Input {} {
         label {Balloon: : }
-        callback {m_DeformFilter->SetKappa( o->value() );} selected
+        callback {m_DeformFilter->SetKappa( o->value() );}
         xywh {790 770 50 25} maximum 10 step 0.1 value 0.5
       }
     }
@@ -102,5 +108,7 @@ class DeformableModelApplicationGUI {open : {public DeformableModelApplicationBa
   Function {SelectCoronalSlice( int )} {open return_type {virtual void}
   } {}
   Function {SelectSagittalSlice( int )} {return_type {virtual void}
+  } {}
+  Function {ComputeInternalForces()} {return_type {virtual void}
   } {}
 } 

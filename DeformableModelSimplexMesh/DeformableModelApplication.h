@@ -88,12 +88,12 @@ public:
    virtual void LoadMesh();
    virtual void LoadMeshProcessing();
    virtual void DeformMesh();
+   virtual void ComputeInternalForces();
    virtual void Load();
    virtual void LoadPostProcessing();
    virtual void SelectAxialSlice( int );
    virtual void SelectCoronalSlice( int );
    virtual void SelectSagittalSlice( int );
-   virtual void UpdateSimplexMesh();
    virtual void ProcessAxialViewInteraction( void );
    virtual void ProcessCoronalViewInteraction( void );
    virtual void ProcessSagittalViewInteraction( void );
@@ -124,8 +124,7 @@ private:
   itk::SimpleMemberCommand<DeformableModelApplication>::Pointer      m_SagittalViewerCommand;
   itk::SimpleMemberCommand<DeformableModelApplication>::Pointer      m_SurfaceViewerCommand;
 
-
-  
+  bool m_InternalForcesComputed;
 
 };
 

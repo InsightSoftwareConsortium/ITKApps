@@ -20,10 +20,6 @@ DeformableModelApplicationBase
   PointType center; 
   center.Fill(0);
 
-  //must get center from user and use 
-  //double center[3]={5.8,11.3907,13.9893};
-  //double center[3]={50,50,50};
-  //m_SphereMeshSource->SetCenter(center);
   PointType::ValueType scaleInit[3] = {10,10,10};
   VectorType scale = scaleInit;
   m_SphereMeshSource->SetCenter(center);
@@ -36,14 +32,14 @@ DeformableModelApplicationBase
   //deformation stuff
 
   m_DistanceMap = DistanceMapFilterType::New();
-  //m_DistanceMap->SetInput( m_VolumeReader->GetOutput() );
+  m_DistanceMap->SetInput( m_VolumeReader->GetOutput() );
 
   m_DeformFilter = DeformFilterType::New();
 
 
   m_GradientFilter = GradientFilterType::New();
-  //m_GradientFilter->SetInput( m_DistanceMap->GetOutput() );
-  // m_GradientFilter->SetSigma( 1.0 );
+  m_GradientFilter->SetInput( m_DistanceMap->GetOutput() );
+  m_GradientFilter->SetSigma( 1.0 );
   
 }
 
