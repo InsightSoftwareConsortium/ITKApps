@@ -313,6 +313,9 @@ int main(int argc, char **argv)
   // Show the splash screen
   ui->HideSplashScreen();
 
+  // Enable thread support in FLTK
+  Fl::lock();
+
   // Run the FL driver
   Fl::run();
 
@@ -338,6 +341,9 @@ int main(int argc, char **argv)
 
 /*
  *Log: SNAPMain.cxx
+ *Revision 1.5  2003/10/06 12:30:01  pauly
+ *ENH: Added history lists, remembering of settings, new snake parameter preview
+ *
  *Revision 1.4  2003/10/02 14:55:52  pauly
  *ENH: Development during the September code freeze
  *

@@ -651,7 +651,7 @@ Window3D
   }
 
   glFlush();
-  CheckErrors();
+  // CheckErrors();
 }
 
 /**
@@ -1313,6 +1313,9 @@ void Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.11  2003/11/10 00:24:50  pauly
+ **** empty log message ***
+ *
  *Revision 1.10  2003/10/14 13:44:27  pauly
  *FIX: Fixed warnings on gcc-3.3
  *
