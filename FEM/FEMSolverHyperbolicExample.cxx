@@ -149,7 +149,7 @@ int main(int ac, char** av)
 {
   // File I/O streams
   ifstream f;
-  ofstream of;
+  ofstream of, of2;
 
   // NOTE TO THE USER: You should change the output path to something
   // appropriate for your system.  Also, if you would like to run the 
@@ -164,7 +164,18 @@ int main(int ac, char** av)
   char filepath[] = "../../Insight/Testing/Data/Input/FEM/";
 
   // Path to output (either Matlab or IDL)
-  char outpath[] = "/data/tessa/temp/";
+  std::string outpath = "../";
+  std::string filename = "shout.data";
+  std::string outfile = outpath+filename;
+
+  // Field output file
+  std::string fieldoutpath = "../hemi-fields/";
+  std::string fieldfile = "field";
+  std::string fieldsuff = ".img";
+
+  // Image I/O (to generate warped images using fields)
+  std::string inputimg = "../images/brain_slice1.mhd";
+  std::string outimgpath = "../hemi-output/warp";
 
   // Storage for list of or user-specified input file(s)
   char** filelist; 
@@ -173,20 +184,16 @@ int main(int ac, char** av)
   char *fname = NULL;
 
   // Number of solver iterations
-  int niter = 100;
+  int niter = 200;
 
   // Choose a linear system wrapper (0 - sparse VNL, 1 - dense VNL, 2 - Itpack)
   int w = 2;  
 
   // Output comments and file extension
   char comment;
-  char* outfile = new char[strlen(outpath)+20];
   if (MATLAB_OUTPUT) { comment = MATLAB_COMMENT; }
   else if (IDL_OUTPUT) { comment = IDL_COMMENT;  }
   else { comment = DEFAULT_COMMENT; }
-
-  strcpy(outfile, outpath);
-  strcat(outfile, "shout.data");
 
   if (ac < 2)
   // Display the menu
@@ -250,7 +257,7 @@ int main(int ac, char** av)
 
     std::cout << comment << "Solver()" << std::endl;
     SolverHyperbolic SH;
-    SH.SetTimeStep(.05);
+    SH.SetTimeStep(.5);
 
     std::cout << comment << "Read()" << std::endl;
     SH.Read(f);
@@ -293,10 +300,10 @@ int main(int ac, char** av)
     SH.DecomposeK();           // Invert K
     
     // If output is expected, open the output stream
-    of.open(outfile);
-    if (!f) {
-      std::cout << "ERROR: null file handle - couldn't open output file" << std::endl;
-      std::cout << outfile << std::endl;
+    std::cout << outfile << std::endl;
+    of.open(outfile.c_str());
+    if (!of) {
+      std::cout << "ERROR: null file handle - couldn't open output file " << outfile << std::endl;
       return EXIT_FAILURE;
     }
 
@@ -309,25 +316,242 @@ int main(int ac, char** av)
 
     of << static_cast<unsigned char>(niter) << nelems << nndel << ndof;
 
+    // Initialize displacement field and image objects if needed--this
+    // is all hard-coded for now
+#if OUTPUT_FIELD
+    typedef itk::Image<unsigned char,2> ByteImageType;
+    typedef itk::ImageFileReader<ByteImageType> ReaderType;
+    typedef itk::RescaleIntensityImageFilter<ByteImageType,ByteImageType> RescaleFilterType;
+   
+    typedef itk::Image<float,2> FloatImageType;
+    typedef itk::Vector<float,2> VectorType;
+    typedef itk::Image<VectorType,2> FieldType;
+    typedef itk::ImageRegionIteratorWithIndex<FieldType> FieldIteratorType;
+    typedef itk::ImageRegionIteratorWithIndex<FloatImageType> ImageIteratorType;
+    typedef itk::VectorIndexSelectionCastImageFilter<FieldType,FloatImageType> CasterType;
+    typedef itk::ImageFileWriter<FloatImageType> WriterType;
+    
+    typedef itk::CastImageFilter<ByteImageType,FloatImageType> ImageCasterType;
+    typedef itk::WarpImageFilter<FloatImageType,FloatImageType,FieldType> WarperType;
+    typedef WarperType::CoordRepType CoordRepType;
+    typedef itk::LinearInterpolateImageFunction<FloatImageType,CoordRepType> InterpolatorType;
+
+    // Input image setup
+    bool imgread = false;
+    ReaderType::Pointer reader = ReaderType::New();
+    reader->SetFileName(inputimg.c_str());
+    try { 
+      reader->Update(); 
+      imgread = true;
+    }
+    catch (itk::ExceptionObject &e) { std::cout << "No input image read\n"; }
+
+    RescaleFilterType::Pointer rescalefilter;
+    FloatImageType::Pointer img, wimg;
+    InterpolatorType::Pointer interp;
+    WarperType::Pointer warper;
+    ImageCasterType::Pointer imgcaster;
+
+    if (imgread) {
+      rescalefilter = RescaleFilterType::New();
+      rescalefilter->SetInput(reader->GetOutput());
+      
+      rescalefilter->SetOutputMinimum(0);
+      rescalefilter->SetOutputMaximum(255);
+      rescalefilter->UpdateLargestPossibleRegion();
+
+      imgcaster = ImageCasterType::New();
+      imgcaster->SetInput(rescalefilter->GetOutput());
+      imgcaster->Update();
+
+      img = imgcaster->GetOutput();
+      wimg = imgcaster->GetOutput();
+
+      interp = InterpolatorType::New();
+      warper = WarperType::New();
+    }
+      
+    // Displacement field setup
+    VectorType disp;
+    FieldType::SizeType origin, size;
+    FieldType::RegionType region;
+    vnl_vector<double> imagesize, meshorigin, meshsize;
+    imagesize.resize(2);
+    meshorigin.resize(2);
+    meshsize.resize(2);
+
+    for (int j=0; j<2; j++) {
+      disp[j] = 0.;
+      origin[j] = 0;
+      size[j] = 256;
+      imagesize[j] = (double) size[j] + 1.0;
+      meshorigin[j] = (double) origin[j];
+      meshsize[j] = (double) size[j];
+    }
+
+    region.SetSize(size);
+    FieldType::Pointer dispfield = FieldType::New();
+    dispfield->SetLargestPossibleRegion(region);
+    dispfield->SetBufferedRegion(region);
+    dispfield->Allocate();
+
+    FieldIteratorType fieldIter(dispfield, region);
+    fieldIter.GoToBegin();
+    for (; !fieldIter.IsAtEnd(); ++fieldIter) { fieldIter.Set(disp); }
+
+    SH.InitializeInterpolationGrid(imagesize, meshorigin, meshsize);
+
+    int fieldctr = 0;
+#endif
+
+    // Run through the iterations of the problem
     for (int nit = 0; nit < niter; nit++) {
       SH.AssembleF();            // Assemble the global load vector F
       SH.Solve();                // Iteratively solve the system Mu'' + Cu' + Ku=F for u
 
-      int ctr = 0;
-
-      // Output the new positions of the elements in the mesh ** in binary format **
+      // Output the new positions of the elements in the mesh ** in
+      // binary format **
 #if FORMAT_OUTPUT_BINARY
       for (Solver::ElementArray::iterator ee = SH.el.begin(); ee != SH.el.end(); ee++) {
-  for (unsigned int n=0; n < (*ee)->GetNumberOfNodes(); n++) {
-    Element::VectorType nc = (*ee)->GetNode(n)->GetCoordinates();
-    for (unsigned int dof = 0; dof < (*ee)->GetNumberOfDegreesOfFreedomPerNode(); dof++) {
-      double ans = nc[dof] + SH.GetSolution((*ee)->GetNode(n)->GetDegreeOfFreedom(dof));
-      for (unsigned i = 0; i < sizeof(double); i++) {
-        of << reinterpret_cast<unsigned char*>(&ans)[i];
+for (unsigned int n=0; n < (*ee)->GetNumberOfNodes(); n++) {
+        Element::VectorType nc = (*ee)->GetNode(n)->GetCoordinates();
+        for (unsigned int dof = 0; dof < (*ee)->GetNumberOfDegreesOfFreedomPerNode(); dof++) {
+          double ans = nc[dof] + SH.GetSolution((*ee)->GetNode(n)->GetDegreeOfFreedom(dof));
+          for (unsigned i = 0; i < sizeof(double); i++) {
+            of << reinterpret_cast<unsigned char*>(&ans)[i];
+          }
+        }
       }
-    }
-  }
-  ctr++;
+      }
+#endif
+
+      // Output the interpolated deformation field at the right
+      // iteration frequency (specified by FIELD_FREQ, usu. 10)
+#if OUTPUT_FIELD      
+      if (nit % FIELD_FREQ == 0 || nit == niter-1) {
+      OStringStream s;
+      s << (fieldctr+100);
+      std::string fn;
+
+      // Interpolate to get the vector field
+      FieldType::IndexType index = fieldIter.GetIndex();
+      vnl_vector<double> gloPt, locPt, solVec;
+      Element::ConstPointer elem = 0;
+
+      gloPt.resize(2);
+      locPt.resize(2);
+      solVec.resize(2);
+
+      bool inside;
+
+      fieldIter.GoToBegin();
+      for (; !fieldIter.IsAtEnd(); ++fieldIter) {
+        index = fieldIter.GetIndex();
+        for (int k=0; k<2; k++) { gloPt[k] = (double) index[k]; }
+
+        elem = SH.GetElementAtPoint(gloPt);
+        if (elem) {
+          elem->GetLocalFromGlobalCoordinates(gloPt, locPt);
+          //std::cout << gloPt << " --> " << locPt << std::endl;
+
+          int nodes = elem->GetNumberOfNodes();
+          Element::VectorType shapef(nodes);
+          shapef = elem->ShapeFunctions(locPt);
+
+          float sol;
+          for (int k=0; k<2; k++) {
+            sol = 0.;
+            for (int n=0; n<nodes; n++) {
+            sol += shapef[n] * SH.GetSolution(elem->GetNode(n)->GetDegreeOfFreedom(k));
+            }
+            solVec[k] = sol;
+            disp[k] = (float) solVec[k];
+          }
+          dispfield->SetPixel(index, disp);
+        }
+      }
+
+      // Output the vector field in 2 parts (x & y)
+      fn = fieldoutpath+fieldfile+std::string("x")+s.str().c_str()+fieldsuff;
+      std::cout << fn << std::endl;
+      
+      CasterType::Pointer caster = CasterType::New();
+      caster->SetInput(dispfield);
+      caster->SetIndex(0);
+      caster->Update();
+      
+      WriterType::Pointer writer = WriterType::New();
+      writer->SetInput(caster->GetOutput());
+      writer->SetFileName(fn.c_str());
+      writer->Write();
+
+      fn = fieldoutpath+fieldfile+std::string("y")+s.str().c_str()+fieldsuff;
+      std::cout << fn << std::endl;
+      
+      CasterType::Pointer caster2 = CasterType::New();
+      caster2->SetInput(dispfield);
+      caster2->SetIndex(1);
+      caster2->Update();
+
+      WriterType::Pointer writer2 = WriterType::New();
+      writer2->SetInput(caster2->GetOutput());
+      writer2->SetFileName(fn.c_str());
+      writer2->Write();
+      
+      // Warp and output the image for this iteration
+      if (imgread) {
+//         warper->SetInput(img);
+//         warper->SetDeformationField(dispfield);
+//         warper->SetInterpolator(interp);
+//         warper->SetOutputSpacing(img->GetSpacing());
+//         warper->SetOutputOrigin(img->GetOrigin());
+//         ByteImageType::PixelType pad = 1;
+//         warper->SetEdgePaddingValue(pad);
+//         warper->Update();
+
+        FieldIteratorType iter(dispfield, dispfield->GetLargestPossibleRegion());
+        iter.GoToBegin();
+        FloatImageType::IndexType ind = iter.GetIndex();
+        FloatImageType::IndexType wind = iter.GetIndex();
+
+        std::cout << size << std::endl;
+        
+        for (; !iter.IsAtEnd(); ++iter) {
+          ind = iter.GetIndex();
+          wind = iter.GetIndex();
+          VectorType disp = iter.Get();
+
+          //std::cout << ind << std::endl;
+
+          for (int n=0; n<2; n++) {
+            wind[n] += (long int) (disp[n]+0.5);
+//             if (wind[n] >= 0 && (unsigned int) wind[n] < (unsigned int) size[n]) {
+//             inside=true;
+//             //std::cout << "inside\n";
+//             }
+          }
+          
+//            if (inside) {
+            FloatImageType::PixelType t = (FloatImageType::PixelType) img->GetPixel(ind);
+            wimg->SetPixel(wind, t);
+//           }
+//           else {
+//             wimg->SetPixel(wind, 0);
+//           }            
+
+          //std::cout << ind << " --> " << wind << std::endl;
+        }        
+
+        fn = outimgpath+s.str().c_str()+fieldsuff;
+        std::cout << fn << std::endl;
+
+        WriterType::Pointer imgwriter = WriterType::New();
+        imgwriter->SetInput(wimg);
+        imgwriter->SetFileName(fn.c_str());
+        imgwriter->Write();
+      }
+
+      fieldctr++;
       }
 #endif
       
@@ -348,14 +572,12 @@ int main(int ac, char** av)
   catch (::itk::ExceptionObject &err) {
     std::cerr << "ITK exception detected: "  << err;
     of.close();
-    delete(outfile);
 
     return EXIT_FAILURE;
   }
 
   // Clean up and get out
   of.close();
-  delete(outfile);
 
   return EXIT_SUCCESS;
 }
