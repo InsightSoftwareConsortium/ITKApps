@@ -263,6 +263,78 @@ gets passed into the ProcessData function.
 }
 #endif
 
+
+/* OK this macro is useful for plugins that need to set the range of a slider
+ * to the range of the voxel's data type. For example the Boundary plugin has
+ * a slider where the user can set the value for the boundary voxels. For
+ * unsigned char this slider should show 0 to 255. For larger short it would
+ * show roughly -32000 to 32000. Both of those are fairly reasonable. The
+ * problem comes with larger data types such as float, long, double. The
+ * valid range of floats is huge and you probably do not want the slider to
+ * cover the entire range (something crazy like -1e37 to 1e37). Son in these
+ * cases we use a heuristic to find a "reasonable" range. The basic idea is
+ * that we make the slider range the range of the data in the volume and then
+ * extend that range by a factor of 3.  So if the user loads float dta
+ * between 0 and 1 the range computed here would be -1 to 2 for example. The
+ * other reason to do this is that most of the rest of VolView does not
+ * handle wee the situation where there are large gaps in the data. For
+ * example, float data where most of the structure is in the range of 0 to 1
+ * but there are some outlier voxels with a value of 1e37. The texture
+ * hardware/GUI doean't work well with these situations (not a bug, just part
+ * of the design) so we try to avoid them.
+ */
+#define vvPluginSetGUIScaleRange(id) \
+  { \
+  char _tmp[1000]; \
+  double min = info->InputVolumeScalarTypeRange[0]; \
+  double max = info->InputVolumeScalarTypeRange[1]; \
+  double stepSize = 1.0; \
+  /* for some large types let us be reasonable */ \
+  if (info->InputVolumeScalarType == VTK_FLOAT || \
+      info->InputVolumeScalarType == VTK_INT || \
+      info->InputVolumeScalarType == VTK_UNSIGNED_INT || \
+      info->InputVolumeScalarType == VTK_LONG || \
+      info->InputVolumeScalarType == VTK_UNSIGNED_LONG || \
+      info->InputVolumeScalarType == VTK_DOUBLE) \
+    { \
+    /* for non double we can safely do some additional calculations */ \
+    if (info->InputVolumeScalarType != VTK_DOUBLE) \
+      { \
+      min = 2.0*info->InputVolumeScalarRange[0] - \
+            info->InputVolumeScalarRange[1]; \
+      max = 2.0*info->InputVolumeScalarRange[1] - \
+            info->InputVolumeScalarRange[0]; \
+      if (min < info->InputVolumeScalarTypeRange[0]) \
+        { \
+        min = info->InputVolumeScalarTypeRange[0]; \
+        } \
+      if (max > info->InputVolumeScalarTypeRange[1]) \
+        { \
+        max = info->InputVolumeScalarTypeRange[1]; \
+        } \
+      } \
+    /* for integer types include zero in the range */ \
+    if (info->InputVolumeScalarType == VTK_INT || \
+        info->InputVolumeScalarType == VTK_UNSIGNED_INT || \
+        info->InputVolumeScalarType == VTK_LONG || \
+        info->InputVolumeScalarType == VTK_UNSIGNED_LONG) \
+      { \
+      if (min > 0 ) \
+        { \
+        min = 0; \
+        } \
+      if (max < 0 ) \
+        { \
+        max = 0; \
+        } \
+      } \
+    stepSize = max*0.005 - min*0.005; \
+    } \
+  sprintf(_tmp,"%g %g %g", min, max, stepSize); \
+  info->SetGUIProperty(info, id, VVP_GUI_HINTS , _tmp); \
+  }
+  
+
 /* this macro should be called first inside every Init function to make sure
  * the plugin version matches the volview version */
 #define vvPluginVersionCheck() \
