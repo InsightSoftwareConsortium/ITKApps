@@ -5,47 +5,117 @@
 
 #include "itkMedianImageFilter.h"
 
+
+
+
+template <class InputPixelType>
+class MedianRunner
+  {
+  public:
+      typedef  InputPixelType                       PixelType;
+      typedef  itk::Image< PixelType, 3 >           ImageType; 
+      typedef  itk::MedianImageFilter< ImageType,  ImageType >   FilterType;
+      typedef  VolView::PlugIn::FilterModule< FilterType >       ModuleType;
+
+  public:
+    MedianRunner() {}
+    void Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
+    {
+      itk::Size< 3 > radius;
+      radius[0] = atoi( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
+      radius[1] = atoi( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
+      radius[2] = atoi( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ) );
+
+      if( info->NumberOfMarkers < 1 )
+        {
+        info->SetProperty( info, VVP_ERROR, "Please select seed points using the 3D Markers in the Annotation menu" ); 
+        return;
+        }
+
+      ModuleType  module;
+      module.SetPluginInfo( info );
+      module.SetUpdateMessage("Transforming intensities with a Median filter...");
+      module.GetFilter()->SetRadius( radius );
+      // Execute the filter
+      module.ProcessData( pds  );
+    }
+  };
+
+
+
+
 static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 {
 
   vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
-  const unsigned int Dimension = 3;
-
-  itk::Size< Dimension > radius;
-  radius[0] = atoi( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ) );
-  radius[1] = atoi( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ) );
-  radius[2] = atoi( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ) );
 
   try 
   {
   switch( info->InputVolumeScalarType )
     {
+    case VTK_CHAR:
+      {
+      MedianRunner<signed char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
     case VTK_UNSIGNED_CHAR:
       {
-      typedef  unsigned char                        PixelType;
-      typedef  itk::Image< PixelType, Dimension >   ImageType; 
-      typedef  itk::MedianImageFilter< ImageType,   ImageType >   FilterType;
-      VolView::PlugIn::FilterModule< FilterType > module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Transforming intensities with a Median filter...");
-      module.GetFilter()->SetRadius( radius );
-      module.ProcessData( pds  );
+      MedianRunner<unsigned char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_SHORT:
+      {
+      MedianRunner<signed short> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_SHORT:
       {
-      typedef  unsigned short                       PixelType;
-      typedef  itk::Image< PixelType, Dimension >   ImageType; 
-      typedef  itk::MedianImageFilter< ImageType,  ImageType >   FilterType;
-      VolView::PlugIn::FilterModule< FilterType > module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Transforming intensities with a Median filter...");
-      module.GetFilter()->SetRadius( radius );
-      module.ProcessData( pds );
+      MedianRunner<unsigned short> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_INT:
+      {
+      MedianRunner<signed int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_INT:
+      {
+      MedianRunner<unsigned int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_LONG:
+      {
+      MedianRunner<signed long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_LONG:
+      {
+      MedianRunner<unsigned long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_FLOAT:
+      {
+      MedianRunner<float> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_DOUBLE:
+      {
+      MedianRunner<double> runner;
+      runner.Execute( info, pds );
       break; 
       }
     }
+
   }
   catch( itk::ExceptionObject & except )
   {
