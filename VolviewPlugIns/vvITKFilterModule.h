@@ -70,6 +70,12 @@ public:
     }
 
 
+  /** Give access to the second input image */
+  const InputImageType * GetInput() 
+    {  return m_ImportFilter->GetOutput(); }
+
+
+  /** Return  a pointer to the internal filter */
   FilterType * GetFilter()
   {
     return m_Filter.GetPointer();
