@@ -233,14 +233,16 @@ MeshObject
 {
   if (label.IsVisible() && label.IsDoMesh()) 
     {
-    if (label.IsOpaque()) 
-      {
-      glColor3ub(label.GetRGB(0),label.GetRGB(1),label.GetRGB(2)); 
-      } 
-    else 
-      {
-      glColor4ub(label.GetRGB(0),label.GetRGB(1),label.GetRGB(2), label.GetAlpha()); 
-      }
+    // Adjust the label color to reduce the saturation. This in necessary
+    // in order to see the highlights on the object
+    double r = 0.75 * (label.GetRGB(0) / 255.0);
+    double g = 0.75 * (label.GetRGB(1) / 255.0);
+    double b = 0.75 * (label.GetRGB(2) / 255.0);
+    double a = label.GetAlpha() / 255.0;
+
+    if (label.IsOpaque()) glColor3d(r, g, b); 
+    else glColor4d(r, g, b, a);
+  
     return true;
     }
   return false;
@@ -327,6 +329,9 @@ MeshObject
 
 /*
  *Log: MeshObject.cxx
+ *Revision 1.11  2004/01/27 17:34:00  pauly
+ *FIX: Compiling on Mac OSX, issue with GLU include file
+ *
  *Revision 1.10  2004/01/20 00:17:42  pauly
  *FIX: VTK float compatibility
  *

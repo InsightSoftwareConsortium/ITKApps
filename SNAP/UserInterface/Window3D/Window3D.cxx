@@ -20,6 +20,7 @@
 #include <iostream>
 #include "IRISApplication.h"
 #include "ImageRayIntersectionFinder.h"
+#include "SNAPAppearanceSettings.h"
 
 #include <FL/glut.h>
 
@@ -546,6 +547,12 @@ Window3D
     m_NeedsInitialization = 0;
     }
 
+  // Get the properties for the background color
+  Vector3d clrBack = 
+    m_ParentUI->GetAppearanceSettings()->GetUIElement(
+    SNAPAppearanceSettings::BACKGROUND_3D).NormalColor;
+
+  glClearColor(clrBack[0],clrBack[1],clrBack[2],1);
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
   // Compute the center of rotation  
@@ -1310,6 +1317,9 @@ void Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.18  2004/07/22 19:22:51  pauly
+ *ENH: Large image support for SNAP. This includes being able to use more screen real estate to display a slice, a fix to the bug with manual segmentation of images larger than the window size, and a thumbnail used when zooming into the image.
+ *
  *Revision 1.17  2004/06/01 13:33:55  king
  *ERR: Fix for cross_3d to work with both the ITK version and current cvs version of vxl.
  *

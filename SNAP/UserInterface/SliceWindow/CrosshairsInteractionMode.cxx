@@ -16,6 +16,7 @@
 #include "IRISApplication.h"
 #include "IRISImageData.h"
 #include "UserInterfaceLogic.h"
+#include "SNAPAppearanceSettings.h"
 
 CrosshairsInteractionMode
 ::CrosshairsInteractionMode(GenericSliceWindow *parent) 
@@ -56,6 +57,9 @@ int
 CrosshairsInteractionMode
 ::OnMouseWheel(const FLTKEvent &irisNotUsed(event))
 {
+  // Must have the cursor inside the window to process key events
+  if(!m_Parent->m_Focus) return 0;
+
   // Get the amount of the scroll
   float scroll = (float) Fl::event_dy();
   
@@ -90,14 +94,10 @@ CrosshairsInteractionMode
   return 1;
 }
 
-
 void
 CrosshairsInteractionMode
-::UpdateCrosshairs(const FLTKEvent &event)
+::UpdateCrosshairs(const Vector3f &xClick)
 {
-  // Compute the position in slice coordinates
-  Vector3f xClick = m_Parent->MapWindowToSlice(event.XSpace.extract(2));
-  
   // Compute the new cross-hairs position in image space
   Vector3f xCross = m_Parent->MapSliceToImage(xClick);
 
@@ -118,7 +118,53 @@ CrosshairsInteractionMode
 
   // Cause a repaint
   m_NeedToRepaintControls = true;
-  m_ParentUI->RedrawWindows();
+  m_ParentUI->RedrawWindows();  
+}
+
+void
+CrosshairsInteractionMode
+::UpdateCrosshairs(const FLTKEvent &event)
+{
+  // Compute the position in slice coordinates
+  Vector3f xClick = m_Parent->MapWindowToSlice(event.XSpace.extract(2));
+  UpdateCrosshairs(xClick);
+}
+
+int 
+CrosshairsInteractionMode
+::OnKeyDown(const FLTKEvent &event)
+{
+  // Must have the cursor inside the window to process key events
+  if(!m_Parent->m_Focus) return 0;
+
+  // Vector encoding the movement in pixels
+  Vector3f xMotion(0.0f);
+
+  // Check the shift state
+  float xStep = (event.State & FL_SHIFT) ? 5.0f : 1.0f;
+
+  // Handle up, down, left, right, pg-up and pg-down events
+  switch(Fl::event_key())
+    {
+    case FL_Right:     xMotion[0] += xStep; break;
+    case FL_Left:      xMotion[0] -= xStep; break;
+    case FL_Down:      xMotion[1] -= xStep; break;
+    case FL_Up:        xMotion[1] += xStep; break;
+    case FL_Page_Up:   xMotion[2] -= xStep; break;
+    case FL_Page_Down: xMotion[2] += xStep; break;
+    default: return 0;
+    };
+
+  // Get the crosshair coordinates, in slice space
+  Vector3f xCross = 
+    m_Parent->MapImageToSlice(
+      to_float(m_GlobalState->GetCrosshairsPosition()));
+
+  // Add the motion vector
+  UpdateCrosshairs(xCross + xMotion);
+
+  // Handled!
+  return 1;
 }
 
 void 
@@ -149,22 +195,48 @@ OnDraw()
   Vector2i lower(0);
   Vector2i upper = m_Parent->m_SliceSize.extract(2);
 
+  // Get the line color, thickness and dash spacing
+  SNAPAppearanceSettings::Element elt = 
+    m_ParentUI->GetAppearanceSettings()->GetUIElement(
+      SNAPAppearanceSettings::CROSSHAIRS);
+
+  // If in thumbnail mode, replace the line properties with those of the thumbnail
+  if(m_Parent->m_ThumbnailIsDrawing)
+    {
+    SNAPAppearanceSettings::Element eltThumb = 
+      m_ParentUI->GetAppearanceSettings()->GetUIElement(
+        SNAPAppearanceSettings::ZOOM_THUMBNAIL);
+    elt.LineThickness = eltThumb.LineThickness;
+    }
+
   // Set line properties
-  glPushAttrib(GL_LINE_BIT);  
-  glLineWidth(1.0);  
-  glEnable(GL_LINE_STIPPLE);
+  glPushAttrib(GL_LINE_BIT | GL_COLOR_BUFFER_BIT);
+
+  // Apply the line properties; thick line is only applied in zoom thumbnail (?)
+  SNAPAppearanceSettings::ApplyUIElementLineSettings(elt);
+
+  // Apply the color
+  glColor3dv(elt.NormalColor.data_block());
   
-  glColor3f(0.5,0.5,1);
-  glLineStipple(2,0xAAAA);
-  glBegin(GL_LINES);
-  
+  // Refit matrix so that the lines are centered on the current pixel
+  glPushMatrix();
+  glTranslated( xCursorSlice(0), xCursorSlice(1), 0.0 );
+
   // Paint the cross-hairs
-  glVertex2f(lower(0), xCursorSlice(1));
-  glVertex2f(upper(0), xCursorSlice(1));
-  glVertex2f(xCursorSlice(0), lower(1));
-  glVertex2f(xCursorSlice(0), upper(1));
-  
+  glBegin(GL_LINE_STRIP);  
+  glVertex2f(lower(0) - xCursorSlice(0),0); 
+  glVertex2f(0, 0);
+  glVertex2f(upper(0) - xCursorSlice(0), 0);
   glEnd();
+
+  glBegin(GL_LINE_STRIP);  
+  glVertex2f(0, lower(1) - xCursorSlice(1)); 
+  glVertex2f(0, 0);
+  glVertex2f(0, upper(1) - xCursorSlice(1));
+  glEnd();
+
+  glPopMatrix();
+
   glPopAttrib();
 }
 

@@ -122,7 +122,7 @@ OpenGLSliceTexture<TPixel>
 template<class TPixel>
 void
 OpenGLSliceTexture<TPixel>
-::Draw(unsigned char r, unsigned char g, unsigned char b)
+::Draw(const Vector3d &clrBackground)
 {
   // Update the texture
   Update();
@@ -137,8 +137,8 @@ OpenGLSliceTexture<TPixel>
   // Select our texture
   glBindTexture(GL_TEXTURE_2D,m_TextureIndex);
 
-  // Set the color to white
-  glColor3ub(r,g,b);
+  // Set the color to the background color
+  glColor3dv(clrBackground.data_block());
 
   int w = m_Image->GetBufferedRegion().GetSize()[0];
   int h = m_Image->GetBufferedRegion().GetSize()[1];

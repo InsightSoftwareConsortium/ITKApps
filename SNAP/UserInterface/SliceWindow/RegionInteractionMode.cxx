@@ -19,6 +19,7 @@
 #include "IRISSliceWindow.h"
 #include "UserInterfaceLogic.h"
 #include "IRISVectorTypesToITKConversion.h"
+#include "SNAPAppearanceSettings.h"
 
 #include <cassert>
 #include <cmath>
@@ -288,12 +289,17 @@ RegionInteractionMode
   // And if so, return without painting anything
   if(bbMin > slice || bbMax <= slice)
     return;
-  
+
+  // Get the line color, thickness and dash spacing
+  const SNAPAppearanceSettings::Element &elt = 
+    m_ParentUI->GetAppearanceSettings()->GetUIElement(
+    SNAPAppearanceSettings::ROI_BOX);
+
   // Set line properties
-  glPushAttrib(GL_LINE_BIT);
-  glLineWidth(1);
-  glEnable(GL_LINE_STIPPLE);
-  glLineStipple(2,0xAAAA);
+  glPushAttrib(GL_LINE_BIT | GL_COLOR_BUFFER_BIT);
+
+  // Apply the line properties
+  SNAPAppearanceSettings::ApplyUIElementLineSettings(elt);
 
   // Start drawing the lines
   glBegin(GL_LINES);
@@ -303,19 +309,17 @@ RegionInteractionMode
   {
     for(unsigned int i=0;i<2;i++)
     {
-      // Select color according to edge state
-      if(m_EdgeHighlighted[dir][i])
-        glColor3f(1,1,0.5);
-      else
-        glColor3f(1,0.5,0.5);
+    // Select color according to edge state
+    glColor3dv( m_EdgeHighlighted[dir][i] ? 
+      elt.ActiveColor.data_block() : elt.NormalColor.data_block() );
 
-      // Compute the vertices of the edge
-      Vector2f x0,x1;
-      GetEdgeVertices(dir,i,x0,x1,corner);
+    // Compute the vertices of the edge
+    Vector2f x0,x1;
+    GetEdgeVertices(dir,i,x0,x1,corner);
 
-      // Draw the line
-      glVertex2f(x0[0],x0[1]);
-      glVertex2f(x1[0],x1[1]);
+    // Draw the line
+    glVertex2f(x0[0],x0[1]);
+    glVertex2f(x1[0],x1[1]);
     }
   }
 

@@ -68,7 +68,7 @@ public:
    * Draw the texture in the current OpenGL context on a polygon with vertices
    * (0,0) - (size_x,size_y). Paramters are the background color of the polygon
    */
-  void Draw(unsigned char r = 255, unsigned char g = 255, unsigned char b = 255);
+  void Draw(const Vector3d &clrBackground);
 
   /**
    * Draw the texture in transparent mode, with given level of alpha blending.

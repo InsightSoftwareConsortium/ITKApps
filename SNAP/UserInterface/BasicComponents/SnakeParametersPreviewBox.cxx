@@ -76,7 +76,7 @@ SnakeParametersPreviewBox
   
   // Draw the speed image
   m_Texture->SetImage(m_Pipeline->GetSpeedImage());
-  m_Texture->Draw();
+  m_Texture->Draw(Vector3d(1.0));
 
   // Set up the line drawing mode
   glEnable(GL_LINE_SMOOTH);

@@ -17,7 +17,9 @@
 #include "BubblesInteractionMode.h"
 #include "GlobalState.h"
 #include "SNAPImageData.h"
+#include "SNAPAppearanceSettings.h"
 #include "OpenGLSliceTexture.h"
+#include "UserInterfaceLogic.h"
 
 SNAPSliceWindow
 ::SNAPSliceWindow(int x, int y, int w, int h, const char *label)
@@ -76,25 +78,30 @@ SNAPSliceWindow
 }
 
 void SNAPSliceWindow
-::DrawGreyTexture(unsigned char r, unsigned char g, unsigned char b)
+::DrawGreyTexture()
 {
   // The preprocessing image is shown when the corresponding flag is set and 
   // the display mode is not set to overlay
-  if(m_GlobalState->GetShowSpeed() && 
-     !m_GlobalState->GetSpeedViewZero())
+  if(m_GlobalState->GetShowSpeed() && !m_GlobalState->GetSpeedViewZero())
     {
     // We should have a slice to draw
     assert(m_ImageData->IsSpeedLoaded() && m_ImageSliceIndex >= 0);
+
+    // Get the color to use for background
+    Vector3d clrBackground = m_ThumbnailIsDrawing
+      ? m_ParentUI->GetAppearanceSettings()->GetUIElement(
+          SNAPAppearanceSettings::ZOOM_THUMBNAIL).NormalColor
+      : Vector3d(1.0);
 
     // Make sure the correct image is pointed to
     m_SpeedTexture->SetImage(m_ImageData->GetSpeed()->GetDisplaySlice(m_Id));
 
     // Paint the grey texture
-    m_SpeedTexture->Draw(r, g, b);
+    m_SpeedTexture->Draw(clrBackground);
     }
   else
     {
-    GenericSliceWindow::DrawGreyTexture(r, g, b);
+    GenericSliceWindow::DrawGreyTexture();
     }
 }
 
@@ -136,13 +143,13 @@ void SNAPSliceWindow
 }
 
 void SNAPSliceWindow
-::DrawOverlays(bool inZoomLocator)
+::DrawOverlays()
 {
   // Call the parent's code
-  GenericSliceWindow::DrawOverlays(inZoomLocator);
+  GenericSliceWindow::DrawOverlays();
 
   // Draw the bubbles
-  if(!inZoomLocator)
+  if(!m_ThumbnailIsDrawing)
     m_BubblesMode->OnDraw();
 }
 

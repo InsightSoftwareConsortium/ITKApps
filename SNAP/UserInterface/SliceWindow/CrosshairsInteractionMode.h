@@ -35,9 +35,11 @@ public:
                      const FLTKEvent &irisNotUsed(pressEvent));
   int OnMouseDrag(const FLTKEvent &event, 
                   const FLTKEvent &irisNotUsed(pressEvent));
+  int OnKeyDown(const FLTKEvent &event);
 
 private:
   void UpdateCrosshairs(const FLTKEvent &event);
+  void UpdateCrosshairs(const Vector3f &xCross);
 
   // Whether or not we need to repaint the controls that depend on
   // the current slice position

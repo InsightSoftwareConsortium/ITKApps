@@ -12,6 +12,7 @@
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
+#include <algorithm>
 #include <cstdlib>
 #include <ctime>
 
@@ -64,6 +65,15 @@ FLTKCanvas
 ::GetTopInteractionMode()
 {
   return m_Interactors.front();
+}
+
+bool
+FLTKCanvas
+::IsInteractionModeAdded(InteractionMode *target)
+{
+  return 
+    std::find(m_Interactors.begin(), m_Interactors.end(), target) !=
+      m_Interactors.end();
 }
 
 int 
@@ -177,7 +187,7 @@ FLTKCanvas
     }
 
   // The event was not handled
-  return 1;
+  return 0;
 }
 
 void 

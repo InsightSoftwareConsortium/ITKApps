@@ -1,0 +1,40 @@
+======================================
+ InsightSNAP Release Notes
+ Version 1.2
+======================================
+
+1. New Features
+-----------------
+
+1.1 New in Version 1.2
+
+ -  The ability to switch between 4-view mode and single view mode. Each of the 
+    slice views and the 3D view can be expanded to occupy the entire SNAP window.
+
+ -  A zoom thumbnail is now displayed when a slice view is zoomed in. The thumbnail 
+    view can be used to pan the slice.
+
+ -  User can specify whether he/she prefers to start in linked zoom mode or in 
+    unlinked zoom mode.
+
+
+
+2. Bug Fixes
+-----------------
+
+ -  Slice views update correctly when the SNAP window is resized
+
+ -  Accepting a polygon now works for high resolution images.
+
+
+3. Known Issues
+-----------------
+ -  
+
+
+4. Wish List
+-----------------
+ -  The ability to perform 2D level set segmentation in each slice view.
+
+ -  The ability to export level set segmentation results as meshes or as floating
+    point images.

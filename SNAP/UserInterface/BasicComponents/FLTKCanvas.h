@@ -62,6 +62,11 @@ public:
   InteractionMode *GetTopInteractionMode();
 
   /**
+   * See if the interaction mode is in the stack
+   */
+  bool IsInteractionModeAdded(InteractionMode *target);
+
+  /**
    * Remove all interaction modes
    */
   void ClearInteractionStack();

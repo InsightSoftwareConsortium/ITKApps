@@ -246,6 +246,9 @@ protected:
   // default zoom
   unsigned int m_Margin;
 
+  // Flag indicating whether the window has keyboard/mouse-wheel focus or not
+  bool m_Focus;
+
   // Grey texture object typedefs
   typedef OpenGLSliceTexture<unsigned char> GreyTextureType;
 
@@ -265,6 +268,9 @@ protected:
   // The position and size of the zoom thumbnail
   Vector2i m_ThumbnailPosition, m_ThumbnailSize;
 
+  // Whether or not the thumbnail is being drawn at the moment
+  bool m_ThumbnailIsDrawing;
+
   // The zoom level in the thumbnail
   double m_ThumbnailZoom;
 
@@ -272,14 +278,14 @@ protected:
   void ComputeOptimalZoom();
   
   // This method is called in draw() to paint the grey slice
-  virtual void DrawGreyTexture(unsigned char r = 255, unsigned char g = 255, unsigned char b = 255);
+  virtual void DrawGreyTexture();
 
   // This method is called in draw() to paint the segmentation slice
   virtual void DrawSegmentationTexture();
 
   // This method is called after the grey and segmentation images have
   // been drawn.  It calls the draw method of each of the interaction modes
-  virtual void DrawOverlays(bool inZoomLocator);
+  virtual void DrawOverlays();
 
   /** This method draws the RAI labels at the four sides of the slice */
   void DrawOrientationLabels();

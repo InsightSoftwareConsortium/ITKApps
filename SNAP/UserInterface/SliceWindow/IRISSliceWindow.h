@@ -141,7 +141,7 @@ protected:
   PolygonSlicePointer m_PolygonSlice;
 
   /** Draw the region and polygon interactors */
-  void DrawOverlays(bool inZoomLocator);
+  void DrawOverlays();
 };
 
 #endif

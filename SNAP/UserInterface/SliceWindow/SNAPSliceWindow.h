@@ -70,8 +70,8 @@ protected:
   OverlayTextureType *m_OverlayTexture;
 
   // Overlay and texture drawing are customized in this class
-  void DrawOverlays(bool inZoomLocator);
-  void DrawGreyTexture(unsigned char r = 255, unsigned char g = 255, unsigned char b = 255);
+  void DrawOverlays();
+  void DrawGreyTexture();
   void DrawSegmentationTexture();  
 };
 

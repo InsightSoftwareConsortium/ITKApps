@@ -110,6 +110,7 @@ SET(UI_CXX
   UserInterface/ImageIOWizard/GreyImageIOWizardLogic.cxx
   UserInterface/ImageIOWizard/PreprocessingImageIOWizardLogic.cxx
   UserInterface/ImageIOWizard/SegmentationImageIOWizardLogic.cxx
+  UserInterface/MainComponents/AppearanceDialogUILogic.cxx
   UserInterface/MainComponents/HelpViewerLogic.cxx
   UserInterface/MainComponents/IntensityCurveBox.cxx
   UserInterface/MainComponents/IntensityCurveUILogic.cxx
@@ -153,6 +154,8 @@ SET(UI_HEADERS
   UserInterface/ImageIOWizard/RestrictedImageIOWizardLogic.h
   UserInterface/ImageIOWizard/RestrictedImageIOWizardLogic.txx
   UserInterface/ImageIOWizard/SegmentationImageIOWizardLogic.h
+  UserInterface/MainComponents/AppearanceDialogUIBase.h
+  UserInterface/MainComponents/AppearanceDialogUILogic.h
   UserInterface/MainComponents/HelpViewerBase.h
   UserInterface/MainComponents/HelpViewerLogic.h
   UserInterface/MainComponents/IntensityCurveBox.h
@@ -215,6 +218,7 @@ SET(TESTING_HEADERS
 # The FL files for SNAP
 SET(APPLICATION_FLUIDS
   UserInterface/ImageIOWizard/ImageIOWizard.fl
+  UserInterface/MainComponents/AppearanceDialogUI.fl
   UserInterface/MainComponents/HelpViewer.fl
   UserInterface/MainComponents/IntensityCurveUI.fl
   UserInterface/MainComponents/PreprocessingUI.fl

@@ -65,6 +65,10 @@ GenericSliceWindow
 
   // Initialize the zoom management
   m_ManagedZoom = false;
+
+  // No focus
+  m_Focus = false;
+  m_ThumbnailIsDrawing = false;
 }
 
 GenericSliceWindow
@@ -279,20 +283,25 @@ GenericSliceWindow
 ::handle(int eventID)
 {
   // When mouse enters the window, request focus
-  if(eventID == FL_ENTER)
+  switch(eventID)
     {
-    this->take_focus();
-    return 1;
-    }
+    case FL_ENTER:
+      this->take_focus();
+      m_Focus = true;
+      redraw();
+      return 1;
 
-  // Handle the focus event properly
-  if(eventID == FL_FOCUS)
-    {
-    return 1;
-    }
+    case FL_LEAVE:
+      m_Focus = false;
+      redraw();
+      return 1;
+  
+    case FL_FOCUS:
+      return 1;
 
-  // Normal processing
-  return FLTKCanvas::handle(eventID);
+    default:
+      return FLTKCanvas::handle(eventID);
+    };
 }
 
 void
@@ -330,8 +339,13 @@ GenericSliceWindow
       }
   }
 
-  // Clear the display
-  glClearColor(0.0,0.0,0.0,1.0);
+  // Get the properties for the background color
+  Vector3d clrBack = 
+    m_ParentUI->GetAppearanceSettings()->GetUIElement(
+      SNAPAppearanceSettings::BACKGROUND_2D).NormalColor;
+
+  // Clear the display, using a blue shade when under focus
+  glClearColor(clrBack[0],clrBack[1],clrBack[2],1.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);    
 
   // Slice should be initialized before display
@@ -352,7 +366,6 @@ GenericSliceWindow
   glPushAttrib(GL_LIGHTING_BIT | GL_DEPTH_BUFFER_BIT | 
                GL_PIXEL_MODE_BIT | GL_TEXTURE_BIT );  
   
-  
   glDisable(GL_LIGHTING);
 
   // glDisable(GL_DEPTH);
@@ -370,7 +383,7 @@ GenericSliceWindow
   DrawSegmentationTexture();
 
   // Draw the overlays
-  DrawOverlays(false);
+  DrawOverlays();
 
   // Draw the zoom locator
   if(IsThumbnailOn())
@@ -386,13 +399,19 @@ GenericSliceWindow
 
 void 
 GenericSliceWindow
-::DrawGreyTexture(unsigned char r, unsigned char g, unsigned char b) 
+::DrawGreyTexture() 
 {
   // We should have a slice to return
   assert(m_ImageData->IsGreyLoaded() && m_ImageSliceIndex >= 0);
 
-  // Paint the grey texture
-  m_GreyTexture->Draw(r, g, b);
+  // Get the color to use for background
+  Vector3d clrBackground = m_ThumbnailIsDrawing
+    ? m_ParentUI->GetAppearanceSettings()->GetUIElement(
+        SNAPAppearanceSettings::ZOOM_THUMBNAIL).NormalColor
+    : Vector3d(1.0);
+
+  // Paint the grey texture with color as background
+  m_GreyTexture->Draw(clrBackground);
 }
 
 void 
@@ -411,6 +430,9 @@ void
 GenericSliceWindow
 ::DrawThumbnail()
 {
+  // Indicate the fact that we are currently drawing in thumbnail mode
+  m_ThumbnailIsDrawing = true;  
+  
   // The dimensions of the canvas on which we are working, in pixels
   Vector2i xCanvas( w(), h() );
 
@@ -448,14 +470,22 @@ GenericSliceWindow
   glScalef(m_SliceSpacing[0],m_SliceSpacing[1],1.0);
   // glTranslated(w * 0.1111, h * 0.1111, 0.0);
 
-  // Draw the grey scale image
-  DrawGreyTexture(255, 224, 32);
-
+  // Draw the grey scale image (the background will be picked automatically)
+  DrawGreyTexture();
+ 
   // Draw the crosshairs and stuff
-  DrawOverlays(true);
+  DrawOverlays();
+
+  // Get the thumbnail appearance properties
+  const SNAPAppearanceSettings::Element &elt = 
+    m_ParentUI->GetAppearanceSettings()->GetUIElement(
+      SNAPAppearanceSettings::ZOOM_THUMBNAIL);
+
+  // Apply the line settings
+  SNAPAppearanceSettings::ApplyUIElementLineSettings(elt);
 
   // Draw the line around the image
-  glColor3d(0.8, 0.8, 0.2);
+  glColor3dv(elt.NormalColor.data_block());
   glBegin(GL_LINE_LOOP);
   glVertex2d(0,0);
   glVertex2d(0,h);
@@ -469,7 +499,7 @@ GenericSliceWindow
   w = this->w() * 0.5 / m_ViewZoom;
   h = this->h() * 0.5 / m_ViewZoom;
 
-  glColor3d(1.0, 1.0, 1.0);
+  glColor3dv(elt.ActiveColor.data_block());
   glBegin(GL_LINE_LOOP);
   glVertex2d(-w,-h);
   glVertex2d(-w, h);
@@ -478,13 +508,16 @@ GenericSliceWindow
   glEnd();
 
   glPopMatrix();
+
+  // Indicate the fact that we are not drawing in thumbnail mode
+  m_ThumbnailIsDrawing = false;  
 }
 
 void 
 GenericSliceWindow
-::DrawOverlays(bool inZoomLocator) 
+::DrawOverlays() 
 {
-  if(!inZoomLocator) 
+  if(!m_ThumbnailIsDrawing) 
     {
     // Display the letters (RAI)
     DrawOrientationLabels();
@@ -504,6 +537,11 @@ GenericSliceWindow
   // The letter labels
   static const char *letters[3][2] = {{"R","L"},{"A","P"},{"I","S"}};
   const char *labels[2][2];
+
+  // Get the properties for the labels
+  const SNAPAppearanceSettings::Element &elt = 
+    m_ParentUI->GetAppearanceSettings()->GetUIElement(
+      SNAPAppearanceSettings::MARKERS);
 
   // Repeat for X and Y directions
   for(unsigned int i=0;i<2;i++) 
@@ -539,14 +577,16 @@ GenericSliceWindow
 */
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glColor4f(1,1,0,0.5);
 
-  gl_font(FL_COURIER_BOLD, 14);
+  glColor4d( elt.NormalColor[0], elt.NormalColor[1], elt.NormalColor[2], 0.5 );
+
+  gl_font(FL_COURIER_BOLD, elt.FontSize);
+  int offset = 4 + elt.FontSize * 2;
   
-  gl_draw(labels[0][0],0,0,32,h(),FL_ALIGN_LEFT);
-  gl_draw(labels[0][1],w() - 33,0,32,h(),FL_ALIGN_RIGHT);
-  gl_draw(labels[1][0],0,0,w(),32,FL_ALIGN_BOTTOM);
-  gl_draw(labels[1][1],0,h() - 33,w(),32,FL_ALIGN_TOP);
+  gl_draw(labels[0][0],0,0,offset,h(),FL_ALIGN_LEFT);
+  gl_draw(labels[0][1],w() - (offset+1),0,offset,h(),FL_ALIGN_RIGHT);
+  gl_draw(labels[1][0],0,0,w(),offset,FL_ALIGN_BOTTOM);
+  gl_draw(labels[1][1],0,h() - (offset+1),w(),offset,FL_ALIGN_TOP);
 
   glPopMatrix();
   glPopAttrib();
