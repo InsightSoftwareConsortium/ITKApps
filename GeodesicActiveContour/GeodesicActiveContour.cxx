@@ -176,6 +176,12 @@ GeodesicActiveContour
   {
     GeodesicActiveContourBase::LoadInputImage( filename );
   }
+  catch( itk::ExceptionObject & excp ) 
+  {
+    fl_alert( excp.GetDescription() );
+    controlsGroup->deactivate();
+    return;
+  }
   catch( ... ) 
   {
     this->ShowStatus("Problems reading file format");

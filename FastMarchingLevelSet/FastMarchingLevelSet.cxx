@@ -169,7 +169,13 @@ FastMarchingLevelSet
   
   try 
   {
-    FastMarchingLevelSetBase::LoadInputImage( filename );
+    this->FastMarchingLevelSetBase::LoadInputImage( filename );
+  }
+  catch( itk::ExceptionObject & excp ) 
+  {
+    fl_alert( excp.GetDescription() );
+    controlsGroup->deactivate();
+    return;
   }
   catch( ... ) 
   {

@@ -123,8 +123,10 @@ GeodesicActiveContourBase
     if( size[i] < 10 )
       {
       this->ShowStatus("Image must be 3D and with at least 10 pixels along each Dimension.");
+      itk::ExceptionObject excp;
+      excp.SetDescription("Image must be 3D and with at least 10 pixels along each Dimension.");
+      throw excp;
       }
-      return;
     }
 
   m_SeedImage->SetRegions( region );
