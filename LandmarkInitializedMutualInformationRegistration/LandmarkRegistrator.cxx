@@ -192,8 +192,6 @@ LandmarkRegistrator
 ::CopyLandmarkSet( LandmarkSetType::Pointer source,
                    LandmarkSetType::Pointer dest ) const
   {
-  unsigned int size= source->GetNumberOfPoints();
-  
   dest->Initialize();
 
   dest->SetPoints( source->GetPoints() );

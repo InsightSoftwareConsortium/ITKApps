@@ -679,9 +679,9 @@ guiMainImplementation
                                 tkFixedImageViewer->GetLandmarkList());
   m_MovingLandmarkSpatialObject->SetPoints(
                                  tkMovingImageViewer->GetLandmarkList());
-  for(int i=0; i < m_FixedLandmarkSpatialObject->GetNumberOfPoints(); i++)
+  for(unsigned int i=0; i < m_FixedLandmarkSpatialObject->GetNumberOfPoints(); i++)
     {
-    for(int j=i+1; j < m_FixedLandmarkSpatialObject->GetNumberOfPoints(); j++)
+    for(unsigned int j=i+1; j < m_FixedLandmarkSpatialObject->GetNumberOfPoints(); j++)
       {
       dist = 0;
       for(int x=0; x<3; x++)
@@ -715,7 +715,7 @@ guiMainImplementation
 
   LandmarkPointType landmark;
   IndexType index[4];
-  for(int i=0; i < m_MovingLandmarkSpatialObject->GetNumberOfPoints(); i++)
+  for(unsigned int i=0; i < m_MovingLandmarkSpatialObject->GetNumberOfPoints(); i++)
     {
     tkMovingImageViewer->GetLandmark(i, landmark);
     m_MovingImage->TransformPhysicalPointToIndex(landmark.GetPosition(),
@@ -734,7 +734,7 @@ guiMainImplementation
                                 "Save moving image...", "*.mh?", "", 0 );
 
   PointType point;
-  for(int i=0; i < m_MovingLandmarkSpatialObject->GetNumberOfPoints(); i++)
+  for(unsigned int i=0; i < m_MovingLandmarkSpatialObject->GetNumberOfPoints(); i++)
     {
     tkMovingImageViewer->GetLandmark(i, landmark);
     m_MovingImage->TransformIndexToPhysicalPoint( index[i], point );

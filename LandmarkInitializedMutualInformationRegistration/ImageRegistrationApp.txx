@@ -404,11 +404,11 @@ ImageRegistrationApp< TImage >
   typedef itk::LinearInterpolateImageFunction<ImageType, double>
           InterpolatorType;
 
-  InterpolatorType::Pointer interpolator = 
+  typename InterpolatorType::Pointer interpolator = 
     InterpolatorType::New();
   interpolator->SetInputImage(input);
   
-  ResampleImageFilterType::Pointer resample = 
+  typename ResampleImageFilterType::Pointer resample = 
     ResampleImageFilterType::New();
   resample->SetInput(input);
   resample->SetInterpolator(interpolator.GetPointer());
