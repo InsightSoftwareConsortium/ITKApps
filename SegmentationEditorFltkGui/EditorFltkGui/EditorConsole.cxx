@@ -344,7 +344,7 @@ void EditorConsole::SetMergeResolution(double mag) {
   
 }
 
-double EditorConsole::round(double min, double max, double step, double val) {
+double EditorConsole::round(double min, double, double step, double val) {
   int x = 0; 
 
   while( (min + (x*step)) < val) {
