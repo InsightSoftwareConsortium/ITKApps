@@ -8,7 +8,7 @@ class guiMain {open
   } {
     Fl_Window tkWindow {
       label {Landmarkd Initialized Mutual Information 3D Registration Tool } open
-      xywh {223 422 1060 705} type Single box PLASTIC_UP_BOX color 159 resizable visible
+      xywh {223 422 1060 705} box PLASTIC_UP_BOX color 159 resizable visible
     } {
       Fl_Group tkMainGroup {open
         xywh {0 30 1050 710} resizable
@@ -151,7 +151,7 @@ Register();}
             }
           }
           Fl_Group tkMovingImageLandmarkGroup {open
-            xywh {10 400 130 195} deactivate
+            xywh {10 400 130 225} deactivate
           } {
             Fl_Button tkMovingImageLandmarksClearButton {
               label {clear landmarks}
@@ -211,7 +211,12 @@ Register();}
             Fl_Button {} {
               label {Region of interest...}
               callback {ShowRegionOfInterestWindow() ;}
-              xywh {10 568 130 17} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 248 labelsize 9
+              xywh {10 608 130 17} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 71 labelsize 9
+            }
+            Fl_Button tkMovingImageLandmarksUpdateSpacingButton {
+              label {Update spacing...}
+              callback {UpdateMovingImageSpacing();}
+              tooltip {Use landmarks to determine isotropic voxel spacing} xywh {10 560 130 15} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 labelsize 9
             }
           }
           Fl_Box tkMovingImageViewer {
@@ -563,7 +568,7 @@ tkMovingImageViewer->DrawRegionOfInterest() ;}
           }
         }
         Fl_Group {} {
-          label Affine selected
+          label Affine
           xywh {15 40 375 430}
         } {
           Fl_Value_Input tkAffineNumberOfIterations {
@@ -675,5 +680,7 @@ tkMovingImageViewer->DrawRegionOfInterest() ;}
   Function {UpdateMovingSliceNumber()} {open return_type {virtual void}
   } {}
   Function {UpdateFixedSliceNumber()} {open return_type {virtual void}
+  } {}
+  Function {UpdateMovingImageSpacing(  )} {open selected return_type {virtual void}
   } {}
 } 

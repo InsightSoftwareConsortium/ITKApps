@@ -2,9 +2,7 @@
 #define _itkLeastSquaredDistanceCostFunction__h
 
 #include <itkSingleValuedCostFunction.h>
-#include <itkPoint.h>
-#include <itkArray.h>
-#include <itkVectorContainer.h>
+#include <itkLandmarkSpatialObject.h>
 #include <itkVersorRigid3DTransform.h>
 
 namespace itk
@@ -28,12 +26,14 @@ namespace itk
     typedef SmartPointer<Self>                    Pointer;
     typedef SmartPointer< const Self >            ConstPointer;
 
-    typedef itk::Point<double,3>                  PointType;
-    typedef itk::VectorContainer<int,PointType >  PointSetType;
+    typedef itk::LandmarkSpatialObject<3>         PointSetType;
+    typedef PointSetType::SpatialObjectPointType  PointType;
     typedef PointSetType::Pointer                 PointSetPointer;
 
     typedef TTransform                            TransformType;
     typedef typename TransformType::Pointer       TransformPointer;
+    typedef typename TransformType::InputPointType
+                                                  TransformCenterPointType;
 
     typedef double                                MeasureType;
 
@@ -44,6 +44,8 @@ namespace itk
     void SetFixedPointSet( PointSetPointer fixedPointSet );
 
     void SetMovingPointSet( PointSetPointer movingPointSet );
+
+    void SetCenter(const TransformCenterPointType & pnt );
 
     double GetValue( const ParametersType &parameters ) const;
 

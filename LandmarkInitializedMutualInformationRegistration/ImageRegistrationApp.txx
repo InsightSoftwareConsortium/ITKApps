@@ -3,6 +3,15 @@
 
 #include "ImageRegistrationApp.h"
 
+#include "itkImageRegistrationMethod.h"
+#include "itkVersorRigid3DTransform.h"
+#include "itkMutualInformationImageToImageMetric.h"
+#include "itkOnePlusOneEvolutionaryOptimizer.h"
+#include "itkGradientDescentOptimizer.h"
+#include "itkLinearInterpolateImageFunction.h"
+#include "itkResampleImageFilter.h"
+
+
 template< class TImage >
 ImageRegistrationApp< TImage >
 ::ImageRegistrationApp()
@@ -146,7 +155,7 @@ ImageRegistrationApp< TImage >
 
   registrator->SetMovingImage(m_FixedImage) ;   // ITK transforms the fixed 
   registrator->SetFixedImage( m_MovingImage ) ; //   image into the moving image
-  registrator->SetFixedImageRegion( m_FixedImageRegion ) ;
+  registrator->SetFixedImageRegion( m_MovingImageRegion ) ;
   registrator->SetOptimizerScales( m_RigidScales );
   registrator->SetOptimizerNumberOfIterations(m_RigidNumberOfIterations);
 
@@ -179,12 +188,12 @@ ImageRegistrationApp< TImage >
     RigidParametersType params;
     params.set_size(6);
     params.Fill(0);
-    params[3] = fixedCenterPoint[0] - movingCenterPoint[0];
-    params[4] = fixedCenterPoint[1] - movingCenterPoint[1];
-    params[5] = fixedCenterPoint[2] - movingCenterPoint[2];
+    params[3] = movingCenterPoint[0] - fixedCenterPoint[0];  // fixed/moving
+    params[4] = movingCenterPoint[1] - fixedCenterPoint[1];  //   swapped
+    params[5] = movingCenterPoint[2] - fixedCenterPoint[2];
     registrator->SetInitialTransformParameters ( params );
     registrator->GetTypedTransform()
-               ->SetCenter(movingCenterPoint);
+               ->SetCenter(fixedCenterPoint); // actually moving
     }
 
   std::cout << "DEBUG: rigid registration INITIAL centered versor transform: "
@@ -229,7 +238,7 @@ ImageRegistrationApp< TImage >
 
   registrator->SetMovingImage(m_FixedImage) ; // ITK transforms the fixed image
   registrator->SetFixedImage( m_MovingImage ) ;  // into the moving
-  registrator->SetFixedImageRegion( m_FixedImageRegion ) ;
+  registrator->SetFixedImageRegion( m_MovingImageRegion ) ;
   registrator->SetOptimizerScales( m_AffineScales );
   registrator->SetOptimizerNumberOfIterations(m_AffineNumberOfIterations);
 
@@ -314,10 +323,48 @@ ImageRegistrationApp< TImage >
   m_AffineAffineTransform->SetOffset(m_AffineRegTransform->GetOffset());
   m_FinalTransform = m_AffineAffineTransform;
 
-  std::cout << "DEBUG: Affine registration FINAL centered affine transform: " << std::endl
+  std::cout << "DEBUG: Affine registration FINAL centered affine transform: " 
+            << std::endl
             << m_AffineRegTransform->GetParameters() << std::endl ;
-  std::cout << "DEBUG: Affine registration FINAL affine transform: "  << std::endl
+  std::cout << "DEBUG: Affine registration FINAL affine transform: "  
+            << std::endl
             << m_FinalTransform->GetParameters() << std::endl  << std::endl;
+  }
+
+template< class TImage >
+typename ImageRegistrationApp< TImage >::ImageType::Pointer
+ImageRegistrationApp< TImage >
+::GetLandmarkRegisteredMovingImage()
+  {
+  return m_ResampleUsingTransform(this->GetLandmarkAffineTransform(),
+                                  m_MovingImage, m_FixedImage);
+  }
+
+template< class TImage >
+typename ImageRegistrationApp< TImage >::ImageType::Pointer
+ImageRegistrationApp< TImage >
+::GetRigidRegisteredMovingImage()
+  {
+  return m_ResampleUsingTransform(this->GetRigidAffineTransform(),
+                                  m_MovingImage, m_FixedImage);
+  }
+
+template< class TImage >
+typename ImageRegistrationApp< TImage >::ImageType::Pointer
+ImageRegistrationApp< TImage >
+::GetAffineRegisteredMovingImage()
+  {
+  return m_ResampleUsingTransform(this->GetAffineAffineTransform(),
+                                  m_MovingImage, m_FixedImage);
+  }
+
+template< class TImage >
+typename ImageRegistrationApp< TImage >::ImageType::Pointer
+ImageRegistrationApp< TImage >
+::GetFinalRegisteredMovingImage()
+  {
+  return m_ResampleUsingTransform(this->GetFinalTransform(),
+                                  m_MovingImage, m_FixedImage);
   }
 
 template< class TImage >
@@ -344,6 +391,34 @@ ImageRegistrationApp< TImage >
   std::cout << e << std::endl;
   std::cout << "-------------------------------------------------" 
             << std::endl;
+  }
+
+template< class TImage >
+typename ImageRegistrationApp< TImage >::ImageType::Pointer
+ImageRegistrationApp< TImage >
+::m_ResampleUsingTransform(AffineTransformType * transform,
+                           ImageType * input, ImageType * output)
+  {
+  typedef itk::ResampleImageFilter<ImageType, ImageType>
+          ResampleImageFilterType;
+  typedef itk::LinearInterpolateImageFunction<ImageType, double>
+          InterpolatorType;
+
+  InterpolatorType::Pointer interpolator = 
+    InterpolatorType::New();
+  interpolator->SetInputImage(input);
+  
+  ResampleImageFilterType::Pointer resample = 
+    ResampleImageFilterType::New();
+  resample->SetInput(input);
+  resample->SetInterpolator(interpolator.GetPointer());
+  resample->SetSize(output->GetLargestPossibleRegion().GetSize());
+  resample->SetOutputOrigin(output->GetOrigin());
+  resample->SetOutputSpacing(output->GetSpacing());
+  resample->SetTransform(transform->Inverse());
+  resample->Update();
+  
+  return resample->GetOutput();
   }
 
 #endif //__ImageRegistrationApp_txx

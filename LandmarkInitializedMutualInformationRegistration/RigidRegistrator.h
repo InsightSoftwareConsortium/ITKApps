@@ -68,11 +68,6 @@ class RigidRegistrator : public ImageRegistrationMethod < TImage, TImage >
     itkSetMacro(MetricNumberOfSpatialSamples, unsigned int) ;
     itkGetConstMacro(MetricNumberOfSpatialSamples, unsigned int) ;
 
-    void SetMovingImageRegion(RegionType & region);
-    itkGetConstReferenceMacro(MovingImageRegion, RegionType);
-    itkGetMacro(MovingImageRegionDefined, bool);
-    itkSetMacro(MovingImageRegionDefined, bool);
-
   protected:
     RigidRegistrator() ;
     virtual ~RigidRegistrator() ;
@@ -89,8 +84,6 @@ class RigidRegistrator : public ImageRegistrationMethod < TImage, TImage >
 
     unsigned int  m_MetricNumberOfSpatialSamples;
 
-    bool          m_MovingImageRegionDefined;
-    RegionType    m_MovingImageRegion;
   } ; // end of class
 
 

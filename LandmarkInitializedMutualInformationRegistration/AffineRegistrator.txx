@@ -39,8 +39,6 @@ AffineRegistrator< TImage >
   
   this->SetMetric(MetricType::New());
   m_MetricNumberOfSpatialSamples = 40000 ;
-
-  m_MovingImageRegionDefined = false;
   }
 
 template< class TImage >
@@ -49,15 +47,6 @@ AffineRegistrator< TImage >
   {
   }
 
-template< class TImage >
-void
-AffineRegistrator< TImage >
-::SetMovingImageRegion(RegionType & region)
-  {
-  m_MovingImageRegionDefined = true;
-  m_MovimgImageRegion = region;
-  }
-  
 template< class TImage >
 void
 AffineRegistrator< TImage >

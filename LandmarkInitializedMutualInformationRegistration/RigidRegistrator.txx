@@ -29,23 +29,12 @@ RigidRegistrator< TImage >
 
   this->SetMetric(MetricType::New());
   m_MetricNumberOfSpatialSamples = 20000 ;
-
-  m_MovingImageRegionDefined = false;
   }
 
 template< class TImage >
 RigidRegistrator< TImage >
 ::~RigidRegistrator()
   {
-  }
-
-template< class TImage >
-void
-RigidRegistrator< TImage >
-::SetMovingImageRegion(RegionType & region)
-  {
-  m_MovingImageRegionDefined = true;
-  m_MovingImageRegion = region;
   }
 
 template< class TImage >

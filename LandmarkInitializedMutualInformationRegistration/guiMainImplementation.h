@@ -14,8 +14,6 @@
 // ITK related includes....
 #include <itkAffineTransform.h>
 #include <itkExceptionObject.h>
-#include <itkResampleImageFilter.h>
-#include <itkImageRegionIterator.h>
 #include <itkImageIOFactory.h>
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
@@ -26,161 +24,153 @@
 #include "ImageRegistrationApp.h"
 
 class guiMainImplementation : public guiMain
-{
-public:
-  typedef short                         ImagePixelType;
-  typedef itk::Image<ImagePixelType,3>  ImageType;
-  typedef ImageType::Pointer            ImagePointer ;
+  {
+  public:
+    typedef short                         ImagePixelType;
+    typedef itk::Image<ImagePixelType,3>  ImageType;
+    typedef ImageType::Pointer            ImagePointer ;
 
-  typedef ImageType::RegionType         RegionType;
-  typedef ImageType::IndexType          IndexType;
-  typedef RegionType::SizeType          SizeType;
-  typedef itk::Point<double,3>          PointType;
+    typedef ImageType::RegionType         RegionType;
+    typedef ImageType::IndexType          IndexType;
+    typedef RegionType::SizeType          SizeType;
+    typedef itk::Point<double,3>          PointType;
 
-  typedef itk::ImageFileReader<ImageType>     ImageReaderType;
-  typedef itk::ImageFileWriter<ImageType>     ImageWriterType;
+    typedef itk::ImageFileReader<ImageType>     ImageReaderType;
+    typedef itk::ImageFileWriter<ImageType>     ImageWriterType;
 
-  typedef LandmarkSliceViewer<ImagePixelType> SliceViewType;
-  typedef SliceViewType::LandmarkSpatialObjectType 
-                                              LandmarkSpatialObjectType ;
-  typedef SliceViewType::LandmarkPointType        
-                                              LandmarkPointType ;
-  typedef SliceViewType::LandmarkPointListType    
-                                              LandmarkPointListType ;
+    typedef LandmarkSliceViewer<ImagePixelType> SliceViewType;
+    typedef SliceViewType::LandmarkSpatialObjectType 
+                                                LandmarkSpatialObjectType ;
+    typedef SliceViewType::LandmarkPointType        
+                                                LandmarkPointType ;
+    typedef SliceViewType::LandmarkPointListType    
+                                                LandmarkPointListType ;
 
-  typedef SliceViewType::OverlayImageType       OverlayImageType ;
-  typedef SliceViewType::OverlayPixelType       OverlayPixelType ;
-  typedef itk::GLTwoImageSliceView<ImagePixelType,OverlayPixelType> 
-                                                TwoImageSliceViewType;
+    typedef SliceViewType::OverlayImageType       OverlayImageType ;
+    typedef SliceViewType::OverlayPixelType       OverlayPixelType ;
+    typedef itk::GLTwoImageSliceView<ImagePixelType,OverlayPixelType> 
+                                                  TwoImageSliceViewType;
 
-  typedef itk::ResampleImageFilter<ImageType,ImageType> 
-                                              ResampleImageFilterType;
-  typedef itk::ResampleImageFilter<OverlayImageType,OverlayImageType> 
-                                              ResampleOverlayImageFilterType;
+    typedef itk::ImageRegistrationApp< ImageType >   ImageRegistrationAppType ;
 
-  typedef itk::ImageRegionIterator<ImageType> ImageRegionIteratorType;
-  
-  typedef itk::ImageRegistrationApp< ImageType >   ImageRegistrationAppType ;
-
-  typedef itk::AffineTransform<double, 3>     AffineTransformType ;
-  typedef itk::LinearInterpolateImageFunction< ImageType, double > 
-                                              InterpolatorType ;
-  
-  guiMainImplementation();
-  virtual ~guiMainImplementation();
-
-  ////////////////////////////////////
-  // Initializations & Terminations
-  ////////////////////////////////////
-  void Quit();
-
-  /////////////////////////////////////////////////
-  // Image File IO functions
-  /////////////////////////////////////////////////
-  void SelectFixedImage() ;
-  void SelectMovingImage() ;
-  void HandleInputImageChange(std::string & fileName, bool isFixedImage) ;
-  ImagePointer LoadImage( const char * filename );
-  void SaveLandmarkRegisteredImage();
-  void SaveFinalRegisteredImage();
-
-  /////////////////////////////////////////////////
-  // Image view functions
-  /////////////////////////////////////////////////
-  void Show();
-  void SetViewAxis(unsigned int axis) ;
-  void SelectImageSet(unsigned int i) ;
-  void UpdateSliceNumber();
-  void UpdateFixedSliceNumber();
-  void UpdateMovingSliceNumber();
-
-  /////////////////////////////////////////////////
-  // Application status functions
-  /////////////////////////////////////////////////
-  void ChangeStatusDisplay(const char* message) ;
-
-  /////////////////////////////////////////////////
-  // Landmark related functions
-  /////////////////////////////////////////////////
-  void JumpToLandmark(bool moving,unsigned int index );
-  void LoadLandmarks( bool moving );
-  void SaveLandmarks( bool moving );
-  void UpdateLandmark( Fl_Group* parent, unsigned int index );
+    typedef itk::AffineTransform<double, 3>     AffineTransformType ;
+    typedef itk::LinearInterpolateImageFunction< ImageType, double > 
+                                                InterpolatorType ;
     
-  void ClearLandmarks(Fl_Group* parent);
-  void TransformLandmarks(LandmarkPointListType * source,
-                          LandmarkPointListType * target,
-                          AffineTransformType * transform) ;
+    guiMainImplementation();
+    virtual ~guiMainImplementation();
 
+    ////////////////////////////////////
+    // Initializations & Terminations
+    ////////////////////////////////////
+    void Quit();
 
-  /////////////////////////////////////////////////
-  // Region of interest related functions
-  /////////////////////////////////////////////////
-  void ShowRegionOfInterestWindow() ;
-  void ApplyRegionOfInterest() ;
-  void CancelRegionOfInterest() ;
-  void MoveRegionOfInterest(unsigned int direction) ;
-  void ResizeRegionOfInterest(unsigned int direction) ;
+    /////////////////////////////////////////////////
+    // Image File IO functions
+    /////////////////////////////////////////////////
+    void SelectFixedImage() ;
+    void SelectMovingImage() ;
+    void HandleInputImageChange(std::string & fileName, bool isFixedImage) ;
+    ImagePointer LoadImage( const char * filename );
+    void SaveLandmarkRegisteredImage();
+    void SaveFinalRegisteredImage();
 
-  /////////////////////////////////////////////////
-  // Advanced option related functions
-  /////////////////////////////////////////////////
-  void ShowAdvancedOptions();
-  void ApplyAdvancedOptions();
-  void SaveOptions() ;
-  void LoadOptions() ;
+    /////////////////////////////////////////////////
+    // Image view functions
+    /////////////////////////////////////////////////
+    void Show();
+    void SetViewAxis(unsigned int axis) ;
+    void SelectImageSet(unsigned int i) ;
+    void UpdateSliceNumber();
+    void UpdateFixedSliceNumber();
+    void UpdateMovingSliceNumber();
 
-  /////////////////////////////////////////////////
-  // Registartion related functions
-  /////////////////////////////////////////////////
-  void SaveTransform() ;
-  ImagePointer ResampleUsingTransform(AffineTransformType * finalTransform, 
-                                      ImageType* input, ImageType* output) ;
-  void Register();
+    /////////////////////////////////////////////////
+    // Application status functions
+    /////////////////////////////////////////////////
+    void ChangeStatusDisplay(const char* message) ;
 
-  /////////////////////////////////////////////////
-  // Help related functions
-  /////////////////////////////////////////////////
-  void ShowHelp( const char * file );
+    /////////////////////////////////////////////////
+    // Landmark related functions
+    /////////////////////////////////////////////////
+    void JumpToLandmark(bool moving,unsigned int index );
+    void LoadLandmarks( bool moving );
+    void SaveLandmarks( bool moving );
+    void UpdateLandmark( Fl_Group* parent, unsigned int index );
+      
+    void ClearLandmarks(Fl_Group* parent);
+    void TransformLandmarks(LandmarkPointListType * source,
+                            LandmarkPointListType * target,
+                            AffineTransformType * transform) ;
+    void UpdateMovingImageSpacing();
 
-private:
-  ImageRegistrationAppType::Pointer m_ImageRegistrationApp ;
-  unsigned int m_ViewAxis ;
-  SizeType m_FixedImageSize ;
-  SizeType m_MovingImageSize ;
+    /////////////////////////////////////////////////
+    // Region of interest related functions
+    /////////////////////////////////////////////////
+    void ShowRegionOfInterestWindow() ;
+    void ApplyRegionOfInterest() ;
+    void CancelRegionOfInterest() ;
+    void MoveRegionOfInterest(unsigned int direction) ;
+    void ResizeRegionOfInterest(unsigned int direction) ;
 
-  std::string m_FixedImageFileName ;
-  std::string m_MovingImageFileName ;
+    /////////////////////////////////////////////////
+    // Advanced option related functions
+    /////////////////////////////////////////////////
+    void ShowAdvancedOptions();
+    void ApplyAdvancedOptions();
+    void SaveOptions() ;
+    void LoadOptions() ;
 
-  LandmarkSpatialObjectType::Pointer 
-                             m_FixedLandmarkSpatialObject ;
-  LandmarkSpatialObjectType::Pointer 
-                             m_MovingLandmarkSpatialObject ;
-  LandmarkSpatialObjectType::Pointer 
-                             m_LandmarkRegisteredMovingLandmarkSpatialObject ;
-  LandmarkSpatialObjectType::Pointer 
-                             m_RegisteredMovingLandmarkSpatialObject ;
+    /////////////////////////////////////////////////
+    // Registartion related functions
+    /////////////////////////////////////////////////
+    void SaveTransform() ;
 
-  ImageType::Pointer m_FixedImage ;
-  ImageType::Pointer m_MovingImage ;
-  ImageType::Pointer m_LandmarkRegisteredMovingImage ;
-  ImageType::Pointer m_RegisteredMovingImage ;
+    void Register();
 
-  std::string m_LastLoadedImagePath;
-  bool m_FixedImageLoaded;
-  bool m_MovingImageLoaded;
+    /////////////////////////////////////////////////
+    // Help related functions
+    /////////////////////////////////////////////////
+    void ShowHelp( const char * file );
 
-  bool m_RigidUseLargestRegion ;
-  bool m_RigidUseUserRegion ;
-  bool m_RigidUseLandmarkRegion ;
-  double m_RigidRegionScale ;
+  private:
+    ImageRegistrationAppType::Pointer m_ImageRegistrationApp ;
+    unsigned int m_ViewAxis ;
+    SizeType m_FixedImageSize ;
+    SizeType m_MovingImageSize ;
 
-  bool m_AffineUseLargestRegion ;
-  bool m_AffineUseUserRegion ;
-  bool m_AffineUseLandmarkRegion ;
-  double m_AffineRegionScale ;
+    std::string m_FixedImageFileName ;
+    std::string m_MovingImageFileName ;
 
-};
+    LandmarkSpatialObjectType::Pointer 
+                              m_FixedLandmarkSpatialObject ;
+    LandmarkSpatialObjectType::Pointer 
+                              m_MovingLandmarkSpatialObject ;
+    LandmarkSpatialObjectType::Pointer 
+                              m_LandmarkRegisteredMovingLandmarkSpatialObject ;
+    LandmarkSpatialObjectType::Pointer 
+                              m_RegisteredMovingLandmarkSpatialObject ;
+
+    ImageType::Pointer m_FixedImage ;
+    ImageType::Pointer m_MovingImage ;
+    ImageType::Pointer m_LandmarkRegisteredMovingImage ;
+    ImageType::Pointer m_RegisteredMovingImage ;
+
+    std::string m_LastLoadedImagePath;
+    bool m_FixedImageLoaded;
+    bool m_MovingImageLoaded;
+
+    bool m_RigidUseLargestRegion ;
+    bool m_RigidUseUserRegion ;
+    bool m_RigidUseLandmarkRegion ;
+    double m_RigidRegionScale ;
+
+    bool m_AffineUseLargestRegion ;
+    bool m_AffineUseUserRegion ;
+    bool m_AffineUseLandmarkRegion ;
+    double m_AffineRegionScale ;
+
+  };
 
 #endif //__guiMainImplementation_h
 

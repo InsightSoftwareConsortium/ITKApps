@@ -1,5 +1,9 @@
 #include "LandmarkRegistrator.h"
 
+#include "vnl/vnl_vector.h"
+#include "vnl/vnl_c_vector.h"
+#include "vnl/algo/vnl_symmetric_eigensystem.h"
+
 namespace itk
 {
 
@@ -37,7 +41,8 @@ LandmarkRegistrator
   { 
   m_Generator->Initialize(1289);
 
-  if( m_FixedLandmarkSet->Size() != m_MovingLandmarkSet->Size() )
+  if( m_FixedLandmarkSet->GetNumberOfPoints() 
+      != m_MovingLandmarkSet->GetNumberOfPoints() )
     {
     itk::ExceptionObject e("LandmarkRegistrator.txx",77);
     e.SetLocation("LandmarkRegistrator::Register()");
@@ -49,22 +54,87 @@ LandmarkRegistrator
   fixedCenter.Fill(0);
   itk::Point<double, 3> movingCenter;
   movingCenter.Fill(0);
-  for( unsigned int i=0; i<m_MovingLandmarkSet->Size(); i++)
+  for( unsigned int i=0; i<m_MovingLandmarkSet->GetNumberOfPoints(); i++)
     {
     for( unsigned int j=0; j<3; j++)
       {
-      fixedCenter[j] += m_FixedLandmarkSet->ElementAt(i)[j];
-      movingCenter[j] += m_MovingLandmarkSet->ElementAt(i)[j];
+      fixedCenter[j] += m_FixedLandmarkSet->GetPoint(i)->GetPosition()[j];
+      movingCenter[j] += m_MovingLandmarkSet->GetPoint(i)->GetPosition()[j];
       }
     }
   for( unsigned int j=0; j<3; j++)
     {
-    fixedCenter[j] /= m_FixedLandmarkSet->Size();
-    movingCenter[j] /= m_MovingLandmarkSet->Size();
+    fixedCenter[j] /= m_FixedLandmarkSet->GetNumberOfPoints();
+    movingCenter[j] /= m_MovingLandmarkSet->GetNumberOfPoints();
     }
   m_InitialTransformParameters[3] = fixedCenter[0]-movingCenter[0];
   m_InitialTransformParameters[4] = fixedCenter[1]-movingCenter[1];
   m_InitialTransformParameters[5] = fixedCenter[2]-movingCenter[2];
+
+  vnl_vector<double> v1(3);
+  vnl_vector<double> v2(3);
+  vnl_vector<double> vTemp(3);
+  vnl_matrix<double> m(3,3);
+  vnl_matrix<double> mTemp(3,3);
+  m.set_identity();
+
+  itk::Vector<double> vct;
+  itk::Versor<double> vsr;
+  itk::Versor<double> vsrTemp;
+  itk::Matrix<double, 3, 3> mat;
+
+  mat = m;
+  vsr.Set(mat);
+  double weight = 0.5;
+  for( int count = 0; count < 5; count++)
+    {
+    for( unsigned int i=0; i<m_MovingLandmarkSet->GetNumberOfPoints(); i++)
+      {
+      v1 = (m_MovingLandmarkSet->GetPoint(i)->GetPosition().Get_vnl_vector()
+            - movingCenter.Get_vnl_vector());
+      v1.normalize();
+      
+      v2 = (m_FixedLandmarkSet->GetPoint(i)->GetPosition().Get_vnl_vector()
+            - fixedCenter.Get_vnl_vector());
+      v2.normalize();
+      
+      vTemp = m * v1;
+      vTemp.normalize();
+      mat = outer_product(v2, vTemp);
+      vsrTemp.Set(mat);
+
+      vct[0] = vsr.GetX() + weight *  vsrTemp.GetX();
+      vct[1] = vsr.GetY() + weight * vsrTemp.GetY();
+      vct[2] = vsr.GetZ() + weight * vsrTemp.GetZ();
+      vsr.Set(vct);
+
+      m = vsr.GetMatrix().GetVnlMatrix();
+      }
+    weight *= 0.75;
+    }
+
+  std::cout << "Landmark quality :" << std::endl;
+  for( unsigned int i=0; i<m_MovingLandmarkSet->GetNumberOfPoints(); i++)
+    {
+    v1 = (m_MovingLandmarkSet->GetPoint(i)->GetPosition().Get_vnl_vector()
+          - movingCenter.Get_vnl_vector());
+    v1.normalize();
+    
+    v2 = (m_FixedLandmarkSet->GetPoint(i)->GetPosition().Get_vnl_vector()
+          - fixedCenter.Get_vnl_vector());
+    v2.normalize();
+
+    vTemp = vsr.Transform(v1);
+    vTemp.normalize();
+    std::cout << "Landmark " << i << " : fit as T(m)*f = "
+              << dot_product(vTemp, v2) << std::endl;
+    }
+
+
+  m_InitialTransformParameters[0] = vsr.GetRight()[0];
+  m_InitialTransformParameters[1] = vsr.GetRight()[1];
+  m_InitialTransformParameters[2] = vsr.GetRight()[2];
+
 
   std::cout << "LandmarkRegistrator: InitialParameters = " << std::endl
             << m_InitialTransformParameters << std::endl;
@@ -72,6 +142,7 @@ LandmarkRegistrator
     {
     m_Metric->SetFixedPointSet(m_FixedLandmarkSet);
     m_Metric->SetMovingPointSet(m_MovingLandmarkSet);
+    m_Metric->SetCenter(movingCenter);
 
     m_Optimizer->SetInitialPosition(m_InitialTransformParameters);
     m_Optimizer->SetScales(m_OptimizerScales);
@@ -121,15 +192,11 @@ LandmarkRegistrator
 ::CopyLandmarkSet( LandmarkSetType::Pointer source,
                    LandmarkSetType::Pointer dest ) const
   {
-  unsigned int i;
-  unsigned int size= source->Size();
+  unsigned int size= source->GetNumberOfPoints();
   
   dest->Initialize();
 
-  for( i=0; i<size; i++ )
-    {
-    dest->InsertElement(i,source->GetElement(i));
-    }
+  dest->SetPoints( source->GetPoints() );
   }
 
 } // end namespace itk

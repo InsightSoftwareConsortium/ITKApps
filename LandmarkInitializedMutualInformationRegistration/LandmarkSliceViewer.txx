@@ -337,13 +337,9 @@ LandmarkSliceViewer<TImagePixel>
     }
   else
     {
-    std::cout << "Color = " << landmark.GetColor().GetRed() << ", "
-                            << landmark.GetColor().GetGreen() << ", "
-                            << landmark.GetColor().GetBlue() << std::endl;
     color = cColorTable->GetClosestColorTableId(landmark.GetColor().GetRed(),
-                                              landmark.GetColor().GetGreen(),
-                                              landmark.GetColor().GetBlue()) + 1;
-    std::cout << "   Closest ColorID = " << color-1 << std::endl;
+                                            landmark.GetColor().GetGreen(),
+                                            landmark.GetColor().GetBlue()) + 1;
     }
 
   for( int i=-5; i<6; i++ )
