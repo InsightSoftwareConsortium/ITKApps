@@ -60,7 +60,7 @@ void
 FEMValidationInputParser<TImage,TLabelImage>
 ::ReadImage(
 const char * patientID,
-signed long startSlice,
+signed long itkNotUsed(startSlice),
 unsigned long numberOfSlices,
 ImagePointer& image )
 {
