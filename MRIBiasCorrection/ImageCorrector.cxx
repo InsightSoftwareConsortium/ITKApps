@@ -143,10 +143,10 @@ void correctBias(ImagePointer input, MaskPointer mask,
           else
             {
               oIter.Set( (Pixel) diff) ;
-              ++oIter ;
-              ++bIter ;
-              ++iIter ;
             }
+          ++oIter ;
+          ++bIter ;
+          ++iIter ;
         }
     }
 
