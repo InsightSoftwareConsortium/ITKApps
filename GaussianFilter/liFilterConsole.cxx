@@ -18,6 +18,7 @@
 
 #include <liFilterConsole.h>
 #include <FL/fl_file_chooser.H>
+#include "itkExceptionObject.h"
  
 
 
@@ -496,7 +497,7 @@ liFilterConsole
     {
     liFilterConsoleBase::Execute();
     }
-  catch( ProcessAborted  & except )
+  catch( itk::ProcessAborted  & except )
     {
     this->ShowStatus("Process cancelled by the User !");
     return;
