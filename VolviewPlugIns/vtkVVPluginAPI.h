@@ -185,7 +185,7 @@ gets passed into the ProcessData function.
     int InputVolumeDimensions[3];
     float InputVolumeSpacing[3];
     float InputVolumeOrigin[3];
-    double InputVolumeScalarRange[2]; /* actual scalar range */
+    double InputVolumeScalarRange[8]; /* actual scalar range */
     double InputVolumeScalarTypeRange[2]; /* possible scalar range */
 
     /* if there is a second input here are its characteristics */
@@ -195,7 +195,7 @@ gets passed into the ProcessData function.
     int InputVolume2Dimensions[3];
     float InputVolume2Spacing[3];
     float InputVolume2Origin[3];
-    double InputVolume2ScalarRange[2]; /* actual scalar range */
+    double InputVolume2ScalarRange[8]; /* actual scalar range */
     double InputVolume2ScalarTypeRange[2]; /* possible scalar range */
     
     int NumberOfMarkers;
@@ -293,6 +293,48 @@ gets passed into the ProcessData function.
       case VTK_UNSIGNED_CHAR: \
         { typedef unsigned char VTK_TT; \
         func(arg1, arg2, arg3); } \
+        break
+
+#define vtkTemplateMacro4(func, arg1, arg2, arg3, arg4) \
+      case VTK_DOUBLE: \
+        { typedef double VTK_TT; \
+        func(arg1, arg2, arg3, arg4); } \
+        break; \
+      case VTK_FLOAT: \
+        { typedef float VTK_TT; \
+        func(arg1, arg2, arg3, arg4); } \
+        break; \
+      case VTK_LONG: \
+        { typedef long VTK_TT; \
+        func(arg1, arg2, arg3, arg4); } \
+        break; \
+      case VTK_UNSIGNED_LONG: \
+        { typedef unsigned long VTK_TT; \
+        func(arg1, arg2, arg3, arg4); } \
+        break; \
+      case VTK_INT: \
+        { typedef int VTK_TT; \
+        func(arg1, arg2, arg3, arg4); } \
+        break; \
+      case VTK_UNSIGNED_INT: \
+        { typedef unsigned int VTK_TT; \
+        func(arg1, arg2, arg3, arg4); } \
+        break; \
+      case VTK_SHORT: \
+        { typedef short VTK_TT; \
+        func(arg1, arg2, arg3, arg4); } \
+        break; \
+      case VTK_UNSIGNED_SHORT: \
+        { typedef unsigned short VTK_TT; \
+        func(arg1, arg2, arg3, arg4); } \
+        break; \
+      case VTK_CHAR: \
+        { typedef char VTK_TT; \
+        func(arg1, arg2, arg3, arg4); } \
+        break; \
+      case VTK_UNSIGNED_CHAR: \
+        { typedef unsigned char VTK_TT; \
+        func(arg1, arg2, arg3, arg4); } \
         break
 
 #endif
