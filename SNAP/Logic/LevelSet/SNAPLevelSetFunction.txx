@@ -18,6 +18,8 @@
 #include "itkImageRegionIterator.h"
 #include "itkNumericTraits.h"
 
+#include <map>
+
 template<class TImageType>
 SNAPLevelSetFunction<TImageType>
 ::SNAPLevelSetFunction()
