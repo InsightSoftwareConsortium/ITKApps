@@ -57,5 +57,9 @@ IF (VTK_WRAP_PYTHON)
                          vtkCommonPython)
 ENDIF (VTK_WRAP_PYTHON)
 
+IF(BORLAND)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w-8004")
+ENDIF(BORLAND)
+
 TARGET_LINK_LIBRARIES(vtkVTKITKCommon vtkImaging
                       ITKIO ITKNumerics ITKBasicFilters)
