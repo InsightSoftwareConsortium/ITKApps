@@ -74,6 +74,8 @@ public:
 
     // Set the Observer for updating progress in the GUI
     m_Filter->AddObserver( itk::ProgressEvent(), this->GetCommandObserver() );
+    m_Filter->AddObserver( itk::StartEvent(), this->GetCommandObserver() );
+    m_Filter->AddObserver( itk::EndEvent(), this->GetCommandObserver() );
 
 
     }
@@ -97,6 +99,8 @@ public:
   ProcessData( const vtkVVProcessDataStruct * pds )
   {
 
+    this->InitializeProgressValue();
+
     const unsigned int numberOfComponents = this->GetPluginInfo()->InputVolumeNumberOfComponents;
 
     for(unsigned int component=0; component < numberOfComponents; component++ )
@@ -110,6 +114,9 @@ public:
       // Execute the filter
       try
         {
+        this->SetCurrentFilterProgressWeight( 0.1 );
+        m_CastFilter->Update();
+        this->SetCurrentFilterProgressWeight( 0.9 );
         m_Filter->Update();
         }
       catch( itk::ProcessAborted &  )
@@ -129,6 +136,8 @@ public:
   virtual void 
   CopyOutputData( unsigned int component, const vtkVVProcessDataStruct * pds )
   {
+
+    this->SetUpdateMessage("Transferring results from plugin...");
 
     // Copy the data (with casting) to the output buffer provided by the PlugIn API
     typename OutputImageType::ConstPointer outputImage =
@@ -160,6 +169,8 @@ public:
   ImportPixelBuffer( unsigned int component, const vtkVVProcessDataStruct * pds )
   {
 
+    this->SetUpdateMessage("Transferring data to plugin...");
+    
     SizeType   size;
     IndexType  start;
 
