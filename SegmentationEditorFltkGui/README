@@ -1,0 +1,31 @@
+---------------------------
+|  Watershed Segmentation |
+---------------------------
+
+These applications use fltk and VTK.
+They work best if the source data is in the Meta Image format.
+
+Segmentation can be done in 3 steps:
+   1) First, smooth your data in a preprocessing step (see below).
+   2) Next, run the Watershed Segmentation application (see below).
+   3) Last, manipulate your segmented output to produce labeled volumes (see below).
+
+
+Preprocessor Step
+------------------
+Run the AnisotropicDiffusionFltkGui2D or AnisotropicDiffusionFltkGui3D depending
+on the dimension of your data.  
+
+
+
+Watershed Segmentation
+----------------------
+Run the WatershedSegmentationFltkGui.  This is for 3 dimensional data.
+
+
+
+Editor
+------
+Use the EditorFltkGui to manipulate the output from the watershed application
+to prodcue a labeled volume.  
+
