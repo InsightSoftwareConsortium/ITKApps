@@ -114,8 +114,6 @@ public:
       start[i]    =  0;
       }
 
-    std::cout << "Size = " << size << std::endl;
-
     RegionType region;
 
     region.SetIndex( start );
