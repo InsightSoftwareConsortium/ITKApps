@@ -19,4 +19,4 @@ FLTK_WRAP_UI(GeodesicActiveContour GeodesicActiveContourGUI.fl)
 ITK_DISABLE_FLTK_GENERATED_WARNINGS(GeodesicActiveContourGUI.fl)
   
 TARGET_LINK_LIBRARIES(GeodesicActiveContour ITKNumerics ITKBasicFilters
-                      ITKIO vtkHybrid vtkIO ITKFltkImageViewer ITKVtkFltk)
+                      ITKIO vtkHybrid vtkIO ITKVtkFltk ITKFltkImageViewer)
