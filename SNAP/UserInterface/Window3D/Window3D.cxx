@@ -917,7 +917,7 @@ Window3D
   // Open GL matrices
   double mvmatrix[16];
   double projmatrix[16];
-  int viewport[4];
+  GLint viewport[4];
   Vector3d x1,x2,p1,p2;
 
   // Compute the GL matrices
@@ -1013,7 +1013,7 @@ int Window3D::IntersectSegData(int mouse_x, int mouse_y, Vector3i &hit)
 {
   double mvmatrix[16];
   double projmatrix[16];
-  int viewport[4];
+  GLint viewport[4];
 
   make_current(); // update GL state
   ComputeMatricies( viewport, mvmatrix, projmatrix );
@@ -1306,6 +1306,9 @@ void Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.14  2004/01/27 18:05:38  pauly
+ *FIX: More MAC OSX fixes. Also removed old snake code no longer in use
+ *
  *Revision 1.13  2004/01/27 17:34:00  pauly
  *FIX: Compiling on Mac OSX, issue with GLU include file
  *
