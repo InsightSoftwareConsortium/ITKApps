@@ -9,7 +9,7 @@
 
 #include "itkCommand.h"
 #include "itkProcessObject.h"
-#include "itkIndex.h"
+#include "itkImageRegion.h"
 
 
 #include <string.h>
@@ -28,8 +28,10 @@ public:
   // Command/Observer intended to update the progress
   typedef itk::MemberCommand< FilterModuleBase >  CommandType;
 
-  // Index type used by algorithms requiring seed points.
-  typedef itk::Index<3>   IndexType;
+  // Type used by most algorithms. These types depend only on dimension.
+  typedef itk::ImageRegion<3>     RegionType;
+  typedef RegionType::IndexType   IndexType;
+  typedef RegionType::SizeType    SizeType;
 
 public:
 
