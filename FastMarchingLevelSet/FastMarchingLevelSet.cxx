@@ -424,7 +424,7 @@ FastMarchingLevelSet
  *****************************************/
 void
 FastMarchingLevelSet
-::ClickSelectCallback(float x, float y, float z, float value, void * args )
+::ClickSelectCallback(float x, float y, float z, float, void * args )
 {
 
   FastMarchingLevelSet * self = 

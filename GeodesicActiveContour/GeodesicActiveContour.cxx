@@ -376,7 +376,7 @@ GeodesicActiveContour
  *****************************************/
 void
 GeodesicActiveContour
-::ClickSelectCallback(float x, float y, float z, float value, void * args )
+::ClickSelectCallback(float x, float y, float z, float, void * args )
 {
 
   GeodesicActiveContour * self = 
