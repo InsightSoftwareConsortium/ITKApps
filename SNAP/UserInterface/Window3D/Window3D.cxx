@@ -22,8 +22,15 @@
 #include "ImageRayIntersectionFinder.h"
 
 #include <FL/glut.h>
-#include <vnl/vnl_cross.h>
-                         
+
+#include <vxl_version.h>
+#if VXL_VERSION_DATE_FULL > 20040406
+# include <vnl/vnl_cross.h>
+# define itk_cross_3d vnl_cross_3d
+#else
+# define itk_cross_3d cross_3d
+#endif
+
 /** These classes are used internally for m_Ray intersection testing */
 class LabelImageHitTester 
 {
@@ -947,7 +954,7 @@ Window3D
   // Now we have two orthogonal vectors laying on the cut plane.  All we have
   // to do is take the cross product
   Vector3d delta = x2-x1;
-  Vector3d n = - vnl_cross_3d(delta, w);
+  Vector3d n = - itk_cross_3d(delta, w);
 
   // Compute the length of the normal and exit if it's zero
   double l = n.two_norm();
@@ -968,8 +975,8 @@ Window3D
   Vector3d p2World(p2[0] * m_Spacing[0],p2[1] * m_Spacing[1],p2[2] * m_Spacing[2]);
   
   // Compute the normal in world coordinates
-  Vector3d nWorld = - cross_3d((vnl_vector<double>) (x2World - x1World),
-                               (vnl_vector<double>) (p2World - p1World));
+  Vector3d nWorld = - itk_cross_3d((vnl_vector<double>) (x2World - x1World),
+                                   (vnl_vector<double>) (p2World - p1World));
   m_Plane.vNormalWorld = nWorld.normalize();
 
   // Compute the intercept in world coordinates  
@@ -1306,6 +1313,9 @@ void Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.16  2004/05/12 18:09:12  pauly
+ *FIX:Error with cross_3d symbol
+ *
  *Revision 1.15  2004/01/27 18:18:44  pauly
  *FIX: Last MAC OSX fix
  *
