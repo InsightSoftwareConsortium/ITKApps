@@ -436,8 +436,8 @@ GenericSliceWindow
   // Set the position and size of the thumbnail, in pixels
   m_ThumbnailZoom = xNewFraction * m_OptimalZoom;
   m_ThumbnailPosition.fill(5);
-  m_ThumbnailSize[0] = m_SliceSize[0] * m_SliceSpacing[0] * m_ThumbnailZoom;
-  m_ThumbnailSize[1] = m_SliceSize[1] * m_SliceSpacing[1] * m_ThumbnailZoom;
+  m_ThumbnailSize[0] = (int)(m_SliceSize[0] * m_SliceSpacing[0] * m_ThumbnailZoom);
+  m_ThumbnailSize[1] = (int)(m_SliceSize[1] * m_SliceSpacing[1] * m_ThumbnailZoom);
   
   glPushMatrix();
   glLoadIdentity();

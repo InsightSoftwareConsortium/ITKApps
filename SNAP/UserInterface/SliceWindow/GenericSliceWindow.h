@@ -15,6 +15,11 @@
 #ifndef __GenericSliceWindow_h_
 #define __GenericSliceWindow_h_
 
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4786 )
+#pragma warning ( disable : 4503 )
+#endif
+
 #include "FLTKCanvas.h"
 #include "SNAPCommonUI.h"
 #include "GreyImageWrapper.h"
