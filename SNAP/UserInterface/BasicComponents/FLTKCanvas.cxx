@@ -103,7 +103,7 @@ FLTKCanvas
 
     // Convert the event coordinates into the model view coordinates
     double modelMatrix[16], projMatrix[16];
-    int viewport[4];
+    GLint viewport[4];
     glGetDoublev(GL_MODELVIEW_MATRIX, modelMatrix);
     glGetDoublev(GL_PROJECTION_MATRIX, projMatrix);
     glGetIntegerv(GL_VIEWPORT,viewport);

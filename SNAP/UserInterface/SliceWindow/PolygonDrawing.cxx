@@ -15,7 +15,7 @@
 #include "PolygonDrawing.h"
 #include "SNAPCommonUI.h"
 
-#include <GL/glu.h>
+#include "SNAPOpenGL.h"
 #include <iostream>
 #include <stdlib.h>
 
@@ -774,6 +774,9 @@ PolygonDrawing
 
 /*
  *Log: PolygonDrawing.cxx
+ *Revision 1.6  2003/10/09 22:45:15  pauly
+ *EMH: Improvements in 3D functionality and snake parameter preview
+ *
  *Revision 1.5  2003/10/02 14:55:53  pauly
  *ENH: Development during the September code freeze
  *

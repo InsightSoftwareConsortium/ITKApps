@@ -90,7 +90,7 @@ private:
   FilterPointer m_PadFilter;
 
   // The texture number (index)
-  unsigned int m_TextureIndex;
+  GLuint m_TextureIndex;
 
   // Has the texture been initialized?
   bool m_IsTextureInitalized;
