@@ -223,7 +223,7 @@ FastMarchingModule<TInputPixelType>
 
 
 /*
- *  Set the Plugin Info structure 
+ *  Get LevelSet (returns the time-crossing map
  */
 template <class TInputPixelType >
 const FastMarchingModule<TInputPixelType>::RealImageType *
