@@ -42,7 +42,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
                                             PixelType >   ModuleType;
       ModuleType  module;
       module.SetPluginInfo( info );
-      module.SetUpdateMessage("Computing Shape Detection Module...");
+      module.SetUpdateMessage("Computing Canny Segmentation LevelSet Module...");
       module.SetDistanceFromSeeds( distanceFromSeeds );
       module.SetVariance( cannyVariance );
       module.SetThreshold( cannyThreshold );
@@ -70,7 +70,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
                                             PixelType >   ModuleType;
       ModuleType  module;
       module.SetPluginInfo( info );
-      module.SetUpdateMessage("Computing Shape Detection Module...");
+      module.SetUpdateMessage("Computing Canny Segmentation LevelSet Module...");
       module.SetDistanceFromSeeds( distanceFromSeeds );
       module.SetVariance( cannyVariance );
       module.SetThreshold( cannyThreshold );
@@ -99,7 +99,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     return -1;
   }
 
-  info->UpdateProgress( info, 1.0, "Shape Detection Done !");
+  info->UpdateProgress( info, 1.0, "Canny Segmentation Done !");
 
   return 0;
 }
@@ -180,11 +180,11 @@ void VV_PLUGIN_EXPORT vvITKCannySegmentationLevelSetModuleInit(vtkVVPluginInfo *
   // setup information that never changes
   info->ProcessData = ProcessData;
   info->UpdateGUI   = UpdateGUI;
-  info->SetProperty(info, VVP_NAME, "Geodesic Active Contour Module (ITK)");
+  info->SetProperty(info, VVP_NAME, "Canny Segmentation LevelSet Module (ITK)");
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
-                                    "Geodesic Active Contour Module");
+                                    "Canny Segmentation LevelSet Module");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,
-    "This module applies the Geodesic Active Contour method for segmenting a volume. All the necessary  preprocessing is packaged in this module. This makes it a good choice when you are already familiar with the parameters settings requires for you particular data set. When you are applying CannySegmentationLevelSet to a new data set, you may want to rather go step by step using each one the individual filters. Please experience first with the FastMarching modules, since it is used here for preprocessing the data set before applying the CannySegmentationLevelSet filter.");
+    "This module applies the Canny Segmentation Level Set method for segmenting a volume. A Canny edge detection filter is used to produce a set of edges that will be used to atract the zero set to them. All the necessary  preprocessing is packaged in this module. This makes it a good choice when you are already familiar with the parameters settings requires for you particular data set. When you are applying CannySegmentationLevelSet to a new data set, you may want to rather go step by step using each one the individual filters. Please experience first with the FastMarching modules, since it is used here for preprocessing the data set before applying the CannySegmentationLevelSet filter.");
 
   info->SetProperty(info, VVP_SUPPORTS_IN_PLACE_PROCESSING, "0");
   info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "0");
