@@ -21,15 +21,29 @@
 #endif
 
 #include "itkFEM.h"
-#include "itkFEMSolverHyperbolic.h"
-
+//#include "itkFEMSolverHyperbolic.h"
 #include "itkFEMLinearSystemWrappers.h"
 
+#define OUTPUT_FIELD        1
+
+#if OUTPUT_FIELD
 #include "itkExceptionObject.h"
+#include "itkImage.h"
+#include "itkVector.h"
+#include "itkImageRegionIteratorWithIndex.h"
+#include "itkVectorCastImageFilter.h"
+#include "itkVectorIndexSelectionCastImageFilter.h"
+#include "itkImageFileReader.h"
+#include "itkImageFileWriter.h"
+#include "itkWarpImageFilter.h"
+#include "itkRescaleIntensityImageFilter.h"
+#include "itkCastImageFilter.h"
+#endif
 
 #include <iostream>
 #include <fstream>
 #include <exception>
+#include <string>
 
 #define DEFAULT_COMMENT     '.'
 #define MATLAB_COMMENT      '%'
@@ -48,6 +62,8 @@
 #define FORMAT_OUTPUT_BINARY  1
 #define FORMAT_OUTPUT_ASCII   0
 #define OUTPUT              ( FORMAT_OUTPUT_BINARY || FORMAT_OUTPUT_ASCII )
+
+#define FIELD_FREQ          10
 
 using namespace std;
 using namespace itk;
