@@ -137,35 +137,12 @@ static int UpdateGUI(void *inf)
   info->SetGUIProperty(info, 1, VVP_GUI_HELP, "Upper threshold for binarizing the feature image and induce attraction to the edges");
   info->SetGUIProperty(info, 1, VVP_GUI_HINTS, VolView::PlugIn::FilterModuleBase::GetInputVolumeScalarRange( info ) );
 
-  info->SetGUIProperty(info, 2, VVP_GUI_LABEL, "Curvature scaling.");
+  info->SetGUIProperty(info, 2, VVP_GUI_LABEL, "Surface Smoothness");
   info->SetGUIProperty(info, 2, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 2, VVP_GUI_DEFAULT, "1.0");
-  info->SetGUIProperty(info, 2, VVP_GUI_HELP, "Scaling factor for the curvature contribution. Larger values will result in smoother contours");
-  info->SetGUIProperty(info, 2, VVP_GUI_HINTS , "0.1 10.0 0.1");
+  info->SetGUIProperty(info, 2, VVP_GUI_DEFAULT, "1.0" );
+  info->SetGUIProperty(info, 2, VVP_GUI_HELP, "Degree of smoothness of the surface. This terms affects the curvature scaling of the level set");
+  info->SetGUIProperty(info, 2, VVP_GUI_HINTS, "0.0 20.0 0.1");
 
-  info->SetGUIProperty(info, 3, VVP_GUI_LABEL, "Propagation scaling.");
-  info->SetGUIProperty(info, 3, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 3, VVP_GUI_DEFAULT, "1.0");
-  info->SetGUIProperty(info, 3, VVP_GUI_HELP, "Scaling factor for the inflation factor. Larger factors will result in rapid expansion with irregular borders");
-  info->SetGUIProperty(info, 3, VVP_GUI_HINTS , "0.1 10.0 0.1");
-
-  info->SetGUIProperty(info, 4, VVP_GUI_LABEL, "Advection scaling.");
-  info->SetGUIProperty(info, 4, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 4, VVP_GUI_DEFAULT, "1.0");
-  info->SetGUIProperty(info, 4, VVP_GUI_HELP, "Scaling factor for the advection factor. This factor generates a force that is proportional to the slant of the level set at a point.");
-  info->SetGUIProperty(info, 4, VVP_GUI_HINTS , "0.1 10.0 0.1");
-
-  info->SetGUIProperty(info, 5, VVP_GUI_LABEL, "Maximum RMS Error.");
-  info->SetGUIProperty(info, 5, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 5, VVP_GUI_DEFAULT, "0.06");
-  info->SetGUIProperty(info, 5, VVP_GUI_HELP, "Threshold of the RMS change between one iteration and the previous one. This is a convergence criteria, the process will stop when the RMS change is lower than the value set here");
-  info->SetGUIProperty(info, 5, VVP_GUI_HINTS , "0.01 0.5 0.01");
-
-  info->SetGUIProperty(info, 6, VVP_GUI_LABEL, "Maximum iterations.");
-  info->SetGUIProperty(info, 6, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 6, VVP_GUI_DEFAULT, "100.0");
-  info->SetGUIProperty(info, 6, VVP_GUI_HELP, "The maximum number of iteration to apply the time step in the partial differental equation.");
-  info->SetGUIProperty(info, 6, VVP_GUI_HINTS , "1.0 500.0 1.0");
 
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, "0");
   
@@ -202,7 +179,7 @@ void VV_PLUGIN_EXPORT vvITKThresholdSegmentationLevelSetInit(vtkVVPluginInfo *in
 
   info->SetProperty(info, VVP_SUPPORTS_IN_PLACE_PROCESSING, "0");
   info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "0");
-  info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "7");
+  info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "3");
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP,           "0");
   info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,   "16");
   info->SetProperty(info, VVP_REQUIRES_SECOND_INPUT,        "1");

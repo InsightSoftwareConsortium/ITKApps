@@ -22,13 +22,17 @@ namespace VolView
 namespace PlugIn
 {
 
+typedef itk::Image< float, 3 > FloatImageType;
+
+typedef itk::ThresholdSegmentationLevelSetImageFilter<
+                                     FloatImageType, 
+                                     FloatImageType > 
+                                       ThresholdSegmentationLevelSetFilterType;
 
 template< class TInputLevelSetImageType, class TFeatureImageType>
 class ThresholdSegmentationLevelSet : public 
                    FilterModuleTwoInputs<
-                          itk::ThresholdSegmentationLevelSetImageFilter<
-                                            TInputLevelSetImageType,
-                                            TFeatureImageType >,
+                              ThresholdSegmentationLevelSetFilterType,
                               TInputLevelSetImageType,
                               TFeatureImageType > {
 
@@ -38,20 +42,17 @@ public:
   typedef TFeatureImageType          InputFeatureImageType;
 
   typedef  FilterModuleTwoInputs<
-                      itk::ThresholdSegmentationLevelSetImageFilter<
-                                        TInputLevelSetImageType,
-                                        TFeatureImageType >,
+                      ThresholdSegmentationLevelSetFilterType,
                       InputLevelSetImageType,
                       InputFeatureImageType > Superclass;
 
-  typedef itk::ThresholdSegmentationLevelSetImageFilter<
-                          TInputLevelSetImageType,
-                          TFeatureImageType
-                                  > ThresholdSegmentationLevelSetFilterType;
  
   typedef typename ThresholdSegmentationLevelSetFilterType::OutputImageType  OutputImageType;
   typedef typename OutputImageType::PixelType                                OutputPixelType;
 
+  typedef itk::CastImageFilter< InputLevelSetImageType, FloatImageType >  InputToFloatFilterType;
+  typedef itk::CastImageFilter< InputFeatureImageType,  FloatImageType >  FeatureToFloatFilterType;
+ 
 public:
 
   /**  Constructor */
@@ -84,22 +85,35 @@ public:
     const float upperThreshold        = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
     const float lowerThreshold        = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
     const float curvatureScaling      = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ));
-    const float propagationScaling    = atof( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ));
-    const float advectionScaling      = atof( info->GetGUIProperty(info, 4, VVP_GUI_VALUE ));
-    const float maximumRMSError       = atof( info->GetGUIProperty(info, 5, VVP_GUI_VALUE ));
 
-    const unsigned int maximumNumberOfIterations = atoi( info->GetGUIProperty(info, 6, VVP_GUI_VALUE ));
+    const float propagationScaling    = 1.0;
+    const float advectionScaling      = 1.0;
+    const float maximumRMSError       = 0.001;
+    const float edgeWeight            = 0.0;
+
+    const unsigned int maximumNumberOfIterations = 500;
 
     filter->SetLowerThreshold( lowerThreshold );
     filter->SetUpperThreshold( upperThreshold );
     filter->SetCurvatureScaling( curvatureScaling );
+
     filter->SetPropagationScaling( propagationScaling );
     filter->SetAdvectionScaling( advectionScaling );
     filter->SetMaximumRMSError( maximumRMSError );
     filter->SetNumberOfIterations( maximumNumberOfIterations );
+    filter->SetEdgeWeight( edgeWeight );
 
-    filter->SetInput(        this->GetInput1() );
-    filter->SetFeatureImage( this->GetInput2() );
+    InputToFloatFilterType::Pointer     inputCaster   = InputToFloatFilterType::New();
+    FeatureToFloatFilterType::Pointer   featureCaster = FeatureToFloatFilterType::New();
+   
+    inputCaster->SetInput(    this->GetInput1()  );
+    featureCaster->SetInput(  this->GetInput2()  );
+
+    inputCaster->ReleaseDataFlagOn();
+    featureCaster->ReleaseDataFlagOn();
+
+    filter->SetInput(          inputCaster->GetOutput()  );
+    filter->SetFeatureImage(  featureCaster->GetOutput() );
 
     // Execute the filter
     try
