@@ -52,7 +52,6 @@ FastMarchingModule<TInputPixelType>
 
     // Allow progressive release of memory as the pipeline is executed
     m_GradientMagnitudeFilter->ReleaseDataFlagOn();
-    m_SigmoidFilter->ReleaseDataFlagOn();
     if( m_PerformPostprocessing )
       {
       m_FastMarchingFilter->ReleaseDataFlagOn();
@@ -334,14 +333,12 @@ void
 FastMarchingModule<TInputPixelType>
 ::PostProcessData( const vtkVVProcessDataStruct * pds )
 {
-
   // This transfer function will invert the map
   m_IntensityWindowingFilter->SetWindowMinimum( m_InitialSeedValue );
   m_IntensityWindowingFilter->SetWindowMaximum( m_FastMarchingFilter->GetStoppingValue() );
   m_IntensityWindowingFilter->SetOutputMinimum( static_cast< OutputPixelType >( m_FastMarchingFilter->GetStoppingValue() ));
   m_IntensityWindowingFilter->SetOutputMaximum( static_cast< OutputPixelType >( m_InitialSeedValue ));
 
-m_IntensityWindowingFilter->Print( std::cout );
   m_IntensityWindowingFilter->Update();
 
   // Copy the data (with casting) to the output buffer provided by the Plug In API

@@ -186,9 +186,20 @@ public:
   }
 
 
+  void SetCumulatedProgress( float progress )
+  {
+     m_CumulatedProgress = progress;
+  }
+
+
   void SetCurrentFilterProgressWeight( float weight )
   {
      m_CurrentFilterProgressWeight = weight;
+  }
+
+  float GetCurrentFilterProgressWeight() const
+  {
+     return m_CurrentFilterProgressWeight;
   }
 
 
@@ -271,6 +282,7 @@ private:
     float                        m_CumulatedProgress;
     float                        m_CurrentFilterProgressWeight;
     bool                         m_ProcessComponentsIndependetly;
+
 };
 
 

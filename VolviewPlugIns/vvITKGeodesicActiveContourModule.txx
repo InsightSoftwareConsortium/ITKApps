@@ -246,10 +246,15 @@ GeodesicActiveContourModule<TInputPixelType>
   m_FastMarchingModule.SetPluginInfo( this->GetPluginInfo() );
 
   // Execute the FastMarching module as preprocessing stage
+  m_FastMarchingModule.SetPerformPostProcessing( false );
   m_FastMarchingModule.SetProgressWeighting( 0.7 );
   m_FastMarchingModule.ProcessData( pds );
 
-  // Execute the filters and progressively remove temporary memory
+  // Since Fast Marching updates progress with another
+  // instantiation of FilterModuleBase, the current 
+  // progress here must be manually set up to the 
+  // final progress of the FastMarching stage.
+  this->SetCumulatedProgress( 0.7 );
   this->SetCurrentFilterProgressWeight( 0.3 );
   this->SetUpdateMessage("Computing Geodesic Active Contour...");
   m_GeodesicActiveContourFilter->Update();

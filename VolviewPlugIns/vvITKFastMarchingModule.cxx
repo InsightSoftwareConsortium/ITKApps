@@ -20,7 +20,6 @@ class FastMarchingModuleRunner
       const float sigma                 = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
       const float lowestBasinValue      = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ));
       const float lowestBorderValue     = atof( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ));
-      const bool  compositeOutput       = atoi( info->GetGUIProperty(info, 4, VVP_GUI_VALUE ) );
 
       ModuleType  module;
       module.SetPluginInfo( info );
@@ -38,7 +37,6 @@ class FastMarchingModuleRunner
         module.AddSeed( seedPosition );
         }
       // Execute the filter
-      //module.SetProduceDoubleOutput( compositeOutput );
       module.ProcessData( pds  );
 
     }
@@ -167,11 +165,6 @@ static int UpdateGUI(void *inf)
   info->SetGUIProperty(info, 3, VVP_GUI_HELP, "The lowest value of the gradient magnitude in the border of the region to be segmented. This value will be mapped by the Sigmoid into the slowest propagation in the speed image.");
   info->SetGUIProperty(info, 3, VVP_GUI_HINTS , "0.1 50.0 0.1");
 
-  info->SetGUIProperty(info, 4, VVP_GUI_LABEL, "Produce composite output");
-  info->SetGUIProperty(info, 4, VVP_GUI_TYPE, VVP_GUI_CHECKBOX);
-  info->SetGUIProperty(info, 4, VVP_GUI_DEFAULT, "0");
-  info->SetGUIProperty(info, 4, VVP_GUI_HELP, "This filter produce by default a single component level set as output. Enabling this option will instead generate a composite output combining the input image and the level set as an image of two components. This is convenient for evaluating the quality of a segmentation.");
-
 
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, "0");
   
@@ -207,7 +200,7 @@ void VV_PLUGIN_EXPORT vvITKFastMarchingModuleInit(vtkVVPluginInfo *info)
 
   info->SetProperty(info, VVP_SUPPORTS_IN_PLACE_PROCESSING, "0");
   info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "0");
-  info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "5");
+  info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "4");
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP,           "0");
   info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,   "16");
 
