@@ -4,11 +4,11 @@ header_name {.h}
 code_name {.cxx}
 class guiMain {open
 } {
-  Function {guiMain()} {open
+  Function {guiMain()} {open selected
   } {
     Fl_Window tkWindow {
       label {3D Registration Tool ====> downloadable on http://caddlab.rad.unc.edu <=====} open
-      xywh {302 141 1060 735} type Double box PLASTIC_UP_BOX color 159 resizable
+      xywh {924 76 1060 735} type Double box PLASTIC_UP_BOX color 159 resizable
       code0 {itk::ImageRegion< 3 > tempRegion ;} visible
     } {
       Fl_Group tkMainGroup {open
@@ -80,7 +80,8 @@ Register();}
           label label
           xywh {448 56 600 601} box FLAT_BOX color 42 deactivate resizable
           code0 {\#include <GLColorSliceView.h>}
-          class {GLColorSliceView< unsigned char, unsigned char >}
+          code1 {typedef float RealImagePixelType ;}
+          class {GLColorSliceView< RealImagePixelType, unsigned char >}
         }
         Fl_Group tkSubGroup {open
           xywh {5 51 420 609}
@@ -227,13 +228,14 @@ Register();}
           Fl_Box tkMovingImageViewer {
             label label
             xywh {150 380 275 275} box FLAT_BOX color 42 deactivate
-            class {LandmarkSliceViewer< unsigned char >}
+            class {LandmarkSliceViewer< ImagePixelType >}
           }
           Fl_Box tkFixedImageViewer {
             label label
             xywh {154 79 275 275} box FLAT_BOX color 42 deactivate
             code0 {\#include <LandmarkSliceViewer.h>}
-            class {LandmarkSliceViewer< unsigned char >}
+            code1 {typedef short ImagePixelType ;}
+            class {LandmarkSliceViewer< ImagePixelType >}
           }
         }
         Fl_Group tkViewAxisGroup {
@@ -460,7 +462,7 @@ tkFixedImageViewer->DrawRegionOfInterest() ;}
     }
     Fl_Window tkAdvancedOptionsWindow {
       label {Advanced Options...} open
-      xywh {799 87 405 520} type Double box PLASTIC_UP_BOX color 159 labelsize 10 resizable visible
+      xywh {1342 158 405 520} type Double box PLASTIC_UP_BOX color 159 labelsize 10 resizable visible
     } {
       Fl_Tabs {} {open
         xywh {15 15 385 465} labelsize 12
@@ -688,7 +690,7 @@ tkFixedImageViewer->DrawRegionOfInterest() ;}
               xywh {55 125 25 25} type Radio down_box ROUND_DOWN_BOX
             }
             Fl_Round_Button tkRigidUseLargestRegion {
-              label {Use the whole image} selected
+              label {Use the whole image}
               xywh {55 85 25 25} type Radio down_box ROUND_DOWN_BOX value 1
             }
             Fl_Round_Button tkRigidUseUserRegion {

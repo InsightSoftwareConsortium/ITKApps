@@ -548,17 +548,27 @@ guiMainImplementation
 {
   if (i == 0)
     {
-    tkResultImageViewer->SetInputImage(m_ViewNonRegisteredImage) ;
+    if ( m_ViewNonRegisteredImage != 0 )
+      {
+      tkResultImageViewer->SetInputImage(m_ViewNonRegisteredImage) ;
+      }
+
     tkMovingImageViewer->SetInputImage(m_ViewMovingImage) ;
     }
   else if ( i == 1)
     {
-    tkResultImageViewer->SetInputImage(m_ViewLandmarkRegisteredImage) ;
+    if ( m_ViewLandmarkRegisteredImage != 0 )
+      {
+      tkResultImageViewer->SetInputImage(m_ViewLandmarkRegisteredImage) ;
+      }
     tkMovingImageViewer->SetInputImage(m_ViewLandmarkRegisteredMovingImage) ;
     }
   else if ( i == 2 )
     {
-    tkResultImageViewer->SetInputImage(m_ViewRegisteredImage) ;
+    if ( m_ViewRegisteredImage != 0 )
+      {
+      tkResultImageViewer->SetInputImage(m_ViewRegisteredImage) ;
+      }
     tkMovingImageViewer->SetInputImage(m_ViewRegisteredMovingImage) ;
     }
 

@@ -24,8 +24,6 @@
 class guiMainImplementation : public guiMain
 {
 public:
-  typedef unsigned char ImagePixelType;
-  typedef unsigned char RealImagePixelType ;
   typedef itk::Image<ImagePixelType,3> ImageType;
   typedef itk::Image< RealImagePixelType,3 > RealImageType;
   typedef ImageType::Pointer ImagePointer ;
