@@ -144,7 +144,7 @@ static int UpdateGUI(void *inf)
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, "0");
   
   info->OutputVolumeScalarType = info->InputVolumeScalarType;
-  info->OutputVolumeNumberOfComponents = 1; 
+  info->OutputVolumeNumberOfComponents = info->InputVolumeNumberOfComponents; 
   memcpy(info->OutputVolumeDimensions,info->InputVolumeDimensions,
          3*sizeof(int));
   memcpy(info->OutputVolumeSpacing,info->InputVolumeSpacing,

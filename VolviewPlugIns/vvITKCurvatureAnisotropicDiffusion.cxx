@@ -158,7 +158,7 @@ static int UpdateGUI(void *inf)
   
 
   info->OutputVolumeScalarType = info->InputVolumeScalarType;
-  info->OutputVolumeNumberOfComponents = 1;
+  info->OutputVolumeNumberOfComponents = info->InputVolumeNumberOfComponents;
 
   info->OutputVolumeDimensions[0] = info->InputVolumeDimensions[0]; // + 2 * numberOfIterations;
   info->OutputVolumeDimensions[1] = info->InputVolumeDimensions[1]; // + 2 * numberOfIterations;
