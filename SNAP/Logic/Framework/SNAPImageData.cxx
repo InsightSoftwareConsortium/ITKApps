@@ -226,11 +226,15 @@ SNAPImageData
     typedef Point<float,3> PointType;
     PointType ptLower,ptUpper,ptCenter;
 
+    // Compute the physical position of the bubble center
+    imgBubbles->TransformIndexToPhysicalPoint(
+      to_itkIndex(bubbles[iBubble].center),
+      ptCenter);
+
     for(unsigned int i=0;i<3;i++)
       {
-      ptLower[i] = bubbles[iBubble].center[i] - bubbles[iBubble].radius;
-      ptUpper[i] = bubbles[iBubble].center[i] + bubbles[iBubble].radius;
-      ptCenter[i] = bubbles[iBubble].center[i];
+      ptLower[i] = ptCenter[i] - bubbles[iBubble].radius;
+      ptUpper[i] = ptCenter[i] + bubbles[iBubble].radius;
       }
     
     // Index locations corresponding to the extents of the bubble
@@ -240,9 +244,9 @@ SNAPImageData
     
     // Create a region
     BubbleImageType::SizeType szBubble;
-    szBubble[0] = idxUpper[0] - idxLower[0];
-    szBubble[1] = idxUpper[1] - idxLower[1];
-    szBubble[2] = idxUpper[2] - idxLower[2];
+    szBubble[0] = 1 + idxUpper[0] - idxLower[0];
+    szBubble[1] = 1 + idxUpper[1] - idxLower[1];
+    szBubble[2] = 1 + idxUpper[2] - idxLower[2];
     BubbleImageType::RegionType regBubble(idxLower,szBubble);
     regBubble.Crop(imgBubbles->GetLargestPossibleRegion());
 
@@ -393,6 +397,7 @@ SNAPImageData
   // with some large positive value and copy in the results of fltSubtract
   FloatImageType::Pointer imgLevelSet = FloatImageType::New();
   imgLevelSet->SetRegions(imgBubbles->GetLargestPossibleRegion());
+  imgLevelSet->SetSpacing(imgBubbles->GetSpacing());
   imgLevelSet->Allocate();
   
   // Compute a sufficiently large positive value

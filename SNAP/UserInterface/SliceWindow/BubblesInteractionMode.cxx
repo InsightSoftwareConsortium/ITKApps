@@ -99,10 +99,9 @@ BubblesInteractionMode
           // Draw the bubble
           glColor4f(rgb[0],rgb[1],rgb[2],alpha);
           glPushMatrix();
-          // glLoadIdentity();
-          glTranslatef(scaling(0)*((float)(ctrSlice[0])+0.5),
-                       scaling(1)*((float)(ctrSlice[1])+0.5),
-                       0);
+          
+          glTranslatef(ctrSlice[0]+0.5f, ctrSlice[1]+0.5f, 0.0f);
+          glScalef(1.0f / scaling(0),1.0f / scaling(1),1.0f);
           gluDisk(object,0,diskradius,100,100);
           glPopMatrix();
 
