@@ -309,6 +309,7 @@ Window3D
 {
   // Make sure FLTK canvas does not flip the Y coordinate
   SetFlipYCoordinate(false);
+  SetGrabFocusOnEntry(true);
   
   // Clear the flags
   m_NeedsInitialization = 1;
@@ -1189,14 +1190,26 @@ void Window3D::DrawCrosshairs()
 {
   if ( !m_CursorVisible ) return;
 
+  // Get the UI element properties for the crosshairs
+  SNAPAppearanceSettings::Element &elt = 
+    m_ParentUI->GetAppearanceSettings()->GetUIElement(
+    SNAPAppearanceSettings::CROSSHAIRS_3D);
+
+  // Exit if crosshairs are to be ignored
+  if(!elt.Visible) return;
+
+  // Get the crosshair position
   Vector3ui crosshair = m_GlobalState->GetCrosshairsPosition();
 
+  // Set up the GL state
+  glPushAttrib(GL_LINE_BIT | GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT);
   glDisable(GL_LIGHTING);
 
-  glColor3f( 0.0, 0.0, 1.0 );
-  glLineWidth( 2 );
-  glEnable( GL_LINE_STIPPLE );
-  glLineStipple( 2, 0xAAAA );
+  // Set up the line properties
+  glColor3dv(elt.NormalColor.data_block());
+  SNAPAppearanceSettings::ApplyUIElementLineSettings(elt);
+
+  // Draw the lines
   glBegin( GL_LINES );
 
   for (int i=0; i<3; i++)
@@ -1212,7 +1225,7 @@ void Window3D::DrawCrosshairs()
     }
 
   glEnd();
-  glDisable( GL_LINE_STIPPLE );
+  glPopAttrib();
 
 #if DEBUGGING
   glColor3f( 1.0, 1.0, 0.0 );
@@ -1227,9 +1240,7 @@ void Window3D::DrawCrosshairs()
   << ", " << m_Point[2]+m_Ray[2] << " )" << endl;
 #endif
 
-  glEnable(GL_LIGHTING);
 }
-
 
 void Window3D::DrawSamples()
 {
@@ -1315,8 +1326,32 @@ void Window3D
   glPopAttrib();
 };
 
+int 
+Window3D
+::OnKeyAction(int key)
+{
+  cout << "Key press: " << key << endl;
+  if(key == 's')
+    {
+    // Store the state of the trackball
+    m_TrackballBackup = m_Trackball;
+    return 1;
+    }
+  else if(key == 'r')
+    {
+    // Restore the trackball state
+    m_Trackball = m_TrackballBackup;
+    redraw();
+    return 1;
+    }
+  return 0;
+}
+
 /*
  *Log: Window3D.cxx
+ *Revision 1.19  2004/07/29 14:02:05  pauly
+ *ENH: An interface for changing SNAP appearance settings
+ *
  *Revision 1.18  2004/07/22 19:22:51  pauly
  *ENH: Large image support for SNAP. This includes being able to use more screen real estate to display a slice, a fix to the bug with manual segmentation of images larger than the window size, and a thumbnail used when zooming into the image.
  *

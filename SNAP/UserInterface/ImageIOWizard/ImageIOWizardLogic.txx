@@ -334,25 +334,13 @@ void ImageIOWizardLogic<TPixel>
   path = strlen(path) ? path : NULL;
 
   // Configure a file dialog
-  Fl_File_Chooser chooser(path,pattern.c_str(),Fl_File_Chooser::SINGLE,
-                          "Please select an image file");
-  
-  // Disable the preview (what for?)
-  chooser.preview(0);
-
-  // Set font properties
-  chooser.textsize(12);
-
-  // Show the file chooser
-  chooser.show();
-  while(chooser.visible())
-    Fl::wait();
+  char *fName = fl_file_chooser("Load Image", pattern.c_str(), path);
   
   // Bring up th choice dialog
-  if (chooser.count())
+  if (fName)
     {
     // Set the new filename
-    m_InFilePageBrowser->value(chooser.value());
+    m_InFilePageBrowser->value(fName);
 
     // Reset the format drop-down box to a null value
     m_InFilePageFormat->value(0);
@@ -1054,19 +1042,11 @@ ImageIOWizardLogic<TPixel>
   StringType pattern = this->GetFilePattern(false);
 
   // Create a file chooser
-  Fl_File_Chooser fc(path,pattern.c_str(),Fl_File_Chooser::CREATE,"Save As");
-  fc.show();
-
-  // Wait for the chooser to go away
-  while(fc.visible())
-    Fl::wait();
-  
-  // Bring up th choice dialog
-  const char *fname = fc.value();
-  if (fname)
+  char *fName = fl_file_chooser("Save Image As", pattern.c_str(), path);
+  if (fName)
     {
     // Set the new filename
-    m_InSaveFilePageBrowser->value(fname);
+    m_InSaveFilePageBrowser->value(fName);
 
     // Reset the format drop-down box to a null value
     m_InSaveFilePageFormat->value(0);

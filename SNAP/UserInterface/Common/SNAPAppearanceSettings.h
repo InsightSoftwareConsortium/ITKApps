@@ -41,20 +41,28 @@ public:
     double LineThickness;
     double DashSpacing;
     int FontSize;
+    bool Visible, AlphaBlending;
+
+    Element(Vector3d inNormalColor, Vector3d inActiveColor, double inLineThickness,
+      double inDashSpacing, int inFontSize, bool inVisible, inAlphaBlending)
+      : NormalColor(inNormalColor), ActiveColor(inActiveColor), 
+        LineThickness(inLineThickness), DashSpacing(inDashSpacing), FontSize(inFontSize),
+        Visible(inVisible), AlphaBlending(inAlphaBlending) {}
     };
 
   /** An enumeration of available screen elements */
   enum UIElements 
     { 
-    CROSSHAIRS = 0, MARKERS, ROI_BOX, BACKGROUND_3D, BACKGROUND_2D, 
-    ZOOM_THUMBNAIL, ELEMENT_COUNT
+    CROSSHAIRS = 0, MARKERS, ROI_BOX, 
+    BACKGROUND_2D, BACKGROUND_3D, 
+    ZOOM_THUMBNAIL, CROSSHAIRS_3D, CROSSHAIRS_THUMB, ELEMENT_COUNT
     };  
 
   /** An enumeration of the fields that an element may possess */
   enum UIElementFeatures
     {
     NORMAL_COLOR = 0, ACTIVE_COLOR, LINE_THICKNESS, DASH_SPACING, 
-    FONT_SIZE, FEATURE_COUNT
+    FONT_SIZE, VISIBLE, ALPHA_BLEND, FEATURE_COUNT
     };
 
   SNAPAppearanceSettings();

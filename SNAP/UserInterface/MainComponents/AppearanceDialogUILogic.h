@@ -81,6 +81,9 @@ private:
   void ApplyRenderingOptions();
   void ApplySliceLayoutOptions();
   void ApplyAppearanceSettings();
+
+  // A mapping from SNAP appearance elements to menu indices
+  const static int m_MapMenuToElementIndex[];
 };
 
 #endif

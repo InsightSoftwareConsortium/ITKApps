@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0102 
+version 1.0105 
 header_name {.h} 
 code_name {.cxx}
 class RestoreSettingsDialog {open : RestoreSettingsDialogBase
@@ -9,8 +9,8 @@ class RestoreSettingsDialog {open : RestoreSettingsDialogBase
     Fl_Window m_WinMain {
       label {Restore Settings?}
       callback {OnCancelAction();} open selected
-      xywh {123 300 401 256} type Double box PLASTIC_DOWN_BOX
-      code0 {\#include "RestoreSettingsDialogBase.h"} visible
+      xywh {123 300 401 256} type Double box PLASTIC_DOWN_BOX hide
+      code0 {\#include "RestoreSettingsDialogBase.h"}
     } {
       Fl_Group {} {
         label {Would you like SnAP to restore the settings that were used the last time you worked with this image?  
@@ -39,14 +39,14 @@ The following settings can be restored:} open
         }
       }
       Fl_Button {} {
-        label {Restore Settings}
+        label {&Restore Settings}
         callback {OnRestoreSettingsAction();}
-        xywh {85 220 120 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12
+        xywh {85 220 120 25} box PLASTIC_UP_BOX shortcut 0x80072 color 180 labelfont 1 labelsize 12
       }
       Fl_Button {} {
         label {Don't Restore}
         callback {OnDoNotRestoreSettingsAction();}
-        xywh {220 220 105 25} box PLASTIC_UP_BOX color 180 labelsize 12
+        xywh {220 220 105 25} box PLASTIC_UP_BOX shortcut 0xff1b color 180 labelsize 12
       }
       Fl_Choice m_InFutureApproach {
         label {In the future, } open

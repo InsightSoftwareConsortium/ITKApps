@@ -47,6 +47,8 @@
 #include "SliceWindowCoordinator.h"
 #include "SNAPAppearanceSettings.h"
 
+#include "FL/Fl_File_Chooser.H"
+
 #include <itksys/SystemTools.hxx>
 #include <strstream>
 #include <iomanip>
@@ -2201,6 +2203,7 @@ UserInterfaceLogic
   m_MenuSaveSegmentation->activate();
   m_MenuSaveVoxelCounts->activate(); 
   m_MenuIntensityCurve->activate();
+  m_MenuExportSlice->activate();
 
   // Image geometry has changed
   OnImageGeometryUpdate();
@@ -2476,6 +2479,17 @@ void UserInterfaceLogic
   m_DlgLabelsIO->SetTitle("Save Labels");
   m_DlgLabelsIO->DisplaySaveDialog(
     m_SystemInterface->GetHistory("LabelDescriptions"));
+}
+
+void UserInterfaceLogic
+::OnMenuExportSlice(unsigned int iSlice)
+{
+  // We need to get a filename for the export
+  char* fName = fl_file_chooser(
+    "Export Slice As", "Image Files (*.{png,jpg,gif,tiff})", NULL);
+  
+  if(fName)
+    m_Driver->ExportSlice(iSlice, fName);
 }
 
 void UserInterfaceLogic
@@ -2967,6 +2981,9 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.25  2004/08/03 23:26:32  ibanez
+ *ENH: Modification for building in multple platforms. By Julien Jomier.
+ *
  *Revision 1.24  2004/07/29 14:00:36  pauly
  *ENH: A new interface for changing the appearance of SNAP
  *

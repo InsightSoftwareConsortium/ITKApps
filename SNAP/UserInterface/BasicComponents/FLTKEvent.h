@@ -29,29 +29,19 @@ class FLTKCanvas;
  * \sa FLTKCanvas
  */
 struct FLTKEvent {
-    /**
-     * The FLTK id of the event
-     */
+    /** The FLTK id of the event */
     int Id;
 
-    /**
-     * The cursor position of the event in window coordinates
-     */
+    /** The cursor position of the event in window coordinates */
     Vector2i XCanvas;
 
-    /**
-     * The cursor position of the event in object space coordinates
-     */
+    /** The cursor position of the event in object space coordinates */
     Vector3f XSpace;
 
-    /**
-     * Time when the event was generated (value of the clock() function)
-     */
+    /** Time when the event was generated (value of the clock() function) */
     long int TimeStamp;
     
-    /**
-     * The button that generated this event
-     */
+    /** The button that generated this event */
     int Button;
 
     /**
@@ -62,10 +52,11 @@ struct FLTKEvent {
      */
     int SoftButton;
 
-    /**
-     * The state of the interface (ALT,CTRL,SHIFT)
-     */
+    /** The state of the interface (ALT,CTRL,SHIFT) */
     int State;
+
+    /** The key associated with the event */
+    int Key;
 
     /**
      * Pointer to the FLTKCanvas that generated this event.  This is a safety

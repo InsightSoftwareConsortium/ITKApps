@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0102 
+version 1.0105 
 header_name {.h} 
 code_name {.cxx}
 class ImageIOWizard {open : ImageIOWizardBase
@@ -8,18 +8,18 @@ class ImageIOWizard {open : ImageIOWizardBase
   } {
     Fl_Window m_WinInput {
       label {SnAP Image Input Wizard} open
-      xywh {548 424 470 330}
+      xywh {548 424 470 330} type Double
       code0 {\#include "ImageIOWizardBase.h"} modal visible
     } {
       Fl_Wizard m_WizInput {open
         xywh {-5 -10 505 395}
       } {
         Fl_Group m_PageFile {
-          label {File Selection} open
+          label {File Selection}
           xywh {0 0 470 330} box PLASTIC_DOWN_BOX labelfont 2 labelsize 10
         } {
           Fl_Group {} {
-            label {Select a file that contains an image:} open
+            label {Select a file that contains an image:}
             xywh {10 15 370 40} labeltype EMBOSSED_LABEL align 20
           } {}
           Fl_Input m_InFilePageBrowser {
@@ -28,18 +28,18 @@ class ImageIOWizard {open : ImageIOWizardBase
             xywh {30 100 405 25} labelsize 12 align 5 when 1 textsize 12
           }
           Fl_Button {} {
-            label {Browse...}
+            label {&Browse...}
             callback {this->OnFilePageBrowse();}
-            xywh {265 130 80 25} box PLASTIC_UP_BOX labelsize 12
+            xywh {265 130 80 25} box PLASTIC_UP_BOX shortcut 0x80062 labelsize 12
           }
           Fl_Menu_Button m_InFilePageHistory {
             label History
-            callback {this->OnFilePageFileHistoryChange();} open
+            callback {this->OnFilePageFileHistoryChange();} selected
             xywh {355 130 80 25} box PLASTIC_UP_BOX selection_color 181 labelsize 12 align 20 textsize 12
           } {}
           Fl_Choice m_InFilePageFormat {
             label {Image file format:}
-            callback {this->OnFilePageFileFormatChange();} open
+            callback {this->OnFilePageFileFormatChange();}
             xywh {30 190 210 25} down_box BORDER_BOX labelsize 12 align 5 textsize 12
           } {
             menuitem {} {
@@ -52,9 +52,9 @@ class ImageIOWizard {open : ImageIOWizardBase
             xywh {190 285 280 45} labeltype NO_LABEL
           } {
             Fl_Button m_BtnFilePageNext {
-              label {Next  >}
+              label {&Next  >}
               callback {this->OnFilePageNext();}
-              xywh {290 295 80 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12 deactivate hotspot
+              xywh {290 295 80 25} box PLASTIC_UP_BOX shortcut 0x8006e color 180 labelfont 1 labelsize 12 deactivate
             }
             Fl_Button {} {
               label {< Back}
@@ -63,7 +63,7 @@ class ImageIOWizard {open : ImageIOWizardBase
             Fl_Button {} {
               label Cancel
               callback {this->OnCancel();}
-              xywh {380 295 80 25} box PLASTIC_UP_BOX color 180 labelsize 12
+              xywh {380 295 80 25} box PLASTIC_UP_BOX shortcut 0xff1b color 180 labelsize 12
             }
           }
         }
@@ -186,9 +186,9 @@ class ImageIOWizard {open : ImageIOWizardBase
             xywh {190 285 280 45} labeltype NO_LABEL
           } {
             Fl_Button m_BtnHeaderPageNext {
-              label {Next  >}
+              label {&Next  >}
               callback {this->OnHeaderPageNext();}
-              xywh {290 295 80 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12
+              xywh {290 295 80 25} box PLASTIC_UP_BOX shortcut 0x8006e color 180 labelfont 1 labelsize 12
             }
             Fl_Button m_BtnHeaderPageBack {
               label {< Back}
@@ -198,12 +198,12 @@ class ImageIOWizard {open : ImageIOWizardBase
             Fl_Button {} {
               label Cancel
               callback {this->OnCancel();}
-              xywh {380 295 80 25} box PLASTIC_UP_BOX color 180 labelsize 12
+              xywh {380 295 80 25} box PLASTIC_UP_BOX shortcut 0xff1b color 180 labelsize 12
             }
           }
         }
         Fl_Group m_PageOrientation {
-          label {Image Orientation} open
+          label {Image Orientation}
           xywh {0 0 470 330} box PLASTIC_DOWN_BOX labelfont 2 labelsize 10 hide
         } {
           Fl_Group {} {
@@ -429,9 +429,9 @@ the selected image orientation} open
             xywh {190 285 280 45} labeltype NO_LABEL
           } {
             Fl_Button m_BtnOrientationPageNext {
-              label {Next  >}
+              label {&Next  >}
               callback {this->OnOrientationPageNext();}
-              xywh {290 295 80 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12
+              xywh {290 295 80 25} box PLASTIC_UP_BOX shortcut 0x8006e color 180 labelfont 1 labelsize 12
             }
             Fl_Button {} {
               label {< Back}
@@ -441,7 +441,7 @@ the selected image orientation} open
             Fl_Button {} {
               label Cancel
               callback {this->OnCancel();}
-              xywh {380 295 80 25} box PLASTIC_UP_BOX color 180 labelsize 12
+              xywh {380 295 80 25} box PLASTIC_UP_BOX shortcut 0xff1b color 180 labelsize 12
             }
           }
         }
@@ -458,9 +458,9 @@ the selected image orientation} open
             xywh {190 285 280 45} labeltype NO_LABEL
           } {
             Fl_Button {} {
-              label Finish
+              label {&Finish}
               callback {this->OnSummaryPageFinish();}
-              xywh {290 295 80 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12
+              xywh {290 295 80 25} box PLASTIC_UP_BOX shortcut 0x80066 color 180 labelfont 1 labelsize 12
             }
             Fl_Button {} {
               label {< Back}
@@ -470,7 +470,7 @@ the selected image orientation} open
             Fl_Button {} {
               label Cancel
               callback {this->OnCancel();}
-              xywh {380 295 80 25} box PLASTIC_UP_BOX color 180 labelsize 12
+              xywh {380 295 80 25} box PLASTIC_UP_BOX shortcut 0xff1b color 180 labelsize 12
             }
           }
           Fl_Value_Output m_OutSummarySize {
@@ -517,8 +517,8 @@ the selected image orientation} open
       }
     }
     Fl_Window m_WinOutput {
-      label {SnAP Save Image Wizard} open selected
-      xywh {612 147 470 330} modal visible
+      label {SnAP Save Image Wizard} open
+      xywh {123 337 470 330} type Double modal visible
     } {
       Fl_Wizard m_WizOutput {
         xywh {-5 -10 505 395}
@@ -537,9 +537,9 @@ the selected image orientation} open
             xywh {30 100 405 25} labelsize 12 align 5 when 1 textsize 12
           }
           Fl_Button {} {
-            label {Browse...}
+            label {&Browse...}
             callback {this->OnSaveFilePageBrowse();}
-            xywh {265 130 80 25} box PLASTIC_UP_BOX labelsize 12
+            xywh {265 130 80 25} box PLASTIC_UP_BOX shortcut 0x80062 labelsize 12
           }
           Fl_Menu_Button m_InSaveFilePageHistory {
             label History
@@ -561,14 +561,14 @@ the selected image orientation} open
             xywh {190 285 280 45} labeltype NO_LABEL
           } {
             Fl_Button m_BtnSaveFilePageNext {
-              label Save
+              label {&Save}
               callback {this->OnSaveFilePageSave();}
-              xywh {290 295 80 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12 deactivate hotspot
+              xywh {290 295 80 25} box PLASTIC_UP_BOX shortcut 0x80073 color 180 labelfont 1 labelsize 12 deactivate hotspot
             }
             Fl_Button {} {
               label Cancel
               callback {this->OnSaveCancel();}
-              xywh {380 295 80 25} box PLASTIC_UP_BOX color 180 labelsize 12
+              xywh {380 295 80 25} box PLASTIC_UP_BOX shortcut 0xff1b color 180 labelsize 12
             }
           }
         }

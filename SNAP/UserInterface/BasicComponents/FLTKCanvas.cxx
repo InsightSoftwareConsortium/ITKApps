@@ -29,6 +29,8 @@ FLTKCanvas
 {
   m_Dragging = false;
   m_FlipYCoordinate = true;
+  m_GrabFocusOnEntry = false;
+  m_Focus = false;
 }
 
 void                            
@@ -92,6 +94,7 @@ FLTKCanvas
   event.Source = this;  
   event.Button = Fl::event_button();
   event.State = Fl::event_state();
+  event.Key = Fl::event_key();
 
   // Construct the software button
   if(event.Button == FL_LEFT_MOUSE && (event.State & FL_ALT))
@@ -124,6 +127,25 @@ FLTKCanvas
                  modelMatrix,projMatrix,viewport,
                  &xProjection[0],&xProjection[1],&xProjection[2]);
     event.XSpace = to_float(xProjection);
+    }
+
+  // Take care of focus grabbing on entry
+  if(eventID == FL_ENTER && m_GrabFocusOnEntry)
+    {
+    this->take_focus();
+    m_Focus = true;
+    redraw();
+    return 1;
+    }
+  else if(eventID == FL_LEAVE && m_GrabFocusOnEntry)
+    {
+    m_Focus = false;
+    redraw();
+    return 1;
+    }
+  else if(eventID == FL_FOCUS && m_GrabFocusOnEntry)
+    {
+    return 1;
     }
 
   // Record the event as the drag-start if the mouse was pressed

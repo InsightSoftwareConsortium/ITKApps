@@ -87,6 +87,15 @@ public:
   /** Are we flipping? */
   irisSetMacro(FlipYCoordinate,bool);
 
+  /** Check if keyboard focus is grabbed when the mouse enters the window */
+  irisGetMacro(GrabFocusOnEntry,bool);
+
+  /** Set whether keyboard focus is grabbed when the mouse enters the window */
+  irisSetMacro(GrabFocusOnEntry,bool);
+
+  /** Check if the window has keyboard focus */
+  irisGetMacro(Focus,bool);
+
 protected:
   /**
    * This method should be called to draw the interactors (call their OnDraw methods 
@@ -107,6 +116,11 @@ private:
   // Should we flip the Y coordinates of the events (top = 0, bottom = h)
   bool m_FlipYCoordinate;
 
+  /** Whether the keyboard focus is grabbed when the mouse enters the window */
+  bool m_GrabFocusOnEntry;
+
+  /** Whether the window has keyboard focus */
+  bool m_Focus;
 };
 
 #endif // __FLTKCanvas_h_

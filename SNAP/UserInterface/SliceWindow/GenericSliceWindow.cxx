@@ -66,9 +66,11 @@ GenericSliceWindow
   // Initialize the zoom management
   m_ManagedZoom = false;
 
-  // No focus
-  m_Focus = false;
+  // No thumbnail
   m_ThumbnailIsDrawing = false;
+
+  // Allow focus grabbing
+  SetGrabFocusOnEntry(true);
 }
 
 GenericSliceWindow
@@ -278,32 +280,6 @@ GenericSliceWindow
   return uvSlice;
 }
 
-int 
-GenericSliceWindow
-::handle(int eventID)
-{
-  // When mouse enters the window, request focus
-  switch(eventID)
-    {
-    case FL_ENTER:
-      this->take_focus();
-      m_Focus = true;
-      redraw();
-      return 1;
-
-    case FL_LEAVE:
-      m_Focus = false;
-      redraw();
-      return 1;
-  
-    case FL_FOCUS:
-      return 1;
-
-    default:
-      return FLTKCanvas::handle(eventID);
-    };
-}
-
 void
 GenericSliceWindow
 ::draw()
@@ -430,6 +406,14 @@ void
 GenericSliceWindow
 ::DrawThumbnail()
 {
+  // Get the thumbnail appearance properties
+  const SNAPAppearanceSettings::Element &elt = 
+    m_ParentUI->GetAppearanceSettings()->GetUIElement(
+      SNAPAppearanceSettings::ZOOM_THUMBNAIL);
+
+  // If thumbnail is not to be drawn, exit
+  if(!elt.Visible) return;
+
   // Indicate the fact that we are currently drawing in thumbnail mode
   m_ThumbnailIsDrawing = true;  
   
@@ -475,11 +459,6 @@ GenericSliceWindow
  
   // Draw the crosshairs and stuff
   DrawOverlays();
-
-  // Get the thumbnail appearance properties
-  const SNAPAppearanceSettings::Element &elt = 
-    m_ParentUI->GetAppearanceSettings()->GetUIElement(
-      SNAPAppearanceSettings::ZOOM_THUMBNAIL);
 
   // Apply the line settings
   SNAPAppearanceSettings::ApplyUIElementLineSettings(elt);
@@ -543,6 +522,9 @@ GenericSliceWindow
     m_ParentUI->GetAppearanceSettings()->GetUIElement(
       SNAPAppearanceSettings::MARKERS);
 
+  // Leave if the labels are disabled
+  if(!elt.Visible) return;
+
   // Repeat for X and Y directions
   for(unsigned int i=0;i<2;i++) 
     {
@@ -566,25 +548,20 @@ GenericSliceWindow
   glPushMatrix();
   glLoadIdentity();
 
-  //glEnable(GL_LIGHTING);
-  //glEnable(GL_DEPTH);
-  /*
-  glBegin(GL_LINE_STRIP);
-  glVertex2d(320,320);
-  glVertex2d(320,100);
-  glVertex2d(100,320);
-  glEnd();
-*/
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  if(elt.AlphaBlending)
+    {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
 
-  glColor4d( elt.NormalColor[0], elt.NormalColor[1], elt.NormalColor[2], 0.5 );
+  glColor4d( elt.NormalColor[0], elt.NormalColor[1], elt.NormalColor[2], 1.0 );
 
   gl_font(FL_COURIER_BOLD, elt.FontSize);
   int offset = 4 + elt.FontSize * 2;
+  int margin = elt.FontSize / 3;
   
-  gl_draw(labels[0][0],0,0,offset,h(),FL_ALIGN_LEFT);
-  gl_draw(labels[0][1],w() - (offset+1),0,offset,h(),FL_ALIGN_RIGHT);
+  gl_draw(labels[0][0],margin,0,offset,h(),FL_ALIGN_LEFT);
+  gl_draw(labels[0][1],w() - (offset+margin),0,offset,h(),FL_ALIGN_RIGHT);
   gl_draw(labels[1][0],0,0,w(),offset,FL_ALIGN_BOTTOM);
   gl_draw(labels[1][1],0,h() - (offset+1),w(),offset,FL_ALIGN_TOP);
 

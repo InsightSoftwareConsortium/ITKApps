@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0102 
+version 1.0105 
 header_name {.h} 
 code_name {.cxx}
 class SimpleFileDialog {open : SimpleFileDialogBase
@@ -7,8 +7,8 @@ class SimpleFileDialog {open : SimpleFileDialogBase
   Function {MakeWindow()} {open
   } {
     Fl_Window m_Window {
-      label {Load File} open selected
-      xywh {551 370 373 152} box PLASTIC_DOWN_BOX
+      label {Load File} open
+      xywh {551 370 373 152} type Double box PLASTIC_DOWN_BOX
       code0 {\#include "SimpleFileDialogBase.h"} modal visible
     } {
       Fl_Input m_InFile {
@@ -17,9 +17,9 @@ class SimpleFileDialog {open : SimpleFileDialogBase
         xywh {15 35 340 25} labelsize 12 align 5 textsize 12
       }
       Fl_Button {} {
-        label {Browse...}
+        label {&Browse...}
         callback {this->OnBrowseAction();}
-        xywh {185 65 80 25} box PLASTIC_UP_BOX down_box UP_BOX labelsize 12
+        xywh {185 65 80 25} box PLASTIC_UP_BOX down_box UP_BOX shortcut 0x80062 labelsize 12
       }
       Fl_Menu_Button m_InHistory {
         label History
@@ -28,13 +28,13 @@ class SimpleFileDialog {open : SimpleFileDialogBase
       } {}
       Fl_Button m_BtnOk {
         label Ok
-        callback {this->OnOkAction();}
+        callback {this->OnOkAction();} selected
         xywh {100 120 80 25} box PLASTIC_UP_BOX down_box DOWN_BOX shortcut 0x1ff0d color 180 labelfont 1 labelsize 12
       }
       Fl_Button {} {
         label Cancel
         callback {this->OnCancelAction();}
-        xywh {190 120 80 25} box PLASTIC_UP_BOX down_box DOWN_BOX color 180 labelsize 12
+        xywh {190 120 80 25} box PLASTIC_UP_BOX down_box DOWN_BOX shortcut 0xff1b color 180 labelsize 12
       }
     }
   }

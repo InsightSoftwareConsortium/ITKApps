@@ -50,7 +50,8 @@ public:
   typedef Superclass::ImageType ImageType;
 
   // The type definition for the image used to display speed slices
-  typedef Superclass::SliceType DisplaySliceType;
+  typedef itk::RGBAPixel<unsigned char> DisplayPixelType;
+  typedef itk::Image<DisplayPixelType,2> DisplaySliceType;
   typedef itk::SmartPointer<DisplaySliceType> DisplaySlicePointer;
 
   // The type definition for the image used to display overlays based on
@@ -160,7 +161,12 @@ private:
   class MappingFunctor 
   {
   public:
-    float operator()(float in);
+    MappingFunctor();
+    DisplayPixelType operator()(float in);
+    void SetColorMap(DisplayPixelType inPlus, 
+      DisplayPixelType inMinus, DisplayPixelType inZero); 
+  private:
+    DisplayPixelType m_Plus, m_Minus, m_Zero;
   };  
   
   /**

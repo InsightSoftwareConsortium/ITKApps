@@ -44,7 +44,7 @@ public:
 protected:
 
   // Texture object type associated with the preprocessing (speed) image
-  typedef OpenGLSliceTexture<float> SpeedTextureType;
+  typedef OpenGLSliceTexture<RGBAType> SpeedTextureType;
 
   // Texture object type associated with the active segmentation image
   typedef LabelImageWrapper::DisplayPixelType RGBAType;

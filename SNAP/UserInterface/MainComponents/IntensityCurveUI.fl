@@ -18,9 +18,9 @@ class IntensityCurveUI {open : IntensityCurveUIBase
         class IntensityCurveBox
       }
       Fl_Button {} {
-        label Reset
+        label {&Reset}
         callback {this->OnReset();}
-        xywh {310 165 95 25} box PLASTIC_UP_BOX color 180 labelsize 12
+        xywh {310 165 95 25} box PLASTIC_UP_BOX shortcut 0x80072 color 180 labelsize 12
       }
       Fl_Group {} {
         label {input image intensity} open
@@ -29,7 +29,7 @@ class IntensityCurveUI {open : IntensityCurveUIBase
       Fl_Button {} {
         label Close
         callback {this->OnClose();}
-        xywh {310 195 95 25} box PLASTIC_UP_BOX color 180 selection_color 38 labelfont 1 labelsize 12
+        xywh {310 195 95 25} box PLASTIC_UP_BOX shortcut 0xff1b color 180 selection_color 38 labelfont 1 labelsize 12
       }
       Fl_Group {} {open
         image {Artwork/outputintensity.gif} xywh {5 10 15 210} align 16

@@ -36,9 +36,9 @@ SNAPSliceWindow
 {
   // Initialize the texture for displaying the speed image
   m_SpeedTexture = new SpeedTextureType;
-  m_SpeedTexture->SetGlComponents(1);
-  m_SpeedTexture->SetGlFormat(GL_LUMINANCE);
-  m_SpeedTexture->SetGlType(GL_FLOAT);
+  m_SpeedTexture->SetGlComponents(4);
+  m_SpeedTexture->SetGlFormat(GL_RGBA);
+  m_SpeedTexture->SetGlType(GL_UNSIGNED_BYTE);
 
   // Initialize the snake image texture
   m_SnakeTexture = new SnakeTextureType;

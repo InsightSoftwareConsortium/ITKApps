@@ -642,6 +642,9 @@ protected:
   void OnLoadPreprocessedImageAction();
   void OnMenuLoadAdvection();
 
+  // Save a slice
+  void OnMenuExportSlice(unsigned int iSlice);
+
   // Display options callbacks
   void OnMenuShowDisplayOptions();
   
@@ -781,6 +784,9 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.19  2004/08/03 23:26:32  ibanez
+ *ENH: Modification for building in multple platforms. By Julien Jomier.
+ *
  *Revision 1.18  2004/07/30 15:56:34  jjomier
  *FIX: Warning, disabling 4786 on MSVC
  *

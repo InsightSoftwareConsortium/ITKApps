@@ -19,31 +19,58 @@
 const int 
 SNAPAppearanceSettings
 ::m_Applicable[SNAPAppearanceSettings::ELEMENT_COUNT][SNAPAppearanceSettings::FEATURE_COUNT] = {
-    { 1, 0, 1, 1, 0 },
-    { 1, 0, 0, 0, 1 },
-    { 1, 1, 1, 1, 0 },
-    { 1, 0, 0, 0, 0 },
-    { 1, 0, 0, 0, 0 },
-    { 1, 1, 1, 1, 0 }};  
+    { 1, 0, 1, 1, 0, 1, 1 },    // Crosshairs
+    { 1, 0, 0, 0, 1, 1, 1 },    // Markers
+    { 1, 1, 1, 1, 0, 0, 1 },    // ROI
+    { 1, 0, 0, 0, 0, 0, 0 },    // Slice Background
+    { 1, 0, 0, 0, 0, 0, 0 },    // 3D Background
+    { 1, 1, 1, 1, 0, 1, 1 },    // Zoom thumbnail
+    { 1, 0, 1, 1, 0, 1, 1 },    // 3D Crosshairs
+    { 1, 0, 1, 1, 0, 1, 1 },    // Thumbnail Crosshairs
+    };
 
-/*const 
 SNAPAppearanceSettings::Element
 SNAPAppearanceSettings
 ::m_DefaultElementSettings[SNAPAppearanceSettings::ELEMENT_COUNT] = 
 {
-    { Vector3d(0.5, 0.5, 1.0), Vector3d(0.0, 0.0, 0.0), 1.0, 3.0, 0.0 },
-    { Vector3d(1.0, 1.0, 0.2), Vector3d(0.0, 0.0, 0.0), 0.0, 0.0, 12.0 },
-    { Vector3d(1.0, 0.0, 0.2), Vector3d(1.0, 1.0, 0.2), 1.0, 3.0, 0.0 },
-    { Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0), 0.0, 0.0, 0.0 },
-    { Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0), 0.0, 0.0, 0.0 },
-    { Vector3d(1.0, 1.0, 0.0), Vector3d(0.0, 0.0, 0.0), 0.0, 0.0, 0.0 },
-};*/  
+  // Crosshairs
+  SNAPAppearanceSettings::Element( 
+    Vector3d(0.3, 0.3, 1.0), Vector3d(0.0, 0.0, 0.0), 1.0, 1.0, 0.0, true, false ),
+
+  // Markers
+  SNAPAppearanceSettings::Element(
+    Vector3d(1.0, 0.75, 0.0), Vector3d(0.0, 0.0, 0.0), 0.0, 0.0, 16.0, true, false ),
+
+  // ROI
+  SNAPAppearanceSettings::Element(
+    Vector3d(1.0, 0.0, 0.2), Vector3d(1.0, 1.0, 0.2), 1.0, 3.0, 0.0, true, false ),
+
+  // Slice background
+  SNAPAppearanceSettings::Element(
+    Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0), 0.0, 0.0, 0.0, true, false ),
+
+  // 3D Window background
+  SNAPAppearanceSettings::Element(
+    Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0), 0.0, 0.0, 0.0, true, false ),
+
+  // Zoom thumbail
+  SNAPAppearanceSettings::Element(
+    Vector3d(1.0, 1.0, 0.0), Vector3d(1.0, 1.0, 1.0), 1.0, 0.0, 0.0, true, false ),
+
+  // 3D crosshairs
+  SNAPAppearanceSettings::Element(
+    Vector3d(0.3, 0.3, 1.0), Vector3d(0.0, 0.0, 0.0), 1.0, 1.0, 0.0, true, true ),
+
+  // Thumbnail crosshairs
+  SNAPAppearanceSettings::Element(
+    Vector3d(0.3, 0.3, 1.0), Vector3d(0.0, 0.0, 0.0), 1.0, 1.0, 0.0, true, false ) 
+};  
 
 const char *
 SNAPAppearanceSettings
 ::m_ElementNames[SNAPAppearanceSettings::ELEMENT_COUNT] = 
-  { "CROSSHAIRS", "MARKERS", "ROI_BOX", "BACKGROUND_3D", "BACKGROUND_2D", 
-    "ZOOM_THUMBNAIL" };
+  { "CROSSHAIRS", "MARKERS", "ROI_BOX", "BACKGROUND_2D", "BACKGROUND_3D", 
+    "ZOOM_THUMBNAIL", "CROSSHAIRS_3D", "CROSSHAIRS_THUMB" };
 
 SNAPAppearanceSettings
 ::SNAPAppearanceSettings()
@@ -130,6 +157,8 @@ SNAPAppearanceSettings
     elt.LineThickness = f["LineThickness"][def.LineThickness];
     elt.DashSpacing = f["DashSpacing"][def.DashSpacing];
     elt.FontSize = f["FontSize"][def.FontSize];
+    elt.AlphaBlending = f["AlphaBlending"][def.AlphaBlending];
+    elt.Visible = f["Visible"][def.Visible];
     }
 }
 
@@ -159,6 +188,8 @@ SNAPAppearanceSettings
     f["LineThickness"] << elt.LineThickness;
     f["DashSpacing"] << elt.DashSpacing;
     f["FontSize"] << elt.FontSize;
+    f["AlphaBlending"] << elt.AlphaBlending;
+    f["Visible"] << elt.Visible;
     }
 }
 
@@ -170,7 +201,7 @@ SNAPAppearanceSettings
   if(applyThickness)
     {
     // Choose whether to use blending or not
-    if( elt.LineThickness != floor(elt.LineThickness) )
+    if( elt.AlphaBlending )
       {
       glEnable(GL_BLEND);
       glEnable(GL_LINE_SMOOTH);
@@ -178,11 +209,11 @@ SNAPAppearanceSettings
       }
     glLineWidth( elt.LineThickness );
     }
-  if(applyStipple)
+  if(applyStipple && elt.DashSpacing != 0)
     {
     // Set the line thickness and stipple
     glEnable(GL_LINE_STIPPLE);
-    glLineStipple( elt.DashSpacing, 0xaaaa );
+    glLineStipple( elt.DashSpacing, 0x9999 ); // 0011 0011 0011 0011  // 1001 1001 1001 1001
     }
 }
 

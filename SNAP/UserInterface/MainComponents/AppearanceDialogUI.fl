@@ -8,7 +8,7 @@ class AppearanceDialogUI {open : AppearanceDialogUIBase
   } {
     Fl_Window m_WinDisplayOptions {
       label {Display Options} open
-      xywh {458 568 420 415} type Double box PLASTIC_DOWN_BOX align 0
+      xywh {944 395 420 415} type Double box PLASTIC_DOWN_BOX align 0
       code0 {\#include "AppearanceDialogUIBase.h"}
       code1 {\#include <FL/Fl_Color_Chooser.H>} non_modal visible
     } {
@@ -233,52 +233,60 @@ class AppearanceDialogUI {open : AppearanceDialogUIBase
           }
         }
         Fl_Group {} {
-          label Appearance
-          xywh {10 35 400 335} labelsize 12 hide
+          label Appearance open
+          xywh {10 35 400 335} labelsize 12
         } {
           Fl_Choice m_InUIElement {
             label {Select a user interface element to edit:}
-            callback {OnUIElementSelection(o->value())}
+            callback {OnUIElementSelection(o->value())} open selected
             xywh {25 75 370 25} down_box BORDER_BOX labelsize 12 align 5 textsize 12
           } {
+            menuitem {} {
+              label {Anatomical coordinate markers}
+              xywh {20 20 100 20} labelsize 12
+            }
             menuitem {} {
               label Crosshairs
               xywh {0 0 100 20} labelsize 12
             }
             menuitem {} {
-              label {Markers for anatomical coordinates}
-              xywh {20 20 100 20} labelsize 12
-            }
-            menuitem {} {
-              label {Region of interest selection box}
+              label {Region of interest}
               xywh {10 10 100 20} labelsize 12
             }
             menuitem {} {
-              label {Window background: 3D window}
-              xywh {40 40 100 20} labelsize 12
+              label {Window background}
+              xywh {50 50 100 20} labelsize 12 divider
             }
             menuitem {} {
-              label {Window background: slice windows}
+              label {3D window background}
               xywh {50 50 100 20} labelsize 12
             }
             menuitem {} {
-              label {Zoom thumbnail background}
+              label {3D window crosshairs}
+              xywh {20 20 100 20} labelsize 12 divider
+            }
+            menuitem {} {
+              label {Zoom thumbnail}
               xywh {60 60 100 20} labelsize 12
+            }
+            menuitem {} {
+              label {Zoom thumbnail crosshairs}
+              xywh {70 70 100 20} labelsize 12
             }
           }
           Fl_Group {} {open
-            xywh {25 110 370 190} box PLASTIC_DOWN_BOX
+            xywh {25 110 370 215} box PLASTIC_DOWN_BOX
           } {
             Fl_Box m_InColorNormal {
               label {Color in normal state:}
               callback {OnUIElementUpdate()}
-              xywh {35 135 165 90} box BORDER_BOX labelsize 12 align 5
+              xywh {35 135 170 90} box BORDER_BOX labelsize 12 align 5
               class Fl_Color_Chooser
             }
             Fl_Box m_InColorActive {
               label {Color in active state:}
               callback {OnUIElementUpdate()}
-              xywh {210 135 175 90} box BORDER_BOX labelsize 12 align 5 deactivate
+              xywh {215 135 170 90} box BORDER_BOX labelsize 12 align 5 deactivate
               class Fl_Color_Chooser
             }
             Fl_Value_Input m_InLineThickness {
@@ -289,12 +297,22 @@ class AppearanceDialogUI {open : AppearanceDialogUIBase
             Fl_Value_Input m_InFontSize {
               label {Font size:}
               callback {OnUIElementUpdate()}
-              xywh {340 235 45 25} labelsize 12 textsize 12 deactivate
+              xywh {155 295 45 25} labelsize 12 textsize 12 deactivate
             }
             Fl_Value_Input m_InDashSpacing {
               label {Dash spacing}
               callback {OnUIElementUpdate()}
               xywh {155 265 45 25} labelsize 12 textsize 12 deactivate
+            }
+            Fl_Check_Button m_InVisible {
+              label Visible
+              callback {OnUIElementUpdate()}
+              xywh {215 235 60 20} down_box DOWN_BOX labelsize 12 deactivate
+            }
+            Fl_Check_Button m_InAlphaBlending {
+              label {Alpha blending}
+              callback {OnUIElementUpdate()}
+              xywh {275 235 105 20} down_box DOWN_BOX labelsize 12 deactivate
             }
           }
           Fl_Button {} {
@@ -317,7 +335,7 @@ user interface elements} xywh {330 335 65 25} box PLASTIC_UP_BOX down_box PLASTI
         }
         Fl_Group {} {
           label {3D Rendering} open
-          xywh {10 35 400 335} labelsize 12
+          xywh {10 35 400 335} labelsize 12 hide
         } {
           Fl_Group {} {
             label {3D Rendering Options:}
@@ -403,7 +421,7 @@ user interface elements} xywh {330 335 65 25} box PLASTIC_UP_BOX down_box PLASTI
               xywh {250 295 135 20} down_box DOWN_BOX labelsize 11
             }
             Fl_Value_Input m_InRenderOptionsMeshSmoothIterations {
-              label {Iterations:} selected
+              label {Iterations:}
               xywh {165 270 50 20} labelsize 11 textsize 11
             }
           }

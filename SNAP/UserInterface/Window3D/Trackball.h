@@ -56,14 +56,15 @@ public:
   inline GLfloat GetZoom() { return( m_Zoom ); };
   inline GLfloat GetPanX() { return( m_PanX ); };
   inline GLfloat GetPanY() { return( m_PanY ); };
-
-  Trackball& operator= ( const Trackball& T );
 };
 
 #endif // __Trackball_h_
 
 /*
  *Log: Trackball.h
+ *Revision 1.4  2003/10/02 14:55:53  pauly
+ *ENH: Development during the September code freeze
+ *
  *Revision 1.1  2003/09/11 13:51:15  pauly
  *FIX: Enabled loading of images with different orientations
  *ENH: Implemented image save and load operations

@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0102 
+version 1.0105 
 header_name {.h} 
 code_name {.cxx}
 class SnakeParametersUI {open : SnakeParametersUIBase
@@ -7,9 +7,9 @@ class SnakeParametersUI {open : SnakeParametersUIBase
   Function {MakeWindow()} {open
   } {
     Fl_Window m_Window {
-      label {Snake Parameters} open
-      xywh {256 218 716 447} type Double box PLASTIC_DOWN_BOX
-      code0 {\#include "SnakeParametersUIBase.h"} non_modal visible
+      label {Snake Parameters} open selected
+      xywh {256 218 716 447} type Double box PLASTIC_DOWN_BOX hide
+      code0 {\#include "SnakeParametersUIBase.h"} non_modal
     } {
       Fl_Tabs m_TabsMode {open
         xywh {5 5 350 340} box PLASTIC_UP_BOX color 60 labelfont 2 labelsize 12 align 0
@@ -152,7 +152,7 @@ causing the segmentation to converge.} open
             } {}
             Fl_Button m_BtnEasyHelpAdvection {
               label {More info...}
-              callback {this->ShowHelp("TutorialSectionIntroductionToAutomatic.html\#Advection");} selected
+              callback {this->ShowHelp("TutorialSectionIntroductionToAutomatic.html\#Advection");}
               xywh {274 261 65 20} box PLASTIC_UP_BOX color 180 labelsize 11
             }
           }
@@ -353,17 +353,17 @@ OnSmoothingWeightChange(o);}
       Fl_Button m_BtnClose {
         label Cancel
         callback {this->OnCloseAction();}
-        xywh {340 410 64 25} box PLASTIC_UP_BOX color 180 labelsize 12
+        xywh {415 410 64 25} box PLASTIC_UP_BOX shortcut 0xff1b color 180 labelsize 12
       }
       Fl_Button m_BtnHelp {
-        label {Help!}
+        label {&Help!}
         callback {this->OnHelpAction();}
-        xywh {415 410 64 25} box PLASTIC_UP_BOX color 180 labelsize 12
+        xywh {340 410 64 25} box PLASTIC_UP_BOX shortcut 0x80068 color 180 labelsize 12
       }
       Fl_Button m_BtnAccept {
-        label Accept
+        label {&Accept}
         callback {this->OnOkAction();}
-        xywh {265 410 64 25} box PLASTIC_UP_BOX color 180 labelfont 1 labelsize 12
+        xywh {265 410 64 25} box PLASTIC_UP_BOX shortcut 0x80061 color 180 labelfont 1 labelsize 12
       }
       Fl_Group {} {
         label {Conceptual illustration of the forces in 2D:} open
@@ -414,14 +414,14 @@ OnSmoothingWeightChange(o);}
         xywh {5 350 350 45} box PLASTIC_UP_BOX color 22
       } {
         Fl_Button m_BtnLoadParameters {
-          label {Load Parameters...}
+          label {&Load Parameters...}
           callback {this->OnLoadParametersAction();}
-          xywh {65 360 105 25} box PLASTIC_UP_BOX color 180 labelsize 11
+          xywh {65 360 105 25} box PLASTIC_UP_BOX shortcut 0x8006c color 180 labelsize 11
         }
         Fl_Button m_BtnSaveParameters {
-          label {Save Parameters...}
+          label {&Save Parameters...}
           callback {this->OnSaveParametersAction();}
-          xywh {185 360 105 25} box PLASTIC_UP_BOX color 180 labelsize 11
+          xywh {185 360 105 25} box PLASTIC_UP_BOX shortcut 0x80073 color 180 labelsize 11
         }
       }
     }

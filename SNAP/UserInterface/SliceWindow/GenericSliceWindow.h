@@ -87,11 +87,7 @@ public:
 
   /** The FLTK draw method (paints the window) */
   void draw();
-
-  /** The FLTK handle() event, overrides parent's method to grab focus
-   * when the mouse enters the window */
-  int handle(int eventID);
-
+  
   /**
    * Map a point in window coordinates to a point in slice coordinates
    * (Window coordinates are the ones stored in FLTKEvent.xSpace)
@@ -245,9 +241,6 @@ protected:
   // The default screen margin (area into which we do not paint) at lest in 
   // default zoom
   unsigned int m_Margin;
-
-  // Flag indicating whether the window has keyboard/mouse-wheel focus or not
-  bool m_Focus;
 
   // Grey texture object typedefs
   typedef OpenGLSliceTexture<unsigned char> GreyTextureType;

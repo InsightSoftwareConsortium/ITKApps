@@ -59,6 +59,7 @@ public:
   virtual void OnMenuWriteVoxelCounts() = 0;
   virtual void OnMenuIntensityCurve() = 0;  
   virtual void OnMenuShowDisplayOptions() = 0;
+  virtual void OnMenuExportSlice(unsigned int iSlice) = 0;
   virtual void OnMenuQuit() = 0;
   
   // IRIS: Slice selection actions  

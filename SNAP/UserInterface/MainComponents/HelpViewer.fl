@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0102 
+version 1.0105 
 header_name {.h} 
 code_name {.cxx}
 class HelpViewer {open : HelpViewerBase
@@ -8,32 +8,32 @@ class HelpViewer {open : HelpViewerBase
   } {
     Fl_Window m_WinHelp {
       label {SNAP/IRIS Help Window} open
-      xywh {133 98 612 710} type Double color 53
-      code0 {\#include "HelpViewerBase.h"} visible
+      xywh {133 98 612 710} type Double color 53 hide
+      code0 {\#include "HelpViewerBase.h"}
     } {
       Fl_Help_View m_BrsHelp {
         callback {OnLinkAction();} selected
         xywh {5 5 600 660} box BORDER_BOX
       }
       Fl_Button {} {
-        label Contents
+        label {&Contents}
         callback {OnContentsAction()}
-        xywh {140 675 75 25} box PLASTIC_UP_BOX color 180 labelsize 12
+        xywh {140 675 75 25} box PLASTIC_UP_BOX shortcut 0x80063 color 180 labelsize 12
       }
       Fl_Button m_BtnBack {
         label {@<-  Back}
         callback {OnBackAction();}
-        xywh {225 675 75 25} box PLASTIC_UP_BOX color 180 labelsize 12 deactivate
+        xywh {225 675 75 25} box PLASTIC_UP_BOX shortcut 0xff08 color 180 labelsize 12 deactivate
       }
       Fl_Button m_BtnForward {
-        label {@->  Forward}
+        label {@->  &Forward}
         callback {OnForwardAction();}
-        xywh {310 675 80 25} box PLASTIC_UP_BOX color 180 labelsize 12 deactivate
+        xywh {310 675 80 25} box PLASTIC_UP_BOX shortcut 0x80066 color 180 labelsize 12 deactivate
       }
       Fl_Button m_BtnClose {
         label Close
         callback {OnCloseAction();}
-        xywh {400 675 70 25} box PLASTIC_UP_BOX color 180 labelsize 12
+        xywh {400 675 70 25} box PLASTIC_UP_BOX shortcut 0xff1b color 180 labelsize 12
       }
     }
   }

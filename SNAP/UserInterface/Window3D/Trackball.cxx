@@ -190,22 +190,11 @@ Trackball
   v[2] *= a;
 }
 
-Trackball&
-Trackball
-::operator= ( const Trackball& T )
-{
-  if ( this != &T )
-    {
-    cerr << "Trackball::operator= not implemented yet!"
-      << endl << "Exiting."
-      << endl;
-    exit(-1);
-    }
-  return *this;
-}
-
 /*
  *Log: Trackball.cxx
+ *Revision 1.5  2003/10/02 14:55:53  pauly
+ *ENH: Development during the September code freeze
+ *
  *Revision 1.1  2003/09/11 13:51:15  pauly
  *FIX: Enabled loading of images with different orientations
  *ENH: Implemented image save and load operations

@@ -47,6 +47,7 @@ typedef itk::Image<itk::FixedArray<float,3>,3> IRISApplicationBorlandDummyImageT
 #include "itkBSplineInterpolateImageFunction.h"
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkWindowedSincInterpolateImageFunction.h"
+#include "itkImageFileWriter.h"
 
 #include <cstdio>
 #include <sstream>
@@ -594,4 +595,25 @@ void IRISApplication
 
   fout.close();
 }   
+
+void
+IRISApplication
+::ExportSlice(unsigned int iSliceAnatomy, const char *file)
+{
+  // Get the slice index in image coordinates
+  ImageCoordinateTransform ita = 
+    m_CurrentImageData->GetImageGeometry().GetImageToAnatomyTransform();
+  unsigned int iSliceImg = ita.Inverse().GetCoordinateIndexZeroBased(iSliceAnatomy);
+
+  // Get the grey slice
+  GreyImageWrapper::DisplaySlicePointer imgGrey = 
+    m_CurrentImageData->GetGrey()->GetDisplaySlice(iSliceImg);
+
+  // Create a writer for saving the image
+  typedef itk::ImageFileWriter<GreyImageWrapper::DisplaySliceType> WriterType;
+  WriterType::Pointer writer = WriterType::New();
+  writer->SetInput(imgGrey);
+  writer->SetFileName(file);
+  writer->Update();
+}
 

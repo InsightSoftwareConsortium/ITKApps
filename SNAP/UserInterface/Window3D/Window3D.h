@@ -116,6 +116,8 @@ public:
       m_ParentUI = m_Parent->m_ParentUI;
       m_GlobalState = m_Parent->m_GlobalState;
     }
+    virtual int OnKeyDown(const FLTKEvent &e)
+      { return m_Parent->OnKeyAction(e.Key); }
   protected:
     Window3D *m_Parent;
     GlobalState *m_GlobalState;
@@ -141,7 +143,7 @@ public:
   void OnCrosshairClickAction(int x,int y);
   void OnSpraypaintClickAction(int x,int y);
   void OnScalpelPointPairAction(int x1, int y1, int x2, int y2);
-
+  int OnKeyAction(int key);
 
 private:
 
@@ -168,7 +170,7 @@ private:
 
 
   Win3DMode m_Mode;
-  Trackball  m_Trackball;
+  Trackball  m_Trackball, m_TrackballBackup;
   MeshObject m_Mesh;
   CutPlaneStruct m_Plane;
 
@@ -243,6 +245,9 @@ private:
 
 /*
  *Log: Window3D.h
+ *Revision 1.7  2004/01/27 18:05:38  pauly
+ *FIX: More MAC OSX fixes. Also removed old snake code no longer in use
+ *
  *Revision 1.6  2004/01/27 17:34:00  pauly
  *FIX: Compiling on Mac OSX, issue with GLU include file
  *

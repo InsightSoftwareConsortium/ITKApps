@@ -58,7 +58,7 @@ CrosshairsInteractionMode
 ::OnMouseWheel(const FLTKEvent &irisNotUsed(event))
 {
   // Must have the cursor inside the window to process key events
-  if(!m_Parent->m_Focus) return 0;
+  if(!m_Parent->GetFocus()) return 0;
 
   // Get the amount of the scroll
   float scroll = (float) Fl::event_dy();
@@ -135,7 +135,7 @@ CrosshairsInteractionMode
 ::OnKeyDown(const FLTKEvent &event)
 {
   // Must have the cursor inside the window to process key events
-  if(!m_Parent->m_Focus) return 0;
+  if(!m_Parent->GetFocus()) return 0;
 
   // Vector encoding the movement in pixels
   Vector3f xMotion(0.0f);
@@ -181,6 +181,17 @@ OnDraw()
     m_NeedToRepaintControls = false;
     }
 
+  // Get the line color, thickness and dash spacing for the crosshairs
+  SNAPAppearanceSettings::Element elt = 
+    m_Parent->m_ThumbnailIsDrawing 
+    ? m_ParentUI->GetAppearanceSettings()->GetUIElement(
+      SNAPAppearanceSettings::CROSSHAIRS_THUMB)
+    : m_ParentUI->GetAppearanceSettings()->GetUIElement(
+      SNAPAppearanceSettings::CROSSHAIRS);
+
+  // Exit if the crosshars are not drawn
+  if(!elt.Visible) return;
+
   // Get the current cursor position
   Vector3ui xCursorInteger = m_GlobalState->GetCrosshairsPosition();
 
@@ -194,20 +205,6 @@ OnDraw()
   // Upper and lober bounds to which the crosshairs are drawn
   Vector2i lower(0);
   Vector2i upper = m_Parent->m_SliceSize.extract(2);
-
-  // Get the line color, thickness and dash spacing
-  SNAPAppearanceSettings::Element elt = 
-    m_ParentUI->GetAppearanceSettings()->GetUIElement(
-      SNAPAppearanceSettings::CROSSHAIRS);
-
-  // If in thumbnail mode, replace the line properties with those of the thumbnail
-  if(m_Parent->m_ThumbnailIsDrawing)
-    {
-    SNAPAppearanceSettings::Element eltThumb = 
-      m_ParentUI->GetAppearanceSettings()->GetUIElement(
-        SNAPAppearanceSettings::ZOOM_THUMBNAIL);
-    elt.LineThickness = eltThumb.LineThickness;
-    }
 
   // Set line properties
   glPushAttrib(GL_LINE_BIT | GL_COLOR_BUFFER_BIT);
@@ -223,20 +220,14 @@ OnDraw()
   glTranslated( xCursorSlice(0), xCursorSlice(1), 0.0 );
 
   // Paint the cross-hairs
-  glBegin(GL_LINE_STRIP);  
-  glVertex2f(lower(0) - xCursorSlice(0),0); 
-  glVertex2f(0, 0);
-  glVertex2f(upper(0) - xCursorSlice(0), 0);
-  glEnd();
-
-  glBegin(GL_LINE_STRIP);  
-  glVertex2f(0, lower(1) - xCursorSlice(1)); 
-  glVertex2f(0, 0);
-  glVertex2f(0, upper(1) - xCursorSlice(1));
+  glBegin(GL_LINES);  
+  glVertex2f(0, 0); glVertex2f(lower(0) - xCursorSlice(0), 0);
+  glVertex2f(0, 0); glVertex2f(upper(0) - xCursorSlice(0), 0);
+  glVertex2f(0, 0); glVertex2f(0, lower(1) - xCursorSlice(1));
+  glVertex2f(0, 0); glVertex2f(0, upper(1) - xCursorSlice(1));
   glEnd();
 
   glPopMatrix();
-
   glPopAttrib();
 }
 

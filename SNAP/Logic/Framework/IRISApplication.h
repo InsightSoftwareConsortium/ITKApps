@@ -166,6 +166,11 @@ public:
   void SetCursorPosition(Vector3i cursor);
   irisGetMacro(CursorPosition,Vector3i);     
 
+  /**
+   * Export the current slice of the image into a file
+   */
+  void ExportSlice(unsigned int iSliceAnatomy, const char *file);
+
 private:
   // Image data objects
   IRISImageData *m_IRISImageData,*m_CurrentImageData;

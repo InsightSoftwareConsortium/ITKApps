@@ -22,6 +22,20 @@
 
 using namespace std;
 
+const int
+AppearanceDialogUILogic
+::m_MapMenuToElementIndex[] = 
+  { 
+    SNAPAppearanceSettings::MARKERS,
+    SNAPAppearanceSettings::CROSSHAIRS,
+    SNAPAppearanceSettings::ROI_BOX,
+    SNAPAppearanceSettings::BACKGROUND_2D,
+    SNAPAppearanceSettings::BACKGROUND_3D,
+    SNAPAppearanceSettings::CROSSHAIRS_3D,
+    SNAPAppearanceSettings::ZOOM_THUMBNAIL,
+    SNAPAppearanceSettings::CROSSHAIRS_THUMB
+  };
+
 AppearanceDialogUILogic
 ::AppearanceDialogUILogic()
 {
@@ -246,9 +260,14 @@ void
 AppearanceDialogUILogic
 ::OnUIElementSelection(int value)
 {
-  // Get the active element
-  int iElement = value;
-  if(iElement < 0 || iElement >= SNAPAppearanceSettings::ELEMENT_COUNT)
+  // Must have a value!
+  if(value < 0) return;
+
+  // Find out the which element was selected
+  int iElement = m_MapMenuToElementIndex[value];
+
+  // Make sure a legit element was found
+  if(iElement == SNAPAppearanceSettings::ELEMENT_COUNT)
     return;
 
   // Set the user interface properties 
@@ -258,24 +277,26 @@ AppearanceDialogUILogic
   m_InLineThickness->value( e.LineThickness ); 
   m_InDashSpacing->value( e.DashSpacing ); 
   m_InFontSize->value( e.FontSize ); 
+  m_InVisible->value( e.Visible );
+  m_InAlphaBlending->value( e.AlphaBlending );
 
   // Create an array of widgets for cleaner code
   Fl_Widget *w[] = 
     { m_InColorNormal, m_InColorActive, m_InLineThickness,
-      m_InDashSpacing, m_InFontSize };
+      m_InDashSpacing, m_InFontSize, m_InVisible, m_InAlphaBlending };
 
   // Set the active/inactive status
   for(unsigned int iWidget = 0; iWidget < SNAPAppearanceSettings::FEATURE_COUNT; iWidget++)
     {
     if(m_Appearance->IsFeatureApplicable(iElement, iWidget))
       {
-      w[iWidget]->show();
       w[iWidget]->activate();
+      if(iWidget < 2) w[iWidget]->show();
       }
     else
       {
       w[iWidget]->deactivate();
-      w[iWidget]->hide();
+      if(iWidget < 2) w[iWidget]->hide();
       }
     }  
 }
@@ -303,9 +324,14 @@ void
 AppearanceDialogUILogic
 ::OnElementAppearanceResetAction()
 {
-  // Get the active element
-  int iElement = m_InUIElement->value();
-  if(iElement < 0 || iElement >= SNAPAppearanceSettings::ELEMENT_COUNT)
+  // Must have a value!
+  if(m_InUIElement->value() < 0) return;
+
+  // Find out the which element was selected
+  int iElement = m_MapMenuToElementIndex[m_InUIElement->value()];
+
+  // Make sure a legit element was found
+  if(iElement == SNAPAppearanceSettings::ELEMENT_COUNT)
     return;
 
   // Reset the element
@@ -327,9 +353,14 @@ void
 AppearanceDialogUILogic
 ::OnElementAppearanceApplyAction()
 {
-  // Get the active element
-  int iElement = m_InUIElement->value();
-  if(iElement < 0 || iElement >= SNAPAppearanceSettings::ELEMENT_COUNT)
+  // Must have a value!
+  if(m_InUIElement->value() < 0) return;
+
+  // Find out the which element was selected
+  int iElement = m_MapMenuToElementIndex[m_InUIElement->value()];
+
+  // Make sure a legit element was found
+  if(iElement == SNAPAppearanceSettings::ELEMENT_COUNT)
     return;
 
   // Set the element's properties
@@ -343,6 +374,8 @@ AppearanceDialogUILogic
   e.LineThickness = (float) m_InLineThickness->value();
   e.DashSpacing = (float) m_InDashSpacing->value();
   e.FontSize = (float) m_InFontSize->value();
+  e.AlphaBlending = m_InAlphaBlending->value() != 0;
+  e.Visible = m_InVisible->value() != 0;
   
   // Redraw the windows
   m_Parent->RedrawWindows();

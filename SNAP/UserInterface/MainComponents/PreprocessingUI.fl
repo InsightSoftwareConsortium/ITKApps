@@ -7,9 +7,9 @@ class PreprocessingUI {open : PreprocessingUIBase
   Function {MakeWindow()} {open
   } {
     Fl_Window m_WinInOut {
-      label {Intensity Region Filter} open
-      xywh {463 480 399 350} type Double box PLASTIC_DOWN_BOX
-      code0 {\#include "PreprocessingUIBase.h"} non_modal visible
+      label {Intensity Region Filter} open selected
+      xywh {463 480 399 350} type Double box PLASTIC_DOWN_BOX hide
+      code0 {\#include "PreprocessingUIBase.h"} non_modal
     } {
       Fl_Value_Slider m_InThresholdSteepness {
         label Smoothness
@@ -49,17 +49,17 @@ this->OnThresholdSettingsChange();}
       Fl_Button m_BtnThresholdOk {
         label Okay
         callback {this->OnThresholdOk();}
-        xywh {170 300 65 25} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 134 labelfont 1 labelsize 12
+        xywh {170 300 65 25} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX shortcut 0x1ff0d color 180 selection_color 134 labelfont 1 labelsize 12
       }
       Fl_Button m_BtnThresholdApply {
-        label Apply
+        label {&Apply}
         callback {this->OnThresholdApply();}
-        xywh {245 300 65 25} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 134 labelsize 12
+        xywh {245 300 65 25} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX shortcut 0x80061 color 180 selection_color 134 labelsize 12
       }
       Fl_Button m_BtnThresholdClose {
         label Close
         callback {this->OnThresholdClose();}
-        xywh {320 300 65 25} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 134 labelsize 12
+        xywh {320 300 65 25} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX shortcut 0xff1b color 180 selection_color 134 labelsize 12
       }
       Fl_Check_Button m_InThresholdPreview {
         label {Preview result}
@@ -85,7 +85,7 @@ this->OnThresholdSettingsChange();}
       }
       Fl_Value_Input m_InLowerThresholdText {
         label {Lower threshold}
-        callback {this->OnThresholdLowerChange(o->value());} selected
+        callback {this->OnThresholdLowerChange(o->value());}
         xywh {25 175 40 20} color 51 labelsize 12 align 5 maximum 100 step 0.1 textsize 10
       }
       Fl_Slider m_InLowerThreshold {
@@ -106,7 +106,7 @@ this->OnThresholdUpperChange(o->value());}
     }
     Fl_Window m_WinEdge {
       label {Image Edge Filter} open
-      xywh {48 188 400 351} type Double box PLASTIC_DOWN_BOX non_modal visible
+      xywh {48 188 400 351} type Double box PLASTIC_DOWN_BOX hide non_modal
     } {
       Fl_Value_Slider m_InEdgeScale {
         label {Scale of Gaussian blurring (sigma)}
@@ -129,17 +129,17 @@ this->OnEdgeSettingsChange();}
       Fl_Button m_BtnEdgeOK {
         label Okay
         callback {this->OnEdgeOk();}
-        xywh {170 300 65 25} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 134 labelfont 1 labelsize 12
+        xywh {170 300 65 25} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX shortcut 0x1ff0d color 180 selection_color 134 labelfont 1 labelsize 12
       }
       Fl_Button m_BtnEdgeApply {
-        label Apply
+        label {&Apply}
         callback {this->OnEdgeApply();}
-        xywh {245 300 65 25} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 134 labelsize 12
+        xywh {245 300 65 25} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX shortcut 0x80061 color 180 selection_color 134 labelsize 12
       }
       Fl_Button m_BtnEdgeClose {
         label Close
         callback {this->OnEdgeClose();}
-        xywh {320 300 65 25} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 134 labelsize 12
+        xywh {320 300 65 25} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX shortcut 0xff1b color 180 selection_color 134 labelsize 12
       }
       Fl_Check_Button m_InEdgePreview {
         label {Preview result}
