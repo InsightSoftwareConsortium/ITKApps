@@ -112,7 +112,7 @@ vtkPatchedLookupTable::~vtkPatchedLookupTable()
 
 // Scalar values greater than maximum range value are clamped to maximum
 // range value.
-void vtkPatchedLookupTable::SetTableRange(float r[2])
+void vtkPatchedLookupTable::SetTableRange(vtkFloatingPointType r[2])
 {
   this->SetTableRange(r[0],r[1]);
 }
@@ -121,7 +121,7 @@ void vtkPatchedLookupTable::SetTableRange(float r[2])
 // less than minimum range value are clamped to minimum range value.
 // Scalar values greater than maximum range value are clamped to maximum
 // range value.
-void vtkPatchedLookupTable::SetTableRange(float rmin, float rmax)
+void vtkPatchedLookupTable::SetTableRange(vtkFloatingPointType rmin, vtkFloatingPointType rmax)
 {
   if (this->Scale == VTK_SCALE_LOG10 && 
       ((rmin > 0 && rmax < 0) || (rmin < 0 && rmax > 0)))
@@ -156,8 +156,8 @@ void vtkPatchedLookupTable::SetScale(int scale)
   this->Scale = scale;
   this->Modified();
 
-  float rmin = this->TableRange[0];
-  float rmax = this->TableRange[1];
+  vtkFloatingPointType rmin = this->TableRange[0];
+  vtkFloatingPointType rmax = this->TableRange[1];
 
   if (this->Scale == VTK_SCALE_LOG10 && 
       ((rmin > 0 && rmax < 0) || (rmin < 0 && rmax > 0)))
@@ -184,8 +184,8 @@ int vtkPatchedLookupTable::Allocate(unsigned long sz, unsigned long ext)
 void vtkPatchedLookupTable::Build()
 {
   int hueCase;
-  float hue, sat, val, lx, ly, lz, frac, hinc, sinc, vinc, ainc;
-  float rgba[4], alpha;
+  vtkFloatingPointType hue, sat, val, lx, ly, lz, frac, hinc, sinc, vinc, ainc;
+  vtkFloatingPointType rgba[4], alpha;
   unsigned char *c_rgba;
   unsigned long i;
   unsigned long maxIndex = this->NumberOfColors - 1;
@@ -267,11 +267,11 @@ void vtkPatchedLookupTable::Build()
         c_rgba[3] = static_cast<unsigned char> (alpha*255.0);
         /* same code, but with rounding 
         c_rgba[0] = static_cast<unsigned char> 
-          (127.5f*(1.0f + (float)cos(double((1.0f-rgba[0])*3.141593f)))+0.5f);
+          (127.5f*(1.0f + (vtkFloatingPointType)cos(double((1.0f-rgba[0])*3.141593f)))+0.5f);
         c_rgba[1] = static_cast<unsigned char> 
-          (127.5f*(1.0f + (float)cos(double((1.0f-rgba[1])*3.141593f)))+0.5f);
+          (127.5f*(1.0f + (vtkFloatingPointType)cos(double((1.0f-rgba[1])*3.141593f)))+0.5f);
         c_rgba[2] = static_cast<unsigned char> 
-          (127.5f*(1.0f + (float)cos(double((1.0f-rgba[2])*3.141593f)))+0.5f);
+          (127.5f*(1.0f + (vtkFloatingPointType)cos(double((1.0f-rgba[2])*3.141593f)))+0.5f);
         c_rgba[3] = static_cast<unsigned char>(rgba[3]*255.0f + 0.5f);
         */
         }
@@ -288,7 +288,7 @@ void vtkPatchedLookupTable::Build()
 }
 
 // get the color for a scalar value
-void vtkPatchedLookupTable::GetColor(float v, float rgb[3])
+void vtkPatchedLookupTable::GetColor(vtkFloatingPointType v, vtkFloatingPointType rgb[3])
 {
   unsigned char *rgb8 = this->MapValue(v);
 
@@ -298,7 +298,7 @@ void vtkPatchedLookupTable::GetColor(float v, float rgb[3])
 }
 
 // get the opacity (alpha) for a scalar value
-float vtkPatchedLookupTable::GetOpacity(float v)
+vtkFloatingPointType vtkPatchedLookupTable::GetOpacity(vtkFloatingPointType v)
 {
   unsigned char *rgb8 = this->MapValue(v);
 
@@ -308,10 +308,10 @@ float vtkPatchedLookupTable::GetOpacity(float v)
 // There is a little more to this than simply taking the log10 of the
 // two range values: we do conversion of negative ranges to positive
 // ranges, and conversion of zero to a 'very small number'
-void vtkPatchedLookupTableLogRange(float range[2], float logRange[2])
+void vtkPatchedLookupTableLogRange(vtkFloatingPointType range[2], vtkFloatingPointType logRange[2])
 {
-  float rmin = range[0];
-  float rmax = range[1];
+  vtkFloatingPointType rmin = range[0];
+  vtkFloatingPointType rmax = range[1];
 
   if (rmin == 0)
     {
@@ -342,8 +342,8 @@ void vtkPatchedLookupTableLogRange(float range[2], float logRange[2])
 }
 
 // Apply log to value, with appropriate constraints.
-static inline float vtkApplyLogScale(float v, float range[2], 
-                                     float logRange[2])
+static inline vtkFloatingPointType vtkApplyLogScale(vtkFloatingPointType v, vtkFloatingPointType range[2], 
+                                     vtkFloatingPointType logRange[2])
 {
   // is the range set for negative numbers?
   if (range[0] < 0)
@@ -380,12 +380,12 @@ static inline float vtkApplyLogScale(float v, float range[2],
 }                 
 
 // Apply shift/scale to the scalar value v and do table lookup.
-static inline unsigned char *vtkLinearLookup(float v,   
+static inline unsigned char *vtkLinearLookup(vtkFloatingPointType v,   
                                              unsigned char *table,
-                                             float maxIndex,
-                                             float shift, float scale)
+                                             vtkFloatingPointType maxIndex,
+                                             vtkFloatingPointType shift, vtkFloatingPointType scale)
 {
-  float findx = (v + shift)*scale;
+  vtkFloatingPointType findx = (v + shift)*scale;
   if (findx < 0)
     {
     findx = 0;
@@ -401,14 +401,14 @@ static inline unsigned char *vtkLinearLookup(float v,
 }
 
 // Given a scalar value v, return an rgba color value from lookup table.
-unsigned char *vtkPatchedLookupTable::MapValue(float v)
+unsigned char *vtkPatchedLookupTable::MapValue(vtkFloatingPointType v)
 {
-  float maxIndex = this->NumberOfColors - 1;
-  float shift, scale;
+  vtkFloatingPointType maxIndex = this->NumberOfColors - 1;
+  vtkFloatingPointType shift, scale;
 
   if (this->Scale == VTK_SCALE_LOG10)
     {   // handle logarithmic scale
-    float logRange[2];
+    vtkFloatingPointType logRange[2];
     vtkPatchedLookupTableLogRange(this->TableRange, logRange);
     shift = -logRange[0];
     if (logRange[1] <= logRange[0])
@@ -453,19 +453,19 @@ static void vtkPatchedLookupTableMapData(vtkPatchedLookupTable *self, T *input,
                                   int inIncr, int outFormat)
 {
   int i = length;
-  float *range = self->GetTableRange();
-  float maxIndex = self->GetNumberOfColors() - 1;
-  float shift, scale;
+  vtkFloatingPointType *range = self->GetTableRange();
+  vtkFloatingPointType maxIndex = self->GetNumberOfColors() - 1;
+  vtkFloatingPointType shift, scale;
   unsigned char *table = self->GetPointer(0);
   unsigned char *cptr;
-  float alpha;
+  vtkFloatingPointType alpha;
 
   if ( (alpha=self->GetAlpha()) >= 1.0 ) //no blending required 
     {
     if (self->GetScale() == VTK_SCALE_LOG10)
       {
-      float val;
-      float logRange[2];
+      vtkFloatingPointType val;
+      vtkFloatingPointType logRange[2];
       vtkPatchedLookupTableLogRange(range, logRange);
       shift = -logRange[0];
       if (logRange[1] <= logRange[0])
@@ -595,8 +595,8 @@ static void vtkPatchedLookupTableMapData(vtkPatchedLookupTable *self, T *input,
     {
     if (self->GetScale() == VTK_SCALE_LOG10)
       {
-      float val;
-      float logRange[2];
+      vtkFloatingPointType val;
+      vtkFloatingPointType logRange[2];
       vtkPatchedLookupTableLogRange(range, logRange);
       shift = -logRange[0];
       if (logRange[1] <= logRange[0])
@@ -821,7 +821,7 @@ void vtkPatchedLookupTable::SetNumberOfTableValues(unsigned long number)
 // Directly load color into lookup table. Use [0,1] float values for color
 // component specification. Make sure that you've either used the
 // Build() method or used SetNumberOfTableValues() prior to using this method.
-void vtkPatchedLookupTable::SetTableValue(unsigned long indx, float rgba[4])
+void vtkPatchedLookupTable::SetTableValue(unsigned long indx, vtkFloatingPointType rgba[4])
 {
   unsigned char *_rgba = this->Table->WritePointer(4*indx,4);
 
@@ -836,18 +836,18 @@ void vtkPatchedLookupTable::SetTableValue(unsigned long indx, float rgba[4])
 
 // Directly load color into lookup table. Use [0,1] float values for color 
 // component specification.
-void vtkPatchedLookupTable::SetTableValue(unsigned long indx, float
-                                                     r, float g, float b,
-                                                     float a)
+void vtkPatchedLookupTable::SetTableValue(unsigned long indx, vtkFloatingPointType
+                                                     r, vtkFloatingPointType g, vtkFloatingPointType b,
+                                                     vtkFloatingPointType a)
 {
-  float rgba[4];
+  vtkFloatingPointType rgba[4];
   rgba[0] = r; rgba[1] = g; rgba[2] = b; rgba[3] = a;
   this->SetTableValue(indx,rgba);
 }
 
 // Return a rgba color value for the given index into the lookup Table. Color
 // components are expressed as [0,1] float values.
-void vtkPatchedLookupTable::GetTableValue(unsigned long indx, float rgba[4])
+void vtkPatchedLookupTable::GetTableValue(unsigned long indx, vtkFloatingPointType rgba[4])
 {
   unsigned char *_rgba;
 
@@ -863,7 +863,7 @@ void vtkPatchedLookupTable::GetTableValue(unsigned long indx, float rgba[4])
 
 // Return a rgba color value for the given index into the lookup table. Color
 // components are expressed as [0,1] float values.
-float *vtkPatchedLookupTable::GetTableValue(unsigned long indx)
+vtkFloatingPointType *vtkPatchedLookupTable::GetTableValue(unsigned long indx)
 {
   this->GetTableValue(indx, this->RGBA);
   return this->RGBA;

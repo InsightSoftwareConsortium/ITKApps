@@ -46,7 +46,6 @@ EditorConsole.cxx
 EditorConsoleBase.cxx
 Editor.cxx
 vtkPatchedImageReader.cxx
-vtkPatchedLookupTable.cxx
 vtkWSLookupTableManager.cxx
 vtkWSBoundingBoxManager.cxx
 vtkLookupTableEquivalencyHash.cxx

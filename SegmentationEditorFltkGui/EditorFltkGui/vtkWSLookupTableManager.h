@@ -23,7 +23,7 @@
 #ifndef __vtkWSLookupTableManager_
 #define __vtkWSLookupTableManager_
 
-#include "vtkPatchedLookupTable.h"
+#include "vtkLookupTable.h"
 #include "vtkLookupTableEquivalencyHash.h"
 #include "vtkImageData.h"
 
@@ -69,7 +69,7 @@ public:
   void SetNumberOfLabels(unsigned long n);
   vtkGetMacro(NumberOfLabels, unsigned long);
 
-  vtkPatchedLookupTable *GetLookupTable()
+  vtkLookupTable *GetLookupTable()
     { return this->LookupTable; }
 
   void MergeEquivalencies();
@@ -143,7 +143,7 @@ protected:
   ~vtkWSLookupTableManager();
 
 private:
-  vtkPatchedLookupTable *LookupTable;
+  vtkLookupTable *LookupTable;
   vtkLookupTableEquivalencyHash EquivalencyTable;
   
   float    MaximumSaliency;        // Maximum value the saliency can take.

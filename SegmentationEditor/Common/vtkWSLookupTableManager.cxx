@@ -34,7 +34,7 @@ vtkWSLookupTableManager::vtkWSLookupTableManager()
 {
   // Initialize member variables.
   this->LookupTable = 0;
-  //  this->LookupTable = vtkPatchedLookupTable::New();
+  //  this->LookupTable = vtkLookupTable::New();
   this->CurrentThreshold       = 0.0;
   this->CurrentPositionPointer = 0;
   this->MergeList              = 0;
@@ -249,7 +249,7 @@ void vtkWSLookupTableManager::Initialize()
     {
       this->LookupTable->Delete();
     }
-  this->LookupTable = vtkPatchedLookupTable::New();
+  this->LookupTable = vtkLookupTable::New();
 
   // Reset all other values and tables
   if (this->MergeList != 0) delete[] this->MergeList;

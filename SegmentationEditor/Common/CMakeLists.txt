@@ -5,7 +5,6 @@ SET(WSTCommon_SRCS
   vtkITKWatershedFilterAndWriter.h
   vtkLookupTableEquivalencyHash.cxx
   vtkPatchedImageReader.cxx
-  vtkPatchedLookupTable.cxx
   vtkWSBoundingBoxManager.cxx
   vtkWSLookupTableManager.cxx
 )

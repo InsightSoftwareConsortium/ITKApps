@@ -492,16 +492,16 @@ void vtkPatchedImageReader::PrintSelf(ostream& os, vtkIndent indent)
 void vtkPatchedImageReader::ExecuteInformation()
 {
   vtkImageData *output = this->GetOutput();
-  float spacing[3];
+  vtkFloatingPointType spacing[3];
   int extent[6];
-  float origin[3];
+  vtkFloatingPointType origin[3];
   
   
   // set the extent, if the VOI has not been set then default to
   // the DataExtent
   if (this->DataVOI[0] || this->DataVOI[1] || 
       this->DataVOI[2] || this->DataVOI[3] || 
-      this->DataVOI[4] || this->DataVOI[5])
+      this->DataVOI[4] || this->DataVOI[5]) 
     {
     this->ComputeTransformedExtent(this->DataVOI,extent);
     output->SetWholeExtent(extent);
@@ -938,16 +938,16 @@ void vtkPatchedImageReader::SetDataScalarType(int type)
 }
 
 
-void vtkPatchedImageReader::ComputeTransformedSpacing (float Spacing[3])
+void vtkPatchedImageReader::ComputeTransformedSpacing (vtkFloatingPointType Spacing[3])
 {
   if (!this->Transform)
     {
-    memcpy (Spacing, this->DataSpacing, 3 * sizeof (float));
+    memcpy (Spacing, this->DataSpacing, 3 * sizeof (vtkFloatingPointType));
     }
   else
     {
-    float transformedSpacing[3];
-    memcpy (transformedSpacing, this->DataSpacing, 3 * sizeof (float));
+    vtkFloatingPointType transformedSpacing[3];
+    memcpy (transformedSpacing, this->DataSpacing, 3 * sizeof (vtkFloatingPointType));
     this->Transform->TransformVector(transformedSpacing, transformedSpacing);
 
     for (int i = 0; i < 3; i++)
@@ -961,22 +961,22 @@ void vtkPatchedImageReader::ComputeTransformedSpacing (float Spacing[3])
 // if the spacing is negative we need to tranlate the origin
 // basically O' = O + spacing*(dim-1) for any axis that would
 // have a negative spaing
-void vtkPatchedImageReader::ComputeTransformedOrigin (float origin[3])
+void vtkPatchedImageReader::ComputeTransformedOrigin (vtkFloatingPointType origin[3])
 {
   if (!this->Transform)
     {
-    memcpy (origin, this->DataOrigin, 3 * sizeof (float));
+    memcpy (origin, this->DataOrigin, 3 * sizeof (vtkFloatingPointType));
     }
   else
     {
-    float transformedOrigin[3];
-    float transformedSpacing[3];
+    vtkFloatingPointType transformedOrigin[3];
+    vtkFloatingPointType transformedSpacing[3];
     int transformedExtent[6];
     
-    memcpy (transformedSpacing, this->DataSpacing, 3 * sizeof (float));
+    memcpy (transformedSpacing, this->DataSpacing, 3 * sizeof (vtkFloatingPointType));
     this->Transform->TransformVector(transformedSpacing, transformedSpacing);
 
-    memcpy (transformedOrigin, this->DataOrigin, 3 * sizeof (float));
+    memcpy (transformedOrigin, this->DataOrigin, 3 * sizeof (vtkFloatingPointType));
     this->Transform->TransformPoint(transformedOrigin, transformedOrigin);
 
     this->ComputeTransformedExtent(this->DataExtent,transformedExtent);
@@ -1000,7 +1000,7 @@ void vtkPatchedImageReader::ComputeTransformedOrigin (float origin[3])
 void vtkPatchedImageReader::ComputeTransformedExtent(int inExtent[6],
                                               int outExtent[6])
 {
-  float transformedExtent[3];
+  vtkFloatingPointType transformedExtent[3];
   int temp;
   int idx;
   int dataExtent[6];
@@ -1080,7 +1080,7 @@ void vtkPatchedImageReader::ComputeTransformedExtent(int inExtent[6],
 void vtkPatchedImageReader::ComputeInverseTransformedExtent(int inExtent[6],
                                                      int outExtent[6])
 {
-  float transformedExtent[3];
+  vtkFloatingPointType transformedExtent[3];
   int temp;
   int idx;
   
@@ -1170,7 +1170,7 @@ void vtkPatchedImageReader::ComputeInverseTransformedExtent(int inExtent[6],
 void vtkPatchedImageReader::ComputeTransformedIncrements(int inIncr[3],
                                                   int outIncr[3])
 {
-  float transformedIncr[3];
+  vtkFloatingPointType transformedIncr[3];
   
   if (!this->Transform)
     {
@@ -1194,7 +1194,7 @@ void vtkPatchedImageReader::ComputeTransformedIncrements(int inIncr[3],
 void vtkPatchedImageReader::ComputeInverseTransformedIncrements(int inIncr[3],
                                                          int outIncr[3])
 {
-  float transformedIncr[3];
+  vtkFloatingPointType transformedIncr[3];
   
   if (!this->Transform)
     {

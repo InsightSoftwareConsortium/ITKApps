@@ -23,6 +23,10 @@
 #include <FL/fl_file_chooser.H>
 #include <fltkUtils.h>
 
+#ifndef vtkFloatingPointType
+#define vtkFloatingPointType float
+#endif
+
 /************************************
  *
  *  Constructor
@@ -755,7 +759,7 @@ bool EditorConsole::LoadSource() {
   resamplerCol->SetInput(converter->GetOutput());
 
   // change colormap for source image
-  float range[2];
+  vtkFloatingPointType range[2];
   converter->GetOutput()->GetScalarRange(range);
   colormapMin->value(range[0]);
   colormapMax->value(range[1]);
