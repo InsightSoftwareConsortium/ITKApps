@@ -11,10 +11,8 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 
   vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
-  const float stoppingValue         = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
-  const float sigma                 = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
-  const float lowestBasinValue      = atof( info->GetGUIProperty(info, 2, VVP_GUI_VALUE ));
-  const float lowestBorderValue     = atof( info->GetGUIProperty(info, 3, VVP_GUI_VALUE ));
+  const float lowestBasinValue      = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
+  const float lowestBorderValue     = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
 
   const unsigned int numberOfSeeds = info->NumberOfMarkers;
   if( numberOfSeeds < 1 )
@@ -86,29 +84,17 @@ static int UpdateGUI(void *inf)
 {
   vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
-  info->SetGUIProperty(info, 0, VVP_GUI_LABEL, "Stopping Value");
+  info->SetGUIProperty(info, 0, VVP_GUI_LABEL, "Bottom of basin.");
   info->SetGUIProperty(info, 0, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 0, VVP_GUI_DEFAULT, "50.0");
-  info->SetGUIProperty(info, 0, VVP_GUI_HELP, "Defines a stopping value for the time up to which the front propagation will be computed.");
-  info->SetGUIProperty(info, 0, VVP_GUI_HINTS , "1 200 1");
+  info->SetGUIProperty(info, 0, VVP_GUI_DEFAULT, "0.0");
+  info->SetGUIProperty(info, 0, VVP_GUI_HELP, "The lowest value of the gradient magnitude in the inside of the region to be segmented. This value will be mapped by the Sigmoid into the fastest propagation in the speed image.");
+  info->SetGUIProperty(info, 0, VVP_GUI_HINTS , "0.1 10.0 0.1");
 
-  info->SetGUIProperty(info, 1, VVP_GUI_LABEL, "Sigma for gradient magnitude.");
+  info->SetGUIProperty(info, 1, VVP_GUI_LABEL, "Lowest of basin border.");
   info->SetGUIProperty(info, 1, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 1, VVP_GUI_DEFAULT, "1.0");
-  info->SetGUIProperty(info, 1, VVP_GUI_HELP, "The input image is smoothed with a Gaussian during the computation of the Gradient Magnitude. This sigma value should be large enough to attenuate image noise, but not as large as to prevent the level set front from getting close to the edges of objects in the image.");
-  info->SetGUIProperty(info, 1, VVP_GUI_HINTS , "0.1 10.0 0.1");
-
-  info->SetGUIProperty(info, 2, VVP_GUI_LABEL, "Bottom of basin.");
-  info->SetGUIProperty(info, 2, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 2, VVP_GUI_DEFAULT, "0.0");
-  info->SetGUIProperty(info, 2, VVP_GUI_HELP, "The lowest value of the gradient magnitude in the inside of the region to be segmented. This value will be mapped by the Sigmoid into the fastest propagation in the speed image.");
-  info->SetGUIProperty(info, 2, VVP_GUI_HINTS , "0.1 10.0 0.1");
-
-  info->SetGUIProperty(info, 3, VVP_GUI_LABEL, "Lowest of basin border.");
-  info->SetGUIProperty(info, 3, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 3, VVP_GUI_DEFAULT, "6.0");
-  info->SetGUIProperty(info, 3, VVP_GUI_HELP, "The lowest value of the gradient magnitude in the border of the region to be segmented. This value will be mapped by the Sigmoid into the slowest propagation in the speed image.");
-  info->SetGUIProperty(info, 3, VVP_GUI_HINTS , "0.1 50.0 0.1");
+  info->SetGUIProperty(info, 1, VVP_GUI_DEFAULT, "6.0");
+  info->SetGUIProperty(info, 1, VVP_GUI_HELP, "The lowest value of the gradient magnitude in the border of the region to be segmented. This value will be mapped by the Sigmoid into the slowest propagation in the speed image.");
+  info->SetGUIProperty(info, 1, VVP_GUI_HINTS , "0.1 50.0 0.1");
 
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP, "0");
   
@@ -133,15 +119,15 @@ void VV_PLUGIN_EXPORT vvITKShapeDetectionModuleInit(vtkVVPluginInfo *info)
   // setup information that never changes
   info->ProcessData = ProcessData;
   info->UpdateGUI   = UpdateGUI;
-  info->SetProperty(info, VVP_NAME, "Fast Marching Module (ITK)");
+  info->SetProperty(info, VVP_NAME, "Shape Detection Module (ITK)");
   info->SetProperty(info, VVP_TERSE_DOCUMENTATION,
-                                    "Fast Marching Module");
+                                    "Shape Detection Module");
   info->SetProperty(info, VVP_FULL_DOCUMENTATION,
-    "This module applies a Fast Marching level set method for segmenting a volume. All the necessary  preprocessing is packaged in this module. This makes it a good choice when you are already familiar with the parameters settings requires for you particular data set. When you are applying FastMarching to a new data set, you may want to rather go step by step using each one the individual filters.");
+    "This module applies a Shape Detection level set method for segmenting a volume. All the necessary  preprocessing is packaged in this module. This makes it a good choice when you are already familiar with the parameters settings requires for you particular data set. When you are applying ShapeDetection to a new data set, you may want to rather go step by step using each one the individual filters. Please experience first with the FastMarching modules, since it is used here for preprocessing the data set before applying the ShapeDetection filter.");
 
   info->SetProperty(info, VVP_SUPPORTS_IN_PLACE_PROCESSING, "0");
   info->SetProperty(info, VVP_SUPPORTS_PROCESSING_PIECES,   "0");
-  info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "4");
+  info->SetProperty(info, VVP_NUMBER_OF_GUI_ITEMS,          "2");
   info->SetProperty(info, VVP_REQUIRED_Z_OVERLAP,           "0");
   info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED,   "16");
 
