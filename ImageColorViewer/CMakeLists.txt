@@ -8,11 +8,6 @@ INCLUDE_DIRECTORIES (
 )
 
 
-IF(WIN32)
-  LINK_LIBRARIES(
-    wsock32
-  )
-ENDIF(WIN32)
 
 ADD_GUI_EXECUTABLE( ImageColorViewer "${ImageColorViewer_SRCS}" )
 TARGET_LINK_LIBRARIES (ImageColorViewer
