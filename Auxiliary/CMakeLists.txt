@@ -1,6 +1,6 @@
 # Add an option to build or not build the FltkImageViewer Library
 IF(FLTK_FOUND)
-  SUBDIRS(FltkImageViewer)
+  SUBDIRS(FltkImageViewer ITKFlFileWriter)
   IF(VTK_FOUND)
     SUBDIRS(VtkFltk)
   ENDIF(VTK_FOUND)
