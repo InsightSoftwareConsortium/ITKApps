@@ -17,25 +17,22 @@ AffineRegistrator< TImage >
   
   this->SetOptimizer(OptimizerType::New());
   m_OptimizerNumberOfIterations = 100 ;
-  m_OptimizerScales.set_size(18) ; 
+  m_OptimizerScales.set_size(15) ; 
   m_OptimizerScales[0] = 200; // rotations
   m_OptimizerScales[1] = 200;
   m_OptimizerScales[2] = 200;
-  m_OptimizerScales[3] = 10;  // center of rotation
-  m_OptimizerScales[4] = 10;
-  m_OptimizerScales[5] = 10;
-  m_OptimizerScales[6] = 1;  // offset
-  m_OptimizerScales[7] = 1;
-  m_OptimizerScales[8] = 1;
-  m_OptimizerScales[9] = 300;  // scale
-  m_OptimizerScales[10] = 300;
-  m_OptimizerScales[11] = 300;
-  m_OptimizerScales[12] = 400; // skew
+  m_OptimizerScales[3] = 1;  // offset
+  m_OptimizerScales[4] = 1;
+  m_OptimizerScales[5] = 1;
+  m_OptimizerScales[6] = 300;  // scale
+  m_OptimizerScales[7] = 300;
+  m_OptimizerScales[8] = 300;
+  m_OptimizerScales[9] = 400; // skew
+  m_OptimizerScales[10] = 400;
+  m_OptimizerScales[11] = 400;
+  m_OptimizerScales[12] = 400;
   m_OptimizerScales[13] = 400;
   m_OptimizerScales[14] = 400;
-  m_OptimizerScales[15] = 400;
-  m_OptimizerScales[16] = 400;
-  m_OptimizerScales[17] = 400;
   
   this->GetTypedOptimizer()->SetNormalVariateGenerator(
                              OptimizerNormalGeneratorType::New());

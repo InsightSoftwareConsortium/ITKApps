@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0103 
+version 1.0104 
 header_name {.h} 
 code_name {.cxx}
 class guiMain {open
@@ -8,7 +8,7 @@ class guiMain {open
   } {
     Fl_Window tkWindow {
       label {Landmarkd Initialized Mutual Information 3D Registration Tool } open
-      xywh {223 436 1060 705} type Single box PLASTIC_UP_BOX color 159 resizable visible
+      xywh {223 422 1060 705} type Single box PLASTIC_UP_BOX color 159 resizable visible
     } {
       Fl_Group tkMainGroup {open
         xywh {0 30 1050 710} resizable
@@ -532,13 +532,9 @@ tkMovingImageViewer->DrawRegionOfInterest() ;}
             label Rotation
             xywh {235 100 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
           }
-          Fl_Value_Input tkLandmarkCenterOfRotationScale {
-            label {Center of Rotation}
-            xywh {235 135 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
-          }
           Fl_Value_Input tkLandmarkTranslationScale {
             label Translation
-            xywh {235 170 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+            xywh {235 135 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
           }
         }
         Fl_Group {} {
@@ -561,13 +557,9 @@ tkMovingImageViewer->DrawRegionOfInterest() ;}
             label Rotation
             xywh {235 100 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
           }
-          Fl_Value_Input tkRigidCenterOfRotationScale {
-            label {Center of Rotation}
-            xywh {235 135 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
-          }
           Fl_Value_Input tkRigidTranslationScale {
             label Translation
-            xywh {235 170 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+            xywh {235 135 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
           }
         }
         Fl_Group {} {
@@ -590,21 +582,17 @@ tkMovingImageViewer->DrawRegionOfInterest() ;}
             label Rotation
             xywh {235 100 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
           }
-          Fl_Value_Input tkAffineCenterOfRotationScale {
-            label {Center of Rotation}
-            xywh {235 135 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
-          }
           Fl_Value_Input tkAffineTranslationScale {
             label Translation
-            xywh {235 170 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+            xywh {235 135 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
           }
           Fl_Value_Input tkAffineScaleScale {
             label Scale
-            xywh {235 205 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+            xywh {235 170 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
           }
           Fl_Value_Input tkAffineSkewScale {
             label Skew
-            xywh {235 240 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+            xywh {235 205 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
           }
         }
       }

@@ -17,16 +17,13 @@ LandmarkRegistrator::LandmarkRegistrator()
 
   m_OptimizerNumberOfIterations = 5000;
 
-  m_OptimizerScales.set_size(9);
+  m_OptimizerScales.set_size(6);
   m_OptimizerScales[0] = 200; // rotation
   m_OptimizerScales[1] = 200;
   m_OptimizerScales[2] = 200;
-  m_OptimizerScales[3] = 10; // center of rotation
-  m_OptimizerScales[4] = 10;
-  m_OptimizerScales[5] = 10;
-  m_OptimizerScales[6] = 1;   // offset
-  m_OptimizerScales[7] = 1;
-  m_OptimizerScales[8] = 1;
+  m_OptimizerScales[3] = 1;   // offset
+  m_OptimizerScales[4] = 1;
+  m_OptimizerScales[5] = 1;
   }
 
 LandmarkRegistrator
@@ -48,11 +45,9 @@ LandmarkRegistrator
     throw(e);
     }
 
-  ParametersType fixedCenter;
-  fixedCenter.set_size(3);
+  itk::Point<double, 3> fixedCenter;
   fixedCenter.Fill(0);
-  ParametersType movingCenter;
-  movingCenter.set_size(3);
+  itk::Point<double, 3> movingCenter;
   movingCenter.Fill(0);
   for( unsigned int i=0; i<m_MovingLandmarkSet->Size(); i++)
     {
@@ -67,12 +62,9 @@ LandmarkRegistrator
     fixedCenter[j] /= m_FixedLandmarkSet->Size();
     movingCenter[j] /= m_MovingLandmarkSet->Size();
     }
-  m_InitialTransformParameters[3] = movingCenter[0];
-  m_InitialTransformParameters[4] = movingCenter[1];
-  m_InitialTransformParameters[5] = movingCenter[2];
-  m_InitialTransformParameters[6] = fixedCenter[0]-movingCenter[0];
-  m_InitialTransformParameters[7] = fixedCenter[1]-movingCenter[1];
-  m_InitialTransformParameters[8] = fixedCenter[2]-movingCenter[2];
+  m_InitialTransformParameters[3] = fixedCenter[0]-movingCenter[0];
+  m_InitialTransformParameters[4] = fixedCenter[1]-movingCenter[1];
+  m_InitialTransformParameters[5] = fixedCenter[2]-movingCenter[2];
 
   std::cout << "LandmarkRegistrator: InitialParameters = " << std::endl
             << m_InitialTransformParameters << std::endl;
@@ -107,6 +99,7 @@ LandmarkRegistrator
 
   m_Transform = TransformType::New();
   m_Transform->SetParameters(m_Optimizer->GetCurrentPosition());
+  m_Transform->SetCenter(movingCenter);
   }
 
 void 

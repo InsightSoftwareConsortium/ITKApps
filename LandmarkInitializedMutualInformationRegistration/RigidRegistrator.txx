@@ -17,16 +17,13 @@ RigidRegistrator< TImage >
 
   this->SetOptimizer(OptimizerType::New());
   m_OptimizerNumberOfIterations = 100 ;
-  m_OptimizerScales.set_size(9) ; 
+  m_OptimizerScales.set_size(6) ; 
   m_OptimizerScales[0] = 200; // rotations
   m_OptimizerScales[1] = 200;
   m_OptimizerScales[2] = 200;
-  m_OptimizerScales[3] = 10;  // center of rotation
-  m_OptimizerScales[4] = 10;
-  m_OptimizerScales[5] = 10;
-  m_OptimizerScales[6] = 1;  // offset
-  m_OptimizerScales[7] = 1;
-  m_OptimizerScales[8] = 1;
+  m_OptimizerScales[3] = 1;  // offset
+  m_OptimizerScales[4] = 1;
+  m_OptimizerScales[5] = 1;
   this->GetTypedOptimizer()->SetNormalVariateGenerator(
                 OptimizerNormalGeneratorType::New());
 

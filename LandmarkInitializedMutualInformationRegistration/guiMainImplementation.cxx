@@ -810,14 +810,12 @@ guiMainImplementation
 
   // set landmark advance option values
   tkLandmarkRotationScale->value(m_ImageRegistrationApp->GetLandmarkScales()[0]);
-  tkLandmarkCenterOfRotationScale->value(m_ImageRegistrationApp->GetLandmarkScales()[3]);
-  tkLandmarkTranslationScale->value(m_ImageRegistrationApp->GetLandmarkScales()[6]);
+  tkLandmarkTranslationScale->value(m_ImageRegistrationApp->GetLandmarkScales()[3]);
   tkLandmarkNumberOfIterations->value(m_ImageRegistrationApp->GetLandmarkNumberOfIterations());
 
   // set rigid advance option values
   tkRigidRotationScale->value(m_ImageRegistrationApp->GetRigidScales()[0]);
-  tkRigidCenterOfRotationScale->value(m_ImageRegistrationApp->GetRigidScales()[3]);
-  tkRigidTranslationScale->value(m_ImageRegistrationApp->GetRigidScales()[6]);
+  tkRigidTranslationScale->value(m_ImageRegistrationApp->GetRigidScales()[3]);
   tkRigidNumberOfIterations->value(m_ImageRegistrationApp->GetRigidNumberOfIterations());
   tkRigidNumberOfSpatialSamples->value
     (m_ImageRegistrationApp->GetRigidNumberOfSpatialSamples());
@@ -829,10 +827,9 @@ guiMainImplementation
 
   // set affine advance option values
   tkAffineRotationScale->value(m_ImageRegistrationApp->GetAffineScales()[0]);
-  tkAffineCenterOfRotationScale->value(m_ImageRegistrationApp->GetAffineScales()[3]);
-  tkAffineTranslationScale->value(m_ImageRegistrationApp->GetAffineScales()[6]);
-  tkAffineScaleScale->value(m_ImageRegistrationApp->GetAffineScales()[9]);
-  tkAffineSkewScale->value(m_ImageRegistrationApp->GetAffineScales()[12]);
+  tkAffineTranslationScale->value(m_ImageRegistrationApp->GetAffineScales()[3]);
+  tkAffineScaleScale->value(m_ImageRegistrationApp->GetAffineScales()[6]);
+  tkAffineSkewScale->value(m_ImageRegistrationApp->GetAffineScales()[9]);
   tkAffineNumberOfIterations->value(m_ImageRegistrationApp->GetAffineNumberOfIterations());
   tkAffineNumberOfSpatialSamples->value
     (m_ImageRegistrationApp->GetAffineNumberOfSpatialSamples());
@@ -850,32 +847,26 @@ guiMainImplementation
 
   // set landmark advance option values
   ImageRegistrationAppType::RigidScalesType landmarkScales;
-  landmarkScales.set_size(9);
+  landmarkScales.set_size(6);
   landmarkScales[0] = tkLandmarkRotationScale->value();
   landmarkScales[1] = tkLandmarkRotationScale->value();
   landmarkScales[2] = tkLandmarkRotationScale->value();
-  landmarkScales[3] = tkLandmarkCenterOfRotationScale->value();
-  landmarkScales[4] = tkLandmarkCenterOfRotationScale->value();
-  landmarkScales[5] = tkLandmarkCenterOfRotationScale->value();
-  landmarkScales[6] = tkLandmarkTranslationScale->value();
-  landmarkScales[7] = tkLandmarkTranslationScale->value();
-  landmarkScales[8] = tkLandmarkTranslationScale->value();
+  landmarkScales[3] = tkLandmarkTranslationScale->value();
+  landmarkScales[4] = tkLandmarkTranslationScale->value();
+  landmarkScales[5] = tkLandmarkTranslationScale->value();
   m_ImageRegistrationApp->SetLandmarkScales(landmarkScales);
   m_ImageRegistrationApp->SetLandmarkNumberOfIterations(
                (unsigned int) tkLandmarkNumberOfIterations->value());
 
   // set rigid advance option values
   ImageRegistrationAppType::RigidScalesType rigidScales;
-  rigidScales.set_size(9);
+  rigidScales.set_size(6);
   rigidScales[0] = tkRigidRotationScale->value();
   rigidScales[1] = tkRigidRotationScale->value();
   rigidScales[2] = tkRigidRotationScale->value();
-  rigidScales[3] = tkRigidCenterOfRotationScale->value();
-  rigidScales[4] = tkRigidCenterOfRotationScale->value();
-  rigidScales[5] = tkRigidCenterOfRotationScale->value();
-  rigidScales[6] = tkRigidTranslationScale->value();
-  rigidScales[7] = tkRigidTranslationScale->value();
-  rigidScales[8] = tkRigidTranslationScale->value();
+  rigidScales[3] = tkRigidTranslationScale->value();
+  rigidScales[4] = tkRigidTranslationScale->value();
+  rigidScales[5] = tkRigidTranslationScale->value();
   m_ImageRegistrationApp->SetRigidScales(rigidScales);
   m_ImageRegistrationApp->SetRigidNumberOfIterations(
                (unsigned int) tkRigidNumberOfIterations->value());
@@ -889,25 +880,22 @@ guiMainImplementation
 
   // set affine advance option values
   ImageRegistrationAppType::AffineScalesType affineScales;
-  affineScales.set_size(18);
+  affineScales.set_size(15);
   affineScales[0] = tkAffineRotationScale->value();
   affineScales[1] = tkAffineRotationScale->value();
   affineScales[2] = tkAffineRotationScale->value();
-  affineScales[3] = tkAffineCenterOfRotationScale->value();
-  affineScales[4] = tkAffineCenterOfRotationScale->value();
-  affineScales[5] = tkAffineCenterOfRotationScale->value();
-  affineScales[6] = tkAffineTranslationScale->value();
-  affineScales[7] = tkAffineTranslationScale->value();
-  affineScales[8] = tkAffineTranslationScale->value();
-  affineScales[9] = tkAffineScaleScale->value();
-  affineScales[10] = tkAffineScaleScale->value();
-  affineScales[11] = tkAffineScaleScale->value();
+  affineScales[3] = tkAffineTranslationScale->value();
+  affineScales[4] = tkAffineTranslationScale->value();
+  affineScales[5] = tkAffineTranslationScale->value();
+  affineScales[6] = tkAffineScaleScale->value();
+  affineScales[7] = tkAffineScaleScale->value();
+  affineScales[8] = tkAffineScaleScale->value();
+  affineScales[9] = tkAffineSkewScale->value();
+  affineScales[10] = tkAffineSkewScale->value();
+  affineScales[11] = tkAffineSkewScale->value();
   affineScales[12] = tkAffineSkewScale->value();
   affineScales[13] = tkAffineSkewScale->value();
   affineScales[14] = tkAffineSkewScale->value();
-  affineScales[15] = tkAffineSkewScale->value();
-  affineScales[16] = tkAffineSkewScale->value();
-  affineScales[17] = tkAffineSkewScale->value();
   m_ImageRegistrationApp->SetAffineScales(affineScales);
   m_ImageRegistrationApp->SetAffineNumberOfIterations(
                (unsigned int) tkAffineNumberOfIterations->value());
