@@ -61,7 +61,6 @@ LandmarkBasedRegistrator<TInputImage, TOutputImage, TTransform >
     m_Optimizer->SetCostFunction(m_CostFunction);
     m_Optimizer->SetNormalVariateGenerator(m_Generator);
     m_Optimizer->SetMaximumIteration(m_NumberOfIterations);
-    m_Optimizer->DebugOn() ;
     m_Optimizer->StartOptimization();
     }
   catch( itk::ExceptionObject &e )
