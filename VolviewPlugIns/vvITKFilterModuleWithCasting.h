@@ -150,7 +150,7 @@ public:
       {
       m_Filter->Update();
       }
-    catch( itk::ProcessAborted & excp )
+    catch( itk::ProcessAborted &  )
       {
       return;
       }
