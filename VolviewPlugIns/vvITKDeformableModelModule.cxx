@@ -59,19 +59,19 @@ static int UpdateGUI(void *inf)
 
   info->SetGUIProperty(info, 0, VVP_GUI_LABEL, "Radius X");
   info->SetGUIProperty(info, 0, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 0, VVP_GUI_DEFAULT, "1.0");
+  info->SetGUIProperty(info, 0, VVP_GUI_DEFAULT, "10.0");
   info->SetGUIProperty(info, 0, VVP_GUI_HELP, "Radius along X of the ellipsoide surface used to initialize the deformable model");
   info->SetGUIProperty(info, 0, VVP_GUI_HINTS , "0.5 50.0 0.5");
 
   info->SetGUIProperty(info, 1, VVP_GUI_LABEL, "Radius Y");
   info->SetGUIProperty(info, 1, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 1, VVP_GUI_DEFAULT, "1.0");
+  info->SetGUIProperty(info, 1, VVP_GUI_DEFAULT, "10.0");
   info->SetGUIProperty(info, 1, VVP_GUI_HELP, "Radius along Y of the ellipsoide surface used to initialize the deformable model");
   info->SetGUIProperty(info, 1, VVP_GUI_HINTS , "0.5 50.0 0.5");
 
   info->SetGUIProperty(info, 2, VVP_GUI_LABEL, "Radius Z");
   info->SetGUIProperty(info, 2, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 2, VVP_GUI_DEFAULT, "1.0");
+  info->SetGUIProperty(info, 2, VVP_GUI_DEFAULT, "10.0");
   info->SetGUIProperty(info, 2, VVP_GUI_HELP, "Radius along Z of the ellipsoide surface used to initialize the deformable model");
   info->SetGUIProperty(info, 2, VVP_GUI_HINTS , "0.5 50.0 0.5");
 
@@ -83,15 +83,15 @@ static int UpdateGUI(void *inf)
   
   info->SetGUIProperty(info, 4, VVP_GUI_LABEL, "Stiffness");
   info->SetGUIProperty(info, 4, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 4, VVP_GUI_DEFAULT, "0.05");
+  info->SetGUIProperty(info, 4, VVP_GUI_DEFAULT, "0.005");
   info->SetGUIProperty(info, 4, VVP_GUI_HELP, "Stiffness of the deformable surface. Larger values of this parameter will reduce the ability of the surface to adapt to details in the image. Too low values will make the surface prone to leaking through small openings.");
-  info->SetGUIProperty(info, 4, VVP_GUI_HINTS , "0.001 0.10 0.001");
+  info->SetGUIProperty(info, 4, VVP_GUI_HINTS , "0.0001 0.10 0.0001");
   
   info->SetGUIProperty(info, 5, VVP_GUI_LABEL, "External Forces");
   info->SetGUIProperty(info, 5, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 5, VVP_GUI_DEFAULT, "5.0");
+  info->SetGUIProperty(info, 5, VVP_GUI_DEFAULT, "50.0");
   info->SetGUIProperty(info, 5, VVP_GUI_HELP, "Factor used to weight the contribution of external forces computed from image gradients. Large values of this weight will increase the tendency of the surface to adhere to image contours. Too large values will result in irregular surfaces and leaking. Too low values will result in smoothed surfaces with poor fitting to image structures.");
-  info->SetGUIProperty(info, 5, VVP_GUI_HINTS , "0.1 10.0 0.1");
+  info->SetGUIProperty(info, 5, VVP_GUI_HINTS , "1.0 100.0 1.0");
   
   info->SetGUIProperty(info, 6, VVP_GUI_LABEL, "Time Step");
   info->SetGUIProperty(info, 6, VVP_GUI_TYPE, VVP_GUI_SCALE);
@@ -101,9 +101,9 @@ static int UpdateGUI(void *inf)
   
   info->SetGUIProperty(info, 7, VVP_GUI_LABEL, "Number of Iterations");
   info->SetGUIProperty(info, 7, VVP_GUI_TYPE, VVP_GUI_SCALE);
-  info->SetGUIProperty(info, 7, VVP_GUI_DEFAULT, "50");
+  info->SetGUIProperty(info, 7, VVP_GUI_DEFAULT, "200");
   info->SetGUIProperty(info, 7, VVP_GUI_HELP, "Number of times the evolution of the surface will be recomputed through one time step. Too few iterations will result in smoothed surfaces with poor image fitting. Too many iterations will was computational time and make the surface prone to leaking.");
-  info->SetGUIProperty(info, 7, VVP_GUI_HINTS , "0 500 1");
+  info->SetGUIProperty(info, 7, VVP_GUI_HINTS , "1 1000 1");
   
   info->SetGUIProperty(info, 8, VVP_GUI_LABEL, "Resolution X");
   info->SetGUIProperty(info, 8, VVP_GUI_TYPE, VVP_GUI_SCALE);
