@@ -75,6 +75,9 @@ public:
       to methods in the importer */
   ImporterFilterType * GetImporter() const;
   
+  /** This call delegate the update to the importer */
+  void Update();
+  
 protected:
   VTKImageToImageFilter(); 
   virtual ~VTKImageToImageFilter(); 

@@ -118,6 +118,20 @@ ImageToVTKImageFilter<TInputImage>
 
 
 
+/**
+ * Delegate the Update to the importer
+ */
+template <class TInputImage>
+void
+ImageToVTKImageFilter<TInputImage>
+::Update()
+{
+  m_Importer->Update();
+}
+
+
+
+
 
 } // end namespace itk
 
