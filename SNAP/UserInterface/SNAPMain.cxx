@@ -12,6 +12,12 @@
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
+// Borland compiler is very lazy so we need to instantiate the template
+//  by hand 
+#if defined(__BORLANDC__)
+#include <../../../SNAPBorlandDummyTypes.h>
+#endif
+
 #include "CommandLineArgumentParser.h"
 #include "ImageCoordinateGeometry.h"
 #include "ImageIORoutines.h"
@@ -339,6 +345,9 @@ int main(int argc, char **argv)
 
 /*
  *Log: SNAPMain.cxx
+ *Revision 1.8  2004/07/09 23:07:38  pauly
+ *ENH: Added a zoom-locator frame inside of the slice display window.
+ *
  *Revision 1.7  2003/12/16 13:19:26  pauly
  *FIX: Removed Fl::lock()
  *

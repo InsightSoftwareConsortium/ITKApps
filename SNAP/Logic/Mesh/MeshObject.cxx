@@ -12,6 +12,11 @@
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
+// Borland compiler is very lazy so we need to instantiate the template
+//  by hand 
+#if defined(__BORLANDC__)
+#include <../../../SNAPBorlandDummyTypes.h>
+#endif
 #include "MeshObject.h"
 
 #include "ColorLabel.h"
@@ -329,6 +334,9 @@ MeshObject
 
 /*
  *Log: MeshObject.cxx
+ *Revision 1.12  2004/07/29 14:01:56  pauly
+ *ENH: An interface for changing SNAP appearance settings
+ *
  *Revision 1.11  2004/01/27 17:34:00  pauly
  *FIX: Compiling on Mac OSX, issue with GLU include file
  *

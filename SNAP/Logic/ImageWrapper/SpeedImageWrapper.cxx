@@ -142,7 +142,11 @@ SpeedImageWrapper::OverlayFunctor
   SpeedImageWrapper::OverlayPixelType rtn(clear);
   
   // Check the threshold and return appropriate value
-  return in < m_Cutoff ? clear : m_Color;
+  if(in<m_Cutoff)
+    {
+    return clear;
+    } 
+  return m_Color;
 }
 
 

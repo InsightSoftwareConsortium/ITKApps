@@ -18,19 +18,8 @@
 // Smart pointers have to be included from ITK, can't forward reference them
 #include "SNAPCommon.h"
 #include "ImageCoordinateTransform.h"
-
-// Forward declarations of the ITK classes
-namespace itk {
-  template <unsigned int size> class ImageBase;
-  template <unsigned int size> class ImageRegion;
-  template <class TPixel, unsigned int size> class Image;
-  template <class ImageType> class ImageRegionIterator;
-  template <class ImageType> class ImageRegionConstIterator;
-  template <class ImageType> class MinimumMaximumImageCalculator;
-  class Command;
-  class ImageIOBase;
-  class ExceptionObject;
-}
+#include <itkMinimumMaximumImageCalculator.h>
+#include <itkImageRegionIterator.h>
 
 // Forward declarations to IRIS classes
 template <class TPixel> class IRISSlicer;

@@ -44,7 +44,7 @@ class AppearanceDialogUILogic;
 //template<class TPixel> class ImageIOWizardLogic;
 //class SegmentationImageIOWizardLogic;
 
-#include <ctime>
+#include <time.h>
 
 // ITK forward references
 namespace itk {
@@ -781,6 +781,9 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.18  2004/07/30 15:56:34  jjomier
+ *FIX: Warning, disabling 4786 on MSVC
+ *
  *Revision 1.17  2004/07/29 14:00:36  pauly
  *ENH: A new interface for changing the appearance of SNAP
  *

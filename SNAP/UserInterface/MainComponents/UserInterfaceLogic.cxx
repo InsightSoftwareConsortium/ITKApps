@@ -12,6 +12,12 @@
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
+// Borland compiler is very lazy so we need to instantiate the template
+//  by hand 
+#if defined(__BORLANDC__)
+#include <../../../SNAPBorlandDummyTypes.h>
+#endif
+
 #include "UserInterfaceLogic.h"
 
 #include "GlobalState.h"
@@ -1508,7 +1514,8 @@ UserInterfaceLogic
     }
   else
     {
-    m_OutDrawOverColor->color(fl_rgb_color(192, 192, 192));
+    rgb[0]=rgb[1]=rgb[2]=192;
+    m_OutDrawOverColor->color(fl_rgb_color(rgb[0],rgb[1],rgb[2]));
     m_OutDrawOverColor->redraw();
     }
 }
@@ -2960,6 +2967,9 @@ m_Driver->SetCursorPosition(m_GlobalState)
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.24  2004/07/29 14:00:36  pauly
+ *ENH: A new interface for changing the appearance of SNAP
+ *
  *Revision 1.23  2004/07/24 19:00:06  pauly
  *ENH: Thumbnail UI for slice zooming
  *

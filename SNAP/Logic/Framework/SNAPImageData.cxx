@@ -12,6 +12,13 @@
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
+// Borland compiler is very lazy so we need to instantiate the template
+//  by hand 
+#if defined(__BORLANDC__)
+#include <../../../SNAPBorlandDummyTypes.h>
+#endif
+
+#include "SNAPLevelSetDriver.h"
 #include "itkGroupSpatialObject.h"
 #include "itkEllipseSpatialObject.h"
 #include "itkSpatialObjectToImageFilter.h"
@@ -27,12 +34,12 @@
 #include "LevelSetImageWrapper.h"
 #include "SignedDistanceFilter.h"
 #include "SmoothBinaryThresholdImageFilter.h"
-#include "SNAPImageData.h"
-#include "SNAPLevelSetDriver.h"
 #include "SpeedImageWrapper.h"
 
-using namespace itk;
 
+#include "SNAPImageData.h"
+
+using namespace itk;
 
 SNAPImageData
 ::SNAPImageData()
@@ -40,19 +47,23 @@ SNAPImageData
   m_SpeedWrapper = NULL;
   m_SnakeInitializationWrapper = NULL;
   m_SnakeWrapper = NULL;
+
   m_LevelSetDriver = NULL;
   m_SnakeColorLabel = 0;
 }
+
 
 SNAPImageData
 ::~SNAPImageData() 
 {
   if(m_LevelSetDriver)
     delete m_LevelSetDriver;
+
   ClearSnake();
   ClearSnakeInitialization();
   ClearSpeed();
 }
+#if 1
 
 void 
 SNAPImageData
@@ -768,3 +779,5 @@ SNAPImageData
 {
   return m_LevelSetDriver->GetLevelSetFunction();
 }
+
+#endif

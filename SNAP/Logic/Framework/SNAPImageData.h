@@ -15,23 +15,25 @@
 #ifndef __SNAPImageData_h_
 #define __SNAPImageData_h_
 
-#include <itkImage.h>
+#include "SNAPCommon.h"
+#include "IRISException.h"
+
+#include "GreyImageWrapper.h"
+#include "GlobalState.h"
+#include "ColorLabel.h"
+#include "ImageCoordinateGeometry.h"
+
 #include "IRISImageData.h"
 #include "SnakeParameters.h"
 #include "SpeedImageWrapper.h"
 #include "LevelSetImageWrapper.h"
 
+
 #include "EdgePreprocessingSettings.h"
 #include "ThresholdSettings.h"
 
+#include "SNAPLevelSetFunction.h"
 template <unsigned int VDimension> class SNAPLevelSetDriver;
-template <class ImageType> class SNAPLevelSetFunction;
-typedef SNAPLevelSetDriver<3> SNAPLevelSetDriver3d;
-
-namespace itk {
-  class Command;
-  class EventObject;
-}
 
 /**
  * \class SNAPImageData
@@ -48,9 +50,6 @@ public:
   // The type of the internal level set image
   typedef itk::Image<float,3> FloatImageType;
   typedef FloatImageType LevelSetImageType;
-
-  // Command type for callbacks 
-  typedef itk::SmartPointer<itk::Command> CommandPointer;
 
   SNAPImageData();
   ~SNAPImageData();
@@ -244,7 +243,7 @@ private:
 
   /** Check the snake initialization image for validity */
   bool IsSnakeInitializationLoaded();
-  
+
   // Speed image adata
   SpeedImageWrapper *m_SpeedWrapper;
 
@@ -254,8 +253,9 @@ private:
   // Snake initialization data (initial distance transform
   LevelSetImageWrapper *m_SnakeInitializationWrapper;
 
+
   // Snake driver
-  SNAPLevelSetDriver3d *m_LevelSetDriver;
+  SNAPLevelSetDriver<3> *m_LevelSetDriver;
 
   // Label color used for the snake images
   LabelType m_SnakeColorLabel;

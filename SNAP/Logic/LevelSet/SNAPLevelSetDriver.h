@@ -79,6 +79,14 @@ template <unsigned int VDimension>
 class SNAPLevelSetDriver : public SNAPLevelSetDriverBase
 {
 public:
+
+  typedef SNAPLevelSetDriver Self;
+  // A callback type
+  typedef itk::SmartPointer<itk::Command> CommandPointer;
+  typedef itk::SimpleMemberCommand<Self> SelfCommandType;
+  typedef itk::SmartPointer<SelfCommandType> SelfCommandPointer;
+
+
   /** Floating point image type used internally */
   typedef itk::Image<float, VDimension> FloatImageType;
   typedef typename itk::SmartPointer<FloatImageType> FloatImagePointer;
@@ -160,11 +168,6 @@ private:
 
   /** Assign the values of snake parameters to a snake function */
   void AssignParametersToPhi(const SnakeParameters &parms, bool firstTime);
-
-  // A callback type
-  typedef itk::SmartPointer<itk::Command> CommandPointer;
-  typedef itk::SimpleMemberCommand<SNAPLevelSetDriver> SelfCommandType;
-  typedef itk::SmartPointer<SelfCommandType> SelfCommandPointer;
 
   /** Internal command pointer */
   SelfCommandPointer m_CommandAfterUpdate;

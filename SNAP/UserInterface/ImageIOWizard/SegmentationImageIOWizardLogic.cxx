@@ -12,6 +12,11 @@
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
+// Borland compiler is very lazy so we need to instantiate the template
+//  by hand 
+#if defined(__BORLANDC__)
+#include <../../../SNAPBorlandDummyTypes.h>
+#endif
 
 #include "SegmentationImageIOWizardLogic.h"
 #include "ImageIOWizardLogic.txx"

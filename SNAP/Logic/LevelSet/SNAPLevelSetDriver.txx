@@ -12,6 +12,15 @@
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
+#ifndef __SNAPLevelSetDriver_txx_
+#define __SNAPLevelSetDriver_txx_
+
+// Borland compiler is very lazy so we need to instantiate the template
+//  by hand 
+//#if defined(__BORLANDC__)
+//#include <../../../SNAPBorlandDummyTypes.h>
+//#endif
+
 #include "SNAPLevelSetDriver.h"
 #include "IRISVectorTypesToITKConversion.h"
 
@@ -109,14 +118,15 @@ SNAPLevelSetDriver<VDimension>
   // NarrowBand, ParallelSparseField, even Dense.  
   if(m_Parameters.GetSolver() == SnakeParameters::PARALLEL_SPARSE_FIELD_SOLVER)
     {
+    typedef itk::Image<float,3> FloatImageType;
     // Define an extension to the appropriate filter class
     typedef ParallelSparseFieldLevelSetImageFilter<
-      FloatImageType,FloatImageType> LevelSetFilterType;
+      itk::Image<float,3> ,itk::Image<float,3> > LevelSetFilterType;
     typedef LevelSetExtensionFilter<LevelSetFilterType> ExtensionFilterType;
       
     // Create a new extended filter
     typename ExtensionFilterType::Pointer filter = ExtensionFilterType::New();
-
+/*
     // Cast this specific filter down to the lowest common denominator that is
     // a filter
     m_LevelSetFilter = filter.GetPointer();
@@ -131,8 +141,9 @@ SNAPLevelSetDriver<VDimension>
     filter->SetNumberOfLayers(3);
     filter->SetIsoSurfaceValue(0.0f);
     filter->SetDifferenceFunction(m_LevelSetFunction);
-    }
-  else if(m_Parameters.GetSolver() == SnakeParameters::NARROW_BAND_SOLVER)
+ */
+   }
+ /* else if(m_Parameters.GetSolver() == SnakeParameters::NARROW_BAND_SOLVER)
     {
     // Define an extension to the appropriate filter class
     typedef NarrowBandLevelSetImageFilter<
@@ -181,6 +192,7 @@ SNAPLevelSetDriver<VDimension>
     filter->SetInput(m_InitializationImage);
     filter->SetDifferenceFunction(m_LevelSetFunction);
     }
+*/
 }
 
 template<unsigned int VDimension>
@@ -358,3 +370,6 @@ SNAPLevelSetDriver<VDimension>
       }
     }
 }
+
+#endif
+

@@ -18,16 +18,12 @@
 #include "itkExceptionObject.h"
 #include "GlobalState.h"
 #include "itkCommand.h"
+#include "itkImage.h"
 
 // Forward reference to the classes pointed at
 class IRISImageData;
 class SNAPImageData;
 
-// ITK forward defs
-namespace itk
-{
-  template<class TPixel,unsigned int VDimensions> class Image;
-}
 
 /**
  * \class IRISApplication
