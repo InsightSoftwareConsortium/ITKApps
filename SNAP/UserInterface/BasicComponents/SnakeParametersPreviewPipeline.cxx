@@ -229,7 +229,7 @@ LevelSetPreviewPipeline2D
   if(!m_ParametersInitialized || !(p == m_Parameters))
     {
     // Set up the level set function
-    m_Phi->SetAdvectionWeight(p.GetAdvectionWeight());
+    m_Phi->SetAdvectionWeight(-p.GetAdvectionWeight());
     m_Phi->SetAdvectionSpeedExponent(p.GetAdvectionSpeedExponent());
     m_Phi->SetCurvatureWeight(p.GetCurvatureWeight());
     m_Phi->SetCurvatureSpeedExponent(p.GetCurvatureSpeedExponent()+1);  
@@ -668,7 +668,7 @@ SnakeParametersPreviewPipeline
       * pow(g,m_Parameters.GetCurvatureSpeedExponent()+1);
 
     // Compute the advection force component of the curve evolution
-    p.AdvectionForce = m_Parameters.GetAdvectionWeight()
+    p.AdvectionForce = - m_Parameters.GetAdvectionWeight()
       * (p.n[0] * gradG[0] + p.n[1] * gradG[1])
       * pow(g,m_Parameters.GetAdvectionSpeedExponent());    
     }

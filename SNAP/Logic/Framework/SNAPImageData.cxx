@@ -364,6 +364,32 @@ SNAPImageData
   // voxels
   if (nInitVoxels == 0) return false;
 
+  // Create the initialization level set image
+  FloatImageType::Pointer imgLevelSet = FloatImageType::New();
+  imgLevelSet->SetRegions(imgBubbles->GetLargestPossibleRegion());
+  imgLevelSet->SetSpacing(imgBubbles->GetSpacing());
+  imgLevelSet->Allocate();
+
+  // Use iterators to set it pixels to positive and negative values. We are 
+  // not computing the distance transform because the level set filter will
+  // do that itself
+  typedef ImageRegionConstIterator<BubbleImageType> BubbleImageConstIterator;
+  typedef ImageRegionIterator<FloatImageType> FloatImageIterator;  
+  BubbleImageConstIterator itBubblesToLevel(
+    imgBubbles,imgBubbles->GetLargestPossibleRegion());
+  FloatImageIterator itLevelSet(
+    imgLevelSet,imgBubbles->GetLargestPossibleRegion());
+
+  // Perform the transfer
+  while(!itBubblesToLevel.IsAtEnd())
+    {
+    itLevelSet.Value() = itBubblesToLevel.Value() == 0 ? 1.0f : -1.0f;
+    ++itLevelSet;
+    ++itBubblesToLevel;
+    }
+
+  /*
+
   // The bounding box is used to compute a region for distance computation
   assert(bbLower[0] < bbUpper[0]);
   assert(bbLower[1] < bbUpper[1]);
@@ -416,6 +442,8 @@ SNAPImageData
     ++itLevelSet;
     ++itDistance;
     }
+  */  
+    
 
   // Create an image wrapper to hold this initialization
   m_SnakeInitializationWrapper = new LevelSetImageWrapper();

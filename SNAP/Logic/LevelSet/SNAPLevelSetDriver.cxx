@@ -63,10 +63,15 @@ SNAPLevelSetDriver
 ::AssignParametersToPhi(const SnakeParameters &p, bool irisNotUsed(firstTime))
 {
   // Set up the level set function
-  m_LevelSetFunction->SetAdvectionWeight(p.GetAdvectionWeight());
+
+  // The sign of the advection term is flipped in our equation
+  m_LevelSetFunction->SetAdvectionWeight( - p.GetAdvectionWeight());
   m_LevelSetFunction->SetAdvectionSpeedExponent(p.GetAdvectionSpeedExponent());
-  m_LevelSetFunction->SetCurvatureWeight(p.GetCurvatureWeight());
+
+  // The curvature exponent for traditional/legacy reasons has a +1 value.
   m_LevelSetFunction->SetCurvatureSpeedExponent(p.GetCurvatureSpeedExponent()+1);  
+  m_LevelSetFunction->SetCurvatureWeight(p.GetCurvatureWeight());
+  
   m_LevelSetFunction->SetPropagationWeight(p.GetPropagationWeight());
   m_LevelSetFunction->SetPropagationSpeedExponent(p.GetPropagationSpeedExponent());  
   m_LevelSetFunction->SetLaplacianSmoothingWeight(p.GetLaplacianWeight());

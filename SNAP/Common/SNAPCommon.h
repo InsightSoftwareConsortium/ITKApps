@@ -50,10 +50,10 @@ static const char SNAPVersionShort[] = "$Name:  $";
 static const char SNAPVersion[] = "@(#) Id";
 
 // Non-cvs version
-static const char SNAPSoftVersion[] = "ITK-SnAP 1.0 beta [2003.12.07]";
+static const char SNAPSoftVersion[] = "ITK-SnAP 1.0 beta [2003.12.09]";
 
 // Release date of the current version
-static const char SNAPCurrentVersionReleaseDate[] = "20031207";
+static const char SNAPCurrentVersionReleaseDate[] = "20031209";
 
 // Release date of the latest version whose user preference files are
 // incompatible with the current version and will be erased
