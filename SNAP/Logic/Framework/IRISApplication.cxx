@@ -335,7 +335,7 @@ IRISApplication
       SourceImageType,double> CubicInterpolatorType;
 
     // More typedefs are needed for the sinc interpolator
-    const static unsigned int VRadius = 5;
+    const unsigned int VRadius = 5;
     typedef itk::Function::HammingWindowFunction<VRadius> WindowFunction;
     typedef itk::ConstantBoundaryCondition<SourceImageType> Condition;
     typedef itk::WindowedSincInterpolateImageFunction<

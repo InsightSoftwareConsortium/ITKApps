@@ -43,7 +43,7 @@ SNAPAppearanceSettings
   elt.ActiveColor = Vector3d(0.0, 0.0, 0.0);
   elt.LineThickness = 1.0;
   elt.DashSpacing = 1.0;
-  elt.FontSize = 0.0;
+  elt.FontSize = 0;
   elt.Visible = true;
   elt.AlphaBlending = false;
 
@@ -53,7 +53,7 @@ SNAPAppearanceSettings
   elt.ActiveColor = Vector3d(0.0, 0.0, 0.0);
   elt.LineThickness = 0.0;
   elt.DashSpacing = 0.0;
-  elt.FontSize = 16.0;
+  elt.FontSize = 16;
   elt.Visible = true;
   elt.AlphaBlending = false;
 
@@ -63,7 +63,7 @@ SNAPAppearanceSettings
   elt.ActiveColor = Vector3d(1.0, 1.0, 0.2);
   elt.LineThickness = 1.0;
   elt.DashSpacing = 3.0;
-  elt.FontSize = 0.0;
+  elt.FontSize = 0;
   elt.Visible = true;
   elt.AlphaBlending = false;
 
@@ -73,7 +73,7 @@ SNAPAppearanceSettings
   elt.ActiveColor = Vector3d(0.0, 0.0, 0.0);
   elt.LineThickness = 0.0;
   elt.DashSpacing = 0.0;
-  elt.FontSize = 0.0;
+  elt.FontSize = 0;
   elt.Visible = true;
   elt.AlphaBlending = false;
 
@@ -83,7 +83,7 @@ SNAPAppearanceSettings
   elt.ActiveColor = Vector3d(0.0, 0.0, 0.0);
   elt.LineThickness = 0.0;
   elt.DashSpacing = 0.0;
-  elt.FontSize = 0.0;
+  elt.FontSize = 0;
   elt.Visible = true;
   elt.AlphaBlending = false;
 
@@ -93,7 +93,7 @@ SNAPAppearanceSettings
   elt.ActiveColor = Vector3d(1.0, 1.0, 1.0);
   elt.LineThickness = 1.0;
   elt.DashSpacing = 0.0;
-  elt.FontSize = 0.0;
+  elt.FontSize = 0;
   elt.Visible = true;
   elt.AlphaBlending = false;
 
@@ -103,7 +103,7 @@ SNAPAppearanceSettings
   elt.ActiveColor = Vector3d(0.0, 0.0, 0.0);
   elt.LineThickness = 1.0;
   elt.DashSpacing = 1.0;
-  elt.FontSize = 0.0;
+  elt.FontSize = 0;
   elt.Visible = true;
   elt.AlphaBlending = true;
 
@@ -113,7 +113,7 @@ SNAPAppearanceSettings
   elt.ActiveColor = Vector3d(0.0, 0.0, 0.0);
   elt.LineThickness = 1.0;
   elt.DashSpacing = 1.0;
-  elt.FontSize = 0.0;
+  elt.FontSize = 0;
   elt.Visible = true;
   elt.AlphaBlending = false;
 }
@@ -233,7 +233,8 @@ SNAPAppearanceSettings
     {
     // Set the line thickness and stipple
     glEnable(GL_LINE_STIPPLE);
-    glLineStipple( elt.DashSpacing, 0x9999 ); // 0011 0011 0011 0011  // 1001 1001 1001 1001
+    glLineStipple( static_cast<GLint>(elt.DashSpacing),
+                   0x9999 ); // 0011 0011 0011 0011  // 1001 1001 1001 1001
     }
 }
 
