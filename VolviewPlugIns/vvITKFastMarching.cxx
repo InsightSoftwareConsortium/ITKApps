@@ -6,98 +6,160 @@
 
 #include "itkFastMarchingImageFilter.h"
 
+
+template <class InputPixelType>
+class FastMarchingRunner
+  {
+  public:
+      typedef  unsigned short                       TimePixelType;
+      typedef  InputPixelType                       PixelType;
+      typedef  itk::Image< PixelType, 3 >           ImageType; 
+      typedef  itk::Image< TimePixelType, 3 >       TimeImageType;
+      typedef  typename ImageType::IndexType        IndexType;
+      typedef  typename ImageType::SizeType         SizeType;
+
+      typedef  itk::FastMarchingImageFilter< 
+                                    TimeImageType,  
+                                    ImageType >     FilterType;
+
+      typedef  VolView::PlugIn::FilterModule< FilterType >   ModuleType;
+
+      typedef  typename FilterType::NodeContainer            NodeContainer;
+      typedef  typename FilterType::NodeType                 NodeType;
+      typedef  typename NodeContainer::Pointer               NodeContainerPointer;
+      typedef  typename NodeType::PixelType                  NodePixelType;
+
+  public:
+    FastMarchingRunner() {}
+    void Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
+    {
+      const float stoppingValue         = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
+      const float normalizationFactor   = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
+
+      const unsigned int numberOfSeeds = info->NumberOfMarkers;
+      if( numberOfSeeds < 1 )
+        {
+        info->SetProperty( info, VVP_ERROR, "Please select points using the 3D Markers in the Annotation menu" ); 
+        return;
+        }
+
+      const double seedValue = 0.0;
+      IndexType seedPosition;
+
+      SizeType size;
+      size[0] = info->OutputVolumeDimensions[0];
+      size[1] = info->OutputVolumeDimensions[1];
+      size[2] = info->OutputVolumeDimensions[2];
+
+
+      NodeContainerPointer seeds = NodeContainer::New();
+      seeds->Initialize();
+
+
+      ModuleType  module;
+      module.SetPluginInfo( info );
+      module.SetUpdateMessage("Computing Fast Marching...");
+      // Set the parameters on it
+      module.GetFilter()->SetStoppingValue(  stoppingValue );
+      module.GetFilter()->SetNormalizationFactor( normalizationFactor );
+      NodeType node;
+      node.SetValue( static_cast< NodePixelType >( seedValue ) );
+      for(unsigned int i=0; i< numberOfSeeds; i++)
+        {
+        VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, i, seedPosition );
+        node.SetIndex( seedPosition );
+        seeds->InsertElement( i, node );
+        }
+      module.GetFilter()->SetTrialPoints( seeds );
+      module.GetFilter()->SetOutputSize( size );
+      // Execute the filter
+      module.ProcessData( pds );
+    }
+  };
+
+
+
+
+
+
 static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 {
 
   vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
-  const unsigned int Dimension = 3;
-
-  const float stoppingValue         = atof( info->GetGUIProperty(info, 0, VVP_GUI_VALUE ));
-  const float normalizationFactor   = atof( info->GetGUIProperty(info, 1, VVP_GUI_VALUE ));
-
-  const unsigned int numberOfSeeds = info->NumberOfMarkers;
-  if( numberOfSeeds < 1 )
+  if( info->InputVolumeNumberOfComponents != 1 )
     {
-    info->SetProperty( info, VVP_ERROR, "Please select points using the 3D Markers in the Annotation menu" ); 
+    info->SetProperty( info, VVP_ERROR, "This filter requires a single-component data set as input" ); 
     return -1;
     }
 
-  const double seedValue = 0.0;
-  itk::Index<Dimension> seedPosition;
-
-  itk::Size<3> size;
-  size[0] = info->OutputVolumeDimensions[0];
-  size[1] = info->OutputVolumeDimensions[1];
-  size[2] = info->OutputVolumeDimensions[2];
 
   try 
   {
   switch( info->InputVolumeScalarType )
     {
+    case VTK_CHAR:
+      {
+      FastMarchingRunner<signed char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
     case VTK_UNSIGNED_CHAR:
       {
-      typedef  unsigned short                         TimePixelType;
-      typedef  unsigned char                          PixelType;
-      typedef  itk::Image< PixelType, Dimension >     ImageType; 
-      typedef  itk::Image< TimePixelType, Dimension > TimeImageType;
-      typedef  itk::FastMarchingImageFilter< TimeImageType,  ImageType >   FilterType;
-      typedef  FilterType::NodeContainer            NodeContainer;
-      typedef  FilterType::NodeType                 NodeType;
-      NodeContainer::Pointer seeds = NodeContainer::New();
-      seeds->Initialize();
-      VolView::PlugIn::FilterModule< FilterType > module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Computing Fast Marching...");
-      // Set the parameters on it
-      module.GetFilter()->SetStoppingValue(  stoppingValue );
-      module.GetFilter()->SetNormalizationFactor( normalizationFactor );
-      NodeType node;
-      node.SetValue( static_cast< NodeType::PixelType >( seedValue ) );
-      for(unsigned int i=0; i< numberOfSeeds; i++)
-        {
-        VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, i, seedPosition );
-        node.SetIndex( seedPosition );
-        seeds->InsertElement( i, node );
-        }
-      module.GetFilter()->SetTrialPoints( seeds );
-      module.GetFilter()->SetOutputSize( size );
-      // Execute the filter
-      module.ProcessData( pds );
+      FastMarchingRunner<unsigned char> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_SHORT:
+      {
+      FastMarchingRunner<signed short> runner;
+      runner.Execute( info, pds );
       break; 
       }
     case VTK_UNSIGNED_SHORT:
       {
-      typedef  unsigned short                         TimePixelType;
-      typedef  unsigned short                          PixelType;
-      typedef  itk::Image< PixelType, Dimension >     ImageType; 
-      typedef  itk::Image< TimePixelType, Dimension > TimeImageType;
-      typedef  itk::FastMarchingImageFilter< TimeImageType,  ImageType >   FilterType;
-      typedef  FilterType::NodeContainer            NodeContainer;
-      typedef  FilterType::NodeType                 NodeType;
-      NodeContainer::Pointer seeds = NodeContainer::New();
-      seeds->Initialize();
-      VolView::PlugIn::FilterModule< FilterType > module;
-      module.SetPluginInfo( info );
-      module.SetUpdateMessage("Computing Fast Marching...");
-      // Set the parameters on it
-      module.GetFilter()->SetStoppingValue(  stoppingValue );
-      module.GetFilter()->SetNormalizationFactor( normalizationFactor );
-      NodeType node;
-      node.SetValue( static_cast< NodeType::PixelType >( seedValue ) );
-      for(unsigned int i=0; i< numberOfSeeds; i++)
-        {
-        VolView::PlugIn::FilterModuleBase::Convert3DMarkerToIndex( info, i, seedPosition );
-        node.SetIndex( seedPosition );
-        seeds->InsertElement( i, node );
-        }
-      module.GetFilter()->SetTrialPoints( seeds );
-      module.GetFilter()->SetOutputSize( size );
-      // Execute the filter
-      module.ProcessData( pds );
+      FastMarchingRunner<unsigned short> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_INT:
+      {
+      FastMarchingRunner<signed int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_INT:
+      {
+      FastMarchingRunner<unsigned int> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_LONG:
+      {
+      FastMarchingRunner<signed long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_UNSIGNED_LONG:
+      {
+      FastMarchingRunner<unsigned long> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_FLOAT:
+      {
+      FastMarchingRunner<float> runner;
+      runner.Execute( info, pds );
+      break; 
+      }
+    case VTK_DOUBLE:
+      {
+      FastMarchingRunner<double> runner;
+      runner.Execute( info, pds );
       break; 
       }
     }
+
   }
   catch( itk::ExceptionObject & except )
   {
@@ -106,6 +168,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
   }
   return 0;
 }
+
 
 
 static int UpdateGUI(void *inf)
