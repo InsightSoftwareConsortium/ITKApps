@@ -89,7 +89,7 @@ public:
     ot.GoToBegin(); 
     while( !ot.IsAtEnd() )
       {
-      *outData = it.Get();  // copy input pixel
+      *outData = static_cast< OutputPixelType >( it.Get() );  // copy input pixel
       ++outData;
       *outData = ot.Get();  // copy output pixel
       ++outData;
