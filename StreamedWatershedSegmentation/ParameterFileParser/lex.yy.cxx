@@ -1688,6 +1688,7 @@ extern int yywrap YY_PROTO(( void ));
 #endif
 #endif
 
+#define YY_NO_UNPUT
 #ifndef YY_NO_UNPUT
 static void yyunput YY_PROTO(( int c, char *buf_ptr ));
 #endif
