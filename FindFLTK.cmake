@@ -34,6 +34,10 @@ IF(APPLE)
   SET( FLTK_PLATFORM_DEPENDENT_LIBS  "-framework Carbon -framework Cocoa -framework ApplicationServices -lz")
 ENDIF(APPLE)
 
+IF(CYGWIN)
+  SET( FLTK_PLATFORM_DEPENDENT_LIBS ole32 uuid comctl32 wsock32 supc++ -lm -lgdi32)
+ENDIF(CYGWIN)
+
 # Find fluid executable.
 FIND_PROGRAM(FLTK_FLUID_EXECUTABLE fluid ${FLTK_INCLUDE_DIR}/fluid)
 
