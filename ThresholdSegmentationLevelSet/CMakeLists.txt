@@ -52,13 +52,19 @@ ITKIO
 ITKFltkImageViewer
 ITKVtkFltk
 vtkRendering
-vtkGraphics	  
-vtkHybrid	  
+vtkGraphics  
+vtkHybrid  
 vtkImaging
 vtkIO
 vtkFiltering
 vtkCommon
 )
+
+IF(VTK_USE_VOLUMERENDERING)
+ LINK_LIBRARIES(
+ vtkVolumeRendering
+)
+ENDIF(VTK_USE_VOLUMERENDERING)
 
 
 ADD_GUI_EXECUTABLE(ThresholdSegmentationLevelSet "${ThresholdSegmentationLevelSet_SRCS}")
