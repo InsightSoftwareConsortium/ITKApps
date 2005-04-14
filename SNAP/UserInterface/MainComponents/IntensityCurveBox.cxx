@@ -20,11 +20,13 @@
 #include <assert.h>
 #include <stdio.h>
 #include <iostream>
+#include <algorithm>
 
 #include <FL/Fl.H>
 #include "SNAPOpenGL.h"
 #include <FL/fl_draw.H>
 
+using namespace std;
 unsigned int IntensityCurveBox::CURVE_RESOLUTION = 64;
 
 IntensityCurveBox
@@ -34,6 +36,11 @@ IntensityCurveBox
   // Start with the blank curve
   m_Curve = NULL;
   m_Parent = NULL;
+
+  // Initialize the histogram parameters
+  m_HistogramBinSize = 1;
+  m_HistogramMaxLevel = 1.0;
+  m_HistogramLog = false;
 
   // Set up the default handler
   PushInteractionMode(&m_DefaultHandler);
@@ -94,19 +101,26 @@ IntensityCurveBox
     {
     float wBin = 1.0f / m_Histogram.size();
     glBegin(GL_QUADS);
-    glColor3f(0.0f,0.0f,0.75f);
+    glColor3f(1.0f, 1.0f, 1.0f);
+
+    // Check the scaling for the height of the bars
+    float xHeightMax = m_HistogramMax * m_HistogramMaxLevel;
+    if(m_HistogramLog)
+      xHeightMax = log(xHeightMax) / log(10.0);
+    
+    // Draw the histogram bars
     for(unsigned int i=0;i < m_Histogram.size();i++)
       {
       // Process the histogram height based on options
       float xHeight = m_Histogram[i];
       if(m_HistogramLog)
-        xHeight = log(xHeight);
-      else if(xRawHeight > m_HistogramMaxLevel && m_HistogramMaxLevel > 0)
-        xRawHeight = m_HistogramMaxLevel;
+        xHeight = (xHeight > 0) ? log(xHeight) / log(10.0) : 0;
+      else if(xHeight > xHeightMax)
+        xHeight = xHeightMax / 0.9f;
       
       // Compute the physical height of the bin
       float xBin = wBin * i;
-      float hBin = xHeight * 0.9f / m_HistogramMax;
+      float hBin = xHeight * 0.9f / xHeightMax;
 
       glVertex2f(xBin,0);
       glVertex2f(xBin,hBin);
@@ -220,6 +234,7 @@ IntensityCurveBox
 {
   // Need a wrapper
   assert(source);
+  assert(this->w() > 0);
 
   // Get 'absolute' image intensity range, i.e., the largest and smallest
   // intensity in the whole image
@@ -237,13 +252,16 @@ IntensityCurveBox
   }
 
   // Determine the bin size: no bin should be less than a single pixel wide
-  unsigned int szBin = m_HistogramBinSize;
-  while(nFrequencies > szBin * this->w()) 
-    szBin++;
-  unsigned int nBins = (unsigned int) ceil(nFrequencies * 1.0 / szBin);
+  if(nFrequencies > m_HistogramBinSize * this->w()) 
+    m_HistogramBinSize = (unsigned int) ceil(nFrequencies / this->w());
+  unsigned int nBins = (unsigned int) ceil(nFrequencies * 1.0 / m_HistogramBinSize);
+
+  cout << "Histogram has " << nBins << " bins" << endl;
+  cout << "Bin size is   " << m_HistogramBinSize << endl;
 
   // Allocate an array of bins
-  m_Histogram.resize(nBins,0);
+  m_Histogram.resize(nBins);
+  fill(m_Histogram.begin(), m_Histogram.end(), 0);
 
   // Reset the max-frequency
   m_HistogramMax = 0;
@@ -251,7 +269,7 @@ IntensityCurveBox
   // Put the frequencies into the bins
   for(unsigned int i=0;i<nFrequencies;i++)
   {
-    unsigned int iBin = i / szBin;
+    unsigned int iBin = i / m_HistogramBinSize;
     m_Histogram[iBin] += frequency[i];
 
     // Compute the maximum frequency

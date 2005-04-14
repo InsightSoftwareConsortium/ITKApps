@@ -52,8 +52,8 @@ public:
   // Get/set the histogram properties
   irisGetMacro(HistogramBinSize, unsigned int);
   irisSetMacro(HistogramBinSize, unsigned int);
-  irisGetMacro(HistogramMaxLevel, unsigned int);
-  irisSetMacro(HistogramMaxLevel, unsigned int);
+  irisGetMacro(HistogramMaxLevel, float);
+  irisSetMacro(HistogramMaxLevel, float);
   irisIsMacro(HistogramLog);
   irisSetMacro(HistogramLog, bool);
 
@@ -83,7 +83,7 @@ private:
   unsigned int m_HistogramMax;
 
   /** Max level in the histograms: bins above this level are truncated */
-  unsigned int m_HistogramMaxLevel;
+  float m_HistogramMaxLevel;
 
   /** Size of the bin, in intensities */
   unsigned int m_HistogramBinSize;

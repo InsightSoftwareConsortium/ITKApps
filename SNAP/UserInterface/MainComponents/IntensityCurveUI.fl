@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0103 
+version 1.0106 
 header_name {.h} 
 code_name {.cxx}
 class IntensityCurveUI {open : IntensityCurveUIBase
@@ -50,20 +50,20 @@ class IntensityCurveUI {open : IntensityCurveUIBase
         xywh {310 125 95 20} type Horizontal color 52 selection_color 197 labelsize 12 align 5 minimum 3 maximum 10 step 1 value 4
       }
       Fl_Group {} {
-        label {Histogram Options:} open
+        label {Histogram Options (advanced):} open
         xywh {20 260 385 85} box PLASTIC_DOWN_FRAME color 55 labelfont 1 labelsize 12 align 5
       } {
         Fl_Value_Input m_InHistogramMaxLevel {
-          label {Max. displayed height:}
-          xywh {330 275 65 25} labelsize 12 textsize 12
+          label {Histogram cutoff (%):}
+          xywh {330 275 65 25} labelsize 12 minimum 1 maximum 100 step 1 value 100 textsize 12
         }
         Fl_Value_Input m_InHistogramBinSize {
           label {Bin size:}
           xywh {110 275 65 25} labelsize 12 minimum 1 maximum 100 step 1 value 1 textsize 12
         }
         Fl_Check_Button m_ChkHistogramLog {
-          label {Show the log of the histogram}
-          xywh {35 305 205 25} down_box DOWN_BOX labelsize 12
+          label {Plot the log of the frequencies}
+          xywh {60 310 205 25} down_box DOWN_BOX labelsize 12
         }
         Fl_Button {} {
           label Update
