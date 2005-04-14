@@ -57,6 +57,7 @@ public:
   virtual void OnMenuIntensityCurve() = 0;  
   virtual void OnMenuShowDisplayOptions() = 0;
   virtual void OnMenuExportSlice(unsigned int iSlice) = 0;
+  virtual void OnMenuImageInfo() = 0;
   virtual void OnMenuQuit() = 0;
   
   // IRIS: Slice selection actions  
@@ -93,6 +94,9 @@ public:
   // IRIS: ROI manipulation callbacks
   virtual void OnResetROIAction() = 0;
   virtual void OnSnakeStartAction() = 0;
+
+  // IRIS: Image Info Window callbacks
+  virtual void OnCloseImageInfoAction() = 0;
   
   // SNAP Preprocessing page actions
   virtual void OnInOutSnakeSelect() = 0;

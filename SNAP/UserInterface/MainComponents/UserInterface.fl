@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0104 
+version 1.0103 
 header_name {.h} 
 code_name {.cxx}
 decl {\#include <stdio.h>} {public
@@ -38,18 +38,18 @@ class UserInterface {open : {public UserInterfaceBase}
     Fl_Window m_WinMain {
       label {SnAP: IRIS}
       callback {OnMainWindowCloseAction();} open
-      xywh {398 136 875 710} type Double align 0 resizable
-      code0 {\#include "UserInterfaceBase.h"} visible
+      xywh {327 161 875 710} type Double align 0 hide resizable
+      code0 {\#include "UserInterfaceBase.h"}
     } {
       Fl_Menu_Bar m_MenubarMain {
         xywh {0 0 146 25} labelsize 12 textsize 12
       } {
         submenu {} {
-          label {&File}
+          label {&File} open
           xywh {10 10 100 20} labelsize 12
         } {
           submenu {} {
-            label {&Load Data}
+            label {&Load Data} open
             xywh {5 5 100 20} labelsize 12
           } {
             menuitem m_MenuLoadGrey {
@@ -128,6 +128,11 @@ class UserInterface {open : {public UserInterfaceBase}
               }
             }
           }
+          menuitem m_MenuImageInfo {
+            label {&Image Info...}
+            callback {this->OnMenuImageInfo();}
+            xywh {5 5 100 20} labelsize 12 divider
+          }
           menuitem {} {
             label {&Quit}
             callback {this->OnMenuQuit();}
@@ -170,7 +175,7 @@ class UserInterface {open : {public UserInterfaceBase}
           }
         }
       }
-      Fl_Group Controls {open
+      Fl_Group Controls {
         xywh {0 24 146 686} box BORDER_FRAME color 0
       } {
         Fl_Wizard m_WizControlPane {
@@ -178,7 +183,7 @@ class UserInterface {open : {public UserInterfaceBase}
           xywh {0 25 145 680} box NO_BOX color 22 align 16
         } {
           Fl_Group m_GrpToolbarPage {
-            xywh {0 25 145 679} color 53 labelsize 12 hide
+            xywh {0 25 145 679} color 53 labelsize 12
           } {
             Fl_Group m_GrpInteractionModes {
               label {IRIS Toolbox}
@@ -362,8 +367,8 @@ OnDrawOverLabelUpdate();} open
               }
             }
           }
-          Fl_Group m_GrpWelcomePage {selected
-            xywh {0 25 145 680} color 53
+          Fl_Group m_GrpWelcomePage {
+            xywh {0 25 145 680} color 53 hide
           } {
             Fl_Group {} {
               label InsightSnAP open
@@ -1195,8 +1200,88 @@ this->ChangeLabelsCallback();}
         }
       }
     }
-    Fl_Window {} {open
-      xywh {37 76 679 585} type Double color 35 hide
-    } {}
+    Fl_Window m_WinImageInfo {
+      label {Image Information} open
+      xywh {489 644 515 320} type Double box PLASTIC_DOWN_BOX color 40 non_modal visible
+    } {
+      Fl_Group {} {
+        label {Image Information:} open
+        xywh {10 35 495 275} box PLASTIC_DOWN_BOX labeltype EMBOSSED_LABEL labelsize 16 labelcolor 15 align 5
+      } {
+        Fl_Value_Output {m_OutImageInfoDimensions[0]} {
+          label {Image dimensions  x:}
+          xywh {245 50 65 25}
+        }
+        Fl_Value_Output {m_OutImageInfoDimensions[1]} {
+          label {y:}
+          xywh {330 50 65 25}
+        }
+        Fl_Value_Output {m_OutImageInfoDimensions[2]} {
+          label {z:}
+          xywh {415 50 65 25}
+        }
+        Fl_Value_Output {m_OutImageInfoSpacing[0]} {
+          label {Voxel spacing  x:}
+          xywh {245 80 65 25}
+        }
+        Fl_Value_Output {m_OutImageInfoSpacing[1]} {
+          label {y:}
+          xywh {330 80 65 25}
+        }
+        Fl_Value_Output {m_OutImageInfoSpacing[2]} {
+          label {z:}
+          xywh {415 80 65 25}
+        }
+        Fl_Value_Output {m_OutImageInfoOrigin[0]} {
+          label {Image origin  x:}
+          xywh {245 110 65 25}
+        }
+        Fl_Value_Output {m_OutImageInfoOrigin[1]} {
+          label {y:}
+          xywh {330 110 65 25}
+        }
+        Fl_Value_Output {m_OutImageInfoOrigin[2]} {
+          label {z:}
+          xywh {415 110 65 25}
+        }
+        Fl_Value_Output {m_OutImageInfoRange[0]} {
+          label {Intensity range  min:}
+          xywh {245 150 65 25}
+        }
+        Fl_Value_Output {m_OutImageInfoRange[1]} {
+          label {max:}
+          xywh {350 150 65 25}
+        }
+        Fl_Value_Output {m_OutImageInfoCursorIndex[0]} {
+          label {Cursor voxel index  x:}
+          xywh {245 190 65 25}
+        }
+        Fl_Value_Output {m_OutImageInfoCursorIndex[1]} {
+          label {y:}
+          xywh {330 190 65 25}
+        }
+        Fl_Value_Output {m_OutImageInfoCursorIndex[2]} {
+          label {z:} selected
+          xywh {415 190 65 25}
+        }
+        Fl_Value_Output {m_OutImageInfoCursorPosition[0]} {
+          label {Cursor spatial position  x:}
+          xywh {245 220 65 25}
+        }
+        Fl_Value_Output {m_OutImageInfoCursorPosition[1]} {
+          label {y:}
+          xywh {330 220 65 25}
+        }
+        Fl_Value_Output {m_OutImageInfoCursorPosition[2]} {
+          label {z:}
+          xywh {415 220 65 25}
+        }
+        Fl_Button {} {
+          label Close
+          callback {this->OnCloseImageInfoAction();}
+          xywh {225 270 85 30} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 labelfont 1 labelsize 12
+        }
+      }
+    }
   }
 } 

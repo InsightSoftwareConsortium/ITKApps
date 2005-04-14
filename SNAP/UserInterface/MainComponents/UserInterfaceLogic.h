@@ -643,6 +643,7 @@ protected:
   void OnMenuSavePreprocessed();  
   void OnLoadPreprocessedImageAction();
   void OnMenuLoadAdvection();
+  void OnMenuImageInfo();
 
   // Save a slice
   void OnMenuExportSlice(unsigned int iSlice);
@@ -666,6 +667,9 @@ protected:
 
   // Methods to tweak window positions
   void OnIRISWindowFocus(unsigned int i);
+
+  // Image Info Window Callbacks
+  void OnCloseImageInfoAction();
   
   char *m_ChosedFile;
 
@@ -812,6 +816,9 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.23  2005/03/08 03:12:51  pauly
+ *BUG: Minor bugfixes in SNAP, mostly to the user interface
+ *
  *Revision 1.22  2004/09/14 14:11:11  pauly
  *ENH: Added an activation manager to main UI class, improved snake code, various UI fixes and additions
  *

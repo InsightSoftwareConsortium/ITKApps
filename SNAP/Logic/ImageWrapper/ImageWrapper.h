@@ -254,6 +254,9 @@ public:
   /** For each slicer, find out which image dimension does is slice along */
   unsigned int GetDisplaySliceImageAxis(unsigned int slice);
 
+  /** Transform a voxel index into a spatial position */
+  Vector3d TransformVoxelIndexToPosition(const Vector3ui &iVoxel) const;
+
 protected:
 
   /** The image that we are wrapping */

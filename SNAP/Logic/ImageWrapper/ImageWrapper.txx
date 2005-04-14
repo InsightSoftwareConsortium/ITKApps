@@ -594,4 +594,22 @@ ImageWrapper<TPixel>
     (unsigned int) size[2]);
 }
 
+template<class TPixel>
+Vector3d
+ImageWrapper<TPixel>
+::TransformVoxelIndexToPosition(const Vector3ui &iVoxel) const
+{
+  // Use the ITK method to do this
+  typename ImageType::IndexType xIndex;
+  for(size_t d = 0; d < 3; d++) xIndex[d] = iVoxel[d];
+  
+  itk::Point<double, 3> xPoint;
+  m_Image->TransformIndexToPhysicalPoint(xIndex, xPoint);
+
+  Vector3d xOut;
+  for(size_t q = 0; q < 3; q++) xOut[q] = xPoint[q];
+
+  return xOut;
+}
+
 #endif // __ImageWrapper_txx_

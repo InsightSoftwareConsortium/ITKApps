@@ -157,6 +157,7 @@ void UserInterfaceLogic
   m_Activation->AddMenuItem(m_MenuSavePreprocessed, UIF_SNAP_SPEED_AVAILABLE);
   m_Activation->AddMenuItem(m_MenuLoadPreprocessed, UIF_SNAP_PAGE_PREPROCESSING);
   m_Activation->AddMenuItem(m_MenuLoadAdvection, UIF_SNAP_PAGE_PREPROCESSING);
+  m_Activation->AddMenuItem(m_MenuImageInfo, UIF_IRIS_WITH_GRAY_LOADED);
 }
 
 UserInterfaceLogic
@@ -1154,6 +1155,21 @@ UserInterfaceLogic
 
 void 
 UserInterfaceLogic
+::OnMenuImageInfo()
+{
+  m_WinImageInfo->show();
+  CenterChildWindowInMainWindow(m_WinImageInfo);
+}
+
+void 
+UserInterfaceLogic
+::OnCloseImageInfoAction()
+{
+  m_WinImageInfo->hide();
+}
+
+void 
+UserInterfaceLogic
 ::OnMainWindowCloseAction()
 {
   // We don't want to just exit when users press escape
@@ -1489,8 +1505,16 @@ UserInterfaceLogic
   int iSegmentation = 
     (int)m_Driver->GetCurrentImageData()->GetSegmentation()->GetVoxel(crosshairs);
   sSegmentation << iSegmentation;
-    
 
+  // Update the cursor position in the image info window
+  Vector3d xPosition = m_Driver->GetCurrentImageData()->GetGrey()->
+    TransformVoxelIndexToPosition(crosshairs);
+  for(size_t d = 0; d < 3; d++)
+    {
+    m_OutImageInfoCursorIndex[d]->value(crosshairs[d]);
+    m_OutImageInfoCursorPosition[d]->value(xPosition[d]);
+    }
+  
   // The rest depends on the current mode
   if(m_GlobalState->GetSNAPActive())
     {
@@ -1716,6 +1740,9 @@ UserInterfaceLogic
 
   // Update the little display box under the scroll bar
   UpdatePositionDisplay(id);
+
+  // Update the probe values
+  UpdateImageProbe();
 
   // Repaint the windows
   RedrawWindows();
@@ -2228,6 +2255,17 @@ UserInterfaceLogic
   OnPolygonStateUpdate(0);
   OnPolygonStateUpdate(1);
   OnPolygonStateUpdate(2);
+
+  // Update the image info window controls
+  GreyImageWrapper *wrpGrey = m_Driver->GetCurrentImageData()->GetGrey();
+  for(size_t d = 0; d < 3; d++)
+    {
+    m_OutImageInfoDimensions[d]->value(wrpGrey->GetSize()[d]);
+    m_OutImageInfoOrigin[d]->value(wrpGrey->GetImage()->GetOrigin()[d]);
+    m_OutImageInfoSpacing[d]->value(wrpGrey->GetImage()->GetSpacing()[d]);
+    }
+  m_OutImageInfoRange[0]->value(wrpGrey->GetImageMin());
+  m_OutImageInfoRange[1]->value(wrpGrey->GetImageMax());
 
   // Now that we've loaded the image, check if there are any settings 
   // associated with it.  If there are, give the user an option to restore 
@@ -2883,6 +2921,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.31  2005/03/08 03:12:51  pauly
+ *BUG: Minor bugfixes in SNAP, mostly to the user interface
+ *
  *Revision 1.30  2004/09/21 15:50:40  jjomier
  *FIX: vector_multiply_mixed requires template parameters otherwise MSVC cannot deduce them
  *
