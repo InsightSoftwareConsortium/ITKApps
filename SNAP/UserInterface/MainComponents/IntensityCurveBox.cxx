@@ -97,8 +97,16 @@ IntensityCurveBox
     glColor3f(0.0f,0.0f,0.75f);
     for(unsigned int i=0;i < m_Histogram.size();i++)
       {
+      // Process the histogram height based on options
+      float xHeight = m_Histogram[i];
+      if(m_HistogramLog)
+        xHeight = log(xHeight);
+      else if(xRawHeight > m_HistogramMaxLevel && m_HistogramMaxLevel > 0)
+        xRawHeight = m_HistogramMaxLevel;
+      
+      // Compute the physical height of the bin
       float xBin = wBin * i;
-      float hBin = m_Histogram[i] * 0.9f / m_HistogramMax;
+      float hBin = xHeight * 0.9f / m_HistogramMax;
 
       glVertex2f(xBin,0);
       glVertex2f(xBin,hBin);
@@ -229,7 +237,7 @@ IntensityCurveBox
   }
 
   // Determine the bin size: no bin should be less than a single pixel wide
-  unsigned int szBin = 1;
+  unsigned int szBin = m_HistogramBinSize;
   while(nFrequencies > szBin * this->w()) 
     szBin++;
   unsigned int nBins = (unsigned int) ceil(nFrequencies * 1.0 / szBin);

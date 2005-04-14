@@ -26,7 +26,7 @@ public:
   virtual void OnReset() = 0;
   virtual void OnWindowLevelChange() = 0;
   virtual void OnControlPointNumberChange() = 0;
-        
+  virtual void OnUpdateHistogram() = 0;
 };
 
 #endif // __IntensityCurveUIBase_h_

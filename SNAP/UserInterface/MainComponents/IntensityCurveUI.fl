@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0102 
+version 1.0103 
 header_name {.h} 
 code_name {.cxx}
 class IntensityCurveUI {open : IntensityCurveUIBase
@@ -8,7 +8,7 @@ class IntensityCurveUI {open : IntensityCurveUIBase
   } {
     Fl_Window m_WinCurve {
       label {Image to Screen Intensity Mapping} open selected
-      xywh {214 445 414 239} type Double box PLASTIC_DOWN_BOX
+      xywh {1087 311 415 355} type Double box PLASTIC_DOWN_BOX
       code0 {\#include "IntensityCurveUIBase.h"}
       code1 {\#include "IntensityCurveBox.h"} non_modal visible
     } {
@@ -48,6 +48,28 @@ class IntensityCurveUI {open : IntensityCurveUIBase
         label {Control Points:}
         callback {this->OnControlPointNumberChange();}
         xywh {310 125 95 20} type Horizontal color 52 selection_color 197 labelsize 12 align 5 minimum 3 maximum 10 step 1 value 4
+      }
+      Fl_Group {} {
+        label {Histogram Options:} open
+        xywh {20 260 385 85} box PLASTIC_DOWN_FRAME color 55 labelfont 1 labelsize 12 align 5
+      } {
+        Fl_Value_Input m_InHistogramMaxLevel {
+          label {Max. displayed height:}
+          xywh {330 275 65 25} labelsize 12 textsize 12
+        }
+        Fl_Value_Input m_InHistogramBinSize {
+          label {Bin size:}
+          xywh {110 275 65 25} labelsize 12 minimum 1 maximum 100 step 1 value 1 textsize 12
+        }
+        Fl_Check_Button m_ChkHistogramLog {
+          label {Show the log of the histogram}
+          xywh {35 305 205 25} down_box DOWN_BOX labelsize 12
+        }
+        Fl_Button {} {
+          label Update
+          callback {this->OnUpdateHistogram();}
+          xywh {310 310 85 25} box PLASTIC_UP_BOX shortcut 0xff1b color 180 selection_color 38 labelsize 12
+        }
       }
     }
   }

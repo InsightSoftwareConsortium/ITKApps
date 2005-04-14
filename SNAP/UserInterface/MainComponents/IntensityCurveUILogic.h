@@ -77,6 +77,7 @@ public:
   void OnReset();
   void OnWindowLevelChange();
   void OnControlPointNumberChange();
+  void OnUpdateHistogram();
   
   // Called when the curve gets changed
   void OnCurveChange();

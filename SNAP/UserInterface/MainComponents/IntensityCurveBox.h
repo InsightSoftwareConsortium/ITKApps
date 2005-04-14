@@ -49,6 +49,14 @@ public:
   irisGetMacro(Parent,IntensityCurveUILogic *);
   irisSetMacro(Parent,IntensityCurveUILogic *);
 
+  // Get/set the histogram properties
+  irisGetMacro(HistogramBinSize, unsigned int);
+  irisSetMacro(HistogramBinSize, unsigned int);
+  irisGetMacro(HistogramMaxLevel, unsigned int);
+  irisSetMacro(HistogramMaxLevel, unsigned int);
+  irisIsMacro(HistogramLog);
+  irisSetMacro(HistogramLog, bool);
+
   /**
    * The resolution of the curve displayed on the screen
    * TODO: Control over curve resolution
@@ -73,6 +81,15 @@ private:
 
   /** Max frequency in the histogram */
   unsigned int m_HistogramMax;
+
+  /** Max level in the histograms: bins above this level are truncated */
+  unsigned int m_HistogramMaxLevel;
+
+  /** Size of the bin, in intensities */
+  unsigned int m_HistogramBinSize;
+
+  /** Flag, whether log of the frequencies is used */
+  bool m_HistogramLog;
 
   /**
    * Interaction handler for control point manipulation

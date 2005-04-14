@@ -177,4 +177,14 @@ IntensityCurveUILogic
   OnWindowLevelChange();
 }
 
+void 
+IntensityCurveUILogic
+::OnHistogramUpdate()
+{
+  m_BoxCurve->SetHistogramBinSize(m_InHistogramBinSize->value());
+  m_BoxCurve->SetHistogramMaxLevel(m_InHistogramMaxLevel->value());
+  m_BoxCurve->SetHistogramLog(m_ChkHistogramLog->value() ? true : false);
+  m_BoxCurve->redraw();
+}
+
 
