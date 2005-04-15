@@ -57,7 +57,7 @@ IRISApplication
 
   // Construct a new intensity curve
   m_IntensityCurve = IntensityCurveVTK::New();
-  m_IntensityCurve->Initialize(4);
+  m_IntensityCurve->Initialize(3);
 
   // Initialize the image-anatomy transformation with RAI code
   m_ImageToAnatomyRAI = "RAI";
@@ -216,7 +216,7 @@ IRISApplication
   m_IRISImageData->SetGreyImage(newGreyImage,icg);    
   
   // Reinitialize the intensity mapping curve 
-  m_IntensityCurve->Initialize(4);
+  m_IntensityCurve->Initialize(3);
 
   // Update the new grey image wrapper with the intensity mapping curve
   m_IRISImageData->GetGrey()->SetIntensityMapFunction(m_IntensityCurve);

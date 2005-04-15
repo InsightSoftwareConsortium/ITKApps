@@ -17,6 +17,7 @@
 
 #include <IntensityCurveInterface.h>
 #include <vtkKochanekSpline.h>
+#include <Registry.h>
 
 /**
  * \class IntensityCurveVTK
@@ -53,6 +54,12 @@ public:
   float Evaluate(const float &t) const {
     return m_Spline->Evaluate(t);
   }
+
+  // Load the curve from a registry
+  void LoadFromRegistry(Registry &registry);
+
+  // Save the curve to a registry
+  void SaveToRegistry(Registry &registry) const;
 
 protected:
   IntensityCurveVTK();

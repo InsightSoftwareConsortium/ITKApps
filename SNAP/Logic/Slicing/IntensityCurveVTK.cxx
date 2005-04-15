@@ -146,4 +146,50 @@ IntensityCurveVTK
     << std::endl;
 }
 
+void
+IntensityCurveVTK
+::LoadFromRegistry(Registry &registry)
+{
+  // Read the number of control points
+  size_t nPoints = registry["NumberOfControlPoints"][3];
+  this->Initialize(nPoints);
 
+  // Load each of the control point
+  for(size_t iPoint = 0; iPoint < nPoints; iPoint++)
+    {
+    // Get the default values, just in case
+    float t0, x0;
+    this->GetControlPoint(iPoint, t0, x0);
+
+    // Read the registry
+    Registry &folder = registry.Folder(registry.Key("ControlPoint[%d]",iPoint));
+    float t = (float) folder["tValue"][(double) t0];
+    float x = (float) folder["xValue"][(double) x0];
+
+    // Set the control point
+    this->UpdateControlPoint(iPoint, t, x);
+    }
+}
+
+void
+IntensityCurveVTK
+::SaveToRegistry(Registry &registry) const
+{
+  // Store the number of control points
+  registry["NumberOfControlPoints"] << this->GetControlPointCount();
+
+  // Save each control point
+  for(size_t iPoint = 0; iPoint < this->GetControlPointCount(); iPoint++)
+    {
+    // Get the current values, just in case
+    float t, x;
+    this->GetControlPoint(iPoint, t, x);
+
+    // Create a folder in the registry
+    string key = registry.Key("ControlPoint[%d]",iPoint);
+    std::cout << "KEY: " << key << std::endl;
+    Registry &folder = registry.Folder(key);
+    folder["tValue"] << (double) t;
+    folder["xValue"] << (double) x;
+    }
+}

@@ -2317,6 +2317,12 @@ UserInterfaceLogic
   // Redraw the crosshairs in the 3D window  
   m_IRISWindow3D->ResetView(); 
 
+  // Redraw the intensity mapping window and controls
+  m_IntensityCurveUI->SetCurve(m_Driver->GetIntensityCurve());    
+  m_IntensityCurveUI->SetImageWrapper(
+    m_Driver->GetCurrentImageData()->GetGrey());
+  m_IntensityCurveUI->OnCurveChange();
+
   // Redraw the user interface
   RedrawWindows();
   m_WinMain->redraw();
@@ -2921,6 +2927,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.32  2005/04/14 16:35:10  pauly
+ *ENH: Added Image Info window to SNAP
+ *
  *Revision 1.31  2005/03/08 03:12:51  pauly
  *BUG: Minor bugfixes in SNAP, mostly to the user interface
  *

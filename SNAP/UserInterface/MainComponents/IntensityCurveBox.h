@@ -39,7 +39,8 @@ public:
   void draw();
 
   /** Compute the histogram given an image wrapper */
-  void ComputeHistogram(GreyImageWrapper *source);
+  void ComputeHistogram(GreyImageWrapper *source, 
+    unsigned int iMinPixelsPerBin = 1);
 
   // Get/set the intensity curve
   irisGetMacro(Curve,IntensityCurveInterface *);

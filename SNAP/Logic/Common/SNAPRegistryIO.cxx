@@ -355,6 +355,10 @@ SNAPRegistryIO
     gs->GetMeshOptions(),
     registry.Folder("IRIS.MeshOptions"));
 
+  // Save the intensity mapping curve
+  app->GetIntensityCurve()->SaveToRegistry(
+    registry.Folder("IRIS.IntensityCurve"));
+
   // Write file related information
   registry["Files.Segmentation.FileName"] << gs->GetSegmentationFileName();
   registry["Files.Preprocessing.FileName"] << gs->GetPreprocessingFileName();
@@ -452,10 +456,18 @@ SNAPRegistryIO
   // Read the display options
   if(restoreDisplayOptions)
     {
+    // Read the mesh options
     gs->SetMeshOptions(
       SNAPRegistryIO::ReadMeshOptions(
         registry.Folder("IRIS.MeshOptions"),
         gs->GetMeshOptions()));
+
+    // Restore the intensity mapping curve
+    app->GetIntensityCurve()->LoadFromRegistry(
+      registry.Folder("IRIS.IntensityCurve"));
+    app->GetCurrentImageData()->GetGrey()->SetIntensityMapFunction(
+      app->GetIntensityCurve());
+   
     }
 
   // Read the information about the bounding box and ROI sub-sampling

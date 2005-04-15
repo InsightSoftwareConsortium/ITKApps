@@ -36,7 +36,7 @@ IntensityCurveUILogic
 {
   // Give the image to the histogram
   m_ImageWrapper = wrapper;
-  m_BoxCurve->ComputeHistogram(wrapper);
+  m_BoxCurve->ComputeHistogram(wrapper, 10);
 
   // Pull out the current histogram settings
   m_InHistogramMaxLevel->value(m_BoxCurve->GetHistogramMaxLevel() * 100.0f);
@@ -148,6 +148,9 @@ IntensityCurveUILogic
   // Fire the event
   GetEventSystem()->InvokeEvent(
     IntensityCurveUILogic::CurveUpdateEvent());
+
+  // Redraw the window
+  m_BoxCurve->redraw();
 }
 
 void 
@@ -191,11 +194,11 @@ IntensityCurveUILogic
   m_BoxCurve->SetHistogramBinSize((size_t) m_InHistogramBinSize->value());
   m_BoxCurve->SetHistogramMaxLevel(m_InHistogramMaxLevel->value() / 100.0f);
   m_BoxCurve->SetHistogramLog(m_ChkHistogramLog->value() ? true : false);
-  m_BoxCurve->ComputeHistogram(m_ImageWrapper);
+  m_BoxCurve->ComputeHistogram(m_ImageWrapper, 1);
   m_BoxCurve->redraw();
 
   // The histogram controls may have changed. Update them
-  m_InHistogramMaxLevel->value(m_BoxCurve->GetHistogramMaxLevel());
+  m_InHistogramMaxLevel->value(m_BoxCurve->GetHistogramMaxLevel() * 100.0);
   m_InHistogramBinSize->value(m_BoxCurve->GetHistogramBinSize());
 }
 

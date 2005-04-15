@@ -58,7 +58,7 @@ IntensityCurveBox
     // Set up the basic projection
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluOrtho2D(-0.05,1.05,-0.05,1.05);
+    gluOrtho2D(-0.025,1.025,-0.025,1.025);
     glViewport(0,0,w(),h());
 
     // Establish the model view matrix
@@ -73,7 +73,7 @@ IntensityCurveBox
     }
 
   // Clear the viewport
-  glClearColor(.906,.906,.906,1.0);
+  glClearColor(.95,.95,.95,1.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
   // Push the related attributes
@@ -82,52 +82,109 @@ IntensityCurveBox
   // Disable lighting
   glDisable(GL_LIGHTING);
 
-  // Draw the plot area
-  // glColor3d(0.85,0.85,0.85);
+  // Draw the plot area. The intensities outside of the window and level
+  // are going to be drawn in darker shade of gray
+  float t0, t1, xDummy;
+  m_Curve->GetControlPoint(0, t0, xDummy);
+  m_Curve->GetControlPoint(m_Curve->GetControlPointCount() - 1, t1, xDummy);
+  
+  // Draw the quads
   glBegin(GL_QUADS);
-  glColor3d(0.,0.,0.);
+
+  // Outer quad
+  glColor3d(0.9, 0.9, 0.9);
   glVertex2d(0,0);
-  // glColor3d(0.,0.,0.85);
-  glColor3d(1.,1.,1.);
   glVertex2d(0,1);
-  glColor3d(1.,1.,1.);
   glVertex2d(1,1);
-  glColor3d(0.,0.,0.);
   glVertex2d(1,0);
+
+  // Inner quad
+  glColor3d(1.0, 1.0, 1.0);
+  glVertex2d(t0, 0.0); 
+  glVertex2d(t0, 1.0); 
+  glVertex2d(t1, 1.0); 
+  glVertex2d(t1, 0.0);
+
   glEnd();
 
   // Draw a histogram if it exists
   if(m_Histogram.size())
     {
-    float wBin = 1.0f / m_Histogram.size();
-    glBegin(GL_QUADS);
-    glColor3f(1.0f, 1.0f, 1.0f);
+    // Compute the heights of all the histogram bars
+    float xWidth = 1.0f / m_Histogram.size();
+    unsigned int xPixelsPerBin = w() / m_Histogram.size();
+    vector<double> xHeight(m_Histogram.size(), 0.0);
 
-    // Check the scaling for the height of the bars
+    // Start by computing the maximum (cutoff) height
     float xHeightMax = m_HistogramMax * m_HistogramMaxLevel;
     if(m_HistogramLog)
       xHeightMax = log(xHeightMax) / log(10.0);
-    
-    // Draw the histogram bars
-    for(unsigned int i=0;i < m_Histogram.size();i++)
+
+    // Continue by computing each bin's height
+    unsigned int i;
+    for(i=0;i < m_Histogram.size();i++)
       {
       // Process the histogram height based on options
-      float xHeight = m_Histogram[i];
+      xHeight[i] = m_Histogram[i];
       if(m_HistogramLog)
-        xHeight = (xHeight > 0) ? log(xHeight) / log(10.0) : 0;
-      else if(xHeight > xHeightMax)
-        xHeight = xHeightMax / 0.9f;
-      
-      // Compute the physical height of the bin
-      float xBin = wBin * i;
-      float hBin = xHeight * 0.9f / xHeightMax;
+        xHeight[i] = (xHeight[i] > 0) ? log(xHeight[i]) / log(10.0) : 0;
+      if(xHeight[i] > xHeightMax)
+        xHeight[i] = xHeightMax / 0.9f;
+      }
 
+    // Draw the horizontal lines at various powers of 10 if in log mode
+    if(m_HistogramLog)
+      {
+      glColor3d(0.75, 0.75, 0.75);
+      glBegin(GL_LINES);
+      for(double d = 1.0; d < xHeightMax; d+=1.0)
+        { glVertex2f(0,d); glVertex2f(1,d); }
+      glEnd();
+      }
+      
+    // Paint the filled-in histogram bars. We fill in with black color if the 
+    // histogram width is less than 4 pixels
+    if(xPixelsPerBin < 4) 
+      glColor3f(0.0f, 0.0f, 0.0f); 
+    else 
+      glColor3f(0.8f, 0.8f, 1.0f);
+
+    // Paint the bars as quads
+    glBegin(GL_QUADS);
+    for(i=0;i < m_Histogram.size();i++)
+      {
+      // Compute the physical height of the bin
+      float xBin = xWidth * i;
+      float hBin = xHeight[i] * 0.9f / xHeightMax;
+
+      // Paint the bar
       glVertex2f(xBin,0);
       glVertex2f(xBin,hBin);
-      glVertex2f(xBin+wBin,hBin);
-      glVertex2f(xBin+wBin,0);
+      glVertex2f(xBin+xWidth,hBin);
+      glVertex2f(xBin+xWidth,0);
       }
     glEnd();
+
+    // Draw lines around the quads, but only if the bins are thick
+    if(xPixelsPerBin >= 4)
+      {
+      // Draw the vertical lines between the histogram bars
+      glBegin(GL_LINE_STRIP);
+      glColor3d(0.0, 0.0, 0.0);
+      for(i = 0; i < m_Histogram.size(); i++)
+        {
+        // Compute the physical height of the bin
+        float xBin = xWidth * i;
+        float hBin = xHeight[i] * 0.9f / xHeightMax;
+
+        // Draw around the bar, starting at the lower left corner
+        glVertex2f(xBin, 0.0f);
+        glVertex2f(xBin, hBin);
+        glVertex2f(xBin + xWidth, hBin);
+        glVertex2f(xBin + xWidth, 0.0f);
+        }
+      glEnd();
+      }
     }
 
   // Draw the box around the plot area
@@ -199,7 +256,7 @@ IntensityCurveBox
 }
 
 int 
-IntensityCurveBox
+  IntensityCurveBox
 ::GetControlPointInVincinity(float x, float y, int pixelRadius) 
 {
   float rx = pixelRadius * 1.0f / w();
@@ -230,7 +287,7 @@ IntensityCurveBox
 
 void 
 IntensityCurveBox
-::ComputeHistogram(GreyImageWrapper *source)
+::ComputeHistogram(GreyImageWrapper *source, unsigned int iMinPixelsPerBin)
 {
   // Need a wrapper
   assert(source);
@@ -247,17 +304,14 @@ IntensityCurveBox
   memset(frequency,0,sizeof(unsigned int) * nFrequencies);
   GreyImageWrapper::ConstIterator it = source->GetImageConstIterator();
   for(it.GoToBegin();!it.IsAtEnd();++it)
-  {
+    {
     frequency[it.Value()-iAbsMin]++;
-  }
+    }
 
   // Determine the bin size: no bin should be less than a single pixel wide
-  if(nFrequencies > m_HistogramBinSize * this->w()) 
-    m_HistogramBinSize = (unsigned int) ceil(nFrequencies / this->w());
+  if(nFrequencies * iMinPixelsPerBin > m_HistogramBinSize * this->w()) 
+    m_HistogramBinSize = (unsigned int) ceil(nFrequencies * iMinPixelsPerBin * 1.0 / this->w());
   unsigned int nBins = (unsigned int) ceil(nFrequencies * 1.0 / m_HistogramBinSize);
-
-  cout << "Histogram has " << nBins << " bins" << endl;
-  cout << "Bin size is   " << m_HistogramBinSize << endl;
 
   // Allocate an array of bins
   m_Histogram.resize(nBins);
@@ -268,27 +322,27 @@ IntensityCurveBox
 
   // Put the frequencies into the bins
   for(unsigned int i=0;i<nFrequencies;i++)
-  {
+    {
     unsigned int iBin = i / m_HistogramBinSize;
     m_Histogram[iBin] += frequency[i];
 
     // Compute the maximum frequency
     if(m_HistogramMax < m_Histogram[iBin])
-       m_HistogramMax  = m_Histogram[iBin]; 
-  }
+      m_HistogramMax  = m_Histogram[iBin]; 
+    }
 
   // Clear the frequencies
   delete frequency;
 }
 
-IntensityCurveBox::DefaultHandler
+  IntensityCurveBox::DefaultHandler
 ::DefaultHandler(IntensityCurveBox *parent) 
 {
   this->m_Parent = parent;
 }
 
 int 
-IntensityCurveBox::DefaultHandler
+  IntensityCurveBox::DefaultHandler
 ::OnMousePress(const FLTKEvent &event)
 {
   // Check the control point affected by the event
@@ -303,7 +357,7 @@ IntensityCurveBox::DefaultHandler
 int 
 IntensityCurveBox::DefaultHandler
 ::OnMouseRelease(const FLTKEvent &event,
-                 const FLTKEvent &irisNotUsed(dragEvent))
+  const FLTKEvent &irisNotUsed(dragEvent))
 {
   if (m_MovingControlPoint >= 0) {
     // Update the control point
@@ -326,7 +380,7 @@ IntensityCurveBox::DefaultHandler
 int 
 IntensityCurveBox::DefaultHandler
 ::OnMouseDrag(const FLTKEvent &event,
-              const FLTKEvent &irisNotUsed(dragEvent))
+  const FLTKEvent &irisNotUsed(dragEvent))
 {
   if (m_MovingControlPoint >= 0) 
     {
@@ -352,7 +406,7 @@ IntensityCurveBox::DefaultHandler
 }
 
 int 
-IntensityCurveBox::DefaultHandler
+  IntensityCurveBox::DefaultHandler
 ::OnMouseLeave(const FLTKEvent &irisNotUsed(event))
 {
   return 1;
@@ -379,7 +433,7 @@ IntensityCurveBox::DefaultHandler
     fl_cursor(FL_CURSOR_DEFAULT);
     }   
   else if (cp == 0 || 
-           cp == (int)(m_Parent->GetCurve()->GetControlPointCount()-1)) 
+    cp == (int)(m_Parent->GetCurve()->GetControlPointCount()-1)) 
     {
     fl_cursor(FL_CURSOR_WE);
     } 

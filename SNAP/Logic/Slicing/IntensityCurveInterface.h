@@ -16,6 +16,7 @@
 #define __IntensityCurveInterface_h_
 
 #include <itkFunctionBase.h>
+#include <Registry.h>
 
 /**
  * \class IntensityCurveInterface
@@ -68,6 +69,12 @@ public:
    * Check the monotonicity of the spline curve
    */
   virtual bool IsMonotonic() const = 0;
+
+  /** Load the curve from a registry object */
+  virtual void LoadFromRegistry(Registry &registry) = 0;
+
+  /** Save the curve to a registry object */
+  virtual void SaveToRegistry(Registry &registry) const = 0;
 
 protected:
   IntensityCurveInterface(){};
