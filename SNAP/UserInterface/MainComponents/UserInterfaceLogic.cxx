@@ -496,6 +496,9 @@ UserInterfaceLogic
   // reset Mesh in IRIS window
   m_IRISWindow3D->ClearScreen();
 
+  // Hide the label editor since it's open
+  m_LabelEditorUI->OnCloseAction();
+
   // show the snake window, hide the IRIS window
   ShowSNAP();
 
@@ -2526,6 +2529,10 @@ UserInterfaceLogic
       m_Driver->GetColorLabelTable()->GetFirstValidLabel());
     m_GlobalState->SetOverWriteColorLabel(0);
     
+    // Update the label editor window
+    m_LabelEditorUI->OnLabelListUpdate(
+      m_GlobalState->GetDrawingColorLabel());
+
     // Update the user interface in response
     OnLabelListUpdate();
 
@@ -3031,6 +3038,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.34  2005/04/21 14:46:30  pauly
+ *ENH: Improved management and editing of color labels in SNAP
+ *
  *Revision 1.33  2005/04/15 19:04:19  pauly
  *ENH: Improved the Intensity Contrast features in SNAP
  *

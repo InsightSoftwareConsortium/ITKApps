@@ -66,6 +66,8 @@ public:
   const bool IsColorLabelValid(size_t id) const
     { return GetColorLabel(id).IsValid(); }
 
+  /** Sets the color label valid or invalid. During invalidation, the label
+   * reverts to default values */
   void SetColorLabelValid(size_t id, bool flag);
 
   /** Return the first valid color label, or zero if there aren't any */

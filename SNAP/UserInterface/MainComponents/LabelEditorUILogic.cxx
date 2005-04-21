@@ -302,9 +302,7 @@ LabelEditorUILogic
     ->ReplaceIntensity(iCurrentLabel, 0);
 
   // Set the label current label as invalid
-  ColorLabel clCurrent = GetColorLabel(iCurrentLabel);
-  clCurrent.SetValid(false);
-  SetColorLabel(iCurrentLabel, clCurrent);
+  m_Driver->GetColorLabelTable()->SetColorLabelValid(iCurrentLabel, false);
 
   // If the label is a current paint-over label or a drawing label, 
   // reposition the currently selected label
@@ -349,14 +347,12 @@ LabelEditorUILogic
     }
 
   // Move the label into the new slot
-  ColorLabel clCurrent = GetColorLabel(iCurrentLabel);
-  clTarget.SetPropertiesFromColorLabel(clCurrent);
+  clTarget.SetPropertiesFromColorLabel(GetColorLabel(iCurrentLabel));
   clTarget.SetValid(true);
-  clCurrent.SetValid(false);
+  SetColorLabel(iNewId, clTarget);
 
   // Update the new labels
-  SetColorLabel(iCurrentLabel, clCurrent);
-  SetColorLabel(iNewId, clTarget);
+  m_Driver->GetColorLabelTable()->SetColorLabelValid(iCurrentLabel, false);
 
   // If the label was a current drawing label, we need to update that
   if(iCurrentLabel == m_GlobalState->GetDrawingColorLabel())
