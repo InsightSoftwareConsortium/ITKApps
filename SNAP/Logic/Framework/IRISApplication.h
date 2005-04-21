@@ -17,13 +17,16 @@
 #include "itkImageRegion.h"
 #include "itkExceptionObject.h"
 #include "GlobalState.h"
+#include "ColorLabelTable.h"
 #include "itkCommand.h"
-#include "itkImage.h"
+// #include "itkImage.h"
 
 // Forward reference to the classes pointed at
 class IRISImageData;
 class SNAPImageData;
-
+namespace itk {
+  template <class TPixel, unsigned int VDimension> class Image;
+}
 
 /**
  * \class IRISApplication
@@ -53,8 +56,6 @@ public:
   typedef itk::Image<LabelType,3> LabelImageType;
   typedef itk::Image<float,3> SpeedImageType;
   typedef itk::Command CommandType;
-
-
 
   /**
    * Constructor for the IRIS/SNAP application
@@ -125,16 +126,9 @@ public:
   void UpdateIRISWithSnapImageData(CommandType *progressCommand = NULL);
 
   /**
-   * Load label descriptions from a file in ASCII space separated format
+   * Get the segmentation label data
    */
-  void ReadLabelDescriptionsFromTextFile(const char *file) 
-    throw(itk::ExceptionObject);
-
-  /**
-   * Save label description file in ASCII space separated format
-   */
-  void WriteLabelDescriptionsToTextFile(const char *file) 
-    throw(itk::ExceptionObject);
+  irisGetMacro(ColorLabelTable, ColorLabelTable *);
 
   /** Release the SNAP Image data */
   void ReleaseSNAPImageData();
@@ -171,10 +165,37 @@ public:
    */
   void ExportSlice(unsigned int iSliceAnatomy, const char *file);
 
+  /** Export voxel statistis to a file */
+  void ExportSegmentationStatistics(const char *file) 
+    throw(itk::ExceptionObject);
+
+  /** 
+   * This method is used to selectively override labels in a target 
+   * segmentation image with the current drawing color.  It uses the 
+   * current coverage mode to determine whether to override the pixel 
+   * or to keep it */
+  LabelType DrawOverLabel(LabelType iTarget);
+
+  /*
+   * Cut the segmentation using a plane and relabed the segmentation
+   * on the side of that plane
+   */
+  void RelabelSegmentationWithCutPlane(
+    const Vector3d &normal, double intercept);
+
+  /**
+   * Compute the intersection of the segmentation with a ray
+   */
+  int GetRayIntersectionWithSegmentation(const Vector3d &point, 
+                     const Vector3d &ray, 
+                     Vector3i &hit) const;
 private:
   // Image data objects
   IRISImageData *m_IRISImageData,*m_CurrentImageData;
   SNAPImageData *m_SNAPImageData;
+
+  // Color label data
+  ColorLabelTable *m_ColorLabelTable;
 
   // Global state object
   // TODO: Incorporate GlobalState into IRISApplication more nicely

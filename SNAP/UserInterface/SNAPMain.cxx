@@ -302,10 +302,14 @@ int main(int argc, char **argv)
     try 
       {
       // Load the labels
-      iris->ReadLabelDescriptionsFromTextFile(fname);
+      iris->GetColorLabelTable()->LoadFromFile(fname);
+
+      // Initialize the drawing color label to the first available label
+      iris->GetGlobalState()->SetDrawingColorLabel(
+        iris->GetColorLabelTable()->GetFirstValidLabel());
     
       // Update the user interfafce
-      ui->OnSegmentationLabelsUpdate(true);
+      ui->OnLabelListUpdate();
       }
     catch(itk::ExceptionObject &exc)
       {
@@ -345,6 +349,9 @@ int main(int argc, char **argv)
 
 /*
  *Log: SNAPMain.cxx
+ *Revision 1.11  2005/02/04 17:01:09  lorensen
+ *COMP: last of gcc 2.96 changes (I hope).
+ *
  *Revision 1.10  2004/08/26 19:43:27  pauly
  *ENH: Moved the Borland code into Common folder
  *

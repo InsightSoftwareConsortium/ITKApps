@@ -628,3 +628,17 @@ GenericSliceWindow
   return m_ParentUI->GetAppearanceSettings()->GetFlagDisplayZoomThumbnail() 
     && m_ViewZoom > m_OptimalZoom; 
 }
+
+GenericSliceWindow::EventHandler
+::EventHandler(GenericSliceWindow *parent) {
+  m_Parent = parent;
+}
+
+void 
+GenericSliceWindow::EventHandler
+::Register() 
+{
+  m_Driver = m_Parent->m_Driver;
+  m_ParentUI = m_Parent->m_ParentUI;
+  m_GlobalState = m_Parent->m_GlobalState;
+}

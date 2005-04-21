@@ -29,6 +29,7 @@
 #include "FL/fl_draw.H"
 #include "itkSmartPointer.h"
 #include "ImageCoordinateGeometry.h"
+#include "Registry.h"
 #include <string>
 #include <vector>
 
@@ -41,6 +42,19 @@ namespace itk
   template <unsigned int VDimensions> class ImageBase;
   class ImageIOBase;  
 }
+
+/**
+ * \class ImageInfoCallbackInterface
+ * \brief A virtual class that is used to provide image-specific information to 
+ * the ImageIOWizardLogic object 
+ */
+class ImageInfoCallbackInterface
+{
+public:
+  virtual bool FindRegistryAssociatedWithImage(
+    const char *file, Registry &registry) = 0;
+};
+
 
 /**
  * \class ImageIOWizardLogic
@@ -177,6 +191,11 @@ public:
   /** Set the history list of recently opened files */
   void SetHistory(const HistoryType &history);
 
+  /** Set the callback object for retrieving historical information about
+   * previously loaded images */
+  void SetImageInfoCallback(ImageInfoCallbackInterface *iCallback)
+    { this->m_Callback = iCallback; }
+
 protected:
 
   /** An image being loaded */
@@ -193,6 +212,12 @@ protected:
 
   /** A history of recently opened files */
   HistoryType m_History;
+
+  /** A callback for retrieving image information */
+  ImageInfoCallbackInterface *m_Callback;
+
+  /** The registry associated with the image currently being considered for loading */
+  Registry m_Registry;
 
   /** A mapping from axis index and flip state to orientation menu items */
   unsigned int m_MapOrientationIndexAndFlipToMenuItem[3][2];

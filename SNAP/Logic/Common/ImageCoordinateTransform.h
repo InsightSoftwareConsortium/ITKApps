@@ -52,7 +52,7 @@ public:
 
   /** Multiply by another transform */
   ImageCoordinateTransform Product(const ImageCoordinateTransform &t1) const;
-                                                                       
+                                                                      
   /** Apply transform to a vector */
   Vector3f TransformVector(const Vector3f &x) const;
 

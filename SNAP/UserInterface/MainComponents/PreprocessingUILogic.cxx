@@ -551,7 +551,7 @@ PreprocessingUILogic
     // system in the SpeedImageWrapper
     unsigned char rgbaOverlay[4];
     unsigned int label = m_GlobalState->GetDrawingColorLabel();
-    m_Driver->GetSNAPImageData()->GetColorLabel(label).GetRGBAVector(rgbaOverlay);
+    m_Driver->GetColorLabelTable()->GetColorLabel(label).GetRGBAVector(rgbaOverlay);
     SpeedImageWrapper::OverlayPixelType colorOverlay(rgbaOverlay);
     m_Driver->GetSNAPImageData()->GetSpeed()->SetOverlayColor(colorOverlay);
 

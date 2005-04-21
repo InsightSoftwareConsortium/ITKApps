@@ -118,6 +118,20 @@ public:
     m_Alpha  = array[3];
   }
 
+  // Copy all properties, except for the label id and the valid flag 
+  // from one label to the other. This is used to reassign ids to labels
+  // because the labels are in sequential order
+  void SetPropertiesFromColorLabel(const ColorLabel &lSource)
+    {
+    m_VisibleIn3D = lSource.m_VisibleIn3D;
+    m_Visible = lSource.m_Visible;
+    m_Alpha = lSource.m_Alpha;
+    m_Label = lSource.m_Label;
+    m_RGB[0] = lSource.m_RGB[0];
+    m_RGB[1] = lSource.m_RGB[1];
+    m_RGB[2] = lSource.m_RGB[2];
+    }
+
 private:
   // The descriptive text of the label
   std::string m_Label;

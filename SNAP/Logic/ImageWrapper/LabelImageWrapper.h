@@ -20,12 +20,15 @@
 #include "UnaryFunctorCache.h"
 
 
+
 // Forward references
 namespace itk {
   template<class TInput, class TOutput, class TFunctor> 
     class UnaryFunctorImageFilter;
 }
+
 class ColorLabel;
+class ColorLabelTable;
 
 /**
  * \class LabelImageWrapper
@@ -50,12 +53,12 @@ public:
   /**
    * Set the table of color labels used to produce color slice images
    */  
-  void SetLabelColorTable(ColorLabel *labels);
+  void SetLabelColorTable(ColorLabelTable *labels);
 
   /**
    * Get the color label table
    */
-  ColorLabel *GetLabelColorTable() const;
+  ColorLabelTable *GetLabelColorTable() const;
 
   /**
    * Tell the object to update it's color mapping cache
@@ -85,7 +88,7 @@ private:
   class IntensityFunctor {
   public:    
       /** The pointer to the label table */
-      ColorLabel *m_ColorLabelTable;
+      ColorLabelTable *m_ColorLabelTable;
 
       /** The operator that maps label to color */
       DisplayPixelType operator()(const LabelType &x) const;

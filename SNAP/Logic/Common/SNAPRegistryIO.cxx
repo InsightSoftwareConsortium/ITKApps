@@ -381,31 +381,8 @@ SNAPRegistryIO
   WriteSegmentationROISettings(
     gs->GetSegmentationROISettings(), registry.Folder("IRIS.BoundingBox"));
 
-  // Write the labels themselves
-  unsigned int validLabels = 0;
-  for(unsigned int i=1;i < MAX_COLOR_LABELS; i++)
-    {
-    // Get the i-th color label
-    ColorLabel cl = app->GetCurrentImageData()->GetColorLabel(i);
-    
-    // Only write valid color labels (otherwise, what's the point?)
-    if(!cl.IsValid()) continue;
-    
-    // Create a folder for the color label
-    Registry &folder = 
-      registry.Folder(registry.Key("IRIS.LabelTable.Element[%d]",validLabels));    
-    
-    folder["Index"] << i;
-    folder["Alpha"] << (int) cl.GetAlpha();
-    folder["Label"] << cl.GetLabel();
-    folder["Color"] << Vector3i(cl.GetRGB(0),cl.GetRGB(1),cl.GetRGB(2));
-    folder["Flags"] << Vector2i(cl.IsVisibleIn3D(),cl.IsVisible());
-
-    // Increment the valid label counter
-    validLabels++;
-    }
-
-  registry["IRIS.LabelTable.NumberOfElements"] << validLabels;
+  // Write the color label table
+  app->GetColorLabelTable()->SaveToRegistry(registry.Folder("IRIS.LabelTable"));
 }
 
 bool 
@@ -478,49 +455,8 @@ SNAPRegistryIO
   // Read the label info
   if(restoreLabels) 
     {
-    // Reset the color labels
-    app->GetCurrentImageData()->ResetColorLabelTable();
-
-    // Read the number of color labels
-    unsigned int nColorLabels = 
-      registry["IRIS.LabelTable.NumberOfElements"][0];
-
-    // Read each label (don't assign them yet)
-    for(unsigned int i=0;i<nColorLabels;i++) 
-      {
-      // Get the folder describing the label
-      Registry &folder = 
-        registry.Folder(registry.Key("IRIS.LabelTable.Element[%d]",i));
-
-      // Get the index
-      int index = folder["Index"][0];
-
-      // If index is valid, proceed to load the label
-      if(index > 0) 
-        {
-        // Get current color label 
-        ColorLabel cl = app->GetCurrentImageData()->GetColorLabel(i);
-
-        // Read the color label properties
-        cl.SetAlpha(folder["Alpha"][(int) cl.GetAlpha()]);
-        cl.SetLabel(folder["Label"][cl.GetLabel()]);
-        
-        // Read the color property
-        Vector3i color = 
-          folder["Color"][Vector3i(cl.GetRGB(0),cl.GetRGB(1),cl.GetRGB(2))];
-        cl.SetRGB((unsigned char)color[0],(unsigned char)color[1],
-                  (unsigned char)color[2]);
-        
-        // Read the flag property
-        Vector2i flags = folder["Flags"][Vector2i(0,0)];
-        cl.SetVisibleIn3D(flags[0] > 0);
-        cl.SetVisible(flags[1] > 0);
-        cl.SetValid(true);
-
-        // Assign the color label
-        app->GetIRISImageData()->SetColorLabel(index,cl);
-        }
-      }
+    // Restore the table of color labels
+    app->GetColorLabelTable()->LoadFromRegistry(registry.Folder("IRIS.LabelTable"));
 
     // Read the drawing color label
     gs->SetDrawingColorLabel(

@@ -46,6 +46,7 @@ SET(LOGIC_CXX
   Logic/Common/ImageCoordinateGeometry.cxx
   Logic/Common/ImageCoordinateTransform.cxx
   Logic/Common/SNAPRegistryIO.cxx
+  Logic/Common/ColorLabelTable.cxx
   Logic/Framework/GlobalState.cxx
   Logic/Framework/IRISApplication.cxx
   Logic/Framework/IRISImageData.cxx
@@ -78,6 +79,7 @@ SET(LOGIC_HEADERS
   Common/SNAPOpenGL.h
   Common/SystemInterface.h
   Logic/Common/ColorLabel.h
+  Logic/Common/ColorLabelTable.h
   Logic/Common/ImageCoordinateGeometry.h
   Logic/Common/ImageCoordinateTransform.h
   Logic/Common/ImageRayIntersectionFinder.h
@@ -141,6 +143,7 @@ SET(UI_CXX
   UserInterface/MainComponents/HelpViewerLogic.cxx
   UserInterface/MainComponents/IntensityCurveBox.cxx
   UserInterface/MainComponents/IntensityCurveUILogic.cxx
+  UserInterface/MainComponents/LabelEditorUILogic.cxx
   UserInterface/MainComponents/PreprocessingUILogic.cxx
   UserInterface/MainComponents/ResizeRegionDialogLogic.cxx
   UserInterface/MainComponents/RestoreSettingsDialogLogic.cxx
@@ -188,6 +191,8 @@ SET(UI_HEADERS
   UserInterface/MainComponents/IntensityCurveBox.h
   UserInterface/MainComponents/IntensityCurveUIBase.h
   UserInterface/MainComponents/IntensityCurveUILogic.h
+  UserInterface/MainComponents/LabelEditorUIBase.h
+  UserInterface/MainComponents/LabelEditorUILogic.h
   UserInterface/MainComponents/PreprocessingUIBase.h
   UserInterface/MainComponents/PreprocessingUILogic.h
   UserInterface/MainComponents/ResizeRegionDialogBase.h
@@ -248,6 +253,7 @@ SET(APPLICATION_FLUIDS
   UserInterface/MainComponents/AppearanceDialogUI.fl
   UserInterface/MainComponents/HelpViewer.fl
   UserInterface/MainComponents/IntensityCurveUI.fl
+  UserInterface/MainComponents/LabelEditorUI.fl
   UserInterface/MainComponents/PreprocessingUI.fl
   UserInterface/MainComponents/ResizeRegionDialog.fl
   UserInterface/MainComponents/RestoreSettingsDialog.fl

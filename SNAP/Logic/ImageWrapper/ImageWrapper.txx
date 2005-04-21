@@ -612,4 +612,58 @@ ImageWrapper<TPixel>
   return xOut;
 }
 
+template <class TPixel>
+unsigned int 
+ImageWrapper<TPixel>
+::ReplaceIntensity(TPixel iOld, TPixel iNew)
+{
+  // Counter for the number of replaced voxels
+  unsigned int nReplaced = 0;
+
+  // Replace the voxels
+  for(Iterator it = GetImageIterator(); !it.IsAtEnd(); ++it)
+    if(it.Value() == iOld)
+      {
+      it.Set(iNew);
+      ++nReplaced;
+      }
+
+  // Flag that changes have been made
+  if(nReplaced > 0)
+    m_Image->Modified();
+
+  // Return the number of replacements
+  return nReplaced;
+}
+
+template <class TPixel>
+unsigned int 
+ImageWrapper<TPixel>
+::SwapIntensities(TPixel iFirst, TPixel iSecond)
+{
+  // Counter for the number of replaced voxels
+  unsigned int nReplaced = 0;
+
+  // Replace the voxels
+  for(Iterator it = GetImageIterator(); !it.IsAtEnd(); ++it)
+    if(it.Value() == iFirst)
+      {
+      it.Set(iSecond);
+      ++nReplaced;
+      }
+    else if(it.Value() == iSecond)
+      {
+      it.Set(iFirst);
+      ++nReplaced;
+      }
+
+  // Flag that changes have been made
+  if(nReplaced > 0)
+    m_Image->Modified();
+
+  // Return the number of replacements
+  return nReplaced;
+}
+  
+
 #endif // __ImageWrapper_txx_

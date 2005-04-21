@@ -27,6 +27,7 @@
 #include "IntensityCurveVTK.h"
 #include "itkImageRegionIterator.h"
 #include "itkImageRegionConstIterator.h"
+#include "itkImageRegionIteratorWithIndex.h"
 #include "itkPasteImageFilter.h"
 #include "itkImageRegionIterator.h"
 #include "itkIdentityTransform.h"
@@ -36,6 +37,10 @@
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkWindowedSincInterpolateImageFunction.h"
 #include "itkImageFileWriter.h"
+#include "itkFlipImageFilter.h"
+
+#include "IRISSlicer.h"
+
 
 #include <stdio.h>
 #include <sstream>
@@ -48,8 +53,11 @@ IRISApplication
   // Construct new global state object
   m_GlobalState = new GlobalState;
 
+  // Initialize the color table
+  m_ColorLabelTable = new ColorLabelTable();
+
   // Contruct the IRIS and SNAP data objects
-  m_IRISImageData = new IRISImageData();
+  m_IRISImageData = new IRISImageData(this);
   m_SNAPImageData = NULL;
 
   // Set the current IRIS pointer
@@ -93,6 +101,7 @@ IRISApplication
   delete m_IRISImageData;
   delete m_SNAPImageData;
   delete m_GlobalState;
+  delete m_ColorLabelTable;
 }
 
 void 
@@ -103,7 +112,7 @@ IRISApplication
   assert(m_SNAPImageData == NULL);
 
   // Create the SNAP image data object
-  m_SNAPImageData = new SNAPImageData();
+  m_SNAPImageData = new SNAPImageData(this);
 
   // Get the roi chunk from the grey image
   GreyImageType::Pointer imgNewGrey = 
@@ -146,8 +155,7 @@ IRISApplication
 
   // Pass the label description of the drawing label to the SNAP image data
   m_SNAPImageData->SetColorLabel(
-    passThroughLabel,
-    m_IRISImageData->GetColorLabel(passThroughLabel));
+    m_ColorLabelTable->GetColorLabel(passThroughLabel));
 
   // Assign the intensity mapping function to the Snap data
   m_SNAPImageData->GetGrey()->SetIntensityMapFunction(m_IntensityCurve);
@@ -281,7 +289,34 @@ IRISApplication
   assert(m_SNAPImageData == NULL);
 
   // Update the iris data
-  m_IRISImageData->SetSegmentationImage(newSegmentationImage);  
+  m_IRISImageData->SetSegmentationImage(newSegmentationImage); 
+
+  // Update the color labels, so that for every label in the image
+  // there is a valid color label
+  LabelImageWrapper::ConstIterator it = 
+    m_IRISImageData->GetSegmentation()->GetImageConstIterator();
+  for( ; !it.IsAtEnd(); ++it)
+    if(!m_ColorLabelTable->IsColorLabelValid(it.Get()))
+      m_ColorLabelTable->SetColorLabelValid(it.Get(), true);
+}
+
+LabelType
+IRISApplication
+::DrawOverLabel(LabelType iTarget)
+{
+  // Get the current merge settings
+  CoverageModeType iMode = m_GlobalState->GetCoverageMode();
+  LabelType iDrawing = m_GlobalState->GetDrawingColorLabel();
+  LabelType iDrawOver = m_GlobalState->GetOverWriteColorLabel();  
+
+  // Assign the output intensity based on the current drawing mode    
+  bool visible = m_ColorLabelTable->GetColorLabel(iTarget).IsVisible();
+
+  // If mode is paint over all, the victim is overridden
+  return
+     ((iMode == PAINT_OVER_ALL) ||
+      (iMode == PAINT_OVER_COLORS && visible) ||
+      (iMode == PAINT_OVER_ONE && iDrawOver == iTarget)) ? iDrawing : iTarget;
 }
 
 void 
@@ -381,15 +416,19 @@ IRISApplication
   // possible combination of two input intensities (note that snap image only
   // has two possible intensities
   LabelType mergeTable[2][MAX_COLOR_LABELS];
+
+  // Perform the merge
   for(unsigned int i=0;i<MAX_COLOR_LABELS;i++)
     {
     // Whe the SNAP image is clear, IRIS passes through to the output
     // except for the IRIS voxels of the drawing color, which get cleared out
     mergeTable[iClear][i] = (i!=m_GlobalState->GetDrawingColorLabel()) ? i : 0;
 
-    // Assign the output intensity based on the current drawing mode
-    mergeTable[1-iClear][i] = 
-      m_IRISImageData->DrawOverFunction(m_GlobalState, (LabelType) i);
+    // Assign the output intensity based on the current drawing mode    
+    bool visible = m_ColorLabelTable->GetColorLabel(i).IsVisible();
+
+    // If mode is paint over all, the victim is overridden
+    mergeTable[1-iClear][i] = DrawOverLabel((LabelType) i);
     }
 
   // Go through both iterators, copy the new over the old
@@ -441,148 +480,6 @@ void IRISApplication
   m_CurrentImageData = m_SNAPImageData;
 }
 
-void IRISApplication
-::ReadLabelDescriptionsFromTextFile(const char *filename)
-  throw(ExceptionObject)
-{
-  // Can not do this in SNAP mode
-  assert(m_SNAPImageData == NULL);
-  
-  // Create a stream for reading the file
-  ifstream fin(filename);
-  string line;
-
-  // Check that the file is readable
-  if(!fin.good())
-    {
-    throw itk::ExceptionObject(
-      __FILE__, __LINE__,"File does not exist or can not be opened");
-    }
-
-  // Read each line of the file separately
-  for(unsigned int iLine=0;!fin.eof();iLine++)
-    {
-    // Read the line into a string
-    std::getline(fin,line);
-
-    // Check if the line is a comment or a blank line
-    if(line[0] == '#' || line.length() == 0)
-      continue;
-
-    // Create a stream to parse that string
-    IRISIStringStream iss(line);
-    iss.exceptions(std::ios::badbit | std::ios::failbit);
-
-    try 
-      {
-      // Read in the elements of the file
-      int idx, red, green, blue, visible, mesh;
-      float alpha;
-      iss >> idx;
-      iss >> red;
-      iss >> green;
-      iss >> blue;
-      iss >> alpha;
-      iss >> visible;
-      iss >> mesh;
-
-      // Skip to a quotation mark
-      iss.ignore(line.length(),'\"');
-
-      // Allocate a label of appropriate size
-      char *label = new char[line.length()+1];
-
-      // Read the label
-      iss.get(label,line.length(),'\"');
-
-      // Create a new color label
-      ColorLabel cl;
-
-      // Store the results
-      cl.SetValid(true);
-      cl.SetRGB(0,(unsigned char) red);
-      cl.SetRGB(1,(unsigned char) green);
-      cl.SetRGB(2,(unsigned char) blue);
-      cl.SetAlpha( (unsigned char) (255 * alpha) );
-      cl.SetVisible(visible != 0);
-      cl.SetVisibleIn3D(mesh != 0);
-      cl.SetLabel(label);
-
-      // Store the color label
-      m_IRISImageData->SetColorLabel(idx,cl);
-
-      // Clean up the label
-      delete label;      
-      }
-    catch( std::exception )
-      {
-      // Close the input stream
-      fin.close();
-      
-      // create an exeption string
-      IRISOStringStream oss;
-      oss << "Syntax error on line " << (iLine+1);
-
-      // throw our own exception
-      throw itk::ExceptionObject(
-        __FILE__, __LINE__,oss.str().c_str());
-      }
-    }  
-
-  fin.close();
-}
-
-void IRISApplication
-::WriteLabelDescriptionsToTextFile(const char *filename)
-  throw(ExceptionObject)
-{
-  // Open the file for writing
-  ofstream fout(filename);
-  
-  // Check that the file is readable
-  if(!fout.good())
-    {
-    throw itk::ExceptionObject(
-      __FILE__, __LINE__,"File can not be opened for writing");
-    }
-
-  // Print out a header to the file
-  fout << "################################################"<< endl;
-  fout << "# ITK-SnAP Label Description File"               << endl;
-  fout << "# File format: "                                 << endl;
-  fout << "# IDX   -R-  -G-  -B-  -A--  VIS MSH  LABEL"     << endl;
-  fout << "# Fields: "                                      << endl;
-  fout << "#    IDX:   Zero-based index "                   << endl;
-  fout << "#    -R-:   Red color component (0..255)"        << endl;
-  fout << "#    -G-:   Green color component (0..255)"      << endl;
-  fout << "#    -B-:   Blue color component (0..255)"       << endl;
-  fout << "#    -A-:   Label transparency (0.00 .. 1.00)"   << endl;
-  fout << "#    VIS:   Label visibility (0 or 1)"           << endl;
-  fout << "#    IDX:   Label mesh visibility (0 or 1)"      << endl;
-  fout << "#  LABEL:   Label description "                  << endl;
-  fout << "################################################"<< endl;
-
-  // Print out the labels
-  for(unsigned int i=0;i<MAX_COLOR_LABELS;i++)
-    {
-    ColorLabel cl = m_IRISImageData->GetColorLabel(i);
-    if(cl.IsValid())
-      {
-      fout << "  "  << std::ios::right << std::setw(3) << i;
-      fout << "   " << std::ios::right << std::setw(3) << (int) cl.GetRGB(0);
-      fout << "  "  << std::ios::right << std::setw(3) << (int) cl.GetRGB(1);
-      fout << "  "  << std::ios::right << std::setw(3) << (int) cl.GetRGB(2);
-      fout << "  "  << std::ios::right << std::setw(7) << std::setprecision(2) 
-           << (cl.GetAlpha() / 255.0f);
-      fout << "  "  << std::ios::right << std::setw(1) << (cl.IsVisible() ? 1 : 0);
-      fout << "  "  << std::ios::right << std::setw(1) << (cl.IsVisibleIn3D() ? 1 : 0);
-      fout << "    \"" << cl.GetLabel() << "\"" << endl;
-      }
-    }
-
-  fout.close();
-}   
-
 void
 IRISApplication
 ::ExportSlice(unsigned int iSliceAnatomy, const char *file)
@@ -596,11 +493,321 @@ IRISApplication
   GreyImageWrapper::DisplaySlicePointer imgGrey = 
     m_CurrentImageData->GetGrey()->GetDisplaySlice(iSliceImg);
 
+  // Flip the image in the Y direction
+  typedef itk::FlipImageFilter<GreyImageWrapper::DisplaySliceType> FlipFilter;
+  FlipFilter::Pointer fltFlip = FlipFilter::New();
+  fltFlip->SetInput(imgGrey);
+  
+  FlipFilter::FlipAxesArrayType arrFlips;
+  arrFlips[0] = false; arrFlips[1] = true;
+  fltFlip->SetFlipAxes(arrFlips);
+
   // Create a writer for saving the image
   typedef itk::ImageFileWriter<GreyImageWrapper::DisplaySliceType> WriterType;
   WriterType::Pointer writer = WriterType::New();
-  writer->SetInput(imgGrey);
+  writer->SetInput(fltFlip->GetOutput());
   writer->SetFileName(file);
   writer->Update();
+}
+
+void 
+IRISApplication
+::ExportSegmentationStatistics(const char *file)  throw(ExceptionObject)
+{
+  unsigned int i;
+  
+  // Make sure that the segmentation image exists
+  assert(m_CurrentImageData->IsSegmentationLoaded());
+
+  // A structure to describe each label
+  struct Entry {
+    unsigned long int count;
+    unsigned long int sumGrey;
+    unsigned long int sumGreySqr;
+    double mean;
+    double stddev;
+  
+    Entry() : count(0),sumGrey(0),sumGreySqr(0),mean(0),stddev(0) {}
+  };
+  
+  // histogram of the segmentation image
+  Entry data[MAX_COLOR_LABELS];
+
+  // Create an iterator for parsing the segmentation image
+  LabelImageWrapper::ConstIterator itLabel = 
+    m_CurrentImageData->GetSegmentation()->GetImageConstIterator();
+
+  // Another iterator for accessing the grey image
+  GreyImageWrapper::ConstIterator itGrey = 
+    m_CurrentImageData->GetGrey()->GetImageConstIterator();
+
+  // Compute the number, sum and sum of squares of grey intensities for each 
+  // label
+  while(!itLabel.IsAtEnd())
+    {
+    LabelType label = itLabel.Value();
+    GreyType grey = itGrey.Value();
+
+    data[label].count++;
+    data[label].sumGrey += grey;
+    data[label].sumGreySqr += grey * grey;
+
+    ++itLabel;
+    ++itGrey;
+    }
+  
+  // Compute the mean and standard deviation
+  for (i=0; i<MAX_COLOR_LABELS; i++)
+    {
+    // The mean
+    data[i].mean = data[i].sumGrey * 1.0 / data[i].count;
+
+    // The standard deviation
+    data[i].stddev = sqrt(
+      (data[i].sumGreySqr * 1.0 - data[i].count * data[i].mean * data[i].mean) 
+      / (data[i].count - 1));
+    }
+  
+  // Compute the size of a voxel, in mm^3
+  const double *spacing = 
+    m_CurrentImageData->GetGrey()->GetImage()->GetSpacing().GetDataPointer();
+  double volVoxel = spacing[0] * spacing[1] * spacing[2];
+
+  // Open the selected file for writing
+  std::ofstream fout(file);
+
+  // Check if the file is readable
+  if(!fout.good())
+    throw itk::ExceptionObject(__FILE__, __LINE__,
+                               "File can not be opened for writing");
+  try 
+    {
+    // Write voxel volumes to the file
+    fout << "##########################################################" << std::endl;
+    fout << "# SNAP Voxel Count File" << std::endl;
+    fout << "# File format:" << std::endl;
+    fout << "# LABEL: NUMBER / VOLUME / MEAN / SD" << std::endl;
+    fout << "# Fields:" << std::endl;
+    fout << "#    LABEL         Label description" << std::endl;
+    fout << "#    NUMBER        Number of voxels that have that label " << std::endl;
+    fout << "#    VOLUME        Volume of those voxels in cubic mm " << std::endl;
+    fout << "#    MEAN          Mean intensity of those voxels " << std::endl;
+    fout << "#    SD            Standard deviation of those voxels " << std::endl;
+    fout << "##########################################################" << std::endl;
+
+    for (i=1; i<MAX_COLOR_LABELS; i++) 
+      {
+      const ColorLabel &cl = m_ColorLabelTable->GetColorLabel(i);
+      if(cl.IsValid() && data[i].count > 0)
+        {
+        fout << std::ios::left << std::setw(40) << cl.GetLabel() << ": ";
+        fout << std::ios::right << std::setw(10) << data[i].count << " / ";
+        fout << std::setw(10) << (data[i].count * volVoxel) << " / ";
+        fout << std::ios::internal << std::setw(10) << data[i].mean << " / ";
+        fout << std::setw(10) << data[i].stddev << std::endl;
+        }      
+      }
+    }
+  catch(...)
+    {
+    throw itk::ExceptionObject(__FILE__, __LINE__,
+                           "File can not be written");
+    }
+
+  fout.close();
+}
+
+
+void 
+IRISApplication
+::RelabelSegmentationWithCutPlane(const Vector3d &normal, double intercept) 
+{
+  // Get the label image
+  LabelImageWrapper::ImagePointer imgLabel = 
+    m_CurrentImageData->GetSegmentation()->GetImage();
+  
+  // Get an iterator for the image
+  typedef ImageRegionIteratorWithIndex<
+    LabelImageWrapper::ImageType> IteratorType;
+  IteratorType it(imgLabel, imgLabel->GetBufferedRegion());
+
+  // Compute a label mapping table based on the color labels
+  LabelType table[MAX_COLOR_LABELS];
+  
+  // The clear label does not get painted over, no matter what
+  table[0] = 0;
+
+  // The other labels get painted over, depending on current settings
+  for(unsigned int i = 1; i < MAX_COLOR_LABELS; i++)
+    table[i] = DrawOverLabel(i);
+
+  // Adjust the intercept by 0.5 for voxel offset
+  intercept -= 0.5 * (normal[0] + normal[1] + normal[2]);
+
+  // Iterate over the image, relabeling labels on one side of the plane
+  while(!it.IsAtEnd())
+    {
+    // Compute the distance to the plane
+    const long *index = it.GetIndex().GetIndex();
+    double distance = 
+      index[0]*normal[0] + 
+      index[1]*normal[1] + 
+      index[2]*normal[2] - intercept;
+
+    // Check the side of the plane
+    if(distance > 0)
+      {
+      LabelType &voxel = it.Value();
+      voxel = table[voxel];
+      }
+
+    // Next voxel
+    ++it;
+    }
+  
+  // Register that the image has been updated
+  imgLabel->Modified();
+}
+
+int 
+IRISApplication
+::GetRayIntersectionWithSegmentation(const Vector3d &point, 
+                                     const Vector3d &ray, Vector3i &hit) const
+{
+  // Get the label wrapper
+  LabelImageWrapper *xLabelWrapper = m_CurrentImageData->GetSegmentation();
+  assert(xLabelWrapper->IsInitialized());
+
+  Vector3ui lIndex;
+  Vector3ui lSize = xLabelWrapper->GetSize();
+
+  double delta[3][3], dratio[3];
+  int    signrx, signry, signrz;
+
+  double rx = ray[0];
+  double ry = ray[1];
+  double rz = ray[2];
+
+  double rlen = rx*rx+ry*ry+rz*rz;
+  if(rlen == 0) return -1;
+
+  double rfac = 1.0 / sqrt(rlen);
+  rx *= rfac; ry *= rfac; rz *= rfac;
+
+  if (rx >=0) signrx = 1; else signrx = -1;
+  if (ry >=0) signry = 1; else signry = -1;
+  if (rz >=0) signrz = 1; else signrz = -1;
+
+  // offset everything by (.5, .5) [becuz samples are at center of voxels]
+  // this offset will put borders of voxels at integer values
+  // we will work with this offset grid and offset back to check samples
+  // we really only need to offset "point"
+  double px = point[0]+0.5;
+  double py = point[1]+0.5;
+  double pz = point[2]+0.5;
+
+  // get the starting point within data extents
+  int c = 0;
+  while ( (px < 0 || px >= lSize[0]||
+           py < 0 || py >= lSize[1]||
+           pz < 0 || pz >= lSize[2]) && c < 10000)
+    {
+    px += rx;
+    py += ry;
+    pz += rz;
+    c++;
+    }
+  if (c >= 9999) return -1;
+
+  // walk along ray to find intersection with any voxel with val > 0
+  while ( (px >= 0 && px < lSize[0]&&
+           py >= 0 && py < lSize[1] &&
+           pz >= 0 && pz < lSize[2]) )
+    {
+
+    // offset point by (-.5, -.5) [to account for earlier offset] and
+    // get the nearest sample voxel within unit cube around (px,py,pz)
+    //    lx = my_round(px-0.5);
+    //    ly = my_round(py-0.5);
+    //    lz = my_round(pz-0.5);
+    lIndex[0] = (int)px;
+    lIndex[1] = (int)py;
+    lIndex[2] = (int)pz;
+
+    LabelType hitlabel = m_CurrentImageData->GetSegmentation()->GetVoxel(lIndex);
+    const ColorLabel &cl = m_ColorLabelTable->GetColorLabel(hitlabel);
+
+    if (cl.IsValid() && cl.IsVisible())
+      {
+      hit[0] = lIndex[0];
+      hit[1] = lIndex[1];
+      hit[2] = lIndex[2];
+      return 1;
+      }
+
+    // BEGIN : walk along ray to border of next voxel touched by ray
+
+    // compute path to YZ-plane surface of next voxel
+    if (rx == 0)
+      { // ray is parallel to 0 axis
+      delta[0][0] = 9999;
+      }
+    else
+      {
+      delta[0][0] = (int)(px+signrx) - px;
+      }
+
+    // compute path to XZ-plane surface of next voxel
+    if (ry == 0)
+      { // ray is parallel to 1 axis
+      delta[1][0] = 9999;
+      }
+    else
+      {
+      delta[1][1] = (int)(py+signry) - py;
+      dratio[1]   = delta[1][1]/ry;
+      delta[1][0] = dratio[1] * rx;
+      }
+
+    // compute path to XY-plane surface of next voxel
+    if (rz == 0)
+      { // ray is parallel to 2 axis
+      delta[2][0] = 9999;
+      }
+    else
+      {
+      delta[2][2] = (int)(pz+signrz) - pz;
+      dratio[2]   = delta[2][2]/rz;
+      delta[2][0] = dratio[2] * rx;
+      }
+
+    // choose the shortest path 
+    if ( fabs(delta[0][0]) <= fabs(delta[1][0]) && fabs(delta[0][0]) <= fabs(delta[2][0]) )
+      {
+      dratio[0]   = delta[0][0]/rx;
+      delta[0][1] = dratio[0] * ry;
+      delta[0][2] = dratio[0] * rz;
+      px += delta[0][0];
+      py += delta[0][1];
+      pz += delta[0][2];
+      }
+    else if ( fabs(delta[1][0]) <= fabs(delta[0][0]) && fabs(delta[1][0]) <= fabs(delta[2][0]) )
+      {
+      delta[1][2] = dratio[1] * rz;
+      px += delta[1][0];
+      py += delta[1][1];
+      pz += delta[1][2];
+      }
+    else
+      { //if (fabs(delta[2][0] <= fabs(delta[0][0] && fabs(delta[2][0] <= fabs(delta[0][0]) 
+      delta[2][1] = dratio[2] * ry;
+      px += delta[2][0];
+      py += delta[2][1];
+      pz += delta[2][2];
+      }
+    // END : walk along ray to border of next voxel touched by ray
+
+    } // while ( (px
+  return 0;
 }
 

@@ -31,6 +31,8 @@ class PreprocessingUILogic;
 class RestoreSettingsDialogLogic;
 class SnakeParametersUILogic;
 class SystemInterface;
+class ImageInfoCallbackInterface;
+class LabelEditorUILogic;
 
 class GreyImageIOWizardLogic;
 class SegmentationImageIOWizardLogic;
@@ -479,7 +481,8 @@ public:
   void OnMenuQuit();
 
   // Color label callbacks
-  void InitColorMap(bool resetCurrentAndDrawOverLabels = true);
+  void UpdateColorLabelMenu();
+  void UpdateColorLabelSelection();
   void UpdateColorChips();
   void OnDrawingLabelUpdate();
   void OnDrawOverLabelUpdate();
@@ -489,6 +492,9 @@ public:
   void UpdateImageProbe();
   void UpdateMainLabel();
   // void Activate3DAccept(bool on);
+  
+  void OnEditLabelsAction();
+  void OnLabelListUpdate();
   void UpdateEditLabelWindow();
   void UpdatePositionDisplay(int id);
 
@@ -517,7 +523,7 @@ public:
   void OnSegmentationImageUpdate();
 
   /** Update the user interface after loading a new labels file  */
-  void OnSegmentationLabelsUpdate(bool resetCurrentAndDrawOverLabels);
+  // void OnSegmentationLabelsUpdate(bool resetCurrentAndDrawOverLabels);
 
   /** Update the user interface after loading a new preprocessing image  */
   void OnSpeedImageUpdate();
@@ -576,7 +582,9 @@ public:
   // Show the help system
   void ShowHTMLPage(const char *link);
 
-
+  // Get the window under mouse focus or -1 if none
+  int GetWindowUnderFocus(void);
+  
 protected:
 
   /**
@@ -627,7 +635,6 @@ protected:
   void OnSaveLabelsAction();
   void OnWriteVoxelCountsAction();
 
-  void ChangeLabelsCallback();
   void OnSliceSliderChange(int id);
 
   // Menu item callbacks
@@ -670,7 +677,7 @@ protected:
 
   // Image Info Window Callbacks
   void OnCloseImageInfoAction();
-  
+
   char *m_ChosedFile;
 
 private:
@@ -743,6 +750,9 @@ private:
   /** UI object used for handling Curve editing */
   IntensityCurveUILogic *m_IntensityCurveUI;
 
+  /** UI object for label editing */
+  LabelEditorUILogic *m_LabelEditorUI;
+
   /** Preprocessing UI object */
   PreprocessingUILogic *m_PreprocessingUI;
 
@@ -772,6 +782,9 @@ private:
 
   /** Write voxels dialog */
   SimpleFileDialogLogic *m_DlgVoxelCountsIO;
+
+  // An adapter used in association with the image IO wizard
+  ImageInfoCallbackInterface *m_GreyCallbackInterface;
 
   // Intensity curve update callback (uses ITK event system)
   void OnIntensityCurveUpdate();
@@ -816,6 +829,9 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.24  2005/04/14 16:35:10  pauly
+ *ENH: Added Image Info window to SNAP
+ *
  *Revision 1.23  2005/03/08 03:12:51  pauly
  *BUG: Minor bugfixes in SNAP, mostly to the user interface
  *

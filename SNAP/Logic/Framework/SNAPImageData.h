@@ -51,7 +51,7 @@ public:
   typedef itk::Image<float,3> FloatImageType;
   typedef FloatImageType LevelSetImageType;
 
-  SNAPImageData();
+  SNAPImageData(IRISApplication *m_Parent);
   ~SNAPImageData();
 
   /** 
@@ -110,6 +110,10 @@ public:
   /** This method reverts back to using gradient based advection fields */
   void RemoveExternalAdvectionField()
     { m_ExternalAdvectionField = NULL; }
+
+  /** Set the color label used for the segmentation */
+  irisSetMacro(ColorLabel, ColorLabel);
+  irisGetMacro(ColorLabel, ColorLabel);
 
   /** =========== Methods dealing with the segmentation pipeline ============ */
 
@@ -236,6 +240,9 @@ private:
 
   // The advection image
   VectorImagePointer m_ExternalAdvectionField;
+
+  // The color label that is used for this segmentation
+  ColorLabel m_ColorLabel;
 };
 
 

@@ -42,7 +42,8 @@
 using namespace itk;
 
 SNAPImageData
-::SNAPImageData()
+::SNAPImageData(IRISApplication *parent)
+: IRISImageData(parent)
 {
   // Update the list of linked wrappers
   m_LinkedWrappers.push_back(&m_SpeedWrapper);
@@ -312,7 +313,7 @@ SNAPImageData
     }
 
   // Make sure that the correct color label is being used
-  m_SnakeInitializationWrapper.SetColorLabel(m_ColorLabels[m_SnakeColorLabel]);
+  m_SnakeInitializationWrapper.SetColorLabel(m_ColorLabel);
 
   // Initialize the snake driver
   InitalizeSnakeDriver(parameters);
@@ -401,7 +402,7 @@ SNAPImageData
   m_SnakeWrapper.GetImage()->SetOrigin( m_GreyWrapper.GetImage()->GetOrigin() );
   
   // Make sure that the correct color label is being used
-  m_SnakeWrapper.SetColorLabel(m_ColorLabels[m_SnakeColorLabel]);
+  m_SnakeWrapper.SetColorLabel(m_ColorLabel);
 }
 
 void 

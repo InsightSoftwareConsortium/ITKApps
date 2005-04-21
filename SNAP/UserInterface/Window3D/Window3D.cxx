@@ -36,20 +36,20 @@
 class LabelImageHitTester 
 {
 public:
-  LabelImageHitTester(const IRISImageData *irisData = NULL)
+  LabelImageHitTester(const ColorLabelTable *table = NULL)
   {
-    m_IRISData = irisData;
+    m_LabelTable = table;
   }
 
   int operator()(LabelType label) const
   {
-    assert(m_IRISData);
-    const ColorLabel &cl = m_IRISData->GetColorLabel(label);
+    assert(m_LabelTable);
+    const ColorLabel &cl = m_LabelTable->GetColorLabel(label);
     return cl.IsValid() && cl.IsVisible() ? 1 : 0;
   }
 
 private:
-  const IRISImageData *m_IRISData;
+  const ColorLabelTable *m_LabelTable;
 };
 
 class SnakeImageHitTester 
@@ -518,8 +518,7 @@ Window3D
   // If the plane is valid, apply it for relabeling
   if (1 == m_Plane.valid )
     {   
-    m_Driver->GetCurrentImageData()->RelabelSegmentationWithCutPlane(
-      m_Plane.vNormal, m_Plane.dIntercept, m_GlobalState);
+    m_Driver->RelabelSegmentationWithCutPlane(m_Plane.vNormal, m_Plane.dIntercept);
     m_Plane.valid = -1;
     }
 }
@@ -1071,7 +1070,7 @@ int Window3D::IntersectSegData(int mouse_x, int mouse_y, Vector3i &hit)
       LabelType,LabelImageHitTester> RayCasterType;
 
     RayCasterType caster;
-    caster.SetHitTester(LabelImageHitTester(m_Driver->GetCurrentImageData()));
+    caster.SetHitTester(LabelImageHitTester(m_Driver->GetColorLabelTable()));
     result = 
       caster.FindIntersection(
         m_Driver->GetCurrentImageData()->GetSegmentation()->GetImage(),
@@ -1227,27 +1226,33 @@ void DrawCube( Vector3f &x, Vector3f &y )
   glEnd();
   }
 
-void DrawCutPlanes( Vector3f &a, Vector3f &b, Vector3f &x)
+void DrawCoordinateCutPlane( unsigned int iPlane, Vector3f &a, Vector3f &b, Vector3f &x )
   {
   glBegin(GL_LINE_LOOP);
-  glVertex3f( x[0], a[1], a[2] );
-  glVertex3f( x[0], a[1], b[2] );
-  glVertex3f( x[0], b[1], b[2] );
-  glVertex3f( x[0], b[1], a[2] );
-  glEnd();
 
-  glBegin(GL_LINE_LOOP);
-  glVertex3f( a[0], x[1], a[2] );
-  glVertex3f( a[0], x[1], b[2] );
-  glVertex3f( b[0], x[1], b[2] );
-  glVertex3f( b[0], x[1], a[2] );
-  glEnd();
+  switch(iPlane) {
+    case 0 :
+      glVertex3f( x[0], a[1], a[2] );
+      glVertex3f( x[0], a[1], b[2] );
+      glVertex3f( x[0], b[1], b[2] );
+      glVertex3f( x[0], b[1], a[2] );
+      break;
 
-  glBegin(GL_LINE_LOOP);
-  glVertex3f( a[0], a[1], x[2] );
-  glVertex3f( a[0], b[1], x[2] );
-  glVertex3f( b[0], b[1], x[2] );
-  glVertex3f( b[0], a[1], x[2] );
+    case 1 :
+      glVertex3f( a[0], x[1], a[2] );
+      glVertex3f( a[0], x[1], b[2] );
+      glVertex3f( b[0], x[1], b[2] );
+      glVertex3f( b[0], x[1], a[2] );
+      break;
+
+    case 2 :
+      glVertex3f( a[0], a[1], x[2] );
+      glVertex3f( a[0], b[1], x[2] );
+      glVertex3f( b[0], b[1], x[2] );
+      glVertex3f( b[0], a[1], x[2] );
+      break;
+    }
+
   glEnd();
   }
 
@@ -1282,7 +1287,8 @@ void Window3D::DrawCrosshairs()
 
     // The slice planes
     glColor3dv(eltBox.ActiveColor.data_block());
-    DrawCutPlanes(zeros, imageSize, xCross );
+    for(int d = 0; d < 3; d++)
+      DrawCoordinateCutPlane(d, zeros, imageSize, xCross );
     }
 
   // Get the UI element properties for the crosshairs
@@ -1334,7 +1340,7 @@ void Window3D::DrawSamples()
 {
   unsigned char index = m_GlobalState->GetDrawingColorLabel();
   unsigned char rgb[3];
-  m_Driver->GetCurrentImageData()->GetColorLabel(index).GetRGBVector(rgb);
+  m_Driver->GetColorLabelTable()->GetColorLabel(index).GetRGBVector(rgb);
 
   glColor3ubv(rgb);
   for (SampleListIterator it=m_Samples.begin();it!=m_Samples.end();it++)
@@ -1383,7 +1389,7 @@ void Window3D
 
   // Use the current label color
   unsigned char rgb[3];
-  m_Driver->GetCurrentImageData()->GetColorLabel(
+  m_Driver->GetColorLabelTable()->GetColorLabel(
     m_GlobalState->GetDrawingColorLabel()).GetRGBVector(rgb);
   
   // Start with a white color
@@ -1437,6 +1443,9 @@ Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.26  2005/03/08 03:12:51  pauly
+ *BUG: Minor bugfixes in SNAP, mostly to the user interface
+ *
  *Revision 1.25  2004/12/31 17:34:04  lorensen
  *COMP: gcc3.4 issues.
  *

@@ -162,7 +162,7 @@ MeshObject
     // Compute a list of meshes in the filter
     for(unsigned int i=1;i<MAX_COLOR_LABELS;i++) 
       {
-      ColorLabel cl = m_Driver->GetCurrentImageData()->GetColorLabel(i);
+      ColorLabel cl = m_Driver->GetColorLabelTable()->GetColorLabel(i);
       if(cl.IsVisibleIn3D() && meshPipeline->CanComputeMesh(i))
         {
         vtkPolyData *mesh = vtkPolyData::New();
@@ -271,7 +271,8 @@ MeshObject
     // First render all the fully opaque objects
     for (i=0; i < m_DisplayListNumber; i++) 
       {
-      const ColorLabel &cl = irisData->GetColorLabel(m_Labels[i]);
+      const ColorLabel &cl = 
+        m_Driver->GetColorLabelTable()->GetColorLabel(m_Labels[i]);
       if (cl.IsOpaque() && ApplyColorLabel(cl)) 
       {
         glCallList(m_DisplayListIndex + i);
@@ -289,7 +290,8 @@ MeshObject
     
     for (i=0; i < m_DisplayListNumber; i++) 
       {
-      const ColorLabel &cl = irisData->GetColorLabel(m_Labels[i]);
+      const ColorLabel &cl = 
+        m_Driver->GetColorLabelTable()->GetColorLabel(m_Labels[i]);
       if (!cl.IsOpaque() && ApplyColorLabel(cl)) 
       {
         glCallList(m_DisplayListIndex + i); 
@@ -308,7 +310,8 @@ MeshObject
 
     // first check if the segmentation is fully opaque
     // and render it
-    const ColorLabel &cl = irisData->GetColorLabel(currentcolor);
+    const ColorLabel &cl = 
+      m_Driver->GetColorLabelTable()->GetColorLabel(currentcolor);
     if (cl.IsOpaque() && ApplyColorLabel(cl)) 
     {
       glCallList(m_DisplayListIndex);
@@ -334,6 +337,9 @@ MeshObject
 
 /*
  *Log: MeshObject.cxx
+ *Revision 1.15  2004/09/14 14:11:09  pauly
+ *ENH: Added an activation manager to main UI class, improved snake code, various UI fixes and additions
+ *
  *Revision 1.14  2004/08/26 19:43:23  pauly
  *ENH: Moved the Borland code into Common folder
  *

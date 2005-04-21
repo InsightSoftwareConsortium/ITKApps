@@ -36,7 +36,7 @@ IntensityCurveUILogic
 {
   // Give the image to the histogram
   m_ImageWrapper = wrapper;
-  m_BoxCurve->ComputeHistogram(wrapper, 10);
+  m_BoxCurve->ComputeHistogram(wrapper, 4);
 
   // Pull out the current histogram settings
   m_InHistogramMaxLevel->value(m_BoxCurve->GetHistogramMaxLevel() * 100.0f);

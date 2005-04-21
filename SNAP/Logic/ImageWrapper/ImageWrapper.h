@@ -142,17 +142,19 @@ public:
 
   /** Return some image info independently of pixel type */
   virtual itk::ImageBase<3> *GetImageBase() const
-  {
-    return m_Image.GetPointer();
-  }
+    { return m_Image.GetPointer(); }
 
   /** 
    * Return the pointed to the ITK image encapsulated by this wrapper.
    */
   virtual ImageType *GetImage() const
-  {
-    return m_Image;
-  }
+    { return m_Image; }
+
+  /** 
+   * Get the slicer inside this wrapper
+   */
+  virtual SlicerType *GetSlicer(unsigned int iDirection) const
+    { return m_Slicer[iDirection]; }
 
   /**
    * Get the size of the image
@@ -256,6 +258,18 @@ public:
 
   /** Transform a voxel index into a spatial position */
   Vector3d TransformVoxelIndexToPosition(const Vector3ui &iVoxel) const;
+
+  /** 
+   * Replace all voxels with intensity values iOld with values iNew. 
+   * \return number of voxels that had been modified
+   */
+  virtual unsigned int ReplaceIntensity(TPixel iOld, TPixel iNew);
+
+  /** 
+   * Swap intensity values iFirst and iSecond
+   * \return number of voxels that had been modified
+   */
+  virtual unsigned int SwapIntensities(TPixel iFirst, TPixel iSecond);
 
 protected:
 

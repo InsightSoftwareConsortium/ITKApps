@@ -77,8 +77,8 @@ public:
   virtual void UpdateColorChips() = 0;
   virtual void OnDrawingLabelUpdate() = 0;
   virtual void OnDrawOverLabelUpdate() = 0;
-  virtual void ChangeLabelsCallback() = 0;
   virtual void UpdateEditLabelWindow() = 0;
+  virtual void OnEditLabelsAction() = 0;
   
   // IRIS: Polygon buttons callbacks
   virtual void OnAcceptPolygonAction(unsigned int window) = 0;

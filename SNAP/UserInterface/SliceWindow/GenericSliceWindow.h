@@ -136,15 +136,9 @@ public:
    */
   class EventHandler : public InteractionMode {
   public:
-    EventHandler(GenericSliceWindow *parent) {
-      m_Parent = parent;
-    }    
-    void Register() 
-    {
-      m_Driver = m_Parent->m_Driver;
-      m_ParentUI = m_Parent->m_ParentUI;
-      m_GlobalState = m_Parent->m_GlobalState;
-    }
+    EventHandler(GenericSliceWindow *parent);
+    void Register();
+
   protected:
     GenericSliceWindow *m_Parent;
     GlobalState *m_GlobalState;

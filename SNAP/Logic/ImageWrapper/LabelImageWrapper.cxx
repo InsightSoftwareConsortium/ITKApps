@@ -16,8 +16,7 @@
 #include "ImageWrapper.txx"
 #include "LabelImageWrapper.h"
 #include "ColorLabel.h"
-
-
+#include "ColorLabelTable.h"
 
 // Create an instance of ImageWrapper of appropriate type
 template class ImageWrapper<LabelType>;
@@ -62,7 +61,7 @@ LabelImageWrapper
   }
 
   // Initialize the color table as well
- SetLabelColorTable(source.GetLabelColorTable());
+  SetLabelColorTable(source.GetLabelColorTable());
 }
 
 LabelImageWrapper
@@ -70,7 +69,7 @@ LabelImageWrapper
 {
 }
 
-ColorLabel *
+ColorLabelTable *
 LabelImageWrapper
 ::GetLabelColorTable() const
 {
@@ -79,7 +78,7 @@ LabelImageWrapper
 
 void 
 LabelImageWrapper
-::SetLabelColorTable(ColorLabel *table) 
+::SetLabelColorTable(ColorLabelTable *table) 
 {
   // Set the new table
   m_IntensityFunctor.m_ColorLabelTable = table;
@@ -121,7 +120,7 @@ LabelImageWrapper::IntensityFunctor
   assert(m_ColorLabelTable);
 
   // Get the appropriate color label
-  ColorLabel &label = m_ColorLabelTable[x];
+  const ColorLabel &label = m_ColorLabelTable->GetColorLabel(x);
 
   // Create a new pixel
   DisplayPixelType pixel;

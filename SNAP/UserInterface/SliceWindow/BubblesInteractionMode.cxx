@@ -42,7 +42,7 @@ BubblesInteractionMode
       // Get the active color label 
       int currentcolor =  m_GlobalState->GetDrawingColorLabel();      
       ColorLabel cl = 
-        m_Driver->GetCurrentImageData()->GetColorLabel(currentcolor);
+        m_Driver->GetColorLabelTable()->GetColorLabel(currentcolor);
       
       if (cl.IsValid())
         {

@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
      * labels associated with this image. Segmentation labels are stored in the 
      * file MRIcrop-seg.label and passed on as an argument to this test program */
     const char *sLabelFileName = argv[2];
-    application.ReadLabelDescriptionsFromTextFile(sLabelFileName);
+    application.GetColorLabelTable()->LoadFromFile(sLabelFileName);
   }
   catch(itk::ExceptionObject &exception)
   {
@@ -125,16 +125,15 @@ int main(int argc, char *argv[])
     to_int(irisData->GetVolumeExtents()) << endl;       // Ignore the to_int!
 //  cout << "Voxel Size      : " << irisData->GetVoxelScaleFactor() << endl;
 
-  /* IRISImageData also handles segmentation labels. We can get the number of 
-   * active labels, and inquire about each label. */
-  cout << "Active Labels   : " << irisData->GetColorLabelCount() << endl;
-  for(unsigned int iLabel=0;iLabel<irisData->GetColorLabelCount();iLabel++)
+  /* IRISImageData also handles segmentation labels. We can inquire about each label. 
+   * Labels are indexed from 1 to 255 (0 is the clear label). Only some labels are 
+   * defined as 'valid', i.e., available to the user to edit */
+  for(unsigned int iLabel=0; iLabel < MAX_COLOR_LABELS; iLabel++)
     {
-
     /* Labels are represented by the class ColorLabel. Each label has a color,
      * a transparency level, a visible flag, a 'visible in 3d mesh flag', and a
      * textual description */
-    const ColorLabel &label = irisData->GetColorLabel(iLabel);                                                       
+    const ColorLabel &label = application.GetColorLabelTable()->GetColorLabel(iLabel);                                                       
     cout << "Label Number  : " << iLabel << endl;
     cout << "  Decription  : " << label.GetLabel() << endl;
     cout << "  Color       : {" 
@@ -347,7 +346,7 @@ int main(int argc, char *argv[])
    * Section 4. Additional Functionality
    * ====================================================================== */
                                       
-  /* One of the features of SNAP it to be able to divide segmentations into two\
+  /* One of the features of SNAP it to be able to divide segmentations into two
    * labels using a cut-plane. This can be done programatically, using the
    * following code. In our example, this will divide the left and the right
    * caudates, giving them different labels */
@@ -359,8 +358,7 @@ int main(int argc, char *argv[])
 
   /* This actually performs the cut, given an normal vector and intercept that
    * define the cut plane */
-  irisData->RelabelSegmentationWithCutPlane(
-    Vector3d(1,0,0),64,application.GetGlobalState());
+  application.RelabelSegmentationWithCutPlane(Vector3d(1,0,0), 64);
 
   /* We can now save the segmentation result as a 3d image */
   SaveImageToFile("result.gipl",irisData->GetSegmentation()->GetImage());
