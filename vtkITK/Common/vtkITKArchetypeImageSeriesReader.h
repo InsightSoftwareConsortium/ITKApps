@@ -22,6 +22,7 @@
 #define __vtkITKArchetypeImageSeriesReader_h
 
 #include "vtkImageSource.h"
+#include "itkSpatialOrientation.h"
 #include <vector>
 #include <string>
 
@@ -31,6 +32,10 @@ public:
   static vtkITKArchetypeImageSeriesReader *New();
   vtkTypeRevisionMacro(vtkITKArchetypeImageSeriesReader,vtkImageSource);
   void PrintSelf(ostream& os, vtkIndent indent);   
+
+//BTX
+  typedef itk::SpatialOrientation::ValidCoordinateOrientationFlags CoordinateOrientationCode;
+//ETX
 
   // Description:
   // Specify the archetype filename for the series.
@@ -70,6 +75,30 @@ public:
   vtkGetMacro(FileNameSliceCount,int);
 
   // Description:
+  // Set the orientation of the output image
+  void SetDesiredCoordinateOrientationToAxial ()
+    {
+   this->DesiredCoordinateOrientation =
+//     itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI;
+     itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPS;
+   this->Modified();
+    }
+  void SetDesiredCoordinateOrientationToCoronal ()
+    {
+    this->DesiredCoordinateOrientation =
+//      itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSA;
+      itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIP;
+    this->Modified();
+    }
+  void SetDesiredCoordinateOrientationToSagittal ()
+    {
+    this->DesiredCoordinateOrientation =
+//      itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASL;
+      itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIR;
+    this->Modified();
+    }
+
+  // Description:
   // Set the data type of pixels in the file.  
   // If you want the output scalar type to have a different value, set it
   // after this method is called.
@@ -105,6 +134,7 @@ protected:
   
 //BTX
   std::vector<std::string> FileNames;
+  CoordinateOrientationCode DesiredCoordinateOrientation;
 //ETX
   virtual void ExecuteInformation();
   virtual void ExecuteData(vtkDataObject *data);

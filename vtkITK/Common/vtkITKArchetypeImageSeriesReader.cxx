@@ -47,22 +47,23 @@
 
 #include "itkArchetypeSeriesFileNames.h"
 #include "itkImage.h"
+#include "itkOrientImageFilter.h"
 #include "itkImageSeriesReader.h"
 #include "itkImageFileReader.h"
 #include "itkImportImageContainer.h"
 #include "itkImageRegion.h"
-#include "itkDICOMSeriesFileNames.h"
-#include "itkDICOMImageIO2.h"
+#include "itkGDCMSeriesFileNames.h"
+#include "itkGDCMImageIO.h"
 #include <itksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.6 $");
+vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.7 $");
 vtkStandardNewMacro(vtkITKArchetypeImageSeriesReader);
 
 //----------------------------------------------------------------------------
 vtkITKArchetypeImageSeriesReader::vtkITKArchetypeImageSeriesReader()
 {
   this->Archetype = NULL;
-  
+  this->SetDesiredCoordinateOrientationToAxial();
   this->FileNameSliceOffset = 0;
   this->FileNameSliceSpacing = 1;
   this->FileNameSliceCount = 0;
@@ -131,11 +132,11 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
   int extent[6];  
 
   // Test whether the input file is a DICOM file
-  itk::DICOMImageIO2::Pointer dicomIO = itk::DICOMImageIO2::New();
+  itk::GDCMImageIO::Pointer dicomIO = itk::GDCMImageIO::New();
   bool isDicomFile = dicomIO->CanReadFile(this->Archetype);
   if (isDicomFile)
     {
-    typedef itk::DICOMSeriesFileNames DICOMNameGeneratorType;
+    typedef itk::GDCMSeriesFileNames DICOMNameGeneratorType;
     DICOMNameGeneratorType::Pointer inputImageFileGenerator = DICOMNameGeneratorType::New();  
     std::string fileNameName = itksys::SystemTools::GetFilenameName( this->Archetype );
     std::string fileNamePath = itksys::SystemTools::GetFilenamePath( this->Archetype );
@@ -143,29 +144,10 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
       {
       fileNamePath = ".";
       }
-    inputImageFileGenerator->SetDirectory( fileNamePath );
-    std::vector <std::string> seriesUIDs = inputImageFileGenerator->GetSeriesUIDs();
-    inputImageFileGenerator->SetFileNameSortingOrderToSortByImagePositionPatient();
-    int archetypeSeries = -1;
-    for (unsigned int s = 0; s < seriesUIDs.size(); s++)
+    inputImageFileGenerator->SetInputDirectory( fileNamePath );
+    candidateFiles = inputImageFileGenerator->GetInputFileNames();
+    if (candidateFiles.size() == 0)
       {
-      candidateFiles = inputImageFileGenerator->GetFileNames( seriesUIDs[s] );
-      for (unsigned int f = 0; f < candidateFiles.size(); f++)
-        {
-        if (candidateFiles[f] == (fileNamePath + "/" + fileNameName))
-          {
-          archetypeSeries = s;
-          break;
-          }
-        }
-      }
-    if (archetypeSeries != -1)
-      {
-      candidateFiles = inputImageFileGenerator->GetFileNames(seriesUIDs[archetypeSeries]);      
-      }
-    else
-      {
-      candidateFiles.resize(0);
       candidateFiles.push_back(this->Archetype);
       }
     }
@@ -209,6 +191,7 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
     {
     itk::ImageFileReader<ImageType>::Pointer imageReader =
       itk::ImageFileReader<ImageType>::New();
+    imageReader->SetImageIO(dicomIO);
     imageReader->SetFileName(this->FileNames[0].c_str());
     imageReader->GenerateOutputInformation();
     for (int i = 0; i < 3; i++)
@@ -228,14 +211,23 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
     {
     itk::ImageSeriesReader<ImageType>::Pointer seriesReader =
       itk::ImageSeriesReader<ImageType>::New();
+    seriesReader->SetImageIO(dicomIO);
     seriesReader->SetFileNames(this->FileNames);
-    seriesReader->GenerateOutputInformation();
+    
+    itk::OrientImageFilter<ImageType,ImageType>::Pointer orient =
+      itk::OrientImageFilter<ImageType,ImageType>::New();
+    orient->SetInput(seriesReader->GetOutput());
+    orient->UseImageDirectionOn();
+    orient->SetDesiredCoordinateOrientation(this->DesiredCoordinateOrientation);
+    orient->UpdateOutputInformation();
+
     for (int i = 0; i < 3; i++)
       {
-      spacing[i] = seriesReader->GetOutput()->GetSpacing()[i];
-      origin[i] = seriesReader->GetOutput()->GetOrigin()[i];
+      spacing[i] = orient->GetOutput()->GetSpacing()[i];
+      origin[i] = orient->GetOutput()->GetOrigin()[i];
       }
-    region = seriesReader->GetOutput()->GetLargestPossibleRegion();
+
+    region = orient->GetOutput()->GetLargestPossibleRegion();
     extent[0] = region.GetIndex()[0];
     extent[1] = region.GetIndex()[0] + region.GetSize()[0] - 1;
     extent[2] = region.GetIndex()[1];
@@ -244,7 +236,7 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
     extent[5] = region.GetIndex()[2] + region.GetSize()[2] - 1;
     }
 
-  // If it looks like the reader did not provide the spacing and
+  // If it looks like the pipeline did not provide the spacing and
   // origin, modify the spacing and origin with the defaults
   for (int j = 0; j < 3; j++)
     {
@@ -272,6 +264,8 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
 // are assumed to be the same as the file extent/order.
 void vtkITKArchetypeImageSeriesReader::ExecuteData(vtkDataObject *output)
 {
+  itk::GDCMImageIO::Pointer dicomIO = itk::GDCMImageIO::New();
+
   if (!this->Archetype)
     {
     vtkErrorMacro("An Archetype must be specified.");
@@ -283,7 +277,6 @@ void vtkITKArchetypeImageSeriesReader::ExecuteData(vtkDataObject *output)
   data->SetExtent(0,0,0,0,0,0);
   data->AllocateScalars();
   data->SetExtent(data->GetWholeExtent());
-
 #define vtkITKExecuteDataFromSeries(typeN, type) \
     case typeN: \
     {\
@@ -291,9 +284,16 @@ void vtkITKArchetypeImageSeriesReader::ExecuteData(vtkDataObject *output)
       itk::ImageSeriesReader<image##typeN>::Pointer reader##typeN = \
             itk::ImageSeriesReader<image##typeN>::New(); \
       reader##typeN->SetFileNames(this->FileNames); \
-      reader##typeN->UpdateLargestPossibleRegion();\
+      reader##typeN->SetImageIO(dicomIO); \
+      reader##typeN->ReleaseDataFlagOn(); \
+      itk::OrientImageFilter<image##typeN,image##typeN>::Pointer orient##typeN = \
+            itk::OrientImageFilter<image##typeN,image##typeN>::New(); \
+      orient##typeN->SetInput(reader##typeN->GetOutput()); \
+      orient##typeN->UseImageDirectionOn(); \
+      orient##typeN->SetDesiredCoordinateOrientation(this->DesiredCoordinateOrientation); \
+      orient##typeN->UpdateLargestPossibleRegion();\
       itk::ImportImageContainer<unsigned long, type>::Pointer PixelContainer##typeN;\
-      PixelContainer##typeN = reader##typeN->GetOutput()->GetPixelContainer();\
+      PixelContainer##typeN = orient##typeN->GetOutput()->GetPixelContainer();\
       void *ptr = static_cast<void *> (PixelContainer##typeN->GetBufferPointer());\
       (dynamic_cast<vtkImageData *>( output))->GetPointData()->GetScalars()->SetVoidArray(ptr, PixelContainer##typeN->Size(), 0);\
       PixelContainer##typeN->ContainerManageMemoryOff();\
@@ -307,9 +307,14 @@ void vtkITKArchetypeImageSeriesReader::ExecuteData(vtkDataObject *output)
       itk::ImageFileReader<image2##typeN>::Pointer reader2##typeN = \
             itk::ImageFileReader<image2##typeN>::New(); \
       reader2##typeN->SetFileName(this->FileNames[0].c_str()); \
-      reader2##typeN->UpdateLargestPossibleRegion();\
+      itk::OrientImageFilter<image2##typeN,image2##typeN>::Pointer orient2##typeN = \
+            itk::OrientImageFilter<image2##typeN,image2##typeN>::New(); \
+      orient2##typeN->SetInput(reader2##typeN->GetOutput()); \
+      orient2##typeN->UseImageDirectionOn(); \
+      orient2##typeN->SetDesiredCoordinateOrientation(this->DesiredCoordinateOrientation); \
+      orient2##typeN->UpdateLargestPossibleRegion();\
       itk::ImportImageContainer<unsigned long, type>::Pointer PixelContainer2##typeN;\
-      PixelContainer2##typeN = reader2##typeN->GetOutput()->GetPixelContainer();\
+      PixelContainer2##typeN = orient2##typeN->GetOutput()->GetPixelContainer();\
       void *ptr = static_cast<void *> (PixelContainer2##typeN->GetBufferPointer());\
       (dynamic_cast<vtkImageData *>( output))->GetPointData()->GetScalars()->SetVoidArray(ptr, PixelContainer2##typeN->Size(), 0);\
       PixelContainer2##typeN->ContainerManageMemoryOff();\
