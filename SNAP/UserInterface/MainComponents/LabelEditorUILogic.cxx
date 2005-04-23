@@ -402,7 +402,12 @@ LabelEditorUILogic
   SetColorLabel(iCurrentLabel, cl);
 
   // Update the label list
-  OnLabelListUpdate(iCurrentLabel);
+  // OnLabelListUpdate(iCurrentLabel);
+ 
+  // Update the text in the browser
+  std::ostringstream oss;
+  oss << std::setw(3) << iCurrentLabel << ": " << cl.GetLabel();
+  m_BrsLabelList->text(m_BrsLabelList->value(), oss.str().c_str());
 
   // Update the list in the parent UI
   m_Parent->OnLabelListUpdate();

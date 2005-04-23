@@ -56,7 +56,6 @@
 #include <iomanip>
 #include <string>
 #include <vector>
-#include "UserInterfaceLogic.h"
 
 // Disable some utterly annoying windows messages
 #if defined(_MSC_VER)
@@ -1368,7 +1367,7 @@ UserInterfaceLogic
 
   // Select the drawing label
   for(size_t i = 0; i < m_InDrawingColor->size(); i++)
-    if(iDrawing == (LabelType) m_InDrawingColor->menu()[i].user_data())
+    if(iDrawing == (LabelType) (size_t) m_InDrawingColor->menu()[i].user_data())
       m_InDrawingColor->value(i);
 
   // Set the draw over label
@@ -1377,7 +1376,7 @@ UserInterfaceLogic
   else if (m_GlobalState->GetCoverageMode() == PAINT_OVER_COLORS)
     m_InDrawOverColor->value(1);
   else for(size_t j = 0; j < m_InDrawingColor->size(); j++)
-    if(iDrawOver == (LabelType) m_InDrawingColor->menu()[j].user_data())
+    if(iDrawOver == (LabelType) (size_t) m_InDrawingColor->menu()[j].user_data())
       m_InDrawOverColor->value(j + 2);
 }
 
@@ -1389,11 +1388,11 @@ UserInterfaceLogic
   m_InDrawOverColor->clear();
   m_InDrawOverColor->add("All labels");
   m_InDrawOverColor->add("Visible labels");
-  m_InDrawOverColor->add("Clear label", NULL, NULL, (void *) 0);
+  m_InDrawOverColor->add("Clear label", 0, NULL, (void *) 0);
   
   // Set up the draw color
   m_InDrawingColor->clear();
-  m_InDrawingColor->add("Clear label", NULL, NULL, (void *) 0);
+  m_InDrawingColor->add("Clear label", 0, NULL, (void *) 0);
 
   // Add each of the color labels to the drop down boxes
   if (m_FileLoaded)
@@ -1404,8 +1403,8 @@ UserInterfaceLogic
       if (cl.IsValid()) 
         {
         // Add these entries
-        m_InDrawOverColor->add(cl.GetLabel(), NULL, NULL, (void *) i);
-        m_InDrawingColor->add(cl.GetLabel(), NULL, NULL, (void *) i);
+        m_InDrawOverColor->add(cl.GetLabel(), 0, NULL, (void *) i);
+        m_InDrawingColor->add(cl.GetLabel(), 0, NULL, (void *) i);
         }
       }
     }
@@ -1505,7 +1504,8 @@ UserInterfaceLogic
 ::OnDrawingLabelUpdate()
 {
   // Get the drawing label that was selected
-  LabelType iLabel = (LabelType) m_InDrawingColor->mvalue()->user_data();
+  LabelType iLabel = (LabelType) (size_t) 
+    m_InDrawingColor->mvalue()->user_data();
   
   // Set the global state
   m_GlobalState->SetDrawingColorLabel((LabelType) iLabel);
@@ -1527,7 +1527,8 @@ UserInterfaceLogic
     m_GlobalState->SetCoverageMode(PAINT_OVER_COLORS);
   else
     {
-    LabelType iLabel = (LabelType) m_InDrawOverColor->mvalue()->user_data();
+    LabelType iLabel = (LabelType) (size_t) 
+      m_InDrawOverColor->mvalue()->user_data();
     m_GlobalState->SetCoverageMode(PAINT_OVER_ONE);
     m_GlobalState->SetOverWriteColorLabel(iLabel);
     }
@@ -1658,7 +1659,8 @@ UserInterfaceLogic
 ::OnEditLabelsAction()
 {
   // Get the currently selected color index
-  LabelType iLabel = (LabelType) m_InDrawingColor->mvalue()->user_data();
+  LabelType iLabel = (LabelType) (size_t) 
+    m_InDrawingColor->mvalue()->user_data();
   m_LabelEditorUI->OnLabelListUpdate(iLabel);
 
   // Display the label editor
@@ -3038,6 +3040,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.36  2005/04/23 12:56:59  lorensen
+ *BUG: bad include.
+ *
  *Revision 1.35  2005/04/21 18:52:38  pauly
  *ENH: Furhter improvements to SNAP label editor
  *
