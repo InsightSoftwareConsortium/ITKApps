@@ -56,7 +56,7 @@
 #include <iomanip>
 #include <string>
 #include <vector>
-#include ".\userinterfacelogic.h"
+#include "UserInterfaceLogic.h"
 
 // Disable some utterly annoying windows messages
 #if defined(_MSC_VER)
@@ -3038,6 +3038,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.35  2005/04/21 18:52:38  pauly
+ *ENH: Furhter improvements to SNAP label editor
+ *
  *Revision 1.34  2005/04/21 14:46:30  pauly
  *ENH: Improved management and editing of color labels in SNAP
  *
