@@ -424,9 +424,6 @@ IRISApplication
     // except for the IRIS voxels of the drawing color, which get cleared out
     mergeTable[iClear][i] = (i!=m_GlobalState->GetDrawingColorLabel()) ? i : 0;
 
-    // Assign the output intensity based on the current drawing mode    
-    bool visible = m_ColorLabelTable->GetColorLabel(i).IsVisible();
-
     // If mode is paint over all, the victim is overridden
     mergeTable[1-iClear][i] = DrawOverLabel((LabelType) i);
     }

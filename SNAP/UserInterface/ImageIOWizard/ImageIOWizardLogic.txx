@@ -498,7 +498,7 @@ bool
 ImageIOWizardLogic<TPixel>
 ::LoadImage(ImageIOType *customIO)
 {
-  bool rc = true;
+  bool rc;
 
   // Show a wait cursor
   fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);

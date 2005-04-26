@@ -63,7 +63,7 @@ public:
     return m_DefaultLabel[id]; 
     }
 
-  const bool IsColorLabelValid(size_t id) const
+  bool IsColorLabelValid(size_t id) const
     { return GetColorLabel(id).IsValid(); }
 
   /** Sets the color label valid or invalid. During invalidation, the label

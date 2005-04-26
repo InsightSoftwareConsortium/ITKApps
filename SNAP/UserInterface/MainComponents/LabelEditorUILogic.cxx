@@ -56,7 +56,7 @@ void
 LabelEditorUILogic
 ::SetColorLabel(size_t iLabel, const ColorLabel &xLabel)
 { 
-  return m_Driver->GetColorLabelTable()->SetColorLabel(iLabel, xLabel); 
+  m_Driver->GetColorLabelTable()->SetColorLabel(iLabel, xLabel); 
 }
 
 void 
