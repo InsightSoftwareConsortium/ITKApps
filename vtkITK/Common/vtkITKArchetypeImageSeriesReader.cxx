@@ -56,7 +56,7 @@
 #include "itkGDCMImageIO.h"
 #include <itksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.7 $");
+vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.8 $");
 vtkStandardNewMacro(vtkITKArchetypeImageSeriesReader);
 
 //----------------------------------------------------------------------------
@@ -191,15 +191,20 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
     {
     itk::ImageFileReader<ImageType>::Pointer imageReader =
       itk::ImageFileReader<ImageType>::New();
-    imageReader->SetImageIO(dicomIO);
     imageReader->SetFileName(this->FileNames[0].c_str());
-    imageReader->GenerateOutputInformation();
+
+    itk::OrientImageFilter<ImageType,ImageType>::Pointer orient =
+      itk::OrientImageFilter<ImageType,ImageType>::New();
+    orient->SetInput(imageReader->GetOutput());
+    orient->UseImageDirectionOn();
+    orient->SetDesiredCoordinateOrientation(this->DesiredCoordinateOrientation);
+    orient->UpdateOutputInformation();
     for (int i = 0; i < 3; i++)
       {
-      spacing[i] = imageReader->GetOutput()->GetSpacing()[i];
-      origin[i] = imageReader->GetOutput()->GetOrigin()[i];
+      spacing[i] = orient->GetOutput()->GetSpacing()[i];
+      origin[i] = orient->GetOutput()->GetOrigin()[i];
       }
-    region = imageReader->GetOutput()->GetLargestPossibleRegion();
+    region = orient->GetOutput()->GetLargestPossibleRegion();
     extent[0] = region.GetIndex()[0];
     extent[1] = region.GetIndex()[0] + region.GetSize()[0] - 1;
     extent[2] = region.GetIndex()[1];
