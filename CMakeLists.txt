@@ -267,7 +267,10 @@ IF(VTK_FOUND)
   ENDIF(FLTK_FOUND)
 
   IF(VTK_WRAP_TCL)
-    SUBDIRS(MRIRegistration vtkITK SegmentationEditor)
+    SUBDIRS(MRIRegistration vtkITK)
+    IF(NOT BORLAND)
+      SUBDIRS(SegmentationEditor)
+    ENDIF(NOT BORLAND)
   ENDIF(VTK_WRAP_TCL)
   
   SET (VTK_AND_ITK_WRAPPED 0)
