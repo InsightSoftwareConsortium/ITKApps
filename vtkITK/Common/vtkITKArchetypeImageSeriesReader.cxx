@@ -56,7 +56,7 @@
 #include "itkGDCMImageIO.h"
 #include <itksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.8 $");
+vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.9 $");
 vtkStandardNewMacro(vtkITKArchetypeImageSeriesReader);
 
 //----------------------------------------------------------------------------
@@ -167,9 +167,12 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
     }
   else
     {
-    lastFile = this->FileNameSliceCount;
+    lastFile = this->FileNameSliceOffset + this->FileNameSliceCount - 1;
+    if (lastFile > candidateFiles.size())
+      {
+      lastFile = candidateFiles.size();      
+      }
     }
-
   this->FileNames.resize(0);
   for (int f = this->FileNameSliceOffset;
        f < lastFile;
@@ -293,6 +296,7 @@ void vtkITKArchetypeImageSeriesReader::ExecuteData(vtkDataObject *output)
       reader##typeN->ReleaseDataFlagOn(); \
       itk::OrientImageFilter<image##typeN,image##typeN>::Pointer orient##typeN = \
             itk::OrientImageFilter<image##typeN,image##typeN>::New(); \
+      if (this->Debug) {orient##typeN->DebugOn();} \
       orient##typeN->SetInput(reader##typeN->GetOutput()); \
       orient##typeN->UseImageDirectionOn(); \
       orient##typeN->SetDesiredCoordinateOrientation(this->DesiredCoordinateOrientation); \
@@ -314,6 +318,7 @@ void vtkITKArchetypeImageSeriesReader::ExecuteData(vtkDataObject *output)
       reader2##typeN->SetFileName(this->FileNames[0].c_str()); \
       itk::OrientImageFilter<image2##typeN,image2##typeN>::Pointer orient2##typeN = \
             itk::OrientImageFilter<image2##typeN,image2##typeN>::New(); \
+      if (this->Debug) {orient2##typeN->DebugOn();} \
       orient2##typeN->SetInput(reader2##typeN->GetOutput()); \
       orient2##typeN->UseImageDirectionOn(); \
       orient2##typeN->SetDesiredCoordinateOrientation(this->DesiredCoordinateOrientation); \

@@ -79,22 +79,22 @@ public:
   void SetDesiredCoordinateOrientationToAxial ()
     {
    this->DesiredCoordinateOrientation =
-//     itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI;
-     itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPS;
+     itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI;
+//     itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPS;
    this->Modified();
     }
   void SetDesiredCoordinateOrientationToCoronal ()
     {
     this->DesiredCoordinateOrientation =
-//      itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSA;
-      itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIP;
+      itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSA;
+//      itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIP;
     this->Modified();
     }
   void SetDesiredCoordinateOrientationToSagittal ()
     {
     this->DesiredCoordinateOrientation =
-//      itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASL;
-      itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIR;
+      itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASL;
+//      itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIR;
     this->Modified();
     }
 
