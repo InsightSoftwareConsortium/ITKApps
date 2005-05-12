@@ -37,6 +37,14 @@ class VTK_EXPORT vtkITKRelabelComponentImageFilter : public vtkITKImageToImageFi
     { DelegateGetMacro(ReleaseDataBeforeUpdateFlag); }
 
   // Description:
+  // Turn inplace  filter operation on/off.
+  virtual void SetInPlace(int i)
+    { DelegateSetMacro(InPlace, (bool) i); }
+  virtual int GetInPlace()
+    { DelegateGetMacro(InPlace); }
+  vtkBooleanMacro(InPlace,int); 
+
+  // Description:
   // Get the number of objects in the label map (excluding the
   // background). Can only be called after an Update().
   unsigned long GetNumberOfObjects() { return this->GetImageFilterPointer()->GetNumberOfObjects(); }
@@ -68,7 +76,7 @@ private:
   void operator=(const vtkITKRelabelComponentImageFilter&);  // Not implemented.
 };
 
-vtkCxxRevisionMacro(vtkITKRelabelComponentImageFilter, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkITKRelabelComponentImageFilter, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkITKRelabelComponentImageFilter);
 
 #endif
