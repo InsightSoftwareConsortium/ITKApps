@@ -1,0 +1,210 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0106 
+header_name {.h} 
+code_name {.cxx}
+class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
+} {
+  Function {ceExtractorConsoleGUI()} {open
+  } {
+    Fl_Window consoleWindow {
+      label {3D Curves Extractor Console} open
+      xywh {249 172 1010 390} type Double
+      code0 {\#if defined(_MSC_VER)
+\#pragma warning ( disable : 4786 )
+\#endif}
+      code1 {\#include <ceExtractorConsoleBase.h>}
+      code2 {\#include <fltkLightButton.h>} visible
+    } {
+      Fl_Group Connectors {
+        xywh {5 5 995 255}
+      } {
+        Fl_Box {} {
+          xywh {215 152 55 10} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {72 125 143 10} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {211 48 60 10} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {215 97 55 10} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {210 48 10 115} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {60 60 10 65} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {330 151 125 10} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {465 204 355 10} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {345 45 409 10} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {915 55 10 50} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {810 55 10 160} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {725 125 65 10} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {835 45 65 10} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {780 55 10 80} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {915 115 10 50} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {465 160 10 55} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {331 98 125 10} box UP_BOX color 4
+        }
+      }
+      Fl_Group controlsGroup {selected
+        xywh {5 5 995 255} box DOWN_FRAME deactivate
+      } {
+        Fl_Light_Button inputButton {
+          label Input
+          callback {ShowInput();}
+          xywh {27 116 69 30} type Normal value 1 selection_color 1
+          class {fltk::LightButton}
+        }
+        Fl_Counter sigmaCounter {
+          label Sigma
+          callback {SetSigma( o->value() );}
+          xywh {30 190 160 25} align 1 when 4 minimum -100 maximum 100 value 1
+        }
+        Fl_Light_Button gradientButton {
+          label Gradient
+          callback {this->ComputeGradient();}
+          xywh {260 90 100 25} type Normal value 1 selection_color 1
+          class {fltk::LightButton}
+        }
+        Fl_Light_Button smoothButton {
+          label Smooth
+          callback {ShowSmoothed();}
+          xywh {260 41 98 24} type Normal value 1 selection_color 1
+          class {fltk::LightButton}
+        }
+        Fl_Light_Button hessianButton {
+          label Hessian
+          callback {ComputeHessian();}
+          xywh {259 145 101 25} type Normal value 1 selection_color 1
+          class {fltk::LightButton}
+        }
+        Fl_Button {} {
+          label {Eigen Analysis}
+          callback {this->ComputeHessianEigenAnalysis();}
+          xywh {405 140 125 35} box ROUND_UP_BOX align 128
+        }
+        Fl_Light_Button tubenessButton {
+          label Tubeness
+          callback {this->ShowTubeness();}
+          xywh {400 200 142 25} type Normal value 1 selection_color 1
+          class {fltk::LightButton}
+        }
+        Fl_Light_Button gradientOnEigenVectorButton {
+          label {Gradient || EigenVector}
+          callback {ShowGradientOnEigenVector();}
+          xywh {575 120 180 25} type Normal value 1 selection_color 1
+          class {fltk::LightButton}
+        }
+        Fl_Light_Button parametricSpaceButton {
+          label {Parametric Space}
+          callback {ShowParametricSpace();}
+          xywh {745 35 105 37} type Normal value 1 selection_color 1 align 148
+          class {fltk::LightButton}
+        }
+        Fl_Light_Button extractedParametricPointsButton {
+          label {Extracted Points}
+          callback {ShowExtractedParametricPoints();}
+          xywh {870 90 100 40} type Normal value 1 selection_color 1 align 148
+          class {fltk::LightButton}
+        }
+        Fl_Button {} {
+          label {Spatial Function}
+          callback {ShowSpatialFunctionControl();}
+          xywh {875 30 90 45} box ROUND_UP_BOX align 128
+        }
+        Fl_Light_Button curve3DPointsButton {
+          label {Curve3D Points}
+          callback {ShowCurve3DPoints();}
+          xywh {870 150 100 40} type Normal value 1 selection_color 1 align 148
+          class {fltk::LightButton}
+        }
+        Fl_Light_Button modulusButton {
+          label Modulus
+          callback {ShowGradientModulus();}
+          xywh {415 90 100 25} type Normal value 1 selection_color 1
+          class {fltk::LightButton}
+        }
+      }
+      Fl_Slider progressSlider {
+        xywh {5 324 825 15} type {Horz Fill} selection_color 2
+        code0 {\#include <fltkProgressBar.h>}
+        class {fltk::ProgressBar}
+      }
+      Fl_Output statusTextOutput {
+        xywh {5 349 825 25}
+      }
+      Fl_Light_Button loadButton {
+        label Load
+        callback {Load();}
+        xywh {30 45 69 30} type Normal value 1 selection_color 1
+        class {fltk::LightButton}
+      }
+      Fl_Button {} {
+        label Quit
+        callback {Quit();}
+        xywh {500 275 90 30} box ROUND_UP_BOX
+      }
+      Fl_Button {} {
+        label Execute
+        callback {Execute();}
+        xywh {125 275 215 30} box ROUND_UP_BOX
+      }
+    }
+  }
+  Function {~ceExtractorConsoleGUI()} {return_type virtual
+  } {}
+  Function {Quit( void )} {return_type {virtual void}
+  } {}
+  Function {Load( void )} {return_type {virtual void}
+  } {}
+  Function {ShowInput( void )} {return_type {virtual void}
+  } {}
+  Function {ShowLaplacian( void )} {return_type {virtual void}
+  } {}
+  Function {ShowGradientModulus( void )} {return_type {virtual void}
+  } {}
+  Function {ComputeHessian( void )} {return_type {virtual void}
+  } {}
+  Function {ShowSmoothed( void )} {return_type {virtual void}
+  } {}
+  Function {ShowTubeness( void )} {return_type {virtual void}
+  } {}
+  Function {ShowGradientOnEigenVector( void )} {return_type {virtual void}
+  } {}
+  Function {ShowParametricSpace( void )} {return_type {virtual void}
+  } {}
+  Function {ResetViewOfParametricSpace( void )} {return_type {virtual void}
+  } {}
+  Function {ShowCurve3DPoints( void )} {return_type {virtual void}
+  } {}
+  Function {ShowExtractedParametricPoints( void )} {return_type {virtual void}
+  } {}
+  Function {ComputeHessianEigenAnalysis( void )} {return_type {virtual void}
+  } {}
+  Function {ComputeGradient( void )} {return_type {virtual void}
+  } {}
+} 
