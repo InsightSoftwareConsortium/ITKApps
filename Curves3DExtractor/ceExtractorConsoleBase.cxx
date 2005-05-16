@@ -106,6 +106,8 @@ ceExtractorConsoleBase
   m_Hessian = HessianFilterType::New();
   m_Hessian->SetInput( m_Reader->GetOutput() );
    
+  m_Eigen = EigenFilterType::New();
+  m_Eigen->SetInput( m_Hessian->GetOutput() );
 
   m_ScalarProduct = ScalarProductFilterType::New();
 

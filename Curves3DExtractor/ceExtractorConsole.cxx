@@ -413,34 +413,7 @@ ceExtractorConsole
 {
 
   std::cout << "ComputeHessianEigenAnalysis" << std::endl;
-  m_Hessian->Update();
-
-  HessianImageType::ConstPointer hessian = m_Hessian->GetOutput();
-
-  typedef itk::ImageRegionConstIterator< HessianImageType > HessianIterator;
-  
-  HessianIterator itr( hessian, hessian->GetBufferedRegion() );
-  itr.GoToBegin();
-
-  typedef HessianPixelType HessianMatrixType;
-  HessianMatrixType matrix = itr.Get();
-
-  typedef HessianMatrixType::EigenValuesArrayType     EigenValuesArrayType;
-  typedef HessianMatrixType::EigenVectorsMatrixType   EigenVectorsMatrixType;
-  
-  EigenValuesArrayType    eigenValues;
-  EigenVectorsMatrixType  eigenVectors;
-  
-  matrix.ComputeEigenAnalysis( eigenValues, eigenVectors );
-
-  std::cout << "Hessian Matrix = " << std::endl;
-  std::cout << matrix << std::endl;
-
-  std::cout << "Eigen Values = " << std::endl;
-  std::cout << eigenValues << std::endl;
-
-  std::cout << "Eigen Vectors = " << std::endl;
-  std::cout << eigenVectors << std::endl;
+  m_Eigen->Update();
 
 }
 

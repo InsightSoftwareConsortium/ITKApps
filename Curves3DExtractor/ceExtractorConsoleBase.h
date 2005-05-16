@@ -24,6 +24,7 @@
 #include "itkSmoothingRecursiveGaussianImageFilter.h"
 #include "itkGradientRecursiveGaussianImageFilter.h"
 #include "itkHessianRecursiveGaussianImageFilter.h"
+#include "itkSymmetricEigenAnalysisImageFilter.h"
 #include "itkMultiplyImageFilter.h"
 #include "itkImageToParametricSpaceFilter.h"
 #include "itkMesh.h"
@@ -102,6 +103,15 @@ public:
   typedef   HessianFilterType::OutputImageType            HessianImageType;
   typedef   HessianImageType::PixelType                   HessianPixelType;
 
+
+  typedef   itk::FixedArray< float, 3 >                   EigenValuesArrayType;
+  typedef   itk::Image< EigenValuesArrayType, 3 >         EigenValuesImageType;
+
+  typedef   itk::SymmetricEigenAnalysisImageFilter< 
+                                        HessianImageType, 
+                                        EigenValuesImageType 
+                                                  >       EigenFilterType;
+
   typedef   itk::MultiplyImageFilter< VectorImageType,
                                       VectorImageType,
                                       ImageType >  ScalarProductFilterType;
@@ -175,6 +185,7 @@ protected:
   SmoothingGaussianFilterType::Pointer    m_Smooth;
   GradientFilterType::Pointer             m_Gradient;
   HessianFilterType::Pointer              m_Hessian;
+  EigenFilterType::Pointer                m_Eigen;
 
   GaussianFilterType::Pointer             m_H1x;
   GaussianFilterType::Pointer             m_H1y;
