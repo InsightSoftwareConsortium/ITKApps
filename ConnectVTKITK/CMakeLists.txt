@@ -13,7 +13,7 @@ INCLUDE_DIRECTORIES(${VTK_INCLUDE_DIRS} ${ITK_INCLUDE_DIRS}
                     ${ConnectVTKITK_SOURCE_DIR})
 LINK_DIRECTORIES(${VTK_LIBRARY_DIRS} ${ITK_LIBRARY_DIRS})
 
-IF(ITK_CSWIG_TCL)
+IF(ITK_CSWIG_TCL AND VTK_WRAP_TCL)
   SET_SOURCE_FILES_PROPERTIES(ConnectVTKITK_wrapTcl.cxx GENERATED)
   ADD_LIBRARY(ConnectVTKITKTcl SHARED ConnectVTKITK_wrapTcl.cxx)
   TARGET_LINK_LIBRARIES(ConnectVTKITKTcl ITKBasicFilters
@@ -50,9 +50,9 @@ IF(ITK_CSWIG_TCL)
       "${ConnectVTKITK_BINARY_DIR}/pkgIndex.tcl"
       @ONLY IMMEDIATE)
   ENDIF(ConnectVTKITK_CONFIGURATION_TYPES)
-ENDIF(ITK_CSWIG_TCL)
+ENDIF(ITK_CSWIG_TCL AND VTK_WRAP_TCL)
 
-IF(ITK_CSWIG_PYTHON)
+IF(ITK_CSWIG_PYTHON AND VTK_WRAP_PYTHON)
   SET_SOURCE_FILES_PROPERTIES(ConnectVTKITK_wrapPython.cxx GENERATED)
   ADD_LIBRARY(_ConnectVTKITKPython MODULE ConnectVTKITK_wrapPython.cxx)
   # we don't want a "lib" prefix, thanks.
@@ -125,10 +125,10 @@ IF(ITK_CSWIG_PYTHON)
           SET(src "${ConnectVTKITK_SOURCE_DIR}/${file}.py")
           SET(tgt "${ConnectVTKITK_BINARY_DIR}/${file}.py")
           ADD_CUSTOM_COMMAND(SOURCE ${src}
-   		         COMMAND ${CMAKE_COMMAND}
+                            COMMAND ${CMAKE_COMMAND}
                             ARGS -E copy ${src} ${tgt}
                             OUTPUTS ${tgt}
-   			 TARGET connectvtkitk_pyc
+                            TARGET connectvtkitk_pyc
                             COMMENT "source copy")
         ENDFOREACH(file)
       ENDIF(CMAKE_CONFIGURATION_TYPES)
@@ -157,4 +157,4 @@ IF(ITK_CSWIG_PYTHON)
       TARGET connectvtkitk_pyc
       )
   ENDIF(PYTHON_EXECUTABLE)
-ENDIF(ITK_CSWIG_PYTHON)
+ENDIF(ITK_CSWIG_PYTHON AND VTK_WRAP_PYTHON)
