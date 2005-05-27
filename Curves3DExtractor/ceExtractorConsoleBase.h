@@ -24,7 +24,6 @@
 #include "itkSmoothingRecursiveGaussianImageFilter.h"
 #include "itkGradientRecursiveGaussianImageFilter.h"
 #include "itkHessianRecursiveGaussianImageFilter.h"
-#include "itkSymmetricEigenAnalysisImageFilter.h"
 #include "itkMultiplyImageFilter.h"
 #include "itkImageToParametricSpaceFilter.h"
 #include "itkMesh.h"
@@ -37,12 +36,38 @@
 #include "itkRescaleIntensityImageFilter.h"
 #include "itkImageFileWriter.h"
 #include "itkSymmetricSecondRankTensor.h"
+#include "itkSymmetricEigenAnalysisImageFilter.h"
+#include "itkImageAdaptor.h"
+#include "itkAbsImageFilter.h"
 
 
 // Define which type of spatial function to use
 // Only one of the following lines should be uncommented.
 // # define SPHERE_FUNCTION
 #define FRUSTUM_FUNCTION
+
+// 
+// Eigenvalue pixel accessor to access vector of eigen value pixels 
+template< class TPixel >
+class EigenValueAccessor
+{
+public:
+  typedef TPixel                     InternalType;
+  typedef float                      ExternalType;
+  
+  inline ExternalType Get( const InternalType & input ) const 
+    {
+      return static_cast<ExternalType>( input[m_EigenIdx] );
+    }
+
+  void SetEigenIdx( unsigned int i )
+    {
+    m_EigenIdx = i;
+    }
+  
+private:
+  unsigned int m_EigenIdx;
+};
 
 
 
@@ -103,21 +128,30 @@ public:
   typedef   HessianFilterType::OutputImageType            HessianImageType;
   typedef   HessianImageType::PixelType                   HessianPixelType;
 
-
-  typedef   itk::FixedArray< float, 3 >                   EigenValuesArrayType;
-  typedef   itk::Image< EigenValuesArrayType, 3 >         EigenValuesImageType;
-
+  typedef   itk::FixedArray< double, HessianPixelType::Dimension >
+                                                          EigenValueArrayType;
+  typedef  itk::Image< EigenValueArrayType, HessianImageType::ImageDimension >
+                                                          EigenValueImageType;
   typedef   itk::SymmetricEigenAnalysisImageFilter< 
-                                        HessianImageType, 
-                                        EigenValuesImageType 
-                                                  >       EigenFilterType;
-
+              HessianImageType, EigenValueImageType >     EigenAnalysisFilterType;
+  
   typedef   itk::MultiplyImageFilter< VectorImageType,
                                       VectorImageType,
                                       ImageType >  ScalarProductFilterType;
 
-  typedef   itk::ImageToParametricSpaceFilter< ImageType, MeshType >
-                                                  ParametricSpaceFilterType;
+  typedef itk::ImageAdaptor<  EigenValueImageType, 
+         EigenValueAccessor< EigenValueArrayType > > ImageAdaptorType;
+
+  // Just a dummy filter...
+  typedef itk::Image< MeshPointDataType::ValueType, 
+                    MeshPointDataType::PointDimension > 
+                                      EachEigenValueImageType;
+
+  typedef itk::AbsImageFilter< ImageAdaptorType, 
+                               EachEigenValueImageType >  AbsImageFilterType;
+  
+  typedef   itk::ImageToParametricSpaceFilter< EachEigenValueImageType, 
+                                               MeshType > ParametricSpaceFilterType;
 
   typedef   itk::RescaleIntensityImageFilter< ImageType, 
                                               ImageType > RescaleIntensityFilterType;
@@ -185,7 +219,8 @@ protected:
   SmoothingGaussianFilterType::Pointer    m_Smooth;
   GradientFilterType::Pointer             m_Gradient;
   HessianFilterType::Pointer              m_Hessian;
-  EigenFilterType::Pointer                m_Eigen;
+
+  EigenAnalysisFilterType::Pointer        m_EigenFilter;
 
   GaussianFilterType::Pointer             m_H1x;
   GaussianFilterType::Pointer             m_H1y;

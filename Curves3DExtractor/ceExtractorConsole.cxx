@@ -22,6 +22,8 @@
  
 
 
+
+
 /************************************
  *
  *  Constructor
@@ -72,6 +74,7 @@ ceExtractorConsole
   progressSlider->Observe( m_Hz.GetPointer() );
   progressSlider->Observe( m_Smooth.GetPointer() );
   progressSlider->Observe( m_Hessian.GetPointer() );
+  progressSlider->Observe( m_EigenFilter.GetPointer() );
   progressSlider->Observe( m_Add.GetPointer() );
   progressSlider->Observe( m_Modulus.GetPointer() );
   progressSlider->Observe( m_Gradient.GetPointer() );
@@ -150,7 +153,6 @@ ceExtractorConsole
 
   
   this->ShowStatus("Let's start by loading an image...");
-
 }
 
 
@@ -413,7 +415,10 @@ ceExtractorConsole
 {
 
   std::cout << "ComputeHessianEigenAnalysis" << std::endl;
-  m_Eigen->Update();
+  m_EigenFilter->Update();
+
+
+  
 
 }
 

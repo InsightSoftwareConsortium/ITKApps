@@ -21,7 +21,7 @@
 
 #include "ceExtractorConsoleBase.h"
 
-
+ 
 /************************************
  *
  *  Constructor
@@ -106,32 +106,59 @@ ceExtractorConsoleBase
   m_Hessian = HessianFilterType::New();
   m_Hessian->SetInput( m_Reader->GetOutput() );
    
-  m_Eigen = EigenFilterType::New();
-  m_Eigen->SetInput( m_Hessian->GetOutput() );
+  m_EigenFilter = EigenAnalysisFilterType::New();
+  m_EigenFilter->SetInput(m_Hessian->GetOutput());
+  
+  // Create an adaptor and plug the output to the parametric space
+  ImageAdaptorType::Pointer adaptor1 = ImageAdaptorType::New();
+  EigenValueAccessor< EigenValueArrayType > accessor1;
+  accessor1.SetEigenIdx( 0 );
+  adaptor1->SetImage( m_EigenFilter->GetOutput() );
+  
+  ImageAdaptorType::Pointer adaptor2 = ImageAdaptorType::New();
+  EigenValueAccessor< EigenValueArrayType > accessor2;
+  accessor2.SetEigenIdx( 1 );
+  adaptor2->SetImage( m_EigenFilter->GetOutput() );
 
-  m_ScalarProduct = ScalarProductFilterType::New();
+  ImageAdaptorType::Pointer adaptor3 = ImageAdaptorType::New();
+  EigenValueAccessor< EigenValueArrayType > accessor3;
+  accessor3.SetEigenIdx( 2 );
+  adaptor3->SetImage( m_EigenFilter->GetOutput() );
+
+  AbsImageFilterType::Pointer absfilter1 = AbsImageFilterType::New();
+  absfilter1->SetInput( adaptor1 );
+  AbsImageFilterType::Pointer absfilter2 = AbsImageFilterType::New();
+  absfilter2->SetInput( adaptor2 );
+  AbsImageFilterType::Pointer absfilter3 = AbsImageFilterType::New();
+  absfilter3->SetInput( adaptor3 );
+
+  //m_ScalarProduct = ScalarProductFilterType::New();
 
 //  m_ScalarProduct->SetInput1( m_Join->GetOutput() );
 //  m_ScalarProduct->SetInput2( m_Eigen->GetMaxEigenVector() );
 
   // Normalize the parametric space
-  m_RescaleIntensitySmoothed->SetInput( m_Smooth->GetOutput() );
-  m_RescaleIntensitySmoothed->SetOutputMinimum( -1.0 );
-  m_RescaleIntensitySmoothed->SetOutputMaximum(  1.0 );
+  //m_RescaleIntensitySmoothed->SetInput( m_Smooth->GetOutput() );
+  //m_RescaleIntensitySmoothed->SetOutputMinimum( -1.0 );
+  //m_RescaleIntensitySmoothed->SetOutputMaximum(  1.0 );
 
-  m_RescaleIntensityMedialness->SetInput( m_ScalarProduct->GetOutput() );
-  m_RescaleIntensityMedialness->SetOutputMinimum( -1.0 );
-  m_RescaleIntensityMedialness->SetOutputMaximum(  1.0 );
+  //m_RescaleIntensityMedialness->SetInput( m_ScalarProduct->GetOutput() );
+  //m_RescaleIntensityMedialness->SetOutputMinimum( -1.0 );
+  //m_RescaleIntensityMedialness->SetOutputMaximum(  1.0 );
 
 //  m_RescaleIntensityMaxEigen->SetInput( m_Eigen->GetMaxEigenValue() );
-  m_RescaleIntensityMaxEigen->SetOutputMinimum( 0.0 );
-  m_RescaleIntensityMaxEigen->SetOutputMaximum( 1.0 );
+  //m_RescaleIntensityMaxEigen->SetOutputMinimum( 0.0 );
+  //m_RescaleIntensityMaxEigen->SetOutputMaximum( 1.0 );
 
   m_ParametricSpace = ParametricSpaceFilterType::New();
 
-  m_ParametricSpace->SetInput( 0, m_RescaleIntensityMaxEigen->GetOutput() );
-  m_ParametricSpace->SetInput( 1, m_RescaleIntensityMedialness->GetOutput() );
-  m_ParametricSpace->SetInput( 2, m_RescaleIntensitySmoothed->GetOutput() );
+  //m_ParametricSpace->SetInput( 0, m_RescaleIntensityMaxEigen->GetOutput() );
+  //m_ParametricSpace->SetInput( 1, m_RescaleIntensityMedialness->GetOutput() );
+  //m_ParametricSpace->SetInput( 2, m_RescaleIntensitySmoothed->GetOutput() );
+  m_ParametricSpace->SetInput( 0, absfilter1->GetOutput() );
+  m_ParametricSpace->SetInput( 1, absfilter2->GetOutput() );
+  m_ParametricSpace->SetInput( 2, absfilter3->GetOutput() );
+  
 
   m_SpatialFunctionControl = SpatialFunctionControlType::New();
 
