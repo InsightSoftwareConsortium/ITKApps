@@ -1,0 +1,413 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0104 
+header_name {.h} 
+code_name {.cxx}
+class DeformableRegistration3DTimeSeriesGUI {open : {public fltk::DeformableRegistration3DTimeSeriesBase}
+} {
+  Function {DeformableRegistration3DTimeSeriesGUI()} {open
+  } {
+    Fl_Window externalWindow {
+      label {4D ImageViewer-ISIS Center} open
+      xywh {569 156 695 680} type Double hide resizable
+      code0 {\#include "DeformableRegistration3DTimeSeriesBase.h"}
+    } {
+      Fl_Box fltkRenderWindowInteractor {
+        xywh {0 20 685 455} box DOWN_FRAME
+        code0 {\#include "vtkFlRenderWindowInteractor.h"}
+        class vtkFlRenderWindowInteractor
+      }
+      Fl_Value_Slider slider {
+        label Slice
+        callback {this->SelectSlice(static_cast<int>(slider->value()));
+  fltkRenderWindowInteractor->redraw();
+  Fl::check();}
+        xywh {53 501 395 20} type Horizontal align 4 maximum 50 step 1 deactivate
+        code0 {std::cout<<endl;}
+      }
+      Fl_Round_Button Axial {
+        label Axial
+        user_data 1
+        callback {if(Axial->value()==1) 
+{
+this->SelectAxis(2);
+this->slider->maximum(this->GetMaximum());
+fltkRenderWindowInteractor->redraw();
+Fl::check();
+}}
+        xywh {64 554 50 25} type Radio down_box ROUND_DOWN_BOX value 1 deactivate
+      }
+      Fl_Round_Button Sagittal {
+        label Sagittal
+        user_data 0
+        callback {if(Sagittal->value()==1)
+{
+ this->SelectAxis(1); 
+ this->slider->maximum(this->GetMaximum()); 
+ fltkRenderWindowInteractor->redraw();
+ Fl::check();
+}}
+        xywh {170 554 70 25} type Radio down_box ROUND_DOWN_BOX deactivate
+      }
+      Fl_Round_Button Coronar {
+        label Coronal
+        user_data 0
+        callback {if(Coronar->value()==1) 
+{
+this->SelectAxis(0);
+this->slider->maximum(this->GetMaximum());
+fltkRenderWindowInteractor->redraw();
+Fl::check();
+}}
+        xywh {281 555 75 25} type Radio down_box ROUND_DOWN_BOX deactivate
+      }
+      Fl_Menu_Bar {} {
+        label Menu_Bar open
+        xywh {0 0 695 20}
+      } {
+        submenu {} {
+          label File open
+          xywh {0 0 100 20}
+        } {
+          menuitem {} {
+            label {Load 4D raw data}
+            callback {this->LoadRawData();
+ fltkRenderWindowInteractor->redraw();}
+            xywh {0 0 100 20}
+          }
+          menuitem {} {
+            label {Load 4D vector field}
+            callback {this->LoadDeformableFieldData();
+ fltkRenderWindowInteractor->redraw();}
+            xywh {10 10 100 20}
+          }
+          menuitem {} {
+            label {Load 3D segmented data}
+            callback {this->LoadSegmentedData();
+ fltkRenderWindowInteractor->redraw();}
+            xywh {5 5 100 20}
+          }
+          menuitem {} {
+            label LoadDicomSeries
+            callback {this->LoadDicomSeries();
+ fltkRenderWindowInteractor->redraw();}
+            xywh {10 10 100 20}
+          }
+          menuitem {} {
+            label {Save 4D deformation field}
+            callback {this->Save4DDeformationImage();}
+            xywh {10 10 100 20}
+          }
+          menuitem {} {
+            label {Save 4D segmented data}
+            callback {this->Save4DSegmentedImage();} selected
+            xywh {10 10 100 20}
+          }
+          menuitem Quit {
+            label Quit
+            callback {Fl::first_window()->hide();
+exit(0);}
+            xywh {25 25 100 20}
+          }
+        }
+        submenu Genfield {
+          label {Generate deformable field} open
+          xywh {0 0 100 20}
+        } {
+          menuitem {} {
+            label {Use Demons deformation}
+            callback {this->StartDemonsDeformation();}
+            xywh {0 0 100 20}
+          }
+          menuitem {} {
+            label {Use BSpline deformation}
+            callback {this->StartBSplineDeformation();}
+            xywh {0 0 100 20}
+          }
+          menuitem {} {
+            label {Use FEM deformation}
+            callback {this->StartFEMDeformation();}
+            xywh {0 0 100 20}
+          }
+        }
+        submenu ViewPath {
+          label {View Path} open
+          xywh {5 5 100 20}
+        } {
+          menuitem VPathSP {
+            label {View path of the selected point}
+            callback {if(point_selected)
+{
+  MotionPathView->label("Display the path of the selected point");
+  this->ComputePathSelectedPoint();
+  MotionPathView->show();
+        fltkRenderWindowInteractor2->show();
+  Fl::check();
+}}
+            xywh {0 0 100 20}
+          }
+          menuitem VPathSV {
+            label {View path of the segmented volume}
+            callback {if(m_segmented_loaded&&m_deformable_loaded)
+{
+MotionPathView->label("Display the motion path of the segmented volume");
+this->ComputePathSelectedVolume();
+MotionPathView->show();
+fltkRenderWindowInteractor2->show();
+Fl::check();
+}}
+            xywh {0 0 100 20}
+          }
+        }
+        submenu View {
+          label View open
+          xywh {0 0 100 20}
+        } {
+          menuitem {} {
+            label Draw3D
+            callback {MotionPathView->label("Draw 3D");
+ViewVolume();}
+            xywh {0 0 100 20}
+          }
+        }
+      }
+      Fl_Value_Slider slidertime {
+        label Time
+        callback {this->SelectTime(static_cast<int>(slidertime->value()));
+  fltkRenderWindowInteractor->redraw();
+  Fl::check();}
+        xywh {54 531 395 20} type Horizontal align 4 maximum 50 step 1 deactivate
+        code0 {std::cout<<endl;}
+      }
+      Fl_Button start {
+        label Start
+        callback {Fl::add_timeout(0, timer_callback,this);}
+        xywh {13 606 58 25} box THIN_UP_BOX deactivate
+      }
+      Fl_Choice fps {
+        label Fps
+        callback {//} open
+        xywh {183 606 70 25} box THIN_UP_BOX down_box THIN_UP_BOX
+      } {
+        menuitem {} {
+          label 15
+          xywh {0 0 100 20}
+        }
+        menuitem {} {
+          label 30
+          xywh {0 0 100 20}
+        }
+        menuitem {} {
+          label 60
+          xywh {0 0 100 20}
+        }
+        menuitem {} {
+          label {1/17}
+          xywh {0 0 100 20}
+        }
+      }
+      Fl_Choice timeorslice {
+        label {Time/Slice} open
+        xywh {324 606 140 25} box THIN_UP_BOX down_box THIN_UP_BOX
+      } {
+        menuitem {} {
+          label Slice
+          xywh {0 0 100 20}
+        }
+        menuitem {} {
+          label Time
+          xywh {0 0 100 20} value 1
+        }
+        menuitem {} {
+          label Both
+          xywh {0 0 100 20} value 1
+        }
+      }
+      Fl_Button stop {
+        label Stop
+        callback {Fl::remove_timeout(timer_callback,this);}
+        xywh {83 606 60 25} deactivate
+      }
+      Fl_Box {} {
+        image {caimr.bmp} xywh {484 476 205 165} box PLASTIC_UP_BOX align 25
+      }
+      Fl_Box {} {
+        label {Volume slicer}
+        xywh {5 476 478 105} box PLASTIC_UP_FRAME align 21
+      }
+      Fl_Box {} {
+        label {Animation Controls}
+        xywh {6 585 477 56} box PLASTIC_UP_FRAME align 21
+      }
+      Fl_Choice {} {
+        label View open
+        xywh {519 610 170 25} down_box BORDER_BOX
+      } {
+        menuitem GrayImageActive {
+          label {4D grayscale image}
+          callback {this->ActivateRawData();
+ fltkRenderWindowInteractor->redraw();}
+          xywh {5 5 100 20} type Toggle value 1
+        }
+        menuitem DeformableFieldActive {
+          label {4D deformable field}
+          callback {this->ActivateDeformableFieldData();
+ fltkRenderWindowInteractor->redraw();}
+          xywh {5 5 100 20} type Toggle value 1
+        }
+        menuitem SegmentedImageActive {
+          label {4D segmented image}
+          callback {this->ActivateSegmentedData();
+ fltkRenderWindowInteractor->redraw();}
+          xywh {10 10 100 20} type Toggle value 1
+        }
+      }
+      Fl_Round_Button threeD {
+        label 3D
+        user_data 0
+        xywh {390 555 75 25} type Radio down_box ROUND_DOWN_BOX deactivate
+      }
+      Fl_Box {} {
+        label {Deformation info}
+        xywh {6 645 685 30} box PLASTIC_UP_FRAME align 21
+      }
+      Fl_Slider progressBar {
+        label slider
+        xywh {115 648 340 22} type {Horz Fill} box BORDER_BOX color 48 selection_color 90 labeltype NO_LABEL align 4 deactivate
+        code0 {\#include"fltkProgressBar.h"}
+        class {fltk::ProgressBar}
+      }
+      Fl_Value_Output TotalTime {
+        label {Total time}
+        xywh {615 648 70 23}
+      }
+      Fl_Button {} {
+        label Abort
+        callback {this->AbortDeformation();}
+        xywh {465 649 70 20} box THIN_UP_BOX
+      }
+      Fl_Choice {} {
+        label {Field type} open
+        xywh {489 580 75 25} down_box BORDER_BOX align 5
+      } {
+        menuitem {} {
+          label Glyph
+          callback {this->SelectFieldType(0);
+fltkRenderWindowInteractor->redraw();}
+          xywh {0 0 100 20}
+        }
+        menuitem {} {
+          label Grid
+          callback {this->SelectFieldType(1);
+fltkRenderWindowInteractor->redraw();}
+          xywh {0 0 100 20}
+        }
+      }
+      Fl_Box {} {
+        image {caimr.bmp} xywh {576 489 100 110}
+      }
+      Fl_Roller {} {
+        label Blend
+        xywh {490 488 75 20} type Horizontal
+      }
+    }
+    Fl_Window MotionPathView {
+      label {Motion Path of the segmented object} open
+      xywh {980 231 452 330} type Double hide resizable
+    } {
+      Fl_Box fltkRenderWindowInteractor2 {
+        xywh {0 0 445 325} box DOWN_FRAME
+        code0 {\#include "vtkFlRenderWindowInteractor.h"}
+        class vtkFlRenderWindowInteractor
+      }
+    }
+    code {//General view
+  fltkRenderWindowInteractor->SetRenderWindow( m_RenderWindow );
+       // Interact with the data at 3 frames per second
+   fltkRenderWindowInteractor->SetDesiredUpdateRate(3.0);
+   fltkRenderWindowInteractor->SetStillUpdateRate(0.001);
+   //Motion path view
+   fltkRenderWindowInteractor2->SetRenderWindow( m_RenderWindow2 );
+       // Interact with the data at 3 frames per second
+   fltkRenderWindowInteractor2->SetDesiredUpdateRate(3.0);
+   fltkRenderWindowInteractor2->SetStillUpdateRate(0.001);} {}
+  }
+  Function {~DeformableRegistration3DTimeSeriesGUI()} {open return_type virtual
+  } {}
+  Function {Show()} {open return_type {virtual void}
+  } {
+    code {externalWindow->show();
+fltkRenderWindowInteractor->show();} {}
+  }
+  Function {Hide()} {open return_type {virtual void}
+  } {
+    code {externalWindow->hide();} {}
+  }
+  Function {LoadRawData()} {open C return_type {virtual void}
+  } {}
+  Function {LoadDeformableFieldData()} {open return_type {virtual void}
+  } {}
+  Function {SelectTime(int)} {open return_type {virtual void}
+  } {}
+  Function {timer_callback(void* v)} {open return_type {static void}
+  } {
+    code {DeformableRegistration3DTimeSeriesGUI* window = reinterpret_cast<DeformableRegistration3DTimeSeriesGUI*>(v);
+  
+  switch(window->timeorslice->value()){
+    case 0:{
+           if (window->slider->value()<window->slider->maximum())window->slider->value(window->slider->value()+1);
+            else window->slider->value(0);
+            window->SelectSlice(static_cast<int>(window->slider->value()));
+            window->fltkRenderWindowInteractor->redraw();
+      break;}
+    case 1:{
+           if (window->slidertime->value()<window->slidertime->maximum())window->slidertime->value(window->slidertime->value()+1);
+            else window->slidertime->value(0);
+            window->SelectTime(static_cast<int>(window->slidertime->value()));
+            window->fltkRenderWindowInteractor->redraw();
+      break;}
+    case 2:{
+      if (window->slidertime->value()<window->slidertime->maximum())window->slidertime->value(window->slidertime->value()+1);
+            else window->slidertime->value(0);
+      if (window->slider->value()<window->slider->maximum())window->slider->value(window->slider->value()+1);
+            else window->slider->value(0);
+            window->SelectTime(static_cast<int>(window->slidertime->value()));
+            window->SelectSlice(static_cast<int>(window->slider->value()));
+            window->fltkRenderWindowInteractor->redraw();
+
+      break;}
+  }
+  
+   switch(window->fps->value()){
+    case 0:Fl::repeat_timeout(1.0 / 15.0, timer_callback,v);
+    break;
+    case 1:Fl::repeat_timeout(1.0 / 30.0, timer_callback,v);
+    break;
+    case 2:Fl::repeat_timeout(1.0 / 60.0, timer_callback,v);
+    break;
+    case 3:Fl::repeat_timeout(12, timer_callback,v);
+    break;
+}} {}
+  }
+  Function {LoadSegmentedData()} {open return_type {virtual void}
+  } {}
+  Function {StartDemonsDeformation()} {open return_type {virtual void}
+  } {}
+  Function {Save4DDeformationImage()} {open return_type {virtual void}
+  } {}
+  Function {AbortDeformation()} {open return_type {virtual void}
+  } {}
+  Function {StartBSplineDeformation()} {open return_type {virtual void}
+  } {}
+  Function {ComputePathSelectedPoint()} {open return_type {virtual void}
+  } {}
+  Function {StartFEMDeformation()} {open return_type {virtual void}
+  } {}
+  Function {ComputePathSelectedVolume()} {open return_type {virtual void}
+  } {}
+  Function {LoadDicomSeries()} {open return_type {virtual void}
+  } {}
+  Function {ViewVolume()} {open return_type {virtual void}
+  } {}
+  Function {Save4DSegmentedImage()} {open return_type {virtual void}
+  } {}
+} 

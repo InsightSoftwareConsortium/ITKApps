@@ -1,0 +1,65 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0104 
+header_name {.h} 
+code_name {.cxx}
+class DicomImageReaderGUI {open : {public ISIS::DicomImageReaderBase}
+} {
+  Function {DicomImageReaderGUI()} {open
+  } {
+    Fl_Window seriesBrowserWindow {
+      label {DICOM Series selection} open
+      xywh {520 289 796 360} type Double hide
+      code0 {\#include "DicomImageReaderBase.h"}
+    } {
+      Fl_Button {} {
+        label Cancel
+        callback {this->HideSeriesBrowser();}
+        xywh {120 323 85 30}
+      }
+      Fl_Button {} {
+        label Ok
+        callback {this->HideSeriesBrowser();
+this->ReadVolume();}
+        xywh {25 323 85 30}
+      }
+      Fl_Browser seriesBrowser {
+        xywh {5 15 355 305} type Hold
+      }
+      Fl_Browser SelectedSeries {
+        xywh {424 20 355 300} type Hold
+      }
+      Fl_Button {} {
+        label {>>}
+        callback {this->AddSelectOne();}
+        xywh {369 110 45 30}
+      }
+      Fl_Button {} {
+        label {<<}
+        callback {this->RemoveSelectOne();} selected
+        xywh {369 150 45 30}
+      }
+    }
+  }
+  Function {~DicomImageReaderGUI()} {return_type virtual
+  } {}
+  Function {ShowSeriesBrowser()} {return_type {virtual void}
+  } {
+    code {seriesBrowserWindow->show();} {}
+  }
+  Function {HideSeriesBrowser()} {open return_type {virtual void}
+  } {
+    code {seriesBrowserWindow->hide();
+while (seriesBrowserWindow->visible())
+{
+	Fl::wait();
+	printf("waited\\n");
+}
+Fl::check();} {}
+  }
+  Function {ReadVolume()} {return_type {virtual void}
+  } {}
+  Function {RemoveSelectOne()} {open return_type {virtual void}
+  } {}
+  Function {AddSelectOne()} {open return_type {virtual void}
+  } {}
+} 
