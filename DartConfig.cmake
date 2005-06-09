@@ -1,15 +1,23 @@
 # Dashboard is opened for submissions for a 24 hour period starting at
 # the specified NIGHLY_START_TIME. Time is specified in 24 hour format.
-SET (NIGHTLY_START_TIME "1:00:00 EDT")
+SET (NIGHTLY_START_TIME "21:00:00 EDT")
 
 # Dart server to submit results (used by client)
-SET (DROP_SITE "www.itk.org")
-SET (DROP_LOCATION "/incoming")
-SET (DROP_SITE_USER "ftpuser")
-SET (DROP_SITE_PASSWORD "public")
-SET (DROP_METHOD "ftp")
+IF(NOT DROP_METHOD)
+  SET (DROP_METHOD "ftp")
+ENDIF(NOT DROP_METHOD)
+IF(DROP_METHOD MATCHES http)
+  SET (DROP_SITE "public.kitware.com")
+  SET (DROP_LOCATION "/cgi-bin/HTTPUploadDartFile.cgi")
+ELSE(DROP_METHOD MATCHES http)
+  SET (DROP_SITE "www.itk.org")
+  SET (DROP_LOCATION "/incoming")
+  SET (DROP_SITE_USER "ftpuser")
+  SET (DROP_SITE_PASSWORD "public")
+ENDIF(DROP_METHOD MATCHES http)
+
 SET (TRIGGER_SITE 
-       "http://${DROP_SITE}/cgi-bin/Submit-Insight-TestingResults.pl")
+  "http://${DROP_SITE}/cgi-bin/Submit-Insight-TestingResults.cgi")
 
 # Project Home Page
 SET (PROJECT_URL "http://www.itk.org/")
