@@ -19,7 +19,12 @@
 #include "ceExtractorConsole.h"
 #include <FL/fl_file_chooser.H>
 #include <FL/fl_ask.H>
- 
+#include "itkImageFileWriter.h"
+#include "itkColorTable.h" 
+
+#ifdef INTERMEDIATE_OUTPUTS
+  #include <iostream>
+#endif
 
 
 
@@ -37,13 +42,13 @@ ceExtractorConsole
 
   m_Viewer_Laplacian.SetLabel( "Laplacian" );
 
-  m_Viewer_Smoothed.SetLabel( "Smoothed" );
-  
   m_Viewer_Gradient_Modulus.SetLabel( "Gradient Modulus" );
 
-  m_Viewer_Extracted_Points.SetLabel("Points of Extracted Curves");
+  m_Viewer_Lambda1.SetLabel( "Lambda_1 image (1 > 2 > 3)" );
+  m_Viewer_Lambda2.SetLabel( "Lambda_2 image (1 > 2 > 3)" );
+  m_Viewer_Lambda3.SetLabel( "Lambda_3 image (1 > 2 > 3)" );
 
-  m_Viewer_Gradient_On_EigenVector.SetLabel( "Gradient Projected on EigenVector" );
+  m_Viewer_Extracted_Points.SetLabel("Points of Extracted Curves");
 
   m_ParametricSpaceSamplesShape = PointSetShapeType::New();
 
@@ -63,42 +68,31 @@ ceExtractorConsole
                           m_SpatialFunctionFilter->GetOutput() );
 
   progressSlider->Observe( m_Reader.GetPointer() );
-  progressSlider->Observe( m_H1x.GetPointer() );
-  progressSlider->Observe( m_H1y.GetPointer() );
-  progressSlider->Observe( m_H1z.GetPointer() );
-  progressSlider->Observe( m_H2x.GetPointer() );
-  progressSlider->Observe( m_H2y.GetPointer() );
-  progressSlider->Observe( m_H2z.GetPointer() );
-  progressSlider->Observe( m_Hx.GetPointer() );
-  progressSlider->Observe( m_Hy.GetPointer() );
-  progressSlider->Observe( m_Hz.GetPointer() );
-  progressSlider->Observe( m_Smooth.GetPointer() );
   progressSlider->Observe( m_Hessian.GetPointer() );
   progressSlider->Observe( m_EigenFilter.GetPointer() );
-  progressSlider->Observe( m_Add.GetPointer() );
-  progressSlider->Observe( m_Modulus.GetPointer() );
-  progressSlider->Observe( m_Gradient.GetPointer() );
-  progressSlider->Observe( m_ScalarProduct.GetPointer() );
+  progressSlider->Observe( m_Laplacian.GetPointer() );
+  progressSlider->Observe( m_GradientMagnitude.GetPointer() );
   progressSlider->Observe( m_ParametricSpace.GetPointer() );
   progressSlider->Observe( m_SpatialFunctionFilter.GetPointer() );
   progressSlider->Observe( m_InverseParametricFilter.GetPointer() );
 
+
   loadButton->Observe( m_Reader.GetPointer() );
   inputButton->Observe( m_Reader.GetPointer() );
-  smoothButton->Observe( m_Smooth.GetPointer() );
-  gradientButton->Observe( m_Gradient.GetPointer() );
+  gradientButton->Observe( m_GradientMagnitude.GetPointer() );
+  modulusButton->Observe( m_GradientMagnitude.GetPointer() );
   hessianButton->Observe( m_Hessian.GetPointer() );
-  modulusButton->Observe( m_Modulus.GetPointer() );
-  gradientOnEigenVectorButton->Observe( m_ScalarProduct.GetPointer() );
+  laplacianButton->Observe( m_Laplacian.GetPointer() );
+  lambda1Button->Observe( m_EigenCastfilter1.GetPointer() );
+  lambda2Button->Observe( m_EigenCastfilter2.GetPointer() );
+  lambda3Button->Observe( m_EigenCastfilter3.GetPointer() );
   parametricSpaceButton->Observe( m_ParametricSpace.GetPointer() );
   extractedParametricPointsButton->Observe( m_SpatialFunctionFilter.GetPointer() );
   curve3DPointsButton->Observe( m_InverseParametricFilter.GetPointer() );
 
-  m_Reader->AddObserver( itk::ModifiedEvent(), smoothButton->GetRedrawCommand() );
-  m_Reader->AddObserver( itk::ModifiedEvent(), hessianButton->GetRedrawCommand() );
   m_Reader->AddObserver( itk::ModifiedEvent(), modulusButton->GetRedrawCommand() );
-  m_Reader->AddObserver( itk::ModifiedEvent(), tubenessButton->GetRedrawCommand() );
-  m_Reader->AddObserver( itk::ModifiedEvent(), gradientOnEigenVectorButton->GetRedrawCommand() );
+  m_Reader->AddObserver( itk::ModifiedEvent(), hessianButton->GetRedrawCommand() );
+  m_Reader->AddObserver( itk::ModifiedEvent(), laplacianButton->GetRedrawCommand() );
   m_Reader->AddObserver( itk::ModifiedEvent(), parametricSpaceButton->GetRedrawCommand() );
   m_Reader->AddObserver( itk::ModifiedEvent(), extractedParametricPointsButton->GetRedrawCommand() );
   m_Reader->AddObserver( itk::ModifiedEvent(), curve3DPointsButton->GetRedrawCommand() );
@@ -137,6 +131,22 @@ ceExtractorConsole
 
   m_ImageSpaceSamplesShape->SetPointSet(
                   m_InverseParametricFilter->GetOutput() );
+
+  // Register the SpatialFunctionControl as a Drawer in the OpenGL window
+  m_ParametricSpaceViewer.GetNotifier()->AddObserver( 
+                  fltk::GlDrawEvent(), 
+                  m_SpatialFunctionControl->GetDrawCommand() );
+
+  // Notify the OpenGL window when the spatial function changes
+  m_SpatialFunctionControl->AddObserver( 
+                  fltk::RedrawEvent(),
+                  m_ParametricSpaceViewer.GetRedrawCommand() );
+
+
+  //m_Viewer_Extracted_Points.AddObserver(
+  //                fltk::GlDrawEvent(), 
+  //                m_ImageSpaceSamplesShape->GetDrawCommand() );
+
 
   m_ExtractedParametricSpaceSamplesShape->SetCompileMode( fltk::Shape3D::compileExecute ); 
   
@@ -259,10 +269,8 @@ ceExtractorConsole
 
   consoleWindow->hide();
   m_InputViewer.Hide();
-  m_Viewer_Smoothed.Hide();
   m_Viewer_Laplacian.Hide();
   m_Viewer_Gradient_Modulus.Hide();
-  m_Viewer_Gradient_On_EigenVector.Hide();
   m_Viewer_Extracted_Points.Hide();
   
   m_ParametricSpaceViewer.Hide();
@@ -336,26 +344,6 @@ ceExtractorConsole
  
 /************************************
  *
- *  Show Smoothed XY
- *
- ***********************************/
-void
-ceExtractorConsole
-::ShowSmoothed( void )
-{
-
-  m_Smooth->Update();
-  m_Viewer_Smoothed.SetImage( m_Smooth->GetOutput() );  
-  m_Viewer_Smoothed.Show();
-
-}
-
-
-
-
- 
-/************************************
- *
  *  Compute Hessian
  *
  ***********************************/
@@ -396,9 +384,7 @@ void
 ceExtractorConsole
 ::ComputeGradient( void )
 {
-
-  m_Gradient->Update();
-
+  m_GradientMagnitude->Update();
 }
 
 
@@ -413,13 +399,7 @@ void
 ceExtractorConsole
 ::ComputeHessianEigenAnalysis( void )
 {
-
-  std::cout << "ComputeHessianEigenAnalysis" << std::endl;
   m_EigenFilter->Update();
-
-
-  
-
 }
 
 
@@ -434,11 +414,38 @@ void
 ceExtractorConsole
 ::ShowLaplacian( void )
 {
-
-  m_Add->Update();
-  m_Viewer_Laplacian.SetImage( m_Add->GetOutput() );  
+  m_Laplacian->UpdateLargestPossibleRegion();
+  m_Viewer_Laplacian.SetImage( m_Laplacian->GetOutput() );
   m_Viewer_Laplacian.Show();
+}
 
+
+void
+ceExtractorConsole 
+::ShowLambda1( void )
+{
+  m_EigenCastfilter1->Update();
+  m_Viewer_Lambda1.SetImage( m_EigenCastfilter1->GetOutput() );
+  m_Viewer_Lambda1.Show();
+}
+
+void
+ceExtractorConsole 
+::ShowLambda2( void )
+{
+  m_EigenCastfilter2->Update();
+  m_Viewer_Lambda2.SetImage( m_EigenCastfilter2->GetOutput() );
+  m_Viewer_Lambda2.Show();
+}
+
+
+void
+ceExtractorConsole 
+::ShowLambda3( void )
+{
+  m_EigenCastfilter3->Update();
+  m_Viewer_Lambda3.SetImage( m_EigenCastfilter3->GetOutput() );
+  m_Viewer_Lambda3.Show();
 }
 
 
@@ -454,8 +461,8 @@ ceExtractorConsole
 ::ShowGradientModulus( void )
 {
 
-  m_Modulus->Update();
-  m_Viewer_Gradient_Modulus.SetImage( m_Modulus->GetOutput() );  
+  m_GradientMagnitude->Update();
+  m_Viewer_Gradient_Modulus.SetImage( m_GradientMagnitude->GetOutput() );  
   m_Viewer_Gradient_Modulus.Show();
 
 }
@@ -469,6 +476,7 @@ ceExtractorConsole
  *  Show Gradient projected on max EigenVector
  *
  ***********************************************/
+/*
 void
 ceExtractorConsole
 ::ShowGradientOnEigenVector( void )
@@ -479,7 +487,7 @@ ceExtractorConsole
   m_Viewer_Gradient_On_EigenVector.Show();
 
 }
-
+*/
 
 
  
@@ -493,6 +501,7 @@ ceExtractorConsole
 ::ShowExtractedParametricPoints( void )
 {
 
+  m_SpatialFunctionFilter->Update(); 
   m_ExtractedParametricSpaceViewer.Show();
   this->ResetViewOfExtractedParametricSpace();
 
@@ -517,7 +526,51 @@ ceExtractorConsole
 
   m_InverseParametricFilter->Update();
 
+#ifdef INTERMEDIATE_OUTPUTS  
+  // Write the extracted curve points and their corresponding eigen values to a
+  // file..
+  std::ofstream ofs( "ImageSpace-EigenSpaceMap.txt", std::ios::trunc );
+  MeshType::PointDataContainerPointer  pointData   = 
+    m_InverseParametricFilter->GetOutput()->GetPointData();
+  MeshType::PointsContainerPointer     points      = 
+    m_InverseParametricFilter->GetOutput()->GetPoints();
+  MeshType::PointsContainerIterator    pointIt     = points->Begin();
+  MeshType::PointDataContainerIterator pointDataIt = pointData->Begin();
+  while (pointIt != points->End() )
+  {
+    ofs << "Image space point: " << pointIt.Value()
+        << " EigenValue: " << pointDataIt.Value() << std::endl;
+    ++pointIt;
+    ++pointDataIt;
+  }
+  ofs.close();
+#endif
+  
+  m_PointSetToImageFilter->Update();
+
+  // Resample the pointset image to have the same spacing/origin as the input image
+  m_OverlayResampleFilter->SetOutputSpacing( m_Reader->GetOutput()->GetSpacing() );
+  m_OverlayResampleFilter->SetOutputOrigin( m_Reader->GetOutput()->GetOrigin() );
+  m_OverlayResampleFilter->SetSize( 
+      m_Reader->GetOutput()->GetLargestPossibleRegion().GetSize() );
+  m_OverlayResampleFilter->UpdateLargestPossibleRegion();
+  
+#ifdef INTERMEDIATE_OUTPUTS
+  // Write the extracted curves to a file... 
+  typedef itk::ImageFileWriter< PointSetImageType > OverlayWriterType;
+  OverlayWriterType::Pointer overlayWriter = OverlayWriterType::New();
+  overlayWriter->SetInput( m_OverlayResampleFilter->GetOutput() );
+  overlayWriter->SetFileName("Overlay.mhd");
+  overlayWriter->Update();
+#endif
+
+  m_ThresholdImageFilter->Update();
+
+  m_Viewer_Extracted_Points.SetOverlayColorIndex( 0 ); // Overlay with red points
+
   m_Viewer_Extracted_Points.SetImage( m_Reader->GetOutput() );  
+  m_Viewer_Extracted_Points.SetOverlay( m_ThresholdImageFilter->GetOutput() );  
+  m_Viewer_Extracted_Points.Update();
   m_Viewer_Extracted_Points.Show();
 
 }
@@ -581,7 +634,6 @@ ceExtractorConsole
 ::ResetViewOfExtractedParametricSpace( void )
 {
 
-  m_SpatialFunctionFilter->Update(); 
 
   fltk::GlWindowInteractive::Point3DType center;
   center[0] =   0;
@@ -633,7 +685,7 @@ ceExtractorConsole
   }
 
 
-  this->ShowStatus("Filtering Image with a Gaussian...");
+  this->ShowStatus("Executing.....");
 
   try 
     {
@@ -645,7 +697,7 @@ ceExtractorConsole
     }
 
 
-  this->ShowStatus("Filtering done ");
+  this->ShowStatus("Done ");
   
 }
 

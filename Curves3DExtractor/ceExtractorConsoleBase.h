@@ -19,10 +19,9 @@
 
 #include "itkImage.h"
 #include "itkRecursiveGaussianImageFilter.h"
-#include "itkAddImageFilter.h"
-#include "itkBinaryMagnitudeImageFilter.h"
+#include "itkTernaryMagnitudeImageFilter.h"
 #include "itkSmoothingRecursiveGaussianImageFilter.h"
-#include "itkGradientRecursiveGaussianImageFilter.h"
+#include "itkGradientMagnitudeRecursiveGaussianImageFilter.h"
 #include "itkHessianRecursiveGaussianImageFilter.h"
 #include "itkMultiplyImageFilter.h"
 #include "itkImageToParametricSpaceFilter.h"
@@ -38,38 +37,25 @@
 #include "itkSymmetricSecondRankTensor.h"
 #include "itkSymmetricEigenAnalysisImageFilter.h"
 #include "itkImageAdaptor.h"
-#include "itkAbsImageFilter.h"
-
+#include "itkCastImageFilter.h"
+#include "itkEigenMeasureSpatialFunction.h"
+#include "itkPointSetToImageFilter.h"
+#include "itkResampleImageFilter.h"
+#include "itkBinaryThresholdImageFilter.h"
+#include "itkJoinImageFilter.h"
+#include "PixelAccessors.h"
+#include "itkUnaryFunctorImageFilter.h"
 
 // Define which type of spatial function to use
 // Only one of the following lines should be uncommented.
-// # define SPHERE_FUNCTION
-#define FRUSTUM_FUNCTION
+#define  FRUSTUM_FUNCTION
+//# define SPHERE_FUNCTION
 
-// 
-// Eigenvalue pixel accessor to access vector of eigen value pixels 
-template< class TPixel >
-class EigenValueAccessor
-{
-public:
-  typedef TPixel                     InternalType;
-  typedef float                      ExternalType;
-  
-  inline ExternalType Get( const InternalType & input ) const 
-    {
-      return static_cast<ExternalType>( input[m_EigenIdx] );
-    }
-
-  void SetEigenIdx( unsigned int i )
-    {
-    m_EigenIdx = i;
-    }
-  
-private:
-  unsigned int m_EigenIdx;
-};
-
-
+// Write intermediate images for debug purposes 
+//    image of eigen values.
+//    ImageSpace-ParametricSpace map,
+//    ExtractedCurve points image.
+// #define INTERMEDIATE_OUTPUTS
 
 
 class ceExtractorConsoleBase 
@@ -79,6 +65,8 @@ public:
   typedef   double                            InputPixelType;
   typedef   double                            PixelType;
   typedef   unsigned char                     OverlayPixelType;
+  typedef   float                             MeshPixelType;
+  typedef   MeshPixelType                     EigenPixelType;
 
   itkStaticConstMacro(Dimension,unsigned int,3);
 
@@ -91,38 +79,19 @@ public:
   typedef   itk::Image< VectorType, Dimension >           VectorImageType;
   typedef   itk::Image< CovariantVectorType, Dimension >  CovariantVectorImageType;
 
-  typedef   itk::Point<float,Dimension>                   MeshPointDataType;
+  typedef   itk::Point< MeshPixelType, Dimension>         MeshPointDataType;
 
-  typedef   itk::Mesh< MeshPointDataType, 3 >     MeshType;
+  typedef   itk::Mesh< MeshPointDataType, 3 >             MeshType;
 
   typedef   itk::ImageFileReader< 
-                            InputImageType >      VolumeReaderType;
+                            InputImageType >              VolumeReaderType;
 
   typedef   itk::Mesh< MeshType::PointType, Dimension >   ImageSpaceMeshType;
 
-
-  typedef   itk::RecursiveGaussianImageFilter<
+  typedef   itk::GradientMagnitudeRecursiveGaussianImageFilter<
                             InputImageType,
-                            ImageType        > InputGaussianFilterType;
+                            ImageType        > GradientMagnitudeFilterType;
   
-  typedef   itk::RecursiveGaussianImageFilter<
-                            ImageType,
-                            ImageType         > GaussianFilterType;
-
-  typedef   itk::SmoothingRecursiveGaussianImageFilter<
-                            InputImageType,
-                            ImageType         > SmoothingGaussianFilterType;
-
-  typedef   itk::AddImageFilter< ImageType, 
-                            ImageType, ImageType >  AddFilterType;
-
-  typedef   itk::BinaryMagnitudeImageFilter< ImageType, 
-                            ImageType, ImageType >  ModulusFilterType;
-
-  typedef   itk::GradientRecursiveGaussianImageFilter< 
-                            InputImageType,
-                            CovariantVectorImageType >    GradientFilterType;
-
   typedef   itk::HessianRecursiveGaussianImageFilter< 
                             InputImageType >              HessianFilterType;
   typedef   HessianFilterType::OutputImageType            HessianImageType;
@@ -135,24 +104,27 @@ public:
   typedef   itk::SymmetricEigenAnalysisImageFilter< 
               HessianImageType, EigenValueImageType >     EigenAnalysisFilterType;
   
-  typedef   itk::MultiplyImageFilter< VectorImageType,
-                                      VectorImageType,
-                                      ImageType >  ScalarProductFilterType;
-
+  typedef itk::UnaryFunctorImageFilter< HessianImageType, ImageType,
+          Functor::HessianToLaplacianFunction< HessianPixelType, PixelType > >
+                                                          HessianToLaplacianImageFilter; 
+  
   typedef itk::ImageAdaptor<  EigenValueImageType, 
          EigenValueAccessor< EigenValueArrayType > > ImageAdaptorType;
 
-  // Just a dummy filter...
   typedef itk::Image< MeshPointDataType::ValueType, 
                     MeshPointDataType::PointDimension > 
                                       EachEigenValueImageType;
 
-  typedef itk::AbsImageFilter< ImageAdaptorType, 
-                               EachEigenValueImageType >  AbsImageFilterType;
+  typedef itk::CastImageFilter< ImageAdaptorType, 
+                               EachEigenValueImageType >  CastImageFilterType;
+
+  
+  typedef itk::ImageFileWriter< CastImageFilterType::OutputImageType > WriterType;
+  typedef itk::ImageFileWriter< CastImageFilterType::OutputImageType > EigenValueWriterType;
   
   typedef   itk::ImageToParametricSpaceFilter< EachEigenValueImageType, 
                                                MeshType > ParametricSpaceFilterType;
-
+  
   typedef   itk::RescaleIntensityImageFilter< ImageType, 
                                               ImageType > RescaleIntensityFilterType;
 
@@ -184,6 +156,7 @@ public:
    typedef  FrustumSpatialFunctionType         SpatialFunctionType;
    typedef  FrustumSpatialFunctionControlType  SpatialFunctionControlType;
 #endif
+
                                 
   typedef itk::InteriorExteriorMeshFilter<
                                         MeshType,
@@ -196,7 +169,20 @@ public:
                                       ImageSpaceMeshType 
                                       >         InverseParametricFilterType;
 
-  typedef GaussianFilterType::RealType     RealType;
+  typedef itk::PointSetToImageFilter< MeshType, ImageType > 
+                                              PointSetToImageFilterType;
+
+  typedef PointSetToImageFilterType::OutputImageType   PointSetImageType;
+
+  typedef itk::Image< OverlayPixelType, Dimension > OverlayImageType;
+  
+  typedef itk::ResampleImageFilter< PointSetImageType, PointSetImageType >
+                                        OverlayImageResampleFilterType;
+  
+  typedef itk::BinaryThresholdImageFilter< 
+    PointSetImageType,OverlayImageType >  ThresholdImageFilterType;
+
+  typedef GradientMagnitudeFilterType::RealType     RealType;
 
 public:
   ceExtractorConsoleBase();
@@ -212,43 +198,39 @@ public:
 protected:
   VolumeReaderType::Pointer               m_Reader;
 
-  InputGaussianFilterType::Pointer        m_Hx;
-  InputGaussianFilterType::Pointer        m_Hy;
-  InputGaussianFilterType::Pointer        m_Hz;
-
-  SmoothingGaussianFilterType::Pointer    m_Smooth;
-  GradientFilterType::Pointer             m_Gradient;
+  GradientMagnitudeFilterType::Pointer    m_GradientMagnitude;
+  
   HessianFilterType::Pointer              m_Hessian;
 
   EigenAnalysisFilterType::Pointer        m_EigenFilter;
 
-  GaussianFilterType::Pointer             m_H1x;
-  GaussianFilterType::Pointer             m_H1y;
-  GaussianFilterType::Pointer             m_H1z;
+  ImageAdaptorType::Pointer               m_EigenAdaptor1;
+  ImageAdaptorType::Pointer               m_EigenAdaptor2;
+  ImageAdaptorType::Pointer               m_EigenAdaptor3;
 
-  GaussianFilterType::Pointer             m_H2x;
-  GaussianFilterType::Pointer             m_H2y;
-  GaussianFilterType::Pointer             m_H2z;
+  CastImageFilterType::Pointer            m_EigenCastfilter1;
+  CastImageFilterType::Pointer            m_EigenCastfilter2;
+  CastImageFilterType::Pointer            m_EigenCastfilter3;
 
-  AddFilterType::Pointer                  m_Add;
+  HessianToLaplacianImageFilter::Pointer  m_Laplacian;
 
-  ModulusFilterType::Pointer              m_Modulus;
-
-  ScalarProductFilterType::Pointer        m_ScalarProduct;
-
-  RescaleIntensityFilterType::Pointer     m_RescaleIntensitySmoothed;
-  
-  RescaleIntensityFilterType::Pointer     m_RescaleIntensityMaxEigen;
-  
-  RescaleIntensityFilterType::Pointer     m_RescaleIntensityMedialness;
-  
   ParametricSpaceFilterType::Pointer      m_ParametricSpace;
-
+  
   SpatialFunctionFilterType::Pointer      m_SpatialFunctionFilter;
 
   SpatialFunctionControlType::Pointer     m_SpatialFunctionControl;
 
   InverseParametricFilterType::Pointer    m_InverseParametricFilter;
+
+  PointSetToImageFilterType::Pointer      m_PointSetToImageFilter;
+
+  OverlayImageResampleFilterType::Pointer m_OverlayResampleFilter;
+
+  ThresholdImageFilterType::Pointer       m_ThresholdImageFilter;
+
+  WriterType::Pointer                     m_Writer;
+
+  EigenValueWriterType::Pointer           m_EigenValueWriter;
 
   bool   m_ImageLoaded;
 
