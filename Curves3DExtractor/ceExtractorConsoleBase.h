@@ -18,12 +18,8 @@
 #define ce_FilterConsoleBase_h
 
 #include "itkImage.h"
-#include "itkRecursiveGaussianImageFilter.h"
-#include "itkTernaryMagnitudeImageFilter.h"
-#include "itkSmoothingRecursiveGaussianImageFilter.h"
 #include "itkGradientMagnitudeRecursiveGaussianImageFilter.h"
 #include "itkHessianRecursiveGaussianImageFilter.h"
-#include "itkMultiplyImageFilter.h"
 #include "itkImageToParametricSpaceFilter.h"
 #include "itkMesh.h"
 #include "itkImageFileReader.h"
@@ -38,7 +34,6 @@
 #include "itkSymmetricEigenAnalysisImageFilter.h"
 #include "itkImageAdaptor.h"
 #include "itkCastImageFilter.h"
-#include "itkEigenMeasureSpatialFunction.h"
 #include "itkPointSetToImageFilter.h"
 #include "itkResampleImageFilter.h"
 #include "itkBinaryThresholdImageFilter.h"
