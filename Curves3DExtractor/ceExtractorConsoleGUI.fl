@@ -19,55 +19,52 @@ class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
         xywh {5 5 995 255}
       } {
         Fl_Box {} {
-          xywh {215 152 55 10} box UP_BOX color 4
+          xywh {60 146 10 20} box UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {72 125 143 10} box UP_BOX color 4
+          xywh {60 191 10 25} box UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {211 48 60 10} box UP_BOX color 4
+          xywh {280 60 10 80} box UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {215 97 55 10} box UP_BOX color 4
+          xywh {90 125 193 10} box UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {210 48 10 115} box UP_BOX color 4
+          xywh {296 116 10 100} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {341 123 104 10} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {445 50 10 82} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {475 50 10 173} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {485 213 40 10} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {485 173 40 10} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {485 133 40 10} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {530 48 215 10} box UP_BOX color 4
         }
         Fl_Box {} {
           xywh {60 60 10 65} box UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {330 151 125 10} box UP_BOX color 4
-        }
-        Fl_Box {} {
-          xywh {465 204 355 10} box UP_BOX color 4
-        }
-        Fl_Box {} {
-          xywh {345 45 409 10} box UP_BOX color 4
-        }
-        Fl_Box {} {
           xywh {915 55 10 50} box UP_BOX color 4
-        }
-        Fl_Box {} {
-          xywh {810 55 10 160} box UP_BOX color 4
-        }
-        Fl_Box {} {
-          xywh {725 125 65 10} box UP_BOX color 4
         }
         Fl_Box {} {
           xywh {835 45 65 10} box UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {780 55 10 80} box UP_BOX color 4
-        }
-        Fl_Box {} {
           xywh {915 115 10 50} box UP_BOX color 4
-        }
-        Fl_Box {} {
-          xywh {465 160 10 55} box UP_BOX color 4
-        }
-        Fl_Box {} {
-          xywh {331 98 125 10} box UP_BOX color 4
         }
       }
       Fl_Group controlsGroup {selected
@@ -82,41 +79,47 @@ class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
         Fl_Counter sigmaCounter {
           label Sigma
           callback {SetSigma( o->value() );}
-          xywh {30 190 160 25} align 1 when 4 minimum -100 maximum 100 value 1
+          xywh {200 50 160 25} align 1 when 4 minimum -100 maximum 100 value 1
         }
         Fl_Light_Button gradientButton {
           label Gradient
           callback {this->ComputeGradient();}
-          xywh {260 90 100 25} type Normal value 1 selection_color 1
-          class {fltk::LightButton}
-        }
-        Fl_Light_Button smoothButton {
-          label Smooth
-          callback {ShowSmoothed();}
-          xywh {260 41 98 24} type Normal value 1 selection_color 1
+          xywh {20 166 80 25} type Normal value 1 selection_color 1
           class {fltk::LightButton}
         }
         Fl_Light_Button hessianButton {
           label Hessian
           callback {ComputeHessian();}
-          xywh {259 145 101 25} type Normal value 1 selection_color 1
+          xywh {240 116 101 25} type Normal value 1 selection_color 1
           class {fltk::LightButton}
         }
-        Fl_Button {} {
+        Fl_Light_Button laplacianButton {
+          label Laplacian
+          callback {ShowLaplacian();}
+          xywh {250 200 98 24} type Normal value 1 selection_color 1
+          class {fltk::LightButton}
+        }
+        Fl_Button eigenAnalysisButton {
           label {Eigen Analysis}
           callback {this->ComputeHessianEigenAnalysis();}
-          xywh {405 140 125 35} box ROUND_UP_BOX align 128
+          xywh {405 35 125 35} box ROUND_UP_BOX align 128
         }
-        Fl_Light_Button tubenessButton {
-          label Tubeness
-          callback {this->ShowTubeness();}
-          xywh {400 200 142 25} type Normal value 1 selection_color 1
+        Fl_Light_Button lambda1Button  {
+          label {Lamda_1 image}
+          callback {this->ShowLambda1();}
+          xywh {505 126 140 24} type Normal value 1 selection_color 1
           class {fltk::LightButton}
         }
-        Fl_Light_Button gradientOnEigenVectorButton {
-          label {Gradient || EigenVector}
-          callback {ShowGradientOnEigenVector();}
-          xywh {575 120 180 25} type Normal value 1 selection_color 1
+        Fl_Light_Button lambda2Button  {
+          label {Lamda_2 image}
+          callback {this->ShowLambda2();}
+          xywh {505 166 140 24} type Normal value 1 selection_color 1
+          class {fltk::LightButton}
+        }
+        Fl_Light_Button lambda3Button {
+          label {Lamda_3 image}
+          callback {this->ShowLambda3();}
+          xywh {505 206 140 24} type Normal value 1 selection_color 1
           class {fltk::LightButton}
         }
         Fl_Light_Button parametricSpaceButton {
@@ -143,9 +146,9 @@ class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
           class {fltk::LightButton}
         }
         Fl_Light_Button modulusButton {
-          label Modulus
+          label {Gradient Magnitude}
           callback {ShowGradientModulus();}
-          xywh {415 90 100 25} type Normal value 1 selection_color 1
+          xywh {10 216 170 25} type Normal value 1 selection_color 1
           class {fltk::LightButton}
         }
       }
@@ -189,11 +192,7 @@ class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
   } {}
   Function {ComputeHessian( void )} {return_type {virtual void}
   } {}
-  Function {ShowSmoothed( void )} {return_type {virtual void}
-  } {}
   Function {ShowTubeness( void )} {return_type {virtual void}
-  } {}
-  Function {ShowGradientOnEigenVector( void )} {return_type {virtual void}
   } {}
   Function {ShowParametricSpace( void )} {return_type {virtual void}
   } {}
@@ -204,6 +203,12 @@ class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
   Function {ShowExtractedParametricPoints( void )} {return_type {virtual void}
   } {}
   Function {ComputeHessianEigenAnalysis( void )} {return_type {virtual void}
+  } {}
+  Function {ShowLambda1( void )} {return_type {virtual void}
+  } {}
+  Function {ShowLambda2( void )} {return_type {virtual void}
+  } {}
+  Function {ShowLambda3( void )} {return_type {virtual void}
   } {}
   Function {ComputeGradient( void )} {return_type {virtual void}
   } {}
