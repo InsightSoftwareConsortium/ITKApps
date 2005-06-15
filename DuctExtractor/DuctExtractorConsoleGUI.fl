@@ -2,7 +2,7 @@
 version 1.0106 
 header_name {.h} 
 code_name {.cxx}
-class DuctExtractorConsoleGUI {open selected : {public DuctExtractorConsoleBase}
+class DuctExtractorConsoleGUI {open : {public DuctExtractorConsoleBase}
 } {
   Function {DuctExtractorConsoleGUI()} {} {
     Fl_Window consoleWindow {
@@ -69,15 +69,10 @@ class DuctExtractorConsoleGUI {open selected : {public DuctExtractorConsoleBase}
           xywh {357 85 74 30} type Normal value 1 selection_color 1
           class {fltk::LightButton}
         }
-        Fl_Value_Input lowerThresholdInput {
-          label Lower
-          callback {this->SetRegionGrowingLowerThreshold( o->value() );}
-          xywh {402 59 53 23} minimum -50 maximum 50 step 0.01
-        }
         Fl_Value_Input upperThresholdInput {
-          label Upper
+          label Threshold
           callback {this->SetRegionGrowingUpperThreshold( o->value() );}
-          xywh {402 35 53 23} minimum -50 maximum 50 step 0.01 value 1
+          xywh {370 60 53 23} align 1 minimum -50 maximum 50 step 0.01 value 1
         }
         Fl_Counter {} {
           label Iterations

@@ -34,6 +34,7 @@ DuctExtractorConsoleBase
   m_Laplacian     = LaplacianFilterType::New();
   m_Smoother      = SmoothingFilterType::New();
   m_RegionGrower  = RegionGrowthFilterType::New();
+  m_Statistics    = StatisticsFilterType::New();
 
   m_Laplacian->SetSigma( 2.5 );
 
@@ -47,6 +48,9 @@ DuctExtractorConsoleBase
   m_Smoother->SetInput(  m_Reader->GetOutput()   );
   m_Laplacian->SetInput( m_Smoother->GetOutput() );
   m_RegionGrower->SetInput( m_Laplacian->GetOutput() );
+  m_Statistics->SetInput( m_Laplacian->GetOutput() );
+
+  m_RegionGrower->SetLowerInput( m_Statistics->GetMinimumOutput() );
 
   m_Writer_Segmentation        = VolumeWriterType::New();
 

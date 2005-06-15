@@ -23,6 +23,7 @@
 #include "itkLaplacianRecursiveGaussianImageFilter.h"
 #include "itkCurvatureFlowImageFilter.h"
 #include "itkConnectedThresholdImageFilter.h"
+#include "itkStatisticsImageFilter.h"
 
 class DuctExtractorConsoleBase 
 {
@@ -52,6 +53,9 @@ public:
 
   typedef   LaplacianFilterType::RealType    RealType;
 
+
+  typedef   itk::StatisticsImageFilter< ImageType >  StatisticsFilterType;
+                                               
 
   typedef   itk::ConnectedThresholdImageFilter< 
                                           ImageType, 
@@ -84,6 +88,7 @@ protected:
   LaplacianFilterType::Pointer       m_Laplacian;
   SmoothingFilterType::Pointer       m_Smoother;
   RegionGrowthFilterType::Pointer    m_RegionGrower;
+  StatisticsFilterType::Pointer      m_Statistics;
 
   bool                               m_ImageFileNameAvailable;
 

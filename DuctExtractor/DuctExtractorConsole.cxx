@@ -49,7 +49,7 @@ DuctExtractorConsole
   m_Viewer_Region_Growth->SetLabel( "Region Growth" );
 
   
-  m_Viewer_Smoothed->ClickSelectCallBack( ClickSelectCallback, (void *)this);
+  m_Viewer_Input->ClickSelectCallBack( ClickSelectCallback, (void *)this);
 
   
   progressSlider->Observe( m_Smoother.GetPointer() );
