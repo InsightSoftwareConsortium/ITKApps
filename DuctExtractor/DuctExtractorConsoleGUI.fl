@@ -1,0 +1,128 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0106 
+header_name {.h} 
+code_name {.cxx}
+class DuctExtractorConsoleGUI {open selected : {public DuctExtractorConsoleBase}
+} {
+  Function {DuctExtractorConsoleGUI()} {} {
+    Fl_Window consoleWindow {
+      label {Duct Extractor Console}
+      xywh {485 557 495 265} type Double
+      code0 {\#include <DuctExtractorConsoleBase.h>}
+      code1 {\#include <fltkLightButton.h>} visible
+    } {
+      Fl_Group Connectors {
+        xywh {0 0 485 190}
+      } {
+        Fl_Box {} {
+          xywh {72 96 74 10} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {195 96 70 10} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {60 47 10 58} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {314 96 70 10} box UP_BOX color 4
+        }
+      }
+      Fl_Group controlsGroup {
+        xywh {0 16 485 178} deactivate
+      } {
+        Fl_Button {} {
+          label Execute
+          callback {Execute();}
+          xywh {198 149 80 30} box ROUND_UP_BOX
+        }
+        Fl_Counter {} {
+          label {Expected Duct Diameter}
+          callback {SetSigma( o->value() );}
+          xywh {25 151 160 28} align 1 minimum 0 maximum 100 value 2.5
+        }
+        Fl_Button {} {
+          label Cancel
+          callback {Cancel();}
+          xywh {290 149 80 30} box ROUND_UP_BOX
+        }
+        Fl_Light_Button inputButton {
+          label Input
+          callback {ShowInput();}
+          xywh {27 85 71 30} type Normal value 1 selection_color 1
+          class {fltk::LightButton}
+        }
+        Fl_Light_Button laplacianButton {
+          label Laplacian
+          callback {this->ShowLaplacian();}
+          xywh {241 85 89 30} type Normal value 1 selection_color 1
+          class {fltk::LightButton}
+        }
+        Fl_Light_Button smoothedButton {
+          label Smoothed
+          callback {this->ShowSmoothed();}
+          xywh {127 85 90 30} type Normal value 1 selection_color 1
+          class {fltk::LightButton}
+        }
+        Fl_Light_Button regionGrowthButton {
+          label Growth
+          callback {this->ShowRegionGrowth();}
+          xywh {357 85 74 30} type Normal value 1 selection_color 1
+          class {fltk::LightButton}
+        }
+        Fl_Value_Input lowerThresholdInput {
+          label Lower
+          callback {this->SetRegionGrowingLowerThreshold( o->value() );}
+          xywh {402 59 53 23} minimum -50 maximum 50 step 0.01
+        }
+        Fl_Value_Input upperThresholdInput {
+          label Upper
+          callback {this->SetRegionGrowingUpperThreshold( o->value() );}
+          xywh {402 35 53 23} minimum -50 maximum 50 step 0.01 value 1
+        }
+        Fl_Counter {} {
+          label Iterations
+          callback {this->SetSmoothingNumberOfIterations( (unsigned int) o->value() );}
+          xywh {131 59 78 24} type Simple align 1 minimum 1 maximum 300 step 1 value 5
+        }
+        Fl_Button {} {
+          label {@2}
+          callback {this->WriteSegmentation();}
+          xywh {432 85 23 30}
+        }
+      }
+      Fl_Slider progressSlider {
+        xywh {5 210 480 15} type {Horz Fill} selection_color 2
+        code0 {\#include <fltkProgressBar.h>}
+        class {fltk::ProgressBar}
+      }
+      Fl_Output statusTextOutput {
+        xywh {5 231 480 24}
+      }
+      Fl_Button {} {
+        label Quit
+        callback {Quit();}
+        xywh {382 149 80 30} box ROUND_UP_BOX
+      }
+      Fl_Light_Button loadButton {
+        label Load
+        callback {Load();}
+        xywh {27 35 71 30} type Normal value 1 selection_color 1
+        class {fltk::LightButton}
+      }
+    }
+  }
+  Function {~DuctExtractorConsoleGUI()} {return_type virtual
+  } {}
+  Function {Quit( void )} {return_type {virtual void}
+  } {}
+  Function {Load( void )} {return_type {virtual void}
+  } {}
+  Function {ShowInput( void )} {return_type {virtual void}
+  } {}
+  Function {ShowLaplacian( void )} {return_type {virtual void}
+  } {}
+  Function {ShowSmoothed( void )} {return_type {virtual void}
+  } {}
+  Function {ShowRegionGrowth( void )} {return_type {virtual void}
+  } {}
+} 
