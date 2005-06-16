@@ -10,7 +10,7 @@
 #include "vtkPolyData.h"
 #include "vtkPoints.h"
 #include "vtkImageMarchingCubes.h"
-#include "vtkDecimate.h"
+#include "vtkDecimatePro.h"
 
 #include "vtkImageImport.h"
 #include "vtkPolyDataWriter.h"
@@ -159,14 +159,9 @@ DeformableModelApplication
   vmarchingcubes->SetInputMemoryLimit(1000);
   vmarchingcubes->Update();
 
-  vtkDecimate* vdecimate = vtkDecimate::New(); 
+  vtkDecimatePro* vdecimate = vtkDecimatePro::New(); 
   vdecimate->SetInput(vmarchingcubes->GetOutput()); 
   vdecimate->SetTargetReduction(0.90); //compression factor, closer to 1 higher compression)
-  vdecimate->SetAspectRatio(20);
-  vdecimate->SetInitialError(0.02); //control decimate criterion initially set
-  vdecimate->SetErrorIncrement(0.05); //decimation criterion is incremented at each iteration
-  vdecimate->SetMaximumIterations(6); 
-  vdecimate->SetInitialFeatureAngle(35); //smaller angle ->more surface detail
   vdecimate->Update();
   
   //
