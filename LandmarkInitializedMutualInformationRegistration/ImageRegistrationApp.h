@@ -40,7 +40,6 @@ class ImageRegistrationApp : public Object
     typedef typename NoneRegistratorType::TransformType 
                                                       NoneRegTransformType;
 
-    typedef MomentRegistrator< TImage >               MassRegistratorType;
     typedef MomentRegistrator< TImage >               CenterRegistratorType;
     typedef typename CenterRegistratorType::TransformType 
                                                       CenterRegTransformType;
