@@ -24,6 +24,7 @@
 #include "itkRGBPixel.h"
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
+#include "vtkImageData.h"
 
 #include "vtkImageImport.h"
 #include "vtkImageExport.h"
