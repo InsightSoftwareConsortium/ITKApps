@@ -72,9 +72,16 @@ TARGET_LINK_LIBRARIES( DeformableModelSimplexMesh
   vtkGraphics
   vtkImaging
   vtkIO
-  vtkHybrid 
   vtkRendering
   ${FLTK_LIBRARIES}
   )
 
+  # Stuff was moved from vtkHybrid to vtkWidgets
+  # Link against vtkWidgets if it is found, otherwise link against the older
+  # library, vtkHybrid .
+  IF(VTK_KITS MATCHES WIDGETS)
+    TARGET_LINK_LIBRARIES(DeformableModelSimplexMesh vtkWidgets)
+  ELSE(VTK_KITS MATCHES WIDGETS)
+    TARGET_LINK_LIBRARIES(DeformableModelSimplexMesh vtkHybrid)
+  ENDIF(VTK_KITS MATCHES WIDGETS)
 
