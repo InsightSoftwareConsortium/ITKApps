@@ -23,6 +23,7 @@
 #include "vtkImageReader.h"
 #include "vtkImageExport.h"
 #include "vtkTransform.h"
+#include "vtkImageData.h"
 
 // itk classes
 #include "itkExceptionObject.h"
@@ -368,7 +369,7 @@ int main(int argc, char **argv)
 
 void print_usage()
 {
-  std::cerr << "RegisterAD $Revision: 1.8 $  $Date: 2004-02-19 03:49:52 $"  << std::endl;
+  std::cerr << "RegisterAD $Revision: 1.9 $  $Date: 2005-07-12 15:50:46 $"  << std::endl;
 
   std::cerr <<  " usage: RegisterAD" << std::endl;
   std::cerr <<  "    --study1Prefix prefix" << std::endl;
