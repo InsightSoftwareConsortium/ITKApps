@@ -3,5 +3,13 @@ FOREACH(exe vtk2itk vtk2itkDouble itkCurvatureFlowToVTK
             vtkPolyDataToITKMesh itkReadITKImageSegmentShowVTK 
             itkReadITKImage3DSegmentShowVTK)
   ADD_EXECUTABLE(${exe} ${exe}.cxx)
-  TARGET_LINK_LIBRARIES(${exe} ITKBasicFilters ITKIO vtkRendering vtkIO vtkWidgets)
+ 
+  # Stuff was moved from vtkHybrid to vtkWidgets
+  # Link against vtkWidgets if it is found, otherwise link against the older
+  # library, vtkHybrid .
+  IF(VTK_KITS MATCHES WIDGETS)
+    TARGET_LINK_LIBRARIES(${exe} ITKBasicFilters ITKIO vtkRendering vtkIO vtkWidgets)
+  ELSE(VTK_KITS MATCHES WIDGETS)
+    TARGET_LINK_LIBRARIES(${exe} ITKBasicFilters ITKIO vtkRendering vtkIO vtkHybrid)
+  ENDIF(VTK_KITS MATCHES WIDGETS)
 ENDFOREACH(exe)
