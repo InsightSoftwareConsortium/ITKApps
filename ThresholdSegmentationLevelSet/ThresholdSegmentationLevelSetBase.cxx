@@ -44,7 +44,7 @@ ThresholdSegmentationLevelSetBase
   m_ThresholdLevelSetFilter->SetLowerThreshold(50);
 
   m_ThresholdLevelSetFilter->SetMaximumRMSError(0.02);
-  m_ThresholdLevelSetFilter->SetMaximumIterations(1000);
+  m_ThresholdLevelSetFilter->SetNumberOfIterations(1000);
 
   m_ThresholdLevelSetFilter->SetIsoSurfaceValue(0.5); 
 

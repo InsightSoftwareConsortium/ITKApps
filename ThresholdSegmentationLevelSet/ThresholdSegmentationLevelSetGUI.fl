@@ -95,7 +95,7 @@ class ThresholdSegmentationLevelSetGUI {open : {public ThresholdSegmentationLeve
       }
       Fl_Value_Input maxIterationsValueInput {
         label {Max Iterations}
-        callback {m_ThresholdLevelSetFilter->SetMaximumIterations( static_cast<int>(o->value()) );}
+        callback {m_ThresholdLevelSetFilter->SetNumberOfIterations( static_cast<int>(o->value()) );}
         xywh {486 13 55 25} labelsize 12 minimum 1 maximum 10000 step 1 value 200 textsize 12
       }
       Fl_Value_Input maxRMSValueInput {
