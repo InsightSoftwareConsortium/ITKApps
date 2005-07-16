@@ -158,7 +158,9 @@ SUBDIRS(StreamedWatershedSegmentation/ParameterFileParser)
 #SUBDIRS(StreamedWatershedSegmentation)
 
 # Build the AntiAliasBinaryImageFilter example
+IF(NOT BORLAND)
 SUBDIRS(AntiAliasBinaryImageFilter)
+ENDIF(NOT BORLAND)
 
 # Build the SimpleLevelSetsExample
 IF(NOT BORLAND)
@@ -185,7 +187,9 @@ SUBDIRS(MultichannelTissueClassificationValidation)
 ENDIF(NOT BORLAND)
 
 # Build the DICOMApp example to output raw and png versions of DICOM file
+IF(NOT BORLAND)
 SUBDIRS(DICOMApp)
+ENDIF(NOT BORLAND)
 
 #Build the examples of various fourth-order level set PDEs 
 IF(NOT BORLAND)
@@ -269,9 +273,9 @@ IF(VTK_FOUND)
   ENDIF(FLTK_FOUND)
 
   IF(VTK_WRAP_TCL)
-    SUBDIRS(MRIRegistration vtkITK)
+    SUBDIRS(MRIRegistration)
     IF(NOT BORLAND)
-      SUBDIRS(SegmentationEditor)
+      SUBDIRS(SegmentationEditor vtkITK)
     ENDIF(NOT BORLAND)
   ENDIF(VTK_WRAP_TCL)
   
