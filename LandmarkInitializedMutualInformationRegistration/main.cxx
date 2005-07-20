@@ -3,6 +3,7 @@
 #include "ImageRegistrationApp.h"
 #include <time.h>
 #include <string>
+#include "metaCommand.h"
 
 int usage()
   {
@@ -44,17 +45,54 @@ int main(int argc, char **argv)
   {
   if(argc > 1)
     {
-    if(argc < 3)
+
+    MetaCommand command;
+
+    command.SetOption("RegistrInit","I",false,"Registration initialization (Default is Centers of Mass)");
+    command.AddOptionField("RegistrInit","init",MetaCommand::INT,false,"2");
+  
+    command.SetOption("transform","tr",false,"specification of the transform");
+    command.AddOptionField("transform","filename",MetaCommand::STRING,true);
+
+    command.SetOption("RegistrMethod","R",false,"Registration Method (Default is Rigid)");
+    command.AddOptionField("RegistrMethod","method",MetaCommand::INT,false,"1");
+    
+    command.SetOption("-O","O",false,"Default is One plus One + Powell line search");
+    command.AddOptionField("-O","option",MetaCommand::INT,false,"2");
+    
+    command.SetOption("iterations","i",false,"# of iterations for optimizer [1000]");
+    command.AddOptionField("iterations","nb",MetaCommand::INT,false,"500");
+
+    command.SetOption("samples","s",false,"# of samples for MI computation [20000]");
+    command.AddOptionField("samples","nb",MetaCommand::INT,false,"20000");
+
+    command.SetOption("file","L",false,"<fixedLandmarksfile> <movingLandmarksfile>");
+    command.AddOptionField("file","fixedLandmarksfile",MetaCommand::STRING,true);
+    command.AddOptionField("file","movingLandmarksfile",MetaCommand::STRING,true);
+
+    command.SetOption("saveTrans","T",false,"save registration transform");
+    command.AddOptionField("saveTrans","filename",MetaCommand::STRING,true);
+
+    command.SetOption("saveMove","W",false,"save registered moving image");
+    command.AddOptionField("saveMove","filename",MetaCommand::STRING,true);
+
+  // Fields are added in order
+    command.AddField("fixedImage","fixedImage filename",MetaCommand::STRING,true);
+    command.AddField("movingImage","movingImage filename",MetaCommand::STRING,true);
+    
+    if(!command.Parse(argc,argv))
       {
-      return usage();
+      return 1;
       }
 
-    unsigned long iterations = 500;
-    unsigned long samples = 20000;
+ 
+  
+//  unsigned long iterations = 500;
+//    unsigned long samples = 20000;
 
-    int initializationMethod = 2;
-    int registrationMethod = 1;
-    int optimizationMethod = 2;
+//    int initializationMethod = 2;
+//    int registrationMethod = 1;
+//    int optimizationMethod = 2;
 
     char fixedImageFilename[255];
     char movingImageFilename[255];
@@ -73,7 +111,23 @@ int main(int argc, char **argv)
     char outputTransformFilename[255];
     outputTransformFilename[0] = '\0';
 
-    int argNum = 1;
+    int initializationMethod = command.GetValueAsInt("RegistrInit","init");
+    if( initializationMethod == 5 )
+    {
+      loadedTransformFilename[0]=command.GetValueAsString("transform","filename");
+    }
+    int registrationMethod = command.GetValueAsInt("RegistrMethod","method");
+    int optimizationMethod = command.GetValueAsInt("-O","option");
+    unsigned long iterations = command.GetValueAsInt("iterations","nb");
+    unsigned long samples = command.GetValueAsInt("samples","nb");
+    strcpy(fixedLandmarksFilename,command.GetValueAsString("file","fixedLandmarksfile").c_str());
+    strcpy(outputTransformFilename,command.GetValueAsString("saveTrans","filename").c_str());
+    strcpy(outputImageFilename,command.GetValueAsString("saveMove","filename").c_str());
+
+    strcpy(fixedImageFilename, command.GetValueAsString("fixedImage").c_str());
+    strcpy(movingImageFilename, command.GetValueAsString("movingImage").c_str());
+    
+/*  int argNum = 1;
     while (argNum < argc-3 && argv[argNum][0] == '-')
       {
       switch(argv[argNum][1])
@@ -131,7 +185,7 @@ int main(int argc, char **argv)
 
     strcpy(fixedImageFilename, argv[argNum++]);
     strcpy(movingImageFilename, argv[argNum++]);
-
+*/
     typedef itk::Image<short, 3>            ImageType;
     typedef ImageRegistrationApp<ImageType> ImageRegistrationAppType;
     typedef itk::LandmarkSpatialObject<3>   LandmarkType;
@@ -255,9 +309,11 @@ int main(int argc, char **argv)
         break;
       case 5:
         typedef ImageRegistrationAppType::LoadedRegTransformType LoadedTType;
+        loadedTransformNumber = 1;
         for(int i=0; i<abs(loadedTransformNumber); i++)
           {
           GroupReaderType::Pointer transformReader = GroupReaderType::New();
+          std::cout << "Loading Transform: " << loadedTransformFilename[i].c_str() << std::endl;
           transformReader->SetFileName(loadedTransformFilename[i].c_str());
           transformReader->Update();
           GroupType::Pointer group = transformReader->GetGroup();
