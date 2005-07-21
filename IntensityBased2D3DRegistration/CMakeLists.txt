@@ -17,3 +17,6 @@ ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 ADD_EXECUTABLE(IntensityBased2D3DRegistration IntensityBased2D3DRegistration.cxx)
 TARGET_LINK_LIBRARIES( IntensityBased2D3DRegistration ITKNumerics ITKIO )
+
+ADD_EXECUTABLE(GenerateProjection GenerateProjection.cxx)
+TARGET_LINK_LIBRARIES( GenerateProjection ITKNumerics ITKIO )
