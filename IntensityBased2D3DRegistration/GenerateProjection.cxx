@@ -306,10 +306,11 @@ int main( int argc, char *argv[] )
 
   imageReader3D->SetFileName( fileVolume3D );
 
-  typedef itk::CastImageFilter< 
-                        ImageType2D, InternalImageType > CastFilterType2D;
-  typedef itk::CastImageFilter< 
-                        ImageType3D, InternalImageType > CastFilterType3D;
+  typedef itk::CastImageFilter< ImageType2D, 
+                                InternalImageType > CastFilterType2D;
+
+  typedef itk::CastImageFilter< ImageType3D, 
+                                InternalImageType > CastFilterType3D;
 
   CastFilterType3D::Pointer caster3D = CastFilterType3D::New();
 
@@ -366,9 +367,11 @@ int main( int argc, char *argv[] )
 
   size2D[0] = 256;
   size2D[1] = 256;
+  size2D[2] =   1;
 
   resolution2D[0] = 1.0;
   resolution2D[1] = 1.0;
+  resolution2D[2] = 1.0;
 
   origin2D[0] = origin3D[0] + o2Dx - resolution2D[0]*((double) size2D[0] - 1.)/2.; 
   origin2D[1] = origin3D[1] + o2Dy - resolution2D[1]*((double) size2D[1] - 1.)/2.; 
