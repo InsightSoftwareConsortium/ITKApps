@@ -49,13 +49,12 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
-
-
-ADD_EXECUTABLE( CellularSegmentation ${APPLICATION_SOURCES})
-
 FLTK_WRAP_UI(CellularSegmentation 
   CellularSegmentationApplicationGUI.fl 
   )
+
+ADD_EXECUTABLE( CellularSegmentation ${APPLICATION_SOURCES}
+   ${CellularSegmentation_FLTK_UI_SRCS})
 
 
 INCLUDE_DIRECTORIES(

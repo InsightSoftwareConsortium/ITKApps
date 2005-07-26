@@ -38,6 +38,6 @@ ITK_DISABLE_FLTK_GENERATED_WARNINGS(ceExtractorConsoleGUI.fl)
 TARGET_LINK_LIBRARIES(Curves2DExtractorLib
                       ITKBasicFilters ITKIO ITKFltkImageViewer)
 
-ADD_GUI_EXECUTABLE(Curves2DExtractor main.cxx)
+ADD_GUI_EXECUTABLE(Curves2DExtractor main.cxx ${Curves2DExtractor_FLTK_UI_SRCS})
 TARGET_LINK_LIBRARIES(Curves2DExtractor Curves2DExtractorLib)
 
