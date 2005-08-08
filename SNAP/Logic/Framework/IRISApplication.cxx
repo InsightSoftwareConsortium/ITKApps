@@ -385,9 +385,11 @@ IRISApplication
         break;
       };
 
-    // Set the image sizes and spacing
+    // Set the image sizes and spacing. We are creating an image of the 
+    // dimensions of the ROI defined in the IRIS image space. 
     fltSample->SetSize(roi.GetROI().GetSize());
     fltSample->SetOutputSpacing(target->GetSpacing());
+    fltSample->SetOutputOrigin(source->GetOrigin());
 
     // Watch the segmentation progress
     if(progressCommand) 
@@ -398,7 +400,7 @@ IRISApplication
 
     // Perform resampling
     fltSample->UpdateLargestPossibleRegion();
-
+    
     // Change the source to the output
     source = fltSample->GetOutput();
     }  
