@@ -1,5 +1,5 @@
 /*
- * DicomFilter.java
+ * DICOMFilter.java
  * 
  * Id
  * 
@@ -93,7 +93,7 @@ public class DicomFilter extends MediaFilter
           InputStream zipp = new BufferedInputStream(source);   
      
           // create a "temp" folder and give its path
-          OutputStream out = new  FileOutputStream ("/usr/local/dhaval/dicom/dicomout.dcm"); 
+          OutputStream out = new  FileOutputStream ("/tmp/dicomout.dcm"); 
  
           // create a buffer     
           byte[]  buffer = new byte[1024];  
@@ -111,9 +111,9 @@ public class DicomFilter extends MediaFilter
           // system call to the DicomReadWrite executable
           String[] cmd = 
 		  {
-            "/usr/local/dhaval/dicom/DicomGenerateThumbnail ",
-            "/usr/local/dhaval/dicom/dicomout.dcm",
-            "/usr/local/dhaval/dicom/dhavaloutput.jpg"
+            "DicomThumbnailGenerator ",
+            "/tmp/dicomout.dcm",
+            "/tmp/dicomoutput.jpg"
           };
                                                                                                                              
           Process p =  Runtime.getRuntime().exec(cmd);
@@ -126,7 +126,7 @@ public class DicomFilter extends MediaFilter
                                                                                                                              
           // read the output
     
-          File f = new File("/usr/local/dhaval/dicom/dicomheader.txt");
+          File f = new File("/tmp/dicomheader.txt");
           BufferedWriter writer = new BufferedWriter(new FileWriter(f));       
                                                                                                          
           String line;
@@ -160,7 +160,7 @@ public class DicomFilter extends MediaFilter
           }
 
 
-         File fo = new File("/usr/local/dhaval/dicom/dhavaloutput.jpg");
+         File fo = new File("/tmp/dicomoutput.jpg");
          BufferedImage buf = ImageIO.read(fo);
          buf.flush();
         

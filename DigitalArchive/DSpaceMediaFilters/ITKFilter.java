@@ -1,5 +1,5 @@
 /*
- * ITKFilter.java
+ * METAIOFilter.java
  * 
  * Id
  * 
@@ -94,7 +94,7 @@ public class ITKFilter extends MediaFilter
          InputStream zipp = new BufferedInputStream(source);   
      
          // create a "temp" folder and give its path
-         OutputStream out = new  FileOutputStream("/usr/local/dhaval/metaimage/metaioout.mha"); 
+         OutputStream out = new  FileOutputStream("/tmp/itkout.mha"); 
  
          // create a buffer
      
@@ -112,9 +112,9 @@ public class ITKFilter extends MediaFilter
           // system call to the ITKReadWrite executable
          String[] cmd = 
 		 {
-            "/usr/local/dhaval/metaimage/GenerateThumbnail",
-            "/usr/local/dhaval/metaimage/metaioout.mha",
-            "/usr/local/dhaval/metaimage/metaiooutput.jpg"
+            "/tmp/ITKThumbnailGenerator",
+            "/tmp/itkout.mha",
+            "/tmp/itkoutput.jpg"
          };
                                                                                                                              
          Process p =  Runtime.getRuntime().exec(cmd);
@@ -158,7 +158,7 @@ public class ITKFilter extends MediaFilter
                 System.err.println(e);
          }
 
-         File fo = new File("/usr/local/dhaval/metaimage/metaiooutput.jpg");
+         File fo = new File("/tmp/itkoutput.jpg");
          BufferedImage buf = ImageIO.read(fo);
          buf.flush();
         

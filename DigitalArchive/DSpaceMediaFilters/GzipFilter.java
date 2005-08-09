@@ -1,5 +1,5 @@
 /*
- * GzipFilter.java
+ * GZIPFilter.java
  * 
  * Id
  * 
@@ -102,7 +102,7 @@ public class GzipFilter extends MediaFilter
         String entryName = tarentry.getName();
    
         // create a "temp" folder and give its path
-        String filename = "/usr/local/dhaval/metaimage/";
+        String filename = "/tmp/";
 
         while (tarentry != null)
 		{
@@ -133,9 +133,9 @@ public class GzipFilter extends MediaFilter
          // system call to the ITKReadWrite executable
         String[] cmd = 
 		{
-          "/usr/local/dhaval/metaimage/GenerateThumbnail",
-          "/usr/local/dhaval/metaimage/" + entryName,
-          "/usr/local/dhaval/metaimage/dhavaloutput.jpg"
+          "ITKThumbnailGenerator",
+          "/tmp/" + entryName,
+          "/tmp/gzipoutput.jpg"
         };
                                                                                                                              
         Process p =  Runtime.getRuntime().exec(cmd);
@@ -148,7 +148,7 @@ public class GzipFilter extends MediaFilter
                                                                                                                              
        // read the output
     
-       //   File f = new File("/usr/local/dhaval/metaimage/dicomheader.txt");
+       //   File f = new File("/tmp/dicomheader.txt");
        //   BufferedWriter writer = new BufferedWriter(new FileWriter(f));
       
        //   writer.write(" The Header Contents of the File "+ entryName + " Selected for Generating Thumbnail is ");
@@ -184,7 +184,7 @@ public class GzipFilter extends MediaFilter
 
        tin.close();
 
-       File fo = new File("/usr/local/dhaval/metaimage/dhavaloutput.jpg");
+       File fo = new File("/tmp/gzipoutput.jpg");
        BufferedImage buf = ImageIO.read(fo);
        buf.flush();
         

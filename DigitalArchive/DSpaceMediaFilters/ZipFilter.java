@@ -113,7 +113,7 @@ public class ZipFilter extends MediaFilter
        }
 
        // create a "temp" folder and give its path
-       String filename = "/usr/local/dhaval/dicom/";
+       String filename = "/tmp/";
        OutputStream out = new  FileOutputStream ( filename + entryName); 
  
        // create a buffer
@@ -132,9 +132,9 @@ public class ZipFilter extends MediaFilter
         // system call to the DicomReadWrite executable
        String[] cmd = 
 	   {
-          "/usr/local/dhaval/dicom/DicomGenerateThumbnail",
+          "/tmp/ITKThumbnailGenerator",
           filename + entryName,
-         "/usr/local/dhaval/dicom/dhavaloutput.jpg"
+         "/tmp/zipoutput.jpg"
        };
                                                                                                                              
        Process p =  Runtime.getRuntime().exec(cmd);
@@ -147,7 +147,8 @@ public class ZipFilter extends MediaFilter
                                                                                                                              
        // read the output
     
-      File f = new File("/usr/local/dhaval/dicom/dicomheader.txt");
+/*
+      File f = new File("/tmp/dicomheader.txt");
       BufferedWriter writer = new BufferedWriter(new FileWriter(f));
       
       writer.write(" The Header Contents of the File "+ entryName + " Selected for Generating Thumbnail is ");
@@ -165,6 +166,7 @@ public class ZipFilter extends MediaFilter
       }
                               
       writer.close(); //close to unlock and flush to disk
+*/
                                                                                                                              
       // check for DicomReadWrite failure
                                                                                                                              
@@ -182,7 +184,7 @@ public class ZipFilter extends MediaFilter
                 System.err.println(e);
       }
 
-      File fo = new File("/usr/local/dhaval/dicom/dhavaloutput.jpg");
+      File fo = new File("/tmp/zipoutput.jpg");
       BufferedImage buf = ImageIO.read(fo);
       buf.flush();
         
