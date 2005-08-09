@@ -1,5 +1,5 @@
 /*
- * DICOMFilter.java
+ * DicomFilter.java
  * 
  * Id
  * 
@@ -36,6 +36,7 @@
  */
 package org.dspace.app.mediafilter;
 
+import java.awt.image.BufferedImage;
 import java.awt.Graphics2D;
 import javax.swing.*;
 import java.awt.*;
@@ -45,7 +46,7 @@ import java.io.*;
 
 import org.dspace.core.ConfigurationManager;
 
-public class DICOMFilter extends MediaFilter
+public class DicomFilter extends MediaFilter
 {
      /**
      * @param filename

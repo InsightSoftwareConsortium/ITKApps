@@ -1,5 +1,5 @@
 /*
- * METAIOFilter.java
+ * ITKFilter.java
  * 
  * Id
  * 
@@ -36,6 +36,7 @@
  */
 package org.dspace.app.mediafilter;
 
+import java.awt.image.BufferedImage;
 import java.awt.Graphics2D;
 import javax.swing.*;
 import java.awt.*;
@@ -46,7 +47,7 @@ import java.io.*;
 import org.dspace.core.ConfigurationManager;
 
 
-public class METAIOFilter extends MediaFilter 
+public class ITKFilter extends MediaFilter 
      {
      /**
      * @param filename

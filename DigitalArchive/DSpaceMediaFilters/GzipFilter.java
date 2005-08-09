@@ -1,5 +1,5 @@
 /*
- * GZIPFilter.java
+ * GzipFilter.java
  * 
  * Id
  * 
@@ -36,6 +36,7 @@
  */
 package org.dspace.app.mediafilter;
 
+import java.awt.image.BufferedImage;
 import java.awt.Graphics2D;
 import javax.swing.*;
 import java.awt.*;
@@ -49,7 +50,7 @@ import javax.activation.*;
 
 import org.dspace.core.ConfigurationManager;
 
-public class GZIPFilter extends MediaFilter 
+public class GzipFilter extends MediaFilter 
 {
      /**
      * @param filename
