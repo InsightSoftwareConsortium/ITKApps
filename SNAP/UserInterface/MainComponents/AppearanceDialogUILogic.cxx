@@ -139,12 +139,12 @@ AppearanceDialogUILogic
   if(i == 6) return;
 
   // Start with stock orientations
-  string axes[3] = {string("LPS"),string("AIL"),string("LIP")};
+  string axes[3] = {string("RPS"),string("AIL"),string("RIP")};
 
   // Switch the configurable directions
   if(m_ChkOptionsViews2DRightIsLeft->value() == 0)
     {
-    axes[0][0] = axes[2][0] = 'R';
+    axes[0][0] = axes[2][0] = 'L';
     }
   if(m_ChkOptionsViews2DNoseLeft->value() == 0)
     {

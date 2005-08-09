@@ -514,7 +514,7 @@ GenericSliceWindow
 ::DrawOrientationLabels()
 {
   // The letter labels
-  static const char *letters[3][2] = {{"R","L"},{"A","P"},{"I","S"}};
+  static const char *letters[3][2] = {{"L","R"},{"A","P"},{"I","S"}};
   const char *labels[2][2];
 
   // Get the properties for the labels
