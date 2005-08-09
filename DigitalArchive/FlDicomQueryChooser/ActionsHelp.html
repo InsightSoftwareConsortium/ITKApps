@@ -1,0 +1,80 @@
+ <html>
+ <head>
+ <TITLE> Actions Help</TITLE>
+ </head>
+ <body>
+ <br> The Action Buttons work on the Dicom Objects at all levels. Suppose you are at the Patient Level, selecting a lower level
+      will work on all images relating to that group (such as a Study or Series or Image).
+ <P> </P> 
+ <p>
+<a href="#C1">
+ MOVE
+</a>
+</p>
+<p>
+<a href="#C2">
+ VIEW
+</a>
+</p>
+<p>
+<a href="#C3">
+ LOAD
+</a>
+</p>
+<p>
+<a href="#C4">
+ SAVE
+</a>
+</p>
+<p>
+<a href="#C5">
+ DUMP
+</a>
+</p>
+<a name="C1"><h3> MOVE </h3> It supports retrieve functionality using the C-MOVE message.  It sends query keys to an SCP(Remote Server)
+                 and awaits responses.  It will accept associations( through client port) for the purpose of receiving images sent 
+                 as a result of the C-MOVE request.The utility application cannot initiate the transfer of images to a third party
+                 as yet.  
+                 The retrieved Dicom Objects are stored at the location of the FlDicomQueryChooser working Directory.
+                 The C-MOVE operation actually performs an image copy (no images will be deleted from the SCP).
+                 FlDicomQueryChooser uses a configuration file to store your preferences between executions.
+                 This file is stored as networkprefs.cfg (working directory) by default, although one is able to 
+                 runtime load/save to other locations.  Note that under UNIX it is wise to chmod 600 this file, if you 
+                 wish to keep your server information protected from other users.
+                 To configure preferences, select Preferences under the Option drop down menu.
+                 <table border="0">
+                 <tr> 
+                 <td>Server HostName </td><td> - hostname of DICOM server </td>
+                 </tr>
+                 <tr>
+                 <td>Server Port  </td><td> - tcp/ip port number of server </td>  
+                 </tr>
+                 <tr>
+                 <td>Called APtitle </td><td> - set called AE title of server (default: ANY-SCP) </td>
+                 </tr>
+                 <tr>             
+                 <td>Calling APtitle </td><td> - set my calling AE title (default: MOVESCU) </td>
+                 </tr>
+                 <tr>
+                 <td>Client Port  </td><td> - port number for incoming associations (default: 104) </td>
+                 </tr>
+                 </table>
+ <a name="C2"><h3> VIEW </h3> Selected Dicom Objects can be viewed by using the ImageViewer. This is a multi-dimensional image viewer. 
+                 It displays one 2D slice or a MIP view of that data. A variety of viewing options exist.
+  
+ <a name="C3"><h3> LOAD </h3> Selected Dicom Objects are loaded into memory for use by an ITKApplication.A SmartPointer to the Memory location of the
+                 Image is returned,so that users can continue to process the image using the ITK datastructure.A drawback is that the 
+                 FlDicomQueryChooser GUI window must remain open(or minimized).
+
+ <a name="C4"><h3> SAVE </h3> The selected Dicom Objects are loaded into an itkApplication and are written back as a user-specified Image Format and at a                  user-specified Image Location.
+                 ITK  writes the following file formats: png, jpeg, tiff, bmp, nrrd, meta, analyze, DICOM, GIPL. 
+
+ <a name="C5"><h3> DUMP </h3> This utility dumps the contents of a DICOM file (file format or raw data set) to stdout in textual form and the
+                 pixel data is written as a .raw file (little endian, filename created automatically)  stored stored at the
+                 location of the original Dicom Object.  
+                 Attributes with very large value fields (e.g. pixel data) can be described as "(not loaded)".  String value fields
+                 will be delimited with square brackets ([]).  Known UIDs will be displayed by their names prefixed by an equals 
+                 sign (e.g. "=MRImageStorage").  Empty value fields are described as "(no value available)". 
+               
+ </body>
+ </html>

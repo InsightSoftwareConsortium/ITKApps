@@ -1,0 +1,484 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0104 
+header_name {.h} 
+code_name {.cxx}
+class FlDicomQueryChooserGUI {open
+} {
+  Function {FlDicomQueryChooserGUI()} {open
+  } {
+    Fl_Window mainWindow {
+      label FlDicomQueryChooser open
+      xywh {4 30 759 558} type Double align 5 hide
+      code0 {\#include "osconfig.h"}
+      code1 {\#include "FL/fl_file_chooser.H"}
+      code2 {\#include "FL/Fl_Help_Dialog.H"}
+      code3 {\#include <fldqcPreferences.h>}
+    } {
+      Fl_Menu_Bar {} {open
+        xywh {0 0 830 25}
+      } {
+        submenu fileSubMenu {
+          label File
+          xywh {0 0 100 20}
+        } {
+          menuitem quitMenuItem {
+            label {&Quit}
+            callback {exit(1);}
+            private xywh {40 40 100 20} shortcut 0xff1b
+          }
+        }
+        submenu optionsSubMenu {
+          label Options open
+          xywh {10 10 100 20}
+        } {
+          menuitem prefsMenuItem {
+            label {&Preferences}
+            callback {m_Prefs->Show();}
+            xywh {10 10 100 20} shortcut 0x80070 divider
+          }
+          menuitem dbregisterMenuItem {
+            label {&Register the DataBase}
+            callback {DBRegister();}
+            xywh {0 0 100 20}
+          }
+          menuitem autoSavePrefsMenuItem {
+            label {Auto Save Preferences on Exit}
+            callback {m_Prefs->SetAutoSave(autoSavePrefsMenuItem->value());}
+            xywh {20 20 100 20} type Toggle divider
+          }
+          menuitem openPrefsMenuItem {
+            label {Open Preferences}
+            callback {OpenPrefs();}
+            xywh {15 15 100 20}
+          }
+          menuitem savePrefsAsMenuItem {
+            label {Save Preferences As ...}
+            callback {char *file;
+file = fl_file_chooser("Select a filename to save preferances as ... ","*.cfg",m_PrefsFileName);
+if (file)
+ SavePrefs(file);}
+            xywh {15 15 100 20}
+          }
+        }
+        submenu helpSubMenu {
+          label About
+          xywh {0 0 100 20}
+        } {
+          menuitem aboutMenuItem {
+            label {&About FlDicomQueryChooser}
+            callback {About();}
+            private xywh {0 0 100 20} shortcut 0x80061
+          }
+        }
+      }
+      Fl_Group operationsGroup {
+        xywh {10 35 380 215} box ENGRAVED_BOX
+      } {
+        Fl_Box operationsBox {
+          label {Queries: Network and Local Access}
+          private xywh {80 50 230 25} box SHADOW_BOX labeltype ENGRAVED_LABEL
+        }
+        Fl_Tabs operationsTabs {
+          private xywh {25 95 345 155} box BORDER_BOX color 0
+        } {
+          Fl_Group networkGroup {
+            label {  Network Query                }
+            private xywh {25 125 345 125} box BORDER_FRAME color 20 labeltype EMBOSSED_LABEL align 129 hide
+          } {
+            Fl_Input queryPatientNameInput {
+              label {Patient Name:}
+              xywh {155 145 160 25}
+            }
+            Fl_Input queryPatientIDInput {
+              label {Patient ID:}
+              xywh {155 175 160 25}
+            }
+            Fl_Return_Button queryGoButton {
+              label Go
+              callback {NetworkQueryGo();}
+              xywh {240 205 105 25} labeltype ENGRAVED_LABEL
+            }
+            Fl_Button queryHelpButton {
+              label Help
+              callback {QueryHelp();}
+              private xywh {125 205 110 25} labeltype ENGRAVED_LABEL
+            }
+          }
+          Fl_Group localGroup {
+            label {    Local Query                 }
+            xywh {25 125 345 125} box BORDER_FRAME color 20 labeltype EMBOSSED_LABEL labelcolor 32 align 161
+          } {
+            Fl_Input directoryInput {
+              label {File or Directory to Browse:}
+              xywh {40 160 230 25} align 5
+            }
+            Fl_Button directoryBrowseButton {
+              label Browse
+              callback {DirectoryBrowse();}
+              xywh {275 160 70 25} labeltype ENGRAVED_LABEL
+            }
+            Fl_Return_Button fileGoButton {
+              label Go
+              callback {DirectoryQueryGo();}
+              xywh {240 205 105 25} labeltype ENGRAVED_LABEL
+            }
+            Fl_Button fileHelpButton {
+              label Help
+              callback {DirectoryHelp();}
+              xywh {125 205 110 25} labeltype ENGRAVED_LABEL
+            }
+          }
+        }
+      }
+      Fl_Group objectGroup {
+        xywh {390 35 360 215} box ENGRAVED_BOX
+      } {
+        Fl_Box objectBox {
+          label {Selected Object(s)}
+          xywh {485 50 175 25} labeltype ENGRAVED_LABEL
+        }
+        Fl_Browser infoBrowser {
+          xywh {410 90 330 155}
+        }
+      }
+      Fl_Group browserGroup {
+        xywh {10 280 740 195}
+      } {
+        Fl_Browser patientBrowser {
+          label {Patients:}
+          callback {Patient();}
+          xywh {10 280 185 195} type Multi labeltype ENGRAVED_LABEL align 5
+        }
+        Fl_Browser studyBrowser {
+          label {Studies:}
+          callback {Study();}
+          xywh {195 280 185 195} type Multi labeltype ENGRAVED_LABEL align 5
+        }
+        Fl_Browser seriesBrowser {
+          label {Series:}
+          callback {Series();}
+          xywh {380 280 185 195} type Multi labeltype ENGRAVED_LABEL align 5
+        }
+        Fl_Browser imageBrowser {
+          label {Images:}
+          callback {Image();}
+          xywh {565 280 185 195} type Multi labeltype ENGRAVED_LABEL align 5
+        }
+      }
+      Fl_Group actionGroup {
+        xywh {385 480 365 55}
+      } {
+        Fl_Box actionBox {
+          label {Actions:}
+          xywh {395 495 60 25}
+        }
+        Fl_Button moveButton {
+          label MOVE
+          callback {if( (patientBrowser->size()) == 0)
+  WriteOutput("No Images Selected to Move");
+else
+  Move();}
+          xywh {460 480 85 25} box ENGRAVED_BOX color 51 selection_color 0 labeltype ENGRAVED_LABEL
+        }
+        Fl_Button viewButton {
+          label VIEW
+          callback {ImageView();}
+          xywh {560 480 85 25} box ENGRAVED_BOX selection_color 0 labeltype ENGRAVED_LABEL
+        }
+        Fl_Button loadobjectButton {
+          label LOAD
+          callback {Load();}
+          xywh {660 480 85 25} box ENGRAVED_BOX labeltype ENGRAVED_LABEL
+        }
+        Fl_Button saveobjectButton {
+          label {SAVE }
+          callback {Save();}
+          xywh {460 510 85 25} box ENGRAVED_BOX selection_color 0 labeltype ENGRAVED_LABEL align 128
+        }
+        Fl_Button dumpimageButton {
+          label DUMP
+          callback {DumpFile();}
+          xywh {560 510 85 25} box ENGRAVED_BOX selection_color 0 labeltype ENGRAVED_LABEL
+        }
+        Fl_Button actionHelpButton {
+          label HELP
+          callback {ActionHelp();} selected
+          xywh {660 510 85 25} box ENGRAVED_BOX labeltype ENGRAVED_LABEL
+        }
+      }
+      Fl_Browser outputBrowser {
+        label {Status Browser:}
+        xywh {10 500 370 35} labeltype ENGRAVED_LABEL align 5
+      }
+    }
+  }
+  Function {~FlDicomQueryChooserGUI()} {return_type virtual
+  } {}
+  Function {LoadConfigurationInfo( char*, const char*, const char*, char*, const char*, const char*, Fl_Browser*)} {return_type {virtual void}
+  } {}
+  Function {NetworkQueryGo()} {return_type {virtual void}
+  } {}
+  Function {DirectoryBrowse()} {} {
+    code {// From Local Browse button, open fl_dir_chooser to find a directory
+
+char *dir;
+dir = fl_dir_chooser("Please select a base directory","*");
+
+if (dir)
+{
+  directoryInput->value(dir);
+  std::cout << dir << std::endl;
+}
+else
+  WriteOutput ("No Directory Selected");} {}
+  }
+  Function {DirectoryQueryGo()} {return_type {virtual void}
+  } {}
+  Function {Patient()} {return_type {virtual void}
+  } {}
+  Function {Study()} {return_type {virtual void}
+  } {}
+  Function {Series()} {return_type {virtual void}
+  } {}
+  Function {Image()} {open return_type {virtual void}
+  } {}
+  Function {SavePrefs(char *_file)} {} {
+    code {char output[F_LEN];
+
+if (_file)
+  strcpy(m_PrefsFileName, _file);
+
+sprintf(output, "Saving preferences as %s...", m_PrefsFileName);
+WriteOutput(output);
+m_Prefs->WriteToFile(m_PrefsFileName);} {}
+  }
+  Function {OpenPrefs()} {} {
+    code {char *file = fl_file_chooser("Select a preferences file...","*.cfg",m_PrefsFileName );
+if (file) 
+{
+  strcpy(m_PrefsFileName, file);
+  WriteOutput("Reading preferences...");
+  m_Prefs->ReadFromFile(m_PrefsFileName);
+}} {}
+  }
+  Function {DBRegister()} {} {
+    code {// From DB Register Button, open fl_dir_chooser to find a directory
+
+char * dir;
+dir = fl_dir_chooser("Please Select a Image Database","*",0);
+if ( dir )
+{
+  int j;
+  j = DataBaseRegister(dir);
+  if ( j == 0)
+    WriteOutput("Database Registered Successfully");
+  else
+    WriteOutput("Database Not Registered");
+}
+else
+  WriteOutput("No Dicom Directory Selected");} {}
+  }
+  Function {Init()} {return_type void
+  } {
+    code {if (m_Output)
+  WriteOutput ("@ Welcome to the GUI..........");
+else
+  WriteOutput ("Welcome to GUI............");
+
+//Display prefs window when application starts-up
+//prefsUI->Show();} {}
+  }
+  Function {QueryHelp()} {} {
+    code {// Display help Message
+
+const char message[] = "Enter a patient name and/or ID and hit Go . \\
+Asterisks (*)/Blank permit wildcard searching.";
+
+fl_message( message );} {}
+  }
+  Function {DirectoryHelp()} {} {
+    code {// Display help Message
+
+const char message[] = "Enter a base directory for reading \\
+DICOM files.  This directory will be searched for Dicom Objects.";
+
+fl_message( message );} {}
+  }
+  Function {Move()} {return_type {virtual void}
+  } {}
+  Function {Load()} {return_type {virtual void}
+  } {}
+  Function {Save()} {return_type {virtual void}
+  } {}
+  Function {DumpFile()} {return_type {virtual void}
+  } {}
+  Function {ImageView()} {} {
+    code {if (!m_Remotedb)
+{
+  OFList<OFString> *filelisttoview;
+  filelisttoview = &m_FilesInDirectory; // Default load all files into memory
+  char *level = NULL;
+
+  for (int i = 1; i <=patientBrowser ->size(); i++) 
+  {
+    if (patientBrowser->selected(i))   
+    {
+      filelisttoview = &m_PatientFileNames; 
+      level = "Patient";     
+       
+      for (int i = 1; i <=studyBrowser ->size(); i++) 
+      {              
+        if (studyBrowser->selected(i)) 
+        {
+          filelisttoview = &m_StudyFileNames;
+          level = "Study";                
+              
+          for (int i = 1; i <=seriesBrowser ->size(); i++) 
+          {
+            if (seriesBrowser->selected(i))  
+            {
+              filelisttoview = &m_SeriesFileNames;
+              level = "Series"; 
+                     
+              for (int i = 1; i <=imageBrowser ->size(); i++) 
+              {
+                if (imageBrowser->selected(i))    
+                {
+                  filelisttoview = &m_ImageFileNames;
+                  level = "Image"; 
+                }
+              }
+            } 
+          }
+        }
+      } 
+    }        
+  }
+  if (level == NULL)
+  { 
+    WriteOutput("No Dicom Object Selected");
+  }
+  else
+  {  
+    char outStr[100];
+    sprintf(outStr, "Displaying Dicom Objects at: %s Level",level);
+    WriteOutput(outStr);
+    Display(filelisttoview); 
+  }  
+}
+else
+  WriteOutput ("Cannot be viewed at network mode");} {}
+  }
+  Function {ActionHelp()} {open
+  } {
+    code {// Displays the Help Dialog Window
+
+Fl_Help_Dialog *Manual;
+
+Manual = new Fl_Help_Dialog;
+
+Manual->load("../../../DigitalArchive/FlDicomQueryChooser/ActionsHelp.html");
+Manual->resize(200,300,500,400);
+
+Manual->show();
+Fl::run();} {}
+  }
+  Function {ClearAll()} {} {
+    code {infoBrowser->clear();
+patientBrowser->clear();
+studyBrowser->clear();
+seriesBrowser->clear();
+imageBrowser->clear();} {}
+  }
+  Function {Dump(char*)} {return_type {virtual int}
+  } {
+    code {return 0;} {}
+  }
+  Function {DataBaseRegister( char*)} {return_type {virtual int}
+  } {
+    code {return 0;} {}
+  }
+  Function {SetOutput( Fl_Browser*)} {return_type {virtual void}
+  } {}
+  Function {WriteOutput( const char*)} {return_type {virtual void}
+  } {}
+  Function {LoadToITK( OFList<OFString> *,char*)} {return_type {virtual void}
+  } {}
+  Function {SaveObject( OFList<OFString> *,char*, char*)} {return_type {virtual void}
+  } {}
+  Function {Display( OFList<OFString> *)} {return_type {virtual int}
+  } {
+    code {return 0;} {}
+  }
+  Function {MoveObjectFromServer( char*, char*, char*, char*, char*, const char*, const char*, const char*, const char*, char *)} {return_type {virtual int}
+  } {
+    code {return 0;} {}
+  }
+  Function {About()} {return_type void
+  } {
+    code {//Display information about FlDicomQueryChooser
+
+const char message[] = " FlDicomQueryChooser GUI 1.00 Being Developed at CADDLAB By Dhaval Dalal under Julian Jomier and Stephen Aylward !!Stay Tuned..... ";
+fl_message(message);} {}
+  }
+  decl {PatientData *patient;} {public
+  }
+  decl {StudyData *study;} {public
+  }
+  decl {SeriesData *series;} {public
+  }
+  decl {ImageData *image;} {public
+  }
+  decl {char m_Remotedb;} {public
+  }
+  decl {OFList<OFString> m_FilesInDirectory;} {public
+  }
+  decl {OFList<OFString> m_PatientFileNames;} {public
+  }
+  decl {OFList<OFString> m_StudyFileNames;} {public
+  }
+  decl {OFList<OFString> m_SeriesFileNames;} {public
+  }
+  decl {OFList<OFString> m_ImageFileNames;} {public
+  }
+  decl {OFList<OFString> m_PatientIDList;} {public
+  }
+  decl {OFList<OFString> m_StudyUIDList;} {public
+  }
+  decl {OFList<OFString> m_SeriesUIDList;} {public
+  }
+  decl {OFList<OFString> m_ImageUIDList;} {public
+  }
+  decl {Fl_Browser *m_Output;} {public
+  }
+  decl {char m_PrefsFileName[255];} {public
+  }
+  decl {char m_SaveFileName[255];} {public
+  }
+  decl {char *m_CalledAP;} {public
+  }
+  decl {char *m_CallingAP;} {public
+  }
+  decl {char *m_ServerName;} {public
+  }
+  decl {char *m_ServerPort;} {public
+  }
+  decl {char *m_ClientPort;} {public
+  }
+  decl {char *m_PatientID;} {public
+  }
+  decl {char *m_StudyUID;} {public
+  }
+  decl {char *m_SeriesUID;} {public
+  }
+  decl {char *m_SopUID;} {public
+  }
+  decl {char m_QueryLevel;} {public
+  }
+  decl {typedef enum{ PATIENT, STUDY, SERIES, IMAGE, UNDEFINED} QueryLevels;} {public
+  }
+  decl {QueryLevels m_ModelLevel;} {public
+  }
+  decl {fldqcPreferences* m_Prefs;} {public
+  }
+} 

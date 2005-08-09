@@ -1,0 +1,65 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0106 
+header_name {.h} 
+code_name {.cxx}
+class fldqcPreferencesGUI {open
+} {
+  Function {fldqcPreferencesGUI()} {open
+  } {
+    Fl_Window prefsWindow {
+      label {FlDicomQueryChooser - Preferences} open
+      xywh {652 305 348 342} type Double
+      code0 {\#include <FL/fl_ask.H>}
+      code1 {\#include <FL/fl_file_chooser.H>} visible
+    } {
+      Fl_Tabs prefsTabs {
+        xywh {5 5 335 285}
+      } {
+        Fl_Group networkGroup {
+          label Network
+          private xywh {5 30 325 255}
+        } {
+          Fl_Input serverInput {
+            label {Server Node:}
+            private xywh {20 60 230 25} align 5
+          }
+          Fl_Input portInput {
+            label {Server port:}
+            private xywh {20 105 230 25} type Int align 5
+          }
+          Fl_Input calledAPInput {
+            label {Called AP title:}
+            private xywh {20 150 230 25} align 5
+          }
+          Fl_Input callingAPInput {
+            label {Calling AP title:}
+            private xywh {20 195 230 25} align 5
+          }
+          Fl_Input clientPortInput {
+            label {Client Port (for incoming Associations)}
+            private xywh {20 250 230 25} type Int align 5
+          }
+        }
+      }
+      Fl_Button acceptButton {
+        label OK
+        callback {SaveSettings();
+Quit(1);}
+        xywh {30 300 105 30} shortcut 0xff1b
+      }
+      Fl_Button cancelButton {
+        label Cancel
+        callback {Quit(0);} selected
+        xywh {165 300 105 30}
+      }
+    }
+  }
+  Function {~fldqcPreferencesGUI()} {open return_type virtual
+  } {}
+  Function {SaveSettings()} {open return_type {virtual void}
+  } {}
+  Function {InitSettings()} {open return_type {virtual void}
+  } {}
+  Function {Quit(bool)} {open return_type {virtual void}
+  } {}
+} 
