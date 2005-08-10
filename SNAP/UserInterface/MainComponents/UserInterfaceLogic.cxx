@@ -1269,6 +1269,10 @@ void
 UserInterfaceLogic
 ::ShowSNAP()
 {
+  // Restore the view to four side-by-side windows
+  UpdateWindowFocus();
+
+  // Swap the left-side panels
   m_WizWindows->value(m_GrpSNAPWindows);
   m_WizControlPane->value(m_GrpSNAPPage);
 
@@ -1965,11 +1969,11 @@ UserInterfaceLogic
   m_DlgAppearance->ShowDialog();
 }
 
-
 void
 UserInterfaceLogic
-::OnIRISWindowFocus(unsigned int i)
+::UpdateWindowFocus(int iWindow)
 {
+  // Get the four panels
   Fl_Group *panels[] = 
     { m_GrpIRISSlicePanel[0], m_GrpIRISSlicePanel[1], m_GrpIRISSlicePanel[2], m_GrpIRISView3D };
   Fl_Gl_Window *boxes[] = 
@@ -1980,7 +1984,7 @@ UserInterfaceLogic
   int w = m_GrpIRISWindows->w(), h = m_GrpIRISWindows->h();
 
   // Check if this is an expansion or a collapse operation
-  if( panels[i]->w() == w )
+  if( iWindow < 0 || panels[iWindow]->w() == w )
     {
     // Restore all panels to original configuration
     panels[0]->resize(x, y, w >> 1, h >> 1);
@@ -1988,9 +1992,6 @@ UserInterfaceLogic
     panels[3]->resize(x, y + (h >> 1), w >> 1, h - (h >> 1));
     panels[2]->resize(x + (w >> 1), y + (h >> 1), w - (w >> 1), h - (h >> 1));
     
-    // Remove the current panel
-    m_GrpIRISWindows->remove(panels[i]);
-
     // Show everything
     for(unsigned int j = 0; j < 4; j++)
       {
@@ -2004,7 +2005,7 @@ UserInterfaceLogic
     {
     for(unsigned int j = 0; j < 4; j++)
       {
-      if(i != j)
+      if(iWindow != j)
         {
         panels[j]->hide();
         boxes[j]->hide();
@@ -2012,12 +2013,19 @@ UserInterfaceLogic
         }
       }
 
-    panels[i]->resize(
+    panels[iWindow]->resize(
       m_GrpIRISWindows->x(),m_GrpIRISWindows->y(),
       m_GrpIRISWindows->w(),m_GrpIRISWindows->h());
-    m_GrpIRISWindows->resizable(panels[i]);
-    panels[i]->redraw();
+    m_GrpIRISWindows->resizable(panels[iWindow]);
+    panels[iWindow]->redraw();
     }
+}
+
+void
+UserInterfaceLogic
+::OnIRISWindowFocus(unsigned int i)
+{
+  UpdateWindowFocus((int) i);
 }
 
 void
@@ -2382,9 +2390,6 @@ UserInterfaceLogic
       // Update the label display if necessary
       if(m_DlgRestoreSettings->GetRestoreLabels())
         {
-        // This will reset the color label table
-        OnLabelListUpdate();
-
         // Update the opacity slider
         m_InIRISLabelOpacity->value(m_GlobalState->GetSegmentationAlpha());
 
@@ -2415,6 +2420,9 @@ UserInterfaceLogic
   m_IntensityCurveUI->SetImageWrapper(
     m_Driver->GetCurrentImageData()->GetGrey());
   m_IntensityCurveUI->OnCurveChange();
+
+  // Update the list of labels
+  OnLabelListUpdate();
 
   // Redraw the user interface
   RedrawWindows();
@@ -3046,6 +3054,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.38  2005/08/10 03:24:20  pauly
+ *BUG: Corrected problems with 3D window, label IO from association files
+ *
  *Revision 1.37  2005/04/23 13:58:19  pauly
  *COMP: Fixing compile errors in the last SNAP checkin
  *
