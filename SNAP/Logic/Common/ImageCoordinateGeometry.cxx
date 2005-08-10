@@ -119,9 +119,9 @@ ImageCoordinateGeometry
     switch(rai[i]) 
       {
       case 'r' :
-      case 'R' : result[i] = -1;break;
+      case 'R' : result[i] =  1;break;
       case 'l' :
-      case 'L' : result[i] =  1;break;
+      case 'L' : result[i] = -1;break;
       case 'a' :
       case 'A' : result[i] =  2;break;
       case 'p' :

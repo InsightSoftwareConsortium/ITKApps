@@ -640,8 +640,6 @@ ImageIOWizardLogic<TPixel>
     {
     SetRAI(sStoredOrientation.c_str());
     flagGuessed = true;
-    std::cout << "Setting image orientation to the last used setting : " 
-      << sStoredOrientation << std::endl;
     }
 
   // Otherwise, try to use the image's header to retrieve the RAI code
@@ -886,7 +884,7 @@ ImageIOWizardLogic<TPixel>
   // Convert RAI to a numeric mapping
   Vector3i map = 
     ImageCoordinateGeometry::ConvertRAIToCoordinateMapping(rai);
-  
+
   // Get the coordinate indices and directions
   unsigned int cidx[3];
   unsigned int cflip[3];
