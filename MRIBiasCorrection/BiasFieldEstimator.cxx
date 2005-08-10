@@ -245,10 +245,14 @@ int main(int argc, char* argv[])
   itk::Array<double> classSigmas ;
   classMeans.SetSize(InclassMeans.size());
   classSigmas.SetSize(InclassSigmas.size());
-  for (int i = 0; i < InclassMeans.size(); i++) classMeans.SetElement(i, InclassMeans[i]);
-  for (int i = 0; i < InclassSigmas.size(); i++) classSigmas.SetElement(i, InclassSigmas[i]);
-  
-
+  for (unsigned int i = 0; i < InclassMeans.size(); i++)
+    {
+    classMeans.SetElement(i, InclassMeans[i]);
+    }
+  for (unsigned int i = 0; i < InclassSigmas.size(); i++) 
+    {
+    classSigmas.SetElement(i, InclassSigmas[i]);
+    }
 
   filter->IsBiasFieldMultiplicative(useLog) ;
   // sets tissue classes' statistics for creating the energy function
