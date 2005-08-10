@@ -1093,8 +1093,8 @@ UserInterfaceLogic
   SyncIRISToSnake();
 
   // Reset the mesh display
-  m_SNAPWindow3D->ClearScreen();
-  m_SNAPWindow3D->ResetView();
+  m_IRISWindow3D->ClearScreen();
+  m_IRISWindow3D->ResetView();
 
   // Image geometry has changed
   OnImageGeometryUpdate();
@@ -1287,6 +1287,9 @@ UserInterfaceLogic
 
   // Go to the first page in the SNAP wizard
   SetActiveSegmentationPipelinePage( 0 );
+
+  // Indicate that preprocessing is not done
+  m_Activation->UpdateFlag(UIF_SNAP_PREPROCESSING_DONE, false);
 
   // Repaint everything
   RedrawWindows();
@@ -2088,7 +2091,7 @@ UserInterfaceLogic
 ::OnIRISMeshAcceptAction()
 {
   m_IRISWindow3D->Accept();
-  m_IRISWindow3D->redraw();
+  RedrawWindows();
   
   m_Activation->UpdateFlag(UIF_IRIS_MESH_ACTION_PENDING, false);
   m_Activation->UpdateFlag(UIF_IRIS_MESH_DIRTY, true);
@@ -2798,6 +2801,9 @@ UserInterfaceLogic
     // Save the segmentation file name
     m_GlobalState->SetPreprocessingFileName(m_WizPreprocessingIO->GetFileName());
 
+    // Update the UI flag
+    m_Activation->UpdateFlag(UIF_SNAP_PREPROCESSING_DONE, true);
+
     // Update the user interface accordingly
     OnSpeedImageUpdate();
     }
@@ -3040,6 +3046,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.37  2005/04/23 13:58:19  pauly
+ *COMP: Fixing compile errors in the last SNAP checkin
+ *
  *Revision 1.36  2005/04/23 12:56:59  lorensen
  *BUG: bad include.
  *

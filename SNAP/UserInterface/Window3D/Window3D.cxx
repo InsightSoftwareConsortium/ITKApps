@@ -467,6 +467,14 @@ Window3D
     m_VolumeSize.fill(0.0);
     }
 
+  // Compute the maximum extent of the image cube
+  float xMaxDim = m_VolumeSize.max_value();
+  
+  m_DefaultHalf[X] = m_DefaultHalf[Y] = m_DefaultHalf[Z] = xMaxDim * 0.7 + 1.0;
+  m_DefaultHalf[Z] *= 4.0;
+
+  /*
+
   unsigned int maxdim = 0;
   for (int i=0; i<3; i++)
     {
@@ -482,7 +490,7 @@ Window3D
   // 
   // glMatrixMode(GL_MODELVIEW);
   // glLoadIdentity();
-
+*/
   m_CursorVisible = 1;  // Show the crosshairs.
   m_Plane.valid = -1; // Resets the Cut m_Plane
   
@@ -1310,8 +1318,10 @@ void Window3D::DrawCrosshairs()
       float end1[3], end2[3];
       for (int j=0; j<3; j++)
         end1[j] = end2[j] = xCross[j];
-      end1[i] = m_Center[i] - m_ImageSize[i]*0.7+1;
-      end2[i] = m_Center[i] + m_ImageSize[i]*0.7+1;
+      // end1[i] = m_Center[i] - m_ImageSize[i]*0.7+1;
+      // end2[i] = m_Center[i] + m_ImageSize[i]*0.7+1;
+      end1[i] = 0.0f;
+      end2[i] = m_ImageSize[i];
 
       glVertex3fv(end1);
       glVertex3fv(end2);
@@ -1443,6 +1453,9 @@ Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.27  2005/04/21 14:46:30  pauly
+ *ENH: Improved management and editing of color labels in SNAP
+ *
  *Revision 1.26  2005/03/08 03:12:51  pauly
  *BUG: Minor bugfixes in SNAP, mostly to the user interface
  *

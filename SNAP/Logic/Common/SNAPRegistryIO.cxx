@@ -32,7 +32,7 @@ SNAPRegistryIO
   // Set up the enum objects
   m_EnumMapCoverage.AddPair(PAINT_OVER_ALL,"OverAll");
   m_EnumMapCoverage.AddPair(PAINT_OVER_COLORS,"OverVisible");
-  m_EnumMapCoverage.AddPair(PAINT_OVER_ONE,"OverAll");
+  m_EnumMapCoverage.AddPair(PAINT_OVER_ONE,"OverOne");
 
   m_EnumMapSolver.AddPair(SnakeParameters::DENSE_SOLVER,"Dense");
   m_EnumMapSolver.AddPair(SnakeParameters::LEGACY_SOLVER,"Legacy");
@@ -470,7 +470,7 @@ SNAPRegistryIO
     gs->SetCoverageMode(
       registry["IRIS.LabelState.CoverageMode"].GetEnum(
         m_EnumMapCoverage,gs->GetCoverageMode()));      
-    
+
     // Read the polygon inversion state
     gs->SetPolygonInvert(
       registry["IRIS.LabelState.PolygonInvert"][gs->GetPolygonInvert()]);

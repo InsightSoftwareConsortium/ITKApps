@@ -400,6 +400,7 @@ SNAPImageData
   m_SnakeWrapper.InitializeToWrapper(
     &m_GreyWrapper,m_LevelSetDriver->GetCurrentState());
   m_SnakeWrapper.GetImage()->SetOrigin( m_GreyWrapper.GetImage()->GetOrigin() );
+  m_SnakeWrapper.GetImage()->SetSpacing( m_GreyWrapper.GetImage()->GetSpacing() );
   
   // Make sure that the correct color label is being used
   m_SnakeWrapper.SetColorLabel(m_ColorLabel);
