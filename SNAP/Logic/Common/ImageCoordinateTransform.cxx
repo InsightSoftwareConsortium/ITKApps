@@ -42,7 +42,7 @@ ImageCoordinateTransform
   unsigned int i;
 
   // Make sure it's a legal mapping
-  for(int i=0;i<3;i++)
+  for(i=0;i<3;i++)
     {
     assert(abs(map[i]) <= 3 && abs(map[i]) > 0);
     assert(abs(map[i]) != abs(map[(i+1) % 3]));
