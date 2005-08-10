@@ -585,9 +585,10 @@ IRISApplication
     fout << "##########################################################" << std::endl;
     fout << "# SNAP Voxel Count File" << std::endl;
     fout << "# File format:" << std::endl;
-    fout << "# LABEL: NUMBER / VOLUME / MEAN / SD" << std::endl;
+    fout << "# LABEL: ID / NUMBER / VOLUME / MEAN / SD" << std::endl;
     fout << "# Fields:" << std::endl;
     fout << "#    LABEL         Label description" << std::endl;
+    fout << "#    ID            The numerical id of the label" << std::endl;
     fout << "#    NUMBER        Number of voxels that have that label " << std::endl;
     fout << "#    VOLUME        Volume of those voxels in cubic mm " << std::endl;
     fout << "#    MEAN          Mean intensity of those voxels " << std::endl;
@@ -599,10 +600,11 @@ IRISApplication
       const ColorLabel &cl = m_ColorLabelTable->GetColorLabel(i);
       if(cl.IsValid() && data[i].count > 0)
         {
-        fout << std::ios::left << std::setw(40) << cl.GetLabel() << ": ";
-        fout << std::ios::right << std::setw(10) << data[i].count << " / ";
+        fout << std::left << std::setw(40) << cl.GetLabel() << ": ";
+        fout << std::right << std::setw(4) << i << " / ";
+        fout << std::right << std::setw(10) << data[i].count << " / ";
         fout << std::setw(10) << (data[i].count * volVoxel) << " / ";
-        fout << std::ios::internal << std::setw(10) << data[i].mean << " / ";
+        fout << std::internal << std::setw(10) << data[i].mean << " / ";
         fout << std::setw(10) << data[i].stddev << std::endl;
         }      
       }
