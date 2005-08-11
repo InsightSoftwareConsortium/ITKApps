@@ -167,25 +167,23 @@ void fldqcPreferences::SaveSettings()
 // save fields to current
 
 // items in the Network group
-/*strcpy(current->m_server, serverInput->value());
-strcpy(current->m_calledAP, calledAPInput->value());
-strcpy(current->m_callingAP, callingAPInput->value());
-strcpy(current->m_clientPort, clientPortInput->value());
-strcpy(current->m_serverPort, portInput->value());
-*/
+strcpy(m_server, serverInput->value());
+strcpy(m_calledAP, calledAPInput->value());
+strcpy(m_callingAP, callingAPInput->value());
+strcpy(m_clientPort, clientPortInput->value());
+strcpy(m_serverPort, portInput->value());
+
 }
 
 /** Init the settings */
 void fldqcPreferences::InitSettings()
 {
   // initialize current settings
-  /*if (current) 
-  {
    // items in the Network group
-   serverInput->value(current->m_server);
-   calledAPInput->value(current->m_calledAP);
-   callingAPInput->value(current->m_callingAP);
-   clientPortInput->value(current->m_clientPort);
-   portInput->value(current->m_serverPort);
-  }*/
+   serverInput->value(m_server);
+   calledAPInput->value(m_calledAP);
+   callingAPInput->value(m_callingAP);
+   clientPortInput->value(m_clientPort);
+   portInput->value(m_serverPort);
+  
 }
