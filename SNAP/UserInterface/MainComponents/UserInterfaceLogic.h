@@ -818,6 +818,10 @@ private:
   // This method is called when the snake image has changed.
   void OnSnakeUpdate();
 
+  // Set 'zoomed' window to 0..3, or pass in -1 in order to restore the display
+  // to four side by side windows
+  void UpdateWindowFocus(int iWindow = -1);
+
   /* Command used for progress tracking */
   itk::SmartPointer<ProgressCommandType> m_ProgressCommand;
 
@@ -829,6 +833,9 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.25  2005/04/21 14:46:30  pauly
+ *ENH: Improved management and editing of color labels in SNAP
+ *
  *Revision 1.24  2005/04/14 16:35:10  pauly
  *ENH: Added Image Info window to SNAP
  *

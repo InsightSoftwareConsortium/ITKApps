@@ -386,9 +386,6 @@ ImageWrapper<TPixel>
     m_MinMaxCalc->Compute();
     m_MinMaxCalc->Modified();
     m_ImageScaleFactor = 1.0 / (m_MinMaxCalc->GetMaximum() - m_MinMaxCalc->GetMinimum());
-
-    verbose << "Computing intensity range:" << std::endl;
-    verbose << "   " << m_MinMaxCalc->GetMinimum() << " to " << m_MinMaxCalc->GetMaximum() << std::endl;
     }
 }
 

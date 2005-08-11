@@ -187,7 +187,6 @@ IntensityCurveVTK
 
     // Create a folder in the registry
     string key = registry.Key("ControlPoint[%d]",iPoint);
-    std::cout << "KEY: " << key << std::endl;
     Registry &folder = registry.Folder(key);
     folder["tValue"] << (double) t;
     folder["xValue"] << (double) x;
