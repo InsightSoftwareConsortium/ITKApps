@@ -18,6 +18,8 @@ SET(APPLICATION_SOURCES
   DeformableModelApplicationBase.cxx
   DeformableModelApplication.cxx
   ImageSliceViewer.cxx
+  vtkPolyDataToitkMesh.cxx
+  itkMeshTovtkPolyData.cxx
   ImageSurfaceViewer.cxx
   InteractorObserver.cxx
   main.cxx
