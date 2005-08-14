@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+        <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-15">
+        <TITLE></TITLE>
+        <META NAME="GENERATOR" CONTENT="OpenOffice.org 1.0.1  (Linux)">
+        <META NAME="AUTHOR" CONTENT="Leila Baghdadi">
+        <META NAME="CREATED" CONTENT="20050811;17041400">
+        <META NAME="CHANGEDBY" CONTENT="Leila Baghdadi">
+        <META NAME="CHANGED" CONTENT="20050814;15252500">
+        <STYLE>
+        <!--
+                @page { margin-left: 3.18cm; margin-right: 3.18cm; margin-top: 2.54cm; margin-bottom: 2.54cm }
+        -->
+        </STYLE>
+</HEAD>
+<BODY LANG="en-US">
+<P ALIGN=CENTER STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B><FONT SIZE=5>Prior
+Using the Application</FONT></B></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B>1</B>.
+<B>Deformable Models</B></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">You must
+understand the<SPAN LANG="en-US"> theory </SPAN>behind deformable
+models.  Specifically, you   must understand the parameters and their
+effect in the final result of segmentation.  For additional
+information refer to publications of Herve Delingette of INRIA,
+France.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><A HREF="http://www-sop.inria.fr/epidaure/personnel/Herve.Delingette"><FONT FACE="Times, serif">http://www-sop.inria.fr/epidaure/personnel/Herve.Delingette</FONT></A></P>
+<P STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times, serif">Just
+to mention a few</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">a. <U>Simplex
+Meshes: a General Representation for 3D Shape Reconstruction</U>.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">b. <U>General
+Object Reconstruction based on Simplex Meshes</U>.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">c.
+<U>Anisotropic Filtering for Model Based Segmentation</U> (Scan-line
+algorithm), etc.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B>2. The
+Initial Model</B></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">Deformable
+models always start from an initial model. There are a few ways to
+create a model. This application offers you two of them</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">a. Create a
+model &ldquo;sphere&rdquo; by placing a seed point inside the image. </FONT>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">b. Create a
+model by providing a binary image &ldquo;mask&rdquo; which will be
+sent to &ldquo;vtkImageMarchingCubes&rdquo;  for constructing an
+iso-surface which will then be converted to a Simplex Mesh for
+deformation.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B>3. The
+Image Format</B></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">Currently,
+the application supports meta image format &ldquo;only&rdquo;. (i.,e
+you need to have *.mhd &ldquo;header&rdquo; *.raw &ldquo;image&rdquo;.
+Other Image formats will be added in the future.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B>4. The
+Image Specifications</B></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><SPAN STYLE="font-weight: medium">U</SPAN>ntil
+further changes in the algorithm, only images with spacing (1,1,1)
+and direction cosine of identity should be used otherwise the results
+will be incorrect.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B>5.
+Visualization</B></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">The
+application provides 4 windows as follows</FONT></P>
+<OL START=4>
+        <P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">a.
+        Axial view and slider (Top Left)</FONT></P>
+        <P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">b.
+        Coronal view and slider (Top Right)</FONT></P>
+        <P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">c.
+        Surface (3D image and Mesh overlayed) (Bottom Left)</FONT></P>
+        <P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">d.
+        Sagittal view and slider (Bottom Right)</FONT></P>
+</OL>
+<P ALIGN=CENTER STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B><FONT SIZE=5>Guidelines
+to use the Deformable Model Application</FONT></B></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times, serif"><FONT SIZE=3>1.
+Start by bringing up your image (File --&gt; Load Image).</FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times, serif"><FONT SIZE=3>2.
+Decide which method for creating the initial model.</FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times, serif"><FONT SIZE=3>a.
+Place a seed point on image &ldquo;left click&rdquo;, create Mesh
+(File --&gt; Create Mesh).</FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times, serif"><FONT SIZE=3>b.
+Provide binary image (File --&gt; Load Mesh).</FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times, serif"><FONT SIZE=3>3.
+Create image forces by preprocessing the image (File --&gt;
+Preprocess Image)</FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times, serif"><FONT SIZE=3>Note
+Image is send through a few filters before the final Gradient is
+created.  </FONT></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times, serif"><FONT SIZE=3>For
+further information refer to the parameterization of the filters in
+the ITK</FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times, serif"><FONT SIZE=3>software
+guide (segmentation/Level Sets)</FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times, serif"><FONT SIZE=3><TT><SPAN STYLE="font-weight: medium"><FONT SIZE=3 STYLE="font-size: 13pt"><FONT FACE="Times, serif">anisotropic
+filtering --&gt; gradient magnitude --&gt; sigmoid --&gt; gradient</FONT></FONT></SPAN></TT></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times, serif"><FONT SIZE=3><TT><SPAN STYLE="font-weight: medium"><FONT SIZE=3 STYLE="font-size: 13pt"><FONT FACE="Times, serif">4.
+</FONT></FONT></SPAN></TT>Check the parameters (Settings --&gt;
+Segmentation Parameters)</FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times, serif"><FONT SIZE=3>Alpha
+:  Internal Forces (0 &lt; * &lt; 1)</FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times, serif"><FONT SIZE=3>Beta:
+External Forces  ( 0 &lt; * &lt; 1)</FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times, serif"><FONT SIZE=3>Gamma:
+Damping Force (normally 0.3 &lt; * &lt; 0.4)</FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times, serif"><FONT SIZE=3>Range:
+Range of Search for Scan line algorithm</FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times, serif"><FONT SIZE=3>Rigidity:
+Degree of Regularization. (zero will use the 3 immediate neighbors, 1
+uses the neighbors and their neighbors and so on). </FONT></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times, serif"><FONT SIZE=3>5.
+You are now ready for deformation ( Settings --&gt; Deform Mesh)</FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times, serif"><FONT SIZE=3>6.
+Once you are done deformation you can</FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times, serif"><FONT SIZE=3>a.
+Save Mesh as &ldquo;vtkPolyData&rdquo; (File --&gt; Save Mesh)</FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times, serif"><FONT SIZE=3>b.
+Save a Mask (i.e, Convert your mesh to a binary image) (File --&gt;
+Save Mask)</FONT></FONT></P>
+</BODY>
+</HTML>
