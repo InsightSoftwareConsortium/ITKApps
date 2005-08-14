@@ -2,79 +2,126 @@
 version 1.0104 
 header_name {.h} 
 code_name {.cxx}
+decl {\#include <FL/Fl_File_Chooser.H>} {public
+} 
+
+decl {\#include <FL/Fl_Help_Dialog.H>} {public
+} 
 class DeformableModelApplicationGUI {open : {public DeformableModelApplicationBase}
 } {
   Function {DeformableModelApplicationGUI()} {open
   } {
     Fl_Window mainWindow {
       label DeformableModelApplication open
-      xywh {195 100 870 850} type Double resizable
+      xywh {195 100 870 820} color 206 labeltype NORMAL_LABEL labelfont 1 resizable
       code0 {\#include "DeformableModelApplicationBase.h"} visible
     } {
+      Fl_Menu_Bar {} {
+        xywh {0 0 870 20}
+      } {
+        submenu {} {
+          label File open
+          xywh {0 0 100 20}
+        } {
+         menuitem {} {
+            label {Load File}
+            callback {this->Load();}
+            xywh {0 0 100 20}
+          }
+         menuitem {} {
+            label {Create Mesh }
+            callback {this->CreateMesh();}
+            xywh {0 0 100 20}
+          }
+         menuitem {} {
+            label {Load Mesh}
+            callback {this->LoadMesh();}
+            xywh {0 0 100 20}
+          }
+         menuitem {} {
+            label {Preprocess Image}
+            callback {this->ComputeInternalForces();}
+            xywh {0 0 100 20}
+          }
+        menuitem {} {
+            label {Save Mesh}
+            callback {this->SaveMesh();}
+            xywh {0 0 100 20}
+          }
+        menuitem {} {
+            label {Save Mask}
+            callback {this->SaveMask();}
+            xywh {0 0 100 20}
+          }
+        menuitem {} {
+            label {Quit}
+            callback {this->Quit();}
+            xywh {0 0 100 20}
+          }
+      } 
+         submenu {} {
+          label Settings open
+          xywh {0 0 100 20}
+        } {
+          menuitem {} {
+            label {Segmentation Parameters}
+            callback {m_SegmentationParametersWindow->show();}
+            xywh {0 0 100 20}
+          }
+          menuitem {} {
+            label {Deform Mesh}
+            callback {this->DeformMesh();}
+            xywh {0 0 100 20}
+          }
+        } 
+        
+     submenu {} {
+          label Help open
+          xywh {20 20 100 20}
+        } {
+          menuitem {} {
+            label {How to use?}
+           callback {Fl_Help_Dialog  *help;    // Help dialog
+help = new Fl_Help_Dialog;
+help->load("how_to_use.html");
+help->show();}
+            xywh {0 0 100 20}
+          }
+          menuitem {} {
+            label About
+            callback{m_AboutWindow->show();}
+            xywh {0 0 100 20}
+          }
+        }
+}
       Fl_Button {} {
-        label Quit
-        callback {this->Quit();}
-        xywh {491 765 75 40}
+        label {READ ME FIRST!!!!!}
+        callback {Fl_Help_Dialog  *help;    // Help dialog
+help = new Fl_Help_Dialog;
+help->load("how_to_use.html");
+help->show();}
+        xywh {330 765 200 40}  box PLASTIC_UP_BOX color 67 labelfont 1 align 128
       }
-      Fl_Button {} {
-        label SaveMesh
-        callback {this->SaveMesh();}
-        xywh {413 765 75 40}
-      }
-      Fl_Button {} {
-        label SaveMesh
-        callback {this->SaveMesh();}
-        xywh {413 765 75 40}
-      }
-      Fl_Button {} {
-        label {Deform Mesh}
-        callback {this->DeformMesh();}
-        xywh {335 765 75 40} align 128
-      }
-      Fl_Button {} {
-        label {Prepare Forces}
-        callback {this->ComputeInternalForces();}
-        xywh {257 765 75 40} align 128
-      }
-      Fl_Button {} {
-        label {Load Mesh}
-        callback {this->LoadMesh();}
-        xywh {179 765 75 40} align 128
-      }
-      Fl_Button {} {
-        label {Load Mesh}
-        callback {this->LoadMesh();}
-        xywh {179 765 75 40} align 128
-      }
-      Fl_Button {} {
-        label {Create Mesh}
-        callback {this->CreateMesh();}
-        xywh {101 765 75 40} align 128
-      }
-      Fl_Button {} {
-        label {Load Image}
-        callback {this->Load();}
-        xywh {24 765 75 40} align 128
-      }
+      
       Fl_Box axialView {
         label Axial
-        xywh {25 25 380 345} box DOWN_FRAME align 2
+        xywh {30 40 380 345} box DOWN_FRAME align 2
         code0 {\#include "vtkFlRenderWindowInteractor.h"}
         class vtkFlRenderWindowInteractor
       }
       Fl_Value_Slider axialViewSlider {
         callback {this->SelectAxialSlice( static_cast<int>( o->value() ));}
-        xywh {410 25 15 345} maximum 100 step 1
+        xywh {415 40 15 345} maximum 100 step 1
       }
       Fl_Box coronalView {
         label Coronal
-        xywh {445 25 380 345} box DOWN_FRAME align 2
+        xywh {445 40 380 345} box DOWN_FRAME align 2
         code0 {\#include "vtkFlRenderWindowInteractor.h"}
         class vtkFlRenderWindowInteractor
       }
       Fl_Value_Slider coronalViewSlider {
         callback {this->SelectCoronalSlice( static_cast<int>( o->value() ) );}
-        xywh {830 25 15 345} maximum 100 step 1
+        xywh {830 40 15 345} maximum 100 step 1
       }
       Fl_Box sagittalView {
         label Sagittal
@@ -88,65 +135,90 @@ class DeformableModelApplicationGUI {open : {public DeformableModelApplicationBa
       }
       Fl_Box surfaceView {
         label Surface
-        xywh {30 395 380 345} box DOWN_FRAME align 2
+        xywh {30 400 400 345} box DOWN_FRAME align 2
         code0 {\#include "vtkFlRenderWindowInteractor.h"}
         class vtkFlRenderWindowInteractor
       }
-      Fl_Value_Input m_InternalForceValueInput {
-        label {Internal: }
-        callback {m_DeformFilter->SetAlpha( o->value() );}
-        xywh {65 815 50 25} maximum 10 step 0.1 value 0.3
-      }
-      Fl_Value_Input m_ExternalForceValueInput {
-        label {External: }
-        callback {m_DeformFilter->SetBeta( o->value() );}
-        xywh {185 815 50 25} maximum 10 step 0.1 value 0.9
-      }
-      Fl_Value_Input m_GammaForceValueInput {
-        label {Gamma: }
-        callback {m_DeformFilter->SetGamma( o->value() );}
-        xywh {300 815 50 25} maximum 10 step 0.1 value 0.3
-      }
-      Fl_Value_Input m_IterationsValueInput {
-        label {N:: }
-        callback {m_DeformFilter->SetIterations( (int)(o->value()) );}
-        xywh {380 815 50 25} maximum 1000 step 1 value 100
-      }
+     
     }
-    Fl_Window creditsWindow {
-      label Credits selected
-      xywh {595 428 405 215} type Double modal visible
+   Fl_Window m_SegmentationParametersWindow {
+      label {Segmentation Parameters}
+      xywh {991 160 300 330} type Double color 206 labelfont 3 visible
     } {
-      Fl_Box {} {
-        label Author
-        xywh {65 25 270 25} align 20
+     
+      Fl_Input m_InternalForceValueInput {
+        label {Internal Forces (Alpha): }
+        callback {m_DeformFilter->SetAlpha(atof(m_InternalForceValueInput->value()) );}
+        xywh {200 50 75 26} labelfont 1 
       }
-      Fl_Box {} {
-        label {Leila Bagdadi}
-        xywh {105 55 170 25} align 20
+      Fl_Input m_ExternalForceValueInput {
+        label {External Forces (Beta): }
+        callback {m_DeformFilter->SetBeta(atof(m_ExternalForceValueInput->value()) );}
+        xywh {200 80 75 26} labelfont 1 
       }
-      Fl_Box {} {
-        label {Mouse Imaging Centre (MICe)}
-        xywh {105 80 170 25} align 20
+      Fl_Input m_GammaForceValueInput {
+        label {Damping Forces (Gamma): }
+        callback {m_DeformFilter->SetGamma(atof(m_GammaForceValueInput->value()) );}
+        xywh {200 120 75 26} labelfont 1 
       }
-      Fl_Box {} {
-        label {Hospital for Sick Children}
-        xywh {105 105 170 25} align 20
+      Fl_Input m_RangeForceValueInput {
+        label {Range of Search: }
+        callback {m_DeformFilter->SetRange(atoi(m_RangeForceValueInput->value()) );}
+        xywh {200 150 75 26} labelfont 1
       }
-      Fl_Box {} {
-        label {Toronto, Ontario, Canada}
-        xywh {105 130 170 25} align 20
+      Fl_Input m_RigidityForceValueInput {
+        label {Rigidity (Regularizing) : }
+        callback {m_DeformFilter->SetRigidity(atoi(m_RigidityForceValueInput->value()) );}
+        xywh {200 190 75 26} labelfont 1 
+      }
+      Fl_Input m_IterationsValueInput {
+        label {Number of Iterations: }
+        callback {m_DeformFilter->SetIterations(atoi(m_IterationsValueInput->value()) );}
+        xywh {200 220 75 26} labelfont 1 
+      }
+      Fl_Return_Button {} {
+        label Ok
+        callback {m_DeformFilter->SetAlpha(atof(m_InternalForceValueInput->value()) );
+        m_DeformFilter->SetBeta(atof(m_ExternalForceValueInput->value()) );
+        m_DeformFilter->SetGamma(atof(m_GammaForceValueInput->value()) );
+        m_DeformFilter->SetRange(atoi(m_RangeForceValueInput->value()) );
+        m_DeformFilter->SetRigidity(atoi(m_RigidityForceValueInput->value()) );
+        m_DeformFilter->SetIterations(atoi(m_IterationsValueInput->value()) );
+        m_SegmentationParametersWindow->hide();}
+        xywh {70 270 75 26} labelfont 1
       }
       Fl_Button {} {
-        label Close
-        callback {creditsWindow->hide();}
-        xywh {155 175 105 25}
+        label Cancel
+        callback{m_SegmentationParametersWindow->hide();}
+        xywh {200 270 75 26} labelfont 1
+      }        
+        }
+Fl_Window m_AboutWindow {
+      label {About }
+      callback {m_AboutWindow->hide();}
+      xywh {-32000 -32000 268 161} type Double hide color 206
+    } {
+      Fl_Button {} {
+        label Dismiss
+        callback {m_AboutWindow->hide();}
+        xywh {95 135 60 25}
+      }
+      Fl_Text_Display m_TextDisplay {
+        xywh {50 5 160 120}
       }
     }
-  }
+    code {m_TextBuffer.append("\\nLeila Baghdadi\\n\\nMouse Imaging Centre\\n         MICe\\n\\nToronto Ontario\\nCanada");
+m_TextDisplay->buffer(m_TextBuffer);} {}
+  
+ }
   Function {~DeformableModelApplicationGUI()} {return_type virtual
   } {}
+  Function {Help()} {return_type {virtual void}
+  } {}
+decl {Fl_Text_Buffer m_TextBuffer;} {}        
   Function {Quit()} {return_type {virtual void}
+  } {}
+  Function {SaveMask()} {return_type {virtual void}
   } {}
   Function {SaveMesh()} {return_type {virtual void}
   } {}
@@ -170,4 +242,5 @@ class DeformableModelApplicationGUI {open : {public DeformableModelApplicationBa
   } {}
   Function {ComputeInternalForces()} {return_type {virtual void}
   } {}
+ 
 } 
