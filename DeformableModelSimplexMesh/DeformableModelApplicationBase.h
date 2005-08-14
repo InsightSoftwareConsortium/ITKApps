@@ -10,6 +10,7 @@
 #include "itkMesh.h"
 #include "itkVector.h"
 #include "itkImageFileReader.h"
+#include "itkImageFileWriter.h"
 #include "itkCastImageFilter.h"
 
 #include "itkGradientAnisotropicDiffusionImageFilter.h"
@@ -30,10 +31,13 @@
 #include "itkCellInterfaceVisitor.h"
 #include "itkCommand.h"
 
-#include "itkDeformableSimplexMesh3DBalloonForceFilter.h"
+#include "itkDeformableSimplexMesh3DGradientConstraintForceFilter.h"
 #include "itkDeformableSimplexMesh3DFilter.h"
 #include "itkGradientRecursiveGaussianImageFilter.h"
 #include "itkSobelEdgeDetectionImageFilter.h"
+
+#include "itkSimplexMeshToTriangleMeshFilter.h"
+#include "itkTriangleMeshToBinaryImageFilter.h"
 
 
 class DeformableModelApplicationBase 
@@ -96,19 +100,18 @@ public:
   typedef itk::TriangleMeshToSimplexMeshFilter<TriangleMeshType, SimplexMeshType> SimplexFilterType;
 
   typedef SimplexMeshType::CellsContainer::ConstIterator  CellIterator;
-  typedef itk::CellInterface<
-                      SimplexMeshType::PixelType, 
-                      SimplexMeshType::CellTraits >  CellInterfaceType;
-  typedef itk::VertexCell<CellInterfaceType>      vertexCell;
-  typedef itk::LineCell<CellInterfaceType> lineCell;
   
+  typedef SimplexMeshType::CellType                CellType;
+  typedef itk::LineCell< CellType >         LineType;
+  typedef itk::PolygonCell< CellType >         PolygonType;
+  typedef itk::TriangleCell< CellType >     TriangleType;
+  typedef itk::QuadrilateralCell< CellType >     QuadrilateralType;
  
-  typedef SimplexMeshType::LineType  lineType;
-  typedef SimplexMeshType::CellType  cellType;
+  
 
   // Deformable Models
 
-  typedef itk::DeformableSimplexMesh3DFilter<SimplexMeshType,SimplexMeshType> DeformFilterType;
+  typedef itk::DeformableSimplexMesh3DGradientConstraintForceFilter<SimplexMeshType,SimplexMeshType> DeformFilterType;
  
   typedef itk::SobelEdgeDetectionImageFilter<CastType,CastType> EdgeFilterType;
 
@@ -117,6 +120,12 @@ public:
   typedef itk::GradientRecursiveGaussianImageFilter<CastType,GradientImageType> GradientFilterType;
   
   typedef itk::SimpleMemberCommand< DeformableModelApplicationBase >  IterationObserverType;
+
+  typedef itk::SimplexMeshToTriangleMeshFilter<SimplexMeshType,TriangleMeshType>  TriangleFilterType;
+
+  typedef itk::TriangleMeshToBinaryImageFilter<TriangleMeshType, MeshPixelType> TriangleMeshToBinaryImageFilterType;
+
+  typedef itk::ImageFileWriter<MeshPixelType> ImageWriterType;
 
 public:
   
@@ -169,8 +178,18 @@ protected:
   ImageToVTKImageType::Pointer            m_ImageToVTKImage;
 
   TriangleMeshType::Pointer               m_TriangleMesh;
+
   SimplexFilterType::Pointer              m_SimplexMeshFilter;
+
   SimplexMeshType::Pointer                m_SimplexMeshLoaded;
+
+  char                                    m_MessageString[256];
+
+  TriangleFilterType::Pointer             m_SimplexToTriangle;
+
+  TriangleMeshToBinaryImageFilterType::Pointer m_TriangleToImage;
+
+  ImageWriterType::Pointer                m_ImageWriter;
 
 };
 

@@ -30,7 +30,7 @@ DeformableModelApplicationBase
   center.Fill(0);
  
   VectorType sphereRadius;
-  sphereRadius.Fill( 25.0 );
+  sphereRadius.Fill( 10.0 );
 
   m_SphereMeshSource->SetCenter(center);
   m_SphereMeshSource->SetScale( sphereRadius );
@@ -57,6 +57,12 @@ DeformableModelApplicationBase
 
   m_DeformFilter->AddObserver( itk::IterationEvent(), m_IterationObserver );
   m_DeformFilter->AddObserver( itk::ProgressEvent(), m_IterationObserver );
+
+  m_SimplexToTriangle = TriangleFilterType::New();
+
+  m_TriangleToImage = TriangleMeshToBinaryImageFilterType::New();
+  
+  m_ImageWriter = ImageWriterType::New(); 
 
 }
 
