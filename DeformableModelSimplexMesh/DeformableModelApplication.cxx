@@ -63,24 +63,30 @@ DeformableModelApplication
   //  m_SimplexMeshViewer.AddObserver(ClickedPointEvent(), m_SurfaceViewerCommand);
 
 
-  const float alpha = 0.1; //internal forces
-  const float beta  = 1.0; //external forces
-  const float kappa = 0.5; //balloon deformables to be implemented ...
-  const float gamma = 0.1; 
+  const float alpha = 0.8; //internal forces
+  const float beta  = 0.8; //external forces
+  const float gamma = 0.35; 
+  const int   range = 2; // how far to go through scan line algorithm
+  const int   rigidity = 0; // regularization
+  const int   iterations = 100;
 
-  m_InternalForceValueInput->value( alpha );
-  m_ExternalForceValueInput->value( beta );
-  //m_BalloonForceValueInput->value( kappa );
-  m_GammaForceValueInput->value( gamma );
-
-  m_DeformFilter->SetAlpha( alpha );
-  m_DeformFilter->SetBeta( beta );
-  //m_DeformFilter->SetKappa( kappa );
-  m_DeformFilter->SetGamma (gamma);
-
-  m_DeformFilter->SetRigidity( 1 );
+  sprintf(m_MessageString, "%4.1f", alpha);
+  m_InternalForceValueInput->value(m_MessageString);
+  sprintf(m_MessageString, "%4.1f", beta);
+  m_ExternalForceValueInput->value(m_MessageString);
+  sprintf(m_MessageString, "%5.2f", gamma);
+  m_GammaForceValueInput->value(m_MessageString);
+  sprintf(m_MessageString, "%d", range);
+  m_RangeForceValueInput->value(m_MessageString);
+  sprintf(m_MessageString, "%d", rigidity);
+  m_RigidityForceValueInput->value(m_MessageString);
+  sprintf(m_MessageString, "%d", iterations);
+  m_IterationsValueInput->value(m_MessageString);
  
-  m_InternalForcesComputed = false;
+  m_ImageLoaded = false;
+  m_MeshLoaded = false;
+  m_MeshCreated = false;
+  m_PreprocessingFinished = false;
 
 }
 
@@ -97,7 +103,7 @@ void
 DeformableModelApplication
 ::Show()
 {
-  creditsWindow->show();
+ 
   mainWindow->show();
   axialView->show();
   coronalView->show();
@@ -134,6 +140,17 @@ void
 DeformableModelApplication
 ::LoadMesh()
 {
+  if (m_ImageLoaded )
+    {
+      if (m_MeshCreated) 
+        {
+          return;
+        }
+    }
+  else
+    {
+      return;
+    }
   const char * filename = fl_file_chooser("Mesh filename","*.*","");
  
   if( !filename  || strlen(filename) == 0 )
@@ -156,155 +173,67 @@ DeformableModelApplication
   vmarchingcubes->SetInput(m_ImageToVTKImage->GetOutput());
   vmarchingcubes->SetValue(0, 0.5);
   vmarchingcubes->ComputeScalarsOff();
+  vmarchingcubes->ComputeNormalsOff();
+  vmarchingcubes->ComputeGradientsOff();
   vmarchingcubes->SetInputMemoryLimit(1000);
   vmarchingcubes->Update();
 
   vtkDecimatePro* vdecimate = vtkDecimatePro::New(); 
   vdecimate->SetInput(vmarchingcubes->GetOutput()); 
-  vdecimate->SetTargetReduction(0.90); //compression factor, closer to 1 higher compression)
+  vdecimate->SetTargetReduction(0.9); //compression factor, closer to 1 higher compression)
+  vdecimate->PreserveTopologyOn();
   vdecimate->Update();
   
-  //
-  // Transfer the points from the vtkPolyData into the itk::Mesh
-  //
-  const unsigned int numberOfPoints = vdecimate->GetOutput()->GetNumberOfPoints();
-  vtkPoints * vtkpoints = vdecimate->GetOutput()->GetPoints();
+  // send polydata to vtkPolyDataToitkMesh to return itkMesh
+  m_PolyData.SetInput(vdecimate->GetOutput());
+  m_TriangleMesh = m_PolyData.GetOutput();
  
-  m_TriangleMesh->GetPoints()->Reserve( numberOfPoints );
-
-  for(int p =0; p < numberOfPoints; p++)
-    {
-    vtkFloatingPointType * apoint = vtkpoints->GetPoint( p );
- 
-    // Need to convert the point to PoinType
-    TriangleMeshType::PointType pt;
-    for(unsigned int i=0;i<3; i++)
-      {
-      pt[i] = apoint[i];
-      }
-
-    m_TriangleMesh->SetPoint( p, pt);
-    }
-
-  //
-  // Transfer the cells from the vtkPolyData into the itk::Mesh
-  //
-  vtkCellArray * triangleStrips = vdecimate->GetOutput()->GetStrips();
+  std::cout << "Number of Points =   " << m_TriangleMesh->GetNumberOfPoints() << std::endl;
+  std::cout << "Number of Cells  =   " << m_TriangleMesh->GetNumberOfCells()  << std::endl;
   
-  vtkIdType  * cellPoints;
-  vtkIdType    numberOfCellPoints;
-
-  //
-  // First count the total number of triangles from all the triangle strips.
-  //
-  unsigned int numberOfTriangles = 0;
-
-  triangleStrips->InitTraversal();
-  while( triangleStrips->GetNextCell( numberOfCellPoints, cellPoints ) )
-    {
-      numberOfTriangles += numberOfCellPoints-2;
-    }
-
-   vtkCellArray * polygons = vdecimate->GetOutput()->GetPolys();
-  
-   polygons->InitTraversal();
-
-   while( polygons->GetNextCell( numberOfCellPoints, cellPoints ) )
-     {
-       if( numberOfCellPoints == 3 )
-   {
-     numberOfTriangles ++;
-   }
-     }
-
-  //
-  // Reserve memory in the itk::Mesh for all those triangles
-  //
-   m_TriangleMesh->GetCells()->Reserve( numberOfTriangles );
-
-  // 
-  // Copy the triangles from vtkPolyData into the itk::Mesh
-  //
-  //
-
-   typedef TriangleMeshType::CellType   CellType;
-
-   typedef itk::TriangleCell< CellType > TriangleCellType;
-
-   int cellId = 0;
-
-  // first copy the triangle strips
-   triangleStrips->InitTraversal();
-   while( triangleStrips->GetNextCell( numberOfCellPoints, cellPoints ) )
-     {
-    
-       unsigned int numberOfTrianglesInStrip = numberOfCellPoints - 2;
-
-       unsigned long pointIds[3];
-       pointIds[0] = cellPoints[0];
-       pointIds[1] = cellPoints[1];
-       pointIds[2] = cellPoints[2];
-
-       for( unsigned int t=0; t < numberOfTrianglesInStrip; t++ )
-   {
-     TriangleMeshType::CellAutoPointer c;
-     TriangleCellType * tcell = new TriangleCellType;
-     tcell->SetPointIds( pointIds );
-     c.TakeOwnership( tcell );
-     m_TriangleMesh->SetCell( cellId, c );
-     cellId++;
-     pointIds[0] = pointIds[1];
-     pointIds[1] = pointIds[2];
-     pointIds[2] = cellPoints[t+3];
-   }
-     }
-
-   // then copy the normal triangles
-   polygons->InitTraversal();
-   while( polygons->GetNextCell( numberOfCellPoints, cellPoints ) )
-     {
-       if( numberOfCellPoints !=3 ) // skip any non-triangle.
-  {
-    continue;
-  }
-       TriangleMeshType::CellAutoPointer c;
-       TriangleCellType * t = new TriangleCellType;
-       t->SetPointIds( (unsigned long*)cellPoints );
-       c.TakeOwnership( t );
-       m_TriangleMesh->SetCell( cellId, c );
-       cellId++;
-     }
-  
-   m_SimplexMeshFilter->SetInput( m_TriangleMesh);
-   m_SimplexMeshFilter->Update();
-
-  
-  
-   m_SimplexMesh = m_SimplexMeshFilter->GetOutput();
-
-   m_SimplexMeshToShow = m_SimplexMesh;
-
-   this->RefreshMeshVisualization();
+  m_SimplexMeshFilter->SetInput( m_TriangleMesh);
+  m_SimplexMeshFilter->Update();
    
-   // force a redraw
-   axialView->redraw();
-   coronalView->redraw();
-   sagittalView->redraw();
-   surfaceView->redraw();
+  m_SimplexMesh = m_SimplexMeshFilter->GetOutput();
 
-   Fl::check(); 
-
-   //delete all VTK objects
-   vmarchingcubes->Delete();
-   vdecimate->Delete();
+  m_SimplexMesh->DisconnectPipeline();
+  m_SimplexMeshFilter->Delete();
   
+  std::cout << "simplex Number of Points =   " << m_SimplexMesh->GetNumberOfPoints() << std::endl;
+  std::cout << "simplex Number of Cells  =   " << m_SimplexMesh->GetNumberOfCells()  << std::endl;
 
+  m_SimplexMeshToShow = m_SimplexMesh;
+  m_MeshLoaded = true;
+  this->RefreshMeshVisualization();
+   
+  // force a redraw
+  axialView->redraw();
+  coronalView->redraw();
+  sagittalView->redraw();
+  surfaceView->redraw();
+
+  Fl::check(); 
+
+  //delete all VTK objects
+  vmarchingcubes->Delete();
+  vdecimate->Delete();
 }
-
 void
 DeformableModelApplication
 ::CreateMesh()
 {
+  
+   if (m_ImageLoaded )
+    {
+      if (m_MeshLoaded) 
+        {
+          return;
+        }
+    }
+  else
+    {
+      return;
+    }
   m_SphereMeshSource->SetCenter(m_SeedPoint);
   m_SimplexFilter->Update();
   
@@ -312,7 +241,7 @@ DeformableModelApplication
   m_SimplexMesh->DisconnectPipeline();
 
   m_SimplexMeshToShow = m_SimplexMesh;
-
+  m_MeshCreated = true;
   this->RefreshMeshVisualization();
    
   // force a redraw
@@ -328,94 +257,126 @@ void
 DeformableModelApplication
 ::RefreshMeshVisualization()
 {
+   int numPoints =  m_SimplexMeshToShow->GetNumberOfPoints();
   
-  CellIterator cellIterator = m_SimplexMeshToShow->GetCells()->Begin();
-  CellIterator cellEnd      = m_SimplexMeshToShow->GetCells()->End();
-  int i=0;
-  while (cellIterator != cellEnd)
-    {
-    i++;
-    cellType * cell = cellIterator.Value();
-    if (cell->GetType() == cellType::LINE_CELL)
-      {
-      lineType * line = static_cast<lineType *>( cell );
-      }
-    ++cellIterator;
-    }
-
-  int numPoints =  m_SimplexMeshToShow->GetNumberOfPoints();
-
-  if (numPoints == 0)
-    {
-      fl_alert( "no points in Grid ");
-      return; 
-    }
-
+ if (numPoints == 0)
+   {
+     fl_alert( "no points in Grid ");
+     return; 
+   }
+ 
  // fill in here the conversion between itkMesh versus vtkUnstructuredGrid
 
-  vtkPolyData* vgrid = vtkPolyData::New();
+ vtkPolyData* vgrid = vtkPolyData::New();
 
-  // Create the vtkPoints object and set the number of points
-  vtkPoints* vpoints = vtkPoints::New();
-  vpoints->SetNumberOfPoints(numPoints);
+ // Create the vtkPoints object and set the number of points
+ vtkPoints* vpoints = vtkPoints::New();
+ vpoints->SetNumberOfPoints(numPoints);
   
-  // iterate over all the points in the itk mesh filling in
-  // the vtkPoints object as we go
-  SimplexMeshType::PointsContainer::Pointer points = m_SimplexMeshToShow->GetPoints();
-  for(SimplexMeshType::PointsContainer::Iterator i = points->Begin();
-      i != points->End(); ++i)
-    {
-      // Get the point index from the point container iterator
-      int idx = i->Index();
-      // Set the vtk point at the index with the the coord array from itk
-      // itk returns a const pointer, but vtk is not const correct, so
-      // we have to use a const cast to get rid of the const
-      double * pp1 = const_cast<double*>(i->Value().GetDataPointer());
-      vtkFloatingPointType* pp = new vtkFloatingPointType[3];
-      pp[0] = pp1[0];
-      pp[1] = pp1[1];
-      pp[2] = pp1[2];
-      vpoints->SetPoint(idx, pp);
-    }
+ // iterate over all the points in the itk mesh filling in
+ // the vtkPoints object as we go
+ SimplexMeshType::PointsContainer::Pointer points = m_SimplexMeshToShow->GetPoints();
+ for(SimplexMeshType::PointsContainer::Iterator i = points->Begin();
+     i != points->End(); ++i)
+   {
+     // Get the point index from the point container iterator
+     int idx = i->Index();
+     // Set the vtk point at the index with the the coord array from itk
+     // itk returns a const pointer, but vtk is not const correct, so
+     // we have to use a const cast to get rid of the const
+     vtkFloatingPointType * pp = const_cast<vtkFloatingPointType*>(i->Value().GetDataPointer());
+      
+     vpoints->SetPoint(idx, pp);
+     
+   }
 
-  // Set the points on the vtk grid
-  vgrid->SetPoints(vpoints);
-
-  SimplexMeshType::CellType::MultiVisitor::Pointer mv =
-    SimplexMeshType::CellType::MultiVisitor::New();
+ // Set the points on the vtk grid
+ vgrid->SetPoints(vpoints);
+  
+ // it is probably better not to add scalar to the vis mesh
+ // as it makes it harder to visualize
+ //  vgrid->GetPointData()->SetScalars(scalars);
+ //  vgrid->GetPointData()->CopyAllOn();
+ 
+ SimplexMeshType::CellType::MultiVisitor::Pointer mv =
+   SimplexMeshType::CellType::MultiVisitor::New();
 
   LineVisitor::Pointer lv = LineVisitor::New();
-
+  PolygonVisitor::Pointer pv = PolygonVisitor::New();
+  TriangleVisitor::Pointer tv = TriangleVisitor::New();
+ 
   //set up the visitors
   int vtkCellCount = 0; // running counter for current cell inserted into vtk
   int numCells = m_SimplexMeshToShow->GetNumberOfCells();
   int *types = new int[numCells]; //type array for vtk
-
+  bool onlyTriangles = false;
   //create vtk cells and estimate the size
-  vtkCellArray* cells = vtkCellArray::New();
-  cells->EstimateSize(numCells, 4);
+   vtkCellArray* cells = vtkCellArray::New();
+     cells->EstimateSize(numCells, 4);
+
+    lv->SetTypeArray(types);
+    lv->SetCellCounter(&vtkCellCount);
+    lv->SetCellArray(cells);
+
+    pv->SetTypeArray(types);
+    pv->SetCellCounter(&vtkCellCount);
+    pv->SetCellArray(cells);
+
+    tv->SetTypeArray(types);
+    tv->SetCellCounter(&vtkCellCount);
+    tv->SetCellArray(cells);
+  
 
   // Set the TypeArray CellCount and CellArray for both visitors
-  lv->SetTypeArray(types);
-  lv->SetCellCounter(&vtkCellCount);
-  lv->SetCellArray(cells);
+  //lv->SetTypeArray(types);
+  // tv->SetTypeArray(types);
+  //lv->SetCellCounter(&vtkCellCount);
+    //  tv->SetCellCounter(&vtkCellCount);
+  //lv->SetCellArray(cells);
+    //  tv->SetCellArray(cells);
  
-  mv->AddVisitor(lv);
-  
+  // mv->AddVisitor(lv);
+  //mv->AddVisitor(tv);
   m_SimplexMeshToShow->Accept(mv);
 
 
+  //vgrid->SetLines(cells);
+  //vgrid->SetStrips(cells);  
+   
+if (onlyTriangles) {
+      mv->AddVisitor(tv);
+      m_SimplexMeshToShow->Accept(mv);
+      vgrid->SetStrips(cells);  
+    }
+    else 
+    {
+      mv->AddVisitor(tv);
+      mv->AddVisitor(lv);
+      //      mv->AddVisitor(pv);
+  //    mv->AddVisitor(qv);
+      // Now ask the mesh to accept the multivisitor which
+      // will Call Visit for each cell in the mesh that matches the
+      // cell types of the visitors added to the MultiVisitor
+  m_SimplexMeshToShow->Accept(mv);
+      // Now set the cells on the vtk grid with the type array and cell array
+  vgrid->SetPolys(cells);  
+      //vgrid->SetStrips(cells);  
   vgrid->SetLines(cells);
+    // Clean up vtk objects (no vtkSmartPointer ... )
+  }
 
-  //cells->Delete();
-  //vpoints->Delete();
-
+  cells->Delete();
+  vpoints->Delete();
+   
   m_AxialViewer.SetSimplexMesh(vgrid);
   m_CoronalViewer.SetSimplexMesh(vgrid);
   m_SagittalViewer.SetSimplexMesh(vgrid);
   m_SimplexMeshViewer.SetSimplexMesh(vgrid);
+
  
+
  return;
+  
 }
 
 
@@ -423,16 +384,21 @@ void
 DeformableModelApplication
 ::ComputeInternalForces()
 {
-  
+  if ( !m_ImageLoaded || (!m_MeshLoaded && !m_MeshCreated))
+    {
+      return;
+    }
+  std::cout << " Performing Preprocessing ... " << std::endl;
   m_CastImage->SetInput( m_VolumeReader->GetOutput() );
   m_CastImage->Update();
-
+  /* removed this as it was too slow
   m_GradientAnisotropicImage->SetInput( m_CastImage->GetOutput());
   m_GradientAnisotropicImage->SetNumberOfIterations(5);
   m_GradientAnisotropicImage->SetTimeStep(0.0625);
   m_GradientAnisotropicImage->SetConductanceParameter(3);
- 
-  m_GradientMagnitude->SetInput( m_GradientAnisotropicImage->GetOutput() );
+  */
+  //m_GradientMagnitude->SetInput( m_GradientAnisotropicImage->GetOutput() );
+  m_GradientMagnitude->SetInput(m_CastImage->GetOutput() );
   m_GradientMagnitude->SetSigma(0.5);
   
   m_SigmoidImage->SetInput( m_GradientMagnitude->GetOutput());
@@ -445,16 +411,12 @@ DeformableModelApplication
   m_GradientFilter->SetSigma( 0.5);
 
   m_GradientFilter->Update();
-
-  
-  typedef itk::ImageFileWriter< CastType > WriterType;
-  WriterType::Pointer gradientWriter = WriterType::New();
-  gradientWriter->SetInput( m_SigmoidImage->GetOutput() );
-  gradientWriter->SetFileName("sigmoid.mhd");
-  gradientWriter->Update();
-
+  std::cout << " Preprocessing DONE!... " << std::endl;
   m_DeformFilter->SetGradient( m_GradientFilter->GetOutput() );
-  m_InternalForcesComputed = true;
+  VolumeType::Pointer   Image = m_VolumeReader->GetOutput();
+  Image->DisconnectPipeline();
+  m_DeformFilter->SetImage(Image );
+  m_PreprocessingFinished = true;
 
 }
 
@@ -491,19 +453,74 @@ DeformableModelApplication
       
 }
 
+void
+DeformableModelApplication
+::SaveMask()
+{
+  if (!m_ImageLoaded || (!m_MeshLoaded && !m_MeshCreated) || !m_PreprocessingFinished)
+    {
+      return;
+    }
+
+  const char * filename = fl_file_chooser("Save Mask As","*.mhd","");
+ 
+  if( !filename  || strlen(filename) == 0 )
+    {
+    return;
+    }
+  double orgn[3];
+  orgn[0] = m_LoadedVolume->GetOrigin()[0];
+  orgn[1] = m_LoadedVolume->GetOrigin()[1];
+  orgn[2] = m_LoadedVolume->GetOrigin()[2];
+
+  std::cout << "Converting Simplex Mesh to Triangle Mesh . . ." << std::endl;
+  
+  m_SimplexToTriangle->SetInput(m_DeformFilter->GetOutput());
+  m_SimplexToTriangle->Update();
+  
+  TriangleMeshType::Pointer triangleMesh = m_SimplexToTriangle->GetOutput();
+  triangleMesh->DisconnectPipeline();
+  m_SimplexToTriangle->Delete();
+  m_TriangleToImage->SetInput(triangleMesh);
+  MeshPixelType::SizeType size;
+
+  size[0] = m_LoadedVolume->GetBufferedRegion().GetSize()[0];
+  size[1] = m_LoadedVolume->GetBufferedRegion().GetSize()[1];
+  size[2] = m_LoadedVolume->GetBufferedRegion().GetSize()[2];
+  m_TriangleToImage->SetSize(size);
+  
+ 
+  m_TriangleToImage->SetOrigin(orgn);
+  // spacing remains (1,1,1) until we make a change to deformable model class
+  float spacing[3];
+  spacing[0] = 1;
+  spacing[1] = 1;
+  spacing[2] = 1;
+
+  m_TriangleToImage->SetSpacing(spacing);
+
+  m_TriangleToImage->Update();
+
+  m_ImageWriter->SetInput(m_TriangleToImage->GetOutput() );
+  m_ImageWriter->SetFileName(filename);
+  m_ImageWriter->UseInputMetaDataDictionaryOn();
+  m_ImageWriter->Update();
+}
+
 void 
 DeformableModelApplication
 ::DeformMesh()
 {
-  if( !m_InternalForcesComputed )
+  if (!m_ImageLoaded || (!m_MeshLoaded && !m_MeshCreated) || !m_PreprocessingFinished)
     {
-      this->ComputeInternalForces();
+      return;
     }
  SimplexMeshType::Pointer simplexMesh2 = m_SimplexMesh;
-  const unsigned int numberOfIterationsToGo = (unsigned int)(m_IterationsValueInput->value());
-  
+  const unsigned int numberOfIterationsToGo = atoi(m_IterationsValueInput->value());
+ 
   for( unsigned int i=0; i<numberOfIterationsToGo; i++ )
     {
+      std::cout << " Iteration   " << i << std::endl;
       m_SimplexMesh->DisconnectPipeline();
       
       m_DeformFilter->SetInput( m_SimplexMesh );
@@ -548,6 +565,8 @@ DeformableModelApplication
   m_LoadedVolume = m_VolumeReader->GetOutput();
 
   this->LoadPostProcessing();
+
+  m_ImageLoaded =  true;
 
 }
 
@@ -704,4 +723,3 @@ DeformableModelApplication
   m_SagittalViewer.SelectPoint( m_SeedPoint[0], m_SeedPoint[1], m_SeedPoint[2] );
 
 }
-
