@@ -265,6 +265,7 @@ SET(APPLICATION_FLUIDS
 # All program files
 SET(PROGRAM_DATA_FILES
   ProgramData/SNAPProgramDataDirectory.txt
+
   ProgramData/HTMLHelp/Credits.html
   ProgramData/HTMLHelp/Tutorial.html
   ProgramData/HTMLHelp/TutorialSectionEdgeBasedSegmentation.html
@@ -275,6 +276,7 @@ SET(PROGRAM_DATA_FILES
   ProgramData/HTMLHelp/TutorialSectionRegionSegmentation.html
   ProgramData/HTMLHelp/TutorialSectionTipsAndTricks.html
   ProgramData/HTMLHelp/TutorialSectionViewingImages.html
+  ProgramData/HTMLHelp/TutorialSectionVolumes.html
   ProgramData/HTMLHelp/Artwork/ttAutoIntroEdgesPicture.gif
   ProgramData/HTMLHelp/Artwork/ttAutoIntroEdgesPipeline01.gif
   ProgramData/HTMLHelp/Artwork/ttAutoIntroEdgesPipeline02.gif
@@ -320,6 +322,7 @@ SET(PROGRAM_DATA_FILES
   ProgramData/HTMLHelp/Artwork/ttLoadImageWizardSummary.gif
   ProgramData/HTMLHelp/Artwork/ttManualSegmentLabelEditor.gif
   ProgramData/HTMLHelp/Artwork/ttManualSegmentLabelEditorChanged.gif
+  ProgramData/HTMLHelp/Artwork/ttManualSegmentLabelEditorLoaded.gif
   ProgramData/HTMLHelp/Artwork/ttManualSegmentLabelFileDialog.gif
   ProgramData/HTMLHelp/Artwork/ttManualSegmentLabelSubPanel.gif
   ProgramData/HTMLHelp/Artwork/ttManualSegmentLabelSubPanel02.gif
@@ -344,10 +347,10 @@ SET(PROGRAM_DATA_FILES
   ProgramData/HTMLHelp/Artwork/ttRegionParameterWindow.gif
   ProgramData/HTMLHelp/Artwork/ttRegionPreprocessor01.gif
   ProgramData/HTMLHelp/Artwork/ttRegionPreprocessor02.gif
-  ProgramData/HTMLHelp/Artwork/ttRegionResult.gif
   ProgramData/HTMLHelp/Artwork/ttRegionROISelection01.gif
   ProgramData/HTMLHelp/Artwork/ttRegionROISelection02.gif
   ProgramData/HTMLHelp/Artwork/ttRegionROISelectionFinal.gif
+  ProgramData/HTMLHelp/Artwork/ttRegionResult.gif
   ProgramData/HTMLHelp/Artwork/ttRegionScalpelLabels.gif
   ProgramData/HTMLHelp/Artwork/ttRegionToolbar.gif
   ProgramData/HTMLHelp/Artwork/ttRegionVentricleResult.gif
@@ -356,20 +359,26 @@ SET(PROGRAM_DATA_FILES
   ProgramData/HTMLHelp/Artwork/ttSprayPaintCross.gif
   ProgramData/HTMLHelp/Artwork/ttSprayPaintTool.gif
   ProgramData/HTMLHelp/Artwork/ttTipsAdvanced.gif
+  ProgramData/HTMLHelp/Artwork/ttTipsFocusPlus.gif
+  ProgramData/HTMLHelp/Artwork/ttTipsFocusResult.gif
+  ProgramData/HTMLHelp/Artwork/ttTipsImageInfo.gif
   ProgramData/HTMLHelp/Artwork/ttTipsResample1.gif
   ProgramData/HTMLHelp/Artwork/ttTipsResample2.gif
   ProgramData/HTMLHelp/Artwork/ttTipsResample3.gif
+  ProgramData/HTMLHelp/Artwork/ttViewImageAppearance.gif
   ProgramData/HTMLHelp/Artwork/ttViewImageControlPanel.gif
-  ProgramData/HTMLHelp/Artwork/ttViewImageControlPanelToolbox01.gif
-  ProgramData/HTMLHelp/Artwork/ttViewImageControlPanelToolbox02.gif
   ProgramData/HTMLHelp/Artwork/ttViewImageControlPanelToolOptions01.gif
   ProgramData/HTMLHelp/Artwork/ttViewImageControlPanelToolOptions02.gif
+  ProgramData/HTMLHelp/Artwork/ttViewImageControlPanelToolbox01.gif
+  ProgramData/HTMLHelp/Artwork/ttViewImageControlPanelToolbox02.gif
   ProgramData/HTMLHelp/Artwork/ttViewImageDisplayOptions.gif
   ProgramData/HTMLHelp/Artwork/ttViewImageIntensityDialog.gif
   ProgramData/HTMLHelp/Artwork/ttViewImageIntensityDialogWindowing.gif
   ProgramData/HTMLHelp/Artwork/ttViewImageIntensityDialogWindowingCurve.gif
   ProgramData/HTMLHelp/Artwork/ttViewImageSliceWindowClick.gif
   ProgramData/HTMLHelp/Artwork/ttViewImageSliceWindowZoom.gif
+  ProgramData/HTMLHelp/Artwork/ttVolumeStatsDialog.gif
+  ProgramData/HTMLHelp/Artwork/ttVolumeStatsMesh.gif
   ProgramData/Images2D/EdgeForcesExample.png
   ProgramData/Images2D/RegionForcesExample.png
   ProgramData/Presets/SnakeParameterPreviewCurve.txt
