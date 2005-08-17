@@ -27,7 +27,6 @@ class itkMeshTovtkPolyData
 
   typedef itk::DefaultDynamicMeshTraits<double, 3, 3,double,double> TriangleMeshTraits;
   typedef itk::Mesh<double,3, TriangleMeshTraits> TriangleMeshType;
-  typedef itk::Point < double, 3> PointType;
   typedef TriangleMeshType::PointType                       PointType;
   typedef TriangleMeshType::PointsContainer                 InputPointsContainer;
   typedef InputPointsContainer::Pointer            InputPointsContainerPointer;
