@@ -103,8 +103,8 @@ PreprocessingUILogic
   ThresholdSettings settings = m_GlobalState->GetThresholdSettings();
 
   // Shorthands
-  unsigned int lower = settings.GetLowerThreshold();
-  unsigned int upper = settings.GetUpperThreshold();
+  int lower = settings.GetLowerThreshold();
+  int upper = settings.GetUpperThreshold();
 
   // Set the ranges for the two thresholds.  These ranges do not require the
   // lower slider to be less than the upper slider, that will be corrected
@@ -130,8 +130,8 @@ PreprocessingUILogic
   // Make sure that the specified range is valid
   if(lower > upper)
     {
-    lower = (unsigned int) (0.67 * iMin + 0.33 * iMax);
-    upper = (unsigned int) (0.33 * iMin + 0.67 * iMax);
+    lower = (int) (0.67 * iMin + 0.33 * iMax);
+    upper = (int) (0.33 * iMin + 0.67 * iMax);
     }
 
   // Make sure the current values of the upper and lower threshold are 
