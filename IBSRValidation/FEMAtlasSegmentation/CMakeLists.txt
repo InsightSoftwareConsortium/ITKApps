@@ -51,4 +51,5 @@ ADD_DEFINITIONS( -DFEM_BUILD_VISUALIZATION /D "_AFXDLL" )
 ENDIF(FEM_VISUALIZATION)
 
 ADD_EXECUTABLE(FEMBrainStripValidationApp ${FEMBrainStripApp_SRCS} )
-TARGET_LINK_LIBRARIES(FEMBrainStripValidationApp ITKBasicFilters ITKNumerics ITKFEM ITKIO)
+TARGET_LINK_LIBRARIES(FEMBrainStripValidationApp ITKBasicFilters ITKNumerics
+                                                 ITKFEM ITKIO ITKStatistics)

@@ -19,7 +19,8 @@ ${AtlasSegmentation_SOURCE_DIR}
 )
 
 ADD_EXECUTABLE(BrainStripValidationApp Code/BrainStripValidationApp.cxx)
-TARGET_LINK_LIBRARIES(BrainStripValidationApp ITKBasicFilters ITKIO)
+TARGET_LINK_LIBRARIES(BrainStripValidationApp ITKBasicFilters ITKIO
+                                              ITKStatistics)
 
 
 

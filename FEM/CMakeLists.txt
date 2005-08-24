@@ -18,6 +18,7 @@ LINK_LIBRARIES (
   ITKCommon
   ITKNumerics
   ITKBasicFilters 
+  ITKStatistics
   ITKIO  
 )
 
