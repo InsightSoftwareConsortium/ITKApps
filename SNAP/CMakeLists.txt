@@ -433,31 +433,69 @@ ENDIF(UNIX)
 SET(MY_SOURCE_DIR ${InsightApplications_SOURCE_DIR}/SNAP)
 SET(MY_BINARY_DIR ${InsightApplications_BINARY_DIR}/SNAP)
 
-# Include directories
-INCLUDE_DIRECTORIES(
-  ${ITK_DIR}/Utilities/zlib
-  ${MY_SOURCE_DIR}/Common
-  ${MY_SOURCE_DIR}/Logic
-  ${MY_SOURCE_DIR}/Logic/Common
-  ${MY_SOURCE_DIR}/Logic/Framework
-  ${MY_SOURCE_DIR}/Logic/ImageWrapper
-  ${MY_SOURCE_DIR}/Logic/LevelSet
-  ${MY_SOURCE_DIR}/Logic/Mesh
-  ${MY_SOURCE_DIR}/Logic/Preprocessing
-  ${MY_SOURCE_DIR}/Logic/Slicing
-  ${MY_SOURCE_DIR}/Testing
-  ${MY_SOURCE_DIR}/UserInterface/BasicComponents
-  ${MY_SOURCE_DIR}/UserInterface/Common
-  ${MY_SOURCE_DIR}/UserInterface/ImageIOWizard
-  ${MY_SOURCE_DIR}/UserInterface/MainComponents
-  ${MY_SOURCE_DIR}/UserInterface/MainComponents/Artwork
-  ${MY_SOURCE_DIR}/UserInterface/SliceWindow
-  ${MY_SOURCE_DIR}/UserInterface/Window3D
-  ${MY_BINARY_DIR}/UserInterface/ImageIOWizard
-  ${MY_BINARY_DIR}/UserInterface/MainComponents
-  ${FLTK_INCLUDE_PATH}
-  ${OPENGL_INCLUDE_PATH}
-)
+
+# Due to a limitation in Visual studio 6.0 on the length of include directories 
+# that can be specified, (here we are including all the include directories from
+# ITK, VTK, FLTK and SNAP), if the compiler is VS6, we copy the SNAP source files
+# to a single path in the binary tree to cut down on the number of 
+# INCLUDE_DIRECTORIES
+IF( CMAKE_GENERATOR MATCHES "Visual Studio 6" )
+  FILE( GLOB_RECURSE SNAP_GLOBBED_CXX "${MY_SOURCE_DIR}/*.cxx" )
+  FILE( GLOB_RECURSE SNAP_GLOBBED_H "${MY_SOURCE_DIR}/*.h" )
+  FILE( GLOB_RECURSE SNAP_GLOBBED_TXX "${MY_SOURCE_DIR}/*.txx" )
+  SET( SNAP_SOURCES 
+            ${SNAP_GLOBBED_CXX} 
+            ${SNAP_GLOBBED_H} 
+            ${SNAP_GLOBBED_TXX} 
+     )
+  MAKE_DIRECTORY( "${MY_BINARY_DIR}/src" )
+  SET( CONFIGURED_SOURCE_DIRECTORY "${MY_BINARY_DIR}/src" )
+  FOREACH( SourceFile ${SNAP_SOURCES} )
+    GET_FILENAME_COMPONENT( CONFIGURED_SOURCE_FILE ${SourceFile} NAME )
+    SET( CONFIGURED_SOURCE_FILE "${CONFIGURED_SOURCE_DIRECTORY}/${CONFIGURED_SOURCE_FILE}" )
+    CONFIGURE_FILE( ${SourceFile} ${CONFIGURED_SOURCE_FILE}
+                     COPYONLY IMMEDIATE )
+  ENDFOREACH( SourceFile )
+  INCLUDE_DIRECTORIES( 
+    ${CONFIGURED_SOURCE_DIRECTORY} 
+    ${ITK_DIR}/Utilities/zlib
+    ${MY_BINARY_DIR}/UserInterface/ImageIOWizard
+    ${MY_BINARY_DIR}/UserInterface/MainComponents
+    ${FLTK_INCLUDE_PATH}
+    ${OPENGL_INCLUDE_PATH}
+  )
+
+ELSE( CMAKE_GENERATOR MATCHES "Visual Studio 6" )
+
+  # Include directories
+  INCLUDE_DIRECTORIES(
+    ${ITK_DIR}/Utilities/zlib
+    ${MY_SOURCE_DIR}/Common
+    ${MY_SOURCE_DIR}/Logic
+    ${MY_SOURCE_DIR}/Logic/Common
+    ${MY_SOURCE_DIR}/Logic/Framework
+    ${MY_SOURCE_DIR}/Logic/ImageWrapper
+    ${MY_SOURCE_DIR}/Logic/LevelSet
+    ${MY_SOURCE_DIR}/Logic/Mesh
+    ${MY_SOURCE_DIR}/Logic/Preprocessing
+    ${MY_SOURCE_DIR}/Logic/Slicing
+    ${MY_SOURCE_DIR}/Testing
+    ${MY_SOURCE_DIR}/UserInterface/BasicComponents
+    ${MY_SOURCE_DIR}/UserInterface/Common
+    ${MY_SOURCE_DIR}/UserInterface/ImageIOWizard
+    ${MY_SOURCE_DIR}/UserInterface/MainComponents
+    ${MY_SOURCE_DIR}/UserInterface/MainComponents/Artwork
+    ${MY_SOURCE_DIR}/UserInterface/SliceWindow
+    ${MY_SOURCE_DIR}/UserInterface/Window3D
+    ${MY_BINARY_DIR}/UserInterface/ImageIOWizard
+    ${MY_BINARY_DIR}/UserInterface/MainComponents
+    ${FLTK_INCLUDE_PATH}
+    ${OPENGL_INCLUDE_PATH}
+  )
+
+ENDIF( CMAKE_GENERATOR MATCHES "Visual Studio 6" )
+
+
 
 # ----------------------------------------------------------------
 # Define Libraries 
