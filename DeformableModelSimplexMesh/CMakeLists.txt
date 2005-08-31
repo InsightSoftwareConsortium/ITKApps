@@ -78,6 +78,12 @@ TARGET_LINK_LIBRARIES( DeformableModelSimplexMesh
   ${FLTK_LIBRARIES}
   )
 
+SET(VTK_VERSION_DECIMAL "${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}")
+
+IF(VTK_VERSION_DECIMAL LESS 4.5)
+TARGET_LINK_LIBRARIES(DeformableModelSimplexMesh vtkPatented)
+ENDIF(VTK_VERSION_DECIMAL LESS 4.5)
+
   # Stuff was moved from vtkHybrid to vtkWidgets
   # Link against vtkWidgets if it is found, otherwise link against the older
   # library, vtkHybrid .
