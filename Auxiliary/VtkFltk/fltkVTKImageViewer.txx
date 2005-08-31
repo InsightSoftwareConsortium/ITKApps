@@ -74,14 +74,11 @@ VTKImageViewer<ImagePixelType>
     volume->SetProperty( volumeProperty );
 
   // Add this volume to the renderer 
-  if (UseAddViewProp())
-    {
-    m_Renderer->AddViewProp( volume );
-    }
-  else
-    {
+#if (VTK_MAJOR_VERSION == 4 && VTK_MINOR_VERSION <=4)
     m_Renderer->AddProp( volume );
-    }
+#else
+    m_Renderer->AddViewProp( volume );
+#endif
   
   // Interact with the data at 3 frames per second
   fltkRenderWindowInteractor->SetDesiredUpdateRate(3.0);
