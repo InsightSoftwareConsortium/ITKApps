@@ -198,7 +198,7 @@ void vtkFlRenderWindowInteractor::OnTimer(void)
     // this is all we need to do, InteractorStyle is stateful and will
     // continue with whatever it's busy
     
-#if (VTK_MAJOR_VERSION == 4 && VTK_MINOR_VERSION > 0)
+#if ((VTK_MAJOR_VERSION == 4 && VTK_MINOR_VERSION > 0) || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION >= 0))
     // new style
     this->InvokeEvent(vtkCommand::TimerEvent, NULL);
 #else
