@@ -27,17 +27,22 @@ INCLUDE_DIRECTORIES(
   ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
 )
 
-ADD_LIBRARY(Curves2DExtractorLib ceExtractorConsole.cxx
-            ceExtractorConsoleBase.cxx)
-
 # Take the list of GUI files, generate .cxx and .h from them and add
 # them to the build process of the target
 FLTK_WRAP_UI(Curves2DExtractorLib ceExtractorConsoleGUI.fl)
 ITK_DISABLE_FLTK_GENERATED_WARNINGS(ceExtractorConsoleGUI.fl)
 
+ADD_LIBRARY(Curves2DExtractorLib ceExtractorConsole.cxx
+            ceExtractorConsoleBase.cxx ${Curves2DExtractorLib_FLTK_UI_SRCS})
+
 TARGET_LINK_LIBRARIES(Curves2DExtractorLib
                       ITKBasicFilters ITKIO ITKFltkImageViewer)
 
-ADD_GUI_EXECUTABLE(Curves2DExtractor main.cxx ${Curves2DExtractor_FLTK_UI_SRCS})
+SET(Curves2DExtractor_SRCS
+main.cxx
+${Curves2DExtractor_FLTK_UI_SRCS}
+)
+
+ADD_GUI_EXECUTABLE(Curves2DExtractor ${Curves2DExtractor_SRCS})
 TARGET_LINK_LIBRARIES(Curves2DExtractor Curves2DExtractorLib)
 

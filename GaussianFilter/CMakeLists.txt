@@ -39,11 +39,22 @@ SET(GaussianFilter2D_SRCS
   GaussianFilter2D.cxx
   )
 
+FLTK_WRAP_UI(GaussianFilter liFilterConsoleGUI.fl)
+FLTK_WRAP_UI(GaussianFilter2D liFilterConsole2DGUI.fl)
+
+SET(GaussianFilter_SRCS
+${GaussianFilter_SRCS}
+${GaussianFilter_FLTK_UI_SRCS}
+)
+
+SET(GaussianFilter2D_SRCS
+${GaussianFilter2D_SRCS}
+${GaussianFilter2D_FLTK_UI_SRCS}
+)
+
 ADD_GUI_EXECUTABLE(GaussianFilter   "${GaussianFilter_SRCS}")
 ADD_GUI_EXECUTABLE(GaussianFilter2D "${GaussianFilter2D_SRCS}")
 
-FLTK_WRAP_UI(GaussianFilter liFilterConsoleGUI.fl)
-FLTK_WRAP_UI(GaussianFilter2D liFilterConsole2DGUI.fl)
 ITK_DISABLE_FLTK_GENERATED_WARNINGS(liFilterConsoleGUI.fl)
 ITK_DISABLE_FLTK_GENERATED_WARNINGS(liFilterConsole2DGUI.fl)
 

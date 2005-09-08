@@ -43,7 +43,13 @@ ITKIO
 ITKFltkImageViewer
 )
 
+FLTK_WRAP_UI(DistanceMapFilter  ${DistanceMapFilter_GUI_SRCS})
+
+SET(DistanceMapFilter_SRCS
+${DistanceMapFilter_SRCS}
+${DistanceMapFilter_FLTK_UI_SRCS}
+)
+
 ADD_GUI_EXECUTABLE(DistanceMapFilter "${DistanceMapFilter_SRCS}")
 
-FLTK_WRAP_UI(DistanceMapFilter  ${DistanceMapFilter_GUI_SRCS})
 ITK_DISABLE_FLTK_GENERATED_WARNINGS("${DistanceMapFilter_GUI_SRCS}")
