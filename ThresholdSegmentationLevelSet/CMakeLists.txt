@@ -1,6 +1,5 @@
 PROJECT( ThresholdSegmentationLevelSet )
 
-
 IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
   FIND_PACKAGE(ITK)
@@ -34,15 +33,12 @@ ${ThresholdSegmentationLevelSet_SOURCE_DIR}
 ${ThresholdSegmentationLevelSet_BINARY_DIR}
 )
 
-
-SET(ThresholdSegmentationLevelSet_SRCS
-ThresholdSegmentationLevelSetBase.cxx
-ThresholdSegmentationLevelSet.cxx
-)
-
 SET(ThresholdSegmentationLevelSet_GUI_SRCS
 ThresholdSegmentationLevelSetGUI.fl
 )
+
+FLTK_WRAP_UI( ThresholdSegmentationLevelSet ${ThresholdSegmentationLevelSet_GUI_SRCS} )
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${ThresholdSegmentationLevelSet_SRCS}")
 
 LINK_LIBRARIES (
 ITKCommon
@@ -66,7 +62,11 @@ IF(VTK_USE_VOLUMERENDERING)
 )
 ENDIF(VTK_USE_VOLUMERENDERING)
 
+SET(ThresholdSegmentationLevelSet_SRCS
+ThresholdSegmentationLevelSetBase.cxx
+ThresholdSegmentationLevelSet.cxx
+${ThresholdSegmentationLevelSet_FLTK_UI_SRCS}
+)
 
 ADD_GUI_EXECUTABLE(ThresholdSegmentationLevelSet "${ThresholdSegmentationLevelSet_SRCS}")
-FLTK_WRAP_UI( ThresholdSegmentationLevelSet ${ThresholdSegmentationLevelSet_GUI_SRCS} )
-ITK_DISABLE_FLTK_GENERATED_WARNINGS("${ThresholdSegmentationLevelSet_SRCS}")
+

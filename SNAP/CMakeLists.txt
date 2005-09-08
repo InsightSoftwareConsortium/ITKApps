@@ -541,8 +541,19 @@ LINK_LIBRARIES(${SNAP_ITK_LIBS} ${SNAP_VTK_LIBS} ${SNAP_FLTK_LIBS} ${SNAP_SYSTEM
 # *****************************************************
 # SNAP Executables
 # *****************************************************
-# The SNAP executable
+# FLTK Wrapping
+FLTK_WRAP_UI(InsightSNAP ${APPLICATION_FLUIDS})
 SET(SNAP_EXE_PARAMETERS "WIN32" ${APPLICATION_SRCS})
+
+# Disable FLTK warnings 
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${APPLICATION_FLUIDS}")
+
+# The SNAP executable
+SET(SNAP_EXE_PARAMETERS
+${SNAP_EXE_PARAMETERS}
+${InsightSNAP_FLTK_UI_SRCS}
+)
+
 ADD_GUI_EXECUTABLE(InsightSNAP "${SNAP_EXE_PARAMETERS}")
 
 # The testing executables
@@ -550,12 +561,6 @@ IF(BUILD_TESTING)
   ADD_GUI_EXECUTABLE(SNAPTests "${TESTING_SRCS}")
   ADD_EXECUTABLE(SNAPTutorialTest ${TESTING_TUTORIAL_SRCS})
 ENDIF(BUILD_TESTING)
-  
-# FLTK Wrapping
-FLTK_WRAP_UI(InsightSNAP ${APPLICATION_FLUIDS})
-
-# Disable FLTK warnings 
-ITK_DISABLE_FLTK_GENERATED_WARNINGS("${APPLICATION_FLUIDS}")
 
 # ----------------------------------------------------------------
 # Miscelaneous tasks (not related to link and compilation)
