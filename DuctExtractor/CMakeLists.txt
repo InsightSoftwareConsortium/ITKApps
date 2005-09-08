@@ -27,17 +27,17 @@ INCLUDE_DIRECTORIES(
   ${InsightApplications_BINARY_DIR}/DuctExtractor
 )
 
+FLTK_WRAP_UI(DuctExtractor DuctExtractorConsoleGUI.fl)
+ITK_DISABLE_FLTK_GENERATED_WARNINGS(DuctExtractorConsoleGUI.fl)
+
 SET(DuctExtractor_SRCS 
   DuctExtractorConsole.cxx
   DuctExtractorConsoleBase.cxx 
   DuctExtractor.cxx
+  ${DuctExtractor_FLTK_UI_SRCS}
   )
 
 ADD_GUI_EXECUTABLE(DuctExtractor   "${DuctExtractor_SRCS}")
-
-FLTK_WRAP_UI(DuctExtractor DuctExtractorConsoleGUI.fl)
-ITK_DISABLE_FLTK_GENERATED_WARNINGS(DuctExtractorConsoleGUI.fl)
-
 TARGET_LINK_LIBRARIES(DuctExtractor ITKFltkImageViewer ITKIO ITKBasicFilters)
 
 

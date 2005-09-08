@@ -44,17 +44,13 @@ ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
 ${ThresholdSegmentationLevelSetFltkGui_BINARY_DIR}
 )
 
-SET(ThresholdSegmentationLevelSetFltkGui_SRCS
-SegmenterConsole.cxx
-SegmenterConsoleBase.cxx
-Segmenter.cxx
-ImageViewer.txx
-)
-
 SET(ThresholdSegmentationLevelSetFltkGui_GUI_SRCS
 SegmenterConsoleGUI.fl
 ImageViewerGUI.fl
 )
+
+FLTK_WRAP_UI(ThresholdSegmentationLevelSetFltkGui  ${ThresholdSegmentationLevelSetFltkGui_GUI_SRCS})
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${ThresholdSegmentationLevelSetFltkGui_GUI_SRCS}")
 
 LINK_LIBRARIES (
 ITKBasicFilters 
@@ -63,8 +59,13 @@ ITKNumerics
 ITKFltkImageViewer
 )
 
+SET(ThresholdSegmentationLevelSetFltkGui_SRCS
+SegmenterConsole.cxx
+SegmenterConsoleBase.cxx
+Segmenter.cxx
+ImageViewer.txx
+${ThresholdSegmentationLevelSetFltkGui_FLTK_UI_SRCS}
+)
 
 ADD_EXECUTABLE(ThresholdSegmentationLevelSetFltkGui ${ThresholdSegmentationLevelSetFltkGui_SRCS})
 
-FLTK_WRAP_UI(ThresholdSegmentationLevelSetFltkGui  ${ThresholdSegmentationLevelSetFltkGui_GUI_SRCS})
-ITK_DISABLE_FLTK_GENERATED_WARNINGS("${ThresholdSegmentationLevelSetFltkGui_GUI_SRCS}")

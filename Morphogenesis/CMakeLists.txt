@@ -26,6 +26,9 @@ INCLUDE_DIRECTORIES(
   ${InsightApplications_BINARY_DIR}/Morphogenesis
 )
 
+FLTK_WRAP_UI(Morphogenesis BacterialColonyGUI.fl CellsViewerGUI.fl)
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("BacterialColonyGUI.fl;CellsViewerGUI.fl")
+
 SET(Morphogenesis_SRCS
   Bacteria.cxx
   BacterialColony.cxx
@@ -41,10 +44,8 @@ SET(Morphogenesis_SRCS
   PressureSensitiveBacteria.cxx
   Prokariote.cxx
   main.cxx
+  ${Morphogenesis_FLTK_UI_SRCS}
 )
 
 ADD_GUI_EXECUTABLE(Morphogenesis "${Morphogenesis_SRCS}")
-
-FLTK_WRAP_UI(Morphogenesis BacterialColonyGUI.fl CellsViewerGUI.fl)
-ITK_DISABLE_FLTK_GENERATED_WARNINGS("BacterialColonyGUI.fl;CellsViewerGUI.fl")
 TARGET_LINK_LIBRARIES(Morphogenesis ITKFltkImageViewer ITKBasicFilters ITKIO)

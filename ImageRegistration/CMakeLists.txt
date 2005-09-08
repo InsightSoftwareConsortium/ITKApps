@@ -25,12 +25,6 @@ ${ImageRegistration_SOURCE_DIR}
 ${ImageRegistration_BINARY_DIR}
 )
 
-SET(ImageRegistration_SRCS
-liImageRegistrationConsole.cxx
-liImageRegistrationConsoleBase.cxx
-ImageRegistration.cxx
-)
-
 SET(ImageRegistration_GUI_SRCS
 liImageRegistrationConsoleGUI.fl
 )
@@ -42,7 +36,14 @@ ITKIO
 ITKFltkImageViewer
 )
 
-ADD_GUI_EXECUTABLE(ImageRegistration "${ImageRegistration_SRCS}")
-
 FLTK_WRAP_UI( ImageRegistration ${ImageRegistration_GUI_SRCS} )
 ITK_DISABLE_FLTK_GENERATED_WARNINGS("${ImageRegistration_GUI_SRCS}")
+
+SET(ImageRegistration_SRCS
+liImageRegistrationConsole.cxx
+liImageRegistrationConsoleBase.cxx
+ImageRegistration.cxx
+${ImageRegistration_FLTK_UI_SRCS}
+)
+
+ADD_GUI_EXECUTABLE(ImageRegistration "${ImageRegistration_SRCS}")

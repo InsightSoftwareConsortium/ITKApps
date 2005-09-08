@@ -29,17 +29,18 @@ ${MutualInformationEuler2DRegistration_SOURCE_DIR}
 ${MutualInformationEuler2DRegistration_BINARY_DIR}
 )
 
+FLTK_WRAP_UI(MutualInformationEuler2DRegistration registerGUI.fl)
+ITK_DISABLE_FLTK_GENERATED_WARNINGS(registerGUI.fl)
+
 SET(MutualInformationEuler2DRegistration_SRCS
   RegisterApplication.cxx
   RegisterWindow.cxx
   register.cxx
+  ${MutualInformationEuler2DRegistration_FLTK_UI_SRCS}
 )
 
 ADD_GUI_EXECUTABLE(MutualInformationEuler2DRegistration
   "${MutualInformationEuler2DRegistration_SRCS}")
-
-FLTK_WRAP_UI(MutualInformationEuler2DRegistration registerGUI.fl)
-ITK_DISABLE_FLTK_GENERATED_WARNINGS(registerGUI.fl)
 
 TARGET_LINK_LIBRARIES(MutualInformationEuler2DRegistration
                       ITKNumerics ITKBasicFilters ITKIO ITKFltkImageViewer)

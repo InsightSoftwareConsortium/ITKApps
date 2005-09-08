@@ -53,19 +53,24 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
     ${Curves3DExtractor_BINARY_DIR}/../FltkImageViewer
   )
 
-  ADD_LIBRARY(Curves3DExtractorLib ceExtractorConsole.cxx
-              ceExtractorConsoleBase.cxx)
-
   # Take the list of GUI files, generate .cxx and .h from them and add
   # them to the build process of the target
   FLTK_WRAP_UI(Curves3DExtractorLib ceExtractorConsoleGUI.fl)
+  ADD_LIBRARY(Curves3DExtractorLib ceExtractorConsole.cxx
+              ceExtractorConsoleBase.cxx ${Curves3DExtractorLib_FLTK_UI_SRCS})
 
   TARGET_LINK_LIBRARIES(
       Curves3DExtractorLib
       ITKBasicFilters ITKIO ITKFltkImageViewer
       ${FLTK_LIBRARIES} ${OPENGL_glu_LIBRARY} ${OPENGL_LIBRARIES} )
 
-  ADD_GUI_EXECUTABLE(Curves3DExtractor main.cxx)
+
+  SET(Curves3DExtractor_SRCS
+  main.cxx
+  ${Curves2DExtractor_FLTK_UI_SRCS}
+  )
+
+  ADD_GUI_EXECUTABLE(Curves3DExtractor ${Curves3DExtractor_SRCS})
   TARGET_LINK_LIBRARIES(Curves3DExtractor Curves3DExtractorLib)
 
 ELSE( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
@@ -77,18 +82,23 @@ ELSE( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
     ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
   )
 
-  ADD_LIBRARY(Curves3DExtractorLib ceExtractorConsole.cxx
-              ceExtractorConsoleBase.cxx)
-
   # Take the list of GUI files, generate .cxx and .h from them and add
   # them to the build process of the target
   FLTK_WRAP_UI(Curves3DExtractorLib ceExtractorConsoleGUI.fl)
   ITK_DISABLE_FLTK_GENERATED_WARNINGS(ceExtractorConsoleGUI.fl)
+  
+  ADD_LIBRARY(Curves3DExtractorLib ceExtractorConsole.cxx
+              ceExtractorConsoleBase.cxx ${Curves3DExtractorLib_FLTK_UI_SRCS})
 
   TARGET_LINK_LIBRARIES( Curves3DExtractorLib
                          ITKBasicFilters ITKIO ITKFltkImageViewer )
 
-  ADD_GUI_EXECUTABLE(Curves3DExtractor main.cxx)
+  SET(Curves3DExtractor_SRCS
+  main.cxx
+  ${Curves2DExtractor_FLTK_UI_SRCS}
+  )
+
+  ADD_GUI_EXECUTABLE(Curves3DExtractor ${Curves3DExtractor_SRCS})
   TARGET_LINK_LIBRARIES(Curves3DExtractor Curves3DExtractorLib)
 
 

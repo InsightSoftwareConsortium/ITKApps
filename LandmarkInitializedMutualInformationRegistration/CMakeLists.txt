@@ -41,14 +41,15 @@ INCLUDE_DIRECTORIES(
   ${InsightApplications_BINARY_DIR}/LandmarkInitializedMutualInformationRegistration
 )
 
+FLTK_WRAP_UI(imageRegTool guiMain.fl)
+ITK_DISABLE_FLTK_GENERATED_WARNINGS(guiMain.fl)
+
 ADD_EXECUTABLE(imageRegTool
   guiMainImplementation.cxx
   LandmarkRegistrator.cxx
   main.cxx
+  ${imageRegTool_FLTK_UI_SRCS}
 )
-
-FLTK_WRAP_UI(imageRegTool guiMain.fl)
-ITK_DISABLE_FLTK_GENERATED_WARNINGS(guiMain.fl)
 
 TARGET_LINK_LIBRARIES (imageRegTool
 ITKIO 
