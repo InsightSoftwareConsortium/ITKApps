@@ -51,11 +51,11 @@ vtkWSBoundingBoxManager.cxx
 vtkLookupTableEquivalencyHash.cxx
 vtkBoundingBox.cxx
 vtkBinaryVolume.cxx
-vtkBinaryVolumeLogic.cxx	
-vtkFlImageViewer.cxx	
-SegmentedViewer.cxx			
+vtkBinaryVolumeLogic.cxx  
+vtkFlImageViewer.cxx  
+SegmentedViewer.cxx      
 SourceViewer.cxx
-BinaryViewer.cxx	
+BinaryViewer.cxx  
 )
 
 SET(EditorFltkGui_GUI_SRCS
@@ -75,8 +75,9 @@ ITKVtkFltk
 ITKFltkImageViewer
 )
 
-
-ADD_EXECUTABLE(EditorFltkGui ${EditorFltkGui_SRCS})
-
 FLTK_WRAP_UI(EditorFltkGui   ${EditorFltkGui_GUI_SRCS})
 ITK_DISABLE_FLTK_GENERATED_WARNINGS("${EditorFltkGui_GUI_SRCS}")
+
+ADD_EXECUTABLE(EditorFltkGui ${EditorFltkGui_SRCS}
+              ${EditorFltkGui_FLTK_UI_SRCS})
+

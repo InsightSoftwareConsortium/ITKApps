@@ -25,13 +25,15 @@ SET(AnisotropicDiffusionFltkGui2D_GUI_SRCS
 liFilterConsole2DGUI.fl
 )
 
-ADD_EXECUTABLE(AnisotropicDiffusionFltkGui3D ${AnisotropicDiffusionFltkGui3D_SRCS})
-ADD_EXECUTABLE(AnisotropicDiffusionFltkGui2D ${AnisotropicDiffusionFltkGui2D_SRCS})
-
 FLTK_WRAP_UI(AnisotropicDiffusionFltkGui3D   ${AnisotropicDiffusionFltkGui3D_GUI_SRCS})
 FLTK_WRAP_UI(AnisotropicDiffusionFltkGui2D   ${AnisotropicDiffusionFltkGui2D_GUI_SRCS})
 ITK_DISABLE_FLTK_GENERATED_WARNINGS("${AnisotropicDiffusionFltkGui3D_GUI_SRCS}")
 ITK_DISABLE_FLTK_GENERATED_WARNINGS("${AnisotropicDiffusionFltkGui2D_GUI_SRCS}")
+
+ADD_EXECUTABLE(AnisotropicDiffusionFltkGui3D ${AnisotropicDiffusionFltkGui3D_SRCS}
+               ${AnisotropicDiffusionFltkGui3D_FLTK_UI_SRCS})
+ADD_EXECUTABLE(AnisotropicDiffusionFltkGui2D ${AnisotropicDiffusionFltkGui2D_SRCS}
+               ${AnisotropicDiffusionFltkGui2D_FLTK_UI_SRCS})
 
 TARGET_LINK_LIBRARIES(AnisotropicDiffusionFltkGui2D ITKFltkImageViewer ITKIO
                       ITKBasicFilters)
