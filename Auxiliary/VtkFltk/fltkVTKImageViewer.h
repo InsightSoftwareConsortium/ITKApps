@@ -35,6 +35,8 @@
 
 namespace fltk {
 
+#define USE_PROP ((VTK_MAJOR_VERSION == 4 && VTK_MINOR_VERSION <= 5) || (VTK_MAJOR_VERSION <= 4))
+  
 template <class ImagePixelType >
 class VTKImageViewer : public fltkVTKImageViewerGUI
 {

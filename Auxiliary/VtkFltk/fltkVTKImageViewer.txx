@@ -74,7 +74,7 @@ VTKImageViewer<ImagePixelType>
     volume->SetProperty( volumeProperty );
 
   // Add this volume to the renderer 
-#if (VTK_MAJOR_VERSION == 4 && VTK_MINOR_VERSION <=4)
+#if USE_PROP
     m_Renderer->AddProp( volume );
 #else
     m_Renderer->AddViewProp( volume );
