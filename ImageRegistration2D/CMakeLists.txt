@@ -29,16 +29,17 @@ INCLUDE_DIRECTORIES(
   ${InsightApplications_BINARY_DIR}/ImageRegistration2D
 )
 
+FLTK_WRAP_UI(ImageRegistration2D ImageRegistrationConsoleGUI.fl)
+ITK_DISABLE_FLTK_GENERATED_WARNINGS(ImageRegistrationConsoleGUI.fl)
+
 SET(ImageRegistration2D_SRCS 
   ImageRegistrationConsole.cxx
   ImageRegistrationConsoleBase.cxx 
   ImageRegistration2D.cxx
+  ${ImageRegistration2D_FLTK_UI_SRCS}
   )
 
 ADD_GUI_EXECUTABLE(ImageRegistration2D "${ImageRegistration2D_SRCS}")
-
-FLTK_WRAP_UI(ImageRegistration2D ImageRegistrationConsoleGUI.fl)
-ITK_DISABLE_FLTK_GENERATED_WARNINGS(ImageRegistrationConsoleGUI.fl)
 
 TARGET_LINK_LIBRARIES(ImageRegistration2D ITKFltkImageViewer ITKIO
                       ITKNumerics ITKBasicFilters ITKStatistics

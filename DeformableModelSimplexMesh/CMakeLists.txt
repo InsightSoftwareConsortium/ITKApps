@@ -51,14 +51,13 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
-
-
-ADD_EXECUTABLE( DeformableModelSimplexMesh ${APPLICATION_SOURCES})
-
 FLTK_WRAP_UI(DeformableModelSimplexMesh 
   DeformableModelApplicationGUI.fl 
   )
 
+ADD_EXECUTABLE( DeformableModelSimplexMesh ${APPLICATION_SOURCES}
+               ${DeformableModelSimplexMesh_FLTK_UI_SRCS}
+              )
 
 INCLUDE_DIRECTORIES(
   ${DeformableModels_SOURCE_DIR}

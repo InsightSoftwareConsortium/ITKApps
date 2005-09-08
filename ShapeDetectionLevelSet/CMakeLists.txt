@@ -1,6 +1,5 @@
 PROJECT( ShapeDetectionLevelSet )
 
-
 IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
   FIND_PACKAGE(ITK)
@@ -34,15 +33,12 @@ ${ShapeDetectionLevelSet_SOURCE_DIR}
 ${ShapeDetectionLevelSet_BINARY_DIR}
 )
 
-
-SET(ShapeDetectionLevelSet_SRCS
-ShapeDetectionLevelSetBase.cxx
-ShapeDetectionLevelSet.cxx
-)
-
 SET(ShapeDetectionLevelSet_GUI_SRCS
 ShapeDetectionLevelSetGUI.fl
 )
+
+FLTK_WRAP_UI( ShapeDetectionLevelSet ${ShapeDetectionLevelSet_GUI_SRCS} )
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${ShapeDetectionLevelSet_SRCS}")
 
 LINK_LIBRARIES (
 ITKCommon
@@ -50,8 +46,8 @@ ITKNumerics
 ITKBasicFilters 
 ITKIO
 vtkRendering
-vtkGraphics	  
-vtkHybrid	  
+vtkGraphics    
+vtkHybrid    
 vtkImaging
 vtkIO
 vtkFiltering
@@ -60,6 +56,11 @@ ITKVtkFltk
 ITKFltkImageViewer
 )
 
+SET(ShapeDetectionLevelSet_SRCS
+ShapeDetectionLevelSetBase.cxx
+ShapeDetectionLevelSet.cxx
+${ShapeDetectionLevelSet_FLTK_UI_SRCS}
+)
+
 ADD_GUI_EXECUTABLE(ShapeDetectionLevelSet "${ShapeDetectionLevelSet_SRCS}")
-FLTK_WRAP_UI( ShapeDetectionLevelSet ${ShapeDetectionLevelSet_GUI_SRCS} )
-ITK_DISABLE_FLTK_GENERATED_WARNINGS("${ShapeDetectionLevelSet_SRCS}")
+

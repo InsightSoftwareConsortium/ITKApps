@@ -1,6 +1,5 @@
 PROJECT(GeodesicActiveContour)
 
-
 IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
   FIND_PACKAGE(ITK)
@@ -35,15 +34,16 @@ INCLUDE_DIRECTORIES(
   ${InsightApplications_BINARY_DIR}/GeodesicActiveContour
 )
 
+FLTK_WRAP_UI(GeodesicActiveContour GeodesicActiveContourGUI.fl)
+ITK_DISABLE_FLTK_GENERATED_WARNINGS(GeodesicActiveContourGUI.fl)
+  
 SET(GeodesicActiveContour_SRCS
   GeodesicActiveContourBase.cxx
   GeodesicActiveContour.cxx
+  ${GeodesicActiveContour_FLTK_UI_SRCS}
   )
 
 ADD_GUI_EXECUTABLE(GeodesicActiveContour "${GeodesicActiveContour_SRCS}")
-
-FLTK_WRAP_UI(GeodesicActiveContour GeodesicActiveContourGUI.fl)
-ITK_DISABLE_FLTK_GENERATED_WARNINGS(GeodesicActiveContourGUI.fl)
   
 TARGET_LINK_LIBRARIES(GeodesicActiveContour ITKNumerics ITKBasicFilters
                       ITKIO vtkHybrid vtkIO ITKVtkFltk ITKFltkImageViewer)

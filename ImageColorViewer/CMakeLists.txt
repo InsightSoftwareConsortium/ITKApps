@@ -18,23 +18,8 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
-
-
-SET ( ImageColorViewer_SRCS
-  ImageColorViewer.cxx
-  )
-
 INCLUDE_DIRECTORIES (
   ${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer
-)
-
-
-
-ADD_GUI_EXECUTABLE( ImageColorViewer "${ImageColorViewer_SRCS}" )
-TARGET_LINK_LIBRARIES (ImageColorViewer
-  ITKBasicFilters
-  ITKFltkImageViewer
-  ITKIO
 )
 
 SET(ImageColorViewer_GUI_SRCS
@@ -43,3 +28,16 @@ SET(ImageColorViewer_GUI_SRCS
 
 FLTK_WRAP_UI( ImageColorViewer ${ImageColorViewer_GUI_SRCS} )
 ITK_DISABLE_FLTK_GENERATED_WARNINGS("${ImageColorViewer_GUI_SRCS}")
+
+SET ( ImageColorViewer_SRCS
+  ImageColorViewer.cxx
+  ${ImageColorViewer_FLTK_UI_SRCS}
+  )
+
+ADD_GUI_EXECUTABLE( ImageColorViewer "${ImageColorViewer_SRCS}" )
+
+TARGET_LINK_LIBRARIES (ImageColorViewer
+  ITKBasicFilters
+  ITKFltkImageViewer
+  ITKIO
+)
