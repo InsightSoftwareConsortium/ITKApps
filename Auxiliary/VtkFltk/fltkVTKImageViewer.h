@@ -35,6 +35,8 @@
 
 namespace fltk {
 
+#define USE_PROP ((VTK_MAJOR_VERSION == 4 && VTK_MINOR_VERSION <= 5) || (VTK_MAJOR_VERSION <= 4))
+  
 template <class ImagePixelType >
 class VTKImageViewer : public fltkVTKImageViewerGUI
 {
@@ -80,25 +82,6 @@ protected:
  
   VTKImageViewer();
   virtual ~VTKImageViewer();
-
-  // Checks the version of VTK to see if we should use AddProp() or AddViewProp()
-  static bool UseAddViewProp()
-    {
-    std::string sourceVersion(vtkVersion::GetVTKSourceVersion());
-    std::string::size_type pos    = sourceVersion.find( "$Revision: ");
-    std::string::size_type endpos = sourceVersion.find( " $", pos + 11 );
-    std::string revision = sourceVersion.substr( pos+11, endpos-pos-11 );
-    float rev = atof(revision.c_str() );
-    if( rev < 1.2075 ) 
-      { // AddProp()
-      return false;
-      }
-    else
-      {
-      return true;
-      }
-    }
-    
 
 private:
 
