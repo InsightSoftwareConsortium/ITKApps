@@ -33,7 +33,7 @@ void vvHausdorffDistanceTemplate2(vtkVVPluginInfo *info,
     {
     factor *= spacing[d];
     }
-  sprintf(tmp,"%f mm^3",distance*factor);
+  sprintf(tmp,"%f mm",distance*factor);
   info->SetProperty( info, VVP_REPORT_TEXT, tmp );
   InputImageType1::ConstPointer outputImage= module.GetInput1();
   typedef itk::ImageRegionConstIterator< InputImageType1 >  OutputIteratorType;

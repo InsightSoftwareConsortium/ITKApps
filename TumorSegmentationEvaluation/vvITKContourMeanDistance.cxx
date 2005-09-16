@@ -36,7 +36,7 @@ void vvContourMeanDistanceTemplate2(vtkVVPluginInfo *info,
     {
     factor *= spacing[d];
     }
-  sprintf(tmp,"%f mm^3",distance );//distance*factor);
+  sprintf(tmp,"%f mm",distance );//distance*factor);
   info->SetProperty( info, VVP_REPORT_TEXT, tmp );
 
   InputImageType1::ConstPointer outputImage= module.GetInput1();
