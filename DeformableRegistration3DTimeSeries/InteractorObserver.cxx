@@ -50,17 +50,23 @@ InteractorObserver
 
   if( m_SliceViewer &&(eventId == ::vtkCommand::MiddleButtonPressEvent))
   {
+    m_SliceViewer->SelectPoint( x, y ,1);
     //A very simple window and level
     //For a real one see vtk source code for vtkImagViewer.cxx
     //m_SliceViewer->SelectWindowLevel( x, y );
   }
   if( m_SliceViewer&&(eventId == ::vtkCommand::LeftButtonPressEvent))  
   {
-    m_SliceViewer->SelectPoint( x, y );
+    m_SliceViewer->SelectPoint( x, y ,0);
+  }
+if( m_SliceViewer&&(eventId == ::vtkCommand::RightButtonPressEvent))  
+  {
+
+    m_SliceViewer->SelectPoint( x, y ,1);
   }
 }
 
-vtkCxxRevisionMacro(ISISImageInteractor, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(ISISImageInteractor, "$Revision: 1.2 $");
 vtkStandardNewMacro(ISISImageInteractor);
 
 ISISImageInteractor::ISISImageInteractor() 

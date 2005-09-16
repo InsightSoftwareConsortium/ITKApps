@@ -36,7 +36,7 @@
 #include "itkDemonsRegistrationFilter.h"
 #include "itkHistogramMatchingImageFilter.h"
 #include "itkBSplineDeformableTransform.h"
-#include "itkLBFGSBOptimizer.h"
+#include "itkLBFGSOptimizer.h"
 #include "itkImageRegistrationMethod.h"
 #include "itkMeanSquaresImageToImageMetric.h"
 #include "itkSquaredDifferenceImageFilter.h"
@@ -48,9 +48,7 @@
 #include "DicomImageReader.h"
 
 #include "itkFEMRegistrationFilter.h"
-#include "itkFEM.h"
-
-
+#include "itkFEMImageMetricLoadImplementation.h"
 
 #include "itkEventObject.h"
 #include "itkCommand.h"
@@ -61,13 +59,14 @@ class DeformableRegistration3DTimeSeries : public DeformableRegistration3DTimeSe
 {
 protected:
   int                                                         m_timeserie;
+  typedef float                                               OutputPixelType;
   typedef itk::Image<unsigned short, 4>                       InputImageType;
   typedef itk::Image<float, 3>                                OutputImageType;
   typedef itk::Vector< float, 3>                              PixelType;
   typedef itk::Image<PixelType,4>                             InputDeformableImageType;
   typedef itk::Image<PixelType,3>                             OutputDeformableImageType;
   typedef itk::Image<unsigned short, 3>                       InputSegmentedImageType;
-  typedef itk::Image<float,3>                                 OutputSegmentedImageType;
+  typedef OutputImageType                                     OutputSegmentedImageType;
   typedef itk::ImageFileReader<InputImageType>                ImageReaderType;
   typedef itk::ExtractImageFilter< InputImageType, 
                                             OutputImageType > ExtractFilterType;
@@ -93,10 +92,10 @@ protected:
   typedef itk::ImageToVTKImageFilter<OutputImageType> SegmentedAdaptorFilterType;
   typedef SegmentedAdaptorFilterType::Pointer                 SegmentedAdaptorFilterPointer;
   SegmentedAdaptorFilterPointer                               m_SegmentedAdaptorFilter;
-  typedef itk::WarpImageFilter<InputSegmentedImageType,
-    InputSegmentedImageType,OutputDeformableImageType>        WarperType;
+  typedef itk::WarpImageFilter<OutputSegmentedImageType,
+    OutputSegmentedImageType,OutputDeformableImageType>        WarperType;
   typedef itk::NearestNeighborInterpolateImageFunction<
-                                   InputSegmentedImageType,
+                                   OutputSegmentedImageType,
                                    double          >          InterpolatorType;
 
   //Dicom loader
@@ -123,7 +122,7 @@ protected:
   typedef double                                              CoordinateRepType;
   typedef itk::BSplineDeformableTransform<CoordinateRepType,3,
           3 >                                       TransformType;
-  typedef itk::LBFGSBOptimizer                                OptimizerType;
+  typedef itk::LBFGSOptimizer                                OptimizerType;
   typedef itk::MeanSquaresImageToImageMetric< 
                                     OutputImageType, 
                                     OutputImageType >         MetricType;
@@ -165,12 +164,13 @@ protected:
   WarperType::Pointer                                         m_WarperField2;
   InputDeformableImageType::Pointer                           m_VectorImage4D;
   InputImageType::Pointer                                     m_Image4D;
+  OutputImageType::Pointer                                    m_SegmentedImage3D;
   InputImageType::IndexType index;
   InputImageType::SizeType size;
   InputImageType::RegionType desiredRegion;
 
   //Compute the center of mass for the segmented data
-  typedef itk::ImageMomentsCalculator<InputSegmentedImageType> ImageMomentsType;
+  typedef itk::ImageMomentsCalculator<OutputSegmentedImageType> ImageMomentsType;
 
   ImageMomentsType::Pointer                                     calculator;
 
@@ -197,6 +197,9 @@ public:
   virtual void SelectTime(int );
   virtual void LoadDeformableFieldData();
   virtual void LoadSegmentedData();
+  void ManualSegmentationStart();
+  void ManualSegmentationStop();
+  void RasterizePolygon();
 
   /**
    LoadDicomSeries method loads the volume data from DICOM files. It first props up 
@@ -210,17 +213,20 @@ public:
   void StartFEMDeformation();
   void Save4DDeformationImage();
   void Save4DSegmentedImage();
+  void Save3DSegmentedImage();
   void ViewVolume();
+  void ViewSlice();
   void AbortDeformation();
   void ComputePathSelectedPoint();
   void ComputePathSelectedVolume();
-  virtual void Show();
-  virtual void Hide();
+  void Show();
+  void SetInteractor(int i);
+  void Hide();
   DeformableRegistration3DTimeSeries();
   virtual ~DeformableRegistration3DTimeSeries();
-
+  //Aurora tracking functions - Funtionality disabled
 private:
-
+  //Aurora tracking variables - Funtionality disabled
 };
 } // end namespace fltk
 

@@ -48,6 +48,7 @@ SET( DeformableRegistration3DTimeSeries_SRCS
     DeformableRegistration3DTimeSeriesBase.cxx
     DeformableRegistration3DTimeSeries.cxx
     InteractorObserver.cxx
+    TransferFunctionEditor.cxx
     DicomImageReaderBase.cxx
     )  
 
@@ -68,6 +69,8 @@ TARGET_LINK_LIBRARIES(
   ITKFEM
   ITKNumerics
   ITKMetaIO
+  ITKStatistics
+
 
   vtkRendering
   vtkGraphics
@@ -76,6 +79,8 @@ TARGET_LINK_LIBRARIES(
   vtkIO
   vtkFiltering
   vtkCommon
+  vtkVolumeRendering
+ 
 
   ${FLTK_LIBRARIES}
   )

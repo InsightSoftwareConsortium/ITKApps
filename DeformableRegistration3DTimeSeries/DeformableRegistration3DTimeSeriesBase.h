@@ -56,6 +56,11 @@
 #include "vtkPlaneSource.h"
 #include "vtkAxes.h"
 #include "vtkImageBlend.h"  
+#include "vtkVolume.h"
+#include "vtkPiecewiseFunction.h"
+#include "vtkColorTransferFunction.h"
+//Aurora Tracking Regsitration - Functionality disabled
+
 
 namespace fltk{
 
@@ -72,7 +77,10 @@ public:
   The SelectSlice method provides slice number of the image data to be viewed
   in the set orientation type. 
   */
-  void Select3DView(vtkImageData * image );
+  void Select3DViewImage(vtkImageData * image );
+  void Select3DSurfaceViewImage(vtkImageData * image);
+  void Select3DViewSegmented(vtkImageData * image );
+  void Select3DSurfaceViewSegmented(vtkImageData * image);
   void Select3DFieldView(vtkImageData * image );
   void SelectSlice( int );
   void SelectAxis( int );
@@ -87,20 +95,31 @@ public:
   void ShowMotionPath();
   virtual void SelectPoint( double x, double y, double z );
   virtual void  GetSelectPoint(double data[3]); 
-  void SelectPoint( int x, int y);
-  void SelectWindowLevel(int w,int l);
-  void SetInteractor( vtkRenderWindowInteractor * interactor );
-  //Motion path functions
+  void SelectPoint( int x, int y, int mousebutton);
+  void SetBaseInteractor( vtkRenderWindowInteractor * interactor ,int i);
+  bool SetSegmentedVolumeOpacity( const double value );
+  //Aurora tracking base classes - Functionality Disabled
+  //Get/Set Window and Level
+  void SetWindowLevel(int WindowLevel,int Number );
+  int* GetWindowLevel(void );
+  void Draw2DPolygon(void);
+  void Draw2DCanvasLine(double x1,double y1,double x2,double y2);
+  void Delete2DCanvasLine();
 protected:
   vtkRenderWindow            *  m_RenderWindow;
   vtkRenderer                *  m_Renderer;
   vtkRenderWindow            *  m_RenderWindow2;
   vtkRenderer                *  m_Renderer2;
+  int                           m_SliceNum;//Because is needed for manual segmentation in itk part
 private:
   //4D Image part
   vtkImageActor              *  m_Actor; 
   vtkImageMapToColors        *  m_ImageColors;
   vtkWindowLevelLookupTable  *  m_colormap;
+  //4D Volume part
+  vtkVolume                  *  m_volume;
+  vtkVolume                  *  m_volumeSegmented;
+  vtkActor                   *  m_SurfaceExtractor;
   //4D Deformable part
   vtkImageDataGeometryFilter *  m_plane;
   vtkMaskPoints              *  m_ptMask;
@@ -119,9 +138,11 @@ private:
   vtkCamera                  *  m_Camera;
   vtkPointData               *  m_attributes;
   int                           m_extent[6];
+  double                        m_spacing[3];
+  double                        m_origin[3];
+  int                           m_dimensions[3];
   int                           m_axis;
   double                        m_ZoomFactor;
-  int                           m_SliceNum;
   vtkCommand                 *  m_InteractorObserver;
   int                           m_field_selected;
   //double                        m_SelectPoint[3];
@@ -151,37 +172,48 @@ private:
   vtkTubeFilter              * axesTubes;
   vtkPolyDataMapper          * axesMapper;
   vtkActor                   * axesActor;
-  //Visualisation of the 3d Displacement Field
-/*  vtkImageDataGeometryFilter *  m_3dfield;
-  vtkMaskPoints              *  m_ptMask3dfield;
-  vtkThresholdPoints         *  m_ptThreshold3dfield;
-  vtkGlyph3D                 *  m_glyph3dfield;
-  vtkPolyDataMapper          *  m_3dfieldMapper;
-  vtkActor                   *  m_3dfieldActor;
-  vtkPointData               *  m_3dfieldattributes;
-  vtkArrowSource             *  m_3dfieldarrow;
-  */
+  int                         WindowLevel[2];
+  //The Aurora Tracker Needle - Functionality disabled
+  void HistogramComputation(vtkImageData *imagedata);
+  vtkPiecewiseFunction       * OpacityTransferFunction;
+  vtkColorTransferFunction   * ColorTransferFunction;
+  //Manual segmentation part
+  vtkActorCollection         * CanvasLineActors;
+  
 protected:
-  std::vector<PointType>        m_point;
+  double *                      histogram;
+  std::vector<PointType>        m_point;//This vector is used for path display
+  std::vector<PointType>        m_rasterize_polygon;//This vector is used for manual segmentation
   PointType                     m_SelectedPoint;
   bool                          point_selected;
   //Variables that check if the images are loaded
   int                           m_deformable_loaded;
   int                           m_image_loaded;
   int                           m_segmented_loaded;
-  int                           m_deformable_visible;
-  int                           m_image_visible;
-  int                           m_segmented_visible;
+  bool                          m_deformable_visible;
+  bool                          m_image_visible;
+  bool                          m_segmented_visible;
   int                           m_3dview_selected;
+  int                           m_polyline_draw;//for polygon drawing on slice
+  int                           m_manual_segmentation_selected;
+  double                        lastx,lasty;
+  double                        firstx,firsty;
+  //Miscellaneous variables
+  double                        m_SegmentedVolumeOpacity;
+  //Window/Level
+  int                           m_Window;
+  int                           m_Level;
   /** Constructor and Destructor */
   DeformableRegistration3DTimeSeriesBase();
   virtual ~DeformableRegistration3DTimeSeriesBase();
+public:
+  void SetColorTransferFunctionPoint(double x,double r,double g,double b);
+  void SetOpacityTransferFunctionPoint(double x,double value);
+  void RemoveColorTransferFunctionPoint(double x);
+  void RemoveOpacityTransferFunctionPoint(double x);
 };
 
 
 } // end namespace fltk
-
-
-
 
 #endif
