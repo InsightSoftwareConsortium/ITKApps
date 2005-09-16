@@ -34,6 +34,7 @@ void vvVolumeTemplate(vtkVVPluginInfo *info,
     factor *= spacing[d];
     }
   sprintf(tmp,"%f mm^3",((Volume/mean*max+Volume)*factor)/(max-min));
+  info->SetProperty( info, VVP_REPORT_TEXT, tmp );
 }
 
 static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
@@ -52,7 +53,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
     switch (info->InputVolumeScalarType)
       {
       // invoke the appropriate templated function
-      vtkTemplateMacro3(vvVolumeTemplate, info, pds, 
+    vtkTemplateMacro3(vvVolumeTemplate, info, pds, 
                       static_cast<VTK_TT *>(0));
       }
     }
