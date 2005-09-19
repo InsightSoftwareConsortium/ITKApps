@@ -143,7 +143,6 @@ protected:
   typedef itk::fem::FiniteDifferenceFunctionLoad
                    <OutputImageType,OutputImageType>          ImageLoadType;
 
-  template class itk::fem::ImageMetricLoadImplementation<ImageLoadType>;
   typedef Element3DType::LoadImplementationFunctionPointer    LoadImpFP;
   typedef Element3DType::LoadType                             ElementLoadType;
 
