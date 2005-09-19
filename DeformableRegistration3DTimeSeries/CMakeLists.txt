@@ -50,6 +50,7 @@ SET( DeformableRegistration3DTimeSeries_SRCS
     InteractorObserver.cxx
     TransferFunctionEditor.cxx
     DicomImageReaderBase.cxx
+    ${DeformableRegistration3DTimeSeries_FLTK_UI_SRCS}
     )  
 
 ADD_GUI_EXECUTABLE( 
