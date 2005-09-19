@@ -40,16 +40,16 @@ ITKFltkImageViewer
 
 )
 
+FLTK_WRAP_UI(SimpleFuzzyConnectedness FuzzySegGrayUI.fl)
+
+ITK_DISABLE_FLTK_GENERATED_WARNINGS(FuzzySegGrayUI.fl)
+
 SET(Project_SRCS
 FuzzySegMain.cpp
 FuzzySegGrayRun.cxx
+${SimpleFuzzyConnectedness_FLTK_UI_SRCS}
 )
 
-SET(Project_FLTK_SRCS
-FuzzySegGrayUI.fl
-)
 
 ADD_GUI_EXECUTABLE(SimpleFuzzyConnectedness   "${Project_SRCS}")
 
-FLTK_WRAP_UI(SimpleFuzzyConnectedness ${Project_FLTK_SRCS})
-ITK_DISABLE_FLTK_GENERATED_WARNINGS("${Project_FLTK_SRCS}")
