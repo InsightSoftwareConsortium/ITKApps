@@ -96,28 +96,28 @@ DicomImageReader<TVolumeType>
   //typedef itk::Image<unsigned short, 4 >                VolumeType4D; 
   typedef itk::Image<unsigned short, 3 >                  VolumeType3D; 
   typedef itk::ImageSeriesReader< VolumeType3D >          ReaderType3D; 
-  ReaderType3D::Pointer                                   m_Reader3D=ReaderType3D::New();  
+  typename ReaderType3D::Pointer                                   m_Reader3D=ReaderType3D::New();  
   typedef itk::ImageFileWriter< VolumeType4D >            WriterType4D; 
-  WriterType4D::Pointer                                   file_writer = WriterType4D::New();
+  typename WriterType4D::Pointer                                   file_writer = WriterType4D::New();
   
-  //VolumeType4D::Pointer image4D =VolumeType4D::New();
+  //typename VolumeType4D::Pointer image4D =VolumeType4D::New();
   //Adaugata
   
-  VolumeType3D::Pointer image =VolumeType3D::New();
+  typename VolumeType3D::Pointer image =VolumeType3D::New();
   std::string selectedSerie = SelectedSeries->text( 1);
   std::cout<<selectedSerie<<std::endl;
   m_Reader3D->SetFileNames( m_FilenamesGenerator->GetFileNames(selectedSerie));   
-  itk::DICOMImageIO2::Pointer  dicomImageIO =  itk::DICOMImageIO2::New();
+  typename itk::DICOMImageIO2::Pointer  dicomImageIO =  itk::DICOMImageIO2::New();
   m_Reader3D->SetImageIO( dicomImageIO );
    m_Reader3D->Update();
-  VolumeType4D::SizeType size1;
+  typename VolumeType4D::SizeType size1;
   size1[ 0 ]=m_Reader3D->GetOutput()->GetLargestPossibleRegion().GetSize()[0];
   size1[ 1 ] =m_Reader3D->GetOutput()->GetLargestPossibleRegion().GetSize()[1];
   size1[ 2 ] =m_Reader3D->GetOutput()->GetLargestPossibleRegion().GetSize()[2];
   size1[ 3 ]=SelectedSeries->size();
   image4D->SetRegions( size1 );
-  VolumeType3D::SpacingType spacing3D;
-  VolumeType4D::SpacingType spacing4D;
+  typename VolumeType3D::SpacingType spacing3D;
+  typename VolumeType4D::SpacingType spacing4D;
   spacing3D =m_Reader3D->GetOutput()->GetSpacing();
   spacing4D[0]=spacing3D[0];
   spacing4D[1]=spacing3D[1];
@@ -135,7 +135,7 @@ DicomImageReader<TVolumeType>
 
   typedef itk::ImageRegionConstIterator< VolumeType3D >  Iterator3D;
   image=m_Reader3D->GetOutput();
-  VolumeType3D ::RegionType region = image->GetLargestPossibleRegion();
+  typename VolumeType3D::RegionType region = image->GetLargestPossibleRegion();
   Iterator3D it3( image, region );
   it3.GoToBegin();
   while( !it3.IsAtEnd() )
@@ -172,7 +172,7 @@ DicomImageReader<TVolumeType>
       return;
       }
     image=m_Reader3D->GetOutput();
-    //VolumeType3D ::RegionType region = image->GetLargestPossibleRegion();
+    //typename VolumeType3D ::RegionType region = image->GetLargestPossibleRegion();
     Iterator3D it3( image, region );
     it3.GoToBegin();
     while( !it3.IsAtEnd() )
