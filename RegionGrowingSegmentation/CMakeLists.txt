@@ -34,24 +34,28 @@ ${RegionGrowingSegmentation_SOURCE_DIR}
 ${RegionGrowingSegmentation_BINARY_DIR}
 )
 
+
+FLTK_WRAP_UI( RegionGrowingSegmentation   RegionGrowingSegmentationGUI.fl)
+FLTK_WRAP_UI( RegionGrowingSegmentation2D RegionGrowingSegmentation2DGUI.fl)
+
+
+ITK_DISABLE_FLTK_GENERATED_WARNINGS(RegionGrowingSegmentationGUI.fl)
+ITK_DISABLE_FLTK_GENERATED_WARNINGS(RegionGrowingSegmentation2DGUI.fl)
+
+
 SET(RegionGrowingSegmentation2D_SRCS
 RegionGrowingSegmentationBase2D.cxx
 RegionGrowingSegmentation2D.cxx
-)
-
-SET(RegionGrowingSegmentation2D_GUI_SRCS
-RegionGrowingSegmentation2DGUI.fl
+${RegionGrowingSegmentation2D_FLTK_UI_SRCS}
 )
 
 
 SET(RegionGrowingSegmentation_SRCS
 RegionGrowingSegmentationBase.cxx
 RegionGrowingSegmentation.cxx
+${RegionGrowingSegmentation_FLTK_UI_SRCS}
 )
 
-SET(RegionGrowingSegmentation_GUI_SRCS
-RegionGrowingSegmentationGUI.fl
-)
 
 LINK_LIBRARIES (
 ITKCommon
@@ -61,8 +65,8 @@ ITKIO
 ITKFltkImageViewer
 ITKVtkFltk
 vtkRendering
-vtkGraphics	  
-vtkHybrid	  
+vtkGraphics  
+vtkHybrid
 vtkImaging
 vtkIO
 vtkFiltering
@@ -71,9 +75,5 @@ vtkCommon
 
 
 ADD_GUI_EXECUTABLE(RegionGrowingSegmentation2D "${RegionGrowingSegmentation2D_SRCS}")
-FLTK_WRAP_UI( RegionGrowingSegmentation2D ${RegionGrowingSegmentation2D_GUI_SRCS})
-ITK_DISABLE_FLTK_GENERATED_WARNINGS("${RegionGrowingSegmentation2D_GUI_SRCS}")
-
 ADD_GUI_EXECUTABLE(RegionGrowingSegmentation "${RegionGrowingSegmentation_SRCS}")
-FLTK_WRAP_UI( RegionGrowingSegmentation ${RegionGrowingSegmentation_GUI_SRCS} )
-ITK_DISABLE_FLTK_GENERATED_WARNINGS("${RegionGrowingSegmentation_SRCS}")
+
