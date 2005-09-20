@@ -55,10 +55,10 @@ IF(HAS_FLTK)
   INCLUDE_DIRECTORIES(
     ${FLTK_INCLUDE_DIR}
     )
-LINK_DIRECTORIES(
-  ${FLTK_DIR}/bin
-  ${FLTK_DIR}/lib
-)
+  LINK_DIRECTORIES(
+    ${FLTK_DIR}/bin
+    ${FLTK_DIR}/lib
+    )
   LINK_LIBRARIES( 
    ${FLTK_LIBRARIES}
     )
@@ -79,15 +79,17 @@ ENDIF(CYGWIN)
 
 
 SET(FlDicomQueryChooser_GUI_SRCS
-  FlDicomQueryChooserGUI.fl
   fldqcPreferencesGUI.fl
+  FlDicomQueryChooserGUI.fl
   ImageViewerGUI.fl
 )
 
 
+FLTK_WRAP_UI(FlDicomQueryChooser ${FlDicomQueryChooser_GUI_SRCS})
+
 
 SET(FlDicomQueryChooser_SRCS
-  main.cxx
+  ${FlDicomQueryChooser_FLTK_UI_SRCS}
   fldqcDatatypes.h
   fldqcNet.cxx
   fldqcNet.h 
@@ -99,10 +101,11 @@ SET(FlDicomQueryChooser_SRCS
   fldqcPreferences.h
   FlDicomQueryChooser.h
   FlDicomQueryChooser.cxx 
+  main.cxx
 )
 
-FLTK_WRAP_UI(FlDicomQueryChooser ${FlDicomQueryChooser_GUI_SRCS})
-ADD_EXECUTABLE(FlDicomQueryChooser ${FlDicomQueryChooser_SRCS} ${FlDicomQueryChooser_FLTK_UI_SRCS})
+
+ADD_EXECUTABLE(FlDicomQueryChooser ${FlDicomQueryChooser_SRCS})
 
 
 IF(WIN32)
@@ -120,7 +123,7 @@ IF(WIN32)
   ITKIO
   ITKBasicFilters
   ITKFltkImageViewer
-)
+  )
 ELSE(WIN32)
  TARGET_LINK_LIBRARIES(
   FlDicomQueryChooser
