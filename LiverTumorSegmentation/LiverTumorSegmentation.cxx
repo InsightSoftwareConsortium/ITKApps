@@ -539,8 +539,6 @@ void LiverTumorSegmentation::SyncAllViews(void)
   // Sync the selected point in all the views even if it is outside the image
   sprintf( m_MessageString, "Clicked Point:Indices(%d,%d,%d),Position(%4.3f,%4.3f,%4.3f),Value(%4.3f)", 
     index[0],index[1],index[2],m_SeedPoint[0], m_SeedPoint[1], m_SeedPoint[2], m_SeedValue );
-  printf( m_MessageString );
-  printf("\n");
 
   m_MessageBar->label( m_MessageString );
 
