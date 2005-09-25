@@ -111,13 +111,7 @@ ADD_EXECUTABLE(FlDicomQueryChooser ${FlDicomQueryChooser_SRCS})
 IF(WIN32)
  TARGET_LINK_LIBRARIES(
   FlDicomQueryChooser
-  netapi32
-  wsock32
-  ${DCMTK_ofstd_LIBRARY} 
-  ${DCMTK_dcmdata_LIBRARY}
-  ${DCMTK_dcmnet_LIBRARY}
-  ${DCMTK_imagedb_LIBRARY}
-  ${DCMTK_dcmimgle_LIBRARY}
+  ${DCMTK_LIBRARIES} 
   ${OPENGL_LIBRARY} 
   ITKCommon
   ITKIO
@@ -127,11 +121,7 @@ IF(WIN32)
 ELSE(WIN32)
  TARGET_LINK_LIBRARIES(
   FlDicomQueryChooser
-  ${DCMTK_imagedb_LIBRARY}
-  ${DCMTK_dcmnet_LIBRARY}
-  ${DCMTK_dcmdata_LIBRARY}
-  ${DCMTK_ofstd_LIBRARY} 
-  ${DCMTK_dcmimgle_LIBRARY}
+  ${DCMTK_LIBRARIES} 
   ${OPENGL_LIBRARY} 
   ITKCommon
   ITKIO
