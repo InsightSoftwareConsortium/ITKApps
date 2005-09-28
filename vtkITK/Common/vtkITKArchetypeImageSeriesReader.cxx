@@ -56,7 +56,7 @@
 #include "itkGDCMImageIO.h"
 #include <itksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.9 $");
+vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.10 $");
 vtkStandardNewMacro(vtkITKArchetypeImageSeriesReader);
 
 //----------------------------------------------------------------------------
@@ -129,7 +129,16 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
 {
   vtkImageData *output = this->GetOutput();
   std::vector<std::string> candidateFiles;
+  std::vector<std::string> candidateSeries;
   int extent[6];  
+  std::string fileNameCollapsed = itksys::SystemTools::CollapseFullPath( this->Archetype);
+
+  // First see if the archetype exists
+  if (!itksys::SystemTools::FileExists (fileNameCollapsed.c_str()))
+    {
+    itkGenericExceptionMacro ( "vtkITKArchetypeImageSeriesReader::ExecuteInformation: Archetype file " << fileNameCollapsed.c_str() << " does not exist.");
+    return;
+    }
 
   // Test whether the input file is a DICOM file
   itk::GDCMImageIO::Pointer dicomIO = itk::GDCMImageIO::New();
@@ -137,15 +146,32 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
   if (isDicomFile)
     {
     typedef itk::GDCMSeriesFileNames DICOMNameGeneratorType;
-    DICOMNameGeneratorType::Pointer inputImageFileGenerator = DICOMNameGeneratorType::New();  
+    DICOMNameGeneratorType::Pointer inputImageFileGenerator = DICOMNameGeneratorType::New();
     std::string fileNameName = itksys::SystemTools::GetFilenameName( this->Archetype );
     std::string fileNamePath = itksys::SystemTools::GetFilenamePath( this->Archetype );
     if (fileNamePath == "")
       {
       fileNamePath = ".";
       }
-    inputImageFileGenerator->SetInputDirectory( fileNamePath );
-    candidateFiles = inputImageFileGenerator->GetInputFileNames();
+    inputImageFileGenerator->SetDirectory( fileNamePath );
+
+    // Find the series that contains the archetype
+    candidateSeries = inputImageFileGenerator->GetSeriesUIDs();
+    int found = 0;
+    for (int s = 0; s < candidateSeries.size() && found == 0; s++)
+      {
+      candidateFiles = inputImageFileGenerator->GetFileNames(candidateSeries[s]);
+      for (int f = 0; f < candidateFiles.size(); f++)
+        {
+        if (itksys::SystemTools::CollapseFullPath(candidateFiles[f].c_str()) ==
+            fileNameCollapsed)
+          {
+          found = 1;
+          break;
+          }
+        }
+      }
+
     if (candidateFiles.size() == 0)
       {
       candidateFiles.push_back(this->Archetype);
