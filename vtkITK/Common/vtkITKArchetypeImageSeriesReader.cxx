@@ -56,19 +56,22 @@
 #include "itkGDCMImageIO.h"
 #include <itksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.10 $");
+vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.11 $");
 vtkStandardNewMacro(vtkITKArchetypeImageSeriesReader);
 
 //----------------------------------------------------------------------------
 vtkITKArchetypeImageSeriesReader::vtkITKArchetypeImageSeriesReader()
 {
   this->Archetype = NULL;
+  this->RasToIjkMatrix = NULL;
   this->SetDesiredCoordinateOrientationToAxial();
+  this->UseNativeCoordinateOrientation = 0;
   this->FileNameSliceOffset = 0;
   this->FileNameSliceSpacing = 1;
   this->FileNameSliceCount = 0;
 
   this->OutputScalarType = VTK_FLOAT;
+  this->UseNativeScalarType = 0;
   for (int i = 0; i < 3; i++)
     {
     this->DefaultDataSpacing[i] = 1.0;
@@ -84,6 +87,17 @@ vtkITKArchetypeImageSeriesReader::~vtkITKArchetypeImageSeriesReader()
     delete [] this->Archetype;
     this->Archetype = NULL;
     }
+ if (RasToIjkMatrix)
+   {
+   RasToIjkMatrix->Delete();
+   RasToIjkMatrix = NULL;
+   }
+}
+
+vtkMatrix4x4* vtkITKArchetypeImageSeriesReader::GetRasToIjkMatrix()
+{
+  this->ExecuteInformation();
+  return RasToIjkMatrix;
 }
 
 //----------------------------------------------------------------------------
@@ -207,6 +221,17 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
     this->FileNames.push_back(candidateFiles[f]);
     }
 
+  if (RasToIjkMatrix)
+    {
+    RasToIjkMatrix->Delete();
+    }
+   RasToIjkMatrix = vtkMatrix4x4::New();
+
+   vtkMatrix4x4* IjkToLpsMatrix = vtkMatrix4x4::New();
+
+   RasToIjkMatrix->Identity();
+   IjkToLpsMatrix->Identity();
+
   vtkFloatingPointType spacing[3];
   vtkFloatingPointType origin[3];
   
@@ -215,6 +240,11 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
   typedef itk::Image<float,3> ImageType;
   itk::ImageRegion<3> region;
 
+  typedef itk::ImageSource<ImageType> FilterType;
+  FilterType::Pointer filter;
+
+  itk::ImageIOBase *imageIO;
+
   // If there is only one file in the series, just use an image file reader
   if (this->FileNames.size() == 1)
     {
@@ -222,24 +252,40 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
       itk::ImageFileReader<ImageType>::New();
     imageReader->SetFileName(this->FileNames[0].c_str());
 
-    itk::OrientImageFilter<ImageType,ImageType>::Pointer orient =
-      itk::OrientImageFilter<ImageType,ImageType>::New();
-    orient->SetInput(imageReader->GetOutput());
-    orient->UseImageDirectionOn();
-    orient->SetDesiredCoordinateOrientation(this->DesiredCoordinateOrientation);
-    orient->UpdateOutputInformation();
+    if (this->UseNativeCoordinateOrientation)
+      {
+      imageReader->UpdateOutputInformation();
+      filter = imageReader;
+      }
+    else
+      {
+      itk::OrientImageFilter<ImageType,ImageType>::Pointer orient =
+        itk::OrientImageFilter<ImageType,ImageType>::New();
+      orient->SetInput(imageReader->GetOutput());
+      orient->UseImageDirectionOn();
+      orient->SetDesiredCoordinateOrientation(this->DesiredCoordinateOrientation);
+      orient->UpdateOutputInformation();
+      filter = orient;
+      }
     for (int i = 0; i < 3; i++)
       {
-      spacing[i] = orient->GetOutput()->GetSpacing()[i];
-      origin[i] = orient->GetOutput()->GetOrigin()[i];
+      spacing[i] = filter->GetOutput()->GetSpacing()[i];
+      origin[i] = filter->GetOutput()->GetOrigin()[i];
+
+      // Get IJK to RAS direction vector
+      for ( unsigned int j=0; j < filter->GetOutput()->GetImageDimension (); j++ )
+        {
+        IjkToLpsMatrix->SetElement(j, i, spacing[i]*filter->GetOutput()->GetDirection()[j][i]);
+        }
       }
-    region = orient->GetOutput()->GetLargestPossibleRegion();
+    region = filter->GetOutput()->GetLargestPossibleRegion();
     extent[0] = region.GetIndex()[0];
     extent[1] = region.GetIndex()[0] + region.GetSize()[0] - 1;
     extent[2] = region.GetIndex()[1];
     extent[3] = region.GetIndex()[1] + region.GetSize()[1] - 1;
     extent[4] = region.GetIndex()[2];
     extent[5] = region.GetIndex()[2] + region.GetSize()[2] - 1;
+    imageIO = imageReader->GetImageIO();
     }
   else
     {
@@ -248,32 +294,55 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
     seriesReader->SetImageIO(dicomIO);
     seriesReader->SetFileNames(this->FileNames);
     
-    itk::OrientImageFilter<ImageType,ImageType>::Pointer orient =
-      itk::OrientImageFilter<ImageType,ImageType>::New();
-    orient->SetInput(seriesReader->GetOutput());
-    orient->UseImageDirectionOn();
-    orient->SetDesiredCoordinateOrientation(this->DesiredCoordinateOrientation);
-    orient->UpdateOutputInformation();
-
+    if (this->UseNativeCoordinateOrientation)
+      {
+      seriesReader->UpdateOutputInformation();
+      filter = seriesReader;
+      }
+    else
+      {
+      itk::OrientImageFilter<ImageType,ImageType>::Pointer orient =
+        itk::OrientImageFilter<ImageType,ImageType>::New();
+      orient->SetInput(seriesReader->GetOutput());
+      orient->UseImageDirectionOn();
+      orient->SetDesiredCoordinateOrientation(this->DesiredCoordinateOrientation);
+      orient->UpdateOutputInformation();
+      filter = orient;
+      }
     for (int i = 0; i < 3; i++)
       {
-      spacing[i] = orient->GetOutput()->GetSpacing()[i];
-      origin[i] = orient->GetOutput()->GetOrigin()[i];
+      spacing[i] = filter->GetOutput()->GetSpacing()[i];
+      origin[i] = filter->GetOutput()->GetOrigin()[i];
+      // Get IJK to RAS direction vector
+      for ( unsigned int j=0; j < filter->GetOutput()->GetImageDimension (); j++ )
+        {
+        IjkToLpsMatrix->SetElement(j, i, spacing[i]*filter->GetOutput()->GetDirection()[j][i]);
+        }
       }
 
-    region = orient->GetOutput()->GetLargestPossibleRegion();
+    region = filter->GetOutput()->GetLargestPossibleRegion();
     extent[0] = region.GetIndex()[0];
     extent[1] = region.GetIndex()[0] + region.GetSize()[0] - 1;
     extent[2] = region.GetIndex()[1];
     extent[3] = region.GetIndex()[1] + region.GetSize()[1] - 1;
     extent[4] = region.GetIndex()[2];
     extent[5] = region.GetIndex()[2] + region.GetSize()[2] - 1;
+    imageIO = seriesReader->GetImageIO();
     }
+
+  // Transform from LPS to RAS
+  vtkMatrix4x4* LpsToRasMatrix = vtkMatrix4x4::New();
+  LpsToRasMatrix->Identity();
+  LpsToRasMatrix->SetElement(0,0,-1);
+  LpsToRasMatrix->SetElement(1,1,-1);
+  vtkMatrix4x4::Multiply4x4(IjkToLpsMatrix, LpsToRasMatrix, RasToIjkMatrix);
+  RasToIjkMatrix->Invert();
 
   // If it looks like the pipeline did not provide the spacing and
   // origin, modify the spacing and origin with the defaults
   for (int j = 0; j < 3; j++)
     {
+    RasToIjkMatrix->SetElement(j, 3, (extent[2*j+1] - extent[2*j])/2.0);
     if (spacing[j] == 1.0)
       {
       spacing[j] = this->DefaultDataSpacing[j];
@@ -286,8 +355,53 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
 
   output->SetSpacing(spacing);
   output->SetOrigin(origin);
+  RasToIjkMatrix->SetElement(3,3,1.0);
+  IjkToLpsMatrix->Delete();
 
   output->SetWholeExtent(extent);
+  if (this->UseNativeScalarType)
+    {
+    if (imageIO->GetComponentType() == itk::ImageIOBase::UCHAR)
+      {
+      this->SetOutputScalarType(VTK_UNSIGNED_CHAR);
+      }
+    else if (imageIO->GetComponentType() == itk::ImageIOBase::CHAR)
+      {
+      this->SetOutputScalarType(VTK_CHAR);
+      }
+    else if (imageIO->GetComponentType() == itk::ImageIOBase::USHORT)
+      {
+      this->SetOutputScalarType(VTK_UNSIGNED_SHORT);
+      }
+    else if (imageIO->GetComponentType() == itk::ImageIOBase::SHORT)
+      {
+      this->SetOutputScalarType(VTK_SHORT);
+      }
+    else if (imageIO->GetComponentType() == itk::ImageIOBase::UINT)
+      {
+      this->SetOutputScalarType(VTK_UNSIGNED_INT);
+      }
+    else if (imageIO->GetComponentType() == itk::ImageIOBase::INT)
+      {
+      this->SetOutputScalarType(VTK_INT);
+      }
+    else if (imageIO->GetComponentType() == itk::ImageIOBase::ULONG)
+      {
+      this->SetOutputScalarType(VTK_UNSIGNED_LONG);
+      }
+    else if (imageIO->GetComponentType() == itk::ImageIOBase::LONG)
+      {
+      this->SetOutputScalarType(VTK_LONG);
+      }
+    else if (imageIO->GetComponentType() == itk::ImageIOBase::FLOAT)
+      {
+      this->SetOutputScalarType(VTK_FLOAT);
+      }
+    else if (imageIO->GetComponentType() == itk::ImageIOBase::DOUBLE)
+      {
+      this->SetOutputScalarType(VTK_DOUBLE);
+      }
+    }
 
   output->SetScalarType(this->OutputScalarType);
   output->SetNumberOfScalarComponents(1);
@@ -315,20 +429,30 @@ void vtkITKArchetypeImageSeriesReader::ExecuteData(vtkDataObject *output)
     case typeN: \
     {\
       typedef itk::Image<type,3> image##typeN;\
+      typedef itk::ImageSource<image##typeN> FilterType; \
+      FilterType::Pointer filter; \
       itk::ImageSeriesReader<image##typeN>::Pointer reader##typeN = \
             itk::ImageSeriesReader<image##typeN>::New(); \
       reader##typeN->SetFileNames(this->FileNames); \
       reader##typeN->SetImageIO(dicomIO); \
       reader##typeN->ReleaseDataFlagOn(); \
-      itk::OrientImageFilter<image##typeN,image##typeN>::Pointer orient##typeN = \
+      if (this->UseNativeCoordinateOrientation) \
+        { \
+        filter = reader##typeN; \
+        } \
+      else \
+        { \
+        itk::OrientImageFilter<image##typeN,image##typeN>::Pointer orient##typeN = \
             itk::OrientImageFilter<image##typeN,image##typeN>::New(); \
-      if (this->Debug) {orient##typeN->DebugOn();} \
-      orient##typeN->SetInput(reader##typeN->GetOutput()); \
-      orient##typeN->UseImageDirectionOn(); \
-      orient##typeN->SetDesiredCoordinateOrientation(this->DesiredCoordinateOrientation); \
-      orient##typeN->UpdateLargestPossibleRegion();\
+        if (this->Debug) {orient##typeN->DebugOn();} \
+        orient##typeN->SetInput(reader##typeN->GetOutput()); \
+        orient##typeN->UseImageDirectionOn(); \
+        orient##typeN->SetDesiredCoordinateOrientation(this->DesiredCoordinateOrientation); \
+        filter = orient##typeN; \
+        }\
+      filter->UpdateLargestPossibleRegion(); \
       itk::ImportImageContainer<unsigned long, type>::Pointer PixelContainer##typeN;\
-      PixelContainer##typeN = orient##typeN->GetOutput()->GetPixelContainer();\
+      PixelContainer##typeN = filter->GetOutput()->GetPixelContainer();\
       void *ptr = static_cast<void *> (PixelContainer##typeN->GetBufferPointer());\
       (dynamic_cast<vtkImageData *>( output))->GetPointData()->GetScalars()->SetVoidArray(ptr, PixelContainer##typeN->Size(), 0);\
       PixelContainer##typeN->ContainerManageMemoryOff();\
@@ -339,18 +463,28 @@ void vtkITKArchetypeImageSeriesReader::ExecuteData(vtkDataObject *output)
     case typeN: \
     {\
       typedef itk::Image<type,3> image2##typeN;\
+      typedef itk::ImageSource<image2##typeN> FilterType; \
+      FilterType::Pointer filter; \
       itk::ImageFileReader<image2##typeN>::Pointer reader2##typeN = \
             itk::ImageFileReader<image2##typeN>::New(); \
       reader2##typeN->SetFileName(this->FileNames[0].c_str()); \
-      itk::OrientImageFilter<image2##typeN,image2##typeN>::Pointer orient2##typeN = \
-            itk::OrientImageFilter<image2##typeN,image2##typeN>::New(); \
-      if (this->Debug) {orient2##typeN->DebugOn();} \
-      orient2##typeN->SetInput(reader2##typeN->GetOutput()); \
-      orient2##typeN->UseImageDirectionOn(); \
-      orient2##typeN->SetDesiredCoordinateOrientation(this->DesiredCoordinateOrientation); \
-      orient2##typeN->UpdateLargestPossibleRegion();\
+      if (this->UseNativeCoordinateOrientation) \
+        { \
+        filter = reader2##typeN; \
+        } \
+      else \
+        { \
+        itk::OrientImageFilter<image2##typeN,image2##typeN>::Pointer orient2##typeN = \
+              itk::OrientImageFilter<image2##typeN,image2##typeN>::New(); \
+        if (this->Debug) {orient2##typeN->DebugOn();} \
+        orient2##typeN->SetInput(reader2##typeN->GetOutput()); \
+        orient2##typeN->UseImageDirectionOn(); \
+        orient2##typeN->SetDesiredCoordinateOrientation(this->DesiredCoordinateOrientation); \
+        filter = orient2##typeN; \
+        } \
+       filter->UpdateLargestPossibleRegion();\
       itk::ImportImageContainer<unsigned long, type>::Pointer PixelContainer2##typeN;\
-      PixelContainer2##typeN = orient2##typeN->GetOutput()->GetPixelContainer();\
+      PixelContainer2##typeN = filter->GetOutput()->GetPixelContainer();\
       void *ptr = static_cast<void *> (PixelContainer2##typeN->GetBufferPointer());\
       (dynamic_cast<vtkImageData *>( output))->GetPointData()->GetScalars()->SetVoidArray(ptr, PixelContainer2##typeN->Size(), 0);\
       PixelContainer2##typeN->ContainerManageMemoryOff();\

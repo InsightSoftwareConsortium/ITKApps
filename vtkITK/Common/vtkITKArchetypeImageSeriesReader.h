@@ -22,6 +22,7 @@
 #define __vtkITKArchetypeImageSeriesReader_h
 
 #include "vtkImageSource.h"
+#include "vtkMatrix4x4.h"
 #include "itkSpatialOrientation.h"
 #include <vector>
 #include <string>
@@ -78,16 +79,18 @@ public:
   // Set the orientation of the output image
   void SetDesiredCoordinateOrientationToAxial ()
     {
-   this->DesiredCoordinateOrientation =
+    this->DesiredCoordinateOrientation =
      itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI;
 //     itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPS;
-   this->Modified();
+    this->UseNativeCoordinateOrientation = 0;
+    this->Modified();
     }
   void SetDesiredCoordinateOrientationToCoronal ()
     {
     this->DesiredCoordinateOrientation =
       itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSA;
 //      itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIP;
+    this->UseNativeCoordinateOrientation = 0;
     this->Modified();
     }
   void SetDesiredCoordinateOrientationToSagittal ()
@@ -95,6 +98,12 @@ public:
     this->DesiredCoordinateOrientation =
       itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASL;
 //      itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIR;
+    this->UseNativeCoordinateOrientation = 0;
+    this->Modified();
+    }
+  void SetDesiredCoordinateOrientationToNative ()
+    {
+    this->UseNativeCoordinateOrientation = 1;
     this->Modified();
     }
 
@@ -102,19 +111,70 @@ public:
   // Set the data type of pixels in the file.  
   // If you want the output scalar type to have a different value, set it
   // after this method is called.
-  virtual void SetOutputScalarTypeToFloat(){this->SetOutputScalarType(VTK_FLOAT);}
-  virtual void SetOutputScalarTypeToDouble(){this->SetOutputScalarType(VTK_DOUBLE);}
-  virtual void SetOutputScalarTypeToInt(){this->SetOutputScalarType(VTK_INT);}
-  virtual void SetOutputScalarTypeToShort(){this->SetOutputScalarType(VTK_SHORT);}
+  virtual void SetOutputScalarTypeToDouble()
+  {
+    UseNativeScalarType = 0;
+    this->SetOutputScalarType(VTK_DOUBLE);
+  }
+  virtual void SetOutputScalarTypeToFloat()
+  {
+    UseNativeScalarType = 0;
+    this->SetOutputScalarType(VTK_FLOAT);
+  }
+  virtual void SetOutputScalarTypeToLong()
+  {
+    UseNativeScalarType = 0;
+    this->SetOutputScalarType(VTK_LONG);
+  }
+  virtual void SetOutputScalarTypeToUnsignedLong()
+  {
+    UseNativeScalarType = 0;
+    this->SetOutputScalarType(VTK_UNSIGNED_LONG);
+  }
+  virtual void SetOutputScalarTypeToInt()
+  {
+    UseNativeScalarType = 0;
+    this->SetOutputScalarType(VTK_INT);
+  }
+  virtual void SetOutputScalarTypeToUnsignedInt()
+  {
+    UseNativeScalarType = 0;
+    this->SetOutputScalarType(VTK_UNSIGNED_INT);
+  }
+  virtual void SetOutputScalarTypeToShort()
+  {
+    UseNativeScalarType = 0;
+    this->SetOutputScalarType(VTK_SHORT);
+  }
   virtual void SetOutputScalarTypeToUnsignedShort()
-    {this->SetOutputScalarType(VTK_UNSIGNED_SHORT);}
+  {
+    UseNativeScalarType = 0;
+    this->SetOutputScalarType(VTK_UNSIGNED_SHORT);
+  }
+  virtual void SetOutputScalarTypeToChar()
+  {
+    UseNativeScalarType = 0;
+    this->SetOutputScalarType(VTK_CHAR);
+  }
   virtual void SetOutputScalarTypeToUnsignedChar()
-    {this->SetOutputScalarType(VTK_UNSIGNED_CHAR);}
+  {
+    UseNativeScalarType = 0;
+    this->SetOutputScalarType(VTK_UNSIGNED_CHAR);
+  }
+  virtual void SetOutputScalarTypeToNative()
+  {
+    UseNativeScalarType = 1;
+    this->Modified();
+  }
 
   // Description:
   // Get the file format.  Pixels are this type in the file.
   vtkSetMacro(OutputScalarType, int);
   vtkGetMacro(OutputScalarType, int);
+
+  // Description:
+  // Returns an IJK to RAS transformation matrix
+  vtkMatrix4x4* GetRasToIjkMatrix();
 
 protected:
   vtkITKArchetypeImageSeriesReader();
@@ -132,6 +192,11 @@ protected:
   int FileNameSliceSpacing;
   int FileNameSliceCount;
   
+  vtkMatrix4x4* RasToIjkMatrix;
+
+  char UseNativeCoordinateOrientation;
+  char UseNativeScalarType;
+
 //BTX
   std::vector<std::string> FileNames;
   CoordinateOrientationCode DesiredCoordinateOrientation;
