@@ -154,7 +154,10 @@ itkFlFileWriter( ImageType *imP,       // O - Filename or NULL
                  const char *message,  // I - Message in titlebar
                  const char *pat,      // I - Filename pattern
                  const char *fname,    // I - Initial filename selection
-                 int        relative)   // I - 0 for absolute path
+                 int        relative,
+                 unsigned int defaultPixelSelection = 2,
+                 bool showAlertWindow = true
+                 )   // I - 0 for absolute path
   {
   static char  retname[1024];              // Returned filename
   ITKFlFileWriter<ImageType> *fc = (ITKFlFileWriter<ImageType> *)0;
@@ -165,8 +168,11 @@ itkFlFileWriter( ImageType *imP,       // O - Filename or NULL
     }
   
   fc = new ITKFlFileWriter<ImageType>(imP, fname, pat, ITKFlFileWriter<ImageType>::CREATE, message);
+  fc->SetDefaultSelectionType(defaultPixelSelection);
+  fc->SetShowAlertWindow(showAlertWindow);
   fc->callback(0,0);
   fc -> show();
+
 
   while (fc -> shown())
     {
@@ -184,7 +190,6 @@ itkFlFileWriter( ImageType *imP,       // O - Filename or NULL
       return false;
 
   bool compress = fc -> GetITKCompressFile();
-  bool showAlertWindow = fc->GetShowAlertWindow();
 
   switch(fc -> GetITKPixelType())
     {
