@@ -18,10 +18,15 @@ public:
   int GetITKPixelType();
   bool GetITKCompressFile();
 
+  void SetDefaultSelectionType(unsigned int val) {guiITKPixelType->value(val);}
+  void SetShowAlertWindow(bool show) {m_ShowAlertWindow = show;}
+  bool GetShowAlertWindow() {return m_ShowAlertWindow;}
+
 protected:
   Fl_Choice *guiITKPixelType;
   Fl_Check_Button *guiITKCompressFile;
   static void cb_okButton(Fl_Return_Button *o, void *d);
+  bool m_ShowAlertWindow;
 };
 
 static Fl_Menu_Item  menu_guiITKPixelType[] = {
@@ -63,6 +68,7 @@ ITKFlFileWriter(ImageType * imP, const char *d, const char *p, int t, const char
   window -> add(oo);
 
   window -> end();
+  m_ShowAlertWindow = true;
   }
 
 
@@ -101,7 +107,7 @@ public:
   itkStaticConstMacro(ImageDimension,unsigned int, ImageType::ImageDimension);
   
 template <class ImageType, class PixelType>
-itkFlWriteFile( ImageType * img, PixelType val, char * filename, bool compress )
+itkFlWriteFile( ImageType * img, PixelType val, char * filename, bool compress, bool showAlert )
   {
   typedef itk::Image< PixelType, itkGetStaticConstMacro(ImageDimension)>  SavedImageType;
   typedef itk::ImageFileWriter< SavedImageType  >             WriterType;
@@ -125,8 +131,15 @@ itkFlWriteFile( ImageType * img, PixelType val, char * filename, bool compress )
     }
   catch( itk::ExceptionObject & exp ) 
     {
-    std::cerr << "Exception caught !" << std::endl;
-    std::cerr << exp << std::endl;
+    if(showAlert)
+      {
+      fl_alert(exp.GetDescription());
+      }
+    else
+      {
+      std::cerr << "Exception caught !" << std::endl;
+      std::cerr << exp << std::endl;
+      }
     }
   }
 
@@ -171,32 +184,33 @@ itkFlFileWriter( ImageType *imP,       // O - Filename or NULL
       return false;
 
   bool compress = fc -> GetITKCompressFile();
+  bool showAlertWindow = fc->GetShowAlertWindow();
 
   switch(fc -> GetITKPixelType())
     {
     case 0 :
-        itkFlWriteFile<ImageType, char>( imP, (char)0, retname, compress );
+        itkFlWriteFile<ImageType, char>( imP, (char)0, retname, compress, showAlertWindow );
         break;
     case 1 :
-        itkFlWriteFile<ImageType, unsigned char>( imP, (unsigned char)0, retname, compress );
+        itkFlWriteFile<ImageType, unsigned char>( imP, (unsigned char)0, retname, compress, showAlertWindow );
         break;
     case 2 :
-        itkFlWriteFile<ImageType, short>( imP, (short)0, retname, compress );
+        itkFlWriteFile<ImageType, short>( imP, (short)0, retname, compress, showAlertWindow );
         break;
     case 3 :
-        itkFlWriteFile<ImageType, unsigned short>( imP, (unsigned short)0, retname, compress );
+        itkFlWriteFile<ImageType, unsigned short>( imP, (unsigned short)0, retname, compress, showAlertWindow );
         break;
     case 4 :
-        itkFlWriteFile<ImageType, int>( imP, (int)0, retname, compress );
+        itkFlWriteFile<ImageType, int>( imP, (int)0, retname, compress, showAlertWindow );
         break;
     case 5 :
-        itkFlWriteFile<ImageType, unsigned int>( imP, (unsigned int)0, retname, compress );
+        itkFlWriteFile<ImageType, unsigned int>( imP, (unsigned int)0, retname, compress, showAlertWindow );
         break;
     case 6 :
-        itkFlWriteFile<ImageType, float>( imP, (float)0, retname, compress );
+        itkFlWriteFile<ImageType, float>( imP, (float)0, retname, compress, showAlertWindow );
         break;
     case 7 :
-        itkFlWriteFile<ImageType, double>( imP, (double)0, retname, compress );
+        itkFlWriteFile<ImageType, double>( imP, (double)0, retname, compress, showAlertWindow );
         break;
     };
   return true;
