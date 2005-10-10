@@ -56,7 +56,7 @@
 #include "itkGDCMImageIO.h"
 #include <itksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.11 $");
+vtkCxxRevisionMacro(vtkITKArchetypeImageSeriesReader, "$Revision: 1.12 $");
 vtkStandardNewMacro(vtkITKArchetypeImageSeriesReader);
 
 //----------------------------------------------------------------------------
@@ -225,12 +225,12 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
     {
     RasToIjkMatrix->Delete();
     }
-   RasToIjkMatrix = vtkMatrix4x4::New();
+  RasToIjkMatrix = vtkMatrix4x4::New();
+  
+  vtkMatrix4x4* IjkToLpsMatrix = vtkMatrix4x4::New();
 
-   vtkMatrix4x4* IjkToLpsMatrix = vtkMatrix4x4::New();
-
-   RasToIjkMatrix->Identity();
-   IjkToLpsMatrix->Identity();
+  RasToIjkMatrix->Identity();
+  IjkToLpsMatrix->Identity();
 
   vtkFloatingPointType spacing[3];
   vtkFloatingPointType origin[3];
@@ -243,11 +243,13 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
   typedef itk::ImageSource<ImageType> FilterType;
   FilterType::Pointer filter;
 
-  itk::ImageIOBase *imageIO;
+  itk::ImageIOBase::Pointer imageIO;
 
   // If there is only one file in the series, just use an image file reader
   if (this->FileNames.size() == 1)
     {
+    itk::OrientImageFilter<ImageType,ImageType>::Pointer orient =
+      itk::OrientImageFilter<ImageType,ImageType>::New();
     itk::ImageFileReader<ImageType>::Pointer imageReader =
       itk::ImageFileReader<ImageType>::New();
     imageReader->SetFileName(this->FileNames[0].c_str());
@@ -259,8 +261,6 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
       }
     else
       {
-      itk::OrientImageFilter<ImageType,ImageType>::Pointer orient =
-        itk::OrientImageFilter<ImageType,ImageType>::New();
       orient->SetInput(imageReader->GetOutput());
       orient->UseImageDirectionOn();
       orient->SetDesiredCoordinateOrientation(this->DesiredCoordinateOrientation);
@@ -289,9 +289,10 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
     }
   else
     {
+    itk::OrientImageFilter<ImageType,ImageType>::Pointer orient =
+      itk::OrientImageFilter<ImageType,ImageType>::New();
     itk::ImageSeriesReader<ImageType>::Pointer seriesReader =
       itk::ImageSeriesReader<ImageType>::New();
-    seriesReader->SetImageIO(dicomIO);
     seriesReader->SetFileNames(this->FileNames);
     
     if (this->UseNativeCoordinateOrientation)
@@ -301,8 +302,6 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
       }
     else
       {
-      itk::OrientImageFilter<ImageType,ImageType>::Pointer orient =
-        itk::OrientImageFilter<ImageType,ImageType>::New();
       orient->SetInput(seriesReader->GetOutput());
       orient->UseImageDirectionOn();
       orient->SetDesiredCoordinateOrientation(this->DesiredCoordinateOrientation);
@@ -334,7 +333,14 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
   vtkMatrix4x4* LpsToRasMatrix = vtkMatrix4x4::New();
   LpsToRasMatrix->Identity();
   LpsToRasMatrix->SetElement(0,0,-1);
-  LpsToRasMatrix->SetElement(1,1,-1);
+  if (this->UseNativeCoordinateOrientation)
+    {
+    LpsToRasMatrix->SetElement(1,1,1);
+    }
+  else
+    {
+    LpsToRasMatrix->SetElement(1,1,-1);
+    }
   vtkMatrix4x4::Multiply4x4(IjkToLpsMatrix, LpsToRasMatrix, RasToIjkMatrix);
   RasToIjkMatrix->Invert();
 
@@ -412,8 +418,6 @@ void vtkITKArchetypeImageSeriesReader::ExecuteInformation()
 // are assumed to be the same as the file extent/order.
 void vtkITKArchetypeImageSeriesReader::ExecuteData(vtkDataObject *output)
 {
-  itk::GDCMImageIO::Pointer dicomIO = itk::GDCMImageIO::New();
-
   if (!this->Archetype)
     {
     vtkErrorMacro("An Archetype must be specified.");
@@ -434,7 +438,6 @@ void vtkITKArchetypeImageSeriesReader::ExecuteData(vtkDataObject *output)
       itk::ImageSeriesReader<image##typeN>::Pointer reader##typeN = \
             itk::ImageSeriesReader<image##typeN>::New(); \
       reader##typeN->SetFileNames(this->FileNames); \
-      reader##typeN->SetImageIO(dicomIO); \
       reader##typeN->ReleaseDataFlagOn(); \
       if (this->UseNativeCoordinateOrientation) \
         { \
