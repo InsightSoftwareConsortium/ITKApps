@@ -32,8 +32,9 @@ INCLUDE_DIRECTORIES(
 FLTK_WRAP_UI(Curves2DExtractorLib ceExtractorConsoleGUI.fl)
 ITK_DISABLE_FLTK_GENERATED_WARNINGS(ceExtractorConsoleGUI.fl)
 
-ADD_LIBRARY(Curves2DExtractorLib ceExtractorConsole.cxx
+ADD_LIBRARY(Curves2DExtractorLib  ceExtractorConsole.cxx
             ceExtractorConsoleBase.cxx ${Curves2DExtractorLib_FLTK_UI_SRCS})
+INSTALL_TARGETS(/lib Curves2DExtractorLib)
 
 TARGET_LINK_LIBRARIES(Curves2DExtractorLib
                       ITKBasicFilters ITKIO ITKFltkImageViewer)

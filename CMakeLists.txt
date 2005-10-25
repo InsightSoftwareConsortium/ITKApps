@@ -68,7 +68,7 @@ IF(USE_VTK)
         ADD_DEFINITIONS(-DUSE_VTK_PATENTED)
       ENDIF(USE_VTK_PATENTED)
     ENDIF(VTK_USE_PATENTED)
-    
+
   ENDIF (VTK_FOUND)
 ENDIF(USE_VTK)
 
@@ -104,32 +104,34 @@ ENDMACRO(ITK_DISABLE_FLTK_GENERATED_WARNINGS)
 
 # Macro for adding resources to GUI application on the Mac
 #
-IF(APPLE)
-  FIND_PROGRAM(ITK_APPLE_RESOURCE Rez /Developer/Tools)
-  FIND_FILE(ITK_FLTK_RESOURCE mac.r /usr/local/include/FL)
-  IF(NOT ITK_FLTK_RESOURCE)
-    MESSAGE("Fltk resources not found, GUI application will not respond to mouse events")
-  ENDIF(NOT ITK_FLTK_RESOURCE)
+IF(APPLE AND NOT FLTK_APPLE_X11)
+    FIND_PROGRAM(ITK_APPLE_RESOURCE Rez /Developer/Tools)
+    FIND_FILE(ITK_FLTK_RESOURCE mac.r /usr/local/include/FL)
+    IF(NOT ITK_FLTK_RESOURCE)
+      MESSAGE("Fltk resources not found, GUI application will not respond to mouse events")
+    ENDIF(NOT ITK_FLTK_RESOURCE)
 
+    MACRO(ADD_GUI_EXECUTABLE name sources)
+      ADD_EXECUTABLE(${name} ${sources})
+      INSTALL_TARGETS(/bin ${name})
+      SET(EXEC_PATH ${EXECUTABLE_OUTPUT_PATH})
+      IF(NOT EXEC_PATH)
+        SET(EXEC_PATH ${CMAKE_CURRENT_BINARY_DIR})
+      ENDIF(NOT EXEC_PATH)
+        IF(ITK_APPLE_RESOURCE)
+          ADD_CUSTOM_COMMAND(SOURCE ${name}
+                             COMMAND ${ITK_APPLE_RESOURCE}
+                             ARGS -t APPL ${ITK_FLTK_RESOURCE} -o
+                             ${EXEC_PATH}/${name}
+                             TARGET ${name})
+        ENDIF(ITK_APPLE_RESOURCE)
+    ENDMACRO(ADD_GUI_EXECUTABLE)
+ELSE(APPLE AND NOT FLTK_APPLE_X11)
   MACRO(ADD_GUI_EXECUTABLE name sources)
     ADD_EXECUTABLE(${name} ${sources})
-    SET(EXEC_PATH ${EXECUTABLE_OUTPUT_PATH}) 
-    IF(NOT EXEC_PATH)
-      SET(EXEC_PATH ${CMAKE_CURRENT_BINARY_DIR})
-    ENDIF(NOT EXEC_PATH)
-      IF(ITK_APPLE_RESOURCE)
-        ADD_CUSTOM_COMMAND(SOURCE ${name}
-                           COMMAND ${ITK_APPLE_RESOURCE}
-                           ARGS -t APPL ${ITK_FLTK_RESOURCE} -o 
-                           ${EXEC_PATH}/${name}
-                           TARGET ${name})
-      ENDIF(ITK_APPLE_RESOURCE)
+    INSTALL_TARGETS(/bin ${name})
   ENDMACRO(ADD_GUI_EXECUTABLE)
-ELSE(APPLE)
-  MACRO(ADD_GUI_EXECUTABLE name sources)
-    ADD_EXECUTABLE(${name} ${sources})
-  ENDMACRO(ADD_GUI_EXECUTABLE)
-ENDIF(APPLE)
+ENDIF(APPLE AND NOT FLTK_APPLE_X11)
 
 #
 
@@ -143,11 +145,11 @@ SUBDIRS (AnisotropicDiffusionImageFilter)
 #Build the example of various methods of segmentation using level sets.
 SUBDIRS (LevelSetSegmentation)
 
-#Build the example of how to create a static library for 
+#Build the example of how to create a static library for
 # select filters in itk.
 SUBDIRS (ITKFilterLib)
 
-#Build the example of how to create a static library for 
+#Build the example of how to create a static library for
 # the multi-resolution mutual information registration framework in itk.
 SUBDIRS (ITKRegistrationLib)
 
@@ -191,7 +193,7 @@ IF(NOT BORLAND)
 SUBDIRS(DICOMApp)
 ENDIF(NOT BORLAND)
 
-#Build the examples of various fourth-order level set PDEs 
+#Build the examples of various fourth-order level set PDEs
 IF(NOT BORLAND)
 SUBDIRS (LevelSetSurfaceProcessing)
 ENDIF(NOT BORLAND)
@@ -199,7 +201,7 @@ ENDIF(NOT BORLAND)
 # Build the Intensity based 2D-3D Registration application
 SUBDIRS(IntensityBased2D3DRegistration)
 
-# Applications requiring MetaImages and Fltk GUI 
+# Applications requiring MetaImages and Fltk GUI
 IF(FLTK_FOUND)
   IF(WIN32)
     ADD_DEFINITIONS(-DWIN32)
@@ -282,7 +284,7 @@ IF(VTK_FOUND)
       SUBDIRS(SegmentationEditor vtkITK)
     ENDIF(NOT BORLAND)
   ENDIF(VTK_WRAP_TCL)
-  
+
   SET (VTK_AND_ITK_WRAPPED 0)
   IF(VTK_WRAP_PYTHON AND ITK_CSWIG_PYTHON)
     SET(VTK_AND_ITK_WRAPPED 1)
@@ -290,17 +292,17 @@ IF(VTK_FOUND)
   IF(VTK_WRAP_TCL AND ITK_CSWIG_TCL)
     SET(VTK_AND_ITK_WRAPPED 1)
   ENDIF(VTK_WRAP_TCL AND ITK_CSWIG_TCL)
-  
+
   IF(VTK_AND_ITK_WRAPPED)
     SUBDIRS(ConnectVTKITK)
   ENDIF(VTK_AND_ITK_WRAPPED)
-  
+
 ENDIF(VTK_FOUND)
 
 LINK_LIBRARIES (
 ITKAlgorithms
 ITKCommon
-ITKBasicFilters 
+ITKBasicFilters
 )
 
 # If the version of CMake was too old, complain and build nothing.

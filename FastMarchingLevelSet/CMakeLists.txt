@@ -31,7 +31,7 @@ INCLUDE_DIRECTORIES(
 
 FLTK_WRAP_UI(FastMarchingLevelSet FastMarchingLevelSetGUI.fl)
 
-SET(FastMarchingLevelSet_SRCS 
+SET(FastMarchingLevelSet_SRCS
   FastMarchingLevelSetBase.cxx
   FastMarchingLevelSet.cxx
   ${FastMarchingLevelSet_FLTK_UI_SRCS}

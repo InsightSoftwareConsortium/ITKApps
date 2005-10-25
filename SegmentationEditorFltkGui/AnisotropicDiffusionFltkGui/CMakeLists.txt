@@ -1,6 +1,6 @@
 INCLUDE_DIRECTORIES(
-  ${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer     
-  ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer     
+  ${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer
+  ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
   ${InsightApplications_SOURCE_DIR}/SegmentationEditorFltkGui/AnisotropicDiffusionFltkGui
   ${InsightApplications_BINARY_DIR}/SegmentationEditorFltkGui/AnisotropicDiffusionFltkGui
 )
@@ -30,10 +30,10 @@ FLTK_WRAP_UI(AnisotropicDiffusionFltkGui2D   ${AnisotropicDiffusionFltkGui2D_GUI
 ITK_DISABLE_FLTK_GENERATED_WARNINGS("${AnisotropicDiffusionFltkGui3D_GUI_SRCS}")
 ITK_DISABLE_FLTK_GENERATED_WARNINGS("${AnisotropicDiffusionFltkGui2D_GUI_SRCS}")
 
-ADD_EXECUTABLE(AnisotropicDiffusionFltkGui3D ${AnisotropicDiffusionFltkGui3D_SRCS}
-               ${AnisotropicDiffusionFltkGui3D_FLTK_UI_SRCS})
-ADD_EXECUTABLE(AnisotropicDiffusionFltkGui2D ${AnisotropicDiffusionFltkGui2D_SRCS}
-               ${AnisotropicDiffusionFltkGui2D_FLTK_UI_SRCS})
+ADD_EXECUTABLE(AnisotropicDiffusionFltkGui3D ${AnisotropicDiffusionFltkGui3D_SRCS} ${AnisotropicDiffusionFltkGui3D_FLTK_UI_SRCS})
+INSTALL_TARGETS(/bin AnisotropicDiffusionFltkGui3D)
+ADD_EXECUTABLE(AnisotropicDiffusionFltkGui2D ${AnisotropicDiffusionFltkGui2D_SRCS} ${AnisotropicDiffusionFltkGui2D_FLTK_UI_SRCS})
+INSTALL_TARGETS(/bin AnisotropicDiffusionFltkGui2D)
 
 TARGET_LINK_LIBRARIES(AnisotropicDiffusionFltkGui2D ITKFltkImageViewer ITKIO
                       ITKBasicFilters)

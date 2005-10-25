@@ -18,14 +18,16 @@ INCLUDE_DIRECTORIES(${ITK_INCLUDE_DIRS}
 
 LINK_DIRECTORIES(${ITK_LIBRARY_DIRS})
 
-ADD_LIBRARY(ItkModule itkModule.cxx)
+ADD_LIBRARY(ItkModule  itkModule.cxx)
+INSTALL_TARGETS(/lib ItkModule)
 TARGET_LINK_LIBRARIES(ItkModule ITKBasicFilters)
 
 
 IF(READY_FOR_PRIME_TIME)
   IF(ITK_CSWIG_JAVA)
     SET_SOURCE_FILES_PROPERTIES(itkModuleJava.cxx GENERATED)
-    ADD_LIBRARY(ItkModuleJava SHARED itkModuleJava.cxx)
+    ADD_LIBRARY(ItkModuleJava  SHARED itkModuleJava.cxx)
+    INSTALL_TARGETS(/lib ItkModuleJava)
     TARGET_LINK_LIBRARIES(ItkModuleJava ITKBasicFilters
     SwigRuntimceJava ${JAVA_LIBRARY})
     ADD_CUSTOM_COMMAND(

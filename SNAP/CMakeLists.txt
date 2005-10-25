@@ -36,7 +36,7 @@ ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 # SOURCE FILE SPECIFICATION                 #
 #############################################
 
-# The part of the source code devoted to the SNAP application logic 
+# The part of the source code devoted to the SNAP application logic
 # is organized into a separate library
 SET(LOGIC_CXX
   Common/CommandLineArgumentParser.cxx
@@ -175,7 +175,7 @@ SET(UI_HEADERS
   UserInterface/BasicComponents/SnakeParametersPreviewBox.h
   UserInterface/BasicComponents/SnakeParametersPreviewPipeline.h
   UserInterface/Common/SNAPCommonUI.h
-  UserInterface/Common/SNAPAppearanceSettings.h  
+  UserInterface/Common/SNAPAppearanceSettings.h
   UserInterface/ImageIOWizard/GreyImageIOWizardLogic.h
   UserInterface/ImageIOWizard/ImageIOWizardBase.h
   UserInterface/ImageIOWizard/ImageIOWizardLogic.h
@@ -393,7 +393,7 @@ SET(LOGIC_SRCS
 # The sources needed to build the SNAP application
 SET(APPLICATION_SRCS
   ${LOGIC_SRCS}
-  ${UI_CXX}  
+  ${UI_CXX}
   ${UI_HEADERS}
   ${APPLICATION_CXX}
 )
@@ -424,7 +424,7 @@ IF(UNIX)
     SET(SYSTEM_LIBS ${SYSTEM_LIBS} Xft)
   ENDIF(SNAP_USE_XFT_LIBRARY)
 ENDIF(UNIX)
-    
+
 #############################################
 # LIBRARIES AND EXTERNAL CODE               #
 #############################################
@@ -434,19 +434,19 @@ SET(MY_SOURCE_DIR ${InsightApplications_SOURCE_DIR}/SNAP)
 SET(MY_BINARY_DIR ${InsightApplications_BINARY_DIR}/SNAP)
 
 
-# Due to a limitation in Visual studio 6.0 on the length of include directories 
+# Due to a limitation in Visual studio 6.0 on the length of include directories
 # that can be specified, (here we are including all the include directories from
 # ITK, VTK, FLTK and SNAP), if the compiler is VS6, we copy the SNAP source files
-# to a single path in the binary tree to cut down on the number of 
+# to a single path in the binary tree to cut down on the number of
 # INCLUDE_DIRECTORIES
 IF( CMAKE_GENERATOR MATCHES "Visual Studio 6" )
   FILE( GLOB_RECURSE SNAP_GLOBBED_CXX "${MY_SOURCE_DIR}/*.cxx" )
   FILE( GLOB_RECURSE SNAP_GLOBBED_H "${MY_SOURCE_DIR}/*.h" )
   FILE( GLOB_RECURSE SNAP_GLOBBED_TXX "${MY_SOURCE_DIR}/*.txx" )
-  SET( SNAP_SOURCES 
-            ${SNAP_GLOBBED_CXX} 
-            ${SNAP_GLOBBED_H} 
-            ${SNAP_GLOBBED_TXX} 
+  SET( SNAP_SOURCES
+            ${SNAP_GLOBBED_CXX}
+            ${SNAP_GLOBBED_H}
+            ${SNAP_GLOBBED_TXX}
      )
   MAKE_DIRECTORY( "${MY_BINARY_DIR}/src" )
   SET( CONFIGURED_SOURCE_DIRECTORY "${MY_BINARY_DIR}/src" )
@@ -456,8 +456,8 @@ IF( CMAKE_GENERATOR MATCHES "Visual Studio 6" )
     CONFIGURE_FILE( ${SourceFile} ${CONFIGURED_SOURCE_FILE}
                      COPYONLY IMMEDIATE )
   ENDFOREACH( SourceFile )
-  INCLUDE_DIRECTORIES( 
-    ${CONFIGURED_SOURCE_DIRECTORY} 
+  INCLUDE_DIRECTORIES(
+    ${CONFIGURED_SOURCE_DIRECTORY}
     ${ITK_DIR}/Utilities/zlib
     ${MY_BINARY_DIR}/UserInterface/ImageIOWizard
     ${MY_BINARY_DIR}/UserInterface/MainComponents
@@ -498,7 +498,7 @@ ENDIF( CMAKE_GENERATOR MATCHES "Visual Studio 6" )
 
 
 # ----------------------------------------------------------------
-# Define Libraries 
+# Define Libraries
 # ----------------------------------------------------------------
 
 # ITK Libraries
@@ -545,7 +545,7 @@ LINK_LIBRARIES(${SNAP_ITK_LIBS} ${SNAP_VTK_LIBS} ${SNAP_FLTK_LIBS} ${SNAP_SYSTEM
 FLTK_WRAP_UI(InsightSNAP ${APPLICATION_FLUIDS})
 SET(SNAP_EXE_PARAMETERS "WIN32" ${APPLICATION_SRCS})
 
-# Disable FLTK warnings 
+# Disable FLTK warnings
 ITK_DISABLE_FLTK_GENERATED_WARNINGS("${APPLICATION_FLUIDS}")
 
 # The SNAP executable
@@ -560,6 +560,7 @@ ADD_GUI_EXECUTABLE(InsightSNAP "${SNAP_EXE_PARAMETERS}")
 IF(BUILD_TESTING)
   ADD_GUI_EXECUTABLE(SNAPTests "${TESTING_SRCS}")
   ADD_EXECUTABLE(SNAPTutorialTest ${TESTING_TUTORIAL_SRCS})
+  INSTALL_TARGETS(/bin SNAPTutorialTest)
 ENDIF(BUILD_TESTING)
 
 # ----------------------------------------------------------------

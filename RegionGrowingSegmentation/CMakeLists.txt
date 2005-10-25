@@ -60,12 +60,12 @@ ${RegionGrowingSegmentation_FLTK_UI_SRCS}
 LINK_LIBRARIES (
 ITKCommon
 ITKNumerics
-ITKBasicFilters 
+ITKBasicFilters
 ITKIO
 ITKFltkImageViewer
 ITKVtkFltk
 vtkRendering
-vtkGraphics  
+vtkGraphics
 vtkHybrid
 vtkImaging
 vtkIO

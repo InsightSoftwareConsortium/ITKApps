@@ -10,12 +10,14 @@ SET(WSTCommon_SRCS
 
 SET_SOURCE_FILES_PROPERTIES(vtkLookupTableEquivalencyHash.cxx  WRAP_EXCLUDE)
 
-ADD_LIBRARY(vtkWSTCommon ${WSTCommon_SRCS})
+ADD_LIBRARY(vtkWSTCommon  ${WSTCommon_SRCS})
+INSTALL_TARGETS(/lib vtkWSTCommon)
 TARGET_LINK_LIBRARIES(vtkWSTCommon vtkVTKITKCommon)
 
 # Configure Tcl wrappers.
 VTK_WRAP_TCL2(vtkWSTCommonTCL WSTCommonTCL_SRCS ${WSTCommon_SRCS})
-ADD_LIBRARY(vtkWSTCommonTCL ${WSTCommonTCL_SRCS})
+ADD_LIBRARY(vtkWSTCommonTCL  ${WSTCommonTCL_SRCS})
+INSTALL_TARGETS(/lib vtkWSTCommonTCL)
 
 TARGET_LINK_LIBRARIES(vtkWSTCommonTCL vtkWSTCommon vtkFilteringTCL
                       vtkCommonTCL)

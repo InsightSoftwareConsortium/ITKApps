@@ -34,8 +34,8 @@ INCLUDE_DIRECTORIES (
 )
 
 LINK_DIRECTORIES(
-  ${ITK_LIBRARY_PATH}  
-  ${VTK_LIBRARY_PATH}  
+  ${ITK_LIBRARY_PATH}
+  ${VTK_LIBRARY_PATH}
 )
 
 
@@ -43,8 +43,8 @@ LINK_LIBRARIES (
   ITKFltkImageViewer
   ITKVtkFltk
   vtkRendering
-  vtkGraphics	  
-  vtkHybrid	  
+  vtkGraphics
+  vtkHybrid
   vtkImaging
   vtkIO
   vtkFiltering
@@ -64,6 +64,7 @@ SET(MatroxInput_GUI_SRCS
 
 
 ADD_EXECUTABLE(MatroxInput ${MatroxInput_SRCS})
+INSTALL_TARGETS(/bin MatroxInput)
 
 
 FLTK_WRAP_UI(MatroxInput ${MatroxInput_GUI_SRCS})

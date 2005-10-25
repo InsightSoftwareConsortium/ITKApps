@@ -49,12 +49,13 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
-FLTK_WRAP_UI(CellularSegmentation 
-  CellularSegmentationApplicationGUI.fl 
+FLTK_WRAP_UI(CellularSegmentation
+  CellularSegmentationApplicationGUI.fl
   )
 
-ADD_EXECUTABLE( CellularSegmentation ${APPLICATION_SOURCES}
-   ${CellularSegmentation_FLTK_UI_SRCS})
+ADD_EXECUTABLE(CellularSegmentation
+    ${APPLICATION_SOURCES} ${CellularSegmentation_FLTK_UI_SRCS})
+INSTALL_TARGETS(/bin CellularSegmentation)
 
 
 INCLUDE_DIRECTORIES(
@@ -63,15 +64,15 @@ INCLUDE_DIRECTORIES(
   )
 
 
-TARGET_LINK_LIBRARIES( CellularSegmentation 
-  ITKAlgorithms ITKBasicFilters ITKCommon ITKIO ITKNumerics ITKIO 
+TARGET_LINK_LIBRARIES( CellularSegmentation
+  ITKAlgorithms ITKBasicFilters ITKCommon ITKIO ITKNumerics ITKIO
   ITKFltkImageViewer ITKVtkFltk
   vtkCommon
   vtkFiltering
   vtkGraphics
   vtkImaging
   vtkIO
-  vtkHybrid 
+  vtkHybrid
   vtkRendering
   ${FLTK_LIBRARIES}
   )

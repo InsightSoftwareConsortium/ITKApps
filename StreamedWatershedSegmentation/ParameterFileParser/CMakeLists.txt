@@ -6,5 +6,6 @@ param.cxx
 )
 
 
-ADD_LIBRARY(param ${param_SRCS})
+ADD_LIBRARY(param  ${param_SRCS})
+INSTALL_TARGETS(/lib param)
 TARGET_LINK_LIBRARIES(param ITKCommon)

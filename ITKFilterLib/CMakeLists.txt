@@ -21,13 +21,15 @@ LINK_LIBRARIES (
 ITKNumerics
 ITKCommon
 ITKIO
-ITKBasicFilters 
+ITKBasicFilters
 )
 
 
-ADD_LIBRARY( Example_ITKFilterLib ITKFilterLib )
+ADD_LIBRARY(Example_ITKFilterLib ITKFilterLib )
+INSTALL_TARGETS(/lib Example_ITKFilterLib)
 TARGET_LINK_LIBRARIES(Example_ITKFilterLib ITKCommon ITKNumerics ITKIO ITKBasicFilters)
-ADD_EXECUTABLE( Example_ITKFilterLibTest ITKFilterLibTest.cxx )
+ADD_EXECUTABLE(Example_ITKFilterLibTest ITKFilterLibTest.cxx )
+INSTALL_TARGETS(/bin Example_ITKFilterLibTest)
 TARGET_LINK_LIBRARIES(Example_ITKFilterLibTest Example_ITKFilterLib)
 
 

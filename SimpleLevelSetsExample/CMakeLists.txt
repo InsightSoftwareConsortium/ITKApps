@@ -21,6 +21,8 @@ ITKIO
 )
 
 ADD_EXECUTABLE(itk2DSimpleLevelSetsExample itk2DSimpleLevelSetsExample.cxx)
+INSTALL_TARGETS(/bin itk2DSimpleLevelSetsExample)
 ADD_EXECUTABLE(itk3DSimpleLevelSetsExample itk3DSimpleLevelSetsExample.cxx)
+INSTALL_TARGETS(/bin itk3DSimpleLevelSetsExample)
 
 

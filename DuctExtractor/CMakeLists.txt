@@ -30,9 +30,9 @@ INCLUDE_DIRECTORIES(
 FLTK_WRAP_UI(DuctExtractor DuctExtractorConsoleGUI.fl)
 ITK_DISABLE_FLTK_GENERATED_WARNINGS(DuctExtractorConsoleGUI.fl)
 
-SET(DuctExtractor_SRCS 
+SET(DuctExtractor_SRCS
   DuctExtractorConsole.cxx
-  DuctExtractorConsoleBase.cxx 
+  DuctExtractorConsoleBase.cxx
   DuctExtractor.cxx
   ${DuctExtractor_FLTK_UI_SRCS}
   )

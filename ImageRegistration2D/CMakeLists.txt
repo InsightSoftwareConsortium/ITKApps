@@ -32,9 +32,9 @@ INCLUDE_DIRECTORIES(
 FLTK_WRAP_UI(ImageRegistration2D ImageRegistrationConsoleGUI.fl)
 ITK_DISABLE_FLTK_GENERATED_WARNINGS(ImageRegistrationConsoleGUI.fl)
 
-SET(ImageRegistration2D_SRCS 
+SET(ImageRegistration2D_SRCS
   ImageRegistrationConsole.cxx
-  ImageRegistrationConsoleBase.cxx 
+  ImageRegistrationConsoleBase.cxx
   ImageRegistration2D.cxx
   ${ImageRegistration2D_FLTK_UI_SRCS}
   )

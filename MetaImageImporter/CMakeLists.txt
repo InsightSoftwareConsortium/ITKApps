@@ -13,4 +13,5 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 
-ADD_EXECUTABLE( MetaImageImporter MetaImageImporter.cxx )
+ADD_EXECUTABLE(MetaImageImporter MetaImageImporter.cxx )
+INSTALL_TARGETS(/bin MetaImageImporter)

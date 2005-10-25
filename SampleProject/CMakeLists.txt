@@ -14,6 +14,7 @@ ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 # Add the executable with our source file.
 ADD_EXECUTABLE(itkSampleProject itkSampleProject.cxx)
+INSTALL_TARGETS(/bin itkSampleProject)
 
 # We only need ITK's Common components.  Link to the common library.
 TARGET_LINK_LIBRARIES(itkSampleProject ITKCommon)

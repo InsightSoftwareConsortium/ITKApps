@@ -41,7 +41,7 @@ INCLUDE_DIRECTORIES(
 FLTK_WRAP_UI(DeformableRegistration3DTimeSeries
     DicomImageReaderGUI.fl
     DeformableRegistration3DTimeSeriesGUI.fl
-    ) 
+    )
 
 SET( DeformableRegistration3DTimeSeries_SRCS
     main.cxx
@@ -51,10 +51,10 @@ SET( DeformableRegistration3DTimeSeries_SRCS
     TransferFunctionEditor.cxx
     DicomImageReaderBase.cxx
     ${DeformableRegistration3DTimeSeries_FLTK_UI_SRCS}
-    )  
+    )
 
-ADD_GUI_EXECUTABLE( 
-    DeformableRegistration3DTimeSeries 
+ADD_GUI_EXECUTABLE(
+    DeformableRegistration3DTimeSeries
     "${DeformableRegistration3DTimeSeries_SRCS}" )
 
 
@@ -81,7 +81,7 @@ TARGET_LINK_LIBRARIES(
   vtkFiltering
   vtkCommon
   vtkVolumeRendering
- 
+
 
   ${FLTK_LIBRARIES}
   )

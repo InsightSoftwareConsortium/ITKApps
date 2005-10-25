@@ -28,14 +28,15 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
     MACRO(ADD_GUI_EXECUTABLE name sources)
       ADD_EXECUTABLE(${name} ${sources})
-      SET(EXEC_PATH ${EXECUTABLE_OUTPUT_PATH}) 
+      INSTALL_TARGETS(/bin ${name})
+      SET(EXEC_PATH ${EXECUTABLE_OUTPUT_PATH})
       IF(NOT EXEC_PATH)
         SET(EXEC_PATH ${CMAKE_CURRENT_BINARY_DIR})
       ENDIF(NOT EXEC_PATH)
         IF(ITK_APPLE_RESOURCE)
           ADD_CUSTOM_COMMAND(SOURCE ${name}
                              COMMAND ${ITK_APPLE_RESOURCE}
-                             ARGS -t APPL ${ITK_FLTK_RESOURCE} -o 
+                             ARGS -t APPL ${ITK_FLTK_RESOURCE} -o
                              ${EXEC_PATH}/${name}
                              TARGET ${name})
         ENDIF(ITK_APPLE_RESOURCE)
@@ -43,6 +44,7 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
   ELSE(APPLE)
     MACRO(ADD_GUI_EXECUTABLE name sources)
       ADD_EXECUTABLE(${name} ${sources})
+      INSTALL_TARGETS(/bin ${name})
     ENDMACRO(ADD_GUI_EXECUTABLE)
   ENDIF(APPLE)
 
@@ -56,8 +58,9 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
   # Take the list of GUI files, generate .cxx and .h from them and add
   # them to the build process of the target
   FLTK_WRAP_UI(Curves3DExtractorLib ceExtractorConsoleGUI.fl)
-  ADD_LIBRARY(Curves3DExtractorLib ceExtractorConsole.cxx
+  ADD_LIBRARY(Curves3DExtractorLib  ceExtractorConsole.cxx
               ceExtractorConsoleBase.cxx ${Curves3DExtractorLib_FLTK_UI_SRCS})
+  INSTALL_TARGETS(/lib Curves3DExtractorLib)
 
   TARGET_LINK_LIBRARIES(
       Curves3DExtractorLib
@@ -86,9 +89,10 @@ ELSE( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
   # them to the build process of the target
   FLTK_WRAP_UI(Curves3DExtractorLib ceExtractorConsoleGUI.fl)
   ITK_DISABLE_FLTK_GENERATED_WARNINGS(ceExtractorConsoleGUI.fl)
-  
-  ADD_LIBRARY(Curves3DExtractorLib ceExtractorConsole.cxx
+
+  ADD_LIBRARY(Curves3DExtractorLib  ceExtractorConsole.cxx
               ceExtractorConsoleBase.cxx ${Curves3DExtractorLib_FLTK_UI_SRCS})
+  INSTALL_TARGETS(/lib Curves3DExtractorLib)
 
   TARGET_LINK_LIBRARIES( Curves3DExtractorLib
                          ITKBasicFilters ITKIO ITKFltkImageViewer )

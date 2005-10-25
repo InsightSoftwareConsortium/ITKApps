@@ -23,12 +23,12 @@ ITKBasicFilters
 ITKIO
 )
 
-ADD_EXECUTABLE(GaussianIBSRClassificationApp 
-               Code/GaussianClassifierValidationApp.cxx)
-ADD_EXECUTABLE(KmeansIBSRClassificationApp 
-               Code/KmeansClassifierValidationApp.cxx)
-ADD_EXECUTABLE(MRFGaussianIBSRClassificationApp 
-               Code/MRFGaussianClassifierValidationApp.cxx)
-ADD_EXECUTABLE(MRFKmeansIBSRClassificationApp 
-               Code/MRFKmeansClassifierValidationApp.cxx)
+ADD_EXECUTABLE(GaussianIBSRClassificationApp Code/GaussianClassifierValidationApp.cxx)
+INSTALL_TARGETS(/bin GaussianIBSRClassificationApp)
+ADD_EXECUTABLE(KmeansIBSRClassificationApp Code/KmeansClassifierValidationApp.cxx)
+INSTALL_TARGETS(/bin KmeansIBSRClassificationApp)
+ADD_EXECUTABLE(MRFGaussianIBSRClassificationApp Code/MRFGaussianClassifierValidationApp.cxx)
+INSTALL_TARGETS(/bin MRFGaussianIBSRClassificationApp)
+ADD_EXECUTABLE(MRFKmeansIBSRClassificationApp Code/MRFKmeansClassifierValidationApp.cxx)
+INSTALL_TARGETS(/bin MRFKmeansIBSRClassificationApp)
 

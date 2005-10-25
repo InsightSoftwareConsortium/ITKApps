@@ -40,7 +40,7 @@ vtkITKRelabelComponentImageFilter.h
 vtkITKArchetypeImageSeriesReader.cxx
 )
 
-SET_SOURCE_FILES_PROPERTIES ( 
+SET_SOURCE_FILES_PROPERTIES (
 vtkITKImageToImageFilter.h
 vtkITKImageToImageFilter2DFF.h
 vtkITKImageToImageFilterFF.h
@@ -57,21 +57,24 @@ vtkITKImageToImageFilterSS.h
 ABSTRACT
 )
 
-ADD_LIBRARY ( vtkVTKITKCommon ${VTKITKCommon_SRCS} )
+ADD_LIBRARY(vtkVTKITKCommon  ${VTKITKCommon_SRCS} )
+INSTALL_TARGETS(/lib vtkVTKITKCommon)
 
 # Configure Tcl wrappers.
 VTK_WRAP_TCL2(vtkVTKITKCommonTCL VTKITKCommonTCL_SRCS ${VTKITKCommon_SRCS})
-ADD_LIBRARY ( vtkVTKITKCommonTCL ${VTKITKCommonTCL_SRCS} )
+ADD_LIBRARY(vtkVTKITKCommonTCL  ${VTKITKCommonTCL_SRCS} )
+INSTALL_TARGETS(/lib vtkVTKITKCommonTCL)
 TARGET_LINK_LIBRARIES(vtkVTKITKCommonTCL vtkFilteringTCL vtkCommonTCL)
 
 # Configure Python wrappers.
 IF (VTK_WRAP_PYTHON)
   VTK_WRAP_PYTHON2(vtkVTKITKCommonPython VTKITKCommonPython_SRCS
                    ${VTKITKCommon_SRCS})
-  ADD_LIBRARY(vtkVTKITKCommonPython SHARED ${VTKITKCommonPython_SRCS})
-  TARGET_LINK_LIBRARIES (vtkVTKITKCommonPython 
+  ADD_LIBRARY(vtkVTKITKCommonPython  SHARED ${VTKITKCommonPython_SRCS})
+  INSTALL_TARGETS(/lib vtkVTKITKCommonPython)
+  TARGET_LINK_LIBRARIES (vtkVTKITKCommonPython
                          vtkVTKITKCommon
-                         vtkFilteringPython 
+                         vtkFilteringPython
                          vtkCommonPython)
 ENDIF (VTK_WRAP_PYTHON)
 

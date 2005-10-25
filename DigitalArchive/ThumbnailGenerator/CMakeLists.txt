@@ -8,8 +8,10 @@ ELSE(ITK_FOUND)
  ENDIF(ITK_FOUND)
 
 ADD_EXECUTABLE(ITKThumbnailGenerator GenerateThumbnail.cxx)
+INSTALL_TARGETS(/bin ITKThumbnailGenerator)
 TARGET_LINK_LIBRARIES(ITKThumbnailGenerator ITKCommon ITKBasicFilters ITKIO)
 
 ADD_EXECUTABLE(DicomThumbnailGenerator DicomGenerateThumbnail.cxx)
+INSTALL_TARGETS(/bin DicomThumbnailGenerator)
 TARGET_LINK_LIBRARIES(DicomThumbnailGenerator ITKCommon ITKBasicFilters ITKIO)
 

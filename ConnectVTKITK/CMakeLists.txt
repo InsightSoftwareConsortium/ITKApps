@@ -15,7 +15,8 @@ LINK_DIRECTORIES(${VTK_LIBRARY_DIRS} ${ITK_LIBRARY_DIRS})
 
 IF(ITK_CSWIG_TCL AND VTK_WRAP_TCL)
   SET_SOURCE_FILES_PROPERTIES(ConnectVTKITK_wrapTcl.cxx GENERATED)
-  ADD_LIBRARY(ConnectVTKITKTcl SHARED ConnectVTKITK_wrapTcl.cxx)
+  ADD_LIBRARY(ConnectVTKITKTcl  SHARED ConnectVTKITK_wrapTcl.cxx)
+  INSTALL_TARGETS(/lib ConnectVTKITKTcl)
   TARGET_LINK_LIBRARIES(ConnectVTKITKTcl ITKBasicFilters
   vtkCommonTCL vtkImaging SwigRuntimeTcl ${TCL_LIBRARY})
   ADD_CUSTOM_COMMAND(
@@ -29,7 +30,7 @@ IF(ITK_CSWIG_TCL AND VTK_WRAP_TCL)
     TARGET ConnectVTKITKTcl
     OUTPUTS ${ConnectVTKITK_BINARY_DIR}/ConnectVTKITK_wrapTcl.cxx
     DEPENDS ${ConnectVTKITK_SOURCE_DIR}/ConnectVTKITK.i)
-  
+
   # Configure pkgIndex.tcl for the build tree.
   IF(UNIX)
     SET(ConnectVTKITK_LIBNAME_PREFIX "lib")
@@ -54,7 +55,8 @@ ENDIF(ITK_CSWIG_TCL AND VTK_WRAP_TCL)
 
 IF(ITK_CSWIG_PYTHON AND VTK_WRAP_PYTHON)
   SET_SOURCE_FILES_PROPERTIES(ConnectVTKITK_wrapPython.cxx GENERATED)
-  ADD_LIBRARY(_ConnectVTKITKPython MODULE ConnectVTKITK_wrapPython.cxx)
+  ADD_LIBRARY( _ConnectVTKITKPython MODULE ConnectVTKITK_wrapPython.cxx)
+  INSTALL_TARGETS(/lib _ConnectVTKITKPython)
   # we don't want a "lib" prefix, thanks.
   SET_TARGET_PROPERTIES(_ConnectVTKITKPython PROPERTIES PREFIX "")
   TARGET_LINK_LIBRARIES(_ConnectVTKITKPython ITKBasicFilters
@@ -73,7 +75,7 @@ IF(ITK_CSWIG_PYTHON AND VTK_WRAP_PYTHON)
     TARGET _ConnectVTKITKPython
     OUTPUTS ${ConnectVTKITK_BINARY_DIR}/ConnectVTKITK_wrapPython.cxx
     DEPENDS ${ConnectVTKITK_SOURCE_DIR}/ConnectVTKITK.i)
-  
+
   FIND_PROGRAM(PYTHON_EXECUTABLE
     NAMES python2.3 python2.2 python2.1 python2.0 python1.6 python1.5 python
     PATHS
@@ -132,7 +134,7 @@ IF(ITK_CSWIG_PYTHON AND VTK_WRAP_PYTHON)
                             COMMENT "source copy")
         ENDFOREACH(file)
       ENDIF(CMAKE_CONFIGURATION_TYPES)
-    ENDIF ("${ConnectVTKITK_BINARY_DIR}" MATCHES "^${ConnectVTKITK_SOURCE_DIR}$")  
+    ENDIF ("${ConnectVTKITK_BINARY_DIR}" MATCHES "^${ConnectVTKITK_SOURCE_DIR}$")
 
     # Byte compile the Python files.
     WRITE_FILE(${ConnectVTKITK_BINARY_DIR}/compile_all_connectvtkitk

@@ -4,6 +4,7 @@ ADD_LIBRARY(ITKFlFileWriter
   flstring.c
   vsnprintf.c
 )
+INSTALL_TARGETS(/lib ITKFlFileWriter)
 
 TARGET_LINK_LIBRARIES(ITKFlFileWriter ${FLTK_LIBRARIES})
 

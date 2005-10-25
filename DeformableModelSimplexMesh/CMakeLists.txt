@@ -51,13 +51,12 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
-FLTK_WRAP_UI(DeformableModelSimplexMesh 
-  DeformableModelApplicationGUI.fl 
+FLTK_WRAP_UI(DeformableModelSimplexMesh
+  DeformableModelApplicationGUI.fl
   )
 
-ADD_EXECUTABLE( DeformableModelSimplexMesh ${APPLICATION_SOURCES}
-               ${DeformableModelSimplexMesh_FLTK_UI_SRCS}
-              )
+ADD_EXECUTABLE(DeformableModelSimplexMesh ${APPLICATION_SOURCES} ${DeformableModelSimplexMesh_FLTK_UI_SRCS})
+INSTALL_TARGETS(/bin DeformableModelSimplexMesh)
 
 INCLUDE_DIRECTORIES(
   ${DeformableModels_SOURCE_DIR}
@@ -65,8 +64,8 @@ INCLUDE_DIRECTORIES(
   )
 
 
-TARGET_LINK_LIBRARIES( DeformableModelSimplexMesh 
-  ITKAlgorithms ITKBasicFilters ITKCommon ITKIO ITKNumerics ITKIO 
+TARGET_LINK_LIBRARIES( DeformableModelSimplexMesh
+  ITKAlgorithms ITKBasicFilters ITKCommon ITKIO ITKNumerics ITKIO
   ITKFltkImageViewer ITKVtkFltk
   vtkCommon
   vtkFiltering

@@ -27,15 +27,15 @@ INCLUDE_DIRECTORIES(
   ${InsightApplications_BINARY_DIR}/GaussianFilter
 )
 
-SET(GaussianFilter_SRCS 
+SET(GaussianFilter_SRCS
   liFilterConsole.cxx
-  liFilterConsoleBase.cxx 
+  liFilterConsoleBase.cxx
   GaussianFilter.cxx
   )
 
-SET(GaussianFilter2D_SRCS 
+SET(GaussianFilter2D_SRCS
   liFilterConsole2D.cxx
-  liFilterConsole2DBase.cxx 
+  liFilterConsole2DBase.cxx
   GaussianFilter2D.cxx
   )
 

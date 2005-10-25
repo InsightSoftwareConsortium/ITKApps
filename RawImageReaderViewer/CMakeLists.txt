@@ -24,7 +24,7 @@ ${RawImageReaderViewer_SOURCE_DIR}
 )
 
 LINK_LIBRARIES (
-ITKBasicFilters 
+ITKBasicFilters
 ITKIO
 ITKFltkImageViewer
 )

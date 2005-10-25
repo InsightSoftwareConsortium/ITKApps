@@ -38,6 +38,6 @@ IF(UNIX)
   )
 ENDIF(UNIX)
 
-ADD_EXECUTABLE(itkEllipsoidInteriorExteriorSpatialFunctionExample 
-${ELLIPSOID_SPATIAL_FUNCTION_SRCS})
+ADD_EXECUTABLE(itkEllipsoidInteriorExteriorSpatialFunctionExample ${ELLIPSOID_SPATIAL_FUNCTION_SRCS})
+INSTALL_TARGETS(/bin itkEllipsoidInteriorExteriorSpatialFunctionExample)
 

@@ -22,7 +22,9 @@ ITKIO
 )
 
 ADD_EXECUTABLE(itk2DThresholdSegmentationLevelSetImageFilter itk2DThresholdSegmentationLevelSetImageFilter.cxx)
+INSTALL_TARGETS(/bin itk2DThresholdSegmentationLevelSetImageFilter)
 ADD_EXECUTABLE(itk2DCannySegmentationLevelSetImageFilter itk2DCannySegmentationLevelSetImageFilter.cxx)
+INSTALL_TARGETS(/bin itk2DCannySegmentationLevelSetImageFilter)
 
 
 

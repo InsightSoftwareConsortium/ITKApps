@@ -68,31 +68,34 @@ SET(LIVER_TUMOR_SEGMENTATION_EXAMPLE_HEADS
   LiverTumorSegmentationBase.h
   )
 
-ADD_LIBRARY(LiverTumorSegmentationLibrary 
-    ${LIVER_TUMOR_SEGMENTATION_LIBRARY_HEADS} 
+ADD_LIBRARY(LiverTumorSegmentationLibrary
+    ${LIVER_TUMOR_SEGMENTATION_LIBRARY_HEADS}
     ${LIVER_TUMOR_SEGMENTATION_LIBRARY_SRCS} )
+INSTALL_TARGETS(/lib LiverTumorSegmentationLibrary)
 
 
-FLTK_WRAP_UI(LiverTumorSegmentationExample 
-  DicomImageReaderGUI.fl 
-  LiverTumorSegmentationGUI.fl 
+FLTK_WRAP_UI(LiverTumorSegmentationExample
+  DicomImageReaderGUI.fl
+  LiverTumorSegmentationGUI.fl
   )
 
-ADD_EXECUTABLE(LiverTumorSegmentationExample 
-    main.cxx 
-    ${LIVER_TUMOR_SEGMENTATION_EXAMPLE_HEADS} 
+ADD_EXECUTABLE(LiverTumorSegmentationExample
+    main.cxx
+    ${LIVER_TUMOR_SEGMENTATION_EXAMPLE_HEADS}
     ${LIVER_TUMOR_SEGMENTATION_EXAMPLE_SRCS}
                 ${LiverTumorSegmentationExample_FLTK_UI_SRCS}
                 )
+INSTALL_TARGETS(/bin LiverTumorSegmentationExample)
 
-TARGET_LINK_LIBRARIES( LiverTumorSegmentationExample 
-  LiverTumorSegmentationLibrary 
-  ITKAlgorithms ITKBasicFilters ITKCommon ITKIO ITKNumerics ITKIO 
+TARGET_LINK_LIBRARIES( LiverTumorSegmentationExample
+  LiverTumorSegmentationLibrary
+  ITKAlgorithms ITKBasicFilters ITKCommon ITKIO ITKNumerics ITKIO
   ITKFltkImageViewer ITKVtkFltk
-  vtkRendering vtkGraphics vtkHybrid vtkImaging vtkIO vtkFiltering vtkCommon 
+  vtkRendering vtkGraphics vtkHybrid vtkImaging vtkIO vtkFiltering vtkCommon
   ${FLTK_LIBRARIES})
 
 ADD_EXECUTABLE(ResampleVolumes ResampleVolumes.cxx )
+INSTALL_TARGETS(/bin ResampleVolumes)
 
 TARGET_LINK_LIBRARIES(ResampleVolumes ITKIO ITKCommon ITKNumerics)
 

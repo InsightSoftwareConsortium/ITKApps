@@ -20,9 +20,9 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 
-LINK_LIBRARIES( 
+LINK_LIBRARIES(
   vtkRendering
-  vtkGraphics	  
+  vtkGraphics
   vtkImaging
   vtkIO
   vtkFiltering
@@ -37,3 +37,4 @@ MIRegistration
 )
 
 ADD_EXECUTABLE(MIRegistration ${MIRegistration_SRCS})
+INSTALL_TARGETS(/bin MIRegistration)

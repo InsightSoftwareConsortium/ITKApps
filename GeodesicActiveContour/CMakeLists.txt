@@ -36,7 +36,7 @@ INCLUDE_DIRECTORIES(
 
 FLTK_WRAP_UI(GeodesicActiveContour GeodesicActiveContourGUI.fl)
 ITK_DISABLE_FLTK_GENERATED_WARNINGS(GeodesicActiveContourGUI.fl)
-  
+
 SET(GeodesicActiveContour_SRCS
   GeodesicActiveContourBase.cxx
   GeodesicActiveContour.cxx
@@ -44,6 +44,6 @@ SET(GeodesicActiveContour_SRCS
   )
 
 ADD_GUI_EXECUTABLE(GeodesicActiveContour "${GeodesicActiveContour_SRCS}")
-  
+
 TARGET_LINK_LIBRARIES(GeodesicActiveContour ITKNumerics ITKBasicFilters
                       ITKIO vtkHybrid vtkIO ITKVtkFltk ITKFltkImageViewer)

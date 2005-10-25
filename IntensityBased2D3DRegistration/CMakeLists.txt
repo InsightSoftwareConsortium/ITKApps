@@ -16,7 +16,9 @@ ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 #SET(CMAKE_VERBOSE_MAKEFILE ON)
 
 ADD_EXECUTABLE(IntensityBased2D3DRegistration IntensityBased2D3DRegistration.cxx)
+INSTALL_TARGETS(/bin IntensityBased2D3DRegistration)
 TARGET_LINK_LIBRARIES( IntensityBased2D3DRegistration ITKNumerics ITKIO )
 
 ADD_EXECUTABLE(GenerateProjection GenerateProjection.cxx)
+INSTALL_TARGETS(/bin GenerateProjection)
 TARGET_LINK_LIBRARIES( GenerateProjection ITKNumerics ITKIO )

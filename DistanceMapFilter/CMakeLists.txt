@@ -38,7 +38,7 @@ DistanceMapFilterGUI.fl
 )
 
 LINK_LIBRARIES (
-ITKBasicFilters 
+ITKBasicFilters
 ITKIO
 ITKFltkImageViewer
 )

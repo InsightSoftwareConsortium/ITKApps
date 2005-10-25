@@ -43,11 +43,11 @@ ITK_DISABLE_FLTK_GENERATED_WARNINGS("${ShapeDetectionLevelSet_SRCS}")
 LINK_LIBRARIES (
 ITKCommon
 ITKNumerics
-ITKBasicFilters 
+ITKBasicFilters
 ITKIO
 vtkRendering
-vtkGraphics    
-vtkHybrid    
+vtkGraphics
+vtkHybrid
 vtkImaging
 vtkIO
 vtkFiltering

@@ -31,16 +31,16 @@ SegmenterConsole3DBase.cxx
 Segmenter3D.cxx
 itkWatershedFilterAndWriter.txx
 itkWatershedSegmentTreeWriter.txx
-fltkRGBImageViewer.txx  
+fltkRGBImageViewer.txx
 )
 
 SET(WatershedSegmentationFltkGui3D_GUI_SRCS
 SegmenterConsole3DGUI.fl
-fltkRGBImageViewerGUI.fl  
+fltkRGBImageViewerGUI.fl
 )
 
 LINK_LIBRARIES (
-ITKBasicFilters 
+ITKBasicFilters
 ITKIO
 ITKNumerics
 ITKFltkImageViewer
@@ -50,6 +50,6 @@ ${FTLK_LIBRARY}
 FLTK_WRAP_UI(WatershedSegmentationFltkGui3D   ${WatershedSegmentationFltkGui3D_GUI_SRCS})
 ITK_DISABLE_FLTK_GENERATED_WARNINGS("${WatershedSegmentationFltkGui3D_GUI_SRCS}")
 
-ADD_EXECUTABLE(WatershedSegmentationFltkGui3D ${WatershedSegmentationFltkGui3D_SRCS}
-               ${WatershedSegmentationFltkGui3D_FLTK_UI_SRCS})
+ADD_EXECUTABLE(WatershedSegmentationFltkGui3D ${WatershedSegmentationFltkGui3D_SRCS} ${WatershedSegmentationFltkGui3D_FLTK_UI_SRCS})
+INSTALL_TARGETS(/bin WatershedSegmentationFltkGui3D)
 

@@ -29,5 +29,7 @@ LINK_LIBRARIES (
   )
 
 ADD_EXECUTABLE(itkAntiAliasBinaryImageFilterExample itkAntiAliasBinaryImageFilterExample.cxx)
+INSTALL_TARGETS(/bin itkAntiAliasBinaryImageFilterExample)
 ADD_EXECUTABLE(itkSampleDataGenerator itkSampleDataGenerator.cxx)
+INSTALL_TARGETS(/bin itkSampleDataGenerator)
 

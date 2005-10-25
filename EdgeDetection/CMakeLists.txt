@@ -19,4 +19,5 @@ INCLUDE_DIRECTORIES(${InsightApplications_SOURCE_DIR}/EdgeDetection)
 
 #ADD_EXECUTABLE(itk2DEdgeDetectionSample itk2DEdgeDetectionSample.cxx)
 ADD_EXECUTABLE(itk3DEdgeDetectionSample itk3DEdgeDetectionSample.cxx)
+INSTALL_TARGETS(/bin itk3DEdgeDetectionSample)
 TARGET_LINK_LIBRARIES(itk3DEdgeDetectionSample ITKBasicFilters ITKIO)

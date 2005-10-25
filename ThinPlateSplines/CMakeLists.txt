@@ -35,9 +35,8 @@ INCLUDE_DIRECTORIES(
 FLTK_WRAP_UI(ThinPlateSplines ThinPlateSplinesApplicationGUI.fl)
 ITK_DISABLE_FLTK_GENERATED_WARNINGS(ThinPlateSplinesApplicationGUI.fl)
 
-ADD_EXECUTABLE(ThinPlateSplines ThinPlateSplinesApplicationBase.cxx
-               ThinPlateSplinesApplication.cxx main.cxx
-               ${ThinPlateSplines_FLTK_UI_SRCS})
+ADD_EXECUTABLE(ThinPlateSplines ThinPlateSplinesApplicationBase.cxx ThinPlateSplinesApplication.cxx main.cxx ${ThinPlateSplines_FLTK_UI_SRCS})
+INSTALL_TARGETS(/bin ThinPlateSplines)
 
 TARGET_LINK_LIBRARIES(ThinPlateSplines ITKBasicFilters ITKIO
                       ITKFltkImageViewer ITKVtkFltk vtkHybrid)

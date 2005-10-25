@@ -1,12 +1,13 @@
 # create the WSTITK executable
 ADD_EXECUTABLE(WSTITK tkAppInit.cxx)
+INSTALL_TARGETS(/bin WSTITK)
 
 TARGET_LINK_LIBRARIES (WSTITK
   vtkImagingTCL
   vtkGraphicsTCL
   vtkIOTCL
-  vtkFilteringTCL 
-  vtkCommonTCL  
+  vtkFilteringTCL
+  vtkCommonTCL
 )
 
 IF (VTK_USE_RENDERING)

@@ -1,12 +1,13 @@
 # create the vtkITK executable
 ADD_EXECUTABLE(vtkITK tkAppInit)
+INSTALL_TARGETS(/bin vtkITK)
 
-TARGET_LINK_LIBRARIES(vtkITK 
+TARGET_LINK_LIBRARIES(vtkITK
   vtkImagingTCL
   vtkGraphicsTCL
   vtkIOTCL
-  vtkFilteringTCL 
-  vtkCommonTCL  
+  vtkFilteringTCL
+  vtkCommonTCL
 )
 
 IF (VTK_USE_RENDERING)

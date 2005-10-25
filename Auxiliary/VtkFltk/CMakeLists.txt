@@ -11,6 +11,7 @@ ADD_LIBRARY(ITKVtkFltk
   fltkVTKImageViewerBase.cxx
   ${ITKVtkFltk_FLTK_UI_SRCS}
 )
+INSTALL_TARGETS(/lib ITKVtkFltk)
 
 TARGET_LINK_LIBRARIES(ITKVtkFltk vtkRendering ${FLTK_LIBRARIES} ${OPENGL_glu_LIBRARY})
 

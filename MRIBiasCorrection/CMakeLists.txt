@@ -20,5 +20,7 @@ FOREACH(exe BiasFieldEstimator BiasImageGenerator IntensityHistogram3D
             InterSliceIntensityCorrector SlabIdentifier EnergyTablePlotter
             ImageCorrector BiasCorrector)
   ADD_EXECUTABLE(${exe} ${exe}.cxx OptionList.cxx)
+  INSTALL_TARGETS(/bin ${exe})
+  INSTALL_TARGETS(/bin ${exe})
   TARGET_LINK_LIBRARIES(${exe} ITKIO ITKBasicFilters ITKStatistics ITKNumerics)
 ENDFOREACH(exe)

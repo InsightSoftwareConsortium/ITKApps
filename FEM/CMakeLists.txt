@@ -17,9 +17,9 @@ LINK_LIBRARIES (
   ITKFEM
   ITKCommon
   ITKNumerics
-  ITKBasicFilters 
+  ITKBasicFilters
   ITKStatistics
-  ITKIO  
+  ITKIO
 )
 
 IF(FEM_VISUALIZATION)
@@ -46,9 +46,13 @@ ENDIF(NOT UNIX)
 
 # Create project files for all examples
 ADD_EXECUTABLE(FEMRead FEMRead.cxx)
+INSTALL_TARGETS(/bin FEMRead)
 ADD_EXECUTABLE(FEMTruss FEMTruss.cxx)
+INSTALL_TARGETS(/bin FEMTruss)
 IF(NOT BORLAND)
   ADD_EXECUTABLE(FEMImageRegLMEx ${FEMImageRegLMEx_SRCS})
+  INSTALL_TARGETS(/bin FEMImageRegLMEx)
 ENDIF(NOT BORLAND)
 ADD_EXECUTABLE(FEMSolverHyperbolicExample FEMSolverHyperbolicExample.cxx)
+INSTALL_TARGETS(/bin FEMSolverHyperbolicExample)
 

@@ -34,7 +34,7 @@ SET (LIBRARY_OUTPUT_PATH ${VolviewPlugIns_BINARY_DIR}/bin CACHE PATH "Single out
 
 
 # list all plugins here
-SET (PLUGINS 
+SET (PLUGINS
   vvITKAntiAlias
   vvITKBinaryMedian
   vvITKCannyEdgeDetection
@@ -42,7 +42,7 @@ SET (PLUGINS
   vvITKConfidenceConnected
   vvITKConnectedThreshold
   vvITKCurvatureAnisotropicDiffusion
-  vvITKCurvatureFlow 
+  vvITKCurvatureFlow
   vvITKDeformableModelModule
   vvITKDanielssonDistanceMap
   vvITKFastMarching
@@ -86,11 +86,12 @@ ENDIF( UNIX )
 
 # copy the plugins to a plugin directory
 FOREACH (PLUG ${PLUGINS})
-  ADD_LIBRARY( ${PLUG} MODULE ${PLUG}.cxx )
+  ADD_LIBRARY(${PLUG}  MODULE ${PLUG}.cxx )
+  INSTALL_TARGETS(/lib ${PLUG})
   TARGET_LINK_LIBRARIES( ${PLUG} ITKIO ITKCommon ITKBasicFilters ITKAlgorithms )
   ADD_CUSTOM_COMMAND(
     SOURCE ${PLUG}
-    COMMAND ${CMAKE_COMMAND} 
+    COMMAND ${CMAKE_COMMAND}
     ARGS -E copy ${LIBRARY_BUILD_DIR}/${CMAKE_SHARED_MODULE_PREFIX}${PLUG}${CMAKE_SHARED_MODULE_SUFFIX} ${LIBRARY_DESTINATION_DIR}/${PLUG}${CMAKE_SHARED_MODULE_SUFFIX}
     TARGET ${PLUG}
     OUTPUTS ${LIBRARY_DESTINATION_DIR}/${PLUG}${CMAKE_SHARED_MODULE_SUFFIX}

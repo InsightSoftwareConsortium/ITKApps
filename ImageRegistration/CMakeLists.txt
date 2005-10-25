@@ -31,7 +31,7 @@ liImageRegistrationConsoleGUI.fl
 
 LINK_LIBRARIES (
 ITKNumerics
-ITKBasicFilters 
+ITKBasicFilters
 ITKIO
 ITKFltkImageViewer
 )

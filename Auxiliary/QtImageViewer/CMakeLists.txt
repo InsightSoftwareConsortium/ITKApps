@@ -36,19 +36,19 @@ LINK_LIBRARIES(
  ${OPENGL_LIBRARY}
 )
 
-SET(QtSlicer_SRCS 
+SET(QtSlicer_SRCS
   QtSlicerTest.cxx
   QtGlSliceView.cxx
   QtSlicer.cxx
 )
 
-SET(QtSlicer_GUI_SRCS 
+SET(QtSlicer_GUI_SRCS
   QtSlicerGUI.ui
   QtSlicerHelpGUI.ui
 )
 
 
-SET(QtSlicer_MOC_SRCS 
+SET(QtSlicer_MOC_SRCS
   QtGlSliceView.h
 )
 
@@ -65,6 +65,7 @@ ADD_DEFINITIONS(-DQT_DLL)
 ADD_DEFINITIONS(-DQT_THREAD_SUPPORT)
 
 ADD_EXECUTABLE(QtSlicer QtSlicer_SRCS)
+INSTALL_TARGETS(/bin QtSlicer)
 
 
 

@@ -53,7 +53,7 @@ FLTK_WRAP_UI(ThresholdSegmentationLevelSetFltkGui  ${ThresholdSegmentationLevelS
 ITK_DISABLE_FLTK_GENERATED_WARNINGS("${ThresholdSegmentationLevelSetFltkGui_GUI_SRCS}")
 
 LINK_LIBRARIES (
-ITKBasicFilters 
+ITKBasicFilters
 ITKIO
 ITKNumerics
 ITKFltkImageViewer
@@ -68,4 +68,5 @@ ${ThresholdSegmentationLevelSetFltkGui_FLTK_UI_SRCS}
 )
 
 ADD_EXECUTABLE(ThresholdSegmentationLevelSetFltkGui ${ThresholdSegmentationLevelSetFltkGui_SRCS})
+INSTALL_TARGETS(/bin ThresholdSegmentationLevelSetFltkGui)
 

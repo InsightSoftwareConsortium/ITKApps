@@ -31,5 +31,7 @@ LINK_LIBRARIES( ITKCommon ITKBasicFilters ITKNumerics ITKIO )
 CONFIGURE_FILE(${CLReg_SOURCE_DIR}/testScript.in
                 ${CLReg_BINARY_DIR}/testScript IMMEDIATE )
 ADD_EXECUTABLE(CLReg CLReg.cxx)
+INSTALL_TARGETS(/bin CLReg)
 ADD_EXECUTABLE(CLRegTest CLRegTest.cxx)
+INSTALL_TARGETS(/bin CLRegTest)
 

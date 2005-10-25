@@ -19,4 +19,5 @@ LINK_LIBRARIES (
   ITKIO
     )
 
-ADD_EXECUTABLE( MetaImageReadWrite MetaImageReadWrite.cxx )
+ADD_EXECUTABLE(MetaImageReadWrite MetaImageReadWrite.cxx )
+INSTALL_TARGETS(/bin MetaImageReadWrite)

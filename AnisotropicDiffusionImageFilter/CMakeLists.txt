@@ -18,10 +18,11 @@ LINK_LIBRARIES (
   ITKBasicFilters
   ITKCommon
   ITKIO
-  ITKNumerics 
+  ITKNumerics
   )
 
 ADD_EXECUTABLE(itk2DAnisotropicDiffusionImageFilter itk2DAnisotropicDiffusionImageFilter.cxx)
+INSTALL_TARGETS(/bin itk2DAnisotropicDiffusionImageFilter)
 
 
 

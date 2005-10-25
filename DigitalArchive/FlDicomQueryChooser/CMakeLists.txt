@@ -59,18 +59,18 @@ IF(HAS_FLTK)
     ${FLTK_DIR}/bin
     ${FLTK_DIR}/lib
     )
-  LINK_LIBRARIES( 
+  LINK_LIBRARIES(
    ${FLTK_LIBRARIES}
     )
 ENDIF(HAS_FLTK)
 
 
 INCLUDE_DIRECTORIES(
-  ${DCMTKTEST_SOURCE_DIR} 
-  ${DCMTKTEST_BINARY_DIR} 
+  ${DCMTKTEST_SOURCE_DIR}
+  ${DCMTKTEST_BINARY_DIR}
   ${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer
   ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
-) 
+)
 
 
 IF(CYGWIN)
@@ -92,7 +92,7 @@ SET(FlDicomQueryChooser_SRCS
   ${FlDicomQueryChooser_FLTK_UI_SRCS}
   fldqcDatatypes.h
   fldqcNet.cxx
-  fldqcNet.h 
+  fldqcNet.h
   fldqcLocalDirectoryQuery.h
   fldqcLocalDirectoryQuery.cxx
   fldqcRemoteNetworkQuery.cxx
@@ -100,19 +100,20 @@ SET(FlDicomQueryChooser_SRCS
   fldqcPreferences.cxx
   fldqcPreferences.h
   FlDicomQueryChooser.h
-  FlDicomQueryChooser.cxx 
+  FlDicomQueryChooser.cxx
   main.cxx
 )
 
 
 ADD_EXECUTABLE(FlDicomQueryChooser ${FlDicomQueryChooser_SRCS})
+INSTALL_TARGETS(/bin FlDicomQueryChooser)
 
 
 IF(WIN32)
  TARGET_LINK_LIBRARIES(
   FlDicomQueryChooser
-  ${DCMTK_LIBRARIES} 
-  ${OPENGL_LIBRARY} 
+  ${DCMTK_LIBRARIES}
+  ${OPENGL_LIBRARY}
   ITKCommon
   ITKIO
   ITKBasicFilters
@@ -121,8 +122,8 @@ IF(WIN32)
 ELSE(WIN32)
  TARGET_LINK_LIBRARIES(
   FlDicomQueryChooser
-  ${DCMTK_LIBRARIES} 
-  ${OPENGL_LIBRARY} 
+  ${DCMTK_LIBRARIES}
+  ${OPENGL_LIBRARY}
   ITKCommon
   ITKIO
   ITKBasicFilters

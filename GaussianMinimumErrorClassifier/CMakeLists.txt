@@ -30,3 +30,4 @@ GaussianMinimumErrorClassifier.cxx
 )
 
 ADD_EXECUTABLE(GaussianMinimumErrorClassifier ${GaussianMinimumErrorClassifier_SRCS})
+INSTALL_TARGETS(/bin GaussianMinimumErrorClassifier)

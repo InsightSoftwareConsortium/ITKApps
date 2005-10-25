@@ -34,7 +34,7 @@ ${SimpleFuzzyConnectedness_SOURCE_DIR}
 LINK_LIBRARIES (
 ITKCommon
 ITKNumerics
-ITKBasicFilters 
+ITKBasicFilters
 ITKIO
 ITKFltkImageViewer
 
