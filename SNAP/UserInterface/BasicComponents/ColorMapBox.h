@@ -1,0 +1,42 @@
+/*=========================================================================
+
+  Program:   Insight Segmentation & Registration Toolkit
+  Module:    ColorMapBox.h
+  Language:  C++
+  Date:      $Date$
+  Version:   $Revision$
+  Copyright (c) 2003 Insight Consortium. All rights reserved.
+  See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even 
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     PURPOSE.  See the above copyright notices for more information.
+=========================================================================*/
+#ifndef __ColorMapBox_h_
+#define __ColorMapBox_h_
+
+#include "FLTKCanvas.h"
+#include "SpeedColorMap.h"
+
+/**
+ * \class ColorMapBox
+ * \brief An FLTK Box used to display a color map
+ */
+class ColorMapBox : public FLTKCanvas
+{
+public:
+  /** The standard FLTK window constructor */
+  ColorMapBox(int x,int y,int w,int h,const char *label=NULL);
+
+  /** Set the current color map functor */
+  void SetColorMap(const SpeedColorMap &map)
+    { m_ColorMap = map; redraw(); }
+  
+  /** The draw method */
+  void draw();
+
+private:
+  SpeedColorMap m_ColorMap;
+};
+
+#endif
