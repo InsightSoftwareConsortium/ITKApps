@@ -122,6 +122,14 @@ public:
   /** Callback for when the preprocessing completes */
   void OnPreprocessClose();
 
+  /** Callback to display the color map window */
+  void OnPreprocessedColorMapAction();
+  void OnColorMapCloseAction();
+  void OnColorMapSelectAction();
+
+  /** Callback for when preprocessing preview status changes */
+  void OnPreprocessingPreviewStatusUpdate(bool flagPreview);
+
   /**
    *
    * DESCRIPTION:
@@ -822,6 +830,9 @@ private:
   // to four side by side windows
   void UpdateWindowFocus(int iWindow = -1);
 
+  // Update the color map of the speed image
+  void UpdateSpeedColorMap();
+
   /* Command used for progress tracking */
   itk::SmartPointer<ProgressCommandType> m_ProgressCommand;
 
@@ -833,6 +844,9 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.26  2005/08/11 04:37:07  pauly
+ *BUG: Fixed crash when using single-slice mode and entering auto-seg
+ *
  *Revision 1.25  2005/04/21 14:46:30  pauly
  *ENH: Improved management and editing of color labels in SNAP
  *

@@ -106,6 +106,11 @@ public:
   virtual void OnLoadPreprocessedImageAction() = 0;
   virtual void OnAcceptPreprocessingAction() = 0;
 
+  // SNAP Color map operations
+  virtual void OnPreprocessedColorMapAction() = 0;
+  virtual void OnColorMapCloseAction() = 0;
+  virtual void OnColorMapSelectAction() = 0;
+
   // SNAP Initialization page actions
   virtual void OnAddBubbleAction() = 0;
   virtual void OnRemoveBubbleAction() = 0;

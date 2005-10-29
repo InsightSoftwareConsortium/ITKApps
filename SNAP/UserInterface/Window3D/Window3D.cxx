@@ -473,24 +473,6 @@ Window3D
   m_DefaultHalf[X] = m_DefaultHalf[Y] = m_DefaultHalf[Z] = xMaxDim * 0.7 + 1.0;
   m_DefaultHalf[Z] *= 4.0;
 
-  /*
-
-  unsigned int maxdim = 0;
-  for (int i=0; i<3; i++)
-    {
-    unsigned int len = m_ImageSize[i];
-    m_Center[i] = len / 2.0;
-    if (maxdim < len) 
-      maxdim = len;
-    }
-  m_DefaultHalf[X] = m_DefaultHalf[Y] = m_DefaultHalf[Z] = maxdim * 0.7 + 1.0;
-  m_DefaultHalf[Z] *= 4.0;
-
-  // this->SetupProjection();
-  // 
-  // glMatrixMode(GL_MODELVIEW);
-  // glLoadIdentity();
-*/
   m_CursorVisible = 1;  // Show the crosshairs.
   m_Plane.valid = -1; // Resets the Cut m_Plane
   
@@ -499,10 +481,10 @@ Window3D
 
 void 
 Window3D
-::UpdateMesh()
+::UpdateMesh(itk::Command *command)
 {
   // make_current();
-  m_Mesh.GenerateMesh();
+  m_Mesh.GenerateMesh(command);
   redraw();
 }
 
@@ -673,77 +655,6 @@ Window3D
   // CheckErrors();
 }
 
-/**
- * handle(int event)
- *
- * purpose:
- * this handle() overrides the handle() of Fl_Gl_Window
- * keyboard input events ignored; mouse push/drag/release events processed
- *
- * pre: ??? does voxel data need to be loaded/3D window initialized???
- *
- * post:
- *
- *   results depend on m_GlobalState->GetToolbarMode():
- *   NAVIGATION_MODE:
- *   press starts, drag continues, release stops
- *    rotate        pan     zoom
- *      left button 3rd button  right button
- *   CROSSHAIRS_MODE:
- *   left button push repositions crosshairs
- *   PAINT3D_MODE:
- *   drag does the spray painting
- *     POLYGON_DRAWING_MODE:
- *   no action is done (all polygon drawing is done in Window2D)
- *   CUT_PLANES_MODE: 
- *    right now does nothing
- *  else no change in state
- *  if event is used, 1 is returned, else 0
- */
-/*
-int 
-Window3D
-::handle(int event)
-{
-  int button = Fl::event_button();
-  // accomodate 2-button mice: Ctrl-right => middle
-  if (Fl::event_state(FL_CTRL) && button == FL_RIGHT_MOUSE)
-    button = FL_MIDDLE_MOUSE;
-
-  switch ( m_GlobalState->GetToolbarMode() )
-    {
-    case NAVIGATION_MODE:
-      switch ( event )
-        {
-        case FL_PUSH:  MousePressFunc(button); return 1;
-        case FL_DRAG:  MouseMotionFunc(); return 1;
-        case FL_RELEASE: MouseReleaseFunc(); return 1;
-        }
-      break;
-    case CROSSHAIRS_MODE:
-      switch ( event )
-        {
-        case FL_PUSH: MouseCrossPressFunc(button); return 1;
-        }
-      break;
-    case PAINT3D_MODE:
-      switch ( event )
-        {
-        case FL_PUSH:   MouseCutPressFunc(button); return 1;
-        case FL_DRAG: MousePointPressFunc(button); return 1;
-        }
-      break;
-    case ROI_MODE:
-    case POLYGON_DRAWING_MODE:
-      break;
-    default:
-      cerr << "Case not handled in  Window3D::handle(int)" << std::endl;
-    }
-
-  return 0;
-}
-*/
-  
 void 
 Window3D
 ::OnRotateStartAction(int x, int y)
@@ -1095,111 +1006,6 @@ int Window3D::IntersectSegData(int mouse_x, int mouse_y, Vector3i &hit)
   return 0;
 }
 
-//-----------------------------------------------------------------------
-// ComputePointRay
-// 
-//-----------------------------------------------------------------------
-/*
-void Window3D::OnCutPlanePointRayAction(int mouse_x, int mouse_y, int i)
-{
-  double mvmatrix[16];
-  double projmatrix[16];
-  int viewport[4];
-
-  make_current();     // update GL state
-  ComputeMatricies( viewport, mvmatrix, projmatrix );
-  int x = mouse_x;
-  int y = viewport[3] - mouse_y - 1;
-  if ( 1==i )
-    {
-    ComputeRay( x, y, mvmatrix, projmatrix, viewport, m_Plane.cutPt1,
-                m_Plane.cutRay1 );
-    std::cout << "1st Point: X = " << Fl::event_x() << " Y = " << Fl::event_y() << " in image space is ("
-    << m_Plane.cutPt1[0] << ", " << m_Plane.cutPt1[1] << ", " << m_Plane.cutPt1[2] << ")" << std::endl;
-    std::cout << "Ray 1: x = " << m_Plane.cutRay1[0] << " y = " << m_Plane.cutRay1[1] << " z = "
-    << m_Plane.cutRay1[2] << std::endl;
-    // m_Ray[i] and m_Point[] have been set
-    } 
-  else if ( 2==i )
-    {
-    ComputeRay( x, y, mvmatrix, projmatrix, viewport, m_Plane.cutPt2,
-                m_Plane.cutRay2 );
-    std::cout << "Second m_Point: X = " << Fl::event_x() << " Y = " << Fl::event_y() << " in image space is ("
-    << m_Plane.cutPt2[0] << ", " << m_Plane.cutPt2[1] << ", " << m_Plane.cutPt2[2] << ")" << std::endl;
-    std::cout << "Ray 2: x = " << m_Plane.cutRay2[0] << " y = " << m_Plane.cutRay2[1] << " z = "
-    << m_Plane.cutRay2[2] << std::endl;
-    } 
-  else
-    {
-    std::cerr << "Not able to set Cut m_Plane point: " << i << std::endl; 
-    }
-}
-*/
-
-//-----------------------------------------------------------------------
-// Computem_Plane
-//   returns 0 if plane invalid, 1 if plane sucessfully computed
-//
-// parameters:
-//   pt1    1st user-defined m_Point
-//   pt2    2nd user-defined m_Point
-//   m_Ray    m_Ray projected back from pt2 through image from viewpt
-//   ABC    output m_Plane coordinates Ax+By+Cz+1=0 if DisZero
-//          Ax+By+Cz=0 if !DixZero 
-//   DisZero    true if plane goes through origin, false otherwise
-// pre:
-//   if they pt1==pt2 return 0, plane cannot be calculated
-// post
-//   pt1 != pt2 return 1
-//  ABC returns coordinates of plane equation, and DisZero set
-//-----------------------------------------------------------------------
-/*
-void Window3D::ComputePlane() {
-  if (m_Plane.valid != 1)
-    {
-    std::cerr << "m_Plane not properly initiated, cannot compute plane" << std::endl;
-    return;
-    }
-
-  if (m_Plane.cutRay2[X]==0 && m_Plane.cutRay2[Y]==0 && m_Plane.cutRay2[Z]==0)
-    {
-    std::cerr << "oops, can't have cutRay2 be (0,0,0)" << std::endl;
-    return;
-    }
-
-  Vector3d ray3;    // create new m_Ray between the 2 pts to help calc plane
-  for (int i=0; i<3; i++) ray3[i] = m_Plane.cutPt2[i] - m_Plane.cutPt1[i];
-
-  if (ray3[X] == 0 && ray3[Y] == 0 && ray3[Z] == 0)
-    {
-    std::cerr << "badness, points are the same - don't double click"  << std::endl;
-    return;
-    }
-
-  Vector3d normal;  // Cross product of cutRay2 with ray3
-  normal[X] =   m_Plane.cutRay2[Y]*ray3[Z] - m_Plane.cutRay2[Z]*ray3[Y];
-  normal[Y] = -(m_Plane.cutRay2[X]*ray3[Z] - m_Plane.cutRay2[Z]*ray3[X]);
-  normal[Z] =   m_Plane.cutRay2[X]*ray3[Y] - m_Plane.cutRay2[Y]*ray3[X];
-
-  double D = normal[X]*m_Plane.cutPt2[X] 
-             + normal[Y]*m_Plane.cutPt2[Y] 
-             + normal[Z]*m_Plane.cutPt2[Z] ;
-  m_Plane.distZero = (D == 0);
-
-  if (D != 0)     // Normalize the plane
-    for (int i=0; i<3; i++) normal[i] /= D;
-
-  m_Plane.coords = normal;
-
-#ifdef DEBUG
-  std::cout << "Window3D::Computem_Plane() plane equation is: " << std::endl << "("
-  << m_Plane.coords[0] << ")*x + ("
-  << m_Plane.coords[1] << ")*y + ("
-  << m_Plane.coords[2] << ")*z "
-  << (m_Plane.distZero ? "- 1 " : "") << "== 0" << std::endl;
-#endif
-}
-*/
 void Window3D::AddSample( Vector3i s )
 {
   // Add another sample.
@@ -1453,6 +1259,9 @@ Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.28  2005/08/10 03:24:21  pauly
+ *BUG: Corrected problems with 3D window, label IO from association files
+ *
  *Revision 1.27  2005/04/21 14:46:30  pauly
  *ENH: Improved management and editing of color labels in SNAP
  *

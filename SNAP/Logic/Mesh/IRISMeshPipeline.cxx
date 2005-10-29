@@ -69,11 +69,12 @@ IRISMeshPipeline
   m_VTKPipeline->SetMeshOptions(m_MeshOptions);
 }
 
-void
+unsigned long
 IRISMeshPipeline
 ::ComputeBoundingBoxes()
 {
   unsigned int i;
+  unsigned long nTotalVoxels = 0;
 
   // Get the dimensions of the image
   InputImageType::SizeType size = 
@@ -90,7 +91,7 @@ IRISMeshPipeline
   Vector3l bbMax[MAX_COLOR_LABELS];
 
   // Initialize the histogram and bounding boxes
-  for(i=0;i<MAX_COLOR_LABELS;i++)
+  for(i=1;i<MAX_COLOR_LABELS;i++)
     {
     m_Histogram[i] = 0l;
     bbMin[i] = extUpper;
@@ -123,13 +124,31 @@ IRISMeshPipeline
     }
 
   // Convert the bounding box to a region
-  for(i=0;i<MAX_COLOR_LABELS;i++)
+  for(i=1;i<MAX_COLOR_LABELS;i++)
     {
     Vector3l bbSize = Vector3l(1l) + bbMax[i] - bbMin[i];
     m_BoundingBox[i].SetSize(to_itkSize(bbSize));
     m_BoundingBox[i].SetIndex(to_itkIndex(bbMin[i]));
+    nTotalVoxels += m_BoundingBox[i].GetNumberOfPixels();
     }  
+
+  return nTotalVoxels;
 }
+
+unsigned long
+IRISMeshPipeline
+::GetVoxelsInBoundingBox(LabelType label) const
+{
+  return m_BoundingBox[label].GetNumberOfPixels();
+}
+
+AllPurposeProgressAccumulator *
+IRISMeshPipeline
+::GetProgressAccumulator()
+{
+  return m_VTKPipeline->GetProgressAccumulator();
+}
+  
 
 #include <ctime>
 

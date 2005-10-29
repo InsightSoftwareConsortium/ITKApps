@@ -59,6 +59,15 @@ enum ConstraintsType
   TURELLO,
   USER
 };
+  
+/** Color map presets */
+enum ColorMapPreset 
+{
+  COLORMAP_BLACK_BLACK_WHITE = 0,
+  COLORMAP_BLUE_BLACK_WHITE,
+  COLORMAP_BLACK_GRAY_WHITE,
+  COLORMAP_BLUE_WHITE_RED,
+};
                      
 /**
  * \class GlobalState
@@ -180,6 +189,24 @@ public:
 
   /** Set whether the zero level of the speed image is being displayed */
   irisGetMacro(SpeedViewZero,bool );
+
+  /** Get the colormap used to display speed in edge mode */
+  irisGetMacro(SpeedColorMapInEdgeMode, ColorMapPreset);
+
+  /** Set the colormap used to display speed in edge mode */
+  irisSetMacro(SpeedColorMapInEdgeMode, ColorMapPreset);
+
+  /** Get the colormap used to display speed in region mode */
+  irisGetMacro(SpeedColorMapInRegionMode, ColorMapPreset);
+
+  /** Set the colormap used to display speed in region mode */
+  irisSetMacro(SpeedColorMapInRegionMode, ColorMapPreset);
+
+  /** Set the colormap in current preprocessing mode*/
+  void SetSpeedColorMap(ColorMapPreset xPreset);
+
+  /** Get the colormap in current preprocessing mode*/
+  ColorMapPreset GetSpeedColorMap();
 
   /** Get the type of the snake being used */
   irisSetMacro(SnakeMode,SnakeType );
@@ -343,6 +370,12 @@ private:
   /** Whether the zero level of the speed image is being displayed */
   bool m_SpeedViewZero;
 
+  /** Color map preset in edge mode */
+  ColorMapPreset m_SpeedColorMapInEdgeMode;
+
+  /** Color map preset in region mode */
+  ColorMapPreset m_SpeedColorMapInRegionMode;
+
   /** The type of the snake being used */
   SnakeType m_SnakeMode;
 
@@ -394,6 +427,9 @@ private:
 
 /*
  *Log: GlobalState.h
+ *Revision 1.8  2004/07/24 19:00:03  pauly
+ *ENH: Thumbnail UI for slice zooming
+ *
  *Revision 1.7  2004/03/19 00:54:47  pauly
  *ENH: Added the ability to externally load the advection image
  *

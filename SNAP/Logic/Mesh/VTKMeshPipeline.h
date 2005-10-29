@@ -17,6 +17,7 @@
 
 #include "SNAPCommon.h"
 #include "MeshOptions.h"
+#include "AllPurposeProgressAccumulator.h"
 
 // ITK includes (this file is not widely included in SNAP, so it's OK
 // to include a bunch of headers here).
@@ -34,6 +35,7 @@
 #include <vtkPolyData.h>
 #include <vtkSmoothPolyDataFilter.h>
 #include <vtkStripper.h>
+#include <vtkCallbackCommand.h>
 
 // Optional selection of patented or non-patented algorithms
 #ifdef USE_VTK_PATENTED
@@ -49,6 +51,8 @@
 # define vtkFloatingPointType vtkFloatingPointType
 typedef float vtkFloatingPointType;
 #endif
+
+class VTKProgressAccumulator;
 
 /**
  * \class VTKMeshPipeline
@@ -71,6 +75,10 @@ public:
   /** Compute a mesh for a particular color label.  Returns true if 
    * the color label is not present in the image */
   void ComputeMesh(vtkPolyData *outData);
+
+  /** Get the progress accumulator */
+  AllPurposeProgressAccumulator *GetProgressAccumulator()
+    { return m_Progress; }
 
   /** Constructor, which builds the pipeline */
   VTKMeshPipeline();
@@ -126,6 +134,9 @@ private:
   vtkDecimatePro *            m_DecimateProFilter;
 
 #endif // USE_VTK_PATENTED
+
+  // Progress event monitor
+  AllPurposeProgressAccumulator::Pointer m_Progress;
 
 };
 

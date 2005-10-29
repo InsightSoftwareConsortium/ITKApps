@@ -37,6 +37,10 @@ GlobalState
   // SNAP is off initially
   m_SNAPActive = false;
 
+  // Presets
+  m_SpeedColorMapInRegionMode = COLORMAP_BLUE_BLACK_WHITE;
+  m_SpeedColorMapInEdgeMode = COLORMAP_BLACK_BLACK_WHITE;
+
   // Snake stuff:
   m_SpeedValid = false;
   m_ShowSpeed = false;
@@ -176,3 +180,24 @@ GlobalState
     strcpy(ext, m_GreyFileExtension);
     }
 }
+
+/** Set the colormap in current preprocessing mode*/
+void 
+GlobalState
+::SetSpeedColorMap(ColorMapPreset xPreset)
+{
+  if(m_SnakeMode == EDGE_SNAKE)
+    SetSpeedColorMapInEdgeMode(xPreset);
+  else
+    SetSpeedColorMapInRegionMode(xPreset);
+}
+
+/** Get the colormap in current preprocessing mode*/
+ColorMapPreset 
+GlobalState
+::GetSpeedColorMap()
+{
+  return (m_SnakeMode == EDGE_SNAKE) ?
+    GetSpeedColorMapInEdgeMode() : GetSpeedColorMapInRegionMode();
+}
+

@@ -54,8 +54,10 @@ SET(LOGIC_CXX
   Logic/ImageWrapper/GreyImageWrapper.cxx
   Logic/ImageWrapper/LabelImageWrapper.cxx
   Logic/ImageWrapper/LevelSetImageWrapper.cxx
+  Logic/ImageWrapper/SpeedColorMap.cxx
   Logic/ImageWrapper/SpeedImageWrapper.cxx
   Logic/LevelSet/SnakeParameters.cxx
+  Logic/Mesh/AllPurposeProgressAccumulator.cxx
   Logic/Mesh/IRISMeshPipeline.cxx
   Logic/Mesh/LevelSetMeshPipeline.cxx
   Logic/Mesh/MeshObject.cxx
@@ -96,6 +98,7 @@ SET(LOGIC_HEADERS
   Logic/ImageWrapper/ImageWrapper.txx
   Logic/ImageWrapper/LabelImageWrapper.h
   Logic/ImageWrapper/LevelSetImageWrapper.h
+  Logic/ImageWrapper/SpeedColorMap.h
   Logic/ImageWrapper/SpeedImageWrapper.h
   Logic/LevelSet/LevelSetExtensionFilter.h
   Logic/LevelSet/SnakeParameters.h
@@ -130,6 +133,7 @@ SET(LOGIC_HEADERS
 
 # These files contain the user interface source code
 SET(UI_CXX
+  UserInterface/BasicComponents/ColorMapBox.cxx
   UserInterface/BasicComponents/FLTKCanvas.cxx
   UserInterface/BasicComponents/FunctionPlot2DBox.cxx
   UserInterface/BasicComponents/FunctionPlot2D.cxx
@@ -167,6 +171,7 @@ SET(UI_CXX
 
 # The header files for the UI project
 SET(UI_HEADERS
+  UserInterface/BasicComponents/ColorMapBox.h
   UserInterface/BasicComponents/FLTKCanvas.h
   UserInterface/BasicComponents/FLTKEvent.h
   UserInterface/BasicComponents/FunctionPlot2DBox.h

@@ -35,6 +35,10 @@ class Trackball3DInteractionMode;
 class Spraypaint3DInteractionMode;
 class Scalpel3DInteractionMode;
 
+namespace itk {
+  class Command;
+}
+
 //--------------------------------------------------------------
 // plane struct
 //-------------------------------------------------------------
@@ -86,7 +90,7 @@ public:
   void draw();
 
   /** Recompute the mesh (slow operation) */
-  void UpdateMesh();
+  void UpdateMesh(itk::Command *xProgressCommand);
 
   /** Respond to user pressing the accept button */
   void Accept();
@@ -245,6 +249,9 @@ private:
 
 /*
  *Log: Window3D.h
+ *Revision 1.9  2004/09/14 14:11:11  pauly
+ *ENH: Added an activation manager to main UI class, improved snake code, various UI fixes and additions
+ *
  *Revision 1.8  2004/08/26 18:29:21  pauly
  *ENH: New user interface for configuring the UI options
  *

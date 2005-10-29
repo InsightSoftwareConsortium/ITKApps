@@ -135,7 +135,8 @@ void UserInterfaceLogic
   
   // Link widget activation to flags
   m_Activation->AddWidget(m_BtnAcceptPreprocessing, UIF_SNAP_PREPROCESSING_DONE);
-  m_Activation->AddWidget(m_GrpImageOptions, UIF_SNAP_SPEED_AVAILABLE);
+  m_Activation->AddWidget(m_ChoiceSNAPView, UIF_SNAP_PREPROCESSING_DONE);
+  m_Activation->AddWidget(m_BtnPreprocessedColorMap, UIF_SNAP_SPEED_AVAILABLE);
   m_Activation->AddWidget(m_BtnSNAPMeshUpdate, UIF_SNAP_SNAKE_INITIALIZED);
   m_Activation->AddWidget(m_BtnMeshUpdate, UIF_IRIS_MESH_DIRTY);
   m_Activation->AddWidget(m_BtnStartSnake, UIF_IRIS_ROI_VALID);
@@ -178,7 +179,7 @@ void UserInterfaceLogic
   m_Activation->AddMenuItem(m_MenuSaveVoxelCounts, UIF_IRIS_WITH_GRAY_LOADED);
   m_Activation->AddMenuItem(m_MenuIntensityCurve, UIF_GRAY_LOADED);
   m_Activation->AddMenuItem(m_MenuExportSlice, UIF_GRAY_LOADED);
-  m_Activation->AddMenuItem(m_MenuSavePreprocessed, UIF_SNAP_SPEED_AVAILABLE);
+  m_Activation->AddMenuItem(m_MenuSavePreprocessed, UIF_SNAP_PREPROCESSING_DONE);
   m_Activation->AddMenuItem(m_MenuLoadPreprocessed, UIF_SNAP_PAGE_PREPROCESSING);
   m_Activation->AddMenuItem(m_MenuLoadAdvection, UIF_SNAP_PAGE_PREPROCESSING);
   m_Activation->AddMenuItem(m_MenuImageInfo, UIF_IRIS_WITH_GRAY_LOADED);
@@ -447,14 +448,16 @@ UserInterfaceLogic
     m_RadSnakeEdge->set();
     m_RadSnakeInOut->clear();
     m_GlobalState->SetSnakeMode(EDGE_SNAKE);
+    OnEdgeSnakeSelect();
     }
   else
     {
     m_RadSnakeInOut->set();
     m_RadSnakeEdge->clear();
     m_GlobalState->SetSnakeMode(IN_OUT_SNAKE);
+    OnInOutSnakeSelect();
     }
-
+  
   // The edge preprocessing settings pass through unchanged
   // Get the current thresholding properties
   ThresholdSettings threshSettings = m_GlobalState->GetThresholdSettings();
@@ -475,8 +478,9 @@ UserInterfaceLogic
 
   // Initialize GUI widgets 
   // TODO: WTF is this?
-  m_RadioSNAPViewPreprocessed->value(0);
-  m_RadioSNAPViewOriginal->value(1);
+  m_ChoiceSNAPView->value(m_MenuSNAPViewOriginal);
+  // adioSNAPViewPreprocessed->value(0);
+  //RadioSNAPViewOriginal->value(1);
   m_BtnAcceptInitialization->show();
   m_BtnRestartInitialization->hide();
 
@@ -540,7 +544,10 @@ UserInterfaceLogic
   if(m_GlobalState->GetSpeedValid())
     m_Activation->UpdateFlag(UIF_SNAP_PREPROCESSING_DONE, true);
   else
+    {
     m_Activation->UpdateFlag(UIF_SNAP_PREPROCESSING_ACTIVE, false);    
+    m_Activation->UpdateFlag(UIF_SNAP_SPEED_AVAILABLE, false);
+    }
 }
 
 void 
@@ -548,6 +555,73 @@ UserInterfaceLogic
 ::OnAcceptPreprocessingAction()
 {  
   SetActiveSegmentationPipelinePage(1);
+}
+
+void 
+UserInterfaceLogic
+::OnPreprocessedColorMapAction()
+{  
+  m_WinColorMap->show();
+  m_BoxColorMap->show();
+}
+
+void 
+UserInterfaceLogic
+::OnColorMapCloseAction()
+{
+  m_WinColorMap->hide();
+}
+
+void 
+UserInterfaceLogic
+::OnColorMapSelectAction()
+{
+  // Get the selected value
+  int iSelect = m_ChoiceColorMap->value() - 1;
+
+  // Set the current color map
+  ColorMapPreset xPreset = 
+    static_cast<ColorMapPreset>(COLORMAP_BLUE_BLACK_WHITE + iSelect);
+  m_GlobalState->SetSpeedColorMap(xPreset);
+
+  // Update the display
+  UpdateSpeedColorMap();
+}
+
+
+void 
+UserInterfaceLogic
+::UpdateSpeedColorMap()
+{
+  // Apply the color map to the preview window
+  m_BoxColorMap->SetColorMap(SpeedColorMap::GetPresetColorMap(
+      m_GlobalState->GetSpeedColorMap()));
+
+  // Apply the color map to the speed wrapper
+  if(m_Driver->GetSNAPImageData()->IsSpeedLoaded())
+    m_Driver->GetSNAPImageData()->GetSpeed()->
+      SetColorMap(SpeedColorMap::GetPresetColorMap(
+        m_GlobalState->GetSpeedColorMap()));
+  RedrawWindows();
+}
+
+
+void 
+UserInterfaceLogic
+::OnPreprocessingPreviewStatusUpdate(bool flagPreview)
+{
+  // Enable the preprocessing widgets and color map button
+  m_Activation->UpdateFlag(UIF_SNAP_SPEED_AVAILABLE, flagPreview);
+  
+  // Make sure that the preview mode is used
+  m_ChoiceSNAPView->value(flagPreview ? 
+    m_MenuSNAPViewPreprocessed : m_MenuSNAPViewOriginal);
+
+  // Set whether speed is shown
+  m_GlobalState->SetShowSpeed(flagPreview);
+
+  // Redraw the windows
+  RedrawWindows();
 }
 
 //--------------------------------------------
@@ -724,8 +798,14 @@ UserInterfaceLogic
 
   m_PreprocessingUI->HidePreprocessingWindows();
 
-  m_RadioSNAPViewOriginal->setonly();
+  // Set the SNAP view to the grayscale mode
+  m_ChoiceSNAPView->value(m_MenuSNAPViewOriginal);
   OnSNAPViewOriginalSelect();
+
+  // Update the speed color map
+  UpdateSpeedColorMap();
+  
+  // m_RadioSNAPViewOriginal->setonly();
 }
 
 void 
@@ -760,9 +840,15 @@ UserInterfaceLogic
   m_Activation->UpdateFlag(UIF_SNAP_SPEED_AVAILABLE, false);
   
   m_PreprocessingUI->HidePreprocessingWindows();
-  m_RadioSNAPViewOriginal->setonly();
-
+  
+  // Set the SNAP view to the grayscale mode
+  m_ChoiceSNAPView->value(m_MenuSNAPViewOriginal);
   OnSNAPViewOriginalSelect();
+  
+  // Update the speed color map
+  UpdateSpeedColorMap();
+  
+  // m_RadioSNAPViewOriginal->setonly();
 }
 
 /*
@@ -991,7 +1077,7 @@ UserInterfaceLogic
 
   // Update the mesh if necessary
   if(m_ChkContinuousView3DUpdate->value())
-    m_SNAPWindow3D->UpdateMesh();
+    m_SNAPWindow3D->UpdateMesh(m_ProgressCommand);
   else
     m_Activation->UpdateFlag(UIF_SNAP_MESH_DIRTY, true);
 
@@ -1105,6 +1191,9 @@ UserInterfaceLogic
 
   // Activate/deactivate menu items
   m_Activation->UpdateFlag(UIF_IRIS_ACTIVE, true);
+
+  // Hide the color map window
+  m_WinColorMap->hide();
   
   // Show IRIS window, Hide the snake window
   ShowIRIS();
@@ -1256,6 +1345,10 @@ UserInterfaceLogic
     m_SNAPWindow2D[i]->hide();
     }
 
+  // Clear the 3D window and reset the view
+  m_IRISWindow3D->ClearScreen();
+  m_IRISWindow3D->ResetView();
+
   // Swap the 3D window visibility
   m_IRISWindow3D->show();
   m_SNAPWindow3D->hide();
@@ -1276,18 +1369,20 @@ UserInterfaceLogic
   m_WizWindows->value(m_GrpSNAPWindows);
   m_WizControlPane->value(m_GrpSNAPPage);
 
+  // Swap the visible and invisible windows
   for(unsigned int i=0;i<3;i++)
     {
     m_SNAPWindow2D[i]->show();
     m_IRISWindow2D[i]->hide();
     }
 
+  // Clear the snap window and reset the view
+  m_SNAPWindow3D->ClearScreen();
+  m_SNAPWindow3D->ResetView();
+
   // Swap the visible windows
   m_SNAPWindow3D->show();
   m_IRISWindow3D->hide();
-
-  // Reset the view in the snap window
-  m_SNAPWindow3D->ResetView();
 
   // Go to the first page in the SNAP wizard
   SetActiveSegmentationPipelinePage( 0 );
@@ -1344,16 +1439,6 @@ UserInterfaceLogic
   m_InStepSize->add("2");
   m_InStepSize->add("5");
   m_InStepSize->add("10");
-
-  // Callbacks
-  if (m_GlobalState->GetSnakeMode() == IN_OUT_SNAKE) 
-    {
-    OnInOutSnakeSelect();
-    }
-  else 
-    {
-    OnEdgeSnakeSelect();
-    }
 
   // Apply the special appearance settings that determine startup behavior
   if(m_AppearanceSettings->GetFlagLinkedZoomByDefault())
@@ -2109,7 +2194,7 @@ void
 UserInterfaceLogic
 ::OnIRISMeshUpdateAction()
 {
-  m_IRISWindow3D->UpdateMesh();
+  m_IRISWindow3D->UpdateMesh(m_ProgressCommand);
   m_IRISWindow3D->redraw();
   
   m_Activation->UpdateFlag(UIF_IRIS_MESH_DIRTY, false);
@@ -2141,7 +2226,7 @@ void
 UserInterfaceLogic
 ::OnSNAPMeshUpdateAction()
 {
-  m_SNAPWindow3D->UpdateMesh();
+  m_SNAPWindow3D->UpdateMesh(m_ProgressCommand);
   m_SNAPWindow3D->redraw();
 
   m_Activation->UpdateFlag(UIF_SNAP_MESH_DIRTY, false);
@@ -2153,7 +2238,7 @@ UserInterfaceLogic
 {
   if (m_ChkContinuousView3DUpdate->value()) 
     {
-    m_SNAPWindow3D->UpdateMesh();
+    m_SNAPWindow3D->UpdateMesh(m_ProgressCommand);
     m_Activation->UpdateFlag(UIF_SNAP_MESH_CONTINUOUS_UPDATE, true);
     }
   else 
@@ -2474,7 +2559,8 @@ UserInterfaceLogic
     m_Activation->UpdateFlag(UIF_SNAP_SPEED_AVAILABLE, true);
 
     // Choose to view the preprocessed image
-    m_RadioSNAPViewPreprocessed->setonly();
+    m_ChoiceSNAPView->value(m_MenuSNAPViewPreprocessed);
+    // m_RadioSNAPViewPreprocessed->setonly();
 
     // Run the callback associated with that change
     OnViewPreprocessedSelect();
@@ -2485,10 +2571,11 @@ UserInterfaceLogic
     m_Activation->UpdateFlag(UIF_SNAP_SPEED_AVAILABLE, false);
 
     // Choose to view the grey image
-    m_RadioSNAPViewOriginal->setonly();
+    m_ChoiceSNAPView->value(m_MenuSNAPViewOriginal);
+    // m_RadioSNAPViewOriginal->setonly();
 
     // Run the callback associated with that change
-    OnViewPreprocessedSelect();
+    OnSNAPViewOriginalSelect();
     }
 }
 
@@ -3054,6 +3141,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.39  2005/08/10 19:57:15  pauly
+ *BUG: Labels not always appearing when loading an image in SNAP
+ *
  *Revision 1.38  2005/08/10 03:24:20  pauly
  *BUG: Corrected problems with 3D window, label IO from association files
  *

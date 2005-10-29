@@ -143,51 +143,6 @@ SpeedImageWrapper::OverlayFunctor
   return m_Color;
 }
 
-SpeedImageWrapper::MappingFunctor
-::MappingFunctor()
-{
-  m_Plus.Set(255,255,255,255);
-  m_Minus.Set(0,0,255,255);
-  m_Zero.Set(0,0,0,255);
-}
-
-void
-SpeedImageWrapper::MappingFunctor
-::SetColorMap(DisplayPixelType inPlus, DisplayPixelType inMinus, DisplayPixelType inZero)
-{
-  m_Plus = inPlus;
-  m_Minus = inMinus;
-  m_Zero = inZero;
-}
-
-SpeedImageWrapper::DisplayPixelType
-SpeedImageWrapper::MappingFunctor
-::operator()(float t)
-{
-  // Initialize with a clear pixel
-  const unsigned char clear[] = {0,0,0,255};
-  SpeedImageWrapper::OverlayPixelType P(clear);
-
-  // The red component is used when speed is positive
-  if(t > 0)
-    {
-    float u = 1.0f - t;
-    P[0] = (unsigned char)(t * m_Plus[0] + u * m_Zero[0]);
-    P[1] = (unsigned char)(t * m_Plus[1] + u * m_Zero[1]);
-    P[2] = (unsigned char)(t * m_Plus[2] + u * m_Zero[2]);
-    }
-  else
-    {
-    float u = 1.0f + t;
-    P[0] = (unsigned char)(-t * m_Minus[0] + u * m_Zero[0]);
-    P[1] = (unsigned char)(-t * m_Minus[1] + u * m_Zero[1]);
-    P[2] = (unsigned char)(-t * m_Minus[2] + u * m_Zero[2]);
-    }
-
-  // Return
-  return P;
-}
-
 void 
 SpeedImageWrapper
 ::SetSliceSourceForPreview(unsigned int slice,ImageType *source)
@@ -230,3 +185,15 @@ SpeedImageWrapper
   return m_Slicer[0]->GetInput()->GetPixel(index);    
 }
 
+void
+SpeedImageWrapper
+::SetColorMap(const SpeedColorMap &xColorMap)
+{
+  // Store the color map
+  m_ColorMap = xColorMap;
+
+  // Assign it to the three filters
+  m_DisplayFilter[0]->SetFunctor(m_ColorMap);
+  m_DisplayFilter[1]->SetFunctor(m_ColorMap);
+  m_DisplayFilter[2]->SetFunctor(m_ColorMap);
+}

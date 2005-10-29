@@ -13,13 +13,19 @@
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "VTKMeshPipeline.h"
+#include "AllPurposeProgressAccumulator.h"
+#include <map>
 
 using namespace std;
 using namespace itk;
 
+
 VTKMeshPipeline
 ::VTKMeshPipeline()
 {
+  // Initialize the progress tracker
+  m_Progress = AllPurposeProgressAccumulator::New();
+
   // Initialize all the filters involved in the transaction, but do not
   // pipe the inputs and outputs between these filters. The piping is quite
   // complicated and depends on the set of options that the user wishes to 
@@ -137,6 +143,9 @@ VTKMeshPipeline
   // Store the options
   m_MeshOptions = options;
 
+  // Reset the weights in the progress meter
+  m_Progress->UnregisterAllSources();
+
   // Define the current pipeline end-point
   vtkImageData *pipeImageTail = m_VTKImporter->GetOutput();
   vtkPolyData *pipePolyTail = NULL;
@@ -148,6 +157,7 @@ VTKMeshPipeline
     {    
     // The Gaussian filter is enabled
     m_VTKGaussianFilter->SetInput(pipeImageTail);
+    m_Progress->RegisterSource(m_VTKGaussianFilter, 10.0);
     pipeImageTail = m_VTKGaussianFilter->GetOutput();
 
     // Apply parameters to the Gaussian filter
@@ -167,12 +177,14 @@ VTKMeshPipeline
   
   // Marching cubes gets the tail
   m_MarchingCubesFilter->SetInput(pipeImageTail);
+  m_Progress->RegisterSource(m_MarchingCubesFilter, 10.0);
   pipePolyTail = m_MarchingCubesFilter->GetOutput();
 
 #else // USE_VTK_PATENTED
 
   // Contour filter gets the tail
   m_ContourFilter->SetInput(pipeImageTail);
+  m_Progress->RegisterSource(m_ContourFilter, 10.0);
   pipePolyTail = m_ContourFilter->GetOutput();
 
 #endif // USE_VTK_PATENTED  
@@ -185,6 +197,7 @@ VTKMeshPipeline
 
     // Decimate filter gets the pipe tail
     m_DecimateFilter->SetInput(pipePolyTail);
+    m_Progress->RegisterSource(m_DecimateFilter, 5.0);
     pipePolyTail = m_DecimateFilter->GetOutput();
 
     // Apply parameters to the decimation filter
@@ -213,6 +226,7 @@ VTKMeshPipeline
     
     // Decimate Pro filter gets the pipe tail
     m_DecimateProFilter->SetInput(pipePolyTail);
+    m_Progress->RegisterSource(m_DecimateProFilter, 5.0);
     pipePolyTail = m_DecimateProFilter->GetOutput();
 
     // Apply parameters to the decimation filter
@@ -231,6 +245,7 @@ VTKMeshPipeline
 #ifndef USE_VTK_PATENTED  
 
   m_NormalsFilter->SetInput(pipePolyTail);
+  m_Progress->RegisterSource(m_NormalsFilter, 1.0);
   pipePolyTail = m_NormalsFilter->GetOutput();
 
 #endif // USE_VTK_PATENTED
@@ -240,6 +255,7 @@ VTKMeshPipeline
     {
     // Pipe smoothed output into the pipeline
     m_PolygonSmoothingFilter->SetInput(pipePolyTail);
+    m_Progress->RegisterSource(m_PolygonSmoothingFilter, 3.0);
     pipePolyTail = m_PolygonSmoothingFilter->GetOutput();
 
     // Apply parameters to the mesh smoothing filter
@@ -264,6 +280,7 @@ VTKMeshPipeline
 
   // 6. Pipe in the final output into the stripper
   m_StripperFilter->SetInput(pipePolyTail);
+  m_Progress->RegisterSource(m_StripperFilter, 2.0);
 }
 
 #include <ctime>
@@ -272,8 +289,8 @@ void
 VTKMeshPipeline
 ::ComputeMesh(vtkPolyData *outMesh)
 {
-  // TODO: make this more elegant
-  clock_t now,start = clock();
+  // Reset the progress meter
+  m_Progress->ResetProgress();
 
   // Graft the polydata to the last filter in the pipeline
   m_StripperFilter->SetOutput(outMesh);
@@ -288,58 +305,11 @@ VTKMeshPipeline
   m_VTKImporter->SetCallbackUserData(
     m_VTKExporter->GetCallbackUserData());
 
-  // All these update methods are here for timing, otherwise they can
-  // be collapsed to m_StripperFilter->UpdateWholeExtent
-
   // Update the ITK portion of the pipeline
   m_VTKExporter->SetInput(m_InputImage);
-  m_VTKExporter->UpdateLargestPossibleRegion();
-  
-  // This does the image processing steps
-  m_VTKImporter->UpdateWholeExtent();
-  
-  now = clock(); cout << "IMP " << now - start << endl; start = now;
-  
-  // Update the Gaussian filter
-  if(m_MeshOptions.GetUseGaussianSmoothing())
-    m_VTKGaussianFilter->UpdateWholeExtent();
 
-  now = clock(); cout << "GAU " << now - start << endl; start = now;
-  
-  // The marching cubes filter
-#ifdef USE_VTK_PATENTED
-  m_MarchingCubesFilter->UpdateWholeExtent();
-  now = clock(); cout << "MAR " << now - start << endl; start = now;
-#else
-  m_ContourFilter->UpdateWholeExtent();
-  now = clock(); cout << "CNT " << now - start << endl; start = now;
-#endif
-
-  // Now the decimation filters
-  if(m_MeshOptions.GetUseDecimation())
-    {
-#ifdef USE_VTK_PATENTED
-    m_DecimateFilter->UpdateWholeExtent();
-#else
-    m_DecimateProFilter->UpdateWholeExtent();
-#endif
-    }
-  now = clock(); cout << "DEC " << now - start << endl; start = now;
-
-  // The normal filter
-#ifndef USE_VTK_PATENTED
-  m_NormalsFilter->UpdateWholeExtent();
-  now = clock(); cout << "NRM " << now - start << endl; start = now;
-#endif
-  
-  // Now the subsequent filters
-  if(m_MeshOptions.GetUseMeshSmoothing())
-    m_PolygonSmoothingFilter->UpdateWholeExtent();
-  now = clock(); cout << "SMO " << now - start << endl; start = now;  
-
-  // Now the subsequent filters
+  // Update the pipeline
   m_StripperFilter->UpdateWholeExtent();
-  now = clock(); cout << "STR " << now - start << endl; start = now;
   
   // Shift all the points in the output mesh
   for(vtkIdType i = 0; i < outMesh->GetNumberOfPoints(); i++)

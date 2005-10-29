@@ -17,6 +17,7 @@
 
 #include "ImageWrapper.h"
 #include "SpeedImageWrapper.h"
+#include "SpeedColorMap.h"
 #include "itkRGBAPixel.h"
 
 // Forward references to ITK
@@ -142,6 +143,9 @@ public:
    */
   void SetOverlayColor(const OverlayPixelType &color);
   OverlayPixelType GetOverlayColor() const;
+
+  /** Set the color map to use for generating color output */
+  void SetColorMap(const SpeedColorMap &xColorMap);
   
   /** Constructor initializes mappers */
   SpeedImageWrapper();
@@ -155,19 +159,6 @@ protected:
   void UpdateImagePointer(ImageType *newImage);
 
 private:
-  /**
-   * A very simple functor used to map intensities
-   */
-  class MappingFunctor 
-  {
-  public:
-    MappingFunctor();
-    DisplayPixelType operator()(float in);
-    void SetColorMap(DisplayPixelType inPlus, 
-      DisplayPixelType inMinus, DisplayPixelType inZero); 
-  private:
-    DisplayPixelType m_Plus, m_Minus, m_Zero;
-  };  
   
   /**
    * A functor used for overlay mapping
@@ -188,7 +179,7 @@ private:
   // Type of the display intensity mapping filter used when the 
   // input is a in-out image
   typedef itk::UnaryFunctorImageFilter<
-    ImageWrapper<float>::SliceType,DisplaySliceType,MappingFunctor> 
+    ImageWrapper<float>::SliceType,DisplaySliceType,SpeedColorMap> 
     IntensityFilterType;
   typedef itk::SmartPointer<IntensityFilterType> IntensityFilterPointer;
 
@@ -215,6 +206,9 @@ private:
 
   /** The currently used overlay functor */
   OverlayFunctor m_OverlayFunctor;
+
+  /** The currently used color map */
+  SpeedColorMap m_ColorMap;
 
   /** Preview sources */
   ImagePointer m_PreviewSource[3];

@@ -20,8 +20,14 @@ class IRISApplication;
 class GlobalState;
 class IRISImageData;
 class ColorLabel;
+class AllPurposeProgressAccumulator;
+
+namespace itk {
+  class Command;
+}
 
 #include "SNAPCommon.h"
+#include "AllPurposeProgressAccumulator.h"
 #include <vector>
 
 /**
@@ -55,11 +61,14 @@ private:
   // Pointer to the global state object
   GlobalState *m_GlobalState;
 
+  // Progress accumulator for multi-object rendering
+  itk::SmartPointer<AllPurposeProgressAccumulator> m_Progress;
+
 public:
   MeshObject();
   MeshObject( const MeshObject& M ) { *this=M; } 
   MeshObject& operator= ( const MeshObject& M ) { *this=M; return *this; }
-  ~MeshObject() {};
+  ~MeshObject();
 
   void Reset();
 
@@ -95,7 +104,7 @@ public:
    * POSTCONDITIONS:
    * - A displaylist (points) and a trianglemesh 
    */
-  void GenerateMesh();
+  void GenerateMesh(itk::Command *command);
 
   /* MeshObject::Display();
    *
@@ -115,13 +124,15 @@ public:
    * - each object in displaylist is displayed 
    */
   void Display();
-
 };
 
 #endif // __MeshObject_h_
 
 /*
  *Log: MeshObject.h
+ *Revision 1.7  2003/10/09 22:45:13  pauly
+ *EMH: Improvements in 3D functionality and snake parameter preview
+ *
  *Revision 1.6  2003/10/02 14:54:53  pauly
  *ENH: Development during the September code freeze
  *

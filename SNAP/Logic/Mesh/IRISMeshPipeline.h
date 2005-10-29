@@ -30,6 +30,7 @@ namespace itk {
 // Forward references
 class VTKMeshPipeline;
 class vtkPolyData;
+class AllPurposeProgressAccumulator;
 
 /**
  * \class IRISMeshPipeline
@@ -48,8 +49,10 @@ public:
   void SetImage(InputImageType *input);
 
   /** Compute the bounding boxes for different regions.  Prerequisite for 
-   * calling ComputeMesh() */
-  void ComputeBoundingBoxes();
+   * calling ComputeMesh(). Returns the total number of voxels in all boxes */
+  unsigned long ComputeBoundingBoxes();
+
+  unsigned long GetVoxelsInBoundingBox(LabelType label) const;
 
   /** Set the mesh options for this filter */
   void SetMeshOptions(const MeshOptions &options);
@@ -69,6 +72,9 @@ public:
 
   /** Deallocate the pipeline filters */
   ~IRISMeshPipeline();
+
+  /** Get the progress accumulator from the VTK mesh pipeline */
+  AllPurposeProgressAccumulator *GetProgressAccumulator();
 
 private:
   // Type definitions for the various filters used by this object

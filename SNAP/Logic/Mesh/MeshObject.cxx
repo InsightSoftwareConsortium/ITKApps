@@ -28,6 +28,7 @@
 #include "IRISVectorTypesToITKConversion.h"
 #include "IRISImageData.h"
 #include "SNAPImageData.h"
+#include "AllPurposeProgressAccumulator.h"
 
 // ITK includes
 #include "itkRegionOfInterestImageFilter.h"
@@ -63,6 +64,12 @@ MeshObject
 {
   m_DisplayListNumber = 0;
   m_DisplayListIndex = 0;
+  m_Progress = AllPurposeProgressAccumulator::New();
+}
+
+MeshObject
+::~MeshObject()
+{
 }
 
 void 
@@ -86,12 +93,12 @@ MeshObject
   m_Labels.clear();
 }
 
-
-
 void 
 MeshObject
-::GenerateMesh()
+::GenerateMesh(itk::Command *command)
 {
+  unsigned int i; 
+
   // Reset the label array and the display list index
   Reset();
 
@@ -140,17 +147,7 @@ MeshObject
       {
       // We are in SNAP.  Use one of SNAP's images
       SNAPImageData *snapData = m_Driver->GetSNAPImageData();
-  
-      /*
-      // Select one of the available segmentation images in SNAP
-      if(snapData->IsSnakeLoaded()) 
-        {
-        meshPipeline->SetImage(snapData->GetSnake()->GetImage());
-        }
-      else 
-        {  */
       meshPipeline->SetImage(snapData->GetSegmentation()->GetImage());
-        // }
       }
   
     // Pass the settings on to the pipeline
@@ -158,9 +155,25 @@ MeshObject
   
     // Run the first step in this pipeline
     meshPipeline->ComputeBoundingBoxes();
-  
+
+    // Add the listener to the progress accumulator
+    unsigned long xObserverTag = 
+      m_Progress->AddObserver(itk::ProgressEvent(), command);
+
+    // Initialize the progress meter
+    for(i = 1; i < MAX_COLOR_LABELS; i++)
+      {
+      ColorLabel cl = m_Driver->GetColorLabelTable()->GetColorLabel(i);
+      if(cl.IsVisibleIn3D() && meshPipeline->CanComputeMesh(i))
+        { 
+        m_Progress->RegisterSource(
+          meshPipeline->GetProgressAccumulator(),
+          1.0 * meshPipeline->GetVoxelsInBoundingBox(i));
+        }
+      }
+
     // Compute a list of meshes in the filter
-    for(unsigned int i=1;i<MAX_COLOR_LABELS;i++) 
+    for(i = 1; i < MAX_COLOR_LABELS; i++) 
       {
       ColorLabel cl = m_Driver->GetColorLabelTable()->GetColorLabel(i);
       if(cl.IsVisibleIn3D() && meshPipeline->CanComputeMesh(i))
@@ -168,10 +181,18 @@ MeshObject
         vtkPolyData *mesh = vtkPolyData::New();
         meshPipeline->ComputeMesh(i,mesh);
         meshes.push_back(mesh);
-  
         m_Labels.push_back(i);
+
+        // Advance the progress accumulator
+        m_Progress->StartNextRun(meshPipeline->GetProgressAccumulator());
         }
       }
+
+    // Remove all the progress sources
+    m_Progress->UnregisterAllSources();
+
+    // Remove progress observer
+    m_Progress->RemoveObserver(xObserverTag);
     
     // Deallocate the filter
     delete meshPipeline;
@@ -337,6 +358,9 @@ MeshObject
 
 /*
  *Log: MeshObject.cxx
+ *Revision 1.16  2005/04/21 14:46:29  pauly
+ *ENH: Improved management and editing of color labels in SNAP
+ *
  *Revision 1.15  2004/09/14 14:11:09  pauly
  *ENH: Added an activation manager to main UI class, improved snake code, various UI fixes and additions
  *

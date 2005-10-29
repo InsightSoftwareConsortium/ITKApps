@@ -411,8 +411,8 @@ PreprocessingUILogic
     m_GlobalState->SetSpeedPreviewValid(false);
     }
 
-  // Repaint the slice windows
-  m_ParentUI->RedrawWindows();
+  // Notify parent of the update
+  m_ParentUI->OnPreprocessingPreviewStatusUpdate(preview);
 }
 
 void 
@@ -477,8 +477,8 @@ PreprocessingUILogic
     m_GlobalState->SetSpeedPreviewValid(false);
     }
 
-  // Repaint the slice windows
-  m_ParentUI->RedrawWindows();
+  // Notify parent of the update
+  m_ParentUI->OnPreprocessingPreviewStatusUpdate(preview);
 }
 
 void 

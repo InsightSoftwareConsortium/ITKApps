@@ -158,12 +158,45 @@ bool LoadUserPreferencesInteractive(SystemInterface &system)
   return true;
 }
 
+#ifdef __GNUC__
 
+#include <signal.h>
+#include <execinfo.h>
+
+void SegmentationFaultHandler(int sig)
+{
+  cerr << "*************************************" << endl;
+  cerr << "ITK-SNAP: Segmentation Fault!   " << endl;
+  cerr << "BACKTRACE: " << endl;
+  void *array[50];
+  int nsize = backtrace(array, 50);
+  backtrace_symbols_fd(array, nsize, 2);
+  cerr << "*************************************" << endl;
+  exit(-1);
+}
+
+void SetupSignalHandlers()
+{
+  signal(SIGSEGV, SegmentationFaultHandler);
+}
+
+#else
+
+void SetupSignalHandlers()
+{
+  // Nothing to do!
+}
+
+#endif
+  
 // creates global pointers
 // sets up the GUI and lets things run
 // -g c:\grant\app\Images\MRIcrop-orig.gipl -s c:\grant\app\Images\MRIcrop-seg.gipl --rai RAI --labels c:\grant\app\Images\MRIcrop-seg.label
 int main(int argc, char **argv) 
 {
+  // Handle signals gracefully, with trace-back
+  SetupSignalHandlers();
+  
   // Parse command line parameters
   CommandLineArgumentParser parser;
   parser.AddOption("--grey",1);
@@ -324,7 +357,7 @@ int main(int argc, char **argv)
   // Show the splash screen
   ui->HideSplashScreen();
 
-  // Run the FL driver
+  // Run the UI
   Fl::run();
 
   // Write the user's preferences to disk
@@ -349,6 +382,9 @@ int main(int argc, char **argv)
 
 /*
  *Log: SNAPMain.cxx
+ *Revision 1.12  2005/04/21 14:46:30  pauly
+ *ENH: Improved management and editing of color labels in SNAP
+ *
  *Revision 1.11  2005/02/04 17:01:09  lorensen
  *COMP: last of gcc 2.96 changes (I hope).
  *
