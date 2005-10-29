@@ -14,9 +14,10 @@
 =========================================================================*/
 #include "AllPurposeProgressAccumulator.h"
 #include "vtkCallbackCommand.h" 
-#include "vtkAlgorithm.h" 
+#include "vtkProcessObject.h" 
 #include "itkCommand.h"
 #include "itkEventObject.h"
+#include <cassert>
 
 AllPurposeProgressAccumulator
 ::AllPurposeProgressAccumulator()
@@ -184,7 +185,7 @@ AllPurposeProgressAccumulator
   vtkObject *source, unsigned long eventId, void *clientdata, void *callData)
 {
   // Figure out the pointers
-  vtkAlgorithm *alg = dynamic_cast<vtkAlgorithm *>(source);
+  vtkProcessObject *alg = dynamic_cast<vtkProcessObject *>(source);
   AllPurposeProgressAccumulator *self = 
     static_cast<AllPurposeProgressAccumulator *>(clientdata);
 
@@ -215,7 +216,7 @@ AllPurposeProgressAccumulator
 
 void 
 AllPurposeProgressAccumulator
-::RegisterSource(vtkAlgorithm *source, float weight)
+::RegisterSource(vtkProcessObject *source, float weight)
 {
   // See if the source is already registered
   if(m_Source.find(source) == m_Source.end())
@@ -292,7 +293,7 @@ AllPurposeProgressAccumulator
   
 void 
 AllPurposeProgressAccumulator
-::UnregisterSource(vtkAlgorithm *source)
+::UnregisterSource(vtkProcessObject *source)
 {
   // Unregister ourselves as an observer
   source->RemoveObserver(m_Source[source].ProgressTag);
@@ -312,7 +313,7 @@ AllPurposeProgressAccumulator
     {
     if(it->second.Type == VTK)
       {
-      vtkAlgorithm *vtk = static_cast<vtkAlgorithm *>(it->first);
+      vtkProcessObject *vtk = static_cast<vtkProcessObject *>(it->first);
       vtk->RemoveObserver(it->second.ProgressTag);
       vtk->RemoveObserver(it->second.StartTag);
       vtk->RemoveObserver(it->second.EndTag);

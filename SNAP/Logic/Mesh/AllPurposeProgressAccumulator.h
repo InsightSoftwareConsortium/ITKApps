@@ -20,7 +20,7 @@
 #include "itkProcessObject.h"
 
 class vtkObject;
-class vtkAlgorithm;
+class vtkProcessObject;
 
 using namespace itk;
 
@@ -73,7 +73,7 @@ public:
   /** 
    * Add a VTK algorithm to the list of monitored objects
    */
-  void RegisterSource(vtkAlgorithm *source, float xWeight);
+  void RegisterSource(vtkProcessObject *source, float xWeight);
 
   /** 
    * Add an ITK algorithm to the list of monitored objects
@@ -81,7 +81,7 @@ public:
   void RegisterSource(itk::ProcessObject *source, float xWeight);
 
   /** Unregister a source (and all runs associated with it) */
-  void UnregisterSource(vtkAlgorithm *source);
+  void UnregisterSource(vtkProcessObject *source);
 
   /** Unregister a source (and all runs associated with it) */
   void UnregisterSource(itk::ProcessObject *source);
