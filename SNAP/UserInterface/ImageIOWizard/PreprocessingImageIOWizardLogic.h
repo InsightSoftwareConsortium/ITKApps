@@ -34,8 +34,10 @@ public:
    * point images. This method returns the allowed types */
   virtual bool CanLoadFileFormat(FileFormat type) const
   {
-    return Superclass::CanLoadFileFormat(type) && 
-      (type == FORMAT_MHA || type == FORMAT_ANALYZE || type == FORMAT_RAW);
+    return Superclass::CanLoadFileFormat(type) && (
+      type == GuidedImageIOBase::FORMAT_MHA || 
+      type == GuidedImageIOBase::FORMAT_ANALYZE || 
+      type == GuidedImageIOBase::FORMAT_RAW);
   }
 
   /** Not all file types support saving and loading floating 

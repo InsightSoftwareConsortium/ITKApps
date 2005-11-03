@@ -21,6 +21,7 @@
 #include "IRISApplication.h"
 
 #include "GlobalState.h"
+#include "GuidedImageIO.h"
 #include "IRISImageData.h"
 #include "IRISVectorTypesToITKConversion.h"
 #include "SNAPImageData.h"
@@ -52,6 +53,9 @@ IRISApplication
 {
   // Construct new global state object
   m_GlobalState = new GlobalState;
+
+  // Create a new system interface
+  m_SystemInterface = new SystemInterface();
 
   // Initialize the color table
   m_ColorLabelTable = new ColorLabelTable();
@@ -812,3 +816,57 @@ IRISApplication
   return 0;
 }
 
+void 
+IRISApplication
+::LoadGreyImageFile(const char *filename, const char *rai)
+{
+  // Load the settings associated with this file
+  Registry regFull;
+  m_SystemInterface->FindRegistryAssociatedWithFile(filename, regFull);
+    
+  // Get the folder dealing with grey image properties
+  Registry &regGrey = regFull.Folder("Files.Grey");
+
+  // Create the image reader
+  GuidedImageIO<GreyType> io;
+  
+  // Load the image (exception may occur here)
+  GreyImageType::Pointer imgGrey = io.ReadImage(filename, regGrey);
+
+  // Get the orientation from the registry
+  string sOrient = (rai == NULL)
+    ? regGrey["Orientation"]["RAI"]
+    : rai;
+
+  // Set the image as the current grayscale image
+  UpdateIRISGreyImage(imgGrey, sOrient.c_str());
+
+  // Save the filename for the UI
+  m_GlobalState->SetGreyFileName(filename);  
+}
+
+
+void 
+IRISApplication
+::LoadLabelImageFile(const char *filename)
+{
+  // Load the settings associated with this file
+  Registry regFull;
+  m_SystemInterface->FindRegistryAssociatedWithFile(filename, regFull);
+    
+  // Get the folder dealing with grey image properties
+  // TODO: Figure out something about this!!!
+  Registry &regGrey = regFull.Folder("Files.Grey");
+
+  // Create the image reader
+  GuidedImageIO<LabelType> io;
+  
+  // Load the image (exception may occur here)
+  LabelImageType::Pointer imgLabel = io.ReadImage(filename, regGrey);
+
+  // Set the image as the current grayscale image
+  UpdateIRISSegmentationImage(imgLabel);
+
+  // Save the filename for the UI
+  m_GlobalState->SetSegmentationFileName(filename);  
+}

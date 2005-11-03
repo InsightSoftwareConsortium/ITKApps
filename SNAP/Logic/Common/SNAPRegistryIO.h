@@ -21,6 +21,7 @@
 #include "MeshOptions.h"
 #include "EdgePreprocessingSettings.h"
 #include "ThresholdSettings.h"
+#include "GuidedImageIO.h"
 
 #if defined(_MSC_VER)
 #pragma warning ( disable : 4786 )
@@ -85,7 +86,8 @@ public:
   void WriteSegmentationROISettings(
     const SNAPSegmentationROISettings &in, Registry &folder);
 
-private:
+
+
   // Some enumeraticns used by this class
   RegistryEnumMap<CoverageModeType> m_EnumMapCoverage;
   RegistryEnumMap<SnakeParameters::SolverType> m_EnumMapSolver;

@@ -17,7 +17,6 @@
 
 #include "FL/Fl_File_Chooser.H"
 #include "FL/Fl_Text_Buffer.H"
-//#include <limits>
 #include <stdio.h>
 #include <cmath>
 #include <map>
@@ -25,37 +24,15 @@
 
 #include "itkImage.h"
 #include "itkImageIOBase.h"
-#include "itkAnalyzeImageIO.h"
-#include "itkGiplImageIO.h"
-#include "itkMetaImageIO.h"
-#include "itkRawImageIO.h"
-#include "itkDicomImageIO.h"
-#include "itkGE4ImageIO.h"
-#include "itkGE5ImageIO.h"
-#include "itkSiemensVisionImageIO.h"
-#include "itkVTKImageIO.h"
-#include "itkImageFileReader.h"
-#include "itkImageFileWriter.h"
+#include "itkIOCommon.h"
+#include "itkSpatialOrientation.h"
 #include "itkMetaDataObject.h"
+#include "itkGDCMSeriesFileNames.h"
+#include <itksys/SystemTools.hxx>
 
 using std::map;
 using namespace itk;
 using namespace itk::SpatialOrientation;
-
-template <class TRawPixel> 
-itk::ImageIOBase::Pointer 
-CreateRawImageIO(TRawPixel itkNotUsed(dummy),unsigned int header)
-{
-  typedef RawImageIO<TRawPixel,3> IOType;
-  
-  typename IOType::Pointer rawIO = IOType::New();
-  
-  rawIO->SetHeaderSize(header);
-
-  ImageIOBase::Pointer baseIO = rawIO.GetPointer();
-  
-  return baseIO;
-}
 
 template <class TPixel>
 ImageIOWizardLogic<TPixel>
@@ -86,26 +63,29 @@ ImageIOWizardLogic<TPixel>
   m_OrientationIndexToDollVertex[2][1][0] = 6; // 110 in IAR
 
   // Initialize the file format extensions 
-  m_FileFormatPattern[FORMAT_MHA] = "mha,mhd";
-  m_FileFormatPattern[FORMAT_GIPL] = "gipl,gipl.gz";
-  m_FileFormatPattern[FORMAT_RAW] = "raw*";
-  m_FileFormatPattern[FORMAT_ANALYZE] = "hdr,img,img.gz";  
-  m_FileFormatPattern[FORMAT_DICOM] = "dcm";
-  m_FileFormatPattern[FORMAT_GE4] = "ge4";
-  m_FileFormatPattern[FORMAT_GE5] = "ge5";
-  m_FileFormatPattern[FORMAT_SIEMENS] = "ima";
-  m_FileFormatPattern[FORMAT_VTK] = "vtk";
+  m_FileFormatPattern[GuidedImageIOBase::FORMAT_MHA] = "mha,mhd";
+  m_FileFormatPattern[GuidedImageIOBase::FORMAT_GIPL] = "gipl,gipl.gz";
+  m_FileFormatPattern[GuidedImageIOBase::FORMAT_RAW] = "raw*";
+  m_FileFormatPattern[GuidedImageIOBase::FORMAT_ANALYZE] = "hdr,img,img.gz";  
+  m_FileFormatPattern[GuidedImageIOBase::FORMAT_DICOM] = "dcm";
+  m_FileFormatPattern[GuidedImageIOBase::FORMAT_GE4] = "ge4";
+  m_FileFormatPattern[GuidedImageIOBase::FORMAT_GE5] = "ge5";
+  m_FileFormatPattern[GuidedImageIOBase::FORMAT_SIEMENS] = "ima";
+  m_FileFormatPattern[GuidedImageIOBase::FORMAT_VTK] = "vtk";
 
   // Initialize the file format descriptions
-  m_FileFormatDescription[FORMAT_MHA] = "MetaImage";
-  m_FileFormatDescription[FORMAT_GIPL] = "GIPL";
-  m_FileFormatDescription[FORMAT_RAW] = "Raw Binary";
-  m_FileFormatDescription[FORMAT_ANALYZE] = "Analyze"; 
-  m_FileFormatDescription[FORMAT_DICOM] = "DICOM";
-  m_FileFormatDescription[FORMAT_GE4] = "GE Version 4";
-  m_FileFormatDescription[FORMAT_GE5] = "GE Version 5";
-  m_FileFormatDescription[FORMAT_SIEMENS] = "Siemens Vision";
-  m_FileFormatDescription[FORMAT_VTK] = "VTK";
+  m_FileFormatDescription[GuidedImageIOBase::FORMAT_MHA] = "MetaImage";
+  m_FileFormatDescription[GuidedImageIOBase::FORMAT_GIPL] = "GIPL";
+  m_FileFormatDescription[GuidedImageIOBase::FORMAT_RAW] = "Raw Binary";
+  m_FileFormatDescription[GuidedImageIOBase::FORMAT_ANALYZE] = "Analyze"; 
+  m_FileFormatDescription[GuidedImageIOBase::FORMAT_DICOM] = "DICOM Series";
+  m_FileFormatDescription[GuidedImageIOBase::FORMAT_GE4] = "GE Version 4";
+  m_FileFormatDescription[GuidedImageIOBase::FORMAT_GE5] = "GE Version 5";
+  m_FileFormatDescription[GuidedImageIOBase::FORMAT_SIEMENS] = "Siemens Vision";
+  m_FileFormatDescription[GuidedImageIOBase::FORMAT_VTK] = "VTK";
+
+  // Initialize the DICOM directory lister
+  m_DICOMLister = GDCMSeriesFileNames::New();
   
   // Initialize the text buffers
   m_SummaryTextBuffer = new Fl_Text_Buffer();
@@ -122,7 +102,7 @@ void ImageIOWizardLogic<TPixel>
   ImageIOWizard::MakeWindow();
 
   // Initialize the file save dialog box based on the allowed file types
-  for(unsigned int i = 0;i < FORMAT_COUNT;i++)
+  for(unsigned int i = 0; i < GuidedImageIOBase::FORMAT_COUNT; i++)
     {
     // Create an appropriate description
     StringType text = m_FileFormatDescription[i] + " File";
@@ -154,7 +134,7 @@ void ImageIOWizardLogic<TPixel>
   // In the input is NULL, get the current page from the wizard widget
   current = (current == NULL) ? (Fl_Group *)m_WizInput->value() : current;
 
-  if (current == m_PageHeader)
+  if (current == m_PageHeader || current == m_PageDICOM)
     {
     last = m_PageFile;
     }
@@ -194,9 +174,14 @@ void ImageIOWizardLogic<TPixel>
   // Follow the sequence of the pages
   if(current == m_PageFile) 
     {
-    next = m_PageHeader;
+    if(m_PageHeader->active())
+      next = m_PageHeader;
+    else if(m_PageDICOM->active())
+      next = m_PageDICOM;
+    else
+      assert(0);
     }
-  else if (current == m_PageHeader)
+  else if (current == m_PageHeader || current == m_PageDICOM) 
     {
     next = m_PageOrientation;
     }    
@@ -224,6 +209,10 @@ void ImageIOWizardLogic<TPixel>
     {
     OnHeaderPageEnter();
     }
+  else if (next == m_PageDICOM)
+    {
+    OnDICOMPageEnter();
+    }
   else if (next == m_PageOrientation)
     {
     OnOrientationPageEnter();
@@ -248,7 +237,7 @@ ImageIOWizardLogic<TPixel>
   bool allImageFilesNeedsComma = false;
 
   // Go through all supported formats
-  for(unsigned int i=0;i < FORMAT_COUNT;i++)
+  for(unsigned int i=0;i < GuidedImageIOBase::FORMAT_COUNT;i++)
     {
     // Check if the file format is supported
     if((forLoading && this->CanLoadFileFormat((FileFormat) i)) ||
@@ -293,7 +282,7 @@ ImageIOWizardLogic<TPixel>
 ::DetermineFileFormatFromFileName(bool forLoading, const char *testFile) 
 {
   // Iterate over the known file types
-  for(unsigned int i = 0;i < FORMAT_COUNT;i++)
+  for(unsigned int i = 0;i < GuidedImageIOBase::FORMAT_COUNT;i++)
     {
     // Check if the file format is supported
     if((forLoading && this->CanLoadFileFormat((FileFormat) i)) ||
@@ -309,7 +298,7 @@ ImageIOWizardLogic<TPixel>
     }
 
   // Failed: return illegal pattern
-  return FORMAT_COUNT;
+  return GuidedImageIOBase::FORMAT_COUNT;
 }
 
 template <class TPixel>
@@ -324,10 +313,10 @@ bool ImageIOWizardLogic<TPixel>
 ::CanSaveFileFormat(FileFormat format) const 
 { 
   return (
-    format != FORMAT_DICOM &&
-    format != FORMAT_GE4 &&
-    format != FORMAT_GE5 &&
-    format != FORMAT_SIEMENS);
+    format != GuidedImageIOBase::FORMAT_DICOM &&
+    format != GuidedImageIOBase::FORMAT_GE4 &&
+    format != GuidedImageIOBase::FORMAT_GE5 &&
+    format != GuidedImageIOBase::FORMAT_SIEMENS);
 }
 
 template <class TPixel>
@@ -369,10 +358,17 @@ ImageIOWizardLogic<TPixel>
     m_BtnFilePageNext->deactivate();
 
   // If the user selects 'raw', update the format
-  if (m_InFilePageFormat->value()-1 == FORMAT_RAW)
+  FileFormat format = (FileFormat) (m_InFilePageFormat->value() - 1);
+  if (format == GuidedImageIOBase::FORMAT_RAW)
     m_PageHeader->activate();
   else
     m_PageHeader->deactivate();
+
+  // If the user selects 'dicom' enable the dicom page
+  if(format = GuidedImageIOBase::FORMAT_DICOM)
+    m_PageDICOM->activate();
+  else 
+    m_PageDICOM->deactivate();
 }
 
 template <class TPixel>
@@ -392,25 +388,36 @@ template <class TPixel>
 void ImageIOWizardLogic<TPixel>
 ::OnFilePageFileInputChange() 
 {
+  // Clear the registry
+  m_Registry.Clear();
+
   // Check the length of the input
   const char *text = m_InFilePageBrowser->value();
   if (text != NULL && strlen(text) > 0)
     {
+    // Try to load the registry associated with this filename
+    if(m_Callback)
+      m_Callback->FindRegistryAssociatedWithImage(
+        m_InFilePageBrowser->value(), m_Registry);
+
+    // If the registry contains a file format, override with that
+    FileFormat fmt = 
+      m_GuidedIO.GetFileFormat(m_Registry, GuidedImageIOBase::FORMAT_COUNT);
+
     // Try to select a file format accoring to the file name
-    FileFormat fmt = DetermineFileFormatFromFileName(true,text);
+    if(fmt == GuidedImageIOBase::FORMAT_COUNT)
+      fmt = DetermineFileFormatFromFileName(true, text);
     
     // If the filename does not match any format, we do not change the 
     // format choice box in case that the user has already set it manually
-    if(fmt < FORMAT_COUNT)
+    if(fmt < GuidedImageIOBase::FORMAT_COUNT)
       m_InFilePageFormat->value((int)fmt+1);
     
     // Run the format change event
     OnFilePageFileFormatChange();
     } 
   else
-    {
-    m_BtnFilePageNext->deactivate();
-    }            
+    { m_BtnFilePageNext->deactivate(); }            
 }
 
 template <class TPixel>
@@ -424,21 +431,23 @@ void ImageIOWizardLogic<TPixel>
   // Check that a format has been specified
   assert(m_InFilePageFormat->value() > 0);
 
-  // Check if the file format is raw
-  if(m_InFilePageFormat->value() - 1 == (int) FORMAT_RAW)
-    {
-    GoForward();
-    }
-  else
-    {
-    // Create an Image IO for loading
-    CreateImageIO((FileFormat)(m_InFilePageFormat->value()-1),true);
+  // Get the selected format and place it in the registry
+  FileFormat format = (FileFormat) (m_InFilePageFormat->value() - 1);
+  m_GuidedIO.SetFileFormat(m_Registry, format);
 
-    // Try Loading image
-    if(LoadImage(m_ImageIO))
-      {
-      GoForward();
-      }      
+  // If file format is raw or dicom, go to the next page, o.w., load image
+  switch(format) 
+    {
+    case GuidedImageIOBase::FORMAT_RAW:
+      GoForward(); 
+      break;
+    case GuidedImageIOBase::FORMAT_DICOM:
+      if(ProcessDICOMDirectory())
+        GoForward();
+      break;
+    default:
+      if(DoLoadImage())
+        GoForward();
     }
 }
 
@@ -464,39 +473,135 @@ ImageIOWizardLogic<TPixel>
 ::OnHeaderPageNext() 
 {
   // Make sure we're not here by mistake
-  assert(m_InFilePageFormat->value() == 1 + (int)FORMAT_RAW);
+  assert(m_InFilePageFormat->value() - 1 == (int) GuidedImageIOBase::FORMAT_RAW);
 
-  // Create an ImageIO for loading the file
-  CreateImageIO(FORMAT_RAW,true);
+  // Set up the registry with the specified values
+  m_Registry["Raw.HeaderSize"] 
+    << (unsigned int) m_InHeaderPageHeaderSize->value();
 
-  // Better have something!
-  assert(m_ImageIO);
+  // Set the dimensions
+  m_Registry["Raw.Dimensions"] << Vector3i(
+    (int) m_InHeaderPageDimX->value(),
+    (int) m_InHeaderPageDimY->value(),
+    (int) m_InHeaderPageDimZ->value());
 
-  // Set the dimensions of the image
-  m_ImageIO->SetDimensions(0,(unsigned int)m_InHeaderPageDimX->value());
-  m_ImageIO->SetDimensions(1,(unsigned int)m_InHeaderPageDimY->value());
-  m_ImageIO->SetDimensions(2,(unsigned int)m_InHeaderPageDimZ->value());
+  // Set the spacing
+  m_Registry["Raw.Spacing"] << Vector3d(
+    m_InHeaderPageSpacingX->value(),
+    m_InHeaderPageSpacingY->value(),
+    m_InHeaderPageSpacingZ->value());
 
-  // Set the spacing of the image
-  m_ImageIO->SetSpacing(0,m_InHeaderPageSpacingX->value());
-  m_ImageIO->SetSpacing(1,m_InHeaderPageSpacingY->value());
-  m_ImageIO->SetSpacing(2,m_InHeaderPageSpacingZ->value());
-  
   // Set the endianness
-  if(m_InHeaderPageByteAlign->value() == 0)
-    m_ImageIO->SetByteOrderToBigEndian();
-  else
-    m_ImageIO->SetByteOrderToLittleEndian();
+  m_Registry["Raw.BigEndian"] 
+    << ( m_InHeaderPageByteAlign->value() == 0 );
+
+  // Set the pixel type
+  int iPixType = ((int)m_InHeaderPageVoxelType->value());
+  GuidedImageIOBase::RawPixelType pixtype = (iPixType < 0) 
+    ? GuidedImageIOBase::PIXELTYPE_COUNT
+    : (GuidedImageIOBase::RawPixelType) iPixType;
+  m_GuidedIO.SetPixelType(m_Registry, pixtype);
 
   // Do the loading
-  if(LoadImage(m_ImageIO))
+  if(DoLoadImage())
     GoForward();
 }
+
 
 template <class TPixel>
 bool 
 ImageIOWizardLogic<TPixel>
-::LoadImage(ImageIOType *customIO)
+::ProcessDICOMDirectory()
+{
+  // Get the directory tree from the file
+  StringType dirname = 
+    itksys::SystemTools::FileIsDirectory(m_InFilePageBrowser->value())
+    ? m_InFilePageBrowser->value()
+    : itksys::SystemTools::GetParentDirectory(m_InFilePageBrowser->value());
+
+  // Put up a wait cursor
+  fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+
+  // Try to list the DICOM files in the directory
+  try
+    {
+    m_DICOMLister->SetDirectory(dirname.c_str());
+    m_InFilePageBrowser->value(dirname.c_str());
+    }
+  catch(...)
+    {
+    fl_alert("Error listing DICOM files in directory: \n %s",dirname.c_str());
+    }
+
+  // Restore the cursor
+  fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+  
+  // Get the list of series in the directory
+  if(m_DICOMLister->GetSeriesUIDs().size() == 0)
+    {
+    fl_alert("No DICOM series found in the directory: \n%s",dirname.c_str());
+    return false;
+    }
+  else return true;
+ }
+
+template <class TPixel>
+void 
+ImageIOWizardLogic<TPixel>
+::OnDICOMPageEnter()
+{
+  // Get the list of sequence ids
+  const std::vector<StringType> &uids = m_DICOMLister->GetSeriesUIDs();
+
+  // Add the ids to the menu
+  m_InDICOMPageSequenceId->clear();
+  for(unsigned int i = 0; i < uids.size(); i++)
+    m_InDICOMPageSequenceId->add(uids[i].c_str());
+
+  // See if one of the sequences in the registry matches
+  StringType last = m_Registry["DICOM.SequenceId"]["NULL"];
+  const Fl_Menu_Item *lastpos = m_InDICOMPageSequenceId->find_item(last.c_str());
+  if(lastpos)
+    m_InDICOMPageSequenceId->value(lastpos);
+  else 
+    m_InDICOMPageSequenceId->value(0);
+}
+
+template <class TPixel>
+void 
+ImageIOWizardLogic<TPixel>
+::OnDICOMPageNext()
+{
+  // The user will have selected some DICOM series. All we have to do is
+  // specify the series in the registry and load the file
+  m_Registry["DICOM.SequenceId"] << m_InDICOMPageSequenceId->mvalue()->label();
+
+  // In addition, generate an explicit array of filenames for this sequence id. 
+  // This will allow the DICOM loader to load files without having to list the 
+  // directory again
+  const std::vector<StringType> &files = m_DICOMLister->GetFileNames(
+    StringType(m_InDICOMPageSequenceId->mvalue()->label()));
+  m_Registry.Folder("DICOM.SliceFiles").PutArray(files);
+
+  // Try loading the file now
+  if(DoLoadImage())
+    GoForward();
+}
+
+template <class TPixel>
+void 
+ImageIOWizardLogic<TPixel>
+::OnDICOMPageBack()
+{
+  GoBack();
+}
+
+
+
+template <class TPixel>
+bool 
+ImageIOWizardLogic<TPixel>
+::DoLoadImage()
 {
   bool rc;
 
@@ -505,41 +610,18 @@ ImageIOWizardLogic<TPixel>
   
   // Try to load a file
   try 
-    {
-    typedef ImageFileReader<ImageType> ReaderType;
-    typedef typename ReaderType::Pointer ReaderPointer;
+    {     
+    // Since we want to store the image IO, we need to use these two calls 
+    // instead of just calling ReadImage with the registry
+    m_Image = m_GuidedIO.ReadImage(m_InFilePageBrowser->value(), m_Registry);
+    m_ImageIO = m_GuidedIO.GetIOBase();
 
-    // Create a reader
-    ReaderPointer reader = ReaderType::New();
-
-    // Set the file name
-    reader->SetFileName(m_InFilePageBrowser->value());
-
-    // Check if custom IO is required
-    if(customIO)
-      reader->SetImageIO(customIO);
-        
-    // Perform the read
-    reader->Update();
-    
-    // Get the output
-    m_Image = reader->GetOutput();
-
-    // Disconnect the image from the reader
+    // Disconnect the image from the reader to free up memory (?)
     m_Image->DisconnectPipeline();
-     
-    // Store the image IO
-    m_ImageIO = reader->GetImageIO();
 
     // Check if the image is really valid
     if(rc = CheckImageValidity())
       {
-      // Try to retrieve a registry accociated with the currently selected image
-      m_Registry.Clear();
-      if(m_Callback)
-        m_Callback->FindRegistryAssociatedWithImage(
-          m_InFilePageBrowser->value(), m_Registry);
-
       // Try to determine the RAI code
       GuessImageOrientation();
       }
@@ -621,7 +703,31 @@ void
 ImageIOWizardLogic<TPixel>
 ::OnHeaderPageEnter()
 {
+  // Use the values from the registry to set up the header page
+  m_InHeaderPageHeaderSize->value(m_Registry["Raw.HeaderSize"][0]);
+  
+  // Set the dimensions
+  Vector3i dims = m_Registry["Raw.Dimensions"][Vector3i(0)];
+  m_InHeaderPageDimX->value(dims[0]);
+  m_InHeaderPageDimY->value(dims[1]);
+  m_InHeaderPageDimZ->value(dims[2]);
 
+  // Set the spacing
+  Vector3d spacing = m_Registry["Raw.Spacing"][Vector3d(1.0)];
+  m_InHeaderPageSpacingX->value(spacing[0]);
+  m_InHeaderPageSpacingY->value(spacing[1]);
+  m_InHeaderPageSpacingZ->value(spacing[2]);
+
+  // Set the data type
+  RawPixelType pixtype = 
+    m_GuidedIO.GetPixelType(m_Registry, GuidedImageIOBase::PIXELTYPE_UCHAR);
+  m_InHeaderPageVoxelType->value((int)pixtype);
+
+  // Set the endianness
+  if(m_Registry["Raw.BigEndian"][true]) 
+    m_InHeaderPageByteAlign->value(0);
+  else
+    m_InHeaderPageByteAlign->value(1);
 }
 
 template <class TPixel>
@@ -1029,6 +1135,13 @@ ImageIOWizardLogic<TPixel>
     // Set the status to positive, the image has been loaded!
     m_ImageLoaded = true;
 
+    // Save the registry produced in this wizard
+    if(GetLoadedImageRAI())
+      m_Registry["Orientation"] << GetLoadedImageRAI();
+    if(m_Callback)
+      m_Callback->UpdateRegistryAssociatedWithImage(
+        m_InFilePageBrowser->value(), m_Registry);
+
     // Hide this window
     m_WinInput->hide();
   }
@@ -1142,25 +1255,36 @@ void
 ImageIOWizardLogic<TPixel>
 ::OnSaveFilePageFileInputChange()
 {
+  // Clear the registry
+  m_Registry.Clear();
+
   // Check the length of the input
   const char *text = m_InSaveFilePageBrowser->value();
   if (text != NULL && strlen(text) > 0)
     {
+    // Try to load the registry associated with this filename
+    if(m_Callback)
+      m_Callback->FindRegistryAssociatedWithImage(
+        m_InFilePageBrowser->value(), m_Registry);
+
+    // If the registry contains a file format, override with that
+    FileFormat fmt = 
+      m_GuidedIO.GetFileFormat(m_Registry, GuidedImageIOBase::FORMAT_COUNT);
+
     // Try to select a file format accoring to the file name
-    FileFormat fmt = DetermineFileFormatFromFileName(false,text);
-    
+    if(fmt == GuidedImageIOBase::FORMAT_COUNT)
+      fmt = DetermineFileFormatFromFileName(true, text);
+
     // If the filename does not match any format, we do not change the 
     // format choice box in case that the user has already set it manually
-    if(fmt < FORMAT_COUNT)
+    if(fmt < GuidedImageIOBase::FORMAT_COUNT)
       m_InSaveFilePageFormat->value((int)fmt+1);
     
     // Run the format change event
     OnSaveFilePageFileFormatChange();
     } 
   else
-    {
-    m_BtnSaveFilePageNext->deactivate();
-    }            
+    { m_BtnSaveFilePageNext->deactivate(); }            
 }
 
 template <class TPixel>
@@ -1187,7 +1311,6 @@ ImageIOWizardLogic<TPixel>
   else 
     m_BtnSaveFilePageNext->deactivate();
 }
-
 
 template <class TPixel>
 void 
@@ -1219,94 +1342,38 @@ ImageIOWizardLogic<TPixel>
 template <class TPixel>
 void 
 ImageIOWizardLogic<TPixel>
-::CreateImageIO(FileFormat fmt,bool forLoading)
-{
-  switch(fmt)
-    {
-    case FORMAT_MHA:
-      m_ImageIO = MetaImageIO::New();
-      break;
-    case FORMAT_ANALYZE:
-      m_ImageIO = AnalyzeImageIO::New();
-      break;
-    case FORMAT_GIPL:
-      m_ImageIO = GiplImageIO::New();
-      break;
-    case FORMAT_DICOM:
-      m_ImageIO = DicomImageIO::New();
-      break;
-    case FORMAT_GE4:
-      m_ImageIO = GE4ImageIO::New();
-      break;
-    case FORMAT_GE5:
-      m_ImageIO = GE5ImageIO::New();
-      break;
-    case FORMAT_SIEMENS:
-      m_ImageIO = SiemensVisionImageIO::New();
-      break;
-    case FORMAT_VTK:
-      m_ImageIO = VTKImageIO::New();
-      break;
-    case FORMAT_RAW:
-      if(forLoading)
-        {
-        // Use header page values to initialize the RAW io
-        unsigned int header = (unsigned int)m_InHeaderPageHeaderSize->value(); 
-        switch((int)m_InHeaderPageVoxelType->value())
-          {
-          case 0: m_ImageIO = CreateRawImageIO((unsigned char) 0, header); break;
-          case 1: m_ImageIO = CreateRawImageIO((char) 0, header); break;
-          case 2: m_ImageIO = CreateRawImageIO((unsigned short) 0, header); break;
-          case 3: m_ImageIO = CreateRawImageIO((short) 0, header); break;
-          case 4: m_ImageIO = CreateRawImageIO((unsigned int) 0,header); break;
-          case 5: m_ImageIO = CreateRawImageIO((int) 0, header); break;
-          case 6: m_ImageIO = CreateRawImageIO(0.0f, header); break;
-          default: assert(0);
-          }
-        }
-      else
-        {
-        // Use current pixel type and zero size header
-        m_ImageIO = CreateRawImageIO((TPixel)0,0);
-        }
-      break;
-    default:
-      assert(0);
-    }
-}
-
-
-template <class TPixel>
-void 
-ImageIOWizardLogic<TPixel>
 ::OnSaveFilePageSave()
 {
   // There better be a format selected
   assert(m_InSaveFilePageFormat->value() > 0);
-  
-  // Create an appropriate image IO based on the selected format
-  CreateImageIO((FileFormat)(m_InSaveFilePageFormat->value()-1),false);
+
+  // Get the selected format and place it in the registry
+  FileFormat format = (FileFormat) (m_InSaveFilePageFormat->value() - 1);
+  m_GuidedIO.SetFileFormat(m_Registry, format);
+
+  // Put up a waiting cursor
+  fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
 
   // Try to save the image using the current format
-  typedef ImageFileWriter<ImageType> WriterType;
-  typename WriterType::Pointer writer = WriterType::New();
-  writer->SetFileName(m_InSaveFilePageBrowser->value());
-  writer->SetImageIO(m_ImageIO);
-  writer->SetInput(m_Image);
-
-  fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
-  
   try 
     {
-    writer->Update();
+    // Try to save the image
+    m_GuidedIO.SaveImage(
+      m_InSaveFilePageBrowser->value(), m_Registry, m_Image);
     m_ImageSaved = true;
+
+    // Save the registry produced in this wizard
+    if(m_Callback)
+      m_Callback->UpdateRegistryAssociatedWithImage(
+        m_InFilePageBrowser->value(), m_Registry);
+
+    // Hide the dialog
     m_WinOutput->hide();
     }
   catch(ExceptionObject &exc)
-    {
-    fl_alert("Error saving file: %s",exc.GetDescription());
-    }
+    { fl_alert("Error saving file: %s",exc.GetDescription()); }
   
+  // Restore the cursor
   fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
 }
 

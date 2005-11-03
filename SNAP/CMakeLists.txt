@@ -52,6 +52,7 @@ SET(LOGIC_CXX
   Logic/Framework/IRISImageData.cxx
   Logic/Framework/SNAPImageData.cxx
   Logic/ImageWrapper/GreyImageWrapper.cxx
+  Logic/ImageWrapper/GuidedImageIO.cxx
   Logic/ImageWrapper/LabelImageWrapper.cxx
   Logic/ImageWrapper/LevelSetImageWrapper.cxx
   Logic/ImageWrapper/SpeedColorMap.cxx
@@ -93,6 +94,7 @@ SET(LOGIC_HEADERS
   Logic/Framework/IRISImageData.h
   Logic/Framework/SNAPImageData.h
   Logic/ImageWrapper/GreyImageWrapper.h
+  Logic/ImageWrapper/GuidedImageIO.h
   Logic/ImageWrapper/ImageIORoutines.h
   Logic/ImageWrapper/ImageWrapper.h
   Logic/ImageWrapper/ImageWrapper.txx

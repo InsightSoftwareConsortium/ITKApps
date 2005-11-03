@@ -196,6 +196,9 @@ int main(int argc, char **argv)
 {
   // Handle signals gracefully, with trace-back
   SetupSignalHandlers();
+
+  // Turn off ITK warning windows
+  itk::Object::GlobalWarningDisplayOff();
   
   // Parse command line parameters
   CommandLineArgumentParser parser;
@@ -240,7 +243,7 @@ int main(int argc, char **argv)
   IRISApplication *iris = new IRISApplication;
 
   // Initialize the operating system interface
-  SystemInterface system;  
+  SystemInterface &system = *iris->GetSystemInterface();  
 
   // Load the user preferences into the system
   if(!LoadUserPreferencesInteractive(system))
@@ -251,7 +254,7 @@ int main(int argc, char **argv)
     return -1;
 
   // Create a UI object
-  UserInterfaceLogic *ui = new UserInterfaceLogic(iris,&system);
+  UserInterfaceLogic *ui = new UserInterfaceLogic(iris);
 
   // Initialize FLTK
   Fl::visual(FL_DOUBLE|FL_INDEX);
@@ -271,35 +274,29 @@ int main(int argc, char **argv)
     const char *fnGrey = parseResult.GetOptionParameter("--grey");
 
     // Check for RAI
-    const char *raiCode = "RAI";
+    const char *raiCode = NULL;
     if(parseResult.IsOptionPresent("--orientation"))
       {
       const char *newRAI = parseResult.GetOptionParameter("--orientation");
       if(ImageCoordinateGeometry::IsRAICodeValid(newRAI))
         raiCode = newRAI;
       else
-        cerr << "Invalid orientation code: '" << newRAI 
-          << "'. Using default code 'RAI'." << endl;
+        cerr << "Invalid orientation code: '" << newRAI << "'. " << endl;
       }
 
     // Update the splash screen
     ui->UpdateSplashScreen("Loading grey image...");
-    
-    // Load the image using itk IO
-    IRISApplication::GreyImageType::Pointer img;
-    if(LoadImageFromFileInteractive(fnGrey,img))
-      {      
-      // Load the image
-      iris->UpdateIRISGreyImage(img,raiCode);
 
-      // Save the filename for the UI
-      iris->GetGlobalState()->SetGreyFileName(fnGrey);
-
-      // Update the user interface
-      ui->OnGreyImageUpdate();
-      }
-    else
+    // Try loading the image
+    try 
       {
+      iris->LoadGreyImageFile(fnGrey, raiCode);
+      ui->OnGreyImageUpdate();
+      }  
+    catch(itk::ExceptionObject &exc)
+      {
+      cerr << "Error loading file '" << fnGrey << "'" << endl;
+      cerr << "Reason: " << exc << endl;
       return -1;
       }
 
@@ -313,12 +310,16 @@ int main(int argc, char **argv)
       ui->UpdateSplashScreen("Loading segmentation image...");
 
       // Try to load the image
-      IRISApplication::LabelImageType::Pointer img;
-      if(LoadImageFromFileInteractive(fname,img))
+      try
         {
-        iris->UpdateIRISSegmentationImage(img);
-        iris->GetGlobalState()->SetSegmentationFileName(fname);
+        iris->LoadLabelImageFile(fname);
         ui->OnSegmentationImageUpdate();
+        }
+      catch(itk::ExceptionObject &exc)
+        {
+        cerr << "Error loading file '" << fname << "'" << endl;
+        cerr << "Reason: " << exc << endl;
+        return -1;
         }
       }    
     }
@@ -382,6 +383,9 @@ int main(int argc, char **argv)
 
 /*
  *Log: SNAPMain.cxx
+ *Revision 1.13  2005/10/29 14:00:14  pauly
+ *ENH: SNAP enhacements like color maps and progress bar for 3D rendering
+ *
  *Revision 1.12  2005/04/21 14:46:30  pauly
  *ENH: Improved management and editing of color labels in SNAP
  *

@@ -92,6 +92,13 @@ public:
     const char *file, IRISApplication *app,
     bool restoreLabels, bool restorePreprocessing,
     bool restoreParameters, bool restoreDisplayOptions);
+  
+  /** 
+  * This is a more complex method for loading a file. It work for files that have 
+  * been opened previously, so that the user specified the necessary parameters 
+  * for loading. It works with conjunction with the registry class
+  */
+  void LoadPreviousGreyImageFile(const char *filename, Registry *registry);
 
 private:
   std::string m_UserPreferenceFile;

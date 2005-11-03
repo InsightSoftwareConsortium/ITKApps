@@ -317,6 +317,11 @@ public:
    * header, each line of which must start with the '#" character  */
   void WriteToFile(const char *pathname, const char *header = NULL);
 
+  /**
+   * Update the registry with keys from another registry
+   */
+  void Update(const Registry &reg);
+
   /** Read this Registry from a file */
   void ReadFromFile(const char *pathname);
 
@@ -384,6 +389,7 @@ private:
   // Commonly used hashtable iterators
   typedef FolderMapType::const_iterator FolderIterator;
   typedef EntryMapType::iterator EntryIterator;
+  typedef EntryMapType::const_iterator EntryConstIterator;
 
   /** A hash table for the subfolders */
   FolderMapType m_FolderMap;

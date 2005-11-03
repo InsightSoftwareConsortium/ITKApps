@@ -76,7 +76,7 @@ class UserInterfaceLogic : public UserInterface
 public:
 
   /** Constructor, calls GUI constructor, calls init */
-  UserInterfaceLogic(IRISApplication *iris,SystemInterface *system);
+  UserInterfaceLogic(IRISApplication *iris);
 
   /** Destructor */
   virtual ~UserInterfaceLogic();
@@ -655,7 +655,8 @@ protected:
   void OnMenuWriteVoxelCounts();
   void OnMenuIntensityCurve();
   void OnMenuLoadPreprocessed();  
-  void OnMenuSavePreprocessed();  
+  void OnMenuSavePreprocessed(); 
+  void OnLoadRecentAction(unsigned int iRecent);
   void OnLoadPreprocessedImageAction();
   void OnMenuLoadAdvection();
   void OnMenuImageInfo();
@@ -794,6 +795,9 @@ private:
   // An adapter used in association with the image IO wizard
   ImageInfoCallbackInterface *m_GreyCallbackInterface;
 
+  // A list of recently open files shown in the load recent menu
+  std::string m_RecentFileNames[5];
+
   // Intensity curve update callback (uses ITK event system)
   void OnIntensityCurveUpdate();
 
@@ -838,12 +842,18 @@ private:
 
   // A function used to run the snake in the background
   friend void fnSnakeIdleFunction(void *userData);
+
+  // Update the menu of recent files
+  void GenerateRecentFilesMenu();
 };
 
 #endif
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.27  2005/10/29 14:00:15  pauly
+ *ENH: SNAP enhacements like color maps and progress bar for 3D rendering
+ *
  *Revision 1.26  2005/08/11 04:37:07  pauly
  *BUG: Fixed crash when using single-slice mode and entering auto-seg
  *

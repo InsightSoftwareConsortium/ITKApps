@@ -51,6 +51,7 @@
 
 #include "FL/Fl_File_Chooser.H"
 
+#include "itkImageIOBase.h"
 #include <itksys/SystemTools.hxx>
 #include <strstream>
 #include <iomanip>
@@ -77,13 +78,30 @@ public:
   GreyImageInfoCallback(SystemInterface *system)
     { m_SystemInterface = system; }
 
+  // This method finds the registry associated with a file
   bool FindRegistryAssociatedWithImage(const char *file, Registry &registry)
     { 
+    m_Registry.Clear();
     if(!m_SystemInterface->FindRegistryAssociatedWithFile(file, m_Registry))
       return false;
     registry = m_Registry.Folder("Files.Grey");
     return true;
     }
+
+  // This method updates the registry with values that the user specified
+  void UpdateRegistryAssociatedWithImage(const char *file, Registry &folder)
+    {
+    // Create a registry into which to load the values
+    Registry regNew;
+    m_SystemInterface->FindRegistryAssociatedWithFile(file, regNew);
+
+    // Update the corresponding folder
+    regNew.Folder("Files.Grey").Update(folder);
+      
+    // Associate the settings
+    m_SystemInterface->AssociateRegistryWithFile(file, regNew);
+    }
+
 private:
   SystemInterface *m_SystemInterface;
   Registry m_Registry;
@@ -186,19 +204,20 @@ void UserInterfaceLogic
 }
 
 UserInterfaceLogic
-::UserInterfaceLogic(IRISApplication *iris, SystemInterface *system)
+::UserInterfaceLogic(IRISApplication *iris)
 : UserInterface()
 {
   // Store the pointers to application and system high level objects
   m_Driver = iris;
-  m_SystemInterface = system;
+  m_SystemInterface = iris->GetSystemInterface();
 
   // This is just done for shorthand
   m_GlobalState = iris->GetGlobalState();
 
   // Load the appearance settings from the system interface
   m_AppearanceSettings = new SNAPAppearanceSettings();
-  Registry &regAppearance = system->Folder("UserInterface.AppearanceSettings");
+  Registry &regAppearance = 
+    m_SystemInterface->Folder("UserInterface.AppearanceSettings");
   m_AppearanceSettings->LoadFromRegistry(regAppearance);
 
   // Instantiate the IO wizards
@@ -212,7 +231,7 @@ UserInterfaceLogic
   m_WizPreprocessingIO->MakeWindow();
 
   // Provide the registry callback for the greyscale image wizard
-  m_GreyCallbackInterface = new GreyImageInfoCallback(system);
+  m_GreyCallbackInterface = new GreyImageInfoCallback(m_SystemInterface);
   m_WizGreyIO->SetImageInfoCallback(m_GreyCallbackInterface);
   
   // Instantiate other windows
@@ -298,6 +317,9 @@ UserInterfaceLogic
 
   InitializeActivationFlags();
   InitializeUI();
+
+  // Update the recent files menu
+  GenerateRecentFilesMenu();
 
   // Enter the IRIS-ACTiVE state
   m_Activation->UpdateFlag(UIF_IRIS_ACTIVE, true);
@@ -560,9 +582,15 @@ UserInterfaceLogic
 void 
 UserInterfaceLogic
 ::OnPreprocessedColorMapAction()
-{  
+{
   m_WinColorMap->show();
   m_BoxColorMap->show();
+
+  // Set the color map dropdown correctly
+  ColorMapPreset xPreset = m_GlobalState->GetSpeedColorMap();
+  m_ChoiceColorMap->value(xPreset - COLORMAP_BLACK_BLACK_WHITE);
+
+  UpdateSpeedColorMap();
 }
 
 void 
@@ -577,11 +605,11 @@ UserInterfaceLogic
 ::OnColorMapSelectAction()
 {
   // Get the selected value
-  int iSelect = m_ChoiceColorMap->value() - 1;
+  int iSelect = m_ChoiceColorMap->value();
 
   // Set the current color map
   ColorMapPreset xPreset = 
-    static_cast<ColorMapPreset>(COLORMAP_BLUE_BLACK_WHITE + iSelect);
+    static_cast<ColorMapPreset>(COLORMAP_BLACK_BLACK_WHITE + iSelect);
   m_GlobalState->SetSpeedColorMap(xPreset);
 
   // Update the display
@@ -795,6 +823,7 @@ UserInterfaceLogic
 
   // Update widget state
   m_Activation->UpdateFlag(UIF_SNAP_SPEED_AVAILABLE, false);
+  m_Activation->UpdateFlag(UIF_SNAP_PREPROCESSING_DONE, false);
 
   m_PreprocessingUI->HidePreprocessingWindows();
 
@@ -838,6 +867,7 @@ UserInterfaceLogic
   
   // Update widget state
   m_Activation->UpdateFlag(UIF_SNAP_SPEED_AVAILABLE, false);
+  m_Activation->UpdateFlag(UIF_SNAP_PREPROCESSING_DONE, false);
   
   m_PreprocessingUI->HidePreprocessingWindows();
   
@@ -2579,6 +2609,115 @@ UserInterfaceLogic
     }
 }
 
+// This method should be called whenever the UI starts and every time that
+// the history is updated.
+void 
+UserInterfaceLogic
+::GenerateRecentFilesMenu()
+{
+  // Load the list of recent files from the history file
+  SystemInterface::HistoryListType &history = m_SystemInterface->GetHistory("GreyImage");
+
+  // Take the five most recent items and create menu items
+  for(unsigned int i = 0; i < 5; i++)
+    {
+    // Get a pointer to the corresponding menu item
+    Fl_Menu_Item *item = m_MenuLoadPreviousFirst + i;
+
+    // Update it
+    if( i < history.size()) 
+      {
+      // Populate each of the menu items
+      m_RecentFileNames[i] = history[history.size() - (i+1)];
+      item->label(m_RecentFileNames[i].c_str());
+      item->activate();
+      }
+    else
+      {
+      m_RecentFileNames[i] = "Not Available";
+      item->label(m_RecentFileNames[i].c_str());
+      item->activate();
+      }
+    }
+
+  // Enable / disable the overall menu
+  if(history.size())
+    m_MenuLoadPrevious->activate();
+  else
+    m_MenuLoadPrevious->deactivate();
+}
+
+
+void
+UserInterfaceLogic
+::OnLoadRecentAction(unsigned int iRecent)
+{
+  // Get the history of grayscale images. Here we must be careful that every time
+  // the history is updated, we also remember to update the recent files menu!!!
+  SystemInterface::HistoryListType &history = m_SystemInterface->GetHistory("GreyImage");
+
+  // Check that the history is OK
+  if(history.size() <= iRecent)
+    {
+    fl_alert("Unable to load recent file due to internal error!");
+    return;
+    }
+
+  // Get the recent file name
+  string fnRecent = m_RecentFileNames[iRecent];
+
+  // Show a wait cursor
+  fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+
+  // TODO: At some point, we have to prompt the user that there are unsaved changes...
+  try
+    {
+    // Load the settings associated with this file
+    Registry regFull;
+    m_SystemInterface->FindRegistryAssociatedWithFile(fnRecent.c_str(), regFull);
+      
+    // Get the folder dealing with grey image properties
+    Registry &regGrey = regFull.Folder("Files.Grey");
+
+    // Create the image reader
+    GuidedImageIO<GreyType> io;
+    
+    // Load the image (exception may occur here)
+    GreyImageWrapper::ImagePointer imgGrey = 
+      io.ReadImage(fnRecent.c_str(), regGrey);
+
+    // Update the system's history list
+    m_SystemInterface->UpdateHistory("GreyImage", fnRecent.c_str());
+
+    // Update the list of recently open files
+    GenerateRecentFilesMenu();
+
+    // Perform the clean-up tasks before loading the image
+    OnGreyImageUnload();
+
+    // Send the image and RAI to the IRIS application driver
+    m_Driver->UpdateIRISGreyImage(imgGrey,regGrey["Orientation"]["RAI"]);
+
+    // Save the filename
+    m_GlobalState->SetGreyFileName(fnRecent.c_str());
+
+    // Update the user interface accordingly
+    OnGreyImageUpdate();
+
+    // Restore the cursor
+    fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+    }
+  catch(itk::ExceptionObject &exc) 
+    {
+    // Restore the cursor
+    fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+
+    // Alert the user to the failure
+    fl_alert("Error loading image:\n%s",exc.GetDescription());
+    }
+
+}
+
 void 
 UserInterfaceLogic
 ::OnMenuLoadGrey() 
@@ -2596,6 +2735,9 @@ UserInterfaceLogic
     // Update the system's history list
     m_SystemInterface->UpdateHistory("GreyImage",m_WizGreyIO->GetFileName());
 
+    // Update the list of recently open files
+    GenerateRecentFilesMenu();
+
     // Perform the clean-up tasks before loading the image
     OnGreyImageUnload();
 
@@ -2610,6 +2752,7 @@ UserInterfaceLogic
     OnGreyImageUpdate();
     }
 }
+
 
 void 
 UserInterfaceLogic
@@ -3141,6 +3284,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.40  2005/10/29 14:00:15  pauly
+ *ENH: SNAP enhacements like color maps and progress bar for 3D rendering
+ *
  *Revision 1.39  2005/08/10 19:57:15  pauly
  *BUG: Labels not always appearing when loading an image in SNAP
  *

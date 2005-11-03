@@ -33,6 +33,8 @@
 #include <string>
 #include <vector>
 
+#include "GuidedImageIO.h"
+
 class Fl_Text_Buffer;
 namespace itk 
 {
@@ -41,6 +43,7 @@ namespace itk
   template <unsigned int VDimensions> class Size;
   template <unsigned int VDimensions> class ImageBase;
   class ImageIOBase;  
+  class GDCMSeriesFileNames;
 }
 
 /**
@@ -52,6 +55,9 @@ class ImageInfoCallbackInterface
 {
 public:
   virtual bool FindRegistryAssociatedWithImage(
+    const char *file, Registry &registry) = 0;
+
+  virtual void UpdateRegistryAssociatedWithImage(
     const char *file, Registry &registry) = 0;
 };
 
@@ -95,7 +101,9 @@ public:
   virtual void OnFilePageFileHistoryChange();
   virtual void OnHeaderPageNext();
   virtual void OnHeaderPageBack();
-  virtual void OnHeaderPageInputChange();        
+  virtual void OnHeaderPageInputChange();  
+  virtual void OnDICOMPageNext();
+  virtual void OnDICOMPageBack();
   virtual void OnOrientationPageNext();
   virtual void OnOrientationPageBack();
   virtual void OnOrientationPageSelectPreset();
@@ -107,6 +115,7 @@ public:
   // Functions called on entering wizard input pages
   virtual void OnFilePageEnter();
   virtual void OnHeaderPageEnter();
+  virtual void OnDICOMPageEnter();
   virtual void OnOrientationPageEnter();
   virtual void OnSummaryPageEnter();
 
@@ -216,8 +225,14 @@ protected:
   /** A callback for retrieving image information */
   ImageInfoCallbackInterface *m_Callback;
 
+  /** DICOM file names lister */
+  typename itk::SmartPointer<itk::GDCMSeriesFileNames> m_DICOMLister;
+
   /** The registry associated with the image currently being considered for loading */
   Registry m_Registry;
+
+  /** A guided image IO object used to load images */
+  GuidedImageIO<TPixel> m_GuidedIO;
 
   /** A mapping from axis index and flip state to orientation menu items */
   unsigned int m_MapOrientationIndexAndFlipToMenuItem[3][2];
@@ -233,18 +248,14 @@ protected:
   Fl_Text_Buffer *m_SummaryTextBuffer;
 
   // -- Stuff dealing with file formats --
+  typedef GuidedImageIOBase::FileFormat FileFormat;
+  typedef GuidedImageIOBase::RawPixelType RawPixelType;
 
-  /** Enumerations of file formats supported by the wizard and its children */
-  enum FileFormat {
-    FORMAT_MHA=0,FORMAT_GIPL,FORMAT_RAW,FORMAT_ANALYZE,
-    FORMAT_DICOM, FORMAT_GE4, FORMAT_GE5, FORMAT_SIEMENS, FORMAT_VTK,    
-    FORMAT_COUNT};
-  
   /** Extensions for different file formats */
-  StringType m_FileFormatPattern[FORMAT_COUNT];
+  StringType m_FileFormatPattern[GuidedImageIOBase::FORMAT_COUNT];
 
   /** Brief descriptions of different file formats */
-  StringType m_FileFormatDescription[FORMAT_COUNT];  
+  StringType m_FileFormatDescription[GuidedImageIOBase::FORMAT_COUNT];  
   
   /**
    * Allow children to specify which file formats they can and can't save
@@ -270,11 +281,6 @@ protected:
                                              const char *testFileName);
 
   /**
-   * Initialize the ImageIO object to the given file format
-   */
-  void CreateImageIO(FileFormat fmt,bool forLoading);
-
-  /**
    * A method that controls how we propagate forward and back in the dialog.
    * Fires an assertion if called from where you can't go back or forward.  Inactive
    * pages are simply skipped.
@@ -283,7 +289,10 @@ protected:
   void GoBack(Fl_Group *current = NULL);
 
   // This is called to load the image with a possible custom IO for raw images
-  bool LoadImage(ImageIOType *customIO = NULL);
+  bool DoLoadImage();
+
+  // List files in the dicom directory
+  bool ProcessDICOMDirectory();
 
   // Check image validity after the initial load
   virtual bool CheckImageValidity() { return true; }

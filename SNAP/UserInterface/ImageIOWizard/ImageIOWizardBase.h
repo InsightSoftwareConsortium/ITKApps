@@ -31,6 +31,8 @@ public:
   virtual void OnHeaderPageNext() = 0;
   virtual void OnHeaderPageBack() = 0;
   virtual void OnHeaderPageInputChange() = 0;
+  virtual void OnDICOMPageNext() = 0;
+  virtual void OnDICOMPageBack() = 0;
   virtual void OnOrientationPageNext() = 0;
   virtual void OnOrientationPageBack() = 0;
   virtual void OnOrientationPageSelectPreset() = 0;

@@ -19,6 +19,7 @@
 #include "GlobalState.h"
 #include "ColorLabelTable.h"
 #include "itkCommand.h"
+#include "SystemInterface.h"
 // #include "itkImage.h"
 
 // Forward reference to the classes pointed at
@@ -151,7 +152,12 @@ public:
   /**
    * Get the global state object
    */
-  irisGetMacro(GlobalState,GlobalState *);
+  irisGetMacro(GlobalState, GlobalState *);
+
+  /**
+   * Get the system interface
+   */
+  irisGetMacro(SystemInterface, SystemInterface *);
 
   /**
    * Set the current cursor position.  This will cause all the active image
@@ -189,6 +195,22 @@ public:
   int GetRayIntersectionWithSegmentation(const Vector3d &point, 
                      const Vector3d &ray, 
                      Vector3i &hit) const;
+
+  /**
+   * This is the most high-level way to load an image in SNAP. This method 
+   * will use whatever prior information exists in image associations to 
+   * load an image based on the filename. The second parameter is the rai
+   * code (orientation), which you can override (i.e., on command line)
+   */
+  void LoadGreyImageFile(const char *filename, const char *rai = NULL);
+
+  /**
+   * This is the most high-level method to load a segmentation image. The
+   * segmentation image can only be loaded after the grey image has been 
+   * loaded and it must have the same dimensions
+   */
+  void LoadLabelImageFile(const char *filename);
+
 private:
   // Image data objects
   IRISImageData *m_IRISImageData,*m_CurrentImageData;
@@ -200,6 +222,9 @@ private:
   // Global state object
   // TODO: Incorporate GlobalState into IRISApplication more nicely
   GlobalState *m_GlobalState;
+
+  // SystemInterface used to get things from the system
+  SystemInterface *m_SystemInterface;
 
   /** RAI between image space and anatomy space */
   std::string m_ImageToAnatomyRAI;

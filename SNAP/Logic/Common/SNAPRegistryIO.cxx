@@ -48,6 +48,11 @@ SNAPRegistryIO
   m_EnumMapROI.AddPair(SNAPSegmentationROISettings::TRILINEAR,"TriLinear");
   m_EnumMapROI.AddPair(SNAPSegmentationROISettings::TRICUBIC,"Cubic");
   m_EnumMapROI.AddPair(SNAPSegmentationROISettings::SINC_WINDOW_05,"Sinc05");
+
+
+
+
+
 }
 
 /** Read snake parameters from a registry */

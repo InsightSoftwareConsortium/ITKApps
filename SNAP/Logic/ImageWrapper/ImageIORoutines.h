@@ -56,8 +56,6 @@ void SaveImageToFile(const char *fname,
   writer->Update();
 }
 
-
-
 #endif // __ImageIORoutines_h_
 
 

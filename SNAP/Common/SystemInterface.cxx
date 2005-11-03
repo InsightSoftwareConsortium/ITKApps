@@ -378,7 +378,10 @@ SystemInterface
     array.erase(array.begin(),array.begin() + array.size() - 20);
 
   // Store the new array to the registry
-  Folder("IOHistory").Folder(string(key)).PutArray(array);      
+  Folder("IOHistory").Folder(string(key)).PutArray(array);
+
+  // Save the preferences at this point
+  SaveUserPreferences();
 }
 
 

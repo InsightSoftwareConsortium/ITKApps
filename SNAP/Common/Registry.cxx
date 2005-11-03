@@ -170,6 +170,30 @@ Registry
     }
 }
 
+void 
+Registry
+::Update(const Registry &reg) 
+{
+  // Go through the children
+  for(FolderIterator itf = reg.m_FolderMap.begin(); 
+    itf != reg.m_FolderMap.end(); ++itf)
+    {
+    // Update the sub-folder
+    this->Folder(itf->first).Update(*(itf->second));
+    }
+  
+  // Add the keys in this folder
+  for(EntryConstIterator ite = reg.m_EntryMap.begin();
+    ite != reg.m_EntryMap.end(); ++ite)
+    {
+    RegistryValue &entry = Entry(ite->first);
+    entry = ite->second;   
+    }
+}
+
+
+
+
 Registry::StringType 
 Registry
 ::FindValue(const StringType& value)
