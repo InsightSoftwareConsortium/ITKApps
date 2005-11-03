@@ -2616,7 +2616,8 @@ UserInterfaceLogic
 ::GenerateRecentFilesMenu()
 {
   // Load the list of recent files from the history file
-  SystemInterface::HistoryListType &history = m_SystemInterface->GetHistory("GreyImage");
+  const SystemInterface::HistoryListType &history = 
+    m_SystemInterface->GetHistory("GreyImage");
 
   // Take the five most recent items and create menu items
   for(unsigned int i = 0; i < 5; i++)
@@ -2654,7 +2655,8 @@ UserInterfaceLogic
 {
   // Get the history of grayscale images. Here we must be careful that every time
   // the history is updated, we also remember to update the recent files menu!!!
-  SystemInterface::HistoryListType &history = m_SystemInterface->GetHistory("GreyImage");
+  const SystemInterface::HistoryListType &history = 
+    m_SystemInterface->GetHistory("GreyImage");
 
   // Check that the history is OK
   if(history.size() <= iRecent)
@@ -3284,6 +3286,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.41  2005/11/03 18:45:29  pauly
+ *ENH: Enabled SNAP to read DICOM Series
+ *
  *Revision 1.40  2005/10/29 14:00:15  pauly
  *ENH: SNAP enhacements like color maps and progress bar for 3D rendering
  *

@@ -196,8 +196,8 @@ GuidedImageIO<TPixel>
   if(format == FORMAT_DICOM)
     {
     // Create an image series reader 
-    typedef typename ImageSeriesReader<ImageType> ReaderType;
-    ReaderType::Pointer reader = ReaderType::New();
+    typedef ImageSeriesReader<ImageType> ReaderType;
+    typename ReaderType::Pointer reader = ReaderType::New();
 
     // Set the IO
     reader->SetImageIO(m_IOBase);

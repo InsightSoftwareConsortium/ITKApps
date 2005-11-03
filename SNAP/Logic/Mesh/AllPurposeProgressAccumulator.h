@@ -19,8 +19,16 @@
 #include <vector>
 #include "itkProcessObject.h"
 
-class vtkObject;
-class vtkProcessObject;
+// Some ugly code here because VTK decided to change its architecture 
+// from 4.2 to 4.4. 
+#include "vtkConfigure.h"
+#if (VTK_MAJOR_VERSION == 4) && (VTK_MINOR_VERSION <= 2)
+  #include "vtkProcessObject.h"
+  #define vtkAlgorithmClass vtkProcessObject
+#else
+  #include "vtkAlgorithm.h"
+  #define vtkAlgorithmClass vtkAlgorithm
+#endif
 
 using namespace itk;
 
@@ -73,7 +81,7 @@ public:
   /** 
    * Add a VTK algorithm to the list of monitored objects
    */
-  void RegisterSource(vtkProcessObject *source, float xWeight);
+  void RegisterSource(vtkAlgorithmClass *source, float xWeight);
 
   /** 
    * Add an ITK algorithm to the list of monitored objects
@@ -81,7 +89,7 @@ public:
   void RegisterSource(itk::ProcessObject *source, float xWeight);
 
   /** Unregister a source (and all runs associated with it) */
-  void UnregisterSource(vtkProcessObject *source);
+  void UnregisterSource(vtkAlgorithmClass *source);
 
   /** Unregister a source (and all runs associated with it) */
   void UnregisterSource(itk::ProcessObject *source);

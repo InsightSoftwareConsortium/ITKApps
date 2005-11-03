@@ -157,7 +157,7 @@ VTKMeshPipeline
     {    
     // The Gaussian filter is enabled
     m_VTKGaussianFilter->SetInput(pipeImageTail);
-    m_Progress->RegisterSource(m_VTKGaussianFilter, 10.0);
+    m_Progress->RegisterSource(m_VTKGaussianFilter, 10.0f);
     pipeImageTail = m_VTKGaussianFilter->GetOutput();
 
     // Apply parameters to the Gaussian filter
