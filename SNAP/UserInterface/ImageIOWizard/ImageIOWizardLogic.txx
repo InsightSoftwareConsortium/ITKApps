@@ -179,7 +179,7 @@ void ImageIOWizardLogic<TPixel>
     else if(m_PageDICOM->active())
       next = m_PageDICOM;
     else
-      assert(0);
+      next = m_PageOrientation;
     }
   else if (current == m_PageHeader || current == m_PageDICOM) 
     {
@@ -365,7 +365,7 @@ ImageIOWizardLogic<TPixel>
     m_PageHeader->deactivate();
 
   // If the user selects 'dicom' enable the dicom page
-  if(format = GuidedImageIOBase::FORMAT_DICOM)
+  if(format == GuidedImageIOBase::FORMAT_DICOM)
     m_PageDICOM->activate();
   else 
     m_PageDICOM->deactivate();
