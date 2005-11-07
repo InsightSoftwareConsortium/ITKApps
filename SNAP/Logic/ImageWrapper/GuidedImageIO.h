@@ -56,8 +56,8 @@ public:
   irisGetMacro(IOBase, itk::ImageIOBase *);    
     
   /** Registry mappings for these enums */
-  RegistryEnumMap<GuidedImageIOBase::FileFormat> m_EnumFileFormat;
-  RegistryEnumMap<GuidedImageIOBase::RawPixelType> m_EnumRawPixelType;
+  RegistryEnumMap<FileFormat> m_EnumFileFormat;
+  RegistryEnumMap<RawPixelType> m_EnumRawPixelType;
 
 protected:
 

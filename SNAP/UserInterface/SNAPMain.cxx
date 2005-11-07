@@ -158,7 +158,9 @@ bool LoadUserPreferencesInteractive(SystemInterface &system)
   return true;
 }
 
-#ifdef __GNUC__
+// Setup printing of stack trace on segmentation faults. This only
+// works on select GNU systems
+#if defined(__GNUC__) && !defined(__CYGWIN__) && !defined(__APPLE__)
 
 #include <signal.h>
 #include <execinfo.h>
@@ -383,6 +385,9 @@ int main(int argc, char **argv)
 
 /*
  *Log: SNAPMain.cxx
+ *Revision 1.14  2005/11/03 18:45:29  pauly
+ *ENH: Enabled SNAP to read DICOM Series
+ *
  *Revision 1.13  2005/10/29 14:00:14  pauly
  *ENH: SNAP enhacements like color maps and progress bar for 3D rendering
  *
