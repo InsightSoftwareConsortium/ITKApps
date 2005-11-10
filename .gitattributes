@@ -5,3 +5,4 @@
 *.jpg           -crlf
 *.pdf           -crlf
 *.png           -crlf
+*.raw           -crlf
