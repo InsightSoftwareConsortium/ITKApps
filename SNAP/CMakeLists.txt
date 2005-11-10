@@ -43,6 +43,8 @@ SET(LOGIC_CXX
   Common/IRISException.cxx
   Common/Registry.cxx
   Common/SystemInterface.cxx
+  Common/ITKExtras/itkVoxBoCUBImageIO.cxx
+  Common/ITKExtras/itkVoxBoCUBImageIOFactory.cxx
   Logic/Common/ImageCoordinateGeometry.cxx
   Logic/Common/ImageCoordinateTransform.cxx
   Logic/Common/SNAPRegistryIO.cxx
@@ -81,6 +83,8 @@ SET(LOGIC_HEADERS
   Common/SNAPCommon.h
   Common/SNAPOpenGL.h
   Common/SystemInterface.h
+  Common/ITKExtras/itkVoxBoCUBImageIO.h
+  Common/ITKExtras/itkVoxBoCUBImageIOFactory.h
   Logic/Common/ColorLabel.h
   Logic/Common/ColorLabelTable.h
   Logic/Common/ImageCoordinateGeometry.h
@@ -478,6 +482,7 @@ ELSE( CMAKE_GENERATOR MATCHES "Visual Studio 6" )
   INCLUDE_DIRECTORIES(
     ${ITK_DIR}/Utilities/zlib
     ${MY_SOURCE_DIR}/Common
+    ${MY_SOURCE_DIR}/Common/ITKExtras
     ${MY_SOURCE_DIR}/Logic
     ${MY_SOURCE_DIR}/Logic/Common
     ${MY_SOURCE_DIR}/Logic/Framework

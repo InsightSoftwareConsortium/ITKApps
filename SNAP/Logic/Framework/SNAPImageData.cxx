@@ -189,8 +189,8 @@ SNAPImageData
 bool
 SNAPImageData
 ::InitializeSegmentation(
-  const SnakeParameters &parameters, Bubble *bubbles, 
-  unsigned int nBubbles, unsigned int labelColor) 
+  const SnakeParameters &parameters, 
+  const std::vector<Bubble> &bubbles, unsigned int labelColor)
 {
   assert(m_SpeedWrapper.IsInitialized());
   
@@ -247,7 +247,7 @@ SNAPImageData
     }
 
   // Fill in the bubbles by computing their
-  for(unsigned int iBubble=0; iBubble < nBubbles; iBubble++)
+  for(unsigned int iBubble=0; iBubble < bubbles.size(); iBubble++)
     {
     // Compute the extents of the bubble
     typedef Point<float,3> PointType;

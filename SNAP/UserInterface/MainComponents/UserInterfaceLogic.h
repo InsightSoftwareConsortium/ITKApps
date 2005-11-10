@@ -415,22 +415,20 @@ public:
    * the Active Bubbles browser is returned
    * - returns NULL if Active Bubbles browser is empty
    */
-  Bubble* GetBubbles();
+  std::vector<Bubble> GetBubbleArray();
 
   /**
    *
    * DESCRIPTION:
-   * returns the number of bubbles contained in the Active Bubbles
-   * browser
+   * returns the currently selected bubble in the bubble browser
    *
    * PRECONDITIONS:
    * - Snake GUI is active
    *
    * POSTCONDITIONS:
-   * - the number of bubbles in the Active Bubbles browser is returned
-   * - returns zero if the browser is empty
+   * - the selected bubble or -1 if none is selected
    */
-  int GetNumberOfBubbles();
+  int GetActiveBubble();
 
   /**
    * Pops up a dialog to choose a preprocessed data file
@@ -851,6 +849,9 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.28  2005/11/03 18:45:29  pauly
+ *ENH: Enabled SNAP to read DICOM Series
+ *
  *Revision 1.27  2005/10/29 14:00:15  pauly
  *ENH: SNAP enhacements like color maps and progress bar for 3D rendering
  *

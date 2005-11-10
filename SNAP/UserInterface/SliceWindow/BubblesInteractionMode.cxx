@@ -35,8 +35,13 @@ BubblesInteractionMode
   // Draw the bubbles if necessary
   if (m_GlobalState->GetSnakeActive() == false)
     {
+    // Get the list of bubbles
+    std::vector<Bubble> bubbles = m_ParentUI->GetBubbleArray();
+
     // draw bubbles
-    int numBubbles = m_ParentUI->GetNumberOfBubbles();
+    int numBubbles = bubbles.size();
+    int activeBubble = m_ParentUI->GetActiveBubble();
+
     if (numBubbles > 0)
       {
       // Get the active color label 
@@ -53,9 +58,6 @@ BubblesInteractionMode
         unsigned char rgb[3];
         cl.GetRGBVector(rgb);
 
-        // Get the lust of bubbles
-        Bubble *bubbles = m_ParentUI->GetBubbles();
-        
         // Get the current crosshairs position
         Vector3ui cursorImage = m_GlobalState->GetCrosshairsPosition();
 
@@ -100,7 +102,18 @@ BubblesInteractionMode
           
           glTranslatef(ctrSlice[0], ctrSlice[1], 0.0f);
           glScalef(1.0f / scaling(0),1.0f / scaling(1),1.0f);
-          gluDisk(object,0,diskradius,100,100);
+          gluDisk(object,0,diskradius,100,1);
+
+          // If the bubble is active, draw an outline around the bubble
+          if(activeBubble == i)
+            {
+            glColor4ub(
+              255 - (255 - rgb[0]) / 2,
+              255 - (255 - rgb[1]) / 2,
+              255 - (255 - rgb[2]) / 2, alpha);
+            gluDisk(object,diskradius,diskradius+1,100,2);
+            }
+          
           glPopMatrix();
 
           }

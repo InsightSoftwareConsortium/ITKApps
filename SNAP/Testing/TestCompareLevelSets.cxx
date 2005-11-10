@@ -534,8 +534,9 @@ TestCompareLevelSets
   typedef LevelSetExtensionFilter<NarrowFilterType> NarrowExtensionFilter;
 
   // Pull out the finite difference function
+  std::vector<Bubble> dummy;
   snap->InitializeSegmentation(
-    parameters,NULL,0,app->GetGlobalState()->GetDrawingColorLabel());
+    parameters,dummy,app->GetGlobalState()->GetDrawingColorLabel());
   SNAPLevelSetFunction<FloatImageType> *phi = snap->GetLevelSetFunction();
 
   // Decide on a number of iterations
@@ -755,17 +756,19 @@ TestCompareLevelSets
   Bubble bubble;
   bubble.center = to_int(parmBubbleCenter);
   bubble.radius = (int) parmBubbleRadius;
+  std::vector<Bubble> bubbleList;
+  bubbleList.push_back(bubble);
 
   // Preprocess the image and initialize the level set image
   if(parmUseEdgeSnake)
     {
     snap->DoEdgePreprocessing(parmPreprocessEdge);
-    snap->InitializeSegmentation(parmSnakeEdge,&bubble,1,255);
+    snap->InitializeSegmentation(parmSnakeEdge,bubbleList,255);
     }    
   else
     {
     snap->DoInOutPreprocessing(parmPreprocessInOut);
-    snap->InitializeSegmentation(parmSnakeEdge,&bubble,1,255);
+    snap->InitializeSegmentation(parmSnakeEdge,bubbleList,255);
     }
     
   // Now, we have a speed image and a level set image.  We are ready to

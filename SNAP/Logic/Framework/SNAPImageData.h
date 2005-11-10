@@ -32,6 +32,8 @@
 #include "EdgePreprocessingSettings.h"
 #include "ThresholdSettings.h"
 
+#include <vector>
+
 #include "SNAPLevelSetFunction.h"
 template <unsigned int VDimension> class SNAPLevelSetDriver;
 
@@ -128,9 +130,8 @@ public:
    * segmentation image with the bubbles, false will be returned and 
    * initialization will not be completed.  Otherwise, true will be returned.
    */
-  bool InitializeSegmentation(
-    const SnakeParameters &parameters,Bubble *bubbles, 
-    unsigned int nBubbles, unsigned int labelColor);
+  bool InitializeSegmentation(const SnakeParameters &parameters, 
+    const std::vector<Bubble> &bubbles, unsigned int labelColor);
 
   /** Run the segmentation for a fixed number of iterations */
   void RunSegmentation(unsigned int nIterations);

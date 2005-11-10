@@ -699,31 +699,29 @@ UserInterfaceLogic
   sprintf(msg,"x,y,z=%d,%d,%d; R=%d ", bubble->center[0]+1,
     bubble->center[1]+1,bubble->center[2]+1,bubble->radius);
   m_BrsActiveBubbles->add(msg, bubble);
-  m_BrsActiveBubbles->value(GetNumberOfBubbles()); 
+  m_BrsActiveBubbles->value(m_BrsActiveBubbles->size()); 
   OnActiveBubblesChange();
   m_BrsActiveBubbles->redraw();
   RedrawWindows();
   cerr<<msg<<endl;
 }
 
-Bubble* 
+std::vector<Bubble>
 UserInterfaceLogic
-::GetBubbles()
+::GetBubbleArray()
 {
-  int n=GetNumberOfBubbles();
-  Bubble* bubbles=new Bubble[n];
-  for (int i=0;i<n;i++) 
-    {
-    bubbles[i]=*(Bubble*) m_BrsActiveBubbles->data(i+1);
-    }
+  unsigned int n = m_BrsActiveBubbles->size();
+  std::vector<Bubble> bubbles;
+  for (unsigned int i=0;i<n;i++) 
+    bubbles.push_back(*static_cast<Bubble*>(m_BrsActiveBubbles->data(i+1)));
   return bubbles;
 }
 
 int 
 UserInterfaceLogic
-::GetNumberOfBubbles()
+::GetActiveBubble()
 {
-  return m_BrsActiveBubbles->size();
+  return m_HighlightedBubble - 1;
 }
 
 void 
@@ -757,6 +755,8 @@ UserInterfaceLogic
     m_InBubbleRadius->value(((Bubble*) m_BrsActiveBubbles->
         data(m_HighlightedBubble))->radius);
     }
+
+  RedrawWindows();
 }
 
 void 
@@ -889,8 +889,8 @@ UserInterfaceLogic
 ::OnAcceptInitializationAction()
 {
   // Get bubbles, turn them into segmentation
-  Bubble * bubbles = GetBubbles();
-  int numbubbles = GetNumberOfBubbles();
+  vector<Bubble> bubbles = GetBubbleArray();
+  int numbubbles = bubbles.size();
 
   // Shorthand
   SNAPImageData *snapData = m_Driver->GetSNAPImageData();
@@ -901,7 +901,7 @@ UserInterfaceLogic
 
   // Merge bubbles with the segmentation image and initialize the snake
   bool rc = snapData->InitializeSegmentation(
-    m_GlobalState->GetSnakeParameters(),bubbles, numbubbles,
+    m_GlobalState->GetSnakeParameters(), bubbles, 
     m_GlobalState->GetDrawingColorLabel());
 
   // Restore the cursor
@@ -913,11 +913,6 @@ UserInterfaceLogic
     // There were no voxels selected in the end
     fl_alert("Can not proceed without an initialization\n"
              "Please place a bubble into the image!");
-    
-    // Clear bubble array
-    if (bubbles)
-      delete [] bubbles;
-
     return;        
     } 
 
@@ -3286,6 +3281,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.42  2005/11/03 20:59:15  pauly
+ *COMP: Fixed compiler errors on newer versions of VTK
+ *
  *Revision 1.41  2005/11/03 18:45:29  pauly
  *ENH: Enabled SNAP to read DICOM Series
  *

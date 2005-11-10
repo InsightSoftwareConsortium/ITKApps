@@ -65,6 +65,7 @@ ImageIOWizardLogic<TPixel>
   // Initialize the file format extensions 
   m_FileFormatPattern[GuidedImageIOBase::FORMAT_MHA] = "mha,mhd";
   m_FileFormatPattern[GuidedImageIOBase::FORMAT_GIPL] = "gipl,gipl.gz";
+  m_FileFormatPattern[GuidedImageIOBase::FORMAT_VOXBO_CUB] = "cub,cub.gz";
   m_FileFormatPattern[GuidedImageIOBase::FORMAT_RAW] = "raw*";
   m_FileFormatPattern[GuidedImageIOBase::FORMAT_ANALYZE] = "hdr,img,img.gz";  
   m_FileFormatPattern[GuidedImageIOBase::FORMAT_DICOM] = "dcm";
@@ -74,15 +75,16 @@ ImageIOWizardLogic<TPixel>
   m_FileFormatPattern[GuidedImageIOBase::FORMAT_VTK] = "vtk";
 
   // Initialize the file format descriptions
-  m_FileFormatDescription[GuidedImageIOBase::FORMAT_MHA] = "MetaImage";
-  m_FileFormatDescription[GuidedImageIOBase::FORMAT_GIPL] = "GIPL";
-  m_FileFormatDescription[GuidedImageIOBase::FORMAT_RAW] = "Raw Binary";
-  m_FileFormatDescription[GuidedImageIOBase::FORMAT_ANALYZE] = "Analyze"; 
-  m_FileFormatDescription[GuidedImageIOBase::FORMAT_DICOM] = "DICOM Series";
-  m_FileFormatDescription[GuidedImageIOBase::FORMAT_GE4] = "GE Version 4";
-  m_FileFormatDescription[GuidedImageIOBase::FORMAT_GE5] = "GE Version 5";
-  m_FileFormatDescription[GuidedImageIOBase::FORMAT_SIEMENS] = "Siemens Vision";
-  m_FileFormatDescription[GuidedImageIOBase::FORMAT_VTK] = "VTK";
+  m_FileFormatDescription[GuidedImageIOBase::FORMAT_MHA] = "MetaImage File";
+  m_FileFormatDescription[GuidedImageIOBase::FORMAT_GIPL] = "GIPL File";
+  m_FileFormatDescription[GuidedImageIOBase::FORMAT_VOXBO_CUB] = "VoxBo CUB File";
+  m_FileFormatDescription[GuidedImageIOBase::FORMAT_RAW] = "Raw Binary File";
+  m_FileFormatDescription[GuidedImageIOBase::FORMAT_ANALYZE] = "Analyze File"; 
+  m_FileFormatDescription[GuidedImageIOBase::FORMAT_DICOM] = "DICOM File Series";
+  m_FileFormatDescription[GuidedImageIOBase::FORMAT_GE4] = "GE Version 4 File";
+  m_FileFormatDescription[GuidedImageIOBase::FORMAT_GE5] = "GE Version 5 File";
+  m_FileFormatDescription[GuidedImageIOBase::FORMAT_SIEMENS] = "Siemens Vision File";
+  m_FileFormatDescription[GuidedImageIOBase::FORMAT_VTK] = "VTK Image File";
 
   // Initialize the DICOM directory lister
   m_DICOMLister = GDCMSeriesFileNames::New();
@@ -105,7 +107,7 @@ void ImageIOWizardLogic<TPixel>
   for(unsigned int i = 0; i < GuidedImageIOBase::FORMAT_COUNT; i++)
     {
     // Create an appropriate description
-    StringType text = m_FileFormatDescription[i] + " File";
+    StringType text = m_FileFormatDescription[i];
     
     // Add a menu option to the save menu, disabling it if it's unsupported
     m_InFilePageFormat->add(text.c_str(),0,NULL,NULL,

@@ -19,7 +19,7 @@ GlobalState
 ::GlobalState() 
 {
   m_GreyFileExtension = NULL;
-  m_DrawingColorLabel = 0;
+  m_DrawingColorLabel = 1;
   m_OverWriteColorLabel = 0;
   m_CrosshairsPosition[0] = 0;
   m_CrosshairsPosition[1] = 0;

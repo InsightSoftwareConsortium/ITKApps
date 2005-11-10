@@ -27,6 +27,7 @@
 #include "itkGE5ImageIO.h"
 #include "itkSiemensVisionImageIO.h"
 #include "itkVTKImageIO.h"
+#include "itkVoxBoCUBImageIO.h"
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkImageSeriesReader.h"
@@ -47,6 +48,7 @@ GuidedImageIOBase
   m_EnumFileFormat.AddPair(FORMAT_GE5, "GE Version 5");
   m_EnumFileFormat.AddPair(FORMAT_SIEMENS, "Siemens Vision");
   m_EnumFileFormat.AddPair(FORMAT_VTK, "VTK");
+  m_EnumFileFormat.AddPair(FORMAT_VOXBO_CUB, "VoxBo CUB");
   m_EnumFileFormat.AddPair(FORMAT_COUNT, "INVALID FORMAT");
 
   m_EnumRawPixelType.AddPair(PIXELTYPE_CHAR, "CHAR");
@@ -150,6 +152,8 @@ GuidedImageIO<TPixel>
     m_IOBase = SiemensVisionImageIO::New();
   else if(format == FORMAT_VTK)
     m_IOBase = VTKImageIO::New();
+  else if(format == FORMAT_VOXBO_CUB)
+    m_IOBase = VoxBoCUBImageIO::New();
   else if(format == FORMAT_RAW)
     {
     // Get the Raw header sub-folder

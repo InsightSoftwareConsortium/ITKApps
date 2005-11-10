@@ -27,6 +27,8 @@
 #include "vtkPolyData.h"
 #include "vtkPolyDataWriter.h"
 
+#include <vector>
+
 /** 
  * This function is designed to serve as a tutorial through the classes 
  * that form the logical framework of SNAP. In this test, the student will
@@ -277,7 +279,7 @@ int main(int argc, char *argv[])
    * bubbles. This is performed by passing an array of bubbles to the method
    * SNAPImageData::InitializeSegmentationPipeline. The bubbles given below
    * are located in the caudate nuclei of our image */
-  Bubble bubbles[2];
+  std::vector<Bubble> bubbles(2);
   bubbles[0].center = Vector3i(50,29,26); bubbles[0].radius = 3;
   bubbles[1].center = Vector3i(50,57,34); bubbles[1].radius = 2;
 
@@ -293,7 +295,7 @@ int main(int argc, char *argv[])
    * snake parameters and the bubbles, we need to specify the color label to 
    * be used for the snake-based segmentation */
   snapData->InitializeSegmentation(
-    parameters,bubbles,2,application.GetGlobalState()->GetDrawingColorLabel());
+    parameters,bubbles,application.GetGlobalState()->GetDrawingColorLabel());
 
   /* Now the pipeline is initialized and ready to run. Run 250 iterations */
   snapData->RunSegmentation(250);

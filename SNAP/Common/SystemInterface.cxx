@@ -19,6 +19,7 @@
 #include "FL/Fl_Preferences.H"
 #include "FL/filename.H"
 #include <itksys/SystemTools.hxx>
+#include "itkVoxBoCUBImageIOFactory.h"
 #include <algorithm>
 #include <ctime>
 #include <iomanip>
@@ -28,7 +29,12 @@ using namespace std;
 SystemInterface
 ::SystemInterface()
 {
+  // Initialize the registry
   m_RegistryIO = new SNAPRegistryIO;
+
+  // Register the Image IO factories that are not part of ITK
+  itk::ObjectFactoryBase::RegisterFactory( 
+    itk::VoxBoCUBImageIOFactory::New() );
 }
 
 SystemInterface
