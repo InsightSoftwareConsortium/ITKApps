@@ -403,7 +403,7 @@ OnDrawOverLabelUpdate();} open
             } {}
             Fl_Group {} {
               label {Version 1.4-b2
-11.01.2005} open
+11.10.2005} open
               xywh {5 225 135 35} labelsize 12 align 145
             } {}
             Fl_Group {} {
