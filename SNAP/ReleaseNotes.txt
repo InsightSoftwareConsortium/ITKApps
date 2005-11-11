@@ -11,7 +11,7 @@
 1.1. New in Version 1.4
 -----------------------
 
-1.1.1. User Interface Improvements
+1.1.1. New Features and User Interface Improvements
 
  -  New and improved label editor. You can easily switch between labels while in
     the editor and the interface for adding new labels is more intuitive. You
@@ -21,6 +21,13 @@
     display is more visible and you have more control over the number of bins in
     the histogram and the scaling of the bars (linear or log). 
 
+ -  SNAP remembers all settings associated with loading an image. This means that
+    any image loaded previously can be reloaded without going throught the 
+    wizard. We've added File->Load Previous menu to let you load images quickly
+
+ -  SNAP can now read DICOM file series (experimental support) and it can read 
+    and write VoxBo CUB image files.
+
  -  SNAP remembers more image-associated settings from session to session. For
     example, it will remember the intensity reparameterization that you last
     used. SNAP will also remember the orientation ("RAI" code) that was last
@@ -28,6 +35,12 @@
 
  -  New Image Information window is available under the File menu. It displays
     the size of the image and the current cursor position. 
+
+ -  A color map feature has been added in the automatic segmentation mode. The
+    color map lets you select different color schemes for displaying the
+    probability map / speed image.
+
+ -  A progress monitor has been added for the 3D renderer in main SNAP window.
 
  -  The tutorial has been updated to reflect the new features.
 
