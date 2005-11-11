@@ -35,10 +35,37 @@ namespace itk {
 class GenericCUBFileAdaptor
 {
 public:
-  virtual std::string ReadLine() = 0;
-  virtual void WriteLine(const std::string &str) = 0;
+  virtual unsigned char ReadByte() = 0;
   virtual void ReadData(void *data, unsigned long bytes) = 0;
   virtual void WriteData(const void *data, unsigned long bytes) = 0;
+
+  std::string ReadHeader()
+    {
+    // Read everything up to the \f symbol
+    std::ostringstream oss;
+    unsigned char byte = ReadByte();
+    while(byte != '\f')
+      {
+      oss << byte;
+      byte = ReadByte();
+      }
+
+    // Read the next byte
+    unsigned char term = ReadByte();
+    if(term == '\r')
+      term = ReadByte();
+
+    // Throw exception if term is not there
+    if(term != '\n')
+      {
+      ExceptionObject exception;
+      exception.SetDescription("Header is not terminated by newline.");
+      throw exception;
+      }
+
+    // Return the header string
+    return oss.str();
+    }
 };
 
 /**
@@ -64,17 +91,18 @@ public:
       ::gzclose(m_GzFile);
     }
 
-  std::string ReadLine()
+  unsigned char ReadByte()
     {
-    char buffer[512];
-    if(m_GzFile == NULL || ::gzgets(m_GzFile, buffer, 511) == NULL)
+    int byte = ::gzgetc(m_GzFile);
+    if(byte < 0)
       {
+      std::ostringstream oss;
+      oss << "Error reading byte from file at position: " << ::gztell(m_GzFile);
       ExceptionObject exception;
-      exception.SetDescription("File cannot be read");
+      exception.SetDescription(oss.str().c_str());
       throw exception;
       }
-    std::string str(buffer);
-    return str;
+    return static_cast<unsigned char>(byte);
     }
   
   void ReadData(void *data, unsigned long bytes)
@@ -89,26 +117,13 @@ public:
     int bread = ::gzread(m_GzFile, data, bytes);
     if(bread != bytes)
       {
+      std::ostringstream oss;
+      oss << "File size does not match header: " 
+        << bytes << " bytes requested but only "
+        << bread << " bytes available!" << std::endl
+        << "At file position " << ::gztell(m_GzFile);
       ExceptionObject exception;
-      exception.SetDescription("File size does not match header");
-      throw exception;
-      }
-    }
-
-  void WriteLine(const std::string &str)
-    {
-    if(m_GzFile == NULL)
-      {
-      ExceptionObject exception;
-      exception.SetDescription("File cannot be written");
-      throw exception;
-      }
-
-    int rc = ::gzputs(m_GzFile, str.c_str());
-    if(rc != str.size())
-      {
-      ExceptionObject exception;
-      exception.SetDescription("Error writing file");
+      exception.SetDescription(oss.str().c_str());
       throw exception;
       }
     }
@@ -158,17 +173,18 @@ public:
       fclose(m_File);
     }
 
-  std::string ReadLine()
+  unsigned char ReadByte()
     {
-    char buffer[512];
-    if(m_File == NULL || fgets(buffer, 511, m_File) == NULL)
+    int byte = fgetc(m_File);
+    if(byte == EOF)
       {
+      std::ostringstream oss;
+      oss << "Error reading byte from file at position: " << ::ftell(m_File);
       ExceptionObject exception;
-      exception.SetDescription("File cannot be read");
+      exception.SetDescription(oss.str().c_str());
       throw exception;
       }
-    std::string str(buffer);
-    return str;
+    return static_cast<unsigned char>(byte);
     }
   
   void ReadData(void *data, unsigned long bytes)
@@ -183,30 +199,17 @@ public:
     int bread = fread(data, 1, bytes, m_File);
     if(bread != bytes)
       {
+      std::ostringstream oss;
+      oss << "File size does not match header: " 
+        << bytes << " bytes requested but only "
+        << bread << " bytes available!" << std::endl
+        << "At file position " << ftell(m_File);
       ExceptionObject exception;
-      exception.SetDescription("File size does not match header");
+      exception.SetDescription(oss.str().c_str());
       throw exception;
       }
     }
 
-  void WriteLine(const std::string &str)
-    {
-    if(m_File == NULL)
-      {
-      ExceptionObject exception;
-      exception.SetDescription("File cannot be written");
-      throw exception;
-      }
-
-    int rc = fputs(str.c_str(), m_File);
-    if(rc != str.size())
-      {
-      ExceptionObject exception;
-      exception.SetDescription("Error writing file");
-      throw exception;
-      }
-    }
-  
   void WriteData(const void *data, unsigned long bytes)
     {
     if(m_File == NULL)
@@ -271,9 +274,9 @@ VoxBoCUBImageIO::CreateReader(const char *filename)
     bool compressed;
     if(CheckExtension(filename, compressed))
       if(compressed)
-        return new CompressedCUBFileAdaptor(filename, "r");
+        return new CompressedCUBFileAdaptor(filename, "rb");
       else
-        return new DirectCUBFileAdaptor(filename, "r");
+        return new DirectCUBFileAdaptor(filename, "rb");
     else
       return NULL;
     }
@@ -291,9 +294,9 @@ VoxBoCUBImageIO::CreateWriter(const char *filename)
     bool compressed;
     if(CheckExtension(filename, compressed))
       if(compressed)
-        return new CompressedCUBFileAdaptor(filename, "w");
+        return new CompressedCUBFileAdaptor(filename, "wb");
       else
-        return new DirectCUBFileAdaptor(filename, "w");
+        return new DirectCUBFileAdaptor(filename, "wb");
     else
       return NULL;
     }
@@ -317,15 +320,23 @@ bool VoxBoCUBImageIO::CanReadFile( const char* filename )
   bool iscub = true;
   try 
     {
+    // Get the header
+    std::istringstream iss(reader->ReadHeader());
+
+    // Read the first two words
+    std::string word;
+
     // Read the first line from the file
-    if(reader->ReadLine().substr(0, 4) != VB_IDENTIFIER_SYSTEM)
+    iss >> word;
+    if(word != VB_IDENTIFIER_SYSTEM)
       iscub = false;
 
     // Read the second line
-    if(reader->ReadLine().substr(0, 4) != VB_IDENTIFIER_FILETYPE)
+    iss >> word;
+    if(word != VB_IDENTIFIER_FILETYPE)
       iscub = false;
     }
-  catch(ExceptionObject &exc)
+  catch(...)
     { 
     iscub = false; 
     }
@@ -375,12 +386,18 @@ void VoxBoCUBImageIO::ReadImageInformation()
   // Set the number of dimensions to three
   SetNumberOfDimensions(3);
 
+  // Read the file header
+  std::istringstream issHeader(m_Reader->ReadHeader());
+
   // Read every string in the header. Parse the strings that are special
-  std::string line = m_Reader->ReadLine();
-  while(line != "\f\n")
+  while(issHeader.good())
     {
+    // Read a line from the stream
+    char linebuffer[512];
+    issHeader.getline(linebuffer, 512);
+
     // Get the key string
-    std::istringstream iss(line);
+    std::istringstream iss(linebuffer);
     std::string key;
 
     // Read the key and strip the colon from it
@@ -475,9 +492,6 @@ void VoxBoCUBImageIO::ReadImageInformation()
         EncapsulateMetaData<std::string>(dic, key, oss.str());
         }
       }
-
-    // Read the next line
-    line = m_Reader->ReadLine();
     }
 }
 

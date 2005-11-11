@@ -61,8 +61,12 @@ public:
 
 protected:
 
-  // Create a Raw image IO object
-  template<typename TRaw> void CreateRawImageIO(Registry &folder);
+  // Class that create a Raw image IO object
+  template<typename TRaw> class RawIOGenerator 
+    {
+    public:
+      static itk::ImageIOBase *CreateRawImageIO(Registry &folder);
+    };
   
   // The IO Base Object
   itk::SmartPointer<itk::ImageIOBase> m_IOBase;

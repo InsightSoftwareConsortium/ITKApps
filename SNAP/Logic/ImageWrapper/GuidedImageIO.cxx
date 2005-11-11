@@ -89,9 +89,10 @@ void GuidedImageIOBase
   folder.Entry("Raw.PixelType").PutEnum(m_EnumRawPixelType, type);
 }
 
+
 template<typename TRaw> 
-void
-GuidedImageIOBase
+ImageIOBase *
+GuidedImageIOBase::RawIOGenerator<TRaw>
 ::CreateRawImageIO(Registry &folder)
 {
   // Create the Raw IO
@@ -124,7 +125,7 @@ GuidedImageIOBase
   rawIO->SetFileTypeToBinary();
 
   // Return the pointer
-  m_IOBase = rawIO.GetPointer();
+  return rawIO.GetPointer();
 }
 
 template<typename TPixel>
@@ -165,21 +166,21 @@ GuidedImageIO<TPixel>
 
     // Use header page values to initialize the RAW io
     if(type == PIXELTYPE_UCHAR) 
-      CreateRawImageIO<unsigned char>(fldRaw);
+      m_IOBase = GuidedImageIOBase::RawIOGenerator<unsigned char>::CreateRawImageIO(fldRaw);
     else if(type == PIXELTYPE_CHAR) 
-      CreateRawImageIO<char>(fldRaw);
+      m_IOBase = GuidedImageIOBase::RawIOGenerator<char>::CreateRawImageIO(fldRaw);
     else if(type == PIXELTYPE_USHORT) 
-      CreateRawImageIO<unsigned short>(fldRaw);
+      m_IOBase = GuidedImageIOBase::RawIOGenerator<unsigned short>::CreateRawImageIO(fldRaw);
     else if(type == PIXELTYPE_SHORT) 
-      CreateRawImageIO<short>(fldRaw);
+      m_IOBase = GuidedImageIOBase::RawIOGenerator<short>::CreateRawImageIO(fldRaw);
     else if(type == PIXELTYPE_UINT) 
-      CreateRawImageIO<unsigned int>(fldRaw);
+      m_IOBase = GuidedImageIOBase::RawIOGenerator<unsigned int>::CreateRawImageIO(fldRaw);
     else if(type == PIXELTYPE_INT) 
-      CreateRawImageIO<int>(fldRaw);
+      m_IOBase = GuidedImageIOBase::RawIOGenerator<int>::CreateRawImageIO(fldRaw);
     else if(type == PIXELTYPE_FLOAT) 
-      CreateRawImageIO<float>(fldRaw);
+      m_IOBase = GuidedImageIOBase::RawIOGenerator<float>::CreateRawImageIO(fldRaw);
     else if(type == PIXELTYPE_DOUBLE) 
-      CreateRawImageIO<double>(fldRaw);
+      m_IOBase = GuidedImageIOBase::RawIOGenerator<double>::CreateRawImageIO(fldRaw);
     else
       throw itk::ExceptionObject("Unknown Pixel Type when reading Raw File");
     }

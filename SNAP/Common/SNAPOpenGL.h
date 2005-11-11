@@ -15,11 +15,6 @@
 #ifndef __SNAPOpenGL_h_
 #define __SNAPOpenGL_h_
 
-#ifndef _WIN32
-#ifndef GLU_VERSION_1_2
-#define GLU_VERSION_1_2
-#endif
-#endif
 
 #include "IRISVectorTypes.h"
 
@@ -30,6 +25,12 @@
 #else
   #include <FL/gl.h>
   #include <GL/glu.h>
+#endif
+
+#ifndef _WIN32
+#ifndef GLU_VERSION_1_2
+#define GLU_VERSION_1_2
+#endif
 #endif
 
 // Inline functions for use with vector classes
