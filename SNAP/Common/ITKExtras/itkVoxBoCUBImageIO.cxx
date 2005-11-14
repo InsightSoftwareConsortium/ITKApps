@@ -23,7 +23,11 @@
 #include <list>
 #include <string>
 #include <math.h>
+
+// Commented out because zlib is not available through Insight Applications
+#ifdef SNAP_GZIP_SUPPORT
 #include <zlib.h>
+#endif
 
 namespace itk {
 
@@ -71,6 +75,8 @@ public:
 /**
  * A reader for gzip files
  */
+#ifdef SNAP_GZIP_SUPPORT
+
 class CompressedCUBFileAdaptor : public GenericCUBFileAdaptor
 {
 public:
@@ -149,6 +155,8 @@ public:
 private:
   ::gzFile m_GzFile;
 };
+
+#endif // SNAP_GZIP_SUPPORT
 
 /**
  * A reader for non-gzip files
@@ -274,7 +282,11 @@ VoxBoCUBImageIO::CreateReader(const char *filename)
     bool compressed;
     if(CheckExtension(filename, compressed))
       if(compressed)
-        return new CompressedCUBFileAdaptor(filename, "rb");
+#ifdef SNAP_GZIP_SUPPORT
+          return new CompressedCUBFileAdaptor(filename, "rb");
+#else
+          return NULL;
+#endif
       else
         return new DirectCUBFileAdaptor(filename, "rb");
     else
@@ -294,7 +306,11 @@ VoxBoCUBImageIO::CreateWriter(const char *filename)
     bool compressed;
     if(CheckExtension(filename, compressed))
       if(compressed)
-        return new CompressedCUBFileAdaptor(filename, "wb");
+#ifdef SNAP_GZIP_SUPPORT
+          return new CompressedCUBFileAdaptor(filename, "rb");
+#else
+          return NULL;
+#endif        
       else
         return new DirectCUBFileAdaptor(filename, "wb");
     else
