@@ -21,7 +21,6 @@ ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 
 INCLUDE_DIRECTORIES(
-  ${InsightApplications_SOURCE_DIR}/Curves2DExtractor
   ${InsightApplications_BINARY_DIR}/Curves2DExtractor
   ${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer
   ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
