@@ -24,6 +24,7 @@ INCLUDE_DIRECTORIES(
   ${InsightApplications_BINARY_DIR}/Curves2DExtractor
   ${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer
   ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
+  ${InsightApplications_SOURCE_DIR}/Curves2DExtractor
 )
 
 # Take the list of GUI files, generate .cxx and .h from them and add
