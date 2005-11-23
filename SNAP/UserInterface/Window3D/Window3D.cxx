@@ -826,6 +826,7 @@ void Window3D::ComputeMatricies( GLint *vport, double *mview, double *proj )
   glTranslatef( m_Trackball.GetPanX(), m_Trackball.GetPanY(), 0.0 );
   glMultMatrixf( m_Trackball.GetRot() );
   glTranslate( -m_CenterOfRotation );
+  glTranslate(m_Origin);
   glScale( m_Spacing );
 
   glGetIntegerv( GL_VIEWPORT, vport );
@@ -927,8 +928,8 @@ Window3D
 
   // Now compute the center point of the square   
   Vector3d xCenter = 
-    xVol - m_Plane.vNormalWorld *
-     (dot_product(xVol,m_Plane.vNormalWorld) - interceptWorld);
+    to_double(m_Origin) + xVol - m_Plane.vNormalWorld *
+     (dot_product(to_double(m_Origin) + xVol,m_Plane.vNormalWorld) - interceptWorld);
   
   // Compute the 'up' vector and the 'in' vector
   Vector3d vUp = (x2World - x1World).normalize();
@@ -1191,8 +1192,30 @@ void Window3D
   corner[2] = m_Plane.xDisplayCorner[2];
   corner[3] = m_Plane.xDisplayCorner[3];
 
+  // Use the current label color
+  unsigned char rgb[3];
+  m_Driver->GetColorLabelTable()->GetColorLabel(
+    m_GlobalState->GetDrawingColorLabel()).GetRGBVector(rgb);
+
   // Save the settings
   glPushAttrib(GL_LINE_BIT | GL_COLOR_BUFFER_BIT | GL_LIGHTING_BIT);
+
+  // Create a stipple pattern
+  GLubyte stipple[128];
+  for(unsigned int q = 0; q < 128; q++)
+    stipple[q] = ((q >> 2) % 2 == 0) ? 0xAA : 0x55;
+
+  // Draw a semi-transparent quad
+  glEnable(GL_POLYGON_STIPPLE);
+  glPolygonStipple(stipple);
+  glColor3ubv(rgb);
+  glBegin(GL_QUADS);
+  glVertex(corner[0]);
+  glVertex(corner[1]);
+  glVertex(corner[2]);
+  glVertex(corner[3]);
+  glEnd();
+  glDisable(GL_POLYGON_STIPPLE);
 
   // Draw the plane using lines
   glEnable(GL_LINE_SMOOTH);
@@ -1203,10 +1226,6 @@ void Window3D
   glLineWidth(2.0);
   glLineStipple(2,0xAAAA);
 
-  // Use the current label color
-  unsigned char rgb[3];
-  m_Driver->GetColorLabelTable()->GetColorLabel(
-    m_GlobalState->GetDrawingColorLabel()).GetRGBVector(rgb);
   
   // Start with a white color
   glColor3d(1,1,1);
@@ -1259,6 +1278,9 @@ Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.29  2005/10/29 14:00:15  pauly
+ *ENH: SNAP enhacements like color maps and progress bar for 3D rendering
+ *
  *Revision 1.28  2005/08/10 03:24:21  pauly
  *BUG: Corrected problems with 3D window, label IO from association files
  *

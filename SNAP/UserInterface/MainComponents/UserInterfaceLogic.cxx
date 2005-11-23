@@ -890,7 +890,6 @@ UserInterfaceLogic
 {
   // Get bubbles, turn them into segmentation
   vector<Bubble> bubbles = GetBubbleArray();
-  int numbubbles = bubbles.size();
 
   // Shorthand
   SNAPImageData *snapData = m_Driver->GetSNAPImageData();
@@ -3281,6 +3280,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.43  2005/11/10 23:02:14  pauly
+ *ENH: Added support for VoxBo CUB files to ITK-SNAP, as well as some cosmetic touches
+ *
  *Revision 1.42  2005/11/03 20:59:15  pauly
  *COMP: Fixed compiler errors on newer versions of VTK
  *

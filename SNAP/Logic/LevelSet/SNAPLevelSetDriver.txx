@@ -220,6 +220,7 @@ SNAPLevelSetDriver<VDimension>
 {
   // Fix the spacing of the level set filter's output (huh?)
   m_LevelSetFilter->GetOutput()->SetSpacing(m_InitializationImage->GetSpacing());
+  m_LevelSetFilter->GetOutput()->SetOrigin(m_InitializationImage->GetOrigin());
 
   // Return the filter's output
   return m_LevelSetFilter->GetOutput();

@@ -103,13 +103,6 @@ private:
   OrientationMap m_OrientationMap;
   InverseOrientationMap m_InverseOrientationMap;
 
-  // Byte swapper class
-  template<typename TPixel> class SwapHelper
-    {
-    public:
-      static void SwapIfNecessary(void *, unsigned long, ByteOrder);
-    };
-
   // Method to swap bytes in read buffer
   void SwapBytesIfNecessary(void *buffer, unsigned long numberOfBytes);
 

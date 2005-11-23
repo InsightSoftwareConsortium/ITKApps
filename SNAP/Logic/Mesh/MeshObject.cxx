@@ -19,6 +19,9 @@
 #endif
 #include "MeshObject.h"
 
+#include "SNAPOpenGL.h"
+
+// SNAP Includes
 #include "ColorLabel.h"
 #include "GlobalState.h"
 #include "ImageWrapper.h"
@@ -54,7 +57,6 @@
 
 // System includes
 #include <cstdlib>
-#include "SNAPOpenGL.h"
 
 using namespace itk;
 using namespace std;
@@ -358,6 +360,9 @@ MeshObject
 
 /*
  *Log: MeshObject.cxx
+ *Revision 1.17  2005/10/29 14:00:14  pauly
+ *ENH: SNAP enhacements like color maps and progress bar for 3D rendering
+ *
  *Revision 1.16  2005/04/21 14:46:29  pauly
  *ENH: Improved management and editing of color labels in SNAP
  *

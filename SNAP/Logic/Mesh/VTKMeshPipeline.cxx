@@ -295,12 +295,6 @@ VTKMeshPipeline
   // Graft the polydata to the last filter in the pipeline
   m_StripperFilter->SetOutput(outMesh);
   
-  // This is a work-around. We set the origin to zero, because somehow it gets
-  // messed up in the pipeline. We then add it later on
-  double xZeroOrigin[] = {0.0, 0.0, 0.0};
-  ImageType::PointType xRealOrigin = m_InputImage->GetOrigin();
-  m_InputImage->SetOrigin(ImageType::PointType(xZeroOrigin));
-  
   // Connect importer and exporter
   m_VTKImporter->SetCallbackUserData(
     m_VTKExporter->GetCallbackUserData());
@@ -310,19 +304,6 @@ VTKMeshPipeline
 
   // Update the pipeline
   m_StripperFilter->UpdateWholeExtent();
-  
-  // Shift all the points in the output mesh
-  for(vtkIdType i = 0; i < outMesh->GetNumberOfPoints(); i++)
-    {
-    vtkFloatingPointType *x = outMesh->GetPoint(i);
-    x[0] += xRealOrigin[0];
-    x[1] += xRealOrigin[1];
-    x[2] += xRealOrigin[2];
-    outMesh->GetPoints()->SetPoint(i, x);
-    }
-  
-  // Restore the image origin
-  m_InputImage->SetOrigin(xRealOrigin);  
 }
 
 void
