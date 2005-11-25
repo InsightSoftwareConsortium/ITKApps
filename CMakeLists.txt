@@ -273,6 +273,9 @@ SUBDIRS(EllipsoidInteriorExteriorSpatialFunction)
 # Add an option to build or not build the SymmetricEllipsoidInteriorExteriorSpatialFunction example
 SUBDIRS(SymmetricEllipsoidInteriorExteriorSpatialFunction)
 
+# Build Volview plugins. You can't use them unless you have volview
+SUBDIRS( VolviewPlugIns )
+
 # Test the conditions for building the ThinPlateSplines example
 IF(VTK_FOUND)
   IF(FLTK_FOUND)
