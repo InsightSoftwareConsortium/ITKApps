@@ -25,6 +25,7 @@ template <class PixelType> class ImageRegistrationRunner
 {
 public:
   // define our typedefs
+  typedef ImageRegistrationRunner                      Self;
   typedef itk::Image< PixelType, 3 >                   ImageType; 
   typedef itk::ImportImageFilter< PixelType, 3>        ImportFilterType;
   typedef itk::ShrinkImageFilter<ImageType, ImageType> ShrinkFilterType;
@@ -42,7 +43,7 @@ public:
   typedef itk::Size<3>            SizeType;
 
   // Command/Observer intended to update the progress
-  typedef itk::MemberCommand< ImageRegistrationRunner >  CommandType;
+  typedef itk::MemberCommand< Self >  CommandType;
 
   typedef itk::CenteredTransformInitializer<TransformType,
                                             ImageType, ImageType > 

@@ -26,19 +26,21 @@ template <class TInputPixelType >
 class SurfaceSpline : public FilterModuleBase {
 
 public:
+  typedef SurfaceSpline                  Self;
 
    // Pixel type of the input buffer
   typedef TInputPixelType                InputPixelType;
 
   itkStaticConstMacro( Dimension, unsigned int, 3 );
 
-  typedef itk::Image< InputPixelType,  Dimension >  InputImageType;
+  typedef itk::Image< InputPixelType,  
+          itkGetStaticConstMacro(Dimension) >      InputImageType;
 
   // Instantiate the ImportImageFilter
   // This filter is used for building an ITK image using 
   // the data passed in a buffer.
   typedef itk::ImportImageFilter< InputPixelType, 
-                                  Dimension       > ImportFilterType;
+         itkGetStaticConstMacro(Dimension)       > ImportFilterType;
 
   typedef typename ImportFilterType::RegionType    RegionType;
   typedef typename RegionType::SizeType            SizeType;
@@ -46,15 +48,14 @@ public:
 
   typedef float                                    CoordinateRepresentationType;
   typedef itk::Point< CoordinateRepresentationType,
-                                         Dimension 
-                                             >     PointType;
+             itkGetStaticConstMacro(Dimension) >   PointType;
   typedef std::vector< PointType >                 PointListType;
   typedef typename PointListType::iterator         PointIterator;
   typedef typename PointListType::const_iterator   ConstPointIterator;
 
   typedef itk::ElasticBodySplineKernelTransform< 
                             CoordinateRepresentationType,
-                            Dimension >            SplineType;                
+          itkGetStaticConstMacro(Dimension) >      SplineType;                
 
   typedef typename SplineType::Pointer             SplinePointer;
 

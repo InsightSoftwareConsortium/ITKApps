@@ -24,6 +24,7 @@ template <class TInputPixelType, class TFilterType, class TFinalPixelType >
 class FilterModuleWithCasting : public FilterModuleBase {
 
 public:
+  typedef FilterModuleWithCasting                 Self;
 
    // Instantiate the image types
   typedef TInputPixelType                         InputPixelType;
@@ -45,7 +46,7 @@ public:
   // This filter is used for building an ITK image using 
   // the data passed in a buffer.
   typedef itk::ImportImageFilter< InputPixelType, 
-                                  Dimension       > ImportFilterType;
+               itkGetStaticConstMacro(Dimension)   > ImportFilterType;
 
   typedef typename ImportFilterType::SizeType      SizeType;
   typedef typename ImportFilterType::IndexType     IndexType;

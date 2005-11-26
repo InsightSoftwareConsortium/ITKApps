@@ -37,6 +37,7 @@ class FilterModuleTwoInputs : public FilterModuleBase {
 
 public:
 
+  typedef FilterModuleTwoInputs Self;
   typedef FilterModuleBase   Superclass;
 
    // Instantiate the image types
@@ -55,10 +56,10 @@ public:
   // ITK images using the data passed in a buffer.
 
   typedef itk::ImportImageFilter< Input1PixelType, 
-                                  Dimension       > ImportFilter1Type;
+          itkGetStaticConstMacro(Dimension)       > ImportFilter1Type;
 
   typedef itk::ImportImageFilter< Input2PixelType, 
-                                  Dimension       > ImportFilter2Type;
+          itkGetStaticConstMacro(Dimension)       > ImportFilter2Type;
 
 
   typedef typename Superclass::SizeType      SizeType;

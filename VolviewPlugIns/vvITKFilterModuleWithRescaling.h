@@ -23,6 +23,7 @@ class FilterModuleWithRescaling : public FilterModuleBase {
 public:
 
    // Instantiate the image types
+  typedef FilterModuleWithRescaling               Self;
   typedef TFilterType                             FilterType;
 
   typedef typename FilterType::InputImageType     InputImageType;
@@ -34,13 +35,14 @@ public:
   itkStaticConstMacro( Dimension, unsigned int, 
          itk::GetImageDimension< InternalImageType >::ImageDimension );
 
-  typedef itk::Image< FinalPixelType, Dimension >   FinalImageType;
+  typedef itk::Image< FinalPixelType, 
+            itkGetStaticConstMacro(Dimension) >   FinalImageType;
 
   // Instantiate the ImportImageFilter
   // This filter is used for building an ITK image using 
   // the data passed in a buffer.
   typedef itk::ImportImageFilter< InputPixelType, 
-                                  Dimension       > ImportFilterType;
+          itkGetStaticConstMacro(Dimension)   >   ImportFilterType;
 
   typedef typename ImportFilterType::SizeType      SizeType;
   typedef typename ImportFilterType::IndexType     IndexType;

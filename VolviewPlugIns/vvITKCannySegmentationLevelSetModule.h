@@ -21,7 +21,7 @@ template <class TInputPixelType >
 class CannySegmentationLevelSetModule : public FilterModuleBase {
 
 public:
-
+  typedef CannySegmentationLevelSetModule Self;
    // Pixel type of the input buffer
   typedef TInputPixelType                InputPixelType;
   typedef unsigned char                  OutputPixelType;
@@ -29,14 +29,18 @@ public:
 
   itkStaticConstMacro(Dimension, unsigned int, 3 );
 
-  typedef itk::Image< InputPixelType,  Dimension >      InputImageType;
-  typedef itk::Image< OutputPixelType, Dimension >      OutputImageType;
-  typedef itk::Image< RealPixelType,   Dimension >      RealImageType;
+  typedef itk::Image< InputPixelType,  
+          itkGetStaticConstMacro(Dimension) >      InputImageType;
+  typedef itk::Image< OutputPixelType, 
+          itkGetStaticConstMacro(Dimension) >      OutputImageType;
+  typedef itk::Image< RealPixelType, 
+          itkGetStaticConstMacro(Dimension) >      RealImageType;
 
   // Instantiate the ImportImageFilter
   // This filter is used for building an ITK image using 
   // the data passed in a buffer.
-  typedef itk::ImportImageFilter< InputPixelType, Dimension > ImportFilterType;
+  typedef itk::ImportImageFilter< InputPixelType,
+          itkGetStaticConstMacro(Dimension)  >     ImportFilterType;
 
   typedef typename FilterModuleBase::SizeType      SizeType;
   typedef typename FilterModuleBase::IndexType     IndexType;

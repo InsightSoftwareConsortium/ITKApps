@@ -26,6 +26,7 @@ class FilterModule : public FilterModuleBase {
 public:
 
    // Instantiate the image types
+  typedef FilterModule                            Self;
   typedef TFilterType                             FilterType;
   typedef typename FilterType::InputImageType     InputImageType;
   typedef typename FilterType::OutputImageType    OutputImageType;
@@ -39,7 +40,7 @@ public:
   // This filter is used for building an ITK image using 
   // the data passed in a buffer.
   typedef itk::ImportImageFilter< InputPixelType, 
-                                  Dimension       > ImportFilterType;
+             itkGetStaticConstMacro(Dimension) >  ImportFilterType;
 
   typedef typename ImportFilterType::SizeType      SizeType;
   typedef typename ImportFilterType::IndexType     IndexType;

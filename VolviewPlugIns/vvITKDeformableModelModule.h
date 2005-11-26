@@ -29,21 +29,22 @@ template <class TInputPixelType >
 class DeformableModelModule : public FilterModuleBase {
 
 public:
-
+  typedef DeformableModelModule          Self;
    // Pixel type of the input buffer
   typedef TInputPixelType                InputPixelType;
   typedef float                          RealPixelType;
 
   itkStaticConstMacro( Dimension, unsigned int, 3 );
 
-  typedef itk::Image< InputPixelType,  Dimension >  InputImageType;
+  typedef itk::Image< InputPixelType,  
+          itkGetStaticConstMacro(Dimension) >  InputImageType;
   typedef itk::Image< RealPixelType,   3         >  RealImageType;
 
   // Instantiate the ImportImageFilter
   // This filter is used for building an ITK image using 
   // the data passed in a buffer.
   typedef itk::ImportImageFilter< InputPixelType, 
-                                  Dimension       > ImportFilterType;
+          itkGetStaticConstMacro(Dimension)      > ImportFilterType;
 
   
   typedef typename ImportFilterType::RegionType    RegionType;
