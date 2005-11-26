@@ -40,7 +40,8 @@ public:
   itkStaticConstMacro( Dimension, unsigned int, 
          itk::GetImageDimension< InternalImageType >::ImageDimension );
 
-  typedef itk::Image< InputPixelType,    Dimension > InputImageType;
+  typedef itk::Image< InputPixelType,  
+          itkGetStaticConstMacro(Dimension) > InputImageType;
 
   // Instantiate the ImportImageFilter
   // This filter is used for building an ITK image using 
