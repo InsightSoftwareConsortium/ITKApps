@@ -30,7 +30,7 @@ template <class TInputPixelType >
 class WatershedModule : public FilterModuleBase {
 
 public:
-
+  typedef WatershedModule                Self;
    // Pixel type of the input buffer
   typedef TInputPixelType                InputPixelType;
   typedef float                          RealPixelType;
@@ -38,15 +38,18 @@ public:
 
   itkStaticConstMacro( Dimension, unsigned int, 3 );
 
-  typedef itk::Image< InputPixelType,  Dimension >  InputImageType;
-  typedef itk::Image< RealPixelType,   Dimension >  RealImageType;
-  typedef itk::Image< OutputPixelType, Dimension >  OutputImageType;
+  typedef itk::Image< InputPixelType,  
+          itkGetStaticConstMacro(Dimension) >  InputImageType;
+  typedef itk::Image< RealPixelType,   
+          itkGetStaticConstMacro(Dimension) >  RealImageType;
+  typedef itk::Image< OutputPixelType, 
+          itkGetStaticConstMacro(Dimension) >  OutputImageType;
 
   // Instantiate the ImportImageFilter
   // This filter is used for building an ITK image using 
   // the data passed in a buffer.
   typedef itk::ImportImageFilter< InputPixelType, 
-                                  Dimension       > ImportFilterType;
+    itkGetStaticConstMacro(Dimension)       > ImportFilterType;
 
   typedef FilterModuleBase::RegionType   RegionType;
   typedef FilterModuleBase::IndexType    IndexType;

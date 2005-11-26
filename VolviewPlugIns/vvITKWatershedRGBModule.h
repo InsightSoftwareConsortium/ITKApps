@@ -34,7 +34,7 @@ template <class TInputPixelType >
 class WatershedRGBModule : public FilterModuleBase {
 
 public:
-
+  typedef WatershedRGBModule             Self;
    // Pixel type of the input buffer
   typedef TInputPixelType                InputPixelType;
   typedef float                          RealPixelType;
@@ -42,15 +42,18 @@ public:
 
   itkStaticConstMacro( Dimension, unsigned int, 3 );
 
-  typedef itk::Image< InputPixelType,  Dimension >  InputImageType;
-  typedef itk::Image< RealPixelType,   Dimension >  RealImageType;
-  typedef itk::Image< OutputPixelType, Dimension >  OutputImageType;
+  typedef itk::Image< InputPixelType,  
+          itkGetStaticConstMacro(Dimension) >  InputImageType;
+  typedef itk::Image< RealPixelType,   
+          itkGetStaticConstMacro(Dimension) >  RealImageType;
+  typedef itk::Image< OutputPixelType, 
+          itkGetStaticConstMacro(Dimension) >  OutputImageType;
 
   // Instantiate the ImportImageFilter
   // This filter is used for building an ITK image using 
   // the data passed in a buffer.
   typedef itk::ImportImageFilter< InputPixelType, 
-                                  Dimension       > ImportFilterType;
+    itkGetStaticConstMacro(Dimension)       >  ImportFilterType;
 
   typedef FilterModuleBase::RegionType   RegionType;
   typedef FilterModuleBase::IndexType    IndexType;
@@ -76,7 +79,8 @@ public:
   // Type declaration for RGB image that will hold the color 
   // encoding of the water basins
   typedef itk::RGBPixel< unsigned char >              RGBPixelType;
-  typedef itk::Image< RGBPixelType, Dimension >       RGBImageType;
+  typedef itk::Image< RGBPixelType, 
+          itkGetStaticConstMacro(Dimension) >         RGBImageType;
 
   typedef itk::Functor::ScalarToRGBPixelFunctor<unsigned long>
                                                       ColorMapFunctorType;
