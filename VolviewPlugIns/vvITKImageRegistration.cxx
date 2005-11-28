@@ -470,6 +470,11 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       result = runner.Execute( info, pds );
       break; 
       }
+#if !( defined(_MSC_VER) && (_MSC_VER <= 1300 ) ) 
+      // Too many instantiations causing compiler limit on 
+      // VS70 and VS6 and below So remove a few datatypes for 
+      // these compilers. If you feel like to need these datatypes,
+      // uncomment them and remove some others..
     case VTK_INT:
       {
       ImageRegistrationRunner<signed int> runner;
@@ -494,6 +499,7 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
       result = runner.Execute( info, pds );
       break; 
       }
+#endif
     case VTK_FLOAT:
       {
       ImageRegistrationRunner<float> runner;
