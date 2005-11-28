@@ -62,6 +62,7 @@
 
 extern int      FileConverterScalar(const std::string &inputPixelComponentType,const std::string &outputPixelComponentType,const std::string &inputFileName, const std::string &outputFileName, int inputDimension);
 extern int DicomFileConverterScalar(const std::string &inputPixelComponentType,const std::string &outputPixelComponentType,const std::string &inputFileName, const std::string &outputFileName, int inputDimension);
+extern int DicomFileConverterScalarA(const std::string &inputPixelComponentType,const std::string &outputPixelComponentType,const std::string &inputFileName, const std::string &outputFileName, int inputDimension);
 
 //-------------------------------------------------------------------------------------
 
@@ -296,6 +297,9 @@ int  main(  int  argc,  char *argv[] )
       if ( strcmp( pixelType.c_str(), "scalar" ) == 0 && numberOfComponents == 1 )
       {
         const int ret_value = DicomFileConverterScalar(
+          inputPixelComponentType, outputPixelComponentType,
+          inputDirectoryName, outputFileName, inputDimension )
+      ||                  DicomFileConverterScalarA(
           inputPixelComponentType, outputPixelComponentType,
           inputDirectoryName, outputFileName, inputDimension );
         if ( ret_value != 0 )

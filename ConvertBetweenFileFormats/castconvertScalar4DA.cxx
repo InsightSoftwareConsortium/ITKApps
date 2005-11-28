@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    castconvertScalar3D.cxx
+  Module:    castconvertScalar4DA.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -16,12 +16,12 @@
 =========================================================================*/
 #include "castconverthelpers.h"
 
-int FileConverterScalar3D( const std::string &inputPixelComponentType,
+int FileConverterScalar4DA( const std::string &inputPixelComponentType,
   const std::string &outputPixelComponentType, const std::string &inputFileName,
   const std::string &outputFileName, int inputDimension )
 {
-  enum { ImageDims = 3 };
-
+  enum { ImageDims = 4 };
+  
   if ( inputDimension == ImageDims )
   {
     /** From unsigned char to something else. */
@@ -36,7 +36,6 @@ int FileConverterScalar3D( const std::string &inputPixelComponentType,
     callCorrectReadWriterMacro( unsigned char, float, ImageDims );
     callCorrectReadWriterMacro( unsigned char, double, ImageDims );
 
-    /** From char to something else. */
     callCorrectReadWriterMacro( char, unsigned char, ImageDims );
     callCorrectReadWriterMacro( char, char, ImageDims );
     callCorrectReadWriterMacro( char, unsigned short, ImageDims );
@@ -47,8 +46,7 @@ int FileConverterScalar3D( const std::string &inputPixelComponentType,
     callCorrectReadWriterMacro( char, long, ImageDims );
     callCorrectReadWriterMacro( char, float, ImageDims );
     callCorrectReadWriterMacro( char, double, ImageDims );
-
-    /** From unsigned short to something else. */
+ 
     callCorrectReadWriterMacro( unsigned short, unsigned char, ImageDims );
     callCorrectReadWriterMacro( unsigned short, char, ImageDims );
     callCorrectReadWriterMacro( unsigned short, unsigned short, ImageDims );
@@ -60,7 +58,6 @@ int FileConverterScalar3D( const std::string &inputPixelComponentType,
     callCorrectReadWriterMacro( unsigned short, float, ImageDims );
     callCorrectReadWriterMacro( unsigned short, double, ImageDims );
 
-    /** From short to something else. */
     callCorrectReadWriterMacro( short, unsigned char, ImageDims );
     callCorrectReadWriterMacro( short, char, ImageDims );
     callCorrectReadWriterMacro( short, unsigned short, ImageDims );
@@ -72,7 +69,6 @@ int FileConverterScalar3D( const std::string &inputPixelComponentType,
     callCorrectReadWriterMacro( short, float, ImageDims );
     callCorrectReadWriterMacro( short, double, ImageDims );
 
-    /** From unsigned int to something else. */
     callCorrectReadWriterMacro( unsigned int, unsigned char, ImageDims );
     callCorrectReadWriterMacro( unsigned int, char, ImageDims );
     callCorrectReadWriterMacro( unsigned int, unsigned short, ImageDims );
@@ -95,3 +91,4 @@ int FileConverterScalar3D( const std::string &inputPixelComponentType,
   return 0;
 
 } // end support for SCALAR pixel type
+

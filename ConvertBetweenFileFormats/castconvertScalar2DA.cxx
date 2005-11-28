@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    castconvertScalar3D.cxx
+  Module:    castconvertScalar2DA.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -16,11 +16,11 @@
 =========================================================================*/
 #include "castconverthelpers.h"
 
-int FileConverterScalar3D( const std::string &inputPixelComponentType,
+int FileConverterScalar2DA( const std::string &inputPixelComponentType,
   const std::string &outputPixelComponentType, const std::string &inputFileName,
   const std::string &outputFileName, int inputDimension )
 {
-  enum { ImageDims = 3 };
+  enum { ImageDims = 2 };
 
   if ( inputDimension == ImageDims )
   {

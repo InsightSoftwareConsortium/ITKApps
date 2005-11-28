@@ -22,7 +22,16 @@ extern int FileConverterScalar2D( const std::string &inputPixelComponentType,
 extern int FileConverterScalar3D( const std::string &inputPixelComponentType,
   const std::string &outputPixelComponentType, const std::string &inputFileName,
   const std::string &outputFileName, int inputDimension );
+extern int FileConverterScalar2DA( const std::string &inputPixelComponentType,
+  const std::string &outputPixelComponentType, const std::string &inputFileName,
+  const std::string &outputFileName, int inputDimension );
+extern int FileConverterScalar3DA( const std::string &inputPixelComponentType,
+  const std::string &outputPixelComponentType, const std::string &inputFileName,
+  const std::string &outputFileName, int inputDimension );
 extern int FileConverterScalar4D( const std::string &inputPixelComponentType,
+  const std::string &outputPixelComponentType, const std::string &inputFileName,
+  const std::string &outputFileName, int inputDimension );
+extern int FileConverterScalar4DA( const std::string &inputPixelComponentType,
   const std::string &outputPixelComponentType, const std::string &inputFileName,
   const std::string &outputFileName, int inputDimension );
 
@@ -35,6 +44,9 @@ int FileConverterScalar( const std::string &inputPixelComponentType,
   {
     const int ret_value = FileConverterScalar2D(
       inputPixelComponentType, outputPixelComponentType,
+      inputFileName, outputFileName, inputDimension )
+    ||                  FileConverterScalar2DA(
+      inputPixelComponentType, outputPixelComponentType,
       inputFileName, outputFileName, inputDimension );
     if ( ret_value != 0 )
     {
@@ -45,6 +57,9 @@ int FileConverterScalar( const std::string &inputPixelComponentType,
   {
     const int ret_value = FileConverterScalar3D(
       inputPixelComponentType, outputPixelComponentType,
+      inputFileName, outputFileName, inputDimension )
+    ||                  FileConverterScalar3DA(
+      inputPixelComponentType, outputPixelComponentType,
       inputFileName, outputFileName, inputDimension );
     if ( ret_value != 0 )
     {
@@ -54,6 +69,9 @@ int FileConverterScalar( const std::string &inputPixelComponentType,
   else if ( inputDimension == 4 )
   {
     const int ret_value = FileConverterScalar4D(
+      inputPixelComponentType, outputPixelComponentType,
+      inputFileName, outputFileName, inputDimension )
+    ||                  FileConverterScalar4DA(
       inputPixelComponentType, outputPixelComponentType,
       inputFileName, outputFileName, inputDimension );
     if ( ret_value != 0 )
