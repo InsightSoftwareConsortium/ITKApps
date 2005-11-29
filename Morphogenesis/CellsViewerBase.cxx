@@ -363,11 +363,33 @@ CellsViewerBase
 /**
  *    Return the time from the start of the simulation
  */ 
-clock_t
+double
 CellsViewerBase
 ::GetStartTime(void) const
 {
   return m_StartTime;
+}
+
+
+/**
+ *    Return the current time 
+ */ 
+double
+CellsViewerBase
+::GetCurrentTime(void) const
+{
+  return m_RealTimeClock->GetTimeStamp();
+}
+
+
+/**
+ *    Return the time elapsed during the simulation
+ */ 
+double
+CellsViewerBase
+::GetElapsedTime(void) const
+{
+  return m_RealTimeClock->GetTimeStamp() - m_StartTime;
 }
 
 

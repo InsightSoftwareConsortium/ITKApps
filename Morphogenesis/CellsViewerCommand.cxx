@@ -70,8 +70,7 @@ CellsViewerCommand
     {
     if( m_CellsViewer )
       {
-      m_CellsViewer->timeValueOutput->value( 
-                      ( clock() - m_CellsViewer->GetStartTime() ) / CLOCKS_PER_SEC  );
+      m_CellsViewer->timeValueOutput->value( m_CellsViewer->GetElapsedTime() );
       m_CellsViewer->iterationValueOutput->value( 
                                    m_CellsViewer->iterationValueOutput->value() + 1 );
       m_CellsViewer->numberOfCellsValueOutput->value( aggregate->GetNumberOfCells() );

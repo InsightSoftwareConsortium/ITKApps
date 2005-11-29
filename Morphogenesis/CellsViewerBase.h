@@ -20,14 +20,14 @@
 #if defined(_MSC_VER)
 #pragma warning ( disable : 4786 )
 #endif
+#include "CellularAggregate.h"
 #include "itkImageFileReader.h"
+#include "itkRealTimeClock.h"
 #include "fltkSlice2DDrawer.h"
 #include "fltkSlice3DDrawer.h"
 #include "fltkDisplayGlWindowGUI.h"
-#include "CellularAggregate.h"
 #include "fltkClippingPlane3DDrawer.h"
 #include <map>
-#include <time.h>
 
 namespace bio {
 
@@ -114,7 +114,9 @@ public:
   virtual void HideClippingPlaneControls(void);
   virtual void HideCellularAggregateControls(void);
   virtual void SetCellsAggregate( CellularAggregate * );
-  virtual clock_t GetStartTime(void) const;
+  virtual double GetStartTime(void) const;
+  virtual double GetCurrentTime(void) const;
+  virtual double GetElapsedTime(void) const;
   virtual void LoadSubstrate(void);
   virtual void ShowSubstrate( const char * name );
   virtual void ShowClippingPlane( const char * name );
@@ -147,12 +149,13 @@ private:
   fltkDisplayGlWindowGUI              m_Display;
   CellularAggregate::Pointer          m_Cells;
   SpeciesContainerType                m_SpeciesProducer;
-  clock_t                             m_StartTime;
+  double                              m_StartTime;
   std::string                         m_BaseFileName;
   unsigned int                        m_CurrentFile;
   bool                                m_SavingImages;
   unsigned int                        m_NumberOfIterationsBetweenSaves;
   unsigned int                        m_MaximumNumberOfSaves;
+  RealTimeClock::Pointer              m_RealTimeClock;
 };
 
 } // end namespace bio
