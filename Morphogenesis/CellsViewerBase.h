@@ -155,7 +155,7 @@ private:
   bool                                m_SavingImages;
   unsigned int                        m_NumberOfIterationsBetweenSaves;
   unsigned int                        m_MaximumNumberOfSaves;
-  RealTimeClock::Pointer              m_RealTimeClock;
+  ::itk::RealTimeClock::Pointer       m_RealTimeClock;
 };
 
 } // end namespace bio
