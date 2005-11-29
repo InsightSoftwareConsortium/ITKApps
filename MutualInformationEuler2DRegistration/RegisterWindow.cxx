@@ -2,6 +2,7 @@
 
 #include <RegisterWindow.h>
 #include <FL/fl_file_chooser.H>
+#include "itkTimeProbe.h"
 
 RegisterWindow::RegisterWindow()
 {
@@ -255,16 +256,15 @@ void RegisterWindow::Execute(void)
   iterationsWindow->show();
   Fl::check();
 
-  clock_t time_begin ;
-  clock_t time_end ;
+  itk::TimeProbe  timeProbe;
 
   this->ShowStatus("Registering Moving Image against Fixed Image ...");
   grpControls->deactivate() ;
   this->UpdateParameters() ;
 
-  time_begin = clock() ;
+  timeProbe.Start();
   RegisterApplication::Execute();
-  time_end = clock() ;
+  timeProbe.Stop();
 
   menuRegisteredImageDisplay->activate() ;
   menuMixedChannel->activate() ;
@@ -273,7 +273,7 @@ void RegisterWindow::Execute(void)
   itk::OStringStream message ;
   message
     << "Registration done in " << 
-    double(time_end - time_begin) / CLOCKS_PER_SEC << "seconds." 
+    timeProbe.GetMeanTime() << "seconds." 
     << std::endl ;
   message << "angle = " 
     << m_Registrator->GetTransformParameters()[0] << ", x offset = "
