@@ -193,7 +193,7 @@ CellsViewerBase
   m_Stop = false;
   if( !m_StartTime ) 
   {
-    m_StartTime = clock();
+    m_StartTime = m_RealTimeClock->GetTimeStamp();
   }
   while( !m_Stop )
     {
