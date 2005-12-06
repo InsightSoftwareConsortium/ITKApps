@@ -42,13 +42,10 @@ RegionGrowingSegmentation
   m_CurvatureAnisotropicDiffusionImageViewer.SetImage( m_CurvatureAnisotropicDiffusionImageFilter->GetOutput() );  
 
   m_ConnectedThresholdImageViewer.SetLabel("Connected Threshold Image");
-  m_ConnectedThresholdImageViewer.SetImage( m_ConnectedThresholdImageFilter->GetOutput() );  
 
   m_ConfidenceConnectedImageViewer.SetLabel("Confidence Connected Image");
-  m_ConfidenceConnectedImageViewer.SetImage( m_ConfidenceConnectedImageFilter->GetOutput() );  
 
   m_FuzzyConnectedImageViewer.SetLabel("Fuzzy Connected Image");
-  m_FuzzyConnectedImageViewer.SetImage( m_FuzzyConnectedImageFilter->GetOutput() );  
 
   m_HomogeneousImageViewer.SetLabel("Homogeneous Image");
   m_HomogeneousImageViewer.ClickSelectCallBack( ClickSelectCallback, (void *)this);
@@ -362,7 +359,8 @@ RegionGrowingSegmentation
 ::ShowConnectedThresholdImage( void )
 {
   m_ConnectedThresholdImageFilter->Update();
-  m_ConnectedThresholdImageViewer.SetImage( m_ConnectedThresholdImageFilter->GetOutput() );  
+  m_ConnectedThresholdImageViewer.SetImage( m_ImageReader->GetOutput() );  
+  m_ConnectedThresholdImageViewer.SetOverlay( m_ConnectedThresholdImageFilter->GetOutput() );  
   m_ConnectedThresholdImageViewer.Show();
 
 }
@@ -380,7 +378,8 @@ RegionGrowingSegmentation
 ::ShowConfidenceConnectedImage( void )
 {
   m_ConfidenceConnectedImageFilter->Update();
-  m_ConfidenceConnectedImageViewer.SetImage( m_ConfidenceConnectedImageFilter->GetOutput() );  
+  m_ConfidenceConnectedImageViewer.SetImage( m_ImageReader->GetOutput() );  
+  m_ConfidenceConnectedImageViewer.SetOverlay( m_ConfidenceConnectedImageFilter->GetOutput() );  
   m_ConfidenceConnectedImageViewer.Show();
 
 }
@@ -398,7 +397,8 @@ RegionGrowingSegmentation
 ::ShowFuzzyConnectedImage( void )
 {
   m_FuzzyConnectedImageFilter->Update();
-  m_FuzzyConnectedImageViewer.SetImage( m_FuzzyConnectedImageFilter->GetOutput() );  
+  m_FuzzyConnectedImageViewer.SetImage( m_ImageReader->GetOutput() );  
+  m_FuzzyConnectedImageViewer.SetOverlay( m_FuzzyConnectedImageFilter->GetOutput() );  
   m_FuzzyConnectedImageViewer.Show();
 
 }

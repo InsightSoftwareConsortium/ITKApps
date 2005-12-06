@@ -54,7 +54,7 @@ public:
   typedef   RegionGrowingSegmentationBase::InternalImageType    InternalImageType;
 
   /** Image Viewer Types */
-  typedef unsigned char  OverlayPixelType;
+  typedef OutputPixelType  OverlayPixelType;
 
   typedef fltk::ImageViewer< InputPixelType, 
                                     OverlayPixelType >          InputImageViewerType;
@@ -62,7 +62,7 @@ public:
   typedef fltk::ImageViewer< InternalPixelType, 
                                     OverlayPixelType >          InternalImageViewerType;
 
-  typedef fltk::ImageViewer< OutputPixelType, 
+  typedef fltk::ImageViewer< InputPixelType, 
                                     OverlayPixelType >          OutputImageViewerType;
 
   typedef fltk::VTKImageViewer< OutputPixelType >               VTKImageViewerType;
