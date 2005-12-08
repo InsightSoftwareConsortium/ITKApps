@@ -3,11 +3,11 @@
 
 [Setup]
 AppName=InsightSNAP
-AppVerName=InsightSNAP 1.0
-AppPublisher=Cognitica Corporation
-AppPublisherURL=http://www.cognitica.com/download/snap
-AppSupportURL=http://www.cognitica.com/download/snap
-AppUpdatesURL=http://www.cognitica.com/download/snap
+AppVerName=InsightSNAP 1.4
+AppPublisher=itksnap.org
+AppPublisherURL=http://www.itksnap.org/download/snap
+AppSupportURL=http://www.itksnap.org/download/snap
+AppUpdatesURL=http://www.itksnap.org/download/snap
 DefaultDirName={pf}\InsightApplications\SNAP
 DefaultGroupName=InsightSNAP
 AllowNoIcons=yes
@@ -21,10 +21,13 @@ Name: "quicklaunchicon"; Description: "Create a &Quick Launch icon"; GroupDescri
 [Files]
 Source: "@MY_BINARY_DIR@\Release\InsightSNAP.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "@MY_BINARY_DIR@\ProgramData\*.*"; DestDir: "{app}\ProgramData"; Flags: ignoreversion recursesubdirs
+Source: "c:\windows\system32\msvcp71.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "c:\windows\system32\msvcr71.dll"; DestDir: "{app}"; Flags: ignoreversion
+
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [INI]
-Filename: "{app}\SNAP.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.cognitica.com/download/snap"
+Filename: "{app}\SNAP.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.itksnap.org/download/snap"
 
 [InstallDelete]
 ; Type: filesandordirs; Name: "{userappdata}\itk.org"

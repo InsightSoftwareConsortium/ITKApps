@@ -48,6 +48,9 @@ extern const char SNAPVersion[];
 // Non-cvs version
 extern const char SNAPSoftVersion[];
 
+// A string that appears in the user interface
+extern const char SNAPUISoftVersion[];
+
 // Release date of the current version
 extern const char SNAPCurrentVersionReleaseDate[];
 

@@ -1428,6 +1428,9 @@ UserInterfaceLogic
   // Make the menu bar global
   m_MenubarMain->global();
 
+  // Set the version text in the welcome page
+  m_InWelcomePageVersion->label(SNAPUISoftVersion);
+
   int i;
   // Register the GUI with its children
   for (i=0; i<3; i++) m_IRISWindow2D[i]->Register(i,this);
@@ -1745,23 +1748,22 @@ UserInterfaceLogic
     {
     // Strip the path of the file
     mainLabel << itksys::SystemTools::GetFilenameName(fnGrey.c_str());
+    mainLabel << " - ";
+
+    // Segmentation file name
+    if (fnSeg.length()) 
+      {
+      // Strip the path of the file
+      mainLabel << itksys::SystemTools::GetFilenameName(fnSeg.c_str());
+      }
+    else
+      {
+      mainLabel << "No segmentation loaded";
+      }
     }
   else
     {
-    mainLabel << "no Grey img";
-    }
-
-  mainLabel << " - ";
-
-  // Segmentation file name
-  if (fnSeg.length()) 
-    {
-    // Strip the path of the file
-    mainLabel << itksys::SystemTools::GetFilenameName(fnSeg.c_str());
-    }
-  else
-    {
-    mainLabel << "no Seg img";
+    mainLabel << "No image loaded";
     }
 
   // Store the label
@@ -2699,6 +2701,7 @@ UserInterfaceLogic
 
     // Save the filename
     m_GlobalState->SetGreyFileName(fnRecent.c_str());
+    m_GlobalState->SetSegmentationFileName("");
 
     // Update the user interface accordingly
     OnGreyImageUpdate();
@@ -2746,6 +2749,7 @@ UserInterfaceLogic
 
     // Save the filename
     m_GlobalState->SetGreyFileName(m_WizGreyIO->GetFileName());
+    m_GlobalState->SetSegmentationFileName("");
 
     // Update the user interface accordingly
     OnGreyImageUpdate();
@@ -3283,6 +3287,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.45  2005/12/08 18:20:46  hjohnson
+ *COMP:  Removed compiler warnings from SGI/linux/MacOSX compilers.
+ *
  *Revision 1.44  2005/11/23 14:32:15  ibanez
  *BUG: 2404. Patch provided by Paul Yushkevish.
  *
