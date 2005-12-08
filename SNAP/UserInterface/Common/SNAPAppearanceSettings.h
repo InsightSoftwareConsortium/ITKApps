@@ -61,6 +61,7 @@ public:
     };
 
   SNAPAppearanceSettings();
+  virtual ~SNAPAppearanceSettings() {}
 
   void LoadFromRegistry(Registry &registry);
   void SaveToRegistry(Registry &registry);

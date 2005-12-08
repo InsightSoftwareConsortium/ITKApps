@@ -4,6 +4,8 @@ header_name {.h}
 code_name {.cxx}
 class guiMain {open
 } {
+  Function {~guiMain()} {open return_type {virtual }
+  } {}
   Function {guiMain()} {open
   } {
     Fl_Window tkWindow {

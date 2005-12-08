@@ -20,6 +20,7 @@
 
 class ResizeRegionDialogLogic : public ResizeRegionDialog {
 public:
+    virtual ~ResizeRegionDialogLogic() {}
   // A list of scaling choices
   static const int NumberOfScaleChoices;
   static const int ScaleChoices[10][2];

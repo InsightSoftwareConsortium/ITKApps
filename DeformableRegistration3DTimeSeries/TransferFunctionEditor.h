@@ -28,7 +28,7 @@ class TransferFunctionEditor : public Fl_Gl_Window {
       void SetHistogramValues(int bin,int value);
       void SetHistogramSize(int size);
       void SetActiveTransferFunction(int number);
-      std::list<coord> & TransferFunctionEditor::GetOpacityTransferFunction() ;
+      std::list<coord> & GetOpacityTransferFunction() ;
       void SetImageSliceViewer(fltk::DeformableRegistration3DTimeSeriesBase* viewer);
       void SetColorChooser(Fl_Color_Chooser* colorchooser);
       void SetPointcolor(double r,double g,double b);

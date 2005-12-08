@@ -15,7 +15,7 @@
 #include <FL/Fl_Value_Input.H>
 #include <FL/Fl_Value_Slider.H>
 
-class MyTestAppInterface : MySegmentation {
+class MyTestAppInterface : private MySegmentation {
 public:
   MyTestAppInterface();
   Fl_Window *mainwin;

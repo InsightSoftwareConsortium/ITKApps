@@ -349,9 +349,9 @@ PolygonDrawing
   unsigned int nTilesY = (unsigned int) ceil( height * 1.0 / hTile );
 
   // Draw and retrieve each tile
-  for(int iTileX = 0; iTileX < nTilesX; iTileX++)
+  for(unsigned int iTileX = 0; iTileX < nTilesX; iTileX++)
     {
-    for(int iTileY = 0; iTileY < nTilesY; iTileY++)
+    for(unsigned int iTileY = 0; iTileY < nTilesY; iTileY++)
       {
       // Get the corner of the tile
       unsigned int xTile = iTileX * wTile, yTile = iTileY * hTile;
@@ -814,6 +814,9 @@ void PolygonDrawing::CombineCallback(GLdouble coords[3],
 
 /*
  *Log: PolygonDrawing.cxx
+ *Revision 1.8  2004/07/22 19:22:50  pauly
+ *ENH: Large image support for SNAP. This includes being able to use more screen real estate to display a slice, a fix to the bug with manual segmentation of images larger than the window size, and a thumbnail used when zooming into the image.
+ *
  *Revision 1.7  2004/01/27 17:49:47  pauly
  *FIX: MAC OSX Compilation fixes
  *

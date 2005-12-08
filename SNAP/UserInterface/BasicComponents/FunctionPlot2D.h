@@ -25,6 +25,7 @@
 class FunctionPlot2DSettings
 {
 public:
+    virtual ~FunctionPlot2DSettings() {} ;
 
   irisGetMacro(PlotRangeMin,Vector2f);
   irisSetMacro(PlotRangeMin,Vector2f);

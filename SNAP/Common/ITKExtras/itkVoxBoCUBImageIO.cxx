@@ -39,6 +39,7 @@ namespace itk {
 class GenericCUBFileAdaptor
 {
 public:
+    virtual ~GenericCUBFileAdaptor() {}
   virtual unsigned char ReadByte() = 0;
   virtual void ReadData(void *data, unsigned long bytes) = 0;
   virtual void WriteData(const void *data, unsigned long bytes) = 0;
@@ -174,8 +175,8 @@ public:
       throw exception;
       }
     }
-  
-  ~DirectCUBFileAdaptor()
+
+  virtual ~DirectCUBFileAdaptor()
     {
     if(m_File)
       fclose(m_File);
@@ -204,8 +205,8 @@ public:
       throw exception;
       }
 
-    int bread = fread(data, 1, bytes, m_File);
-    if(bread != bytes)
+    size_t bread = fread(data, 1, bytes, m_File);
+    if(static_cast<unsigned long>(bread) != bytes)
       {
       std::ostringstream oss;
       oss << "File size does not match header: " 
@@ -227,8 +228,8 @@ public:
       throw exception;
       }
 
-    int bwritten = fwrite(data, 1, bytes, m_File);
-    if(bwritten != bytes)
+    size_t bwritten = fwrite(data, 1, bytes, m_File);
+    if(static_cast<unsigned long>(bwritten) != bytes)
       {
       ExceptionObject exception;
       exception.SetDescription("Could not write all bytes to file");

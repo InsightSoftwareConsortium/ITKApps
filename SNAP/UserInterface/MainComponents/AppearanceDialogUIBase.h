@@ -18,6 +18,7 @@
 class AppearanceDialogUIBase
 {
 public:
+    virtual ~AppearanceDialogUIBase() {}
   virtual void OnUIElementUpdate() = 0;
   virtual void OnUIElementSelection(int value) = 0;
   virtual void OnSliceAnatomyOptionsChange(unsigned int order) = 0;

@@ -36,9 +36,6 @@ ${VTK_BINARY_DIR}/Rendering
 ${VTK_BINARY_DIR}/IO
 ${VTK_BINARY_DIR}/Patented
 ${EditorFltkGui_BINARY_DIR}
-${FLTK_LIBRARY}
-${OPENGL_LIBRARY}
-${OPENGL_glu_LIBRARY}
 )
 
 SET(EditorFltkGui_SRCS

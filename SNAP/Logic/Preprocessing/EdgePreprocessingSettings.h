@@ -46,6 +46,8 @@ public:
 
   // Constructor
   EdgePreprocessingSettings();
+  // Destructor
+  virtual ~EdgePreprocessingSettings();
 
 private:
   float m_GaussianBlurScale;

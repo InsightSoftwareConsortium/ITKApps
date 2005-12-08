@@ -449,7 +449,7 @@ SegmenterConsole::ShowSpeedImage()
     }
   else
     {
-    fl_alert("Error! Please set appropriate thresholds.", "OK");
+    fl_alert("Error! Please set appropriate thresholds.");
     }
 }
 
@@ -495,7 +495,7 @@ void SegmenterConsole::SetThresholdSegmentationInput()
     case 1:
       if (strcmp(m_SeedReader->GetFileName(), "") == 0)
         {
-        fl_alert("Error! Please read in a Seed Image.", "OK");
+        fl_alert("Error! Please read in a Seed Image.");
         m_thresholdSegmentation->Modified();
         return;
         break;

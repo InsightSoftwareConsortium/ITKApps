@@ -1083,7 +1083,7 @@ DeformableRegistration3DTimeSeriesBase
   m_SelectedPoint[0] = x;
   m_SelectedPoint[1] = y;
   m_SelectedPoint[2] = z;
-  int dimensions[3] = { 100, 100, 100 };
+  //int dimensions[3] = { 100, 100, 100 };
   m_Sphere->SetRadius(0.8);
   m_SphereActor->SetPosition( x, y, z );
   m_SphereActor->VisibilityOn();

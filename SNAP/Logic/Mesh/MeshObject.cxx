@@ -283,8 +283,8 @@ MeshObject
   unsigned int i;
 
   // Define a shorthand pointer to the image data
-  IRISImageData *irisData = m_Driver->GetCurrentImageData();  
-  
+  //IRISImageData *irisData = m_Driver->GetCurrentImageData();
+
   // check if the snake is not active
   // if yes it means we are in IRIS 
   // so we render all segmentations
@@ -360,6 +360,9 @@ MeshObject
 
 /*
  *Log: MeshObject.cxx
+ *Revision 1.18  2005/11/23 14:32:15  ibanez
+ *BUG: 2404. Patch provided by Paul Yushkevish.
+ *
  *Revision 1.17  2005/10/29 14:00:14  pauly
  *ENH: SNAP enhacements like color maps and progress bar for 3D rendering
  *

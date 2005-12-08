@@ -505,7 +505,7 @@ CellsViewerBase
   }
   
   char buff[500];
-  sprintf( buff,"Substrate%03d",m_Substrates.size() );
+  sprintf( buff,"Substrate%03zd",m_Substrates.size() );
   std::string substrateName = buff;
 
   const char * useranswer = fl_input( "Substrate Name", 

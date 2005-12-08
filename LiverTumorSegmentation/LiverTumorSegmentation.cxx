@@ -64,7 +64,7 @@ LiverTumorSegmentation::LiverTumorSegmentation()
   
   m_ModuleType = THRESHOLD_LEVEL_SET;
   
-  for(unsigned int i=0; i<NUMBER_OF_ALGORITHMS; i++)
+  for(unsigned int i=0; i<static_cast<unsigned int>(NUMBER_OF_ALGORITHMS); i++)
     {
     m_Module->add( LiverTumorSegmentationModuleNames[i] );
     }
@@ -537,7 +537,7 @@ void LiverTumorSegmentation::SyncAllViews(void)
     m_SeedIndex[2] = index[2];
     }
   // Sync the selected point in all the views even if it is outside the image
-  sprintf( m_MessageString, "Clicked Point:Indices(%d,%d,%d),Position(%4.3f,%4.3f,%4.3f),Value(%4.3f)", 
+  sprintf( m_MessageString, "Clicked Point:Indices(%ld,%ld,%ld),Position(%4.3f,%4.3f,%4.3f),Value(%4.3f)", 
     index[0],index[1],index[2],m_SeedPoint[0], m_SeedPoint[1], m_SeedPoint[2], m_SeedValue );
 
   m_MessageBar->label( m_MessageString );

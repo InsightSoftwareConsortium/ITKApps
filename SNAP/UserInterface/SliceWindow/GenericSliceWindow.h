@@ -55,7 +55,6 @@ template <class TPixel> class OpenGLSliceTexture;
 class GenericSliceWindow : public FLTKCanvas
 {
 public:
-  
   GenericSliceWindow(int x,int y,int w,int h,const char *l=0);
   virtual ~GenericSliceWindow();
 

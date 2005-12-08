@@ -39,6 +39,7 @@ namespace itk {
 class SNAPLevelSetDriverBase
 {
 public:
+    virtual ~SNAPLevelSetDriverBase() { /*To avoid compiler warning.*/ }
   /** Set snake parameters */
   virtual void SetSnakeParameters(const SnakeParameters &parms) = 0;
 

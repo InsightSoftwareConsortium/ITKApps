@@ -54,6 +54,7 @@ namespace itk
 class ImageInfoCallbackInterface
 {
 public:
+    virtual ~ImageInfoCallbackInterface() {}
   virtual bool FindRegistryAssociatedWithImage(
     const char *file, Registry &registry) = 0;
 

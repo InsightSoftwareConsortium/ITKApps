@@ -17,8 +17,10 @@
 
 #include "Registry.h"
 #include "itkSmartPointer.h"
+#include "itkImage.h"
+#include "itkImageIOBase.h"
 
-namespace itk 
+namespace itk
 {
   template<class TPixel, unsigned int VDim> class Image;
   class ImageIOBase;
@@ -27,6 +29,7 @@ namespace itk
 class GuidedImageIOBase
 {
 public:
+    virtual ~GuidedImageIOBase() { /*To avoid compiler warning.*/ }
   enum FileFormat {
     FORMAT_MHA=0, FORMAT_GIPL, FORMAT_RAW, FORMAT_ANALYZE,
     FORMAT_DICOM, FORMAT_GE4, FORMAT_GE5, FORMAT_SIEMENS, FORMAT_VTK, 

@@ -75,6 +75,7 @@ using namespace std;
 class GreyImageInfoCallback : public ImageInfoCallbackInterface
 {
 public:
+    virtual ~GreyImageInfoCallback() {}
   GreyImageInfoCallback(SystemInterface *system)
     { m_SystemInterface = system; }
 
@@ -804,7 +805,8 @@ UserInterfaceLogic
   if (m_GlobalState->GetSpeedValid()) 
     {
     //make sure they want to do this
-    if (0 == fl_ask("Preprocessed data will be lost!  Continue?")) 
+    //fl_ask is deprecated if (0 == fl_ask("Preprocessed data will be lost!  Continue?"))
+    if (0 == fl_choice("Preprocessed data will be lost!  Continue?","No","Yes",NULL))
       {
       m_RadSnakeInOut->clear();
       m_RadSnakeEdge->set();
@@ -849,7 +851,8 @@ UserInterfaceLogic
   if (m_GlobalState->GetSpeedValid()) 
     {
     //make sure they want to do this
-    if (0 == fl_ask("Preprocessed data will be lost!  Continue?")) 
+    //fl_ask is deprecated if (0 == fl_ask("Preprocessed data will be lost!  Continue?")) 
+    if (0 == fl_choice("Preprocessed data will be lost!  Continue?","No","Yes",NULL))
       {
       m_RadSnakeInOut->set();
       m_RadSnakeEdge->clear();
@@ -1482,8 +1485,8 @@ UserInterfaceLogic
   LabelType iDrawOver = m_GlobalState->GetOverWriteColorLabel();
 
   // Select the drawing label
-  for(size_t i = 0; i < m_InDrawingColor->size(); i++)
-    if(iDrawing == (LabelType) (size_t) m_InDrawingColor->menu()[i].user_data())
+  for(size_t i = 0; i < static_cast<size_t>(m_InDrawingColor->size()); i++)
+    if(iDrawing == static_cast<LabelType>(reinterpret_cast<size_t>(m_InDrawingColor->menu()[i].user_data())))
       m_InDrawingColor->value(i);
 
   // Set the draw over label
@@ -1491,8 +1494,8 @@ UserInterfaceLogic
     m_InDrawOverColor->value(0);
   else if (m_GlobalState->GetCoverageMode() == PAINT_OVER_COLORS)
     m_InDrawOverColor->value(1);
-  else for(size_t j = 0; j < m_InDrawingColor->size(); j++)
-    if(iDrawOver == (LabelType) (size_t) m_InDrawingColor->menu()[j].user_data())
+  else for(size_t j = 0; j < static_cast<size_t>(m_InDrawingColor->size()); j++)
+    if(iDrawOver == static_cast<LabelType>(reinterpret_cast<size_t>( m_InDrawingColor->menu()[j].user_data())))
       m_InDrawOverColor->value(j + 2);
 }
 
@@ -2112,7 +2115,7 @@ UserInterfaceLogic
     }
   else 
     {
-    for(unsigned int j = 0; j < 4; j++)
+    for(int j = 0; j < 4; j++)
       {
       if(iWindow != j)
         {
@@ -3280,6 +3283,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.44  2005/11/23 14:32:15  ibanez
+ *BUG: 2404. Patch provided by Paul Yushkevish.
+ *
  *Revision 1.43  2005/11/10 23:02:14  pauly
  *ENH: Added support for VoxBo CUB files to ITK-SNAP, as well as some cosmetic touches
  *

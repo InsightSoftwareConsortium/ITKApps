@@ -42,6 +42,7 @@ SET(LOGIC_CXX
   Common/CommandLineArgumentParser.cxx
   Common/IRISException.cxx
   Common/Registry.cxx
+  Common/SNAPCommon.cxx
   Common/SystemInterface.cxx
   Common/ITKExtras/itkVoxBoCUBImageIO.cxx
   Common/ITKExtras/itkVoxBoCUBImageIOFactory.cxx
@@ -536,9 +537,10 @@ ELSE(VTK_USE_PATENTED)
 ENDIF(VTK_USE_PATENTED)
 
 # FLTK Related libraries
-SET(SNAP_FLTK_LIBS
-  ${FLTK_LIBRARIES}
-)
+## Workaround for problem with FindFLTK.cmake when FLTK was built using Cmake.
+#SET(FLTK_LIBRARIES  ${FLTK_LIBRARIES} ${FLTK_IMAGES_LIBRARY} ${FLTK_IMAGES_LIBS} ${FLTK_BASE_LIBRARY} ${FLTK_GL_LIBRARY} ${FLTK_FORMS_LIBRARY})
+SET(SNAP_FLTK_LIBS ${FLTK_LIBRARIES})
+    MESSAGE(INFO "Set SNAP_FLTK_LIBS to ${SNAP_FLTK_LIBS}")
 
 # System libraries
 SET(SNAP_SYSTEM_LIBS

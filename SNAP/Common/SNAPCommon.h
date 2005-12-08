@@ -40,20 +40,20 @@ typedef itk::OStringStream IRISOStringStream;
 typedef std::istringstream IRISIStringStream;
 
 // Short name (release tag, e.g. $Name:  $)
-static const char SNAPVersionShort[] = "$Name:  $";
+extern const char SNAPVersionShort[];
 
 // Full RCS info
-static const char SNAPVersion[] = "@(#) Id";
+extern const char SNAPVersion[];
 
 // Non-cvs version
-static const char SNAPSoftVersion[] = "ITK-SNAP 1.4b2 [2005.11.10]";
+extern const char SNAPSoftVersion[];
 
 // Release date of the current version
-static const char SNAPCurrentVersionReleaseDate[] = "20051110";
+extern const char SNAPCurrentVersionReleaseDate[];
 
 // Release date of the latest version whose user preference files are
 // incompatible with the current version and will be erased
-static const char SNAPLastIncompatibleReleaseDate[] = "20031109";
+extern const char SNAPLastIncompatibleReleaseDate[];
 
 /**
  * Bubble structure

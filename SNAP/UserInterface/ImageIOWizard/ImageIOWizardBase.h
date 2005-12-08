@@ -22,6 +22,7 @@
  */
 class ImageIOWizardBase {
 public:
+    virtual ~ImageIOWizardBase() {}
   virtual void OnCancel() = 0;
   virtual void OnFilePageBrowse() = 0;
   virtual void OnFilePageNext() = 0;

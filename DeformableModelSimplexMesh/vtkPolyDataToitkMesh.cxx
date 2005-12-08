@@ -56,8 +56,8 @@ vtkPolyDataToitkMesh
   vtkPoints * vtkpoints =  m_PolyData->GetPoints();
  
   m_itkMesh->GetPoints()->Reserve( numberOfPoints );
-  
-  for(int p =0; p < numberOfPoints; p++)
+
+  for(unsigned int p =0; p < numberOfPoints; p++)
     {
 
     vtkFloatingPointType * apoint = vtkpoints->GetPoint( p );

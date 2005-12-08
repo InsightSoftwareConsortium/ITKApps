@@ -162,7 +162,7 @@ class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
       }
       Fl_Light_Button loadButton {
         label Load
-        callback {Load();}
+        callback {Load(NULL);}
         xywh {30 45 69 30} type Normal value 1 selection_color 1
         class {fltk::LightButton}
       }
@@ -182,7 +182,7 @@ class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
   } {}
   Function {Quit( void )} {return_type {virtual void}
   } {}
-  Function {Load( void )} {return_type {virtual void}
+  Function {Load( const char * )} {return_type {virtual void}
   } {}
   Function {ShowInput( void )} {return_type {virtual void}
   } {}

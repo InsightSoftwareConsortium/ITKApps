@@ -17,6 +17,7 @@
 
 class RestoreSettingsDialogBase {
 public:
+    virtual ~RestoreSettingsDialogBase() {}
   virtual void OnRestoreSettingsAction() = 0;
   virtual void OnDoNotRestoreSettingsAction() = 0;
   virtual void OnCancelAction() = 0;

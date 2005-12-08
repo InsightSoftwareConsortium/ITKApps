@@ -19,7 +19,7 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
   # Macro for adding resources to GUI application on the Mac
   #
-  IF(APPLE)
+  IF(APPLE AND NOT FLTK_USE_X)
     FIND_PROGRAM(ITK_APPLE_RESOURCE Rez /Developer/Tools)
     FIND_FILE(ITK_FLTK_RESOURCE mac.r /usr/local/include/FL)
     IF(NOT ITK_FLTK_RESOURCE)
@@ -41,12 +41,12 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
                              TARGET ${name})
         ENDIF(ITK_APPLE_RESOURCE)
     ENDMACRO(ADD_GUI_EXECUTABLE)
-  ELSE(APPLE)
+  ELSE(APPLE AND NOT FLTK_USE_X)
     MACRO(ADD_GUI_EXECUTABLE name sources)
       ADD_EXECUTABLE(${name} ${sources})
       INSTALL_TARGETS(/bin ${name})
     ENDMACRO(ADD_GUI_EXECUTABLE)
-  ENDIF(APPLE)
+  ENDIF(APPLE AND NOT FLTK_USE_X)
 
   INCLUDE_DIRECTORIES(
     ${Curves3DExtractor_SOURCE_DIR}

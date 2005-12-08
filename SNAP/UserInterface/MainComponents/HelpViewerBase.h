@@ -17,6 +17,7 @@
 
 class HelpViewerBase {
 public:
+    virtual ~HelpViewerBase () {}
   virtual void OnLinkAction() = 0;
   virtual void OnBackAction() = 0;
   virtual void OnForwardAction() = 0;

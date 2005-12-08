@@ -20,9 +20,6 @@ ${ITK_BINARY_DIR}/Code/Algorithms
 ${ITK_BINARY_DIR}/Code/IO
 ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
 ${WatershedSegmentationFltkGui_BINARY_DIR}
-${FLTK_LIBRARY}
-${OPENGL_LIBRARY}
-${OPENGL_glu_LIBRARY}
 )
 
 SET(WatershedSegmentationFltkGui3D_SRCS
@@ -44,7 +41,7 @@ ITKBasicFilters
 ITKIO
 ITKNumerics
 ITKFltkImageViewer
-${FTLK_LIBRARY}
+${FTLK_LIBRARIES}
 )
 
 FLTK_WRAP_UI(WatershedSegmentationFltkGui3D   ${WatershedSegmentationFltkGui3D_GUI_SRCS})

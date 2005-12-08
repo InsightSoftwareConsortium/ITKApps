@@ -21,6 +21,7 @@
  */
 class LabelEditorUIBase {
 public:
+    virtual ~LabelEditorUIBase() {}
   // Callbacks
   virtual void OnNewAction() = 0;
   virtual void OnDuplicateAction() = 0;

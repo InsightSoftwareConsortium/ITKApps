@@ -19,13 +19,8 @@
 #include "IRISVectorTypes.h"
 
 // Include OpenGL headers according to the platform
-#ifdef __APPLE__
-  #include <glu.h>
-  #include <FL/gl.h>
-#else
   #include <FL/gl.h>
   #include <GL/glu.h>
-#endif
 
 #ifndef _WIN32
 #ifndef GLU_VERSION_1_2
@@ -36,10 +31,32 @@
 // Inline functions for use with vector classes
 inline void glVertex( const Vector3f &x ) { glVertex3fv(x.data_block()); }
 inline void glVertex( const Vector3d &x ) { glVertex3dv(x.data_block()); }
-inline void glVertex( const Vector3i &x ) { glVertex3iv(x.data_block()); }
+
+inline void glVertex( const Vector3i &x )
+{
+#if defined(__APPLE__)
+    const GLint CastConvertTemp[3]={static_cast<GLint>(x[0]),static_cast<GLint>(x[1]),static_cast<GLint>(x[2])};
+    glVertex3iv(CastConvertTemp);//NOTE:  On Mac GLint is a long integer, so we must create a long integer vector to send to glVertex3iv.
+    //A more elegant solution could be made if partial template specialization were allowed.
+    //Perhaps Vector3i could be defined in terms of GLint instead of int
+#else
+    glVertex3iv(x.data_block());
+#endif
+}
 inline void glVertex( const Vector2f &x ) { glVertex2fv(x.data_block()); }
 inline void glVertex( const Vector2d &x ) { glVertex2dv(x.data_block()); }
-inline void glVertex( const Vector2i &x ) { glVertex2iv(x.data_block()); }
+
+inline void glVertex( const Vector2i &x )
+{
+#if defined(__APPLE__)
+    const GLint CastConvertTemp[2]={static_cast<GLint>(x[0]),static_cast<GLint>(x[1])};
+    glVertex2iv(CastConvertTemp);//NOTE:  On Mac GLint is a long integer, so we must create a long integer vector to send to glVertex3iv.
+    //A more elegant solution could be made if partial template specialization were allowed.
+    //Perhaps Vector2i could be defined in terms of GLint instead of int
+#else
+    glVertex2iv(x.data_block());
+#endif
+}
 
 inline void glTranslate( const Vector3f &x ) { glTranslatef(x[0],x[1],x[2]); }
 inline void glTranslate( const Vector3d &x ) { glTranslated(x[0],x[1],x[2]); }

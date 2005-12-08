@@ -68,11 +68,11 @@ protected:
   typedef itk::Image<unsigned short, 3>                       InputSegmentedImageType;
   typedef OutputImageType                                     OutputSegmentedImageType;
   typedef itk::ImageFileReader<InputImageType>                ImageReaderType;
-  typedef itk::ExtractImageFilter< InputImageType, 
-                                            OutputImageType > ExtractFilterType;
   typedef itk::ImageToVTKImageFilter< OutputImageType >       AdaptorFilterType;
   typedef AdaptorFilterType::Pointer                          AdaptorFilterPointer;
   ImageReaderType::Pointer                                    m_file1_reader; 
+  typedef itk::ExtractImageFilter< InputImageType,
+                                       OutputImageType>       ExtractFilterType;
   ExtractFilterType::Pointer                                  m_extractfilter;
   AdaptorFilterPointer                                        m_AdaptorFilter;
 
@@ -101,8 +101,6 @@ protected:
   //Dicom loader
   ISIS::DicomImageReader<InputImageType>                      m_DicomVolumeReader; 
   //Demons registration
-  typedef itk::ExtractImageFilter< InputImageType, 
-                                       OutputImageType>       ExtractFilterType;
   typedef itk::HistogramMatchingImageFilter<
                                     OutputImageType,
                                     OutputImageType >         MatchingFilterType;

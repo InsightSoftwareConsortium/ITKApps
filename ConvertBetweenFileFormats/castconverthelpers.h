@@ -172,14 +172,14 @@ void ReadCastWriteImage( std::string inputFileName, std::string outputFileName )
   caster->SetShift( 0.0 );
   caster->SetScale( 1.0 );
   writer->SetFileName( outputFileName.c_str()  );
-  
+
   /*
   typedef typename InputImageType::PixelType PixelTape;
   typedef typename itk::ImageRegionConstIterator<InputImageType> ImageIteratorType;
   typedef typename ImageIteratorType::PixelType PixelType;
 
   ImageIteratorType it(reader->GetOutput(),reader->GetOutput()->GetLargestPossibleRegion());
-
+  */
   /** Connect the pipeline. */
   caster->SetInput( reader->GetOutput() );
   writer->SetInput( caster->GetOutput() );

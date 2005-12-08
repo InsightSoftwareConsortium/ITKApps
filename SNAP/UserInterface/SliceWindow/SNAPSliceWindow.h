@@ -47,7 +47,6 @@ protected:
   typedef OpenGLSliceTexture<RGBAType> SpeedTextureType;
 
   // Texture object type associated with the active segmentation image
-  typedef LabelImageWrapper::DisplayPixelType RGBAType;
   typedef OpenGLSliceTexture<RGBAType> SnakeTextureType;
   
   // Another texture object type used to display thresholding overlays, etc

@@ -23,7 +23,7 @@
  * \brief  An extension of the VNL vector with some special trivial 
  * extra functionality.
  */
-template<class T, int VSize> 
+template<class T, int VSize>
 class iris_vector_fixed : public vnl_vector_fixed<T,VSize> {
 public:
   typedef iris_vector_fixed<T,VSize> Self;

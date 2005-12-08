@@ -8,7 +8,7 @@
 template<class TImagePixel>
 LandmarkSliceViewer<TImagePixel>
 ::LandmarkSliceViewer( unsigned int x, unsigned int y,
-                       unsigned int w, unsigned int h, const char * label=0 )
+                       unsigned int w, unsigned int h, const char * label )
   : GLSliceView< TImagePixel, unsigned char >(x,y,w,h,label)
   { 
   m_Mode = Normal;
@@ -312,14 +312,13 @@ LandmarkSliceViewer<TImagePixel>
   int    x;
   int    y;
   int    z;
-  SizeType        size; 
   IndexType       modifiedIndex;
   IndexType       index;
   RegionType      region;
   ViewerColorType       color;
 
   region = this->cOverlayData->GetLargestPossibleRegion();
-  size = region.GetSize();
+  //SizeType        size = region.GetSize();
 
 
   this->cImData->TransformPhysicalPointToIndex(landmark.GetPosition(), index);

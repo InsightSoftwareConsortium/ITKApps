@@ -17,6 +17,7 @@
 
 class ResizeRegionDialogBase {
 public:
+    virtual ~ResizeRegionDialogBase() {}
   virtual void OnVoxelSizeChange() = 0;
   virtual void OnVoxelScaleChange() = 0;
   virtual void OnOkAction() = 0;

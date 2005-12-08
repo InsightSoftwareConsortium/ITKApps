@@ -30,8 +30,8 @@
  */
 class InteractionMode
 {
-
 public:
+    virtual ~InteractionMode(void) {} /* Needed to avoid compiler warning */
 
   /**
    * Called when mouse button is pressed.

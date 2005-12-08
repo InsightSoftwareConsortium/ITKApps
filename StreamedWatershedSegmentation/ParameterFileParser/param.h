@@ -69,6 +69,7 @@ typedef enum{
 class GenericValue
 {
 public:
+  virtual ~GenericValue() {}
   GenericValue(bool b) {m_Valid = b;}
   GenericValue() : m_Valid(true) {}
   virtual value_type GetValueType() const    { return VPF_UNKNOWN; }

@@ -2,7 +2,7 @@
 version 1.0105 
 header_name {.h} 
 code_name {.cxx}
-class LabelEditorUI {open : LabelEditorUIBase
+class LabelEditorUI {open : { private LabelEditorUIBase }
 } {
   Function {MakeWindow()} {open
   } {

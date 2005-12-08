@@ -2,7 +2,7 @@
 version 1.0104 
 header_name {.h} 
 code_name {.cxx}
-class SimpleFileDialog {open : SimpleFileDialogBase
+class SimpleFileDialog {open : { private SimpleFileDialogBase }
 } {
   Function {MakeWindow()} {open
   } {

@@ -29,6 +29,7 @@ template <class TPixel, class THitTester>
 class ImageRayIntersectionFinder
 {
 public:
+    virtual ~ImageRayIntersectionFinder() {}
   /** Image type */
   typedef itk::Image<TPixel,3> ImageType;
 

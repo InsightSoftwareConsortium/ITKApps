@@ -2,7 +2,9 @@
 #include <iostream>
 #include<cmath>
 #include <math.h>
+#ifndef M_PI
 #define M_PI 3.145
+#endif
 #define Radius 5
 // the constructor method
 

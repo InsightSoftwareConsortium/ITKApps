@@ -2,7 +2,7 @@
 version 1.0102 
 header_name {.h} 
 code_name {.cxx}
-class PreprocessingUI {open : PreprocessingUIBase
+class PreprocessingUI {open : { private PreprocessingUIBase }
 } {
   Function {MakeWindow()} {open
   } {

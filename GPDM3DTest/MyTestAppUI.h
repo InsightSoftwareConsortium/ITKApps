@@ -19,7 +19,7 @@
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Value_Input.H>
 
-class MyTestAppInterface : MySegmentation {
+class MyTestAppInterface : private MySegmentation {
 public:
   MyTestAppInterface();
   Fl_Window *mainwin;

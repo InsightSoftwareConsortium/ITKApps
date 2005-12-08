@@ -2,7 +2,7 @@
 version 1.0104
 header_name {.h} 
 code_name {.cxx}
-class HelpViewer {open : HelpViewerBase
+class HelpViewer {open : { private HelpViewerBase }
 } {
   Function {MakeWindow()} {open
   } {

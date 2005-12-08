@@ -71,7 +71,7 @@ public:
   enum {X,Y,Z};
 
   Window3D( int x, int y, int w, int h, const char *l=0 );
-  ~Window3D();
+  virtual ~Window3D(void); /* Needed to be virtual to avoid compiler warning */
   Window3D& operator= ( const Window3D& W ) { return *this; };
 
   /** Register the parent classes with this application */
@@ -249,6 +249,9 @@ private:
 
 /*
  *Log: Window3D.h
+ *Revision 1.10  2005/10/29 14:00:16  pauly
+ *ENH: SNAP enhacements like color maps and progress bar for 3D rendering
+ *
  *Revision 1.9  2004/09/14 14:11:11  pauly
  *ENH: Added an activation manager to main UI class, improved snake code, various UI fixes and additions
  *

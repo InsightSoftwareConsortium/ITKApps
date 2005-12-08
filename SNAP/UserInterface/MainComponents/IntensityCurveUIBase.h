@@ -21,6 +21,7 @@
  */
 class IntensityCurveUIBase {
 public:
+    virtual ~IntensityCurveUIBase() {}
   // Callbacks made from the user interface
   virtual void OnClose() = 0;
   virtual void OnReset() = 0;

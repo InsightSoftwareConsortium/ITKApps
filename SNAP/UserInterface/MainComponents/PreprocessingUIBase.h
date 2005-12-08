@@ -24,7 +24,7 @@
 class PreprocessingUIBase
 {
 public:
-  
+  virtual ~PreprocessingUIBase() {}
   // Callbacks for the Edge snake preprocessing window
   virtual void OnEdgeSettingsChange() = 0;
   virtual void OnEdgePreviewChange() = 0;

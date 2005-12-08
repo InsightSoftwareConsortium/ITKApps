@@ -27,6 +27,7 @@ class GreyImageWrapper;
 class ThresholdSettings
 {
 public:
+    virtual ~ThresholdSettings() { /*To avoid compiler warning.*/ }
   irisGetMacro(LowerThreshold, int);
   irisSetMacro(LowerThreshold, int);
 

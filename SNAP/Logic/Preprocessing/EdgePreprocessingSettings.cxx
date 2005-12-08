@@ -28,6 +28,8 @@ EdgePreprocessingSettings()
   SetRemappingSteepness(0.1f);
   SetRemappingExponent(2.0f);
 }
+EdgePreprocessingSettings::
+~EdgePreprocessingSettings() { /*Needs to be defined to avoid compiler warning about needing a virtual destructor*/};
 
 EdgePreprocessingSettings
 EdgePreprocessingSettings

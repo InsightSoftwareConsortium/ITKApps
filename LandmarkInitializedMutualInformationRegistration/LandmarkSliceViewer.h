@@ -16,7 +16,7 @@ class LandmarkSliceViewer : public GLSliceView< TImagePixel,
   public:
 
     LandmarkSliceViewer(unsigned int x, unsigned int y, 
-                        unsigned int w, unsigned int h, const char * label);
+                        unsigned int w, unsigned int h, const char * label=0);
   
     ~LandmarkSliceViewer();
   

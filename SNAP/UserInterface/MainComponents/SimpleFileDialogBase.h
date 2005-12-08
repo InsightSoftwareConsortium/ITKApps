@@ -17,6 +17,7 @@
 
 class SimpleFileDialogBase {
 public:
+    virtual ~SimpleFileDialogBase() {}
   virtual void OnFileChange() = 0;
   virtual void OnHistoryChange() = 0;
   virtual void OnBrowseAction() = 0;

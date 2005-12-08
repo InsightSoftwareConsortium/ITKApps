@@ -114,7 +114,7 @@ LabelEditorUILogic
   assert(GetColorLabel(iLabel).IsValid());
   
   // Find the label in the browser, and select it
-  for(size_t i = 1; i <= m_BrsLabelList->size(); i++)
+  for(size_t i = 1; i <= static_cast<size_t>(m_BrsLabelList->size()); i++)
     {
     size_t id = (size_t) m_BrsLabelList->data(i);
     if(id == iLabel) 
@@ -188,12 +188,12 @@ LabelEditorUILogic
 
   // If the space is not the last one in the list, alert the user that we 
   // are sticking the label in the first available slot
-  else if(iLabel < m_BrsLabelList->size())
+  else if(iLabel < static_cast<size_t>(m_BrsLabelList->size()))
     {
     fl_message(
       "The label will be assigned the first available ID, which is %d\n"
       "To assign a different ID to the label or to move it to the \n"
-      "bottom of the list of labels, use the 'Label Id' tab \n", iLabel);
+      "bottom of the list of labels, use the 'Label Id' tab \n", static_cast<int>(iLabel));
     }
  
   return iLabel;

@@ -24,9 +24,10 @@
  *
  * \sa itk::LevelSetFunction
  */
-class SnakeParameters  
+class SnakeParameters
 {
 public:
+    virtual ~SnakeParameters() { /*To avoid compiler warning.*/ }
   enum ConstraintsType {
     SAPIRO, SCHLEGEL, TURELLO, USER
   };
@@ -114,7 +115,6 @@ public:
 
   irisGetMacro(AdvectionSpeedExponent,int);
   irisSetMacro(AdvectionSpeedExponent,int);
-
 private:
   float m_TimeStepFactor;
   float m_Ground;

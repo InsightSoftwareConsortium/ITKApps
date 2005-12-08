@@ -77,7 +77,7 @@ public:
     if(m_Flags[flag].State == value) return;
 
     // Throw an exception if the recursion depth is too great
-    if(recursionCount > m_Flags.size())
+    if(recursionCount > static_cast<int>(m_Flags.size()))
       throw std::string("Infinite loop in the flag state machine!");
 
     // Get the flag data for this flag
@@ -115,6 +115,7 @@ public:
    */
   class WidgetWrapper {
   public:
+      virtual ~WidgetWrapper() {}
     virtual void OnStateChange(bool newState) = 0;
   };
 
@@ -181,7 +182,7 @@ private:
   template<class TWidget,typename TFlag>
     class GenericWidgetWrapper : public WidgetActivationManager<TFlag>::WidgetWrapper {
   public:
-    
+    virtual ~GenericWidgetWrapper() {}
     // State change method
     virtual void OnStateChange(bool newState) 
       {
@@ -206,6 +207,7 @@ private:
   class ValuatorWidgetWrapper
   : public GenericWidgetWrapper<TWidget,TFlag> {
   public:
+      virtual ~ValuatorWidgetWrapper() {}
     // State change method
     virtual void OnStateChange(bool newState)
       {
@@ -215,7 +217,7 @@ private:
 
     // Constructor
     ValuatorWidgetWrapper(TWidget *w, const TValue &on, const TValue &off)
-      : GenericWidgetWrapper<TWidget,TFlag>(w), m_OnValue(on), m_OffValue(off) {}
+      : GenericWidgetWrapper<TWidget,TFlag>(w), m_OffValue(off), m_OnValue(on) {}
 
   protected:
     TValue m_OffValue, m_OnValue;

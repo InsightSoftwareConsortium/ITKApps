@@ -31,6 +31,7 @@ typedef itk::Image<unsigned char,2> SNAPDummyImageType;
  */
 class UserInterfaceBase {
 public:
+    virtual ~UserInterfaceBase(void) {} /* Needed to avoid compiler warning */
 
   // Methods for switching between SNAP and IRIS modes
   virtual void ShowIRIS() = 0;
