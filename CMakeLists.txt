@@ -83,6 +83,12 @@ ENDIF(OPENGL_INCLUDE_PATH)
 OPTION(USE_FLTK "Use FLTK (The Fast Light Toolkit) for GUI (some applications need this)" OFF)
 IF(USE_FLTK)
   FIND_PACKAGE(FLTK)
+  IF(EXISTS ${FLTK_DIR}/FLTKConfig.cmake)
+    MESSAGE(STATUS "Found ${FLTK_DIR}/FLTKConfig.cmake")
+    INCLUDE(${FLTK_DIR}/FLTKConfig.cmake)
+  ELSE(EXISTS ${FLTK_DIR}/FLTKConfig.cmake)
+    MESSAGE(STATUS "Not Found ${FLTK_DIR}/FLTKConfig.cmake")
+  ENDIF(EXISTS ${FLTK_DIR}/FLTKConfig.cmake)
   IF(FLTK_FOUND)
     INCLUDE_DIRECTORIES(${FLTK_INCLUDE_DIR})
   ENDIF(FLTK_FOUND)
@@ -104,7 +110,7 @@ ENDMACRO(ITK_DISABLE_FLTK_GENERATED_WARNINGS)
 
 # Macro for adding resources to GUI application on the Mac
 #
-IF(APPLE AND NOT FLTK_APPLE_X11)
+IF(APPLE AND NOT FLTK_USE_X)
     FIND_PROGRAM(ITK_APPLE_RESOURCE Rez /Developer/Tools)
     FIND_FILE(ITK_FLTK_RESOURCE mac.r /usr/local/include/FL)
     IF(NOT ITK_FLTK_RESOURCE)
@@ -126,168 +132,164 @@ IF(APPLE AND NOT FLTK_APPLE_X11)
                              TARGET ${name})
         ENDIF(ITK_APPLE_RESOURCE)
     ENDMACRO(ADD_GUI_EXECUTABLE)
-ELSE(APPLE AND NOT FLTK_APPLE_X11)
+ELSE(APPLE AND NOT FLTK_USE_X)
   MACRO(ADD_GUI_EXECUTABLE name sources)
     ADD_EXECUTABLE(${name} ${sources})
     INSTALL_TARGETS(/bin ${name})
   ENDMACRO(ADD_GUI_EXECUTABLE)
-ENDIF(APPLE AND NOT FLTK_APPLE_X11)
+ENDIF(APPLE AND NOT FLTK_USE_X)
 
-#
+#This macro allows finer grained control over what gets built by default
+MACRO(OPTIONAL_APP ApplicationSourceDirectoryName)
+  OPTION(USE_${ApplicationSourceDirectoryName} "Build optional package ${ApplicationSourceDirectoryName}." ON)
+  IF(USE_${ApplicationSourceDirectoryName})
+    SUBDIRS(${ApplicationSourceDirectoryName})
+  ENDIF(USE_${ApplicationSourceDirectoryName})
+ENDMACRO(OPTIONAL_APP ApplicationSourceDirectoryName)
+
 
 #Build the Auxiliary directory on which many applications depend
-SUBDIRS(Auxiliary)
+OPTIONAL_APP(Auxiliary)
 
 #Build the example of how to do simple scalar anisotropic diffusion
 #on a PNG image
-SUBDIRS (AnisotropicDiffusionImageFilter)
+OPTIONAL_APP (AnisotropicDiffusionImageFilter)
 
 #Build the example of various methods of segmentation using level sets.
-SUBDIRS (LevelSetSegmentation)
+OPTIONAL_APP (LevelSetSegmentation)
 
 #Build the example of how to create a static library for
 # select filters in itk.
-SUBDIRS (ITKFilterLib)
+OPTIONAL_APP (ITKFilterLib)
 
 #Build the example of how to create a static library for
 # the multi-resolution mutual information registration framework in itk.
-SUBDIRS (ITKRegistrationLib)
+OPTIONAL_APP (ITKRegistrationLib)
 
 #Build the parameter file parser necessary for several applications that follow
-SUBDIRS(StreamedWatershedSegmentation/ParameterFileParser)
+OPTIONAL_APP(StreamedWatershedSegmentation/ParameterFileParser)
 
 # Build the StreamedWatershedSegmentation example
-#SUBDIRS(StreamedWatershedSegmentation)
+#OPTIONAL_APP(StreamedWatershedSegmentation)
+
+IF(NOT BORLAND)
+# Test the conditions for building the MRIBiasCorrection example
+OPTIONAL_APP(MRIBiasCorrection)
+
+# Add an option to build or not build the
+# GaussianMinimumErrorClassifier example
+OPTIONAL_APP(GaussianMinimumErrorClassifier)
 
 # Build the AntiAliasBinaryImageFilter example
-IF(NOT BORLAND)
-SUBDIRS(AntiAliasBinaryImageFilter)
-ENDIF(NOT BORLAND)
+OPTIONAL_APP(AntiAliasBinaryImageFilter)
 
 # Build the SimpleLevelSetsExample
-IF(NOT BORLAND)
-SUBDIRS(SimpleLevelSetsExample)
-ENDIF(NOT BORLAND)
-
-# Build the FloodFilledSpatialFunctionExample
-SUBDIRS(FloodFilledSpatialFunction)
-
-# Build the Multiresolution Registration example
-SUBDIRS(MultiResMIRegistration)
-
-# Build the MI Validation application
-SUBDIRS(MIValidation)
+OPTIONAL_APP(SimpleLevelSetsExample)
 
 # Build the IBSR Validation applications
-IF(NOT BORLAND)
-SUBDIRS(IBSRValidation)
-ENDIF(NOT BORLAND)
+OPTIONAL_APP(IBSRValidation)
 
 # Build the multichannel tissue classification validation
-IF(NOT BORLAND)
-SUBDIRS(MultichannelTissueClassificationValidation)
-ENDIF(NOT BORLAND)
+OPTIONAL_APP(MultichannelTissueClassificationValidation)
 
 # Build the DICOMApp example to output raw and png versions of DICOM file
-IF(NOT BORLAND)
-SUBDIRS(DICOMApp)
-ENDIF(NOT BORLAND)
+OPTIONAL_APP(DICOMApp)
 
 #Build the examples of various fourth-order level set PDEs
-IF(NOT BORLAND)
-SUBDIRS (LevelSetSurfaceProcessing)
+OPTIONAL_APP (LevelSetSurfaceProcessing)
+
+# Shared libs are needed for plugins
+# Build Volview plugins. You can't use them unless you have volview
+IF(BUILD_SHARED_LIBS)
+  OPTIONAL_APP ( VolviewPlugIns )
+ENDIF(BUILD_SHARED_LIBS)
 ENDIF(NOT BORLAND)
 
+
+# Build the FloodFilledSpatialFunctionExample
+OPTIONAL_APP(FloodFilledSpatialFunction)
+
+# Build the Multiresolution Registration example
+OPTIONAL_APP(MultiResMIRegistration)
+
+# Build the MI Validation application
+OPTIONAL_APP(MIValidation)
+
 # Build the Intensity based 2D-3D Registration application
-SUBDIRS(IntensityBased2D3DRegistration)
+OPTIONAL_APP(IntensityBased2D3DRegistration)
 
 # Applications requiring MetaImages and Fltk GUI
 IF(FLTK_FOUND)
   IF(WIN32)
     ADD_DEFINITIONS(-DWIN32)
   ENDIF(WIN32)
-  SUBDIRS(ConvertBetweenFileFormats)
-  SUBDIRS(DigitalArchive)
-  SUBDIRS(DistanceMapFilter)
-  SUBDIRS(DicomImageViewer)
-  SUBDIRS(GaussianFilter)
-  SUBDIRS(Curves2DExtractor)
-  SUBDIRS(Curves3DExtractor)
-  SUBDIRS(DuctExtractor)
-  SUBDIRS(Morphogenesis)
-  SUBDIRS(MutualInformationEuler2DRegistration)
-  SUBDIRS(ImageRegistration)
-  SUBDIRS(LandmarkInitializedMutualInformationRegistration)
-  SUBDIRS(RawImageReaderViewer)
-  SUBDIRS(VoronoiSegmentation)
+  OPTIONAL_APP(ConvertBetweenFileFormats)
+  OPTIONAL_APP(DigitalArchive)
+  OPTIONAL_APP(DistanceMapFilter)
+  OPTIONAL_APP(DicomImageViewer)
+  OPTIONAL_APP(GaussianFilter)
+  OPTIONAL_APP(Curves2DExtractor)
+  OPTIONAL_APP(Curves3DExtractor)
+  OPTIONAL_APP(DuctExtractor)
+  OPTIONAL_APP(Morphogenesis)
+  OPTIONAL_APP(MutualInformationEuler2DRegistration)
+  OPTIONAL_APP(ImageRegistration)
+  OPTIONAL_APP(LandmarkInitializedMutualInformationRegistration)
+  OPTIONAL_APP(RawImageReaderViewer)
+  OPTIONAL_APP(VoronoiSegmentation)
   IF(ITK_USE_PATENTED)
-    SUBDIRS(SimpleFuzzyConnectedness)
-    SUBDIRS(RegionGrowingSegmentation)
+    OPTIONAL_APP(SimpleFuzzyConnectedness)
+    OPTIONAL_APP(RegionGrowingSegmentation)
   ENDIF(ITK_USE_PATENTED)
-  SUBDIRS(ThresholdSegmentationLevelSetFltkGui)
+  OPTIONAL_APP(ThresholdSegmentationLevelSetFltkGui)
   IF(VTK_FOUND)
-    SUBDIRS(ThresholdSegmentationLevelSet)
-    SUBDIRS(FastMarchingLevelSet)
-    SUBDIRS(ShapeDetectionLevelSet)
-    SUBDIRS(GeodesicActiveContour)
-    SUBDIRS(SegmentationEditorFltkGui)
-    SUBDIRS(SNAP)
-    SUBDIRS(LiverTumorSegmentation)
+    OPTIONAL_APP(ThresholdSegmentationLevelSet)
+    OPTIONAL_APP(FastMarchingLevelSet)
+    OPTIONAL_APP(ShapeDetectionLevelSet)
+    OPTIONAL_APP(GeodesicActiveContour)
+    OPTIONAL_APP(SegmentationEditorFltkGui)
+    OPTIONAL_APP(SNAP)
+    OPTIONAL_APP(LiverTumorSegmentation)
     IF(NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION} LESS 4.5)
-      SUBDIRS(DeformableModelSimplexMesh)
-      SUBDIRS(DeformableRegistration3DTimeSeries)
+      OPTIONAL_APP(DeformableModelSimplexMesh)
+      OPTIONAL_APP(DeformableRegistration3DTimeSeries)
     ENDIF(NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION} LESS 4.5)
-    SUBDIRS(CellularSegmentation)
-    SUBDIRS(ImageRegistration2D)
+    OPTIONAL_APP(CellularSegmentation)
+    OPTIONAL_APP(ImageRegistration2D)
   ENDIF(VTK_FOUND)
-  SUBDIRS(ImageViewer)
-  SUBDIRS(ImageColorViewer)
+  OPTIONAL_APP(ImageViewer)
+  OPTIONAL_APP(ImageColorViewer)
 ENDIF(FLTK_FOUND)
 
 # MetaImage Utilities
-SUBDIRS(MetaImageImporter)
-SUBDIRS(MetaImageReadWrite)
-
-# Test the conditions for building the MRIBiasCorrection example
-IF(NOT BORLAND)
-SUBDIRS(MRIBiasCorrection)
-ENDIF(NOT BORLAND)
+OPTIONAL_APP(MetaImageImporter)
+OPTIONAL_APP(MetaImageReadWrite)
 
 # Add an option to build FEM applications
-SUBDIRS(FEM)
+OPTIONAL_APP(FEM)
 
 # Add an option to build or not build the FuzzyConnectedness example
 IF(ITK_USE_PATENTED)
-  SUBDIRS(FuzzyConnectedness)
+  OPTIONAL_APP(FuzzyConnectedness)
 ENDIF(ITK_USE_PATENTED)
 
-# Add an option to build or not build the
-# GaussianMinimumErrorClassifier example
-IF(NOT BORLAND)
-SUBDIRS(GaussianMinimumErrorClassifier)
-ENDIF(NOT BORLAND)
 
 # Add an option to build or not build the EllipsoidInteriorExteriorSpatialFunction example
-SUBDIRS(EllipsoidInteriorExteriorSpatialFunction)
+OPTIONAL_APP(EllipsoidInteriorExteriorSpatialFunction)
 
 # Add an option to build or not build the SymmetricEllipsoidInteriorExteriorSpatialFunction example
-SUBDIRS(SymmetricEllipsoidInteriorExteriorSpatialFunction)
-
-# Build Volview plugins. You can't use them unless you have volview
-IF(NOT BORLAND)
-SUBDIRS( VolviewPlugIns )
-ENDIF(NOT BORLAND)
+OPTIONAL_APP(SymmetricEllipsoidInteriorExteriorSpatialFunction)
 
 # Test the conditions for building the ThinPlateSplines example
 IF(VTK_FOUND)
   IF(FLTK_FOUND)
-    SUBDIRS(ThinPlateSplines)
+    OPTIONAL_APP(ThinPlateSplines)
   ENDIF(FLTK_FOUND)
 
   IF(VTK_WRAP_TCL)
-    SUBDIRS(MRIRegistration)
+    OPTIONAL_APP(MRIRegistration)
     IF(NOT BORLAND)
-      SUBDIRS(SegmentationEditor vtkITK)
+      OPTIONAL_APP(SegmentationEditor vtkITK)
     ENDIF(NOT BORLAND)
   ENDIF(VTK_WRAP_TCL)
 
@@ -300,7 +302,7 @@ IF(VTK_FOUND)
   ENDIF(VTK_WRAP_TCL AND ITK_CSWIG_TCL)
 
   IF(VTK_AND_ITK_WRAPPED)
-    SUBDIRS(ConnectVTKITK)
+    OPTIONAL_APP(ConnectVTKITK)
   ENDIF(VTK_AND_ITK_WRAPPED)
 
 ENDIF(VTK_FOUND)
