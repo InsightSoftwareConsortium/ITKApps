@@ -1,5 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 1.6)
 PROJECT(InsightApplications)
+
+
 INCLUDE_REGULAR_EXPRESSION("^.*$")
 
 # Tell CMake's FIND_PACKAGE command where to look for our Find<pkg>
@@ -83,12 +85,6 @@ ENDIF(OPENGL_INCLUDE_PATH)
 OPTION(USE_FLTK "Use FLTK (The Fast Light Toolkit) for GUI (some applications need this)" OFF)
 IF(USE_FLTK)
   FIND_PACKAGE(FLTK)
-  IF(EXISTS ${FLTK_DIR}/FLTKConfig.cmake)
-    MESSAGE(STATUS "Found ${FLTK_DIR}/FLTKConfig.cmake")
-    INCLUDE(${FLTK_DIR}/FLTKConfig.cmake)
-  ELSE(EXISTS ${FLTK_DIR}/FLTKConfig.cmake)
-    MESSAGE(STATUS "Not Found ${FLTK_DIR}/FLTKConfig.cmake")
-  ENDIF(EXISTS ${FLTK_DIR}/FLTKConfig.cmake)
   IF(FLTK_FOUND)
     INCLUDE_DIRECTORIES(${FLTK_INCLUDE_DIR})
   ENDIF(FLTK_FOUND)
