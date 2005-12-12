@@ -155,6 +155,10 @@ public:
 
   // Window size manipulation calls
   virtual void OnIRISWindowFocus(unsigned int i) = 0;
+  virtual void OnSNAPWindowFocus(unsigned int i) = 0;
+
+  // Save as PNG
+  virtual void OnActiveWindowSaveSnapshot(unsigned int window) = 0;
 
 protected:
     GlobalState *m_GlobalState;

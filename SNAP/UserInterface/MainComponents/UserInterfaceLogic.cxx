@@ -57,6 +57,9 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include <cctype>
+
+
 
 // Disable some utterly annoying windows messages
 #if defined(_MSC_VER)
@@ -111,6 +114,8 @@ private:
 void UserInterfaceLogic
 ::InitializeActivationFlags()
 {
+  unsigned int i;   
+  
   // ---------------------------------------------------------
   //    Intialize activation object
   // ---------------------------------------------------------
@@ -174,7 +179,7 @@ void UserInterfaceLogic
     UIF_SNAP_SNAKE_INITIALIZED, false, false);
 
   // Activate widgets indexed by dimension
-  for(unsigned int i = 0; i < 3; i++)
+  for(i = 0; i < 3; i++)
     {
     m_Activation->AddWidget(m_InSNAPSliceSlider[i], UIF_SNAP_ACTIVE);
     m_Activation->AddWidget(m_OutSNAPSliceIndex[i], UIF_SNAP_ACTIVE);
@@ -182,6 +187,13 @@ void UserInterfaceLogic
     m_Activation->AddWidget(m_OutIRISSliceIndex[i], UIF_IRIS_WITH_GRAY_LOADED);
     m_Activation->AddWidget(m_BtnIRISPanelResetView[i], UIF_IRIS_WITH_GRAY_LOADED);
     m_Activation->AddWidget(m_BtnIRISPanelZoom[i], UIF_IRIS_WITH_GRAY_LOADED);
+    }
+
+  // Activate the widgets that have four copies
+  for(i = 0; i < 4; i++)
+    {
+    m_Activation->AddWidget(m_BtnIRISPanelSaveAsPNG[i], UIF_IRIS_WITH_GRAY_LOADED);
+    m_Activation->AddWidget(m_BtnSNAPPanelSaveAsPNG[i], UIF_SNAP_ACTIVE);
     }
 
   // The 3D controls that are indexed by i
@@ -1221,6 +1233,9 @@ UserInterfaceLogic
 
   // Hide the color map window
   m_WinColorMap->hide();
+
+  // Restore the SNAP view to four side-by-side windows
+  UpdateSNAPWindowFocus();
   
   // Show IRIS window, Hide the snake window
   ShowIRIS();
@@ -1389,8 +1404,8 @@ void
 UserInterfaceLogic
 ::ShowSNAP()
 {
-  // Restore the view to four side-by-side windows
-  UpdateWindowFocus();
+  // Restore the IRIS view to four side-by-side windows
+  UpdateIRISWindowFocus();
 
   // Swap the left-side panels
   m_WizWindows->value(m_GrpSNAPWindows);
@@ -2083,9 +2098,8 @@ UserInterfaceLogic
   m_DlgAppearance->ShowDialog();
 }
 
-void
-UserInterfaceLogic
-::UpdateWindowFocus(int iWindow)
+void UserInterfaceLogic
+::UpdateIRISWindowFocus(int iWindow)
 {
   // Get the four panels
   Fl_Group *panels[] = 
@@ -2093,9 +2107,30 @@ UserInterfaceLogic
   Fl_Gl_Window *boxes[] = 
     { m_IRISWindow2D[0], m_IRISWindow2D[1], m_IRISWindow2D[2], m_IRISWindow3D };
 
+  // Update the window focus
+  UpdateWindowFocus(m_GrpIRISWindows, panels, boxes, iWindow);
+}
+
+void UserInterfaceLogic
+::UpdateSNAPWindowFocus(int iWindow)
+{
+  // Get the four panels
+  Fl_Group *panels[] = 
+    { m_GrpSNAPSlicePanel[0], m_GrpSNAPSlicePanel[1], m_GrpSNAPSlicePanel[2], m_GrpSNAPView3D };
+  Fl_Gl_Window *boxes[] = 
+    { m_SNAPWindow2D[0], m_SNAPWindow2D[1], m_SNAPWindow2D[2], m_SNAPWindow3D };
+
+  // Update the window focus
+  UpdateWindowFocus(m_GrpSNAPWindows, panels, boxes, iWindow);
+}
+
+void
+UserInterfaceLogic
+::UpdateWindowFocus(Fl_Group *parent, Fl_Group **panels, Fl_Gl_Window **boxes, int iWindow)
+{
   // The dimensions of the parent window
-  int x = m_GrpIRISWindows->x(), y = m_GrpIRISWindows->y();
-  int w = m_GrpIRISWindows->w(), h = m_GrpIRISWindows->h();
+  int x = parent->x(), y = parent->y();
+  int w = parent->w(), h = parent->h();
 
   // Check if this is an expansion or a collapse operation
   if( iWindow < 0 || panels[iWindow]->w() == w )
@@ -2105,15 +2140,19 @@ UserInterfaceLogic
     panels[1]->resize(x + (w >> 1), y, w - (w >> 1), h >> 1);
     panels[3]->resize(x, y + (h >> 1), w >> 1, h - (h >> 1));
     panels[2]->resize(x + (w >> 1), y + (h >> 1), w - (w >> 1), h - (h >> 1));
-    
+
+    // Make the resizable is set to self
+    parent->resizable(parent);
+
     // Show everything
     for(unsigned int j = 0; j < 4; j++)
       {
-      m_GrpIRISWindows->add(panels[j]);
+      parent->add(panels[j]);
       panels[j]->show();
       boxes[j]->show();
       panels[j]->redraw();
       }
+
     }
   else 
     {
@@ -2123,14 +2162,14 @@ UserInterfaceLogic
         {
         panels[j]->hide();
         boxes[j]->hide();
-        m_GrpIRISWindows->remove(panels[j]);
+        parent->remove(panels[j]);
         }
       }
 
     panels[iWindow]->resize(
-      m_GrpIRISWindows->x(),m_GrpIRISWindows->y(),
-      m_GrpIRISWindows->w(),m_GrpIRISWindows->h());
-    m_GrpIRISWindows->resizable(panels[iWindow]);
+      parent->x(),parent->y(),
+      parent->w(),parent->h());
+    parent->resizable(panels[iWindow]);
     panels[iWindow]->redraw();
     }
 }
@@ -2139,7 +2178,15 @@ void
 UserInterfaceLogic
 ::OnIRISWindowFocus(unsigned int i)
 {
-  UpdateWindowFocus((int) i);
+  UpdateIRISWindowFocus((int) i);
+}
+
+
+void
+UserInterfaceLogic
+::OnSNAPWindowFocus(unsigned int i)
+{
+  UpdateSNAPWindowFocus((int) i);
 }
 
 void
@@ -3285,8 +3332,121 @@ UserInterfaceLogic
   return -1;
 }
 
+std::string
+UserInterfaceLogic
+::GenerateScreenShotFilename()
+{
+  // Get the last screen shot filename used
+  std::string last = m_LastSnapshotFileName;
+  if(last.length() == 0)
+    return "snapshot0001.png";
+
+  // Count how many digits there are at the end of the filename
+  std::string noext = 
+    itksys::SystemTools::GetFilenameWithoutExtension(m_LastSnapshotFileName);
+  unsigned int digits = 0;
+  for(unsigned int i = noext.length() - 1; i >= 0; i++)
+    if(isdigit(noext[i])) digits++; else break;
+
+  // If there are no digits, return the filename
+  if(digits == 0) return m_LastSnapshotFileName;
+
+  // Get the number at the end of the string
+  std::string snum = noext.substr(noext.length() - digits);
+  std::istringstream iss(snum);
+  unsigned long num = 0;
+  iss >> num;
+
+  // Increment the number by one and convert to another string, padding with zeros
+  std::ostringstream oss;
+  oss << itksys::SystemTools::GetFilenamePath(last);
+  oss << "/";
+  oss << noext.substr(0, noext.length() - digits);
+  oss << std::setw(digits) << std::setfill('0') << (num + 1);
+  oss << itksys::SystemTools::GetFilenameExtension(m_LastSnapshotFileName);
+  return oss.str();
+}
+
+void
+UserInterfaceLogic
+::OnActiveWindowSaveSnapshot(unsigned int window)
+{
+  // Generate a filename for the screenshot
+  std::string finput = GenerateScreenShotFilename();
+  
+  // Create a file chooser
+  std::string file = itksys::SystemTools::GetFilenameName(finput);
+  std::string path = itksys::SystemTools::GetFilenamePath(finput);
+
+  // Store the current directory
+  std::string dir = itksys::SystemTools::GetCurrentWorkingDirectory();
+  itksys::SystemTools::ChangeDirectory(path.c_str());
+
+  // Get the filename 
+  const char *fchosen = 
+    fl_file_chooser("Save PNG Snapshot", "PNG Files (*.png)", file.c_str());
+  
+  // Restore the current directory
+  itksys::SystemTools::ChangeDirectory(dir.c_str());
+
+  if(!fchosen)
+    return;
+
+  // Store the filename for incrementing numerical names
+  m_LastSnapshotFileName = fchosen;
+
+  // Check if the user omitted the extension
+  if(itksys::SystemTools::GetFilenameExtension(m_LastSnapshotFileName) == "")
+    m_LastSnapshotFileName = m_LastSnapshotFileName + ".png";
+
+  // Delegate between available methods
+  if(m_WizWindows->value() == m_GrpSNAPWindows)
+    if(window << 3)
+      SNAPWindowSaveAsPNG(window, m_LastSnapshotFileName.c_str());
+    else
+      SNAPWindow3DSaveAsPNG(m_LastSnapshotFileName.c_str());
+  else
+    if(window << 3)
+      IRISWindowSaveAsPNG(window, m_LastSnapshotFileName.c_str());
+    else
+      IRISWindow3DSaveAsPNG(m_LastSnapshotFileName.c_str());
+}
+
+void
+UserInterfaceLogic
+::IRISWindowSaveAsPNG(unsigned int window, const char *file)
+{
+  m_IRISWindow2D[window]->SaveAsPNG(file);
+}
+
+
+void
+UserInterfaceLogic
+::IRISWindow3DSaveAsPNG(const char *file)
+{
+  m_IRISWindow3D->SaveAsPNG(file);
+}
+
+void
+UserInterfaceLogic
+::SNAPWindowSaveAsPNG(unsigned int window, const char *file)
+{
+  m_SNAPWindow2D[window]->SaveAsPNG(file);
+}
+
+
+void
+UserInterfaceLogic
+::SNAPWindow3DSaveAsPNG(const char *file)
+{
+  m_SNAPWindow3D->SaveAsPNG(file);
+}
+
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.46  2005/12/08 21:15:58  pauly
+ *COMP: SNAP not linking because whoever did previous fix did not check in SNAPCommon.cxx
+ *
  *Revision 1.45  2005/12/08 18:20:46  hjohnson
  *COMP:  Removed compiler warnings from SGI/linux/MacOSX compilers.
  *

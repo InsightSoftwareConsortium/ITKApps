@@ -591,6 +591,19 @@ public:
   // Get the window under mouse focus or -1 if none
   int GetWindowUnderFocus(void);
   
+  // Opacity slider callbacks
+  void OnIRISLabelOpacityChange();
+  
+  // Methods to tweak window positions
+  void OnIRISWindowFocus(unsigned int i);
+  void OnSNAPWindowFocus(unsigned int i);
+
+  // Save As PNG
+  void OnActiveWindowSaveSnapshot(unsigned int window);
+  void IRISWindowSaveAsPNG(unsigned int window, const char *file);
+  void IRISWindow3DSaveAsPNG(const char *file);
+  void SNAPWindowSaveAsPNG(unsigned int window, const char *file);
+  void SNAPWindow3DSaveAsPNG(const char *file);
 protected:
 
   /**
@@ -667,7 +680,6 @@ protected:
   
   // Opacity slider callbacks
   void OnSNAPLabelOpacityChange();
-  void OnIRISLabelOpacityChange();
 
   // Help system callbacks
   void OnLaunchTutorialAction();
@@ -678,9 +690,6 @@ protected:
   // Restoring settings
   void OnRestoreSettingsAction();
   void OnDoNotRestoreSettingsAction();
-
-  // Methods to tweak window positions
-  void OnIRISWindowFocus(unsigned int i);
 
   // Image Info Window Callbacks
   void OnCloseImageInfoAction();
@@ -830,7 +839,10 @@ private:
 
   // Set 'zoomed' window to 0..3, or pass in -1 in order to restore the display
   // to four side by side windows
-  void UpdateWindowFocus(int iWindow = -1);
+  void UpdateWindowFocus(
+    Fl_Group *parent, Fl_Group **panels, Fl_Gl_Window **boxes, int iWindow);
+  void UpdateIRISWindowFocus(int iWindow = -1);
+  void UpdateSNAPWindowFocus(int iWindow = -1);
 
   // Update the color map of the speed image
   void UpdateSpeedColorMap();
@@ -843,12 +855,21 @@ private:
 
   // Update the menu of recent files
   void GenerateRecentFilesMenu();
+
+  // Generate a PNG filename for use in saving snapshots
+  std::string GenerateScreenShotFilename();
+
+  // A string where the last saved filename is stored
+  std::string m_LastSnapshotFileName;
 };
 
 #endif
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.29  2005/11/10 23:02:14  pauly
+ *ENH: Added support for VoxBo CUB files to ITK-SNAP, as well as some cosmetic touches
+ *
  *Revision 1.28  2005/11/03 18:45:29  pauly
  *ENH: Enabled SNAP to read DICOM Series
  *

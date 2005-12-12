@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Program:   Insight Segmentation & Registration Toolkit
+  Progra_P:   Insight Segmentation & Registration Toolkit
   Module:    Window3D.cxx
   Language:  C++
   Date:      $Date$
@@ -31,6 +31,8 @@
 #else
 # define itk_cross_3d cross_3d
 #endif
+
+#include "GLToPNG.h"
 
 /** These classes are used internally for m_Ray intersection testing */
 class LabelImageHitTester 
@@ -333,6 +335,9 @@ Window3D
   
   // Start with the trackball mode, which is prevailing
   PushInteractionMode(m_TrackballMode);
+  
+  // dump png no
+  m_dumpPNG = NULL;
 }
 
 
@@ -653,6 +658,13 @@ Window3D
 
   glFlush();
   // CheckErrors();
+
+  // dump png if requested
+  if (m_dumpPNG != NULL)
+  {
+    vtkImageData* img = GLToVTKImageData(GL_RGBA, 0, 0, w(), h());
+    VTKImageDataToPNG(img, m_dumpPNG);
+  }
 }
 
 void 
@@ -1276,8 +1288,21 @@ Window3D
   return 0;
 }
 
+void
+Window3D
+::SaveAsPNG(const char *file)
+{
+  m_dumpPNG = file;
+  redraw();
+  Fl::flush();
+  m_dumpPNG = NULL;
+}
+
 /*
  *Log: Window3D.cxx
+ *Revision 1.30  2005/11/23 14:32:15  ibanez
+ *BUG: 2404. Patch provided by Paul Yushkevish.
+ *
  *Revision 1.29  2005/10/29 14:00:15  pauly
  *ENH: SNAP enhacements like color maps and progress bar for 3D rendering
  *

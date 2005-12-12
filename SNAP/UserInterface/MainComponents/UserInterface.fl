@@ -34,16 +34,16 @@ class UserInterface {open : {public UserInterfaceBase}
   Function {UserInterface()} {open
   } {
     Fl_Window m_WinMain {
-      label {SnAP: IRIS}
+      label {ITK-SNAP Main Window}
       callback {OnMainWindowCloseAction();} open
-      xywh {125 306 875 710} type Double align 0 resizable
+      xywh {80 227 875 710} type Double align 0 resizable
       code0 {\#include "UserInterfaceBase.h"} visible
     } {
-      Fl_Menu_Bar m_MenubarMain {open selected
+      Fl_Menu_Bar m_MenubarMain {
         xywh {0 0 146 25} labelsize 12 textsize 12
       } {
         submenu {} {
-          label {&File} open
+          label {&File}
           xywh {10 10 100 20} labelsize 12
         } {
           submenu {} {
@@ -203,7 +203,7 @@ class UserInterface {open : {public UserInterfaceBase}
           }
         }
       }
-      Fl_Group Controls {open
+      Fl_Group Controls {
         xywh {0 24 146 686} box BORDER_FRAME color 0
       } {
         Fl_Wizard m_WizControlPane {
@@ -729,11 +729,11 @@ this->OnSNAPLabelOpacityChange();}
           xywh {0 704 145 5} color 53 labeltype NO_LABEL resizable
         } {}
       }
-      Fl_Wizard m_WizWindows {
-        xywh {147 0 730 710} resizable
+      Fl_Wizard m_WizWindows {open
+        xywh {147 0 730 725} resizable
       } {
-        Fl_Group m_GrpIRISWindows {
-          xywh {147 0 730 710} resizable
+        Fl_Group m_GrpIRISWindows {open selected
+          xywh {147 0 730 710} hide resizable
         } {
           Fl_Group {m_GrpIRISSlicePanel[0]} {
             label {m_GrpIRISSlicePanel[0]}
@@ -751,12 +751,12 @@ this->OnSNAPLabelOpacityChange();}
               Fl_Button {m_BtnIRISPanelResetView[0]} {
                 label {reset view}
                 callback {this->OnResetView2DAction(0);}
-                xywh {372 330 60 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146
+                tooltip {Restore the view to default zoom level} xywh {372 330 60 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146
               }
               Fl_Output {m_OutIRISSliceIndex[0]} {
                 xywh {437 330 70 20} box FLAT_BOX color 49 align 0 textsize 10 deactivate
               }
-              Fl_Group {m_GrpPolygonEdit[0]} {
+              Fl_Group {m_GrpPolygonEdit[0]} {open
                 xywh {152 325 208 30} hide
               } {
                 Fl_Button {m_BtnPolygonAccept[0]} {
@@ -784,18 +784,32 @@ this->OnSNAPLabelOpacityChange();}
                 xywh {147 325 5 30} color 154 resizable
               } {}
             }
-            Fl_Pack {} {open
-              xywh {488 5 20 25}
+            Fl_Group {} {open
+              xywh {488 5 20 320}
             } {
-              Fl_Button {m_BtnIRISPanelZoom[0]} {
-                label {@+}
-                callback {OnIRISWindowFocus(0);}
-                xywh {488 5 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139
+              Fl_Pack {} {open
+                xywh {488 5 20 50}
+              } {
+                Fl_Button {m_BtnIRISPanelZoom[0]} {
+                  label {@+}
+                  callback {OnIRISWindowFocus(0);}
+                  tooltip {Expand this view to occupy the entire screen} xywh {488 5 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139
+                }
+                Fl_Group {} {open
+                  xywh {488 25 20 5}
+                } {}
+                Fl_Button {m_BtnIRISPanelSaveAsPNG[0]} {
+                  callback {OnActiveWindowSaveSnapshot(0);}
+                  tooltip {Save a snapshot of this window as a PNG image} image {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture.gif} deimage {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture2.gif} xywh {488 30 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
+                }
+                Fl_Group {} {open
+                  xywh {488 50 20 5}
+                } {}
               }
-            }
-            Fl_Scrollbar {m_InIRISSliceSlider[0]} {
-              callback {this->OnSliceSliderChange(0);}
-              xywh {489 30 18 295} box THIN_DOWN_BOX labelcolor 0 minimum 1 maximum 0
+              Fl_Scrollbar {m_InIRISSliceSlider[0]} {
+                callback {this->OnSliceSliderChange(0);}
+                xywh {489 55 18 270} box THIN_DOWN_BOX labelcolor 0 minimum 1 maximum 0 resizable
+              }
             }
           }
           Fl_Group {m_GrpIRISSlicePanel[1]} {
@@ -807,20 +821,16 @@ this->OnSNAPLabelOpacityChange();}
               code0 {\#include "IRISSliceWindow.h"}
               class IRISSliceWindow
             }
-            Fl_Scrollbar {m_InIRISSliceSlider[1]} {
-              callback {this->OnSliceSliderChange(1);}
-              xywh {854 30 18 295} box THIN_DOWN_BOX labelcolor 0 minimum 1 maximum 0
-            }
             Fl_Group {} {
-              xywh {517 325 355 30}
+              xywh {515 325 357 30}
             } {
               Fl_Button {m_BtnIRISPanelResetView[1]} {
                 label {reset view}
                 callback {this->OnResetView2DAction(1);}
-                xywh {737 330 60 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146
+                tooltip {Restore the view to default zoom level} xywh {737 330 60 18} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146
               }
               Fl_Output {m_OutIRISSliceIndex[1]} {
-                xywh {802 330 70 20} box FLAT_BOX color 49 align 0 textsize 10 deactivate
+                xywh {802 330 70 18} box FLAT_BOX color 49 align 0 textsize 10 deactivate
               }
               Fl_Group {m_GrpPolygonEdit[1]} {open
                 xywh {540 325 195 30} hide
@@ -828,40 +838,58 @@ this->OnSNAPLabelOpacityChange();}
                 Fl_Button {m_BtnPolygonAccept[1]} {
                   label accept
                   callback {OnAcceptPolygonAction(1);}
-                  tooltip {Fill in the polygon using the currently selected label} xywh {550 330 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
+                  tooltip {Fill in the polygon using the currently selected label} xywh {550 330 40 18} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
                 }
                 Fl_Button {m_BtnPolygonPaste[1]} {
                   label paste
                   callback {OnPastePolygonAction(1);}
-                  tooltip {Paste the previously used polygon into the window} xywh {685 330 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
+                  tooltip {Paste the previously used polygon into the window} xywh {685 330 40 18} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
                 }
                 Fl_Button {m_BtnPolygonInsert[1]} {
                   label insert
                   callback {OnInsertIntoPolygonSelectedAction(1);}
-                  tooltip {Insert a new vertex between pairs of selected vertices} xywh {595 330 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
+                  tooltip {Insert a new vertex between pairs of selected vertices} xywh {595 330 40 18} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
                 }
                 Fl_Button {m_BtnPolygonDelete[1]} {
                   label delete
                   callback {OnDeletePolygonSelectedAction(1);}
-                  tooltip {Delete the selected vertices} xywh {640 330 40 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
+                  tooltip {Delete the selected vertices} xywh {640 330 40 18} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 18
                 }
               }
               Fl_Group {} {open
-                xywh {517 325 0 30} color 154 resizable
+                xywh {515 325 2 30} color 154 resizable
               } {}
             }
-            Fl_Pack {} {open
-              xywh {853 5 20 25}
+            Fl_Group {} {open
+              xywh {850 5 23 320}
             } {
-              Fl_Button {m_BtnIRISPanelZoom[1]} {
-                label {@+}
-                callback {OnIRISWindowFocus(1);}
-                xywh {853 5 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139
+              Fl_Pack {} {open
+                xywh {853 5 20 50}
+              } {
+                Fl_Button {m_BtnIRISPanelZoom[1]} {
+                  label {@+}
+                  callback {OnIRISWindowFocus(1);}
+                  tooltip {Expand this view to occupy the entire screen} xywh {853 5 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139
+                }
+                Fl_Group {} {open
+                  xywh {853 25 20 5}
+                } {}
+                Fl_Button {m_BtnIRISPanelSaveAsPNG[1]} {
+                  callback {OnActiveWindowSaveSnapshot(1);}
+                  tooltip {Save a snapshot of this window as a PNG image} image {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture.gif} deimage {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture2.gif} xywh {853 30 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
+                }
+                Fl_Group {} {open
+                  xywh {853 50 20 5}
+                } {}
+              }
+              Fl_Scrollbar {m_InIRISSliceSlider[1]} {
+                callback {this->OnSliceSliderChange(1);}
+                xywh {854 55 18 270} box THIN_DOWN_BOX labelcolor 0 minimum 1 maximum 0 resizable
               }
             }
           }
           Fl_Group {m_GrpIRISSlicePanel[2]} {
-            xywh {512 355 365 355} box UP_BOX
+            xywh {512 355 368 355} box UP_BOX
           } {
             Fl_Box {m_IRISWindow2D[2]} {
               label {m_GrpIRISCoronal(2)}
@@ -870,17 +898,17 @@ this->OnSNAPLabelOpacityChange();}
               class IRISSliceWindow
             }
             Fl_Group {} {open
-              xywh {512 680 365 30}
+              xywh {512 680 368 30}
             } {
               Fl_Button {m_BtnIRISPanelResetView[2]} {
                 label {reset view}
                 callback {this->OnResetView2DAction(2);}
-                xywh {737 685 60 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146
+                tooltip {Restore the view to default zoom level} xywh {737 685 60 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146
               }
               Fl_Output {m_OutIRISSliceIndex[2]} {
                 xywh {802 685 70 20} box FLAT_BOX color 49 align 0 textsize 10 deactivate
               }
-              Fl_Group {m_GrpPolygonEdit[2]} {open
+              Fl_Group {m_GrpPolygonEdit[2]} {
                 xywh {540 680 195 30} hide
               } {
                 Fl_Button {m_BtnPolygonAccept[2]} {
@@ -905,24 +933,38 @@ this->OnSNAPLabelOpacityChange();}
                 }
               }
               Fl_Group {} {open
-                xywh {512 680 5 30} color 154 resizable
+                xywh {512 680 5 30} resizable
               } {}
             }
-            Fl_Pack {} {open
-              xywh {853 360 20 25}
+            Fl_Group {} {open
+              xywh {853 360 20 320}
             } {
-              Fl_Button {m_BtnIRISPanelZoom[2]} {
-                label {@+}
-                callback {OnIRISWindowFocus(2);}
-                xywh {853 360 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139
+              Fl_Pack {} {open
+                xywh {853 360 20 50}
+              } {
+                Fl_Button {m_BtnIRISPanelZoom[2]} {
+                  label {@+}
+                  callback {OnIRISWindowFocus(2);}
+                  tooltip {Expand this view to occupy the entire screen} xywh {853 360 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139
+                }
+                Fl_Group {} {open
+                  xywh {853 380 20 5}
+                } {}
+                Fl_Button {m_BtnIRISPanelSaveAsPNG[2]} {
+                  callback {OnActiveWindowSaveSnapshot(2);}
+                  tooltip {Save a snapshot of this window as a PNG image} image {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture.gif} deimage {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture2.gif} xywh {853 385 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
+                }
+                Fl_Group {} {open
+                  xywh {853 405 20 5}
+                } {}
+              }
+              Fl_Scrollbar {m_InIRISSliceSlider[2]} {
+                callback {this->OnSliceSliderChange(2);}
+                xywh {854 410 18 270} box THIN_DOWN_BOX labelcolor 0 minimum 1 maximum 0 resizable
               }
             }
-            Fl_Scrollbar {m_InIRISSliceSlider[2]} {
-              callback {this->OnSliceSliderChange(2);}
-              xywh {854 385 18 295} box THIN_DOWN_BOX labelcolor 0 minimum 1 maximum 0
-            }
           }
-          Fl_Group m_GrpIRISView3D {
+          Fl_Group m_GrpIRISView3D {open
             xywh {147 355 365 355} box UP_BOX
           } {
             Fl_Box m_IRISWindow3D {
@@ -934,49 +976,65 @@ this->OnSNAPLabelOpacityChange();}
             Fl_Group {} {open
               xywh {147 680 365 30}
             } {
-              Fl_Button m_BtnMeshUpdate {
-                label {update mesh}
-                callback {OnIRISMeshUpdateAction();}
-                xywh {265 685 70 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146
-              }
-              Fl_Button m_BtnAccept3D {
-                label accept
-                callback {OnIRISMeshAcceptAction();}
-                xywh {340 685 70 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146 deactivate
-              }
-              Fl_Button {m_BtnIRISPanelResetView[3]} {
-                label {reset view}
-                callback {OnIRISMeshResetViewAction();}
-                xywh {415 685 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146
+              Fl_Pack {} {open
+                xywh {240 685 265 20} type HORIZONTAL
+              } {
+                Fl_Button m_BtnMeshUpdate {
+                  label {update mesh}
+                  callback {OnIRISMeshUpdateAction();}
+                  tooltip {Update the 3D rendering from the segmentation data} xywh {240 685 70 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146
+                }
+                Fl_Group {} {open
+                  xywh {310 685 5 20}
+                } {}
+                Fl_Button m_BtnAccept3D {
+                  label accept
+                  callback {OnIRISMeshAcceptAction();}
+                  tooltip {Apply the last 3D paint operation to the image} xywh {315 685 70 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146 deactivate
+                }
+                Fl_Group {} {open
+                  xywh {385 685 5 20}
+                } {}
+                Fl_Button {m_BtnIRISPanelResetView[3]} {
+                  label {reset view}
+                  callback {OnIRISMeshResetViewAction();}
+                  tooltip {Reset the 3D view to default zoom and camera position} xywh {390 685 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146
+                }
+                Fl_Group {} {open
+                  xywh {455 685 5 20}
+                } {}
+                Fl_Button {m_BtnIRISPanelSaveAsPNG[3]} {
+                  callback {OnActiveWindowSaveSnapshot(3);}
+                  tooltip {Save a snapshot of this window as a PNG image} image {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture.gif} deimage {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture2.gif} xywh {460 685 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
+                }
+                Fl_Group {} {open
+                  xywh {480 685 5 20}
+                } {}
+                Fl_Button {m_BtnIRISPanelZoom[3]} {
+                  label {@+}
+                  callback {OnIRISWindowFocus(3);}
+                  tooltip {Expand this view to occupy the entire screen} xywh {485 685 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139
+                }
               }
               Fl_Group {} {open
                 xywh {147 680 5 30} color 154 resizable
               } {}
-              Fl_Button {m_BtnIRISPanelZoom[3]} {
-                label {@+}
-                callback {OnIRISWindowFocus(3);}
-                xywh {485 685 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139
-              }
             }
           }
         }
-        Fl_Group m_GrpSNAPWindows {
-          xywh {147 0 730 710} hide
+        Fl_Group m_GrpSNAPWindows {open
+          xywh {147 0 730 710}
         } {
-          Fl_Group m_GrpSNAPAxial {
+          Fl_Group {m_GrpSNAPSlicePanel[0]} {
             xywh {147 0 365 355} box UP_BOX
           } {
             Fl_Box {m_SNAPWindow2D[0]} {
-              label {m_GrpIRISAxial(0)}
-              xywh {152 5 340 320} box FLAT_BOX color 0 labelcolor 7 resizable
+              label {SNAP 2D Window}
+              xywh {152 5 333 320} box FLAT_BOX color 0 labelcolor 7 resizable
               code0 {\#include "SNAPSliceWindow.h"}
               class SNAPSliceWindow
             }
-            Fl_Scrollbar {m_InSNAPSliceSlider[0]} {
-              callback {this->OnSliceSliderChange(0);}
-              xywh {492 5 15 320} minimum 1 maximum 0
-            }
-            Fl_Group {} {open
+            Fl_Group {} {
               xywh {147 325 365 30}
             } {
               Fl_Group {} {open
@@ -985,25 +1043,48 @@ this->OnSNAPLabelOpacityChange();}
               Fl_Button {} {
                 label {reset view}
                 callback {this->OnResetView2DAction(0);}
-                xywh {347 330 65 20} box PLASTIC_UP_BOX color 140 labelsize 9 labelcolor 0 align 128
+                xywh {347 330 65 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 0 align 128
               }
               Fl_Output {m_OutSNAPSliceIndex[0]} {
                 xywh {432 330 70 20} box FLAT_BOX color 49 align 0 textsize 10 deactivate
               }
             }
+            Fl_Group {} {
+              xywh {488 5 22 320}
+            } {
+              Fl_Pack {} {open
+                xywh {488 5 20 50}
+              } {
+                Fl_Button {m_BtnSNAPPanelZoom[0]} {
+                  label {@+}
+                  callback {OnSNAPWindowFocus(0);}
+                  tooltip {Expand this view to occupy the entire screen} xywh {488 5 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139
+                }
+                Fl_Group {} {open
+                  xywh {488 25 20 5}
+                } {}
+                Fl_Button {m_BtnSNAPPanelSaveAsPNG[0]} {
+                  callback {OnActiveWindowSaveSnapshot(0);}
+                  tooltip {Save a snapshot of this window as a PNG image} image {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture.gif} deimage {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture2.gif} xywh {488 30 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
+                }
+                Fl_Group {} {open
+                  xywh {488 50 20 5}
+                } {}
+              }
+              Fl_Scrollbar {m_InSNAPSliceSlider[0]} {
+                callback {this->OnSliceSliderChange(0);}
+                xywh {489 55 18 270} box THIN_DOWN_BOX labelcolor 0 minimum 1 maximum 0 resizable
+              }
+            }
           }
-          Fl_Group m_GrpSNAPSagittal {
+          Fl_Group {m_GrpSNAPSlicePanel[1]} {
             xywh {512 0 365 355} box UP_BOX
           } {
             Fl_Box {m_SNAPWindow2D[1]} {
-              label {m_GrpIRISSagittal(1)}
-              xywh {517 5 340 320} box FLAT_BOX color 0 labelcolor 7 resizable
+              label {SNAP 2D Window}
+              xywh {517 5 333 320} box FLAT_BOX color 0 labelcolor 7 resizable
               code0 {\#include "SNAPSliceWindow.h"}
               class SNAPSliceWindow
-            }
-            Fl_Scrollbar {m_InSNAPSliceSlider[1]} {
-              callback {this->OnSliceSliderChange(1);}
-              xywh {857 5 15 320} minimum 1 maximum 0
             }
             Fl_Group {} {open
               xywh {512 325 365 30}
@@ -1014,23 +1095,46 @@ this->OnSNAPLabelOpacityChange();}
               Fl_Button {} {
                 label {reset view}
                 callback {this->OnResetView2DAction(1);}
-                xywh {712 330 65 20} box PLASTIC_UP_BOX color 140 labelsize 9 labelcolor 0 align 128
+                xywh {712 330 65 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 0 align 128
               }
               Fl_Output {m_OutSNAPSliceIndex[1]} {
                 xywh {797 330 70 20} box FLAT_BOX color 49 align 0 textsize 10 deactivate
               }
             }
+            Fl_Group {} {
+              xywh {853 5 20 320}
+            } {
+              Fl_Pack {} {open
+                xywh {853 5 20 50}
+              } {
+                Fl_Button {m_BtnSNAPPanelZoom[1]} {
+                  label {@+}
+                  callback {OnSNAPWindowFocus(1);}
+                  tooltip {Expand this view to occupy the entire screen} xywh {853 5 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139
+                }
+                Fl_Group {} {open
+                  xywh {853 25 20 5}
+                } {}
+                Fl_Button {m_BtnSNAPPanelSaveAsPNG[1]} {
+                  callback {OnActiveWindowSaveSnapshot(1);}
+                  tooltip {Save a snapshot of this window as a PNG image} image {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture.gif} deimage {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture2.gif} xywh {853 30 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
+                }
+                Fl_Group {} {open
+                  xywh {853 50 20 5}
+                } {}
+              }
+              Fl_Scrollbar {m_InSNAPSliceSlider[1]} {
+                callback {this->OnSliceSliderChange(1);}
+                xywh {854 55 18 270} box THIN_DOWN_BOX labelcolor 0 minimum 1 maximum 0 resizable
+              }
+            }
           }
-          Fl_Group m_GrpSNAPCoronal {
+          Fl_Group {m_GrpSNAPSlicePanel[2]} {
             xywh {512 355 365 355} box UP_BOX
           } {
-            Fl_Scrollbar {m_InSNAPSliceSlider[2]} {
-              callback {this->OnSliceSliderChange(2);}
-              xywh {857 360 15 320} minimum 1 maximum 0
-            }
             Fl_Box {m_SNAPWindow2D[2]} {
-              label {m_GrpIRISCoronal(2)}
-              xywh {517 360 340 320} box FLAT_BOX color 0 labelcolor 7 resizable
+              label {SNAP 2D Window}
+              xywh {517 360 333 320} box FLAT_BOX color 0 labelcolor 7 resizable
               code0 {\#include "SNAPSliceWindow.h"}
               class SNAPSliceWindow
             }
@@ -1043,18 +1147,45 @@ this->OnSNAPLabelOpacityChange();}
               Fl_Button {} {
                 label {reset view}
                 callback {this->OnResetView2DAction(2);}
-                xywh {712 685 65 20} box PLASTIC_UP_BOX color 140 labelsize 9 labelcolor 0 align 128
+                xywh {712 685 65 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 0 align 128
               }
               Fl_Output {m_OutSNAPSliceIndex[2]} {
                 xywh {797 685 70 20} box FLAT_BOX color 49 align 0 textsize 10 deactivate
               }
             }
+            Fl_Group {} {
+              xywh {853 360 20 320}
+            } {
+              Fl_Pack {} {open
+                xywh {853 360 20 50}
+              } {
+                Fl_Button {m_BtnSNAPPanelZoom[2]} {
+                  label {@+}
+                  callback {OnSNAPWindowFocus(2);}
+                  tooltip {Expand this view to occupy the entire screen} xywh {853 360 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139
+                }
+                Fl_Group {} {open
+                  xywh {853 380 20 5}
+                } {}
+                Fl_Button {m_BtnSNAPPanelSaveAsPNG[2]} {
+                  callback {OnActiveWindowSaveSnapshot(2);}
+                  tooltip {Save a snapshot of this window as a PNG image} image {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture.gif} deimage {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture2.gif} xywh {853 385 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
+                }
+                Fl_Group {} {open
+                  xywh {853 405 20 5}
+                } {}
+              }
+              Fl_Scrollbar {m_InSNAPSliceSlider[2]} {
+                callback {this->OnSliceSliderChange(2);}
+                xywh {854 410 18 270} box THIN_DOWN_BOX labelcolor 0 minimum 1 maximum 0 resizable
+              }
+            }
           }
-          Fl_Group m_GRPSNAPView3D {open
+          Fl_Group m_GrpSNAPView3D {open
             xywh {147 355 365 355} box UP_BOX
           } {
             Fl_Box m_SNAPWindow3D {
-              label 3D
+              label {SNAP 3D Window}
               xywh {152 360 355 320} box FLAT_BOX color 0 labelcolor 7 resizable
               code0 {\#include "Window3D.h"}
               class Window3D
@@ -1062,25 +1193,6 @@ this->OnSNAPLabelOpacityChange();}
             Fl_Group {} {open
               xywh {147 680 365 30}
             } {
-              Fl_Button m_BtnSNAPMeshUpdate {
-                label {update mesh}
-                callback {OnSNAPMeshUpdateAction();}
-                xywh {237 685 65 20} box PLASTIC_UP_BOX color 140 labelsize 9 labelcolor 0 align 128 deactivate
-              }
-              Fl_Button m_BtnSNAPMeshResetView {
-                label {reset view}
-                callback {OnSNAPMeshResetViewAction();}
-                xywh {432 685 65 20} box PLASTIC_UP_BOX color 140 labelsize 9 labelcolor 0 align 128
-              }
-              Fl_Check_Button m_ChkContinuousView3DUpdate {
-                label {update continuously}
-                callback {OnSNAPMeshContinuousUpdateAction();}
-                xywh {307 685 25 20} down_box DOWN_BOX labelsize 11 deactivate
-              }
-              Fl_Group {} {
-                label Spacer open
-                xywh {147 680 8 30} labeltype NO_LABEL resizable
-              } {}
               Fl_Button m_BtnSNAPCrosshairsMode3D {
                 callback {SetToolbarMode3D(CROSSHAIRS_3D_MODE);}
                 tooltip {Crosshairs tool: left clicking moves the cursor} image {Artwork/crosshair3Dtiny.gif} xywh {157 682 25 25} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX shortcut 0x63 color 180 selection_color 180 align 16
@@ -1089,6 +1201,49 @@ this->OnSNAPLabelOpacityChange();}
                 callback {SetToolbarMode3D(TRACKBALL_MODE);}
                 tooltip {Crosshairs tool: left clicking moves the cursor} image {Artwork/rotate3dTiny.gif} xywh {187 682 25 25} type Radio box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX shortcut 0x63 value 1 color 180 selection_color 180 align 16
               }
+              Fl_Pack {} {
+                xywh {230 685 270 20} type HORIZONTAL
+              } {
+                Fl_Button m_BtnSNAPMeshUpdate {
+                  label {update mesh}
+                  callback {OnSNAPMeshUpdateAction();}
+                  xywh {230 685 70 20} box PLASTIC_UP_BOX color 180 labelsize 10 labelcolor 0 align 128 deactivate
+                }
+                Fl_Group {} {open
+                  xywh {300 685 5 20}
+                } {}
+                Fl_Check_Button m_ChkContinuousView3DUpdate {
+                  label {auto-update}
+                  callback {OnSNAPMeshContinuousUpdateAction();}
+                  xywh {305 685 78 20} down_box DOWN_BOX labelsize 11 deactivate
+                }
+                Fl_Group {} {open
+                  xywh {380 685 5 20}
+                } {}
+                Fl_Button m_BtnSNAPMeshResetView {
+                  label {reset view}
+                  callback {OnSNAPMeshResetViewAction();}
+                  xywh {385 685 65 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 0 align 128
+                }
+                Fl_Group {} {open
+                  xywh {450 685 5 20}
+                } {}
+                Fl_Button {m_BtnSNAPPanelSaveAsPNG[3]} {
+                  callback {OnActiveWindowSaveSnapshot(3);}
+                  tooltip {Save a snapshot of this window as a PNG image} image {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture.gif} deimage {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture2.gif} xywh {455 685 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
+                }
+                Fl_Group {} {open
+                  xywh {475 685 5 20}
+                } {}
+                Fl_Button {m_BtnSNAPPanelZoom[3]} {
+                  label {@+}
+                  callback {OnSNAPWindowFocus(3);}
+                  tooltip {Expand this view to occupy the entire screen} xywh {480 685 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139
+                }
+              }
+              Fl_Group {} {open
+                xywh {215 680 10 30} resizable
+              } {}
             }
           }
         }
@@ -1222,7 +1377,7 @@ this->OnSNAPLabelOpacityChange();}
     }
     Fl_Window m_WinColorMap {
       label {Preprocessed Image Color Map} open
-      xywh {162 697 315 105} type Double non_modal visible
+      xywh {-32000 -32000 315 105} type Double hide non_modal
     } {
       Fl_Box m_BoxColorMap {
         xywh {15 25 285 25} box FLAT_BOX color 5 align 5

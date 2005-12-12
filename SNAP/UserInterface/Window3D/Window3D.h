@@ -89,6 +89,9 @@ public:
   /** Perform the GL drawing operations */
   void draw();
 
+  /** Save as PNG */
+  void SaveAsPNG(const char *file);
+
   /** Recompute the mesh (slow operation) */
   void UpdateMesh(itk::Command *xProgressCommand);
 
@@ -215,7 +218,10 @@ private:
   typedef std::list<Vector3i> SampleListType;
   typedef SampleListType::iterator SampleListIterator;
   SampleListType m_Samples;
-
+  
+  // dump png
+  const char *m_dumpPNG;
+  
   void MousePressFunc(int button);
   void MouseReleaseFunc();
   void MouseMotionFunc();
@@ -249,6 +255,9 @@ private:
 
 /*
  *Log: Window3D.h
+ *Revision 1.11  2005/12/08 18:20:46  hjohnson
+ *COMP:  Removed compiler warnings from SGI/linux/MacOSX compilers.
+ *
  *Revision 1.10  2005/10/29 14:00:16  pauly
  *ENH: SNAP enhacements like color maps and progress bar for 3D rendering
  *
