@@ -3345,7 +3345,7 @@ UserInterfaceLogic
   std::string noext = 
     itksys::SystemTools::GetFilenameWithoutExtension(m_LastSnapshotFileName);
   unsigned int digits = 0;
-  for(unsigned int i = noext.length() - 1; i >= 0; i++)
+  for(int i = noext.length() - 1; i >= 0; i--)
     if(isdigit(noext[i])) digits++; else break;
 
   // If there are no digits, return the filename
@@ -3444,6 +3444,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.47  2005/12/12 00:27:44  pauly
+ *ENH: Preparing SNAP for 1.4 release. Snapshot functionality
+ *
  *Revision 1.46  2005/12/08 21:15:58  pauly
  *COMP: SNAP not linking because whoever did previous fix did not check in SNAPCommon.cxx
  *
