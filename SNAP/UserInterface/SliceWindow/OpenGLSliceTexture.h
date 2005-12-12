@@ -20,7 +20,7 @@
 
 #ifndef _WIN32
 #ifndef GLU_VERSION_1_2
-#define GLU_VERSION_1_2
+#define GLU_VERSION_1_2 1
 #endif
 #endif
 

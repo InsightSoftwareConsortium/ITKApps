@@ -86,7 +86,10 @@ public:
 
   /** The FLTK draw method (paints the window) */
   void draw();
-  
+
+  /** Save as PNG */
+  void SaveAsPNG(const char *file);
+
   /**
    * Map a point in window coordinates to a point in slice coordinates
    * (Window coordinates are the ones stored in FLTKEvent.xSpace)
@@ -248,6 +251,9 @@ protected:
   // Label texture object
   LabelTextureType *m_LabelTexture;
 
+  // dump png
+  const char *m_dumpPNG;
+  
   // Check whether the thumbnail should be draw or not
   bool IsThumbnailOn();
 

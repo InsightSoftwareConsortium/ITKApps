@@ -33,6 +33,8 @@
 
 #include "itkConstantPadImageFilter.h"
 
+#include "GLToPNG.h"
+
 using namespace itk;
 using namespace std;
 
@@ -71,6 +73,9 @@ GenericSliceWindow
 
   // Allow focus grabbing
   SetGrabFocusOnEntry(true);
+
+  // dump png no
+  m_dumpPNG = NULL;
 }
 
 GenericSliceWindow
@@ -371,6 +376,13 @@ GenericSliceWindow
 
   // Display!
   glFlush();
+  
+  // dump png if requested
+  if (m_dumpPNG != NULL)
+  {
+    vtkImageData* img = GLToVTKImageData(GL_RGBA, 0, 0, w(), h());
+    VTKImageDataToPNG(img, m_dumpPNG);
+  }
 }
 
 void 
@@ -642,3 +654,14 @@ GenericSliceWindow::EventHandler
   m_ParentUI = m_Parent->m_ParentUI;
   m_GlobalState = m_Parent->m_GlobalState;
 }
+
+void
+GenericSliceWindow
+::SaveAsPNG(const char *file)
+{
+  m_dumpPNG = file;
+  redraw();
+  Fl::flush();
+  m_dumpPNG = NULL;
+}
+
