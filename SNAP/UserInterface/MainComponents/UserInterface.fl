@@ -800,7 +800,7 @@ this->OnSNAPLabelOpacityChange();}
                 } {}
                 Fl_Button {m_BtnIRISPanelSaveAsPNG[0]} {
                   callback {OnActiveWindowSaveSnapshot(0);}
-                  tooltip {Save a snapshot of this window as a PNG image} image {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture.gif} deimage {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture2.gif} xywh {488 30 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
+                  tooltip {Save a snapshot of this window as a PNG image} image {Artwork/screencapture.gif} deimage {Artwork/screencapture2.gif} xywh {488 30 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
                 }
                 Fl_Group {} {open
                   xywh {488 50 20 5}
@@ -876,7 +876,7 @@ this->OnSNAPLabelOpacityChange();}
                 } {}
                 Fl_Button {m_BtnIRISPanelSaveAsPNG[1]} {
                   callback {OnActiveWindowSaveSnapshot(1);}
-                  tooltip {Save a snapshot of this window as a PNG image} image {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture.gif} deimage {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture2.gif} xywh {853 30 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
+                  tooltip {Save a snapshot of this window as a PNG image} image {Artwork/screencapture.gif} deimage {Artwork/screencapture2.gif} xywh {853 30 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
                 }
                 Fl_Group {} {open
                   xywh {853 50 20 5}
@@ -952,7 +952,7 @@ this->OnSNAPLabelOpacityChange();}
                 } {}
                 Fl_Button {m_BtnIRISPanelSaveAsPNG[2]} {
                   callback {OnActiveWindowSaveSnapshot(2);}
-                  tooltip {Save a snapshot of this window as a PNG image} image {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture.gif} deimage {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture2.gif} xywh {853 385 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
+                  tooltip {Save a snapshot of this window as a PNG image} image {Artwork/screencapture.gif} deimage {Artwork/screencapture2.gif} xywh {853 385 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
                 }
                 Fl_Group {} {open
                   xywh {853 405 20 5}
@@ -1005,7 +1005,7 @@ this->OnSNAPLabelOpacityChange();}
                 } {}
                 Fl_Button {m_BtnIRISPanelSaveAsPNG[3]} {
                   callback {OnActiveWindowSaveSnapshot(3);}
-                  tooltip {Save a snapshot of this window as a PNG image} image {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture.gif} deimage {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture2.gif} xywh {460 685 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
+                  tooltip {Save a snapshot of this window as a PNG image} image {Artwork/screencapture.gif} deimage {Artwork/screencapture2.gif} xywh {460 685 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
                 }
                 Fl_Group {} {open
                   xywh {480 685 5 20}
@@ -1065,7 +1065,7 @@ this->OnSNAPLabelOpacityChange();}
                 } {}
                 Fl_Button {m_BtnSNAPPanelSaveAsPNG[0]} {
                   callback {OnActiveWindowSaveSnapshot(0);}
-                  tooltip {Save a snapshot of this window as a PNG image} image {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture.gif} deimage {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture2.gif} xywh {488 30 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
+                  tooltip {Save a snapshot of this window as a PNG image} image {Artwork/screencapture.gif} deimage {Artwork/screencapture2.gif} xywh {488 30 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
                 }
                 Fl_Group {} {open
                   xywh {488 50 20 5}
@@ -1117,7 +1117,7 @@ this->OnSNAPLabelOpacityChange();}
                 } {}
                 Fl_Button {m_BtnSNAPPanelSaveAsPNG[1]} {
                   callback {OnActiveWindowSaveSnapshot(1);}
-                  tooltip {Save a snapshot of this window as a PNG image} image {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture.gif} deimage {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture2.gif} xywh {853 30 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
+                  tooltip {Save a snapshot of this window as a PNG image} image {Artwork/screencapture.gif} deimage {Artwork/screencapture2.gif} xywh {853 30 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
                 }
                 Fl_Group {} {open
                   xywh {853 50 20 5}
@@ -1169,7 +1169,7 @@ this->OnSNAPLabelOpacityChange();}
                 } {}
                 Fl_Button {m_BtnSNAPPanelSaveAsPNG[2]} {
                   callback {OnActiveWindowSaveSnapshot(2);}
-                  tooltip {Save a snapshot of this window as a PNG image} image {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture.gif} deimage {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture2.gif} xywh {853 385 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
+                  tooltip {Save a snapshot of this window as a PNG image} image {Artwork/screencapture.gif} deimage {Artwork/screencapture2.gif} xywh {853 385 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
                 }
                 Fl_Group {} {open
                   xywh {853 405 20 5}
@@ -1230,7 +1230,7 @@ this->OnSNAPLabelOpacityChange();}
                 } {}
                 Fl_Button {m_BtnSNAPPanelSaveAsPNG[3]} {
                   callback {OnActiveWindowSaveSnapshot(3);}
-                  tooltip {Save a snapshot of this window as a PNG image} image {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture.gif} deimage {C:/grant/itkapp/InsightApplications/SNAP/UserInterface/MainComponents/Artwork/screencapture2.gif} xywh {455 685 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
+                  tooltip {Save a snapshot of this window as a PNG image} image {Artwork/screencapture.gif} deimage {Artwork/screencapture2.gif} xywh {455 685 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
                 }
                 Fl_Group {} {open
                   xywh {475 685 5 20}
