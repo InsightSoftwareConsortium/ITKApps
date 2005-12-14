@@ -165,6 +165,7 @@ SET(UI_CXX
   UserInterface/SliceWindow/CrosshairsInteractionMode.cxx
   UserInterface/SliceWindow/GenericSliceWindow.cxx
   UserInterface/SliceWindow/IRISSliceWindow.cxx
+  UserInterface/SliceWindow/GLToPNG.cxx
   UserInterface/SliceWindow/PolygonDrawing.cxx
   UserInterface/SliceWindow/PolygonInteractionMode.cxx
   UserInterface/SliceWindow/RegionInteractionMode.cxx
@@ -221,6 +222,7 @@ SET(UI_HEADERS
   UserInterface/SliceWindow/CrosshairsInteractionMode.h
   UserInterface/SliceWindow/GenericSliceWindow.h
   UserInterface/SliceWindow/IRISSliceWindow.h
+  UserInterface/SliceWindow/GLToPNG.h
   UserInterface/SliceWindow/OpenGLSliceTexture.h
   UserInterface/SliceWindow/OpenGLSliceTexture.txx
   UserInterface/SliceWindow/PolygonDrawing.h

@@ -584,9 +584,9 @@ VoxBoCUBImageIO
 
   // Write the origin (have to convert to bytes)
   header << VB_ORIGIN << ": "
-    << (int)(m_Origin[0] / m_Spacing[0]) << " "
-    << (int)(m_Origin[1] / m_Spacing[1]) << " "
-    << (int)(m_Origin[2] / m_Spacing[2]) << std::endl;
+    << (int) round(m_Origin[0] / m_Spacing[0]) << " "
+    << (int) round(m_Origin[1] / m_Spacing[1]) << " "
+    << (int) round(m_Origin[2] / m_Spacing[2]) << std::endl;
 
   // Write the byte order
   header << VB_BYTEORDER << ": "
