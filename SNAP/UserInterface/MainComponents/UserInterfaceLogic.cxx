@@ -3401,12 +3401,12 @@ UserInterfaceLogic
 
   // Delegate between available methods
   if(m_WizWindows->value() == m_GrpSNAPWindows)
-    if(window << 3)
+    if(window < 3)
       SNAPWindowSaveAsPNG(window, m_LastSnapshotFileName.c_str());
     else
       SNAPWindow3DSaveAsPNG(m_LastSnapshotFileName.c_str());
   else
-    if(window << 3)
+    if(window < 3)
       IRISWindowSaveAsPNG(window, m_LastSnapshotFileName.c_str());
     else
       IRISWindow3DSaveAsPNG(m_LastSnapshotFileName.c_str());
@@ -3444,6 +3444,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.48  2005/12/12 13:11:39  pauly
+ *BUG: Filename problem with talking snapshots in SNAP fixed
+ *
  *Revision 1.47  2005/12/12 00:27:44  pauly
  *ENH: Preparing SNAP for 1.4 release. Snapshot functionality
  *
