@@ -584,9 +584,9 @@ VoxBoCUBImageIO
 
   // Write the origin (have to convert to bytes)
   header << VB_ORIGIN << ": "
-    << (int) round(m_Origin[0] / m_Spacing[0]) << " "
-    << (int) round(m_Origin[1] / m_Spacing[1]) << " "
-    << (int) round(m_Origin[2] / m_Spacing[2]) << std::endl;
+    << static_cast< int >( m_Origin[0] / m_Spacing[0] + 0.5 ) << " "
+    << static_cast< int >( m_Origin[1] / m_Spacing[1] + 0.5 ) << " "
+    << static_cast< int >( m_Origin[2] / m_Spacing[2] + 0.5 ) << std::endl;
 
   // Write the byte order
   header << VB_BYTEORDER << ": "
@@ -624,7 +624,9 @@ VoxBoCUBImageIO
     InverseOrientationMap::const_iterator it = 
       m_InverseOrientationMap.find(oflag);
     if(it != m_InverseOrientationMap.end())
+      {
       header << VB_ORIENTATION << ": " << it->second << std::endl;
+      }
     }
 
   // Write the terminating characters
