@@ -145,7 +145,7 @@ SNAPTestDriver
         {
         // Print out test info
         std::cout << std::setw(20) << std::ios::left << m_TestNames[i];
-        std::cout << std::setw(12) << std::ios::left << m_TestTemplated[i] ? "Yes" : "No";
+        std::cout << std::setw(12) << std::ios::left << (m_TestTemplated[i] ? "Yes" : "No");
         std::cout << test->GetDescription() << std::endl;
         }
       }

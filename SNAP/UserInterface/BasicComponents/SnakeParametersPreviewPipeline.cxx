@@ -205,10 +205,10 @@ public:
       // Get the list of points representing the evolving contour
       vtkPolyData *pd = m_VTKContour->GetOutput();
       m_CurrentCurve.reserve(pd->GetNumberOfCells() * 2);
-      for(unsigned int i=0;i<pd->GetNumberOfCells();i++)
+      for(int i=0;i<pd->GetNumberOfCells();i++)
         {
-        float *pt1 = pd->GetPoint(pd->GetCell(i)->GetPointId(0));
-        float *pt2 = pd->GetPoint(pd->GetCell(i)->GetPointId(1));
+        vtkFloatingPointType *pt1 = pd->GetPoint(pd->GetCell(i)->GetPointId(0));
+        vtkFloatingPointType *pt2 = pd->GetPoint(pd->GetCell(i)->GetPointId(1));
         m_CurrentCurve.push_back(Vector2d(pt1[0] + 0.5,pt1[1] + 0.5));
         m_CurrentCurve.push_back(Vector2d(pt2[0] + 0.5,pt2[1] + 0.5));
         }

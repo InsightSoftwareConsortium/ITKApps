@@ -47,6 +47,6 @@ public: \
           virtual ~name() {} \
 };
 
-irisExceptionMacro(IRISExceptionIO,IRISException);
+irisExceptionMacro(IRISExceptionIO,IRISException)
 
 #endif
