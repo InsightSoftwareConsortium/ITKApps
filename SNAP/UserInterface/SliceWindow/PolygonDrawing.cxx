@@ -13,6 +13,7 @@
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "PolygonDrawing.h"
+#include "PolygonScanConvert.h"
 #include "SNAPCommonUI.h"
 
 #include "SNAPOpenGL.h"
@@ -95,25 +96,6 @@ PolygonDrawing
   m_State = INACTIVE_STATE;
   m_SelectedVertices = false;
   m_DraggingPickBox = false;
-
-  // Typecast for the callback functions
-  #ifdef WIN32
-  typedef void (CALLBACK *TessCallback)();
-  #else
-  typedef void (*TessCallback)();
-  #endif
-
-  // create glu Tesselator for rendering polygons
-  m_Tesselator = gluNewTess();
-  gluTessCallback(m_Tesselator,(GLenum) GLU_TESS_VERTEX, (TessCallback) glVertex3dv);
-  gluTessCallback(m_Tesselator,(GLenum) GLU_TESS_BEGIN, (TessCallback) glBegin); 
-  gluTessCallback(m_Tesselator,(GLenum) GLU_TESS_END, (TessCallback) glEnd);
-  gluTessCallback(m_Tesselator,(GLenum) GLU_TESS_ERROR, 
-    (TessCallback) &PolygonDrawing::ErrorCallback);     
-  gluTessCallback(m_Tesselator,(GLenum) GLU_TESS_COMBINE, 
-    (TessCallback) &PolygonDrawing::CombineCallback);
-  gluTessProperty(m_Tesselator,(GLenum) GLU_TESS_WINDING_RULE, GLU_TESS_WINDING_NONZERO);  
-  gluTessNormal(m_Tesselator,0.0,0.0,1.0);
 }
 
 /**
@@ -125,7 +107,7 @@ PolygonDrawing
 PolygonDrawing
 ::~PolygonDrawing()
 {
-  gluDeleteTess(m_Tesselator);
+
 }
 
 /**
@@ -290,111 +272,14 @@ PolygonDrawing
  */
 void 
 PolygonDrawing
-::AcceptPolygon(unsigned char *buffer, int width, int height) 
+::AcceptPolygon(ByteImageType *image) 
 {
-  // Push the GL attributes
-  glPushAttrib(GL_ALL_ATTRIB_BITS);
-
-  // Tesselate the polygon and save the tesselation as a display list
-  GLint dl = glGenLists(1);
-  glNewList(dl, GL_COMPILE);
-
-  // Set the background to black
-  glClearColor(0,0,0,1);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  // Paint in white
-  glColor3d(1.0, 1.0, 1.0);
-
-  // Allocate an array to hold the vertices
-  double *vArray = new double[3 * m_Vertices.size() + 3], *vPointer = vArray;
-  for(VertexIterator it = m_Vertices.begin(); it!=m_Vertices.end();++it)
-    {
-    *vPointer++ = (double) it->x;
-    *vPointer++ = (double) it->y;
-    *vPointer++ = 0.0;
-    }
-
-  // Start the tesselation
-  gluTessBeginPolygon(m_Tesselator,NULL);
-  gluTessBeginContour(m_Tesselator);
-
-  // Add the vertices
-  for(unsigned int i=0; i < m_Vertices.size(); i++)
-    { gluTessVertex(m_Tesselator, vArray + 3*i, vArray + 3*i); }
-    
-  // End the tesselation
-  gluTessEndContour(m_Tesselator);
-  gluTessEndPolygon(m_Tesselator);
-
-  // Clean up the array
-  delete vArray;
-
-  // End the display list
-  glEndList();
-
-  // Draw polygon into back buffer - back buffer should get redrawn
-  // anyway before it gets swapped to the screen.
-  glDrawBuffer(GL_BACK);
-  glReadBuffer(GL_BACK);
-
-  // We will perform a tiled drawing, because the backbuffer may be smaller
-  // than the size of the image. First get the viewport size, i.e., tile size
-  GLint xViewport[4]; glGetIntegerv(GL_VIEWPORT, xViewport);
-  unsigned int wTile = (unsigned int) xViewport[2];
-  unsigned int hTile = (unsigned int) xViewport[3];
-
-  // Figure out the number of tiles in x and y dimension
-  unsigned int nTilesX = (unsigned int) ceil( width * 1.0 / wTile );
-  unsigned int nTilesY = (unsigned int) ceil( height * 1.0 / hTile );
-
-  // Draw and retrieve each tile
-  for(unsigned int iTileX = 0; iTileX < nTilesX; iTileX++)
-    {
-    for(unsigned int iTileY = 0; iTileY < nTilesY; iTileY++)
-      {
-      // Get the corner of the tile
-      unsigned int xTile = iTileX * wTile, yTile = iTileY * hTile;
-
-      // Set the projection matrix
-      glMatrixMode(GL_PROJECTION);
-      glPushMatrix();
-      glLoadIdentity();
-      gluOrtho2D(xTile, xTile + wTile, yTile, yTile + hTile);
-
-      // Set the model view matrix
-      glMatrixMode(GL_MODELVIEW);
-      glPushMatrix();
-      glLoadIdentity();
-
-      // Draw the triangles
-      glCallList(dl);
-
-      // Figure out the size of the data chunk to copy
-      unsigned int wCopy = width - xTile < wTile ? width - xTile : wTile;
-      unsigned int hCopy = height - yTile < hTile ? height - yTile : hTile;
-      
-      // Set up the copy so that the strides are correct
-      glPixelStorei(GL_PACK_ALIGNMENT, 1);
-      glPixelStorei(GL_PACK_ROW_LENGTH, width);
-      glPixelStorei(GL_PACK_SKIP_PIXELS, xTile);
-      glPixelStorei(GL_PACK_SKIP_ROWS, yTile);
-
-      // Copy the pixels to the buffer
-      glReadPixels(0,0,wCopy,hCopy,GL_LUMINANCE,GL_UNSIGNED_BYTE,buffer);
-
-      // Restore the GL state
-      glPopMatrix();
-      glMatrixMode(GL_PROJECTION);
-      glPopMatrix();
-      }
-    }
-
-  // Get rid of the display list
-  glDeleteLists(dl,1);
-
-  // Restore the GL state
-  glPopAttrib();
+  // Scan convert the points into the slice
+  typedef PolygonScanConvert<
+    unsigned char, GL_UNSIGNED_BYTE, VertexIterator> ScanConvertType;
+  
+  ScanConvertType::RasterizeFilled(
+    m_Vertices.begin(), m_Vertices.size(), image);
 
   // Copy polygon into polygon m_Cache
   m_CachedPolygon = true;
@@ -781,39 +666,12 @@ PolygonDrawing
   return 0;
 }
 
-void PolygonDrawing::VertexCallback(void *data)
-{
-  glVertex3dv((double *)data);
-}
-
-void PolygonDrawing::BeginCallback(GLenum which) 
-{ 
-  glBegin(which); 
-}
-
-void PolygonDrawing::EndCallback(void) 
-{ 
-  glEnd(); 
-}
-
-void PolygonDrawing::ErrorCallback(GLenum errorCode)
-{ 
-  cerr << "Tesselation Error: " << gluErrorString(errorCode) << endl; 
-}
-
-void PolygonDrawing::CombineCallback(GLdouble coords[3], 
-                GLdouble **irisNotUsed(vertex_data),  
-                GLfloat *irisNotUsed(weight), 
-                GLdouble **dataOut) 
-{
-  GLdouble *vertex = new GLdouble[3];
-  vertex[0] = coords[0]; vertex[1] = coords[1]; vertex[2] = coords[2];
-  *dataOut = vertex;
-}
-
 
 /*
  *Log: PolygonDrawing.cxx
+ *Revision 1.9  2005/12/08 18:20:46  hjohnson
+ *COMP:  Removed compiler warnings from SGI/linux/MacOSX compilers.
+ *
  *Revision 1.8  2004/07/22 19:22:50  pauly
  *ENH: Large image support for SNAP. This includes being able to use more screen real estate to display a slice, a fix to the bug with manual segmentation of images larger than the window size, and a thumbnail used when zooming into the image.
  *

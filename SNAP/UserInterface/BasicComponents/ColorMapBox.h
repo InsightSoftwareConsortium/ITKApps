@@ -31,12 +31,17 @@ public:
   /** Set the current color map functor */
   void SetColorMap(const SpeedColorMap &map)
     { m_ColorMap = map; redraw(); }
+
+  /** Set the range for the color map */
+  void SetRange(double x0, double x1)
+    { m_RangeStart = x0; m_RangeEnd = x1; }
   
   /** The draw method */
   void draw();
 
 private:
   SpeedColorMap m_ColorMap;
+  double m_RangeStart, m_RangeEnd;
 };
 
 #endif

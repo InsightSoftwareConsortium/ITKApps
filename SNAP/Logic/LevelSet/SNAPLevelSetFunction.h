@@ -81,6 +81,11 @@ public:
   /** Run-time type information (and related methods) */
   itkTypeMacro( SNAPLevelSetFunction, itk::LevelSetFunction );
                                                                                 
+                                                                                
+  /** Extract some parameters from the superclass. */
+  itkStaticConstMacro(ImageDimension, unsigned int,
+                      Superclass::ImageDimension);
+
   /** Extract some parameters from the superclass. */
   typedef typename Superclass::ImageType ImageType;
   typedef typename ImageType::Pointer ImagePointer;
@@ -90,7 +95,7 @@ public:
   typedef typename Superclass::FloatOffsetType FloatOffsetType;
   
   typedef typename Superclass::VectorType VectorType;
-  typedef itk::Image<VectorType, 3> VectorImageType;
+  typedef itk::Image<VectorType, ImageDimension> VectorImageType;
   typedef typename VectorImageType::Pointer VectorImagePointer;
 
   typedef typename Superclass::TimeStepType TimeStepType;
@@ -105,10 +110,7 @@ public:
   typedef typename ImageType::IndexType IndexType;
   typedef typename ImageInterpolatorType::ContinuousIndexType 
     ContinuousIndexType;
-                                                                                
-  /** Extract some parameters from the superclass. */
-  itkStaticConstMacro(ImageDimension, unsigned int,
-                      Superclass::ImageDimension);
+
   
   /** Set the speed image (a.k.a. function g()) on which the 
       computation of the variuous internal speed images is

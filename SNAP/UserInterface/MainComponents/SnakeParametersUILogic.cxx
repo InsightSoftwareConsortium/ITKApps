@@ -309,11 +309,10 @@ void SnakeParametersUILogic
     m_PreviewPipeline->SetSpeedImage(m_ExampleImage[0]);
   else
     m_PreviewPipeline->SetSpeedImage(m_ExampleImage[1]);
+  
+  // Pass the parameters to the pipeline
   m_PreviewPipeline->SetSnakeParameters(m_Parameters);
     
-  for(unsigned int j=0;j<4;j++)
-    m_BoxPreview[j]->redraw();
-
   // Advanced page : solver
   if(m_Parameters.GetSolver() == SnakeParameters::LEGACY_SOLVER) 
     {
@@ -381,12 +380,21 @@ void SnakeParametersUILogic
   m_InSmoothingWeight->value(m_Parameters.GetLaplacianWeight());
 
   // Update the parameter display windows
+  RedrawAllBoxes();
+}
+
+void 
+SnakeParametersUILogic
+::RedrawAllBoxes()
+{
   m_BoxPreview[0]->redraw();
   m_BoxPreview[1]->redraw();
   m_BoxPreview[2]->redraw();
   m_BoxPreview[3]->redraw();
 }
- 
+
+
+
 void 
 SnakeParametersUILogic
 ::OnHelpAction()
@@ -395,17 +403,24 @@ SnakeParametersUILogic
 }
 
 void SnakeParametersUILogic
+::CloseWindow()
+{
+  // Close the window
+  m_Window->hide();
+}
+
+void SnakeParametersUILogic
 ::OnOkAction()
 {
   m_UserAccepted = true;
-  m_Window->hide();
+  CloseWindow();
 }
 
 void SnakeParametersUILogic
 ::OnCloseAction()
 {
   m_UserAccepted = false;
-  m_Window->hide();
+  CloseWindow();
 }
 
 void SnakeParametersUILogic
@@ -530,23 +545,17 @@ void SnakeParametersUILogic
   // Get the edge and region example image file names
   string fnImage[2];
   fnImage[0] = 
-    m_SystemInterface->GetFileInRootDirectory("Images2D/EdgeForcesExample.png");
+    m_SystemInterface->GetFileInRootDirectory("Images2D/EdgeForcesExample.hdr");
   fnImage[1] = 
-    m_SystemInterface->GetFileInRootDirectory("Images2D/RegionForcesExample.png");
-
-  // We are converting read data from RGB pixel image
-  typedef itk::RGBPixel<unsigned char> RGBPixelType;
-  typedef itk::Image<RGBPixelType,2> RGBImageType;
+    m_SystemInterface->GetFileInRootDirectory("Images2D/RegionForcesExample.hdr");
 
   // Typedefs
-  typedef itk::ImageFileReader<RGBImageType> ReaderType;
-  typedef itk::PNGImageIO IOType;
-  typedef itk::ImageRegionIterator<RGBImageType> RGBIteratorType;
+  typedef itk::ImageFileReader<ExampleImageType> ReaderType;
   typedef itk::ImageRegionIterator<ExampleImageType> IteratorType;
 
-  // Scale and shift constants
-  const float scale[2] = {1.0f / 255.0f, 2.0f / 255.0f };
-  const float shift[2] = {0.0f, -1.0f };
+  // Initialize the pipeline
+  m_PreviewPipeline = new SnakeParametersPreviewPipeline(
+    m_ParentUI->GetDriver()->GetGlobalState());
 
   // Load each of these images
   for(unsigned int i = 0; i < 2; i++) 
@@ -555,31 +564,19 @@ void SnakeParametersUILogic
       {
       // Read the image in
       ReaderType::Pointer reader = ReaderType::New();
-      IOType::Pointer io = IOType::New();
-      reader->SetImageIO(io);
       reader->SetFileName(fnImage[i].c_str());
       reader->Update();
 
       // Allocate the example image
-      m_ExampleImage[i] = ExampleImageType::New();
-      m_ExampleImage[i]->SetRegions(reader->GetOutput()->GetBufferedRegion());
-      m_ExampleImage[i]->Allocate();
-
-      // Scale the image into the range (image is RGB 0..255)
-      RGBIteratorType 
-        itColor(reader->GetOutput(),reader->GetOutput()->GetBufferedRegion());
-      IteratorType it(m_ExampleImage[i],m_ExampleImage[i]->GetBufferedRegion());
-
-      for(itColor.GoToBegin();!itColor.IsAtEnd();++it,++itColor)
-        {
-        it.Value() = itColor.Value().GetLuminance() * scale[i] + shift[i];
-        }
+      m_ExampleImage[i] = reader->GetOutput();
       }
-    catch(...)
+    catch(itk::ExceptionObject &exc)
       {
       // An exception occurred.  
       fl_alert("Unable to load image %s\n"
-               "Force illustration example will not be available.",fnImage[i].c_str());
+               "Exception %s\n"
+               "Force illustration example will not be available.", 
+               exc.GetDescription(), fnImage[i].c_str());
 
       // Initialize an image to zeros
       m_ExampleImage[i] = NULL;
@@ -605,7 +602,10 @@ void SnakeParametersUILogic
   
   // Assign our previewer to the preview windows
   for(unsigned int i=0;i<4;i++)
+    {
+    m_BoxPreview[i]->SetParentUI(this);
     m_BoxPreview[i]->SetPipeline(m_PreviewPipeline);
+    }
   
   // If there are some points in there, draw them
   if(points.size() >= 4)
@@ -643,8 +643,8 @@ SnakeParametersUILogic
 ::SnakeParametersUILogic()
   : SnakeParametersUI()
 {
-  // Create a preview pipeline 
-  m_PreviewPipeline = new SnakeParametersPreviewPipeline();
+  // Clear the pipeline
+  m_PreviewPipeline = NULL;
 
   // Create the parameter IO dialog window
   m_IODialog = new SimpleFileDialogLogic;
@@ -660,7 +660,8 @@ SnakeParametersUILogic
 SnakeParametersUILogic
 ::~SnakeParametersUILogic()
 {
-  delete m_PreviewPipeline;
+  if(m_PreviewPipeline)
+    delete m_PreviewPipeline;
   delete m_IODialog;
 }
 
@@ -669,4 +670,59 @@ SnakeParametersUILogic
 ::ShowHelp(const char *link)
 {
   m_ParentUI->ShowHTMLPage(link);
+}
+
+void
+SnakeParametersUILogic
+::OnAnimateAction()
+{
+  // Remove a timeout callback if it exists
+  Fl::remove_timeout(SnakeParametersUILogic::OnTimerCallback, this);
+  m_PreviewPipeline->SetDemoLoopRunning(false);
+
+  // If the button value is one, add the timeout
+  if(m_BtnAnimate->value())
+    {
+    Fl::add_timeout(0.2, SnakeParametersUILogic::OnTimerCallback, this);
+    m_PreviewPipeline->SetDemoLoopRunning(true);
+    }
+  else
+    {
+    RedrawAllBoxes();
+    }
+}
+
+void 
+SnakeParametersUILogic
+::OnTimerCallback(void *cbdata)
+{
+  // Get the object that this refers to
+  SnakeParametersUILogic *self = 
+    reinterpret_cast<SnakeParametersUILogic *>(cbdata);
+
+  // If the window is not visible, there is nothing to do
+  if(!self->m_Window->visible())
+    {
+    self->m_PreviewPipeline->SetDemoLoopRunning(false);
+    self->m_BtnAnimate->value(0);
+    }
+  else
+    {
+    // Call the pipeline's animation method
+    self->m_PreviewPipeline->AnimationCallback();
+
+    // Redraw all the windows
+    self->RedrawAllBoxes();
+
+    // Schedule another run
+    Fl::repeat_timeout(0.05, SnakeParametersUILogic::OnTimerCallback, self);
+    }
+}
+
+void 
+SnakeParametersUILogic
+::OnSpeedColorMapUpdate()
+{
+  if(m_Window->visible())
+    RedrawAllBoxes();
 }

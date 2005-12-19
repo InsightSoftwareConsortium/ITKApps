@@ -15,10 +15,14 @@
 #ifndef __SnakeParametersPreviewPipeline_h_
 #define __SnakeParametersPreviewPipeline_h_
 
+#include "SNAPOpenGL.h"
 #include "SNAPCommonUI.h"
 #include "itkImage.h"
+#include "itkRGBAPixel.h"
 #include "itkCovariantVector.h"
+#include "itkUnaryFunctorImageFilter.h"
 #include "SnakeParameters.h"
+#include "SpeedColorMap.h"
 
 template<class TInputImage, class TOutputImage> class SignedDistanceFilter;
 template<class TInputImage> class SNAPLevelSetFunction;
@@ -34,6 +38,10 @@ namespace itk {
     class SparseFieldLevelSetImageFilter;
 };
 
+class LevelSetPreview2d;
+
+// #define SNAKE_PREVIEW_ADVANCED 1
+
 /** 
  * \class SnakeParametersPreviewPipeline
  * \brief A pipeline used to preview snake parameters.
@@ -46,12 +54,16 @@ namespace itk {
 class SnakeParametersPreviewPipeline
 {
 public:
-  SnakeParametersPreviewPipeline();
+  SnakeParametersPreviewPipeline(GlobalState *state);
   virtual ~SnakeParametersPreviewPipeline();
 
   // Images used by this class (internally and externally)
   typedef itk::Image<unsigned char, 2> CharImageType;
   typedef itk::Image<float, 2> FloatImageType;
+
+  // Define a color image for display
+  typedef itk::RGBAPixel<unsigned char> DisplayPixelType;
+  typedef itk::Image<DisplayPixelType,2> DisplayImageType;
 
   // Index type used to refer to pixels
   typedef FloatImageType::IndexType IndexType;
@@ -72,6 +84,8 @@ public:
     double CurvatureForce;
     double AdvectionForce;
     
+    double operator[](unsigned int i) const
+      { return x[i]; } 
   };
 
   // Various list types
@@ -101,14 +115,6 @@ public:
    * GL tesselation code for generating an image from the curve */
   void Update(Fl_Gl_Window *context);
 
-#ifdef SNAKE_PREVIEW_ADVANCED
-
-  /** Get the contours associated with a particular level set */
-  const LevelSetContourType &GetLevelSetContour(
-    ForceType force, unsigned int level);
-
-#endif
-
   /** Get the speed image */
   irisGetMacro(SpeedImage,FloatImageType *);
   
@@ -118,7 +124,24 @@ public:
   /** Get a list of densely interpolated points on the curve (for drawing) */
   irisGetMacro(SampledPoints,const SampledPointList &);
 
+  /** Is the demo loop running ? */
+  irisIsMacro(DemoLoopRunning);
+  irisSetMacro(DemoLoopRunning, bool);
+
+  /** Get the demo loop contour */
+  std::vector<Vector2d> &GetDemoLoopContour();
+
+  /** Get the color image corresponding to the speed image */
+  DisplayImageType *GetDisplayImage()  
+    { return m_DisplayMapper->GetOutput(); }
+
+  /** Set the idle callback function that FLTK should call in demo mode */
+  void AnimationCallback();
+
 private:
+
+  /** The global state */
+  GlobalState *m_GlobalState;
       
   /** The speed image */
   itk::SmartPointer<FloatImageType> m_SpeedImage;
@@ -148,7 +171,6 @@ private:
   bool m_SpeedModified;
   bool m_ParametersModified;
   bool m_QuickUpdate;
-  bool m_Updating;
     
   // Internal components of the Update method
   void UpdateLevelSetFunction();
@@ -157,25 +179,20 @@ private:
   void UpdateForces();
   void Update();
 
+  // A filter used to convert the speed image to a color image to display on the screen
+  typedef itk::UnaryFunctorImageFilter<
+    FloatImageType,DisplayImageType,SpeedColorMap> IntensityFilterType;
+  typedef itk::SmartPointer<IntensityFilterType> IntensityFilterPointer;
+  IntensityFilterPointer m_DisplayMapper;
 
-#ifdef SNAKE_PREVIEW_ADVANCED
-  // Filter types used in the pipeline
-  typedef SignedDistanceFilter<FloatImageType,FloatImageType> DistanceFilterType;      
-  typedef SNAPLevelSetFunction<FloatImageType> LevelSetFunctionType;
+  // Demo loop object
+  LevelSetPreview2d *m_DemoLoop;
 
-  /** An image containing the binary image of the spline inside */
-  itk::SmartPointer<FloatImageType> m_FloodFillImage;
+  // Whether the demo loop is currently running
+  bool m_DemoLoopRunning;
 
-  // A filter used to fill the pipeline
-  itk::SmartPointer<DistanceFilterType> m_DistanceFilter;
-
-  // The mini leve set pipelines
-  LevelSetPreviewPipeline2D *m_LevelSetPipeline[4];
-
-  // A method to scan-convert a polygon
-  void ScanConvertSpline(Fl_Gl_Window *context);  
-#endif // SNAKE_PREVIEW_ADVANCED
-
+  // The color map preset currently in use for speed image rendering
+  ColorMapPreset m_ColorMapPreset;
 };
 
 

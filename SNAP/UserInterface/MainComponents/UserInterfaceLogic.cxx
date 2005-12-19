@@ -596,13 +596,32 @@ void
 UserInterfaceLogic
 ::OnPreprocessedColorMapAction()
 {
+  // Set up mapping from color maps to menu items (TODO: this is hacky)
+  static std::map<ColorMapPreset, int> menuMap;
+  if(menuMap.size() == 0)
+    {
+    // Edge items
+    menuMap[COLORMAP_BLACK_BLACK_WHITE] = 0;
+    menuMap[COLORMAP_BLACK_YELLOW_WHITE] = 1;
+
+    // Region items
+    menuMap[COLORMAP_BLACK_GRAY_WHITE] = 0;
+    menuMap[COLORMAP_BLUE_BLACK_WHITE] = 1;    
+    menuMap[COLORMAP_BLUE_WHITE_RED] = 2;
+    }
+
+  // Select current color maps in the menus
+  m_ChoiceColorMap[0]->value(menuMap[m_GlobalState->GetSpeedColorMapInRegionMode()]);
+  m_ChoiceColorMap[1]->value(menuMap[m_GlobalState->GetSpeedColorMapInEdgeMode()]);
+
+  // Set the ranges for the color map boxes
+  m_BoxColorMap[0]->SetRange(-1.0, 1.0);
+  m_BoxColorMap[1]->SetRange(0.0, 1.0);
+
+  // Show the color map box and window
   m_WinColorMap->show();
-  m_BoxColorMap->show();
 
-  // Set the color map dropdown correctly
-  ColorMapPreset xPreset = m_GlobalState->GetSpeedColorMap();
-  m_ChoiceColorMap->value(xPreset - COLORMAP_BLACK_BLACK_WHITE);
-
+  // Update the color map in the speed images
   UpdateSpeedColorMap();
 }
 
@@ -617,12 +636,20 @@ void
 UserInterfaceLogic
 ::OnColorMapSelectAction()
 {
-  // Get the selected value
-  int iSelect = m_ChoiceColorMap->value();
+  // Mapping from edge menu items to color maps
+  static const ColorMapPreset edgeMenuMap[] = 
+    { COLORMAP_BLACK_BLACK_WHITE, COLORMAP_BLACK_YELLOW_WHITE };
+  static const ColorMapPreset regionMenuMap[] = 
+    { COLORMAP_BLACK_GRAY_WHITE, COLORMAP_BLUE_BLACK_WHITE, 
+      COLORMAP_BLUE_WHITE_RED };
+  
+  // Select the appropriate page in the color map window
+  ColorMapPreset xPreset =  
+    (m_GlobalState->GetSnakeMode() == EDGE_SNAKE) 
+    ? edgeMenuMap[m_ChoiceColorMap[1]->value()] 
+    : regionMenuMap[m_ChoiceColorMap[0]->value()] ;
 
   // Set the current color map
-  ColorMapPreset xPreset = 
-    static_cast<ColorMapPreset>(COLORMAP_BLACK_BLACK_WHITE + iSelect);
   m_GlobalState->SetSpeedColorMap(xPreset);
 
   // Update the display
@@ -634,15 +661,36 @@ void
 UserInterfaceLogic
 ::UpdateSpeedColorMap()
 {
+  // Get the index of the color map box to update
+  int iBox = (m_GlobalState->GetSnakeMode() == EDGE_SNAKE) ? 1 : 0;
+
+  // Select the appropriate page in the color map window
+  m_WizColorMap->value(m_GrpColorMapPage[iBox]);
+
   // Apply the color map to the preview window
-  m_BoxColorMap->SetColorMap(SpeedColorMap::GetPresetColorMap(
+  m_BoxColorMap[iBox]->SetColorMap(
+    SpeedColorMap::GetPresetColorMap(
       m_GlobalState->GetSpeedColorMap()));
+  m_BoxColorMap[iBox]->redraw();
 
   // Apply the color map to the speed wrapper
   if(m_Driver->GetSNAPImageData()->IsSpeedLoaded())
     m_Driver->GetSNAPImageData()->GetSpeed()->
       SetColorMap(SpeedColorMap::GetPresetColorMap(
         m_GlobalState->GetSpeedColorMap()));
+
+  // Also, apply the color map to the SNAP preview window
+  if(m_Driver->GetSNAPImageData()->IsSpeedLoaded())
+    m_SnakeParametersUI->OnSpeedColorMapUpdate();
+
+  // If the color map window is showing, show the color boxes
+  if(m_WinColorMap->shown())
+    {
+    m_BoxColorMap[1 - iBox]->hide();
+    m_BoxColorMap[iBox]->show();
+    }
+
+  // Redraw the windows
   RedrawWindows();
 }
 
@@ -3444,6 +3492,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.49  2005/12/16 23:46:51  pauly
+ *BUG: Silly mistake in PNG screenshot saver
+ *
  *Revision 1.48  2005/12/12 13:11:39  pauly
  *BUG: Filename problem with talking snapshots in SNAP fixed
  *

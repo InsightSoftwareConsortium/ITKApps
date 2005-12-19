@@ -22,6 +22,10 @@
 #include <list>
 #include "SNAPCommonUI.h"
 
+namespace itk {
+  template <class TPixel, unsigned int VDimensions> class Image;
+};
+
 
 /**
  * \class PolygonDrawing
@@ -30,6 +34,9 @@
 class PolygonDrawing
 {
 public:
+  // Type of image passed in for rasterization
+  typedef itk::Image<unsigned char, 2> ByteImageType;
+
   /** States that the polygon drawing is in */
   enum PolygonState { INACTIVE_STATE, DRAWING_STATE, EDITING_STATE };
 
@@ -40,12 +47,14 @@ public:
     bool selected;
     Vertex(float x_, float y_, bool on_) : x(x_), y(y_), selected(on_) {}
     Vertex() : x(0.0f), y(0.0f), selected(false) {}
+    float &operator[](unsigned int i) 
+      { return (i==0) ? x : y; }
     };
 
   PolygonDrawing();
   virtual ~PolygonDrawing();
   
-  void AcceptPolygon(unsigned char *buffer, int width, int height);
+  void AcceptPolygon(ByteImageType *slice);
   void PastePolygon(void);
   void Draw(float pixel_x, float pixel_y);
   int  Handle(int event, int button, float x, float y, float pixel_x, float pixel_y);
@@ -84,25 +93,17 @@ private:
 
   float m_StartX, m_StartY;
 
-  GLUtesselator *m_Tesselator;
-
   void ComputeEditBox();
   void Add(float x, float y, int selected);
-
-  // Callbacks for the GL tesselator
-  static void VertexCallback(void *data);
-  static void BeginCallback(GLenum which); 
-  static void EndCallback(void); 
-  static void ErrorCallback(GLenum errorCode);
-  static void CombineCallback(
-    GLdouble coords[3], GLdouble **irisNotUsed(vertex_data),  
-    GLfloat *irisNotUsed(weight), GLdouble **dataOut);
 };
 
 #endif // __PolygonDrawing_h_
 
 /*
  *Log: PolygonDrawing.h
+ *Revision 1.11  2005/02/04 17:01:09  lorensen
+ *COMP: last of gcc 2.96 changes (I hope).
+ *
  *Revision 1.10  2005/02/04 14:17:10  lorensen
  *COMP: gcc 2.96 problems.
  *

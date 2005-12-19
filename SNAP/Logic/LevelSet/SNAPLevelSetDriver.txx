@@ -97,7 +97,9 @@ SNAPLevelSetDriver<VDimension>
   m_LevelSetFunction->CalculateInternalImages();
   
   // Call the initialize method
-  m_LevelSetFunction->Initialize(to_itkSize(Vector3i(1)));
+  typename LevelSetFunctionType::RadiusType radius;
+  radius.Fill(1);
+  m_LevelSetFunction->Initialize(radius);
 
   // Set the time step
   m_LevelSetFunction->SetTimeStepFactor(
@@ -169,6 +171,11 @@ SNAPLevelSetDriver<VDimension>
     // Perform the special configuration tasks on the filter
     filter->SetInput(m_InitializationImage);
     filter->SetDifferenceFunction(m_LevelSetFunction);
+    }
+
+  else
+    {
+    throw itk::ExceptionObject(__FILE__,__LINE__,"Unknown level set solver requested");
     }
 
   // This code is common to all filters. It causes the filter to initialize

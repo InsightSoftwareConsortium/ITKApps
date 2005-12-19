@@ -19,13 +19,18 @@
 #include "IRISVectorTypes.h"
 
 // Include OpenGL headers according to the platform
+#ifdef __APPLE__
+  #include <GL/glu.h>
+  #include <FL/gl.h>
+#else
   #include <FL/gl.h>
   #include <GL/glu.h>
+#endif
 
 #ifndef _WIN32
-#ifndef GLU_VERSION_1_2
-#define GLU_VERSION_1_2
-#endif
+  #ifndef GLU_VERSION_1_2
+    #define GLU_VERSION_1_2
+  #endif
 #endif
 
 // Inline functions for use with vector classes

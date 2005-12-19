@@ -138,9 +138,8 @@ IRISSliceWindow
     make_current(); 
 
     // Have the polygon drawing object render the polygon slice
-    m_PolygonDrawing->AcceptPolygon((unsigned char *) m_PolygonSlice->GetBufferPointer(),
-                        m_SliceSize(0),m_SliceSize(1));
-
+    m_PolygonDrawing->AcceptPolygon(m_PolygonSlice);
+      
     // take polygon rendered by polygon_drawing and merge with 
     // segmentation slice; send changes to voxel data set
     LabelType drawing_color = m_GlobalState->GetDrawingColorLabel();

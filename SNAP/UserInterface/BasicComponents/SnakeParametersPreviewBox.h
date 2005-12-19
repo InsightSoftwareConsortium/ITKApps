@@ -18,9 +18,11 @@
 
 #include "FLTKCanvas.h"
 #include "SnakeParameters.h"
+#include "itkRGBAPixel.h"
 
 template<class TPixel> class OpenGLSliceTexture;
 class SnakeParametersPreviewPipeline;
+class SnakeParametersUILogic;
 
 /**
  * \class SnakeParametersPreviewBox
@@ -40,6 +42,9 @@ public:
   /** A preview pipeline that has the logic of this class */
   irisSetMacro(Pipeline,SnakeParametersPreviewPipeline *);
   irisGetMacro(Pipeline,SnakeParametersPreviewPipeline *);
+
+  irisSetMacro(ParentUI, SnakeParametersUILogic *);
+  irisGetMacro(ParentUI, SnakeParametersUILogic *);
   
   /** An enumeration of different display modes for this widget */
   enum DisplayMode 
@@ -56,7 +61,11 @@ public:
 protected:
   
   // Texture type for drawing speed images
-  typedef OpenGLSliceTexture<float> TextureType;
+  typedef itk::RGBAPixel<unsigned char> RGBAType;
+  typedef OpenGLSliceTexture<RGBAType> TextureType;
+
+  /** Parent UI */
+  SnakeParametersUILogic *m_ParentUI;
 
   /** Preview pipeline logic */
   SnakeParametersPreviewPipeline *m_Pipeline;

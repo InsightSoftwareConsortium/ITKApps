@@ -30,8 +30,6 @@
 #include "vtkImageData.h"
 #include "vtkPNGWriter.h"
 
-#include <GL/gl.h>
-
 // convert a GL buffer into vtkImageData
 vtkImageData* GLToVTKImageData(GLenum format, int x, int y, int w, int h);
 

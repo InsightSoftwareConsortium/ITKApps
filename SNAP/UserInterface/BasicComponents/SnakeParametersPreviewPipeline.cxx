@@ -14,8 +14,10 @@
 =========================================================================*/
 #include "SnakeParametersPreviewPipeline.h"
 
+#include "FL/Fl.H"
 #include "FL/Fl_Gl_Window.H"
 #include "SNAPOpenGL.h"
+#include "GlobalState.h"
 
 #include "LevelSetExtensionFilter.h"
 #include "SignedDistanceFilter.h"
@@ -32,6 +34,9 @@
 #include "vtkImageImport.h"
 #include "vtkPolyData.h"
 
+#include "SNAPLevelSetDriver.h"
+#include "PolygonScanConvert.h"
+
 #ifndef vtkFloatingPointType
 #define vtkFloatingPointType float
 #endif
@@ -39,293 +44,270 @@
 using namespace std;
 using namespace itk;
 
-#ifdef SNAKE_PREVIEW_ADVANCED
+extern void fl_alert(const char *, ...);
 
-class LevelSetPreviewPipeline2D
+/**
+ * This private-scope class creates a 2D demo of the level set segmentation
+ * The segmentation is a 2D version of the SNAP segmentation, with contours
+ * extracted at each iteration. The user supplies the speed image, a set of
+ * points that form the initial contour and the snake evolution parameters.
+ * Then, on a timer, call OnTimerEvent() to generate a demo loop of evolving
+ * contours.
+ */
+class LevelSetPreview2d
 {
 public:
-  // Image type
   typedef itk::Image<float, 2> FloatImageType;
+  typedef SnakeParametersPreviewPipeline::SampledPointList CurveType;
 
-  // Contour type
-  typedef std::vector<Vector2d> ContourType;
+  // Constructor
+  LevelSetPreview2d()
+    {
+    m_Driver = NULL;
+    m_SpeedImage = NULL;
+    m_DriverDirty = true;
+    m_ContourDirty = true;
+    m_DemoLoopLength = 160;
+    m_DemoLoopStep = 2;
+    m_LevelSetImage = NULL;
 
-  // Constructor/destructor
-  LevelSetPreviewPipeline2D();
-  ~LevelSetPreviewPipeline2D();
+    // Initialize the VTK Importer
+    m_VTKExporter = itk::VTKImageExport<FloatImageType>::New();
+    m_VTKImporter = vtkImageImport::New();
 
-  void SetSpeedImage(FloatImageType *image);
-  void SetInitialLevelSetImage(FloatImageType *image);
-  void SetParameters(const SnakeParameters &parameters);  
-  void Update();
+    // Pipe the importer into the exporter (that's a lot of code)
+    m_VTKImporter->SetUpdateInformationCallback(
+      m_VTKExporter->GetUpdateInformationCallback());
+    m_VTKImporter->SetPipelineModifiedCallback(
+      m_VTKExporter->GetPipelineModifiedCallback());
+    m_VTKImporter->SetWholeExtentCallback(
+      m_VTKExporter->GetWholeExtentCallback());
+    m_VTKImporter->SetSpacingCallback(
+      m_VTKExporter->GetSpacingCallback());
+    m_VTKImporter->SetOriginCallback(
+      m_VTKExporter->GetOriginCallback());
+    m_VTKImporter->SetScalarTypeCallback(
+      m_VTKExporter->GetScalarTypeCallback());
+    m_VTKImporter->SetNumberOfComponentsCallback(
+      m_VTKExporter->GetNumberOfComponentsCallback());
+    m_VTKImporter->SetPropagateUpdateExtentCallback(
+      m_VTKExporter->GetPropagateUpdateExtentCallback());
+    m_VTKImporter->SetUpdateDataCallback(
+      m_VTKExporter->GetUpdateDataCallback());
+    m_VTKImporter->SetDataExtentCallback(
+      m_VTKExporter->GetDataExtentCallback());
+    m_VTKImporter->SetBufferPointerCallback(
+      m_VTKExporter->GetBufferPointerCallback());  
+    m_VTKImporter->SetCallbackUserData(
+      m_VTKExporter->GetCallbackUserData());  
 
-  // Get a contour
-  ContourType &GetContour(unsigned int i);
+    // Create and configure the contour filter
+    m_VTKContour = vtkContourFilter::New();
+    m_VTKContour->SetInput(m_VTKImporter->GetOutput());    
+    m_VTKContour->ReleaseDataFlagOn();
+    m_VTKContour->ComputeScalarsOff();
+    m_VTKContour->ComputeGradientsOff();
+    m_VTKContour->UseScalarTreeOn();
+    m_VTKContour->SetNumberOfContours(1);
+    m_VTKContour->SetValue(0, 0.0);
+    }
 
-  // Set and get number of contours
-  irisSetMacro(NumberOfContours,unsigned int);
-  irisGetMacro(NumberOfContours,unsigned int);
+  // Destructor
+  ~LevelSetPreview2d()
+    { 
+    if(m_Driver) delete m_Driver; 
+    m_VTKContour->Delete();
+    m_VTKImporter->Delete();
+    }
+
+  // Timer callback, used to regenerate the current contour
+  void OnTimerEvent()
+    {
+    // Clear the output
+    m_CurrentCurve.clear();
+
+    // If the driver is dirty, we need to create a new one
+    if(m_DriverDirty && m_Driver != NULL)
+      { 
+      delete m_Driver;
+      m_Driver = NULL;
+      }
+
+    // If the driver is null and all the necessary components exist, create it
+    if(m_Driver == NULL && m_SpeedImage.IsNotNull() && m_Curve.size() > 0)
+      {
+      // Check if we need to allocate the level set image
+      if(m_LevelSetImage.IsNull() || m_LevelSetImage->GetBufferedRegion() != 
+          m_SpeedImage->GetBufferedRegion())
+        {
+        m_LevelSetImage = FloatImageType::New();
+        m_LevelSetImage->SetRegions(m_SpeedImage->GetBufferedRegion());
+        m_LevelSetImage->Allocate();
+        m_ContourDirty = true;
+        }
+
+      // Check if the contour is dirty, and create a contour image
+      if(m_ContourDirty)
+        {
+        // Scale the contour by the size of the image
+        std::vector<Vector2d> points; points.reserve(m_Curve.size());
+        for(CurveType::iterator it = m_Curve.begin(); it != m_Curve.end(); ++it)
+          {
+          points.push_back(Vector2d(
+            it->x[0] *  m_LevelSetImage->GetBufferedRegion().GetSize()[0], 
+            it->x[1] *  m_LevelSetImage->GetBufferedRegion().GetSize()[1]));
+          }
+
+        // Fill in the contour in the level set image
+        m_LevelSetImage->FillBuffer(0.0f);
+        typedef PolygonScanConvert<
+          float, GL_FLOAT, std::vector<Vector2d>::iterator> ScanConvertType;
+        ScanConvertType::RasterizeFilled(
+          points.begin(), points.size(), m_LevelSetImage);
+
+        // Ensure that the initial level set is zero
+        typedef itk::ImageRegionIterator<FloatImageType> IteratorType;
+        IteratorType it2(m_LevelSetImage, m_LevelSetImage->GetBufferedRegion());
+        for(; !it2.IsAtEnd(); ++it2)
+          it2.Set(it2.Get() > 0 ? -1.0 : 1.0);
+        m_LevelSetImage->Modified();
+
+        // The contour is not dirty any more
+        m_ContourDirty = false;
+        }
+      
+      m_Driver = new SNAPLevelSetDriver2d(
+        m_LevelSetImage, m_SpeedImage, m_Parameters);
+
+      m_DriverDirty = false;
+      m_DemoLoopTime = 0;
+      }
+
+    // Now that we've made sure that the driver is OK, run the demo loop
+    if(m_Driver != NULL)
+      {
+      // Run some number of level set evolutions
+      if(m_DemoLoopTime > m_DemoLoopLength)
+        {
+        m_DemoLoopTime = 0;
+        m_Driver->Restart();
+        }
+      else
+        {
+        m_Driver->Run(m_DemoLoopStep);
+        m_DemoLoopTime += m_DemoLoopStep;
+        }
+
+      // Generate a contour
+      m_VTKExporter->SetInput(m_Driver->GetCurrentState());
+      m_VTKContour->Update();
+
+      // Get the list of points representing the evolving contour
+      vtkPolyData *pd = m_VTKContour->GetOutput();
+      m_CurrentCurve.reserve(pd->GetNumberOfCells() * 2);
+      for(unsigned int i=0;i<pd->GetNumberOfCells();i++)
+        {
+        float *pt1 = pd->GetPoint(pd->GetCell(i)->GetPointId(0));
+        float *pt2 = pd->GetPoint(pd->GetCell(i)->GetPointId(1));
+        m_CurrentCurve.push_back(Vector2d(pt1[0] + 0.5,pt1[1] + 0.5));
+        m_CurrentCurve.push_back(Vector2d(pt2[0] + 0.5,pt2[1] + 0.5));
+        }
+      }
+    }
+
+  // Change the speed image passed as the input to the level set
+  void SetSpeedImage(FloatImageType *image)
+    {
+    if(image != m_SpeedImage)
+      {
+      m_DriverDirty = true;
+      m_ContourDirty = true;
+      m_SpeedImage = image;
+      }
+    }
+
+  // Set the initial contour curve
+  void SetInitialContour(const CurveType &curve)
+    {
+    m_Curve = curve;
+    m_ContourDirty = true;
+    m_DriverDirty = true;
+    }
+
+  // Set the snake paramters
+  void SetSnakeParameters(const SnakeParameters &parameters)
+    {
+    if(!(m_Parameters == parameters))
+      {
+      m_Parameters = parameters;
+      m_DriverDirty = true;
+      }
+    }
+
+  // Set the length of the demo loop
+  void SetDemoLoopLength(unsigned int length)
+    {
+    m_DemoLoopLength = length;
+    m_DriverDirty = true;
+    }
+
+  // Set the step size of the demo loop
+  void SetDemoLoopStep(unsigned int step)
+    {
+    m_DemoLoopStep = step;
+    m_DriverDirty = true;
+    }
+
+  // See if there is something to display
+  bool IsLevelSetComputed()
+    { return m_Driver != NULL; }
+
+  // Get the level set image to display
+  FloatImageType *GetLevelSetImage()
+    { return m_Driver->GetCurrentState(); }
+
+  // Get the evolving contour
+  vector<Vector2d> &GetEvolvingContour()
+    { return m_CurrentCurve; }
 
 private:
-  // Level set filter
-  typedef LevelSetExtensionFilter<
-    itk::ParallelSparseFieldLevelSetImageFilter<FloatImageType,FloatImageType> >
-    LevelSetFilterType;
-  //typedef LevelSetExtensionFilter<
-  //  itk::NarrowBandLevelSetImageFilter<FloatImageType,FloatImageType> >
-  //  LevelSetFilterType;
-  typedef itk::SmartPointer<LevelSetFilterType> LevelSetFilterPointer;
+  // Parameters of the level set algorithm
+  FloatImageType::Pointer m_SpeedImage, m_LevelSetImage;
+  CurveType m_Curve;
+  SnakeParameters m_Parameters;
+  unsigned int m_DemoLoopStep, m_DemoLoopLength, m_DemoLoopTime;
 
-  // Level set function
-  typedef SNAPLevelSetFunction<FloatImageType> LevelSetFunctionType;
+  // Snake evolution driver pointer
+  SNAPLevelSetDriver2d *m_Driver;
 
-  // Exporter
+  // VTK objects for computing a contour
   typedef itk::VTKImageExport<FloatImageType> ExporterType;
-
-  // A level set function used to compute the forces
-  itk::SmartPointer<LevelSetFunctionType> m_Phi;
-  itk::SmartPointer<LevelSetFilterType> m_Filter;
-
-  // VTK import/export
   itk::SmartPointer<ExporterType> m_VTKExporter;
   vtkImageImport *m_VTKImporter;
   vtkContourFilter *m_VTKContour;
 
-  unsigned int m_NumberOfContours;
+  // The zero level set, as it evolves
+  vector<Vector2d> m_CurrentCurve;
 
-  // A collection of contours
-  std::vector<ContourType> m_Contours;
-
-  // Internal method to add a contour
-  void AddContour();
-
-  // A progress callback
-  void ProgressCallback() {   }
-
-  // Snake parameters
-  SnakeParameters m_Parameters;
-  SnakeParameters m_TempParameters;
-
-  bool m_ParametersInitialized;
-  bool m_ParametersChangedInUpdate;
-
-  // Progress callback command
-  typedef itk::SimpleMemberCommand<LevelSetPreviewPipeline2D> CommandType;
-  itk::SmartPointer<CommandType> m_ProgressCommand;
+  bool m_DriverDirty, m_ContourDirty;
 };
 
-LevelSetPreviewPipeline2D
-::LevelSetPreviewPipeline2D()
+
+
+void 
+SnakeParametersPreviewPipeline
+::AnimationCallback()
 {
-  m_Phi = LevelSetFunctionType::New();
-
-
-  // m_Filter = LevelSetFilterType::New();
-  // m_Filter->SetSegmentationFunction(m_Phi);
-  // m_Filter->SetNarrowBandTotalRadius(5);
-  // m_Filter->SetNarrowBandInnerRadius(3);
-  // m_Filter->SetFeatureImage(m_Phi->GetSpeedImage());  
-
-  m_Filter = LevelSetFilterType::New();
-  m_Filter->SetDifferenceFunction(m_Phi);
-  m_Filter->SetNumberOfLayers(3);
-  m_Filter->SetIsoSurfaceValue(0.0f);
-
-  m_VTKExporter = itk::VTKImageExport<FloatImageType>::New();
-  m_VTKExporter->SetInput(m_Filter->GetOutput());
-
-  // Initialize the VTK Importer
-  m_VTKImporter = vtkImageImport::New();
-
-  // Pipe the importer into the exporter (that's a lot of code)
-  m_VTKImporter->SetUpdateInformationCallback(
-    m_VTKExporter->GetUpdateInformationCallback());
-  m_VTKImporter->SetPipelineModifiedCallback(
-    m_VTKExporter->GetPipelineModifiedCallback());
-  m_VTKImporter->SetWholeExtentCallback(
-    m_VTKExporter->GetWholeExtentCallback());
-  m_VTKImporter->SetSpacingCallback(
-    m_VTKExporter->GetSpacingCallback());
-  m_VTKImporter->SetOriginCallback(
-    m_VTKExporter->GetOriginCallback());
-  m_VTKImporter->SetScalarTypeCallback(
-    m_VTKExporter->GetScalarTypeCallback());
-  m_VTKImporter->SetNumberOfComponentsCallback(
-    m_VTKExporter->GetNumberOfComponentsCallback());
-  m_VTKImporter->SetPropagateUpdateExtentCallback(
-    m_VTKExporter->GetPropagateUpdateExtentCallback());
-  m_VTKImporter->SetUpdateDataCallback(
-    m_VTKExporter->GetUpdateDataCallback());
-  m_VTKImporter->SetDataExtentCallback(
-    m_VTKExporter->GetDataExtentCallback());
-  m_VTKImporter->SetBufferPointerCallback(
-    m_VTKExporter->GetBufferPointerCallback());  
-  m_VTKImporter->SetCallbackUserData(
-    m_VTKExporter->GetCallbackUserData());   
-
-  // Create and configure the contour filter
-  m_VTKContour = vtkContourFilter::New();
-  m_VTKContour->SetInput(m_VTKImporter->GetOutput());    
-  m_VTKContour->ReleaseDataFlagOn();
-  m_VTKContour->ComputeScalarsOff();
-  m_VTKContour->ComputeGradientsOff();
-  m_VTKContour->UseScalarTreeOn();
-  m_VTKContour->SetNumberOfContours(1);
-  m_VTKContour->SetValue(0, 0.0);
-
-  // Callback stuff
-  m_ProgressCommand = CommandType::New();
-  m_ProgressCommand->SetCallbackFunction(
-    this, &LevelSetPreviewPipeline2D::ProgressCallback);
-  //m_Filter->AddObserver(itk::ProgressEvent(),m_ProgressCommand);
-
-  // Set contours
-  m_NumberOfContours = 0;
-  m_ParametersInitialized = false;
+  // Call the callback on the demo loop
+  m_DemoLoop->OnTimerEvent();
 }
-
-LevelSetPreviewPipeline2D
-::~LevelSetPreviewPipeline2D()
-{
-  m_VTKContour->Delete();
-  m_VTKImporter->Delete();
-}
-
-void
-LevelSetPreviewPipeline2D
-::SetSpeedImage(FloatImageType *image)
-{
-  if(image != m_Phi->GetSpeedImage())
-    {
-    // Update the speed image
-    m_Phi->SetSpeedImage(image);
-    m_Phi->CalculateInternalImages();
-    itk::Size<2> radius = {{1,1}};
-    m_Phi->Initialize(radius);
-
-    // Touch the level set filter
-    // m_Filter->SetFeatureImage(m_Phi->GetSpeedImage());    
-    m_Filter->Modified();
-    }    
-}
-
-void
-LevelSetPreviewPipeline2D
-::SetInitialLevelSetImage(FloatImageType *image)
-{
-  if(m_Filter->GetInput() != image)
-    {
-    m_Filter->SetInput(image);
-    }
-}
-
-void
-LevelSetPreviewPipeline2D
-::SetParameters(const SnakeParameters &p)
-{
-  if(m_Filter->IsUpdating()) 
-    {
-    m_TempParameters = p;
-    m_ParametersChangedInUpdate = true;
-    return;
-    }
-
-  if(!m_ParametersInitialized || !(p == m_Parameters))
-    {
-    // Set up the level set function
-    m_Phi->SetAdvectionWeight(-p.GetAdvectionWeight());
-    m_Phi->SetAdvectionSpeedExponent(p.GetAdvectionSpeedExponent());
-    m_Phi->SetCurvatureWeight(p.GetCurvatureWeight());
-    m_Phi->SetCurvatureSpeedExponent(p.GetCurvatureSpeedExponent()+1);  
-    m_Phi->SetPropagationWeight(p.GetPropagationWeight());
-    m_Phi->SetPropagationSpeedExponent(p.GetPropagationSpeedExponent());  
-    m_Phi->SetLaplacianSmoothingWeight(p.GetLaplacianWeight());
-    m_Phi->SetLaplacianSmoothingSpeedExponent(p.GetLaplacianSpeedExponent());  
-
-    // We only need to recompute the internal images if the exponents to those
-    // images have changed
-    m_Phi->CalculateInternalImages();
-
-    // Call the initialize method
-    itk::Size<2> radius = {{1,1}};
-    m_Phi->Initialize(radius);
-
-    // Set the time step
-    m_Phi->SetTimeStep(p.GetAutomaticTimeStep() ? 0.0 : p.GetTimeStep());
-
-    // Remember the parameters
-    m_Parameters = p;
-    m_ParametersInitialized = true;
-
-    // Update the filter
-    m_Filter->Modified();
-    }
-}
-
-void
-LevelSetPreviewPipeline2D
-::AddContour()
-{
-  // Compute the zero sets
-  m_VTKExporter->UpdateLargestPossibleRegion();
-  m_VTKImporter->UpdateWholeExtent();
-  m_VTKContour->UpdateWholeExtent();
-  
-  // Get the contour
-  vtkPolyData *pd = m_VTKContour->GetOutput();
-  ContourType contour;
-  contour.reserve(pd->GetNumberOfCells() * 2);
-  for(unsigned int i=0;i<pd->GetNumberOfCells();i++)
-    {
-    float *pt1 = pd->GetPoint(pd->GetCell(i)->GetPointId(0));
-    float *pt2 = pd->GetPoint(pd->GetCell(i)->GetPointId(1));
-    contour.push_back(Vector2d(pt1[0],pt1[1]));
-    contour.push_back(Vector2d(pt2[0],pt2[1]));
-    }
-
-  m_Contours.push_back(contour);
-}
-
-
-void
-LevelSetPreviewPipeline2D
-::Update()
-{
-  // Clear the contour
-  m_Contours.clear();
-
-  // Make sure parameters don't change in update
-  m_ParametersChangedInUpdate = false;
-
-  // Run filter for 0 iterations
-  m_Filter->SetIterationsUntilPause(0);
-  m_Filter->UpdateLargestPossibleRegion();
-  AddContour();
-  
-  // Run the filter
-  m_Filter->SetIterationsUntilPause(20);
-  m_Filter->GetInput()->Modified();
-  m_Filter->UpdateLargestPossibleRegion();
-  AddContour();
-
-  if(m_ParametersChangedInUpdate)
-    SetParameters(m_TempParameters);
-}
-
-// Get a contour
-LevelSetPreviewPipeline2D::ContourType &
-LevelSetPreviewPipeline2D
-::GetContour(unsigned int i)
-{
-  return m_Contours[i];
-}
-
-#endif // SNAKE_PREVIEW_ADVANCED
-
 
 SnakeParametersPreviewPipeline
-::SnakeParametersPreviewPipeline()
+::SnakeParametersPreviewPipeline(GlobalState *state)
 {
+  // Store the global state
+  m_GlobalState = state;
+
   // Start with a 100 interpolated points
   m_NumberOfSampledPoints = 100;
 
@@ -333,43 +315,29 @@ SnakeParametersPreviewPipeline
   m_SpeedModified = false;
   m_ParametersModified = false;
   m_QuickUpdate = false;
-  m_Updating = false;
 
   // Initialize the parameters
   m_Parameters = SnakeParameters::GetDefaultEdgeParameters();
 
-#ifdef SNAKE_PREVIEW_ADVANCED
-  
-  // The flood fill image
-  m_FloodFillImage = FloatImageType::New();
+  // Initialize the display filter
+  m_DisplayMapper = IntensityFilterType::New();
 
-  // A filter used to fill the pipeline
-  m_DistanceFilter = DistanceFilterType::New();
-  m_DistanceFilter->SetInput(m_FloodFillImage);
+  // Set the current color map preset
+  m_ColorMapPreset = m_GlobalState->GetSpeedColorMap();
+  m_DisplayMapper->SetFunctor(
+    SpeedColorMap::GetPresetColorMap(m_ColorMapPreset));
 
-  // Initialize the level set function
-  for(unsigned int i=0;i<4;i++)
-    {
-    m_LevelSetPipeline[i] = new LevelSetPreviewPipeline2D;
-    m_LevelSetPipeline[i]->SetInitialLevelSetImage(
-      m_DistanceFilter->GetOutput());
-    }
+  // Create a new demo loop
+  m_DemoLoop = new LevelSetPreview2d;
 
-#endif // SNAKE_PREVIEW_ADVANCED
+  // The demo loop is not running
+  m_DemoLoopRunning = false;
 }
 
 SnakeParametersPreviewPipeline
 ::~SnakeParametersPreviewPipeline()
 {
-#ifdef SNAKE_PREVIEW_ADVANCED
-  
-  // Initialize the level set function
-  for(unsigned int i=0;i<4;i++)
-    {
-    delete m_LevelSetPipeline[i];
-    }
-
-#endif // SNAKE_PREVIEW_ADVANCED
+  delete m_DemoLoop;
 }
 
 void
@@ -380,8 +348,6 @@ SnakeParametersPreviewPipeline
     {  
     // Save the points
     m_ControlPoints = points;
-    for(unsigned int i=0;i<m_ControlPoints.size();i++)
-      m_ControlPoints[i] *= 0.25;
 
     // Set the flags
     m_ControlsModified = true;
@@ -411,14 +377,6 @@ void
 SnakeParametersPreviewPipeline
 ::SetSpeedImage(FloatImageType *image)
 {
-#ifdef SNAKE_PREVIEW_ADVANCED
-  
-  // Store the image
-  for(unsigned int i=0;i<4;i++)
-    m_LevelSetPipeline[i]->SetSpeedImage(image);
-  
-#endif // SNAKE_PREVIEW_ADVANCED
-
   // Update the image internally
   if(image != m_SpeedImage)
     {
@@ -434,6 +392,12 @@ SnakeParametersPreviewPipeline
     filter->SetInput(m_SpeedImage);
     m_GradientImage = filter->GetOutput();
     filter->Update();
+
+    // Pass the image to the display functor
+    m_DisplayMapper->SetInput(m_SpeedImage);
+
+    // Pass the speed image to the preview object
+    m_DemoLoop->SetSpeedImage(image);
     }
 }
 
@@ -447,7 +411,10 @@ SnakeParametersPreviewPipeline
   clean.SetGround(0);
   clean.SetLaplacianSpeedExponent(0);
   clean.SetLaplacianWeight(0);
-  clean.SetSolver(SnakeParameters::SPARSE_FIELD_SOLVER);
+  clean.SetSolver(SnakeParameters::PARALLEL_SPARSE_FIELD_SOLVER);
+
+  // Make the 2D example behave more like 3D ...
+  clean.SetCurvatureWeight(5 * parameters.GetCurvatureWeight());
 
   // Don't waste time on nonsense
   if(m_Parameters == clean) return;
@@ -455,6 +422,9 @@ SnakeParametersPreviewPipeline
   // Save the parameters
   m_Parameters = clean;
   m_ParametersModified = true;
+
+  // Pass the parameters to the demo loop
+  m_DemoLoop->SetSnakeParameters(m_Parameters);
 }
 
 void 
@@ -472,10 +442,6 @@ void
 SnakeParametersPreviewPipeline
 ::Update(Fl_Gl_Window *context)
 {
-  // Exit if already updating
-  // if(m_Updating) return;
-  m_Updating = true;
-
   // Check what work needs to be done
   if(m_ControlsModified)
     {
@@ -485,7 +451,8 @@ SnakeParametersPreviewPipeline
     {
     if(m_ControlsModified)
       {
-      UpdateLevelSet(context);
+      m_DemoLoop->SetInitialContour(GetSampledPoints());
+      // UpdateLevelSet(context);
       }
     if(m_ParametersModified || m_ControlsModified)
       {
@@ -496,7 +463,14 @@ SnakeParametersPreviewPipeline
 
   // Clear the modified flags
   m_ControlsModified = false;
-  m_Updating = false;
+
+  // Also, check whether the colormap used for display has changed
+  if(m_ColorMapPreset != m_GlobalState->GetSpeedColorMap())
+    {
+    m_ColorMapPreset = m_GlobalState->GetSpeedColorMap();
+    m_DisplayMapper->SetFunctor(
+      SpeedColorMap::GetPresetColorMap(m_ColorMapPreset));
+    }
 }
 
 void 
@@ -520,17 +494,6 @@ SnakeParametersPreviewPipeline
   for(double t = 0; t < 1.0; t += 0.005)
     {
     double s = t * uMax;
-    /*
-    position[0] = s; 
-    function->Evaluate(position,weights,startIndex);
-
-    Vector2d x(0.0f,0.0f);
-    Vector2d xu(0.0f,0.0f);
-    for(unsigned int j=0;j<weights.size();j++)
-      {
-      int idx = (startIndex[0] + j) % uMax;      
-      x += weights[j] * m_ControlPoints[idx];
-      }*/
     
     // The starting index
     // int si = ((int)(t * uMax)) - 1;
@@ -574,62 +537,16 @@ SnakeParametersPreviewPipeline
 {
 }
 
-#ifdef SNAKE_PREVIEW_ADVANCED
-void
-SnakeParametersPreviewPipeline
-::UpdateLevelSet(Fl_Gl_Window *context)
-{
-  // Allocate the flood fill image  
-  m_FloodFillImage->SetRegions(m_SpeedImage->GetBufferedRegion());
-  m_FloodFillImage->Allocate();
-  ScanConvertSpline(context);
-
-  // Compute the distance image
-  m_DistanceFilter->Update();
-}
-#else
 void
 SnakeParametersPreviewPipeline
 ::UpdateLevelSet(Fl_Gl_Window *irisNotUsed(context))
 {
 }
-#endif // SNAKE_PREVIEW_ADVANCED
 
 void
 SnakeParametersPreviewPipeline
 ::UpdateForces()
 {
-#ifdef SNAKE_PREVIEW_ADVANCED
-  // Compute the sparse field filters
-  for(unsigned int i=0; i < 4; i++)
-    {
-    // Make a copy of the parameters
-    SnakeParameters special = m_Parameters;
-
-    // Set some parameters to zero
-    if(i != CURVATURE && i != TOTAL)
-      {
-      special.SetCurvatureSpeedExponent(-1);
-      special.SetCurvatureWeight(0);
-      }
-    if(i != ADVECTION && i != TOTAL)
-      {
-      special.SetAdvectionSpeedExponent(0);
-      special.SetAdvectionWeight(0);
-      }
-    if(i != PROPAGATION && i != TOTAL)
-      {
-      special.SetPropagationSpeedExponent(0);
-      special.SetPropagationWeight(0);
-      }
-
-    // Pass parameters to the pipeline
-    m_LevelSetPipeline[i]->SetParameters(special);    
-    m_LevelSetPipeline[i]->Update();
-    }
-
-#else 
-
   // Image interpolator types
   typedef LinearInterpolateImageFunction<
     FloatImageType,double> LerpType;
@@ -643,6 +560,9 @@ SnakeParametersPreviewPipeline
   // Create the gradient image interpolator
   VectorLerpType::Pointer gLerp = VectorLerpType::New();
   gLerp->SetInputImage(m_GradientImage);
+
+  // Get the image dimensions
+  itk::Size<2> idim = m_SpeedImage->GetBufferedRegion().GetSize();
   
   // Compute the geometry of each point
   for(unsigned int i = 0; i < m_SampledPoints.size(); i++)
@@ -654,8 +574,8 @@ SnakeParametersPreviewPipeline
     // compute the image-related quantities.  First, convert the point to image
     // coordinates
     LerpType::ContinuousIndexType idx;
-    idx[0] = p.x[0];
-    idx[1] = p.x[1];
+    idx[0] = idim[0] * p.x[0];
+    idx[1] = idim[1] * p.x[1];
 
     // Get the value of the g function
     double g = sLerp->EvaluateAtContinuousIndex(idx);
@@ -676,132 +596,13 @@ SnakeParametersPreviewPipeline
       * (p.n[0] * gradG[0] + p.n[1] * gradG[1])
       * pow(g,m_Parameters.GetAdvectionSpeedExponent());    
     }
-
-#endif // SNAKE_PREVIEW_ADVANCED
 }
 
-#ifdef SNAKE_PREVIEW_ADVANCED
 
-const SnakeParametersPreviewPipeline::LevelSetContourType &
+
+std::vector<Vector2d> &
 SnakeParametersPreviewPipeline
-::GetLevelSetContour(ForceType force, unsigned int level)
+::GetDemoLoopContour()
 {
-  return m_LevelSetPipeline[(unsigned int)force]->GetContour(level);
-  return LevelSetContourType();
+  return m_DemoLoop->GetEvolvingContour();
 }
-
-#endif // SNAKE_PREVIEW_ADVANCED
-
-#if defined(WIN32) && !defined(__CYGWIN__)
-typedef void (CALLBACK *TessCallback)();
-extern void CALLBACK BeginCallback(GLenum);
-extern void CALLBACK EndCallback();
-extern void CALLBACK ErrorCallback(GLenum);
-extern void CALLBACK CombineCallback(GLdouble[3], GLdouble **,GLfloat *,GLdouble **) ;
-#else
-#if defined(__CYGWIN__)
-typedef void (__stdcall *TessCallback)();
-extern void __stdcall BeginCallback(GLenum);
-extern void __stdcall EndCallback();
-extern void __stdcall ErrorCallback(GLenum);
-extern void __stdcall CombineCallback(GLdouble[3], GLdouble **,GLfloat *,GLdouble **) ;
-#else
-typedef void (*TessCallback)();
-extern void BeginCallback(GLenum);
-extern void EndCallback();
-extern void ErrorCallback(GLenum);
-extern void CombineCallback(GLdouble*, GLdouble **,GLfloat *,GLdouble **) ;
-#endif
-#endif
-
-#ifdef SNAKE_PREVIEW_ADVANCED
-
-void 
-SnakeParametersPreviewPipeline
-::ScanConvertSpline(Fl_Gl_Window *context)
-{
-  unsigned int i;
-
-  // Make current context
-  context->make_current();
-
-  // Get the image size
-  CharImageType::SizeType size = 
-    m_FloodFillImage->GetLargestPossibleRegion().GetSize();
-  
-  // Push the GL attributes
-  glPushAttrib(GL_COLOR_BUFFER_BIT | GL_VIEWPORT_BIT | 
-    GL_PIXEL_MODE_BIT | GL_TRANSFORM_BIT);
-
-  glDrawBuffer(GL_AUX0);
-  glReadBuffer(GL_AUX0);
-
-  glDisable(GL_LIGHTING);
-
-  // Draw polygon into back buffer - back buffer should get redrawn
-  // anyway before it gets swapped to the screen.
-  glClearColor(0.0,0.0,0.0,1.0);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  // Create a new projection matrix.  Why do this?  
-  glMatrixMode(GL_PROJECTION);
-  glPushMatrix();
-  glLoadIdentity();
-  gluOrtho2D(0,1.0,0,1.0);
-
-  // New model matrix
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-  glLoadIdentity();
-
-  glScaled(1.0 / size[0],1.0 / size[1],1.0);
-
-  // Set up the viewport
-  glViewport(0,0,size[0],size[1]);
-
-
-  // Paint in black
-  glColor3d(1,1,1);
- 
-  // GLU tesselator draws the poly 
-  GLUtesselatorObj *tesselator = gluNewTess();
-  gluTessCallback(tesselator,(GLenum) GLU_TESS_VERTEX, (TessCallback) glVertex3dv);
-  gluTessCallback(tesselator,(GLenum) GLU_TESS_BEGIN, (TessCallback) BeginCallback);
-  gluTessCallback(tesselator,(GLenum) GLU_TESS_END, (TessCallback) EndCallback);
-  gluTessCallback(tesselator,(GLenum) GLU_TESS_ERROR, (TessCallback) ErrorCallback);     
-  gluTessCallback(tesselator,(GLenum) GLU_TESS_COMBINE, (TessCallback) CombineCallback);
-  gluTessNormal(tesselator,0,0,1);
-
-  gluTessBeginPolygon(tesselator,NULL);
-  gluTessBeginContour(tesselator);
-  
-  double (*v)[3] = new double[m_SampledPoints.size()][3];
-  for (i = 0; i < m_SampledPoints.size(); i++)
-    {
-    v[i][0] = m_SampledPoints[i].x[0];
-    v[i][1] = m_SampledPoints[i].x[1];
-    v[i][2] = 0.0;
-    }
-
-  for(i = 0; i < m_SampledPoints.size(); i++)
-    gluTessVertex(tesselator,v[i],v[i]);
-  
-  gluTessEndContour(tesselator);
-  gluTessEndPolygon(tesselator);
-  
-  gluDeleteTess(tesselator);
-
-  glPopMatrix();
-  
-  glMatrixMode(GL_PROJECTION);
-  glPopMatrix();
-
-  glFinish();
-  glReadPixels(0,0,size[0],size[1],GL_LUMINANCE,GL_FLOAT,m_FloodFillImage->GetBufferPointer());
-
-  glPopAttrib();
-  m_FloodFillImage->Modified();
-}
-
-#endif // SNAKE_PREVIEW_ADVANCED
-

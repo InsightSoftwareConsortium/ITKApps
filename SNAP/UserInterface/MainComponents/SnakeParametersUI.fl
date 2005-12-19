@@ -1,22 +1,22 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0104 
+version 1.0106 
 header_name {.h} 
 code_name {.cxx}
-class SnakeParametersUI {open : { private SnakeParametersUIBase }
+class SnakeParametersUI {open : {private SnakeParametersUIBase}
 } {
   Function {MakeWindow()} {open
   } {
     Fl_Window m_Window {
       label {Snake Parameters} open selected
-      xywh {256 218 716 447} type Double box PLASTIC_DOWN_BOX hide
-      code0 {\#include "SnakeParametersUIBase.h"} non_modal
+      xywh {256 218 716 482} type Double box PLASTIC_DOWN_BOX
+      code0 {\#include "SnakeParametersUIBase.h"} non_modal visible
     } {
       Fl_Tabs m_TabsMode {open
-        xywh {5 5 350 340} box PLASTIC_UP_BOX color 60 labelfont 2 labelsize 12 align 0
+        xywh {5 5 350 360} box PLASTIC_UP_BOX color 60 labelfont 2 labelsize 12 align 0
       } {
         Fl_Group m_GrpEasy {
           label {Intuitive Mode} open
-          xywh {5 25 350 320} color 22 selection_color 94 labelfont 2 labelsize 11
+          xywh {5 25 350 340} color 22 selection_color 94 labelfont 2 labelsize 11
         } {
           Fl_Group m_GrpPropagationEasy {
             label {Balloon force:} open
@@ -353,75 +353,80 @@ OnSmoothingWeightChange(o);}
       Fl_Button m_BtnClose {
         label Cancel
         callback {this->OnCloseAction();}
-        xywh {415 410 64 25} box PLASTIC_UP_BOX shortcut 0xff1b color 180 labelsize 12
+        xywh {405 445 64 25} box PLASTIC_UP_BOX shortcut 0xff1b color 180 labelsize 12
       }
       Fl_Button m_BtnHelp {
         label {&Help!}
         callback {this->OnHelpAction();}
-        xywh {340 410 64 25} box PLASTIC_UP_BOX shortcut 0x80068 color 180 labelsize 12
+        xywh {330 445 64 25} box PLASTIC_UP_BOX shortcut 0x80068 color 180 labelsize 12
       }
       Fl_Button m_BtnAccept {
         label {&Accept}
         callback {this->OnOkAction();}
-        xywh {265 410 64 25} box PLASTIC_UP_BOX shortcut 0x80061 color 180 labelfont 1 labelsize 12
+        xywh {255 445 64 25} box PLASTIC_UP_BOX shortcut 0x80061 color 180 labelfont 1 labelsize 12
       }
       Fl_Group {} {
         label {Conceptual illustration of the forces in 2D:} open
-        xywh {365 25 345 370} box PLASTIC_UP_BOX color 22 labelsize 12
+        xywh {365 25 345 405} box PLASTIC_UP_BOX color 22 labelfont 2 labelsize 12
       } {
         Fl_Group {} {
           label {Curvature force} open
-          xywh {540 31 164 164} box FLAT_BOX color 0 labelsize 11 align 2
+          xywh {540 46 164 164} box FLAT_BOX color 0 labelsize 12
         } {
           Fl_Box {m_BoxPreview[1]} {
-            xywh {542 33 160 160} box FLAT_BOX color 27 labelsize 10
+            xywh {542 48 160 160} box FLAT_BOX color 27 labelsize 10
             code0 {\#include "SnakeParametersPreviewBox.h"}
             class SnakeParametersPreviewBox
           }
         }
         Fl_Group {} {
           label {Advection force} open
-          xywh {370 211 164 164} box FLAT_BOX color 0 labelsize 11 align 2
+          xywh {370 231 164 164} box FLAT_BOX color 0 labelsize 12
         } {
           Fl_Box {m_BoxPreview[2]} {
-            xywh {372 213 160 160} box FLAT_BOX color 27 labelsize 10
+            xywh {372 233 160 160} box FLAT_BOX color 27 labelsize 10
             code0 {\#include "SnakeParametersPreviewBox.h"}
             class SnakeParametersPreviewBox
           }
         }
         Fl_Group {} {
           label {Combined force} open
-          xywh {540 211 164 164} box FLAT_BOX color 0 labelsize 11 align 2
+          xywh {540 231 164 164} box FLAT_BOX color 0 labelsize 12
         } {
           Fl_Box {m_BoxPreview[3]} {
-            xywh {542 213 160 160} box FLAT_BOX color 27 labelsize 10
+            xywh {542 233 160 160} box FLAT_BOX color 27 labelsize 10
             code0 {\#include "SnakeParametersPreviewBox.h"}
             class SnakeParametersPreviewBox
           }
         }
         Fl_Group {} {
           label {Balloon force} open
-          xywh {370 31 164 164} box FLAT_BOX color 0 labelsize 11 align 2
+          xywh {370 46 164 164} box FLAT_BOX color 0 labelsize 12
         } {
           Fl_Box {m_BoxPreview[0]} {
-            xywh {372 33 160 160} box FLAT_BOX color 27 labelsize 10
+            xywh {372 48 160 160} box FLAT_BOX color 27 labelsize 10
             code0 {\#include "SnakeParametersPreviewBox.h"}
             class SnakeParametersPreviewBox
           }
         }
+        Fl_Check_Button m_BtnAnimate {
+          label {Show animated 2D segmentation preview}
+          callback {this->OnAnimateAction();}
+          xywh {485 405 220 20} down_box DOWN_BOX labelsize 11
+        }
       }
       Fl_Group {} {open
-        xywh {5 350 350 45} box PLASTIC_UP_BOX color 22
+        xywh {5 375 350 55} box PLASTIC_UP_BOX color 22
       } {
         Fl_Button m_BtnLoadParameters {
           label {&Load Parameters...}
           callback {this->OnLoadParametersAction();}
-          xywh {65 360 105 25} box PLASTIC_UP_BOX shortcut 0x8006c color 180 labelsize 11
+          xywh {65 390 105 25} box PLASTIC_UP_BOX shortcut 0x8006c color 180 labelsize 11
         }
         Fl_Button m_BtnSaveParameters {
           label {&Save Parameters...}
           callback {this->OnSaveParametersAction();}
-          xywh {185 360 105 25} box PLASTIC_UP_BOX shortcut 0x80073 color 180 labelsize 11
+          xywh {185 390 105 25} box PLASTIC_UP_BOX shortcut 0x80073 color 180 labelsize 11
         }
       }
     }

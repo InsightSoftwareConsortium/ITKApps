@@ -16,8 +16,10 @@
 #include "SnakeParametersPreviewBox.h"
 #include "SnakeParametersPreviewPipeline.h"
 #include "OpenGLSliceTexture.h"
+#include "SnakeParametersUILogic.h"
 #include "SNAPOpenGL.h"
 
+extern void fl_alert(const char *, ...);
 
 using namespace itk;                              
                               
@@ -27,7 +29,8 @@ SnakeParametersPreviewBox
 {
   // Initialize the texture object
   m_Texture = new TextureType();
-  m_Texture->SetGlType(GL_FLOAT);
+  m_Texture->SetGlComponents(4);
+  m_Texture->SetGlFormat(GL_RGBA);
 
   // Set up the interactor
   PushInteractionMode(&m_Interactor);
@@ -75,7 +78,7 @@ SnakeParametersPreviewBox
            1.0);
   
   // Draw the speed image
-  m_Texture->SetImage(m_Pipeline->GetSpeedImage());
+  m_Texture->SetImage(m_Pipeline->GetDisplayImage());
   m_Texture->Draw(Vector3d(1.0));
 
   // Set up the line drawing mode
@@ -83,34 +86,32 @@ SnakeParametersPreviewBox
   glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  
   glLineWidth(2.0);
+  glColor3d(1.0, 0.0, 0.0);
 
-  // Set the line color
-  glColor3d(1.0,0.0,0.0);
+  // Draw the evolving contour if it's available
+  if(m_Pipeline->IsDemoLoopRunning())
+    {
+    std::vector<Vector2d> &points = m_Pipeline->GetDemoLoopContour();
+    glColor3d(1.0, 0.0, 0.0);
+    glBegin(GL_LINES);
+    std::vector<Vector2d>::iterator it = points.begin();
+    for(; it != points.end(); ++it)
+      glVertex(*it);
+    glEnd();
+
+    glLineWidth(1.0);
+    glColor4d(1.0, 0.0, 0.0, 0.5);
+    }
+
 
   // Draw the vectors
   //glLineWidth(1.0);
 
-#ifdef SNAKE_PREVIEW_ADVANCED
-
-  // Get the corresponding contour
-  for(unsigned int c=0;c<2;c++)
-    {
-    const SnakeParametersPreviewPipeline::LevelSetContourType &contour = 
-      m_Pipeline->GetLevelSetContour(
-        (SnakeParametersPreviewPipeline::ForceType)m_ForceToDisplay,c);
-
-    // Draw it
-    glColor3d(1.0 * (1-c),0,1 * c);
-    glBegin(GL_LINES);
-    for(unsigned int j=0;j<contour.size();j++)
-      {
-      glVertex2d(contour[j][0],contour[j][1]);
-      }
-    glEnd();
-    }
-
-#else
+  // No more image scaling
+  glPopMatrix();
+  glPushMatrix();
 
   // Get the point collection
   const SnakeParametersPreviewPipeline::SampledPointList 
@@ -152,16 +153,14 @@ SnakeParametersPreviewBox
       }
 
     // Scale the force for effect
-    force *= 2;
+    force *= 10;
 
     // Draw the forces
     glVertex2d(p.x[0],p.x[1]);
-    glVertex2d(p.x[0] + force * p.n[0],p.x[1] + force * p.n[1]);     
+    glVertex2d(p.x[0] + force * p.n[0] / w(),p.x[1] + force * p.n[1] / w());     
   }
 
   glEnd();  
-
-#endif // SNAKE_PREVIEW_ADVANCED
 
 /*
   const SnakeParametersPreviewPipeline::ImagePointList
@@ -212,7 +211,9 @@ SnakeParametersPreviewBox::Interactor
 ::OnMousePress(const FLTKEvent &event)
 {
   // Get the point of the event
-  Vector2d xClick = 0.25 * to_double(event.XCanvas);
+  Vector2d xClick(
+    event.XCanvas[0] * 1.0 / m_Owner->w(), 
+    event.XCanvas[1] * 1.0 / m_Owner->h());
 
   if(m_ControlsVisible) 
     {
@@ -236,7 +237,7 @@ SnakeParametersPreviewBox::Interactor
       }
 
     // Make sure the distance is large enough
-    if(minDistance < 1.0)
+    if(minDistance < 6.0 / m_Owner->w())
       {
       m_ControlPicked = true;
       }
@@ -259,14 +260,18 @@ int
 SnakeParametersPreviewBox::Interactor
 ::OnMouseRelease(const FLTKEvent &event, const FLTKEvent &irisNotUsed(pressEvent))
 {
+  Vector2d xClick(
+    event.XCanvas[0] * 1.0 / m_Owner->w(), 
+    event.XCanvas[1] * 1.0 / m_Owner->h());
+
   if(m_ControlPicked)
     {
     // Update the control point
     m_Owner->m_Pipeline->ChangeControlPoint(
-      m_ActiveControl,0.25 * to_double(event.XCanvas),false);
+      m_ActiveControl, xClick, false);
 
     // Redraw the parent
-    m_Owner->redraw();
+    m_Owner->GetParentUI()->RedrawAllBoxes();
     }
 
   return true;
@@ -276,11 +281,15 @@ int
 SnakeParametersPreviewBox::Interactor
 ::OnMouseDrag(const FLTKEvent &event, const FLTKEvent &irisNotUsed(pressEvent))
 {
+  Vector2d xClick(
+    event.XCanvas[0] * 1.0 / m_Owner->w(), 
+    event.XCanvas[1] * 1.0 / m_Owner->h());
+
   if(m_ControlPicked)
     {
     // Update the control point
     m_Owner->m_Pipeline->ChangeControlPoint(
-      m_ActiveControl,0.25 * to_double(event.XCanvas),true);
+      m_ActiveControl, xClick, true);
 
     // Redraw the parent
     m_Owner->redraw();
@@ -307,7 +316,7 @@ SnakeParametersPreviewBox::Interactor
       glTranslated(cp[i][0],cp[i][1],0);
       
       GLUquadric *obj = gluNewQuadric();
-      gluDisk(obj,0,0.75,8,3);
+      gluDisk(obj,0, 4.0 / m_Owner->w(),8,3);
       gluDeleteQuadric(obj);
       glPopMatrix();
       }

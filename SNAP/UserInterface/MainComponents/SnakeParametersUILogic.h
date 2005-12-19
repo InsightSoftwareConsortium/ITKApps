@@ -87,8 +87,17 @@ public:
   void OnLegacyGroundChange(Fl_Valuator *input);
   void OnSolverChange();
 
+  // Force example
+  void OnAnimateAction();
+
+  // This method should be called when the speed color map is updated
+  void OnSpeedColorMapUpdate();
+
   // Help System
   void ShowHelp(const char *link);
+
+  // Redraw the boxes
+  void RedrawAllBoxes();
 
 private:
   /** Called internally when the parameters change */
@@ -125,6 +134,12 @@ private:
   // IO Dialog callback functions
   void LoadParametersCallback();
   void SaveParametersCallback();
+
+  // FLTK timer callback for animation
+  static void OnTimerCallback(void *);
+
+  // Common code for closing the window
+  void CloseWindow();
 };
 
 #endif // __SnakeParametersUILogic_h_

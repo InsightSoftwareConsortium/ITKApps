@@ -29,7 +29,6 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
       INCLUDE (${VTK_USE_FILE})
   ENDIF (VTK_FOUND)
 
-
 ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 #############################################
@@ -168,6 +167,7 @@ SET(UI_CXX
   UserInterface/SliceWindow/GLToPNG.cxx
   UserInterface/SliceWindow/PolygonDrawing.cxx
   UserInterface/SliceWindow/PolygonInteractionMode.cxx
+  UserInterface/SliceWindow/PolygonScanConvert.cxx
   UserInterface/SliceWindow/RegionInteractionMode.cxx
   UserInterface/SliceWindow/SNAPSliceWindow.cxx
   UserInterface/SliceWindow/SliceWindowCoordinator.cxx
@@ -227,6 +227,7 @@ SET(UI_HEADERS
   UserInterface/SliceWindow/OpenGLSliceTexture.txx
   UserInterface/SliceWindow/PolygonDrawing.h
   UserInterface/SliceWindow/PolygonInteractionMode.h
+  UserInterface/SliceWindow/PolygonScanConvert.h
   UserInterface/SliceWindow/RegionInteractionMode.h
   UserInterface/SliceWindow/SNAPSliceWindow.h
   UserInterface/SliceWindow/SliceWindowCoordinator.h
@@ -234,11 +235,6 @@ SET(UI_HEADERS
   UserInterface/SliceWindow/ZoomPanInteractionMode.h
   UserInterface/Window3D/Trackball.h
   UserInterface/Window3D/Window3D.h
-)
-
-# The source code for the stand-alone SNAP application
-SET(APPLICATION_CXX
-  UserInterface/SNAPMain.cxx
 )
 
 # The source code for SNAP testing project
@@ -279,7 +275,6 @@ SET(APPLICATION_FLUIDS
 # All program files
 SET(PROGRAM_DATA_FILES
   ProgramData/SNAPProgramDataDirectory.txt
-
   ProgramData/HTMLHelp/Credits.html
   ProgramData/HTMLHelp/Tutorial.html
   ProgramData/HTMLHelp/TutorialSectionEdgeBasedSegmentation.html
@@ -394,35 +389,12 @@ SET(PROGRAM_DATA_FILES
   ProgramData/HTMLHelp/Artwork/ttVolumeStatsDialog.gif
   ProgramData/HTMLHelp/Artwork/ttVolumeStatsMesh.gif
   ProgramData/Images2D/EdgeForcesExample.png
+  ProgramData/Images2D/EdgeForcesExample.hdr
+  ProgramData/Images2D/EdgeForcesExample.img.gz
   ProgramData/Images2D/RegionForcesExample.png
+  ProgramData/Images2D/RegionForcesExample.hdr
+  ProgramData/Images2D/RegionForcesExample.img.gz
   ProgramData/Presets/SnakeParameterPreviewCurve.txt
-)
-
-# The sources needed to build the SNAP logic library
-SET(LOGIC_SRCS
-  ${LOGIC_CXX}
-  ${LOGIC_HEADERS}
-)
-
-# The sources needed to build the SNAP application
-SET(APPLICATION_SRCS
-  ${LOGIC_SRCS}
-  ${UI_CXX}
-  ${UI_HEADERS}
-  ${APPLICATION_CXX}
-)
-
-# Combined sources for the testing application
-SET(TESTING_SRCS
-  ${LOGIC_SRCS}
-  ${TESTING_CXX}
-  ${TESTING_HEADERS}
-)
-
-# Combined sources for the testing application
-SET(TESTING_TUTORIAL_SRCS
-  ${LOGIC_SRCS}
-  ${TESTING_TUTORIAL_CXX}
 )
 
 #############################################
@@ -446,7 +418,6 @@ ENDIF(UNIX)
 # Shorthand to source and binary directories
 SET(MY_SOURCE_DIR ${InsightApplications_SOURCE_DIR}/SNAP)
 SET(MY_BINARY_DIR ${InsightApplications_BINARY_DIR}/SNAP)
-
 
 # Due to a limitation in Visual studio 6.0 on the length of include directories
 # that can be specified, (here we are including all the include directories from
@@ -513,7 +484,7 @@ ENDIF( CMAKE_GENERATOR MATCHES "Visual Studio 6" )
 
 
 # ----------------------------------------------------------------
-# Define Libraries
+# Define External Libraries
 # ----------------------------------------------------------------
 
 # ITK Libraries
@@ -527,8 +498,6 @@ SET(SNAP_VTK_CORE_LIBS
   vtkFiltering
   vtkGraphics
   vtkImaging
-  vtkIO
-  vtkRendering
 )
 
 # VTK Libraries with possible inclusion of patented code
@@ -540,7 +509,15 @@ ENDIF(VTK_USE_PATENTED)
 
 # FLTK Related libraries
 ## Workaround for problem with FindFLTK.cmake when FLTK was built using Cmake.
-#SET(FLTK_LIBRARIES  ${FLTK_LIBRARIES} ${FLTK_IMAGES_LIBRARY} ${FLTK_IMAGES_LIBS} ${FLTK_BASE_LIBRARY} ${FLTK_GL_LIBRARY} ${FLTK_FORMS_LIBRARY})
+IF(NOT FLTK_LIBRARIES)
+  SET(FLTK_LIBRARIES  
+    ${FLTK_IMAGES_LIBRARY} 
+    ${FLTK_IMAGES_LIBS} 
+    ${FLTK_BASE_LIBRARY} 
+    ${FLTK_GL_LIBRARY} 
+    ${FLTK_FORMS_LIBRARY})
+ENDIF(NOT FLTK_LIBRARIES)
+
 SET(SNAP_FLTK_LIBS ${FLTK_LIBRARIES})
 
 # System libraries
@@ -550,32 +527,71 @@ SET(SNAP_SYSTEM_LIBS
   ${SYSTEM_LIBS}
 )
 
-# Assign libraries to targets
-LINK_LIBRARIES(${SNAP_ITK_LIBS} ${SNAP_VTK_LIBS} ${SNAP_FLTK_LIBS} ${SNAP_SYSTEM_LIBS})
+# Designate the external libraries used by SNAP
+SET(SNAP_EXTERNAL_LIBS 
+  ${SNAP_ITK_LIBS} 
+  ${SNAP_VTK_LIBS} 
+  ${SNAP_FLTK_LIBS} 
+  ${SNAP_SYSTEM_LIBS})
 
 # *****************************************************
-# SNAP Executables
+# SNAP Logic and UI Libraries
 # *****************************************************
-# FLTK Wrapping
-FLTK_WRAP_UI(InsightSNAP ${APPLICATION_FLUIDS})
-SET(SNAP_EXE_PARAMETERS "WIN32" ${APPLICATION_SRCS})
+
+# Wrap the .fl files
+FLTK_WRAP_UI(itksnapui ${APPLICATION_FLUIDS})
+
+# The SNAP logic library
+ADD_LIBRARY(itksnaplogic ${LOGIC_CXX})
+
+# The user interface code library
+ADD_LIBRARY(itksnapui ${UI_CXX} ${itksnapui_FLTK_UI_SRCS})
+
+# Designate the SNAP internal libraries
+SET(SNAP_INTERNAL_LIBS itksnapui itksnaplogic)
+
+# *****************************************************
+# Define SNAP Executables
+# *****************************************************
 
 # Disable FLTK warnings
 ITK_DISABLE_FLTK_GENERATED_WARNINGS("${APPLICATION_FLUIDS}")
 
-# The SNAP executable
-SET(SNAP_EXE_PARAMETERS
-${SNAP_EXE_PARAMETERS}
-${InsightSNAP_FLTK_UI_SRCS}
-)
-
+# Define the main SNAP executable
+SET(SNAP_EXE_PARAMETERS "WIN32" UserInterface/SNAPMain.cxx)
 ADD_GUI_EXECUTABLE(InsightSNAP "${SNAP_EXE_PARAMETERS}")
+TARGET_LINK_LIBRARIES(InsightSNAP 
+  ${SNAP_INTERNAL_LIBS}
+  ${SNAP_EXTERNAL_LIBS})
+
+# The customized executable for creating a screen shot
+OPTION(SNAP_PNG_CAPTURE_TOOL 
+  "Should the screen capture tool by Hui Gary Zhang be built?" OFF)
+MARK_AS_ADVANCED(SNAP_PNG_CAPTURE_TOOL)
+IF(SNAP_PNG_CAPTURE_TOOL)
+  SET(SNAP_CC_PNG_EXE_PARAMETERS "WIN32" UserInterface/SNAP_CC_PNG.cxx)
+  ADD_GUI_EXECUTABLE(SNAP_CC_PNG "${SNAP_CC_PNG_EXE_PARAMETERS}")
+  TARGET_LINK_LIBRARIES(SNAP_CC_PNG 
+    ${SNAP_INTERNAL_LIBS}
+    ${SNAP_EXTERNAL_LIBS})
+ENDIF(SNAP_PNG_CAPTURE_TOOL)
 
 # The testing executables
 IF(BUILD_TESTING)
-  ADD_GUI_EXECUTABLE(SNAPTests "${TESTING_SRCS}")
-  ADD_EXECUTABLE(SNAPTutorialTest ${TESTING_TUTORIAL_SRCS})
+  
+  ADD_GUI_EXECUTABLE(SNAPTests "${TESTING_CXX}")
+  TARGET_LINK_LIBRARIES(SNAPTests 
+    ${SNAP_INTERNAL_LIBS} 
+    ${SNAP_EXTERNAL_LIBS})
+    
+  
+  ADD_EXECUTABLE(SNAPTutorialTest ${TESTING_TUTORIAL_CXX})
+  TARGET_LINK_LIBRARIES(SNAPTutorialTest 
+    itksnaplogic 
+    ${SNAP_EXTERNAL_LIBS})
+
   INSTALL_TARGETS(/bin SNAPTutorialTest)
+
 ENDIF(BUILD_TESTING)
 
 # ----------------------------------------------------------------
@@ -596,4 +612,4 @@ CONFIGURE_FILE(
   ${MY_BINARY_DIR}/Utilities/InnoSetup/InstallSNAP.iss)
 
 # Add an option to install SNAP into /usr/local or something
-INSTALL_TARGETS(/bin InsightSNAP)
+INSTALL_TARGETS(/bin InsightSNAP SNAP_CC_PNG)

@@ -67,6 +67,7 @@ enum ColorMapPreset
   COLORMAP_BLUE_BLACK_WHITE,
   COLORMAP_BLACK_GRAY_WHITE,
   COLORMAP_BLUE_WHITE_RED,
+  COLORMAP_BLACK_YELLOW_WHITE
 };
                      
 /**
@@ -427,6 +428,9 @@ private:
 
 /*
  *Log: GlobalState.h
+ *Revision 1.9  2005/10/29 14:00:13  pauly
+ *ENH: SNAP enhacements like color maps and progress bar for 3D rendering
+ *
  *Revision 1.8  2004/07/24 19:00:03  pauly
  *ENH: Thumbnail UI for slice zooming
  *

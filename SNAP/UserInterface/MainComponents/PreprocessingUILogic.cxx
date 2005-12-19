@@ -67,9 +67,14 @@ PreprocessingUILogic
   // Get a handle to the snap image data
   SNAPImageData *snapData = m_Driver->GetSNAPImageData();
 
-  // Initialize the speed image if necessary
+  // Initialize the speed image if necessary, and assign it the correct
+  // color map preset
   if(!snapData->IsSpeedLoaded())
+    {
     snapData->InitializeSpeed();
+    snapData->GetSpeed()->SetColorMap(
+      SpeedColorMap::GetPresetColorMap(m_GlobalState->GetSpeedColorMap()));
+    }
     
   // Set the intensity mapping mode for the speed image
   snapData->GetSpeed()->SetModeToEdgeSnake();
@@ -165,10 +170,13 @@ PreprocessingUILogic
   // Get a handle to the snap image data
   SNAPImageData *snapData = m_Driver->GetSNAPImageData();
 
-  // Initialize the speed image if necessary
+  // Initialize the speed image if necessary and assign it a color map
   if(!snapData->IsSpeedLoaded())
+    {
     snapData->InitializeSpeed();
-
+    snapData->GetSpeed()->SetColorMap(
+      SpeedColorMap::GetPresetColorMap(m_GlobalState->GetSpeedColorMap()));
+    }
   // Set the speed image to In/Out mode
   snapData->GetSpeed()->SetModeToInsideOutsideSnake();
 

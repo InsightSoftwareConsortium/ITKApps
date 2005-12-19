@@ -5,17 +5,15 @@
 AppName=InsightSNAP
 AppVerName=InsightSNAP 1.4
 AppPublisher=itksnap.org
-AppPublisherURL=http://www.itksnap.org/download/snap
-AppSupportURL=http://www.itksnap.org/download/snap
+AppPublisherURL=http://www.itksnap.org
+AppSupportURL=http://www.itksnap.org/bb
 AppUpdatesURL=http://www.itksnap.org/download/snap
 DefaultDirName={pf}\InsightApplications\SNAP
 DefaultGroupName=InsightSNAP
 AllowNoIcons=yes
 
 [Tasks]
-; NOTE: The following entry contains English phrases ("Create a desktop icon" and "Additional icons"). You are free to translate them into another language if required.
 Name: "desktopicon"; Description: "Create a &desktop icon"; GroupDescription: "Additional icons:"
-; NOTE: The following entry contains English phrases ("Create a Quick Launch icon" and "Additional icons"). You are free to translate them into another language if required.
 Name: "quicklaunchicon"; Description: "Create a &Quick Launch icon"; GroupDescription: "Additional icons:"; Flags: unchecked
 
 [Files]
@@ -23,11 +21,12 @@ Source: "@MY_BINARY_DIR@\Release\InsightSNAP.exe"; DestDir: "{app}"; Flags: igno
 Source: "@MY_BINARY_DIR@\ProgramData\*.*"; DestDir: "{app}\ProgramData"; Flags: ignoreversion recursesubdirs
 Source: "c:\windows\system32\msvcp71.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "c:\windows\system32\msvcr71.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@MY_SOURCE_DIR@\Utilities\InnoSetup\itksnap.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [INI]
-Filename: "{app}\SNAP.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.itksnap.org/download/snap"
+Filename: "{app}\SNAP.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.itksnap.org"
 
 [InstallDelete]
 ; Type: filesandordirs; Name: "{userappdata}\itk.org"
@@ -37,16 +36,13 @@ Type: filesandordirs; Name: "{app}\Images2D"
 Type: filesandordirs; Name: "{app}\Presets"
 
 [Icons]
-Name: "{group}\InsightSNAP"; Filename: "{app}\InsightSNAP.exe"
-; NOTE: The following entry contains an English phrase ("on the Web"). You are free to translate it into another language if required.
+Name: "{group}\InsightSNAP"; Filename: "{app}\InsightSNAP.exe"; Comment: "ITK-SNAP 3D Image Segmentation Tool"; IconFilename: "{app}\itksnap.ico"
 Name: "{group}\InsightSNAP on the Web"; Filename: "{app}\SNAP.url"
-; NOTE: The following entry contains an English phrase ("Uninstall"). You are free to translate it into another language if required.
 Name: "{group}\Uninstall InsightSNAP"; Filename: "{uninstallexe}"
 Name: "{userdesktop}\InsightSNAP"; Filename: "{app}\InsightSNAP.exe"; Tasks: desktopicon
 Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\InsightSNAP"; Filename: "{app}\InsightSNAP.exe"; Tasks: quicklaunchicon
 
 [Run]
-; NOTE: The following entry contains an English phrase ("Launch"). You are free to translate it into another language if required.
 Filename: "{app}\InsightSNAP.exe"; Description: "Launch InsightSNAP"; Flags: nowait postinstall skipifsilent
 
 [UninstallDelete]

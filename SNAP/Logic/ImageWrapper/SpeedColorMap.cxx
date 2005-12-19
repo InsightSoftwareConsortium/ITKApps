@@ -17,46 +17,27 @@
 SpeedColorMap
 ::SpeedColorMap()
 {
-  m_Plus.Set(255,255,255,255); 
-  m_Minus.Set(0,0,255,255); 
-  m_Zero.Set(0,0,0,255);
-}
-
-SpeedColorMap::OutputType
-SpeedColorMap
-::operator()(float t)
-{
-  // Initialize with a clear pixel
-  const unsigned char clear[] = {0,0,0,255};
-  OutputType P(clear);
-
-  // The red component is used when speed is positive
-  if(t > 0)
-    {
-    float u = 1.0f - t;
-    P[0] = (unsigned char)(t * m_Plus[0] + u * m_Zero[0]);
-    P[1] = (unsigned char)(t * m_Plus[1] + u * m_Zero[1]);
-    P[2] = (unsigned char)(t * m_Plus[2] + u * m_Zero[2]);
-    }
-  else
-    {
-    float u = 1.0f + t;
-    P[0] = (unsigned char)(-t * m_Minus[0] + u * m_Zero[0]);
-    P[1] = (unsigned char)(-t * m_Minus[1] + u * m_Zero[1]);
-    P[2] = (unsigned char)(-t * m_Minus[2] + u * m_Zero[2]);
-    }
-
-  // Return
-  return P;
+  OutputType allBlack[2];
+  SetColorMap(2, allBlack);
 }
 
 void
 SpeedColorMap
-::SetColorMap(OutputType inMinus, OutputType inZero, OutputType inPlus)
+::SetColorMap(unsigned int n, OutputType *colors)
 {
-  m_Plus = inPlus;
-  m_Minus = inMinus;
-  m_Zero = inZero;
+  // Compute colors and color differences
+  m_ColorEntry.resize(n);
+  m_ColorEntryDelta.resize(n-1);
+  for(unsigned int i = 0; i < n; i++)
+    m_ColorEntry[i] = colors[i];
+  for(unsigned int j = 0; j < n-1; j++)  
+    for(unsigned int k = 0; k < 3; k++)
+      m_ColorEntryDelta[j][k] = 
+        ((float) colors[j+1][k]) - ((float) colors[j][k]);
+
+  // Compute scaling factors
+  m_DeltaT = 0.5 * (n - 1.0f);
+  m_Shift = -m_DeltaT;
 }
 
 SpeedColorMap
@@ -68,6 +49,7 @@ SpeedColorMap
   unsigned char white[]  = {255 , 255 , 255 , 255 };
   unsigned char gray[]   = {128 , 128 , 128 , 255 };
   unsigned char black[]  = {0   , 0   , 0   , 255 };
+  unsigned char yellow[] = {255 , 255 , 0   , 255 };
   
   SpeedColorMap xMap;
   switch(xPreset) 
@@ -90,6 +72,11 @@ SpeedColorMap
     case COLORMAP_BLACK_BLACK_WHITE : 
       xMap.SetColorMap(
         OutputType(black), OutputType(black), OutputType(white));
+      break;
+
+    case COLORMAP_BLACK_YELLOW_WHITE : 
+      xMap.SetColorMapPositive(
+        OutputType(black), OutputType(yellow), OutputType(white));
       break;
     }
 

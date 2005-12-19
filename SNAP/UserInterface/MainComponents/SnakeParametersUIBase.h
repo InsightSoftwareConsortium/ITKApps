@@ -25,7 +25,7 @@ class Fl_Check_Button;
 class SnakeParametersUIBase 
 {
 public:
-    virtual ~SnakeParametersUIBase() {}
+  virtual ~SnakeParametersUIBase() {}
   virtual void OnAdvectionExponentChange(Fl_Valuator *input) = 0;
   virtual void OnAdvectionWeightChange(Fl_Valuator *input) = 0;
   virtual void OnCurvatureExponentChange(Fl_Valuator *input) = 0;
@@ -46,6 +46,9 @@ public:
   virtual void OnLegacyClampChange(Fl_Check_Button *input) = 0;
   virtual void OnLegacyGroundChange(Fl_Valuator *input) = 0;
   virtual void OnSolverChange() = 0;
+
+  // Force example
+  virtual void OnAnimateAction() = 0;
 
   // Help System
   virtual void ShowHelp(const char *link) = 0;

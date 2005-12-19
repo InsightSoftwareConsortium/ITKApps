@@ -19,6 +19,8 @@ ColorMapBox
 ::ColorMapBox(int x,int y,int w,int h,const char *label)
   : FLTKCanvas(x, y, w, h, label)
 {
+  m_RangeStart = 0.0;
+  m_RangeEnd = 0.0;
 }
 
 void
@@ -49,23 +51,20 @@ ColorMapBox
   // Disable lighting
   glDisable(GL_LIGHTING);
 
-  // Get the colors
-  SpeedColorMap::OutputType xMinus = m_ColorMap(-1.0);
-  SpeedColorMap::OutputType xPlus = m_ColorMap(1.0);
-  SpeedColorMap::OutputType xZero = m_ColorMap(0.0);
-
   // Draw the color map
-  glBegin(GL_QUADS);
+  glBegin(GL_QUAD_STRIP);
 
-  glColor3d(xMinus[0], xMinus[1], xMinus[2]);
-  glVertex2d(0.0, 0.0); glVertex2d(0.0, 1.0);
-
-  glColor3d(xZero[0], xZero[1], xZero[2]);
-  glVertex2d(0.5, 1.0); glVertex2d(0.5, 0.0);
-  glVertex2d(0.5, 0.0); glVertex2d(0.5, 1.0);
-  
-  glColor3d(xPlus[0], xPlus[1], xPlus[2]);
-  glVertex2d(1.0, 1.0); glVertex2d(1.0, 0.0);
+  // Get the colors
+  unsigned int n = 256;
+  for(unsigned int i = 0; i <= n; i++)
+    {
+    double u = i * 1.0 / n;
+    double t = m_RangeStart + u * (m_RangeEnd - m_RangeStart);
+    SpeedColorMap::OutputType xColor = m_ColorMap(t);
+    
+    glColor3ub(xColor[0], xColor[1], xColor[2]);    
+    glVertex2d(u, 0.0); glVertex2d(u, 1.0);
+    }
   
   glEnd();
 
