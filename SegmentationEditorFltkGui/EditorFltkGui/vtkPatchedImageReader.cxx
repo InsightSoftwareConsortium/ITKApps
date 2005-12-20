@@ -711,7 +711,8 @@ template <class IT, class OT>
 static void vtkPatchedImageReaderUpdate2(vtkPatchedImageReader *self, vtkImageData *data,
                                   IT *inPtr, OT *outPtr)
 {
-  int inIncr[3], outIncr[3];
+  vtkIdType inIncr[3];
+  vtkIdType outIncr[3];
   OT *outPtr0, *outPtr1, *outPtr2;
   long streamSkip0, streamSkip1;
   long streamRead;
