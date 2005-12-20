@@ -498,6 +498,7 @@ SET(SNAP_VTK_CORE_LIBS
   vtkFiltering
   vtkGraphics
   vtkImaging
+  vtkIO
 )
 
 # VTK Libraries with possible inclusion of patented code
