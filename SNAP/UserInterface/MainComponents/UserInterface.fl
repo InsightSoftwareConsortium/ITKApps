@@ -36,8 +36,8 @@ class UserInterface {open : {public UserInterfaceBase}
     Fl_Window m_WinMain {
       label {ITK-SNAP Main Window}
       callback {OnMainWindowCloseAction();}
-      xywh {-32000 -32000 875 710} type Double align 0 hide resizable
-      code0 {\#include "UserInterfaceBase.h"}
+      xywh {4 30 875 710} type Double align 0 resizable
+      code0 {\#include "UserInterfaceBase.h"} visible
     } {
       Fl_Menu_Bar m_MenubarMain {
         xywh {0 0 146 25} labelsize 12 textsize 12
@@ -192,13 +192,13 @@ class UserInterface {open : {public UserInterfaceBase}
             xywh {30 30 100 20} shortcut 0xffbe labelsize 12
           }
           menuitem {} {
-            label {&Tutorial}
-            callback {this->OnLaunchTutorialAction();}
+            label {&Credits}
+            callback {this->ShowHTMLPage("Credits.html");}
             xywh {20 20 100 20} shortcut 0x1ffbe labelsize 12
           }
           menuitem {} {
             label {&About}
-            callback {this->ShowHTMLPage("Credits.html");}
+            callback {m_WinAbout->show();}
             xywh {30 30 100 20} labelsize 12
           }
         }
@@ -1254,22 +1254,19 @@ this->OnSNAPLabelOpacityChange();}
       }
     }
     Fl_Window m_WinSplash {
-      label {Welcome to ITK-SnAP}
-      xywh {307 240 405 210} type Double color 52 hide
+      label {Welcome to ITK-SnAP} open
+      xywh {151 632 432 196} type Double align 16 resizable visible
     } {
       Fl_Group {} {open
-        image {Artwork/logo.gif} xywh {35 15 338 105} box FLAT_BOX color 0 align 16
-      } {}
-      Fl_Group {} {
-        label {Initializing Application...} open
-        xywh {15 130 375 30} labeltype ENGRAVED_LABEL align 16
+        image {Artwork/logo_new.gif} xywh {5 5 420 155} color 0 align 16
       } {}
       Fl_Group m_OutSplashMessage {
         label {Loading progress} open
-        xywh {15 175 380 25} box BORDER_BOX color 55 labelsize 11 align 20
+        xywh {5 165 420 25} box BORDER_BOX color 55 labelsize 11 align 20
       } {}
-      Fl_Group {} {open
-        image {Artwork/itkLogoSmallTransparentBackground.gif} xywh {5 95 115 80} color 0 align 16
+      Fl_Group {} {
+        label {Initializing...} open
+        xywh {325 15 95 20} labeltype ENGRAVED_LABEL align 24
       } {}
     }
     Fl_Window m_WinProgress {
@@ -1376,7 +1373,7 @@ this->OnSNAPLabelOpacityChange();}
       }
     }
     Fl_Window m_WinColorMap {
-      label {Preprocessed Image Color Map} open
+      label {Preprocessed Image Color Map}
       xywh {-32000 -32000 315 105} type Double hide non_modal
     } {
       Fl_Wizard m_WizColorMap {open
@@ -1454,7 +1451,7 @@ this->OnSNAPLabelOpacityChange();}
             xywh {0 45 315 25}
           } {
             Fl_Group {} {
-              label {0.0} open selected
+              label {0.0} open
               xywh {0 45 35 25} labelsize 12 align 0
             } {}
             Fl_Group {} {
@@ -1499,6 +1496,35 @@ this->OnSNAPLabelOpacityChange();}
           }
         }
       }
+    }
+    Fl_Window m_WinAbout {
+      label {About ITK-SNAP} open selected
+      xywh {675 299 433 224} type Double visible
+    } {
+      Fl_Group {} {open
+        image {Artwork/logo_new.gif} xywh {6 5 420 155} color 0 align 16
+      } {}
+      Fl_Group m_InAboutPageVersion {
+        label {Version X.XX
+Build Date X.XX} open
+        xywh {309 10 115 35} labeltype SHADOW_LABEL labelsize 11 align 153
+      } {}
+      Fl_Group {} {
+        label {ITK-SNAP on the web:} open
+        xywh {65 170 135 30} labelsize 12 align 21
+      } {}
+      Fl_Group {} {
+        label {http://www.itksnap.org} open
+        xywh {210 170 185 30} labelfont 1 labelsize 12 labelcolor 136 align 21
+      } {}
+      Fl_Group {} {
+        label {User support forum:} open
+        xywh {65 195 135 30} labelsize 12 align 21
+      } {}
+      Fl_Group {} {
+        label {http://www.itksnap.org/bb} open
+        xywh {210 195 185 30} labelfont 1 labelsize 12 labelcolor 136 align 21
+      } {}
     }
   }
 } 

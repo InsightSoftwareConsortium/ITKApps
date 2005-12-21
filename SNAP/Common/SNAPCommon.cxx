@@ -24,10 +24,10 @@ const char SNAPVersion[] = "@(#) Id";
 const char SNAPSoftVersion[] = "ITK-SNAP 1.4 RC1";
 
 // A string that appears in the user interface
-const char SNAPUISoftVersion[] = " Version 1.4 RC1 \n Release Candidate 1 \n Dec. 9, 2005 ";
+const char SNAPUISoftVersion[] = "Version 1.4 RC1\n Release Candidate 1\nDec. 21, 2005";
 
 // Release date of the current version
-const char SNAPCurrentVersionReleaseDate[] = "20051209";
+const char SNAPCurrentVersionReleaseDate[] = "20051221";
 
 // Release date of the latest version whose user preference files are
 // incompatible with the current version and will be erased

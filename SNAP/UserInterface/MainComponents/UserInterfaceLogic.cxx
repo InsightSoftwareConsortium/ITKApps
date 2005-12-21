@@ -1493,6 +1493,7 @@ UserInterfaceLogic
 
   // Set the version text in the welcome page
   m_InWelcomePageVersion->label(SNAPUISoftVersion);
+  m_InAboutPageVersion->label(SNAPUISoftVersion);
 
   int i;
   // Register the GUI with its children
@@ -3492,6 +3493,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.50  2005/12/19 03:43:12  pauly
+ *ENH: SNAP enhancements and bug fixes for 1.4 release
+ *
  *Revision 1.49  2005/12/16 23:46:51  pauly
  *BUG: Silly mistake in PNG screenshot saver
  *
