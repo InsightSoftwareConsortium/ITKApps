@@ -548,6 +548,12 @@ ADD_LIBRARY(itksnaplogic ${LOGIC_CXX})
 # The user interface code library
 ADD_LIBRARY(itksnapui ${UI_CXX} ${itksnapui_FLTK_UI_SRCS})
 
+# This is experimental: it seems that shared libraries do not
+# build accurately (at least on MacOS) without the following
+# two lines
+TARGET_LINK_LIBRARIES(itksnaplogic ${SNAP_EXTERNAL_LIBS})
+TARGET_LINK_LIBRARIES(itksnapui itksnaplogic ${SNAP_EXTERNAL_LIBS})
+
 # Designate the SNAP internal libraries
 SET(SNAP_INTERNAL_LIBS itksnapui itksnaplogic)
 
