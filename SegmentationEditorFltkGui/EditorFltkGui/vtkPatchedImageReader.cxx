@@ -1192,14 +1192,14 @@ void vtkPatchedImageReader::ComputeTransformedIncrements(int inIncr[3],
 }
 
 
-void vtkPatchedImageReader::ComputeInverseTransformedIncrements(int inIncr[3],
-                                                         int outIncr[3])
+void vtkPatchedImageReader::ComputeInverseTransformedIncrements(vtkIdType inIncr[3],
+                                                         vtkIdType outIncr[3])
 {
   vtkFloatingPointType transformedIncr[3];
   
   if (!this->Transform)
     {
-    memcpy (outIncr, inIncr, 3 * sizeof (int));
+    memcpy (outIncr, inIncr, 3 * sizeof (vtkIdType));
     }
   else
     {
@@ -1208,9 +1208,9 @@ void vtkPatchedImageReader::ComputeInverseTransformedIncrements(int inIncr[3],
     transformedIncr[2] = inIncr[2];
     this->Transform->GetLinearInverse()->TransformVector(transformedIncr,
                                                          transformedIncr);
-    outIncr[0] = (int) transformedIncr[0];
-    outIncr[1] = (int) transformedIncr[1];
-    outIncr[2] = (int) transformedIncr[2];
+    outIncr[0] = (vtkIdType) transformedIncr[0];
+    outIncr[1] = (vtkIdType) transformedIncr[1];
+    outIncr[2] = (vtkIdType) transformedIncr[2];
     vtkDebugMacro(<< "Inverse Transformed Incr are:" 
     << outIncr[0] << ", " << outIncr[1] << ", " << outIncr[2]);
     }

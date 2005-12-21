@@ -234,8 +234,8 @@ public:
   // following should only be used by methods or template helpers, not users
   void ComputeInverseTransformedExtent(int inExtent[6],
                                        int outExtent[6]);
-  void ComputeInverseTransformedIncrements(int inIncr[3],
-                                           int outIncr[3]);
+  void ComputeInverseTransformedIncrements(vtkIdType inIncr[3],
+                                           vtkIdType outIncr[3]);
 
   void OpenFile();
   void OpenAndSeekFile(int extent[6], int slice);
