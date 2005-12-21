@@ -23,7 +23,9 @@
 
  -  SNAP remembers all settings associated with loading an image. This means that
     any image loaded previously can be reloaded without going throught the 
-    wizard. We've added File->Load Previous menu to let you load images quickly
+    wizard. 
+
+ -  We've added File->Load Previous menu to let you load images quickly
 
  -  SNAP can now read DICOM file series (experimental support) and it can read 
     and write VoxBo CUB image files.
@@ -40,7 +42,11 @@
     color map lets you select different color schemes for displaying the
     probability map / speed image.
 
+ -  Small improvements to the active contour 2D example dialog have been made
+
  -  A progress monitor has been added for the 3D renderer in main SNAP window.
+
+ -  New buttons allow taking of snapshots in each of the SNAP image windows
 
  -  The tutorial has been updated to reflect the new features.
 
@@ -53,6 +59,8 @@
 
  -  The bug with the segmentation being shifted when using "Resample Region"
     option has been fixed
+
+ -  3D window handles images with non-zero origin better
 
  -  Lots of other small bugs have been fixed!
 
