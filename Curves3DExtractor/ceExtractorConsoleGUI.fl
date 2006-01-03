@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0106 
+version 1.0105 
 header_name {.h} 
 code_name {.cxx}
 class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
@@ -8,7 +8,7 @@ class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
   } {
     Fl_Window consoleWindow {
       label {3D Curves Extractor Console} open
-      xywh {249 172 1010 390} type Double
+      xywh {245 154 1010 390} type Double
       code0 {\#if defined(_MSC_VER)
 \#pragma warning ( disable : 4786 )
 \#endif}
@@ -67,7 +67,7 @@ class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
           xywh {915 115 10 50} box UP_BOX color 4
         }
       }
-      Fl_Group controlsGroup {selected
+      Fl_Group controlsGroup {
         xywh {5 5 995 255} box DOWN_FRAME deactivate
       } {
         Fl_Light_Button inputButton {
@@ -104,13 +104,13 @@ class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
           callback {this->ComputeHessianEigenAnalysis();}
           xywh {405 35 125 35} box ROUND_UP_BOX align 128
         }
-        Fl_Light_Button lambda1Button  {
+        Fl_Light_Button lambda1Button {
           label {Lamda_1 image}
           callback {this->ShowLambda1();}
           xywh {505 126 140 24} type Normal value 1 selection_color 1
           class {fltk::LightButton}
         }
-        Fl_Light_Button lambda2Button  {
+        Fl_Light_Button lambda2Button {
           label {Lamda_2 image}
           callback {this->ShowLambda2();}
           xywh {505 166 140 24} type Normal value 1 selection_color 1
@@ -162,7 +162,7 @@ class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
       }
       Fl_Light_Button loadButton {
         label Load
-        callback {Load(NULL);}
+        callback {Load();} selected
         xywh {30 45 69 30} type Normal value 1 selection_color 1
         class {fltk::LightButton}
       }
@@ -211,5 +211,7 @@ class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
   Function {ShowLambda3( void )} {return_type {virtual void}
   } {}
   Function {ComputeGradient( void )} {return_type {virtual void}
+  } {}
+  Function {Load()} {open return_type {virtual void}
   } {}
 } 

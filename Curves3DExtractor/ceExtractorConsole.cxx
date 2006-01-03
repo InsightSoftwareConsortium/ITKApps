@@ -191,15 +191,23 @@ void
 ceExtractorConsole
 ::Load( void )
 {
+  Fl_File_Chooser *fileChooser = new Fl_File_Chooser("",
+       "MetaImage (*.{mhd,mha})\tVTK (*.{vtk})\tNrrd (*.{nrrd})\tAnalyze (*.{img,hdr})\tgipl (*.{gipl})", 
+       Fl_File_Chooser::SINGLE, "Choose file");
+  fileChooser->show();
+  
+  while( fileChooser->shown()) { Fl::wait(); }
 
-  const char * filename = fl_file_chooser("Image filename","*.*","latmag0Acor.mha");
-  if( !filename )
-  {
-    return;
-  }
-
-  this->Load( filename );
-
+  if( fileChooser->value() )
+    {
+    //fl_cursor(Fl_Cursor(FL_CURSOR_DEFAULT), 
+    //                      (Fl_Color) 56, (Fl_Color) 255);
+    this->Load( fileChooser->value() );
+    }
+  else
+    { 
+    return; 
+    }
 }
 
 
@@ -587,6 +595,7 @@ ceExtractorConsole
 {
 
   m_ParametricSpaceViewer.Show();
+  this->ShowStatus("BLUE");
   this->ResetViewOfParametricSpace();
 
 }

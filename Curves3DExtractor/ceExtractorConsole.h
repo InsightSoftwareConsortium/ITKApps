@@ -50,7 +50,7 @@ public:
   virtual ~ceExtractorConsole();
   virtual void Show(void);
   virtual void Hide(void);
-  virtual void Load(void);
+  virtual void Load();
   virtual void Load(const char * filename);
   virtual void Quit(void);
   virtual void ComputeGradient(void);

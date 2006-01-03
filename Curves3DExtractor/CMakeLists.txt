@@ -70,7 +70,7 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
   SET(Curves3DExtractor_SRCS
   main.cxx
-  ${Curves2DExtractor_FLTK_UI_SRCS}
+  ${Curves3DExtractor_FLTK_UI_SRCS}
   )
 
   ADD_GUI_EXECUTABLE(Curves3DExtractor ${Curves3DExtractor_SRCS})
@@ -99,7 +99,7 @@ ELSE( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
   SET(Curves3DExtractor_SRCS
   main.cxx
-  ${Curves2DExtractor_FLTK_UI_SRCS}
+  ${Curves3DExtractor_FLTK_UI_SRCS}
   )
 
   ADD_GUI_EXECUTABLE(Curves3DExtractor ${Curves3DExtractor_SRCS})
