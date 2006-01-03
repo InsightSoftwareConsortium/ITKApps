@@ -111,7 +111,7 @@ SystemInterface
   // in the $PATH variable, we don't know for sure where the data is
   // Create a vector of paths that will be searched for 
   // the file SNAPProgramDataDirectory.txt
-  StringType sExeFullPath = SystemTools::FindProgram(pathToExe);
+  StringType sExeFullPath = itksys::SystemTools::FindProgram(pathToExe);
   if(sExeFullPath.length())
     {
     // Encode the path to the executable so that we can search for an associated
@@ -139,8 +139,8 @@ SystemInterface
       GetProgramDataDirectoryTokenFileName();
 
     // Perform a sanity check on the directory
-    if(SystemTools::FileIsDirectory(sAssociatedPath.c_str()) && 
-       SystemTools::FileExists(sSearchName.c_str()))
+    if(itksys::SystemTools::FileIsDirectory(sAssociatedPath.c_str()) && 
+       itksys::SystemTools::FileExists(sSearchName.c_str()))
       {
       // We've found the path
       sRootDir = sAssociatedPath;
@@ -157,23 +157,26 @@ SystemInterface
 
     // Look at the directory where the exe sits
     vPathList.push_back(
-      SystemTools::GetFilenamePath(sExeFullPath) + "/ProgramData");
+      itksys::SystemTools::GetFilenamePath(sExeFullPath) + "/ProgramData");
 
     // Look one directory up from that
     vPathList.push_back(
-      SystemTools::GetFilenamePath(SystemTools::GetFilenamePath(sExeFullPath)) + 
+      itksys::SystemTools::GetFilenamePath(
+        itksys::SystemTools::GetFilenamePath(sExeFullPath)) + 
       "/ProgramData");
 
     // Also, for UNIX installations, look for ${INSTALL_PATH}/share/snap/ProgramData
     vPathList.push_back(
-       SystemTools::GetFilenamePath(SystemTools::GetFilenamePath(sExeFullPath)) + 
+       itksys::SystemTools::GetFilenamePath(
+         itksys::SystemTools::GetFilenamePath(sExeFullPath)) + 
        "/share/snap/ProgramData");
 
     // Search for the token file in the path list
     StringType sFoundFile = 
-      SystemTools::FindFile(GetProgramDataDirectoryTokenFileName(),vPathList);
+      itksys::SystemTools::FindFile(
+        GetProgramDataDirectoryTokenFileName(),vPathList);
     if(sFoundFile.length())
-      sRootDir = SystemTools::GetFilenamePath(sFoundFile);
+      sRootDir = itksys::SystemTools::GetFilenamePath(sFoundFile);
     }
 
   // If we still don't have a root path, there's no home

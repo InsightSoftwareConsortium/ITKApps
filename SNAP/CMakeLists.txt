@@ -619,4 +619,4 @@ CONFIGURE_FILE(
   ${MY_BINARY_DIR}/Utilities/InnoSetup/InstallSNAP.iss)
 
 # Add an option to install SNAP into /usr/local or something
-INSTALL_TARGETS(/bin InsightSNAP SNAP_CC_PNG)
+INSTALL_TARGETS(/bin InsightSNAP)

@@ -24,7 +24,9 @@
 // Forward declarations to IRIS classes
 template <class TPixel> class IRISSlicer;
 class SNAPSegmentationROISettings;
-
+namespace itk {
+  template <unsigned int VDimension> class ImageBase;
+}
 
 /**
  * \class ImageWrapper
@@ -34,7 +36,7 @@ class SNAPSegmentationROISettings;
 class ImageWrapperBase
 {
 public:
-    virtual ~ImageWrapperBase() { /*To avoid compiler warning.*/ }
+  virtual ~ImageWrapperBase() { /*To avoid compiler warning.*/ }
   virtual const ImageCoordinateTransform &GetImageToDisplayTransform(
     unsigned int) const = 0;
   virtual void SetImageToDisplayTransform(
