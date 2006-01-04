@@ -18,6 +18,7 @@
 // #include "itkImageRegion.h"
 #include "SNAPCommon.h"
 #include "itkImageRegion.h"
+#include "IRISVectorTypesToITKConversion.h"
 
 /** 
  * Settings describing the region of interest selected for the SnAP 
@@ -62,6 +63,11 @@ public:
   
   // Set the interpolation method used
   irisGetMacro(InterpolationMethod,InterpolationMethod);
+
+  // This method will map the cursor position from image space to ROI image
+  // space. If the cursor is outside of the ROI, it will be set to the center
+  // of the ROI
+  Vector3ui UpdateCursorPosition(const Vector3ui &cursor);
 
 private:
   // The region of interest, in the main IRIS image

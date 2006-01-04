@@ -540,8 +540,19 @@ UserInterfaceLogic
   // show the snake window, hide the IRIS window
   ShowSNAP();
 
-  // Image geometry has changed
+  // We are going to preserve the cursor position if it was in the ROI
+  Vector3ui newCursor;
+  newCursor = 
+    roi.UpdateCursorPosition(m_GlobalState->GetCrosshairsPosition()); 
+
+  // Image geometry has changed. This method also resets the cursor 
+  // position, which is something we don't want.
   OnImageGeometryUpdate();
+
+  // So we reset the cursor position manually here
+  // TODO: Fix this redundancy
+  m_Driver->GetCurrentImageData()->SetCrosshairs(newCursor);
+  m_GlobalState->SetCrosshairsPosition(newCursor);
 
   m_OutMessage->value("Initalize snake");
 }
@@ -3493,6 +3504,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.51  2005/12/21 17:07:22  pauly
+ *STYLE: New SNAP logo, about window
+ *
  *Revision 1.50  2005/12/19 03:43:12  pauly
  *ENH: SNAP enhancements and bug fixes for 1.4 release
  *

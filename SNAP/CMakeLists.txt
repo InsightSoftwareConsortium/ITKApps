@@ -49,6 +49,7 @@ SET(LOGIC_CXX
   Logic/Common/ImageCoordinateTransform.cxx
   Logic/Common/SNAPRegistryIO.cxx
   Logic/Common/ColorLabelTable.cxx
+  Logic/Common/SNAPSegmentationROISettings.cxx
   Logic/Framework/GlobalState.cxx
   Logic/Framework/IRISApplication.cxx
   Logic/Framework/IRISImageData.cxx
