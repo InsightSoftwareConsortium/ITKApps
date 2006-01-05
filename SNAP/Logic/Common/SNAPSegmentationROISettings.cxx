@@ -14,29 +14,30 @@
 =========================================================================*/
 #include "SNAPSegmentationROISettings.h"
 
-Vector3ui 
+bool 
 SNAPSegmentationROISettings
-::UpdateCursorPosition(const Vector3ui &cursor)
+::TransformImageVoxelToROIVoxel(const Vector3ui &vImage, Vector3ui &vROI)
 {
-  itk::Index<3> idx = to_itkIndex(cursor);
+  itk::Index<3> idx = to_itkIndex(vImage);
   if(m_ROI.IsInside(idx)) 
   {
-    Vector3ui pos1, pos2;
     for(unsigned int i = 0; i < 3; i++)
     {
-      pos1[i] = cursor[i] - m_ROI.GetIndex()[i];
-      pos2[i] = (unsigned int) (pos1[i] / m_VoxelScale[i]);
+      unsigned int p = vImage[i] - m_ROI.GetIndex()[i];
+      vROI[i] = (unsigned int) (p / m_VoxelScale[i]);
     }
-    return pos2;
+    return true;
   }
-  else
+  else return false;
+}
+
+void
+SNAPSegmentationROISettings
+::TransformROIVoxelToImageVoxel(const Vector3ui &vROI, Vector3ui &vImage)
+{
+  for(unsigned int i = 0; i < 3; i++)
   {
-    Vector3ui pos1, pos2;
-    for(unsigned int i = 0; i < 3; i++)
-    {
-      pos1[i] = m_ROI.GetSize()[i] / 2;
-      pos2[i] = (unsigned int) (pos1[i] / m_VoxelScale[i]);
-    }
-    return pos2;
+    unsigned int p = (unsigned int) (vROI[i] * m_VoxelScale[i]);
+    vImage[i] = p + m_ROI.GetIndex()[i];
   }
 }

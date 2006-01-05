@@ -64,10 +64,12 @@ public:
   // Set the interpolation method used
   irisGetMacro(InterpolationMethod,InterpolationMethod);
 
-  // This method will map the cursor position from image space to ROI image
-  // space. If the cursor is outside of the ROI, it will be set to the center
-  // of the ROI
-  Vector3ui UpdateCursorPosition(const Vector3ui &cursor);
+  // Map image voxel to an ROI voxel, if the result is outside of the region
+  // this will return false, and not change the index
+  bool TransformImageVoxelToROIVoxel(const Vector3ui &vImage, Vector3ui &vROI);
+
+  // Map ROI voxel into an image voxel. The result will be inside the image
+  void TransformROIVoxelToImageVoxel(const Vector3ui &vROI, Vector3ui &vImage);
 
 private:
   // The region of interest, in the main IRIS image

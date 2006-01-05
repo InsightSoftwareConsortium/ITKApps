@@ -541,18 +541,19 @@ UserInterfaceLogic
   ShowSNAP();
 
   // We are going to preserve the cursor position if it was in the ROI
-  Vector3ui newCursor;
-  newCursor = 
-    roi.UpdateCursorPosition(m_GlobalState->GetCrosshairsPosition()); 
+  Vector3ui newCursor, oldCursor = m_GlobalState->GetCrosshairsPosition();
 
   // Image geometry has changed. This method also resets the cursor 
   // position, which is something we don't want.
   OnImageGeometryUpdate();
 
-  // So we reset the cursor position manually here
-  // TODO: Fix this redundancy
-  m_Driver->GetCurrentImageData()->SetCrosshairs(newCursor);
-  m_GlobalState->SetCrosshairsPosition(newCursor);
+  // So we reset the cursor position manually here if the cursor was in the ROI
+  if(roi.TransformImageVoxelToROIVoxel(oldCursor, newCursor))
+    {
+    // TODO: Fix this redundancy
+    m_Driver->GetCurrentImageData()->SetCrosshairs(newCursor);
+    m_GlobalState->SetCrosshairsPosition(newCursor);
+    }
 
   m_OutMessage->value("Initalize snake");
 }
@@ -1280,8 +1281,18 @@ UserInterfaceLogic
   m_IRISWindow3D->ClearScreen();
   m_IRISWindow3D->ResetView();
 
-  // Image geometry has changed
+  // We are going to preserve the cursor position if it was in the ROI
+  Vector3ui newCursor, oldCursor = m_GlobalState->GetCrosshairsPosition();
+
+  // Image geometry has changed. This method also resets the cursor 
+  // position, which is something we don't want.
   OnImageGeometryUpdate();
+
+  // So we reset the cursor position manually here if the cursor was in the ROI
+  SNAPSegmentationROISettings roi = m_GlobalState->GetSegmentationROISettings();
+  roi.TransformROIVoxelToImageVoxel(oldCursor, newCursor);
+  m_Driver->GetCurrentImageData()->SetCrosshairs(newCursor);
+  m_GlobalState->SetCrosshairsPosition(newCursor);
 
   // Clear the list of bubbles
   m_BrsActiveBubbles->clear();
@@ -3504,6 +3515,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.52  2006/01/04 23:25:42  pauly
+ *ENH: SNAP will keep crosshairs position when entering automatic segmentation
+ *
  *Revision 1.51  2005/12/21 17:07:22  pauly
  *STYLE: New SNAP logo, about window
  *
