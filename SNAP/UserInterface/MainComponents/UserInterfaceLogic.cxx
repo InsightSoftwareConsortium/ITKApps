@@ -553,6 +553,7 @@ UserInterfaceLogic
     // TODO: Fix this redundancy
     m_Driver->GetCurrentImageData()->SetCrosshairs(newCursor);
     m_GlobalState->SetCrosshairsPosition(newCursor);
+    this->OnCrosshairPositionUpdate();
     }
 
   m_OutMessage->value("Initalize snake");
@@ -1293,6 +1294,7 @@ UserInterfaceLogic
   roi.TransformROIVoxelToImageVoxel(oldCursor, newCursor);
   m_Driver->GetCurrentImageData()->SetCrosshairs(newCursor);
   m_GlobalState->SetCrosshairsPosition(newCursor);
+  this->OnCrosshairPositionUpdate();
 
   // Clear the list of bubbles
   m_BrsActiveBubbles->clear();
@@ -3517,6 +3519,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.54  2006/01/05 18:25:05  pauly
+ *BUG: Fixed cursor bug in lInux
+ *
  *Revision 1.53  2006/01/05 00:02:41  pauly
  *ENH: Now SNAP keeps cursor position whether you enter or exit auto mode
  *
