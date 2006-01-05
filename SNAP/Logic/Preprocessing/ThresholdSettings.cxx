@@ -29,16 +29,17 @@ ThresholdSettings
   // Use the min and the max of the wrapper
   int iMin = wrapper->GetImageMin();
   int iMax = wrapper->GetImageMax();
+
+  // If the image is constant, return default settings
+  if(iMin == iMax) return MakeDefaultSettingsWithoutImage();
   
+  // Generate the default settings
   ThresholdSettings settings;
   settings.m_LowerThresholdEnabled = true;
   settings.m_UpperThresholdEnabled = true;  
-  settings.m_LowerThreshold = iMin + (iMax-iMin) / 3;
-  settings.m_UpperThreshold = iMin + 2 * (iMax-iMin) / 3;
-  
-  settings.m_Smoothness = (iMax-iMin) / 6;
-  // settings.m_Smoothness = 0.5;
-  settings.m_Smoothness = 3;
+  settings.m_LowerThreshold = iMin + (iMax-iMin) / 3.0;
+  settings.m_UpperThreshold = iMin + 2.0 * (iMax-iMin) / 3.0;
+  settings.m_Smoothness = 3.0;
 
   return settings;
 }
@@ -50,9 +51,9 @@ ThresholdSettings
   ThresholdSettings settings;
   settings.m_LowerThresholdEnabled = true;
   settings.m_UpperThresholdEnabled = true;  
-  settings.m_LowerThreshold = 40;
-  settings.m_UpperThreshold = 80; 
-  settings.m_Smoothness = 3;
+  settings.m_LowerThreshold = 40.0;
+  settings.m_UpperThreshold = 80.0; 
+  settings.m_Smoothness = 3.0;
 
   return settings;
 }
@@ -62,7 +63,19 @@ ThresholdSettings
 {
   m_LowerThresholdEnabled = true;
   m_UpperThresholdEnabled = true;  
-  m_LowerThreshold = 0;
-  m_UpperThreshold = 0; 
-  m_Smoothness = 1;
+  m_LowerThreshold = 0.0;
+  m_UpperThreshold = 1.0; 
+  m_Smoothness = 1.0;
 }
+
+bool
+ThresholdSettings
+::IsValid() const
+{
+  if(m_Smoothness < 0.0) return false;
+  if(m_LowerThresholdEnabled && m_UpperThresholdEnabled && 
+      m_UpperThreshold <= m_LowerThreshold)
+    return false;
+  return true;
+}
+

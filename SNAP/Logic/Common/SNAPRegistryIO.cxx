@@ -275,6 +275,10 @@ SNAPRegistryIO
   out.SetUpperThresholdEnabled(
     registry["UpperThresholdEnabled"][defaultSet.IsUpperThresholdEnabled()]);
 
+  // Check that what we've read is valid
+  if(!out.IsValid())
+    out = defaultSet;
+
   return out;
 }
 

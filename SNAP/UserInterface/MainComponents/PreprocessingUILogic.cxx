@@ -108,8 +108,8 @@ PreprocessingUILogic
   ThresholdSettings settings = m_GlobalState->GetThresholdSettings();
 
   // Shorthands
-  int lower = settings.GetLowerThreshold();
-  int upper = settings.GetUpperThreshold();
+  float lower = settings.GetLowerThreshold();
+  float upper = settings.GetUpperThreshold();
 
   // Set the ranges for the two thresholds.  These ranges do not require the
   // lower slider to be less than the upper slider, that will be corrected
@@ -332,8 +332,8 @@ PreprocessingUILogic
 {
   // Pass the current GUI settings to the filter
   ThresholdSettings settings;
-  settings.SetLowerThreshold((unsigned int)m_InLowerThreshold->value());
-  settings.SetUpperThreshold((unsigned int)m_InUpperThreshold->value());
+  settings.SetLowerThreshold(m_InLowerThreshold->value());
+  settings.SetUpperThreshold(m_InUpperThreshold->value());
   settings.SetSmoothness(m_InThresholdSteepness->value());
   settings.SetLowerThresholdEnabled(m_InLowerThreshold->active());
   settings.SetUpperThresholdEnabled(m_InUpperThreshold->active());  

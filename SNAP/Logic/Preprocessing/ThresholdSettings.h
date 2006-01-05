@@ -28,11 +28,11 @@ class ThresholdSettings
 {
 public:
     virtual ~ThresholdSettings() { /*To avoid compiler warning.*/ }
-  irisGetMacro(LowerThreshold, int);
-  irisSetMacro(LowerThreshold, int);
+  irisGetMacro(LowerThreshold, float);
+  irisSetMacro(LowerThreshold, float);
 
-  irisGetMacro(UpperThreshold, int);
-  irisSetMacro(UpperThreshold, int);
+  irisGetMacro(UpperThreshold, float);
+  irisSetMacro(UpperThreshold, float);
 
   irisGetMacro(Smoothness,float);
   irisSetMacro(Smoothness,float);
@@ -45,6 +45,9 @@ public:
 
   /** Compare two sets of settings */
   bool operator == (const ThresholdSettings &other) const;
+
+  /** Check if the settings are valid */
+  bool IsValid() const;
 
   /**
    * Create a default instance of the settings based on an image wrapper
@@ -60,8 +63,8 @@ public:
   ThresholdSettings();
 
 private:
-  int m_LowerThreshold;
-  int m_UpperThreshold;
+  float m_LowerThreshold;
+  float m_UpperThreshold;
   float m_Smoothness;
   
   bool m_UpperThresholdEnabled;

@@ -44,6 +44,13 @@ public:
     m_LowerThreshold = settings.GetLowerThreshold();
     m_UpperThreshold = settings.GetUpperThreshold();
 
+    // Handle the bad case: everything is mapped to zero
+    if(m_LowerThreshold >= m_UpperThreshold)
+      {
+      m_ScalingFactor = m_FactorUpper = m_FactorLower = m_Shift = 0.0;
+      return;
+      }
+
     // Compute the largest scaling for U-L such that the function is greater
     // than 1-eps
     float eps = pow((float)10,-(float)settings.GetSmoothness());
