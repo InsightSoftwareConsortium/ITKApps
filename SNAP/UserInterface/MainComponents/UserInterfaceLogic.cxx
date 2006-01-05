@@ -971,7 +971,7 @@ UserInterfaceLogic
 
   // Put on a wait cursor
   // TODO: Progress bar is needed here
-  fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+  m_WinMain->cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
 
   // Merge bubbles with the segmentation image and initialize the snake
   bool rc = snapData->InitializeSegmentation(
@@ -979,7 +979,7 @@ UserInterfaceLogic
     m_GlobalState->GetDrawingColorLabel());
 
   // Restore the cursor
-  fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+  m_WinMain->cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
   
   // Check if we need to bail out
   if (!rc) 
@@ -2786,7 +2786,7 @@ UserInterfaceLogic
   string fnRecent = m_RecentFileNames[iRecent];
 
   // Show a wait cursor
-  fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+  m_WinMain->cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
 
   // TODO: At some point, we have to prompt the user that there are unsaved changes...
   try
@@ -2825,12 +2825,12 @@ UserInterfaceLogic
     OnGreyImageUpdate();
 
     // Restore the cursor
-    fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+    m_WinMain->cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
     }
   catch(itk::ExceptionObject &exc) 
     {
     // Restore the cursor
-    fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+    m_WinMain->cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
 
     // Alert the user to the failure
     fl_alert("Error loading image:\n%s",exc.GetDescription());
@@ -3271,11 +3271,12 @@ UserInterfaceLogic
   // Place the window in the center of display
   CenterChildWindowInMainWindow(m_WinSplash);
 
-  // Show a wait cursor
-  fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
-
   // Show the splash screen
   m_WinSplash->show();
+
+  // Show a wait cursor
+  m_WinSplash->cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+  m_WinMain->cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
 
   // Make FL update the screen
   Fl::check();
@@ -3290,12 +3291,13 @@ UserInterfaceLogic
 {
   // Wait a second with the splash screen
   while(clock() - m_SplashScreenStartTime < CLOCKS_PER_SEC) {}
+
+  // Clear the cursor
+  m_WinMain->cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+  m_WinSplash->cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
   
   // Hide the screen 
   m_WinSplash->hide();
-
-  // Clear the cursor
-  fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
 }
 
 void
@@ -3515,6 +3517,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.53  2006/01/05 00:02:41  pauly
+ *ENH: Now SNAP keeps cursor position whether you enter or exit auto mode
+ *
  *Revision 1.52  2006/01/04 23:25:42  pauly
  *ENH: SNAP will keep crosshairs position when entering automatic segmentation
  *

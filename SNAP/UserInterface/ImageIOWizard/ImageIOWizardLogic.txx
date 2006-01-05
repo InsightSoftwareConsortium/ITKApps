@@ -522,7 +522,7 @@ ImageIOWizardLogic<TPixel>
     : itksys::SystemTools::GetParentDirectory(m_InFilePageBrowser->value());
 
   // Put up a wait cursor
-  fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+  m_WinInput->cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
 
   // Try to list the DICOM files in the directory
   try
@@ -536,7 +536,7 @@ ImageIOWizardLogic<TPixel>
     }
 
   // Restore the cursor
-  fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+  m_WinInput->cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
   
   // Get the list of series in the directory
   if(m_DICOMLister->GetSeriesUIDs().size() == 0)
@@ -608,7 +608,7 @@ ImageIOWizardLogic<TPixel>
   bool rc;
 
   // Show a wait cursor
-  fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+  m_WinInput->cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
   
   // Try to load a file
   try 
@@ -640,7 +640,7 @@ ImageIOWizardLogic<TPixel>
   }
 
   // Fix the cursor
-  fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+  m_WinInput->cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
 
   // Check if the image is valid (subclasses can perform extra tasks here)
   return rc;
@@ -1354,7 +1354,7 @@ ImageIOWizardLogic<TPixel>
   m_GuidedIO.SetFileFormat(m_Registry, format);
 
   // Put up a waiting cursor
-  fl_cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+  m_WinOutput->cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
 
   // Try to save the image using the current format
   try 
@@ -1376,7 +1376,7 @@ ImageIOWizardLogic<TPixel>
     { fl_alert("Error saving file: %s",exc.GetDescription()); }
   
   // Restore the cursor
-  fl_cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
+  m_WinOutput->cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
 }
 
 template <class TPixel>
