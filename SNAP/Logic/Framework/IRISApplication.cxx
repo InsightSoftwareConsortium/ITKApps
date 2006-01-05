@@ -384,7 +384,6 @@ IRISApplication
         break;  
 
       case SNAPSegmentationROISettings::SINC_WINDOW_05 :
-        cout << "Using Window Sinc" << endl;
         fltSample->SetInterpolator(SincInterpolatorType::New());
         break;
       };

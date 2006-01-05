@@ -1271,7 +1271,6 @@ int
 Window3D
 ::OnKeyAction(int key)
 {
-  std::cout << "Key press: " << key << std::endl;
   if(key == 's')
     {
     // Store the state of the trackball
@@ -1300,6 +1299,9 @@ Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.31  2005/12/12 00:27:45  pauly
+ *ENH: Preparing SNAP for 1.4 release. Snapshot functionality
+ *
  *Revision 1.30  2005/11/23 14:32:15  ibanez
  *BUG: 2404. Patch provided by Paul Yushkevish.
  *

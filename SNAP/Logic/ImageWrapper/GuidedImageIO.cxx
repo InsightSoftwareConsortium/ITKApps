@@ -73,7 +73,6 @@ void GuidedImageIOBase
 ::SetFileFormat(Registry &folder, FileFormat format)
 {
   folder.Entry("Format").PutEnum(m_EnumFileFormat, format);
-  cout << "GuidedImageIOBase::SetFileFormat : " << folder["Format"]["Error"] << endl;
 }
 
 GuidedImageIOBase::RawPixelType 
