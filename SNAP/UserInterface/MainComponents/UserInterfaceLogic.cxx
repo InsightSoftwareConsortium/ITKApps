@@ -1333,6 +1333,9 @@ UserInterfaceLogic
   // Get data from SNAP back into IRIS
   m_Driver->UpdateIRISWithSnapImageData(m_ProgressCommand);
 
+  // This is a safeguard in case the progress events do not fire
+  m_WinProgress->hide();
+
   // Close up SNAP
   this->CloseSegmentationCommon();
 
@@ -2345,6 +2348,9 @@ UserInterfaceLogic
 {
   m_IRISWindow3D->UpdateMesh(m_ProgressCommand);
   m_IRISWindow3D->redraw();
+
+  // This is a safeguard in case the progress events do not fire
+  m_WinProgress->hide();
   
   m_Activation->UpdateFlag(UIF_IRIS_MESH_DIRTY, false);
 }
@@ -2377,6 +2383,9 @@ UserInterfaceLogic
 {
   m_SNAPWindow3D->UpdateMesh(m_ProgressCommand);
   m_SNAPWindow3D->redraw();
+
+  // This is a safeguard in case the progress events do not fire
+  m_WinProgress->hide();
 
   m_Activation->UpdateFlag(UIF_SNAP_MESH_DIRTY, false);
 }
@@ -3519,6 +3528,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.55  2006/01/05 23:19:45  pauly
+ *BUG: SNAP label file was not being written correctly
+ *
  *Revision 1.54  2006/01/05 18:25:05  pauly
  *BUG: Fixed cursor bug in lInux
  *
