@@ -146,6 +146,11 @@ public:
 
   /** Default constructor */
   CachingUnaryFunctor() { }
+
+  /** Operator for comparing whether this functor is different from another instance or not */
+  bool operator!=( const CachingUnaryFunctor & other ) const
+          { return (this->m_Parent != other.m_Parent ); }
+    
 private:
   /** Pointer to the cache */
   CachePointer m_Parent;

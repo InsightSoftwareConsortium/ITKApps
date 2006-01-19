@@ -78,6 +78,14 @@ public:
   /** Generate a color map for one of the presets */
   static SpeedColorMap GetPresetColorMap(ColorMapPreset xPreset);
 
+  bool operator!=( const SpeedColorMap & other ) const
+  {
+    bool value = ( ( this->m_DeltaT != other.m_DeltaT ) || 
+                   ( this->m_Shift  != other.m_Shift  ) || 
+                   ( this->m_ColorMapSize  != other.m_ColorMapSize ) );
+      return value;
+  }
+    
 private:
   // The colors in the color map
   std::vector<OutputType> m_ColorEntry;
@@ -86,7 +94,9 @@ private:
   std::vector<Vector3f> m_ColorEntryDelta;
 
   // Scaling factors used to reference color entries
-  float m_DeltaT, m_Shift, m_ColorMapSize;
+  float m_DeltaT;
+  float m_Shift;
+  float m_ColorMapSize;
 };  
 
 #endif

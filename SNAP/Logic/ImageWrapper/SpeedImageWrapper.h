@@ -174,6 +174,13 @@ private:
 
     /** Overlay color */
     OverlayPixelType m_Color;
+    
+    /** Comparison operator */
+    bool operator!=( const OverlayFunctor & other ) const
+    {
+      return ( ( this->m_Cutoff != other.m_Cutoff ) ||
+               ( this->m_Color  != other.m_Color  )  );
+    }
   };  
   
   // Type of the display intensity mapping filter used when the 

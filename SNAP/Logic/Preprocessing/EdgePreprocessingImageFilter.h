@@ -50,6 +50,15 @@ public:
     return static_cast<TOutput> (y);
   }
 
+  bool operator!=( const EdgeRemappingFunctor & other ) const
+  { 
+    bool value = ( ( this->m_KappaFactor != other.m_KappaFactor ) ||
+                   ( this->m_IntensityBase != other.m_IntensityBase ) ||
+                   ( this->m_IntensityScale != other.m_IntensityScale ) ||
+                   ( this->m_Exponent != other.m_Exponent ) );
+    return value;
+  }
+
 private:
   
   float m_KappaFactor;

@@ -304,6 +304,8 @@ private:
       inline ScalarValueType operator()(ScalarValueType x) 
         { return vcl_pow(x,power); }
       int power;
+      bool operator!=( const PowFunctor & other ) const
+        { return (this->power != other.power ); }
     };
 
   /** A casting functor to convert between vector types.  */

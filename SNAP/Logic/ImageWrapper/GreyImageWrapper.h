@@ -88,6 +88,14 @@ private:
      * Set the range over which the input data is mapped to output data
      */
     void SetInputRange(GreyType intensityMin,GreyType intensityMax);
+
+    bool operator!=( const IntensityFunctor & other ) const
+    {
+      bool value = ( ( this->m_IntensityMin != other.m_IntensityMin ) ||
+                     ( this->m_IntensityFactor != other.m_IntensityFactor ) ||
+                     ( this->m_IntensityMap != other.m_IntensityMap ) );
+      return value;
+    }
   };
 
   // Type of intensity function used to map 3D volume intensity into
