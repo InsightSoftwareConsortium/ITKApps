@@ -17,6 +17,10 @@ TARGET_LINK_LIBRARIES(ConvertBetweenFileFormats  ITKIO ITKCommon)
 INSTALL_TARGETS(/bin ConvertBetweenFileFormats)
 
 IF( BUILD_TESTING )
+
+  ADD_EXECUTABLE(ImageCompare ImageCompare.cxx)
+  TARGET_LINK_LIBRARIES(ImageCompare  ITKIO ITKCommon)
+
   SET(IMAGE_PATH ${ConvertBetweenFileFormats_SOURCE_DIR}/Testing/Data)
   SET(IMAGE_PATH_OUTPUTS ${ConvertBetweenFileFormats_BINARY_DIR})
   # Convert from grayscale mhd to other image file formats
