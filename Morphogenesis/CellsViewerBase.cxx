@@ -39,7 +39,7 @@ CellsViewerBase
   m_StartTime =          0;
   m_SavingImages =   false;
   m_NumberOfIterationsBetweenSaves = 100;
- 
+  m_RealTimeClock = ::itk::RealTimeClock::New();
 }
 
 
@@ -192,9 +192,9 @@ CellsViewerBase
 {
   m_Stop = false;
   if( !m_StartTime ) 
-  {
+    {
     m_StartTime = m_RealTimeClock->GetTimeStamp();
-  }
+    }
   while( !m_Stop )
     {
     m_Cells->AdvanceTimeStep();
