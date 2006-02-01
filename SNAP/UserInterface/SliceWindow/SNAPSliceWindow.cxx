@@ -28,11 +28,11 @@ typedef itk::SmartPointer<itk::Command> SNAPSliceWindowDummyCommandSPType;
 #include "SNAPImageData.h"
 #include "SNAPAppearanceSettings.h"
 #include "OpenGLSliceTexture.h"
-#include "UserInterfaceLogic.h"
+#include "UserInterfaceBase.h"
 
 SNAPSliceWindow
-::SNAPSliceWindow(int x, int y, int w, int h, const char *label)
-: GenericSliceWindow(x,y,w,h,label)
+::SNAPSliceWindow(int id, UserInterfaceBase *parentUI, FLTKCanvas *canvas) 
+: GenericSliceWindow(id, parentUI, canvas)
 {
   // Initialize the texture for displaying the speed image
   m_SpeedTexture = new SpeedTextureType;
@@ -54,22 +54,15 @@ SNAPSliceWindow
 
   // Initialize the bubbles interaction mode
   m_BubblesMode = new BubblesInteractionMode(this);
+
+  // Register the interaction modes
+  m_BubblesMode->Register();
 }
 
 SNAPSliceWindow
 ::~SNAPSliceWindow()
 {
   delete m_SpeedTexture;
-}
-
-void SNAPSliceWindow
-::Register(int id, UserInterfaceLogic *parentUI)
-{
-  // Call parent's init method
-  GenericSliceWindow::Register(id, parentUI);
-
-  // Register the interaction modes
-  m_BubblesMode->Register();
 }
 
 void 

@@ -17,14 +17,13 @@
 
 #include "PreprocessingUI.h"
 #include "SNAPCommonUI.h"
-#include "itkSmartPointer.h"
 #include "EdgePreprocessingImageFilter.h"
 #include "SmoothBinaryThresholdImageFilter.h"
 
 // Forward references to application classes
 class GlobalState;
 class IRISApplication;
-class UserInterfaceLogic;
+class UserInterfaceBase;
 
 // ITK forward references
 namespace itk {
@@ -63,7 +62,7 @@ public:
   void OnThresholdOverlayChange();
   
   // Register this class with the parent user interface
-  void Register(UserInterfaceLogic *parent);
+  void Register(UserInterfaceBase *parent);
 
   // Display the Edge preprocessing window
   void DisplayEdgeWindow();
@@ -77,7 +76,7 @@ public:
 private:
   GlobalState *m_GlobalState;
   IRISApplication *m_Driver;
-  UserInterfaceLogic *m_ParentUI;
+  UserInterfaceBase *m_ParentUI;
 
   /** The image types used for preprocessing */
   typedef itk::Image<GreyType,3> GreyImageType;

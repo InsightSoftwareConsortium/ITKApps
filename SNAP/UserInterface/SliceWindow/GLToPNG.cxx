@@ -17,18 +17,19 @@
 #include <iostream>
 using namespace std;
 
-vtkImageData* GLToVTKImageData(GLenum format, int x, int y, int w, int h) 
+vtkImageData* GLToVTKImageData(unsigned int format, int x, int y, int w, int h) 
 {
-  /**
-   * OSX does double buffer automatically
-   */
+  // Cast the format to GL enum
+  GLenum glformat = (GLenum) format;
+
+  // OSX does double buffer automatically (???)
   //glReadBuffer(GL_BACK);
   unsigned int GL_comps = 0;
-  if (format == GL_RGBA) 
+  if (glformat == GL_RGBA) 
     {
     GL_comps = 4;
     } 
-  else if (format == GL_RGB) 
+  else if (glformat == GL_RGB) 
     {
     GL_comps = 3;
     } 

@@ -272,7 +272,7 @@ int main(int argc, char **argv)
   Fl::background(236,233,216);
 
   // Show the IRIS Interface
-  ui->ShowIRIS();
+  ui->Launch();
 
   // Check if the user passed in command line arguments
   if(parseResult.IsOptionPresent("--grey"))
@@ -418,7 +418,10 @@ int main(int argc, char **argv)
 }
 
 /*
- *Log: SNAPMain.cxx
+ *Log: SNAP_CC_PNG.cxx
+ *Revision 1.1  2005/12/12 00:27:45  pauly
+ *ENH: Preparing SNAP for 1.4 release. Snapshot functionality
+ *
  *Revision 1.10  2004/08/26 19:43:27  pauly
  *ENH: Moved the Borland code into Common folder
  *

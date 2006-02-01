@@ -13,7 +13,7 @@
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "LabelEditorUILogic.h"
-#include "UserInterfaceLogic.h"
+#include "UserInterfaceBase.h"
 #include "GlobalState.h"
 #include "IRISApplication.h"
 #include "IRISImageData.h"
@@ -38,7 +38,7 @@ LabelEditorUILogic
 
 void
 LabelEditorUILogic
-::Register(UserInterfaceLogic *parent)
+::Register(UserInterfaceBase *parent)
 {
   m_Parent = parent;
   m_Driver = parent->GetDriver();

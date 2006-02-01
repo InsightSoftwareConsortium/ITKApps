@@ -15,6 +15,7 @@
 #ifndef __GlobalState_h_
 #define __GlobalState_h_
 
+#include <vector>
 #include "SNAPCommon.h"
 #include "EdgePreprocessingSettings.h"
 #include "MeshOptions.h"
@@ -69,6 +70,18 @@ enum ColorMapPreset
   COLORMAP_BLUE_WHITE_RED,
   COLORMAP_BLACK_YELLOW_WHITE
 };
+
+/**
+ * Bubble structure: an object of this class stores information about an 
+ * individual bubble initialized in the Snake window
+ */
+struct Bubble {
+  // center of the bubble (voxel index)
+  Vector3i center;
+  
+  // radius of the bubble (in mm.)
+  double radius;     
+};
                      
 /**
  * \class GlobalState
@@ -79,6 +92,9 @@ class GlobalState
 public:
   // Region of interest definition
   typedef itk::ImageRegion<3> RegionType;
+
+  // Define the bubble array
+  typedef std::vector<Bubble> BubbleArray;
 
   GlobalState();
   virtual ~GlobalState();
@@ -316,6 +332,32 @@ public:
   const char *GetAdvectionFileName(unsigned int i)
     { return m_AdvectionFileName[i].c_str(); }
 
+  /** Get the array of bubbles */
+  irisGetMacro(BubbleArray, BubbleArray);
+
+  /** Set the array of bubbles */
+  irisSetMacro(BubbleArray, BubbleArray);
+
+  /** 
+   * Get the active bubble number. This can be -1 indicating that there is no
+   * active bubble or 0 .. N-1, where N is the size of the bubble array. The
+   * active bubble is really a GUI concept for the time being. In general, the
+   * bubbles will be eventually replaced by more advanced class hierarchy of
+   * seeds, sensors, attractors, and detractors.
+   */
+  irisGetMacro(ActiveBubble, int);
+
+  /** Set the active bubble */
+  irisSetMacro(ActiveBubble, int);
+
+  /** Check if there is an active bubble (i.e., ActiveBubble == -1) */
+  bool IsActiveBubbleOn() const
+    { return (m_ActiveBubble >= 0); }
+
+  /** Disable active bubble (i.e., set ActiveBubble to -1) */
+  void UnsetActiveBubble()
+    { m_ActiveBubble = -1; }
+
 private:
   /** Color label used to draw polygons */
   unsigned char m_DrawingColorLabel;
@@ -422,12 +464,21 @@ private:
 
   // File names for advection images
   std::string m_AdvectionFileName[3];
+
+  // Array of bubbles
+  BubbleArray m_BubbleArray;
+
+  // Current bubble
+  int m_ActiveBubble;
 };
 
 #endif // __GlobalState_h_
 
 /*
  *Log: GlobalState.h
+ *Revision 1.10  2005/12/19 03:43:11  pauly
+ *ENH: SNAP enhancements and bug fixes for 1.4 release
+ *
  *Revision 1.9  2005/10/29 14:00:13  pauly
  *ENH: SNAP enhacements like color maps and progress bar for 3D rendering
  *

@@ -68,6 +68,7 @@ ImageIOWizardLogic<TPixel>
   m_FileFormatPattern[GuidedImageIOBase::FORMAT_VOXBO_CUB] = "cub,cub.gz";
   m_FileFormatPattern[GuidedImageIOBase::FORMAT_RAW] = "raw*";
   m_FileFormatPattern[GuidedImageIOBase::FORMAT_ANALYZE] = "hdr,img,img.gz";  
+  m_FileFormatPattern[GuidedImageIOBase::FORMAT_NIFTI] = "nii,nia,nii.gz,nia.gz";
   m_FileFormatPattern[GuidedImageIOBase::FORMAT_DICOM] = "dcm";
   m_FileFormatPattern[GuidedImageIOBase::FORMAT_GE4] = "ge4";
   m_FileFormatPattern[GuidedImageIOBase::FORMAT_GE5] = "ge5";
@@ -79,7 +80,8 @@ ImageIOWizardLogic<TPixel>
   m_FileFormatDescription[GuidedImageIOBase::FORMAT_GIPL] = "GIPL File";
   m_FileFormatDescription[GuidedImageIOBase::FORMAT_VOXBO_CUB] = "VoxBo CUB File";
   m_FileFormatDescription[GuidedImageIOBase::FORMAT_RAW] = "Raw Binary File";
-  m_FileFormatDescription[GuidedImageIOBase::FORMAT_ANALYZE] = "Analyze File"; 
+  m_FileFormatDescription[GuidedImageIOBase::FORMAT_ANALYZE] = "Analyze File";
+  m_FileFormatDescription[GuidedImageIOBase::FORMAT_NIFTI] = "NIFTI (SPM5) File"; 
   m_FileFormatDescription[GuidedImageIOBase::FORMAT_DICOM] = "DICOM File Series";
   m_FileFormatDescription[GuidedImageIOBase::FORMAT_GE4] = "GE Version 4 File";
   m_FileFormatDescription[GuidedImageIOBase::FORMAT_GE5] = "GE Version 5 File";

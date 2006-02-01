@@ -84,18 +84,23 @@ private:
     GreyType m_IntensityMin;
     float m_IntensityFactor;
 
+    // Dummy equality operators, since there is no data here
+    bool operator == (const IntensityFunctor &z) const 
+      { 
+      return 
+        m_IntensityMap == z.m_IntensityMap &&
+        m_IntensityFactor == z.m_IntensityFactor &&
+        m_IntensityMin == z.m_IntensityMin;
+      }
+
+
+    bool operator != (const IntensityFunctor &z) const 
+      { return !(*this == z); }
+
     /**
      * Set the range over which the input data is mapped to output data
      */
     void SetInputRange(GreyType intensityMin,GreyType intensityMax);
-
-    bool operator!=( const IntensityFunctor & other ) const
-    {
-      bool value = ( ( this->m_IntensityMin != other.m_IntensityMin ) ||
-                     ( this->m_IntensityFactor != other.m_IntensityFactor ) ||
-                     ( this->m_IntensityMap != other.m_IntensityMap ) );
-      return value;
-    }
   };
 
   // Type of intensity function used to map 3D volume intensity into

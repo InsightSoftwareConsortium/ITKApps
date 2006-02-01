@@ -16,7 +16,7 @@
 
 #include "GlobalState.h"
 #include "PolygonDrawing.h"
-#include "UserInterfaceLogic.h"
+#include "UserInterfaceBase.h"
 
 
 PolygonInteractionMode
@@ -38,7 +38,9 @@ PolygonInteractionMode
                 const FLTKEvent &irisNotUsed(pressEvent))
 {
   // Pass through events that are irrelevant
-  if(event.SoftButton != FL_LEFT_MOUSE && event.SoftButton != FL_RIGHT_MOUSE)
+  if(event.SoftButton != FL_LEFT_MOUSE 
+    && event.SoftButton != FL_RIGHT_MOUSE
+    && event.Key != ' ')
     return 0;
 
   // We'll need these shorthands
@@ -47,23 +49,40 @@ PolygonInteractionMode
 #ifdef DRAWING_LOCK
   if (!m_GlobalState->GetDrawingLock(id)) break;
 #endif /* DRAWING_LOCK */
-  
+
   // Compute the dimension of a pixel on the screen
   Vector2f pixelSize = GetPixelSizeVector();
 
-  // Map the event into slice coordinates 
-  Vector3f xEvent = m_Parent->MapWindowToSlice(event.XSpace.extract(2));
+  // Masquerade keypress events as mouse-clicks at the cursor position
+  if(event.Key == ' ') 
+    {
+    // Map the cursor position into slice coordinates
+    Vector3f xEvent = m_Parent->MapImageToSlice(
+      to_float(m_GlobalState->GetCrosshairsPosition()));
 
-  // Handle the event
-  m_Drawing->Handle(event.Id,event.SoftButton,xEvent(0),xEvent(1),
-                    pixelSize(0),pixelSize(1));
+    // Get the event state based on shift-ctrl
+    int fakeButton = (event.State & FL_SHIFT) ? FL_RIGHT_MOUSE : FL_LEFT_MOUSE;
+
+    // Handle the event
+    m_Drawing->Handle(FL_PUSH, fakeButton, xEvent(0), xEvent(1),
+                      pixelSize(0),pixelSize(1));
+    }
+  else
+    {
+    // Map the event into slice coordinates 
+    Vector3f xEvent = m_Parent->MapWindowToSlice(event.XSpace.extract(2));
+
+    // Handle the event
+    m_Drawing->Handle(event.Id,event.SoftButton,xEvent(0),xEvent(1),
+                      pixelSize(0),pixelSize(1));
+    }
 
 #ifdef DRAWING_LOCK
   m_GlobalState->ReleaseDrawingLock(id);
 #endif /* DRAWING_LOCK */
   
   // Update the display
-  m_Parent->redraw();
+  m_Parent->GetCanvas()->redraw();
   
   // Let the parent UI know that the polygon state has changed
   m_ParentUI->OnPolygonStateUpdate(id);

@@ -58,20 +58,6 @@ extern const char SNAPCurrentVersionReleaseDate[];
 // incompatible with the current version and will be erased
 extern const char SNAPLastIncompatibleReleaseDate[];
 
-/**
- * Bubble structure
- * an object of this class stores information about an individual bubble 
- * initialized in the Snake window
- * author Konstantin Bobkov
- */
-struct Bubble {
-  // center of the bubble
-  Vector3i center;
-  
-  // radius of the bubble
-  int radius;     
-};
-
 // Voxel types 
 // CAREFUL: do not redefine this to INT without disabling the usage of
 // UnaryFunctorCache in the GreyImageWrapper type.  Greyscale instensities

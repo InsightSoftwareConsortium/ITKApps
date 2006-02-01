@@ -12,7 +12,6 @@
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
-#include <algorithm>
 #include <cstdlib>
 #include <ctime>
 
@@ -20,6 +19,7 @@
 
 #include <FL/Fl.H>
 #include "SNAPOpenGL.h"
+#include "GLToPNG.h"
 
 using namespace std;
 
@@ -31,52 +31,19 @@ FLTKCanvas
   m_FlipYCoordinate = true;
   m_GrabFocusOnEntry = false;
   m_Focus = false;
+  m_DumpPNG = NULL;
 }
 
-void                            
+void
 FLTKCanvas
-::PushInteractionMode(InteractionMode *mode)
+::SaveAsPNG(const char *filename)
 {
-  m_Interactors.push_front(mode);
+  m_DumpPNG = filename;
+  this->redraw();
+  Fl::flush();
+  m_DumpPNG = NULL;
 }
 
-InteractionMode *
-  FLTKCanvas
-  ::PopInteractionMode() {
-  InteractionMode *lastMode = m_Interactors.front();
-  m_Interactors.pop_front();
-  return lastMode;
-}
-
-void 
-  FLTKCanvas
-  ::ClearInteractionStack() 
-{
-  m_Interactors.clear();
-} 
-
-unsigned int 
-FLTKCanvas
-::GetInteractionModeCount()
-{
-  return m_Interactors.size();
-}
-
-InteractionMode *
-FLTKCanvas
-::GetTopInteractionMode()
-{
-  return m_Interactors.front();
-}
-
-bool
-FLTKCanvas
-::IsInteractionModeAdded(InteractionMode *target)
-{
-  return 
-    std::find(m_Interactors.begin(), m_Interactors.end(), target) !=
-      m_Interactors.end();
-}
 
 int 
 FLTKCanvas
@@ -212,17 +179,19 @@ FLTKCanvas
   return 0;
 }
 
-void 
+void
 FLTKCanvas
-::FireInteractionDrawEvent()
+::draw()
 {
-  // Propagate the drawing event through the stack
-  for (list<InteractionMode *>::reverse_iterator it = m_Interactors.rend();
-      it!=m_Interactors.rbegin();it--)
-    {
-    InteractionMode *mode = *it;
-    mode->OnDraw();
-    }
-}
+  // Let the children do the drawing
+  FireInteractionDrawEvent();
 
+  // dump png if requested
+  if (m_DumpPNG != NULL)
+  {
+    vtkImageData* img = 
+      GLToVTKImageData((unsigned int) GL_RGBA, 0, 0, w(), h());
+    VTKImageDataToPNG(img, m_DumpPNG);
+  }
+}
 

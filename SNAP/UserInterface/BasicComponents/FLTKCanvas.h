@@ -18,6 +18,7 @@
 #include <FL/Fl_Gl_Window.H>
 #include "FLTKEvent.h"
 #include "InteractionMode.h"
+#include "InteractionModeClient.h"
 
 #include <list>
 
@@ -35,51 +36,19 @@
  * in the stack is the first to receive events, and the event is propagated through
  * the stack until it has been handled properly.
  */
-class FLTKCanvas : public Fl_Gl_Window 
+class FLTKCanvas : public Fl_Gl_Window, public InteractionModeClient 
 {
 public:
-  /**
-   * Constructor sets up some basics, sets interaction mode stack to be empty
-   */
+
+  /** Constructor sets up some basics, sets interaction mode stack to be empty */
   FLTKCanvas(int x, int y, int w, int h, const char *label);
   virtual ~FLTKCanvas() {}
 
-  /**
-   * Push an interaction mode onto the stack of modes.  Mode becomes first to 
-   * receive events.  The events that it does not receive are passed on to the
-   * next mode on the stack.
-   */
-  void PushInteractionMode(InteractionMode *mode);
-
-  /**
-   * Pop the last interaction mode off the stack
-   */
-  InteractionMode *PopInteractionMode();
-
-  /**
-   * Get the top interaction mode on the stack
-   */
-  InteractionMode *GetTopInteractionMode();
-
-  /**
-   * See if the interaction mode is in the stack
-   */
-  bool IsInteractionModeAdded(InteractionMode *target);
-
-  /**
-   * Remove all interaction modes
-   */
-  void ClearInteractionStack();
-
-  /**
-   * Get the number of interaction modes on the stack
-   */
-  unsigned int GetInteractionModeCount();
-
-  /**
-   * Handle events
-   */
+  /** Handle events */
   virtual int handle(int eventID);
+
+  /** Default drawing handler */
+  virtual void draw();
 
   /** Are we dragging ? */
   irisIsMacro(Dragging);
@@ -96,16 +65,10 @@ public:
   /** Check if the window has keyboard focus */
   irisGetMacro(Focus,bool);
 
-protected:
-  /**
-   * This method should be called to draw the interactors (call their OnDraw methods 
-   * in a sequence from bottom to top)
-   */
-  void FireInteractionDrawEvent();
+  /** Save the window content to a PNG file */
+  void SaveAsPNG(const char *filename);
 
 private:
-  // The stack of interaction modes
-  std::list<InteractionMode *> m_Interactors;
 
   // The event at the start of a drag operation (if there is one going on)
   FLTKEvent m_DragStartEvent;
@@ -121,6 +84,9 @@ private:
 
   /** Whether the window has keyboard focus */
   bool m_Focus;
+
+  /** PNG filename to save on the next draw command */
+  const char *m_DumpPNG;
 };
 
 #endif // __FLTKCanvas_h_

@@ -29,6 +29,7 @@ template<class TInput, class TOutput>
 class SmoothBinaryThresholdFunctor 
 {
 public:
+  typedef SmoothBinaryThresholdFunctor<TInput, TOutput> Self;
 
   /**
    * Initialize the function
@@ -86,16 +87,19 @@ public:
     return static_cast<TOutput>(yLower + yUpper + m_Shift);
   }
 
-  bool operator!=( const SmoothBinaryThresholdFunctor & other ) const
-  { 
-    bool value = ( ( this->m_LowerThreshold != other.m_LowerThreshold ) ||
-                   ( this->m_UpperThreshold != other.m_UpperThreshold ) ||
-                   ( this->m_ScalingFactor != other.m_ScalingFactor ) ||
-                   ( this->m_FactorLower != other.m_FactorLower ) ||
-                   ( this->m_FactorUpper != other.m_FactorUpper ) ||
-                   ( this->m_Shift != other.m_Shift ) );
-    return value;
-  }
+  bool operator ==(const Self &z)
+    {
+    return 
+      m_LowerThreshold == z.m_LowerThreshold &&
+      m_UpperThreshold == z.m_UpperThreshold &&
+      m_ScalingFactor == z.m_ScalingFactor &&
+      m_FactorLower == z.m_FactorLower &&
+      m_FactorUpper == z.m_FactorUpper &&
+      m_Shift == z.m_Shift;
+    }
+
+  bool operator !=(const Self &x)
+    { return !((*this) == x); }
 
 private:
   // The lower threshold in intensity units

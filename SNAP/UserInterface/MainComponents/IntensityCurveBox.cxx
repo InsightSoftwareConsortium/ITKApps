@@ -310,7 +310,8 @@ IntensityCurveBox
 
   // Determine the bin size: no bin should be less than a single pixel wide
   if(nFrequencies * iMinPixelsPerBin > m_HistogramBinSize * this->w()) 
-    m_HistogramBinSize = (unsigned int) ceil(nFrequencies * iMinPixelsPerBin * 1.0 / this->w());
+    m_HistogramBinSize = 
+    (unsigned int) ceil(nFrequencies * iMinPixelsPerBin * 1.0 / this->w());
   unsigned int nBins = (unsigned int) ceil(nFrequencies * 1.0 / m_HistogramBinSize);
 
   // Allocate an array of bins
@@ -335,14 +336,15 @@ IntensityCurveBox
   delete frequency;
 }
 
-  IntensityCurveBox::DefaultHandler
+IntensityCurveBox::DefaultHandler
 ::DefaultHandler(IntensityCurveBox *parent) 
+: InteractionMode(parent)
 {
   this->m_Parent = parent;
 }
 
 int 
-  IntensityCurveBox::DefaultHandler
+IntensityCurveBox::DefaultHandler
 ::OnMousePress(const FLTKEvent &event)
 {
   // Check the control point affected by the event

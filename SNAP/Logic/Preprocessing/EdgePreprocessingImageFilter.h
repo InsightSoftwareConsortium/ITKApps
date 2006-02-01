@@ -34,6 +34,8 @@ template<class TInput, class TOutput>
 class EdgeRemappingFunctor
   {
 public:
+  typedef EdgeRemappingFunctor<TInput, TOutput> Self;
+
   void SetParameters(float intensityMin, float intensityMax,
                      float exponent, float kappa)
   {
@@ -50,14 +52,17 @@ public:
     return static_cast<TOutput> (y);
   }
 
-  bool operator!=( const EdgeRemappingFunctor & other ) const
-  { 
-    bool value = ( ( this->m_KappaFactor != other.m_KappaFactor ) ||
-                   ( this->m_IntensityBase != other.m_IntensityBase ) ||
-                   ( this->m_IntensityScale != other.m_IntensityScale ) ||
-                   ( this->m_Exponent != other.m_Exponent ) );
-    return value;
-  }
+  bool operator ==(const Self &z)
+    { 
+    return 
+      m_KappaFactor == z.m_KappaFactor &&
+      m_IntensityBase == z.m_IntensityBase &&
+      m_IntensityScale == z.m_IntensityScale &&
+      m_Exponent == z.m_Exponent;
+    }
+
+  bool operator !=(const Self &z)
+    { return !(*this == z); }
 
 private:
   

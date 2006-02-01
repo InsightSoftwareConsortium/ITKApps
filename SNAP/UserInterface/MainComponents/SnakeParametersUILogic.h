@@ -23,7 +23,7 @@
 // Forward references to application classes
 class GlobalState;
 class IRISApplication;
-class UserInterfaceLogic;
+class UserInterfaceBase;
 class SnakeParametersPreviewPipeline;
 class SimpleFileDialogLogic;
 class SystemInterface;
@@ -45,7 +45,7 @@ public:
   virtual ~SnakeParametersUILogic();
   
   /** Register with the parent object (required for examples to work) */
-  void Register(UserInterfaceLogic *parent);
+  void Register(UserInterfaceBase *parent);
 
   /** Initialize the internal snake parameters with external value */
   void SetParameters(const SnakeParameters &parms);
@@ -123,7 +123,7 @@ private:
   bool m_WarnOnSolverUpdate;
 
   /** Parent user interface, needed for invoking the help system */
-  UserInterfaceLogic *m_ParentUI;
+  UserInterfaceBase *m_ParentUI;
 
   /** A pointer to the system interface object */
   SystemInterface *m_SystemInterface;

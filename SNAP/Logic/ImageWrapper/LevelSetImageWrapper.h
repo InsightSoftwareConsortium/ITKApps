@@ -69,12 +69,17 @@ private:
     DisplayPixelType operator()(float in);
     DisplayPixelType m_InsidePixel;
     DisplayPixelType m_OutsidePixel;
-    bool operator!=(const MappingFunctor & other ) const
-    {
-      bool value = ( ( this->m_InsidePixel != other.m_InsidePixel ) ||
-                     ( this->m_OutsidePixel != other.m_OutsidePixel ) );
-      return value;
-    }
+    
+    // Dummy equality operators, since there is no data here
+    bool operator == (const MappingFunctor &z) const 
+      { 
+      return
+        m_InsidePixel == z.m_InsidePixel &&
+        m_OutsidePixel == z.m_OutsidePixel;
+      }
+      
+    bool operator != (const MappingFunctor &z) const 
+      { return !(*this == z); }
   };  
   
   // Type of the display intensity mapping filter used when the 

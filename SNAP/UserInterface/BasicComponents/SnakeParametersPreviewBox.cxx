@@ -201,6 +201,7 @@ SnakeParametersPreviewBox
 
 SnakeParametersPreviewBox::Interactor
 ::Interactor(SnakeParametersPreviewBox *owner)
+: InteractionMode(owner)
 {
   m_Owner = owner;
   m_ControlPicked = m_ControlsVisible = false;

@@ -21,7 +21,7 @@
 
 #include "AppearanceDialogUI.h"
 
-class UserInterfaceLogic;
+class UserInterfaceBase;
 class SNAPAppearanceSettings;
 class GlobalState;
 
@@ -31,7 +31,7 @@ public:
   AppearanceDialogUILogic();
   virtual ~AppearanceDialogUILogic();
 
-  void Register( UserInterfaceLogic *parent );
+  void Register( UserInterfaceBase *parent );
 
   /* Show the dialog */
   void ShowDialog();
@@ -61,7 +61,7 @@ public:
 
 private:
   // Referece to the parent
-  UserInterfaceLogic *m_Parent;
+  UserInterfaceBase *m_Parent;
 
   // Pointer to the appearance settings, from parent.
   SNAPAppearanceSettings *m_Appearance;

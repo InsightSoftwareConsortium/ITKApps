@@ -32,7 +32,7 @@ class IRISSliceWindow : public GenericSliceWindow
 {
 public:
   
-  IRISSliceWindow(int x,int y,int w,int h,const char *l=0);
+  IRISSliceWindow(int id, UserInterfaceBase *parentUI, FLTKCanvas *canvas);
   virtual ~IRISSliceWindow();
 
   /** Enter the polygon editing mode of operation */
@@ -40,9 +40,6 @@ public:
 
   /** Enter the region of interest mode of operation */
   void EnterRegionMode();
-
-  /** The parent's register method is overridden */
-  void Register(int id,UserInterfaceLogic *parentUI);
 
   /**
    * The initialize method extends the parent's version, sets up some 

@@ -20,7 +20,7 @@
 #include "RestoreSettingsDialog.h"
 
 class SystemInterface;
-class UserInterfaceLogic;
+class UserInterfaceBase;
 
 /**
  * \class RestoreSettingsDialogLogic
@@ -40,7 +40,7 @@ public:
    * The first parameter is the pointer to the \see SystemInterface object.
    * The second parameter is the 16 digit code used to refer to the image
    * in the system interface registry */
-  void DisplayDialog(UserInterfaceLogic *parent, Registry *associatedSettings);    
+  void DisplayDialog(UserInterfaceBase *parent, Registry *associatedSettings);    
 
   /** Did the user want to restore settings */
   irisGetMacro(RestoreSettings,bool);

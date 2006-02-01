@@ -33,6 +33,9 @@
 #include "SNAPRegistryIO.h"
 #include "SmoothBinaryThresholdImageFilter.h"
 #include "SystemInterface.h"
+#include "IRISSliceWindow.h"
+#include "SNAPSliceWindow.h"
+#include "Window3D.h"
 
 // Additional UI component inludes
 #include "AppearanceDialogUILogic.h"
@@ -178,27 +181,20 @@ void UserInterfaceLogic
   m_Activation->AddCheckBox(m_ChkContinuousView3DUpdate, 
     UIF_SNAP_SNAKE_INITIALIZED, false, false);
 
-  // Activate widgets indexed by dimension
+  // Activate slice-related widgets indexed by dimension
   for(i = 0; i < 3; i++)
     {
-    m_Activation->AddWidget(m_InSNAPSliceSlider[i], UIF_SNAP_ACTIVE);
-    m_Activation->AddWidget(m_OutSNAPSliceIndex[i], UIF_SNAP_ACTIVE);
-    m_Activation->AddWidget(m_InIRISSliceSlider[i], UIF_IRIS_WITH_GRAY_LOADED);
-    m_Activation->AddWidget(m_OutIRISSliceIndex[i], UIF_IRIS_WITH_GRAY_LOADED);
-    m_Activation->AddWidget(m_BtnIRISPanelResetView[i], UIF_IRIS_WITH_GRAY_LOADED);
-    m_Activation->AddWidget(m_BtnIRISPanelZoom[i], UIF_IRIS_WITH_GRAY_LOADED);
+    m_Activation->AddWidget(m_InSliceSlider[i], UIF_GRAY_LOADED);
+    m_Activation->AddWidget(m_OutSliceIndex[i], UIF_GRAY_LOADED);
     }
 
   // Activate the widgets that have four copies
   for(i = 0; i < 4; i++)
     {
-    m_Activation->AddWidget(m_BtnIRISPanelSaveAsPNG[i], UIF_IRIS_WITH_GRAY_LOADED);
-    m_Activation->AddWidget(m_BtnSNAPPanelSaveAsPNG[i], UIF_SNAP_ACTIVE);
+    m_Activation->AddWidget(m_BtnSaveAsPNG[i], UIF_GRAY_LOADED);
+    m_Activation->AddWidget(m_BtnResetView[i], UIF_GRAY_LOADED);
+    m_Activation->AddWidget(m_BtnPanelZoom[i], UIF_GRAY_LOADED);
     }
-
-  // The 3D controls that are indexed by i
-  m_Activation->AddWidget(m_BtnIRISPanelResetView[3], UIF_IRIS_WITH_GRAY_LOADED);
-  m_Activation->AddWidget(m_BtnIRISPanelZoom[3], UIF_IRIS_WITH_GRAY_LOADED);
 
   // Link menu items to flags
   m_Activation->AddMenuItem(m_MenuLoadGrey, UIF_IRIS_ACTIVE);
@@ -293,12 +289,25 @@ UserInterfaceLogic
   m_DlgAppearance->MakeWindow();
   m_DlgAppearance->Register(this);
 
+  // Create the window managers for SNAP and IRIS. Start in IRIS mode
+  for(int i=0; i<3; i++)
+    {    
+    m_IRISWindowManager2D[i] = new IRISSliceWindow(i, this, m_SliceWindow[i]);
+    m_SNAPWindowManager2D[i] = new SNAPSliceWindow(i, this, m_SliceWindow[i]);
+    m_SliceWindow[i]->PushInteractionMode(m_IRISWindowManager2D[i]);
+    }
+
+  // Create the 3D Window managers for SNAP and IRIS
+  m_IRISWindowManager3D = new Window3D(this, m_RenderWindow);
+  m_SNAPWindowManager3D = new Window3D(this, m_RenderWindow);
+  m_RenderWindow->PushInteractionMode(m_IRISWindowManager3D);
+
   // Initialize the slice window coordinator object
   m_SliceCoordinator = new SliceWindowCoordinator();
   
   // Group the three windows inside the window coordinator
   m_SliceCoordinator->RegisterWindows(
-    reinterpret_cast<GenericSliceWindow **>(m_IRISWindow2D));    
+    reinterpret_cast<GenericSliceWindow **>(m_IRISWindowManager2D));    
 
   // Create a callback command for the snake loop
   m_PostSnakeCommand = SimpleCommandType::New();
@@ -362,6 +371,15 @@ UserInterfaceLogic
   delete m_DlgAppearance;
   delete m_LabelEditorUI;
 
+  // Delete the window managers
+  for(int i = 0; i < 3; i++)
+    {
+    delete m_IRISWindowManager2D[i];
+    delete m_SNAPWindowManager2D[i];
+    }
+  delete m_IRISWindowManager3D;
+  delete m_SNAPWindowManager3D;
+
   // Delete the window coordinator
   delete m_SliceCoordinator;
 
@@ -391,7 +409,6 @@ UserInterfaceLogic
   
   // Update the UI
   this->RedrawWindows();
-  m_OutMessage->value("Region of interest set to volume extents");
 }
 
 //--------------------------------------------
@@ -532,7 +549,7 @@ UserInterfaceLogic
   m_InStepSize->value(0);
 
   // reset Mesh in IRIS window
-  m_IRISWindow3D->ClearScreen();
+  m_IRISWindowManager3D->ClearScreen();
 
   // Hide the label editor since it's open
   m_LabelEditorUI->OnCloseAction();
@@ -555,8 +572,6 @@ UserInterfaceLogic
     m_GlobalState->SetCrosshairsPosition(newCursor);
     this->OnCrosshairPositionUpdate();
     }
-
-  m_OutMessage->value("Initalize snake");
 }
 
 //--------------------------------------------
@@ -762,100 +777,108 @@ UserInterfaceLogic
 
 void 
 UserInterfaceLogic
+::UpdateBubbleUI()
+{
+  // Fill the array of values
+  m_BrsActiveBubbles->clear();
+  GlobalState::BubbleArray ba = m_GlobalState->GetBubbleArray();
+  for(unsigned int i = 0; i < ba.size(); i++)
+    {
+    std::ostringstream oss;
+    oss << "C=" << ba[i].center << "; ";
+    oss << "R=" << std::setprecision(3) << ba[i].radius;
+    m_BrsActiveBubbles->add(oss.str().c_str());
+    }
+  
+  // Get the active bubble
+  int ibub = m_GlobalState->GetActiveBubble();
+  
+  // The browser uses 1-based indexing, so we add 1
+  m_BrsActiveBubbles->value(ibub + 1);
+
+  // Set the radius slider
+  if(ibub >= 0)
+    m_InBubbleRadius->value(ba[ibub].radius);
+
+  // Redraw the browser
+  m_BrsActiveBubbles->redraw();  
+
+  // Redraw the windows as well
+  RedrawWindows();
+}
+
+void 
+UserInterfaceLogic
 ::OnAddBubbleAction()
 {
-  m_OutMessage->value("");
-  Bubble* bubble;
-  bubble=new Bubble();
-  bubble->center=to_int(m_GlobalState->GetCrosshairsPosition());
-  bubble->radius=(int) m_InBubbleRadius->value();
-  char msg[1024];
-  sprintf(msg,"x,y,z=%d,%d,%d; R=%d ", bubble->center[0]+1,
-    bubble->center[1]+1,bubble->center[2]+1,bubble->radius);
-  m_BrsActiveBubbles->add(msg, bubble);
-  m_BrsActiveBubbles->value(m_BrsActiveBubbles->size()); 
-  OnActiveBubblesChange();
-  m_BrsActiveBubbles->redraw();
-  RedrawWindows();
-  cerr<<msg<<endl;
-}
+  // Create a new bubble
+  Bubble bub;
+  bub.center = to_int(m_GlobalState->GetCrosshairsPosition());
+  bub.radius = m_InBubbleRadius->value();
 
-std::vector<Bubble>
-UserInterfaceLogic
-::GetBubbleArray()
-{
-  unsigned int n = m_BrsActiveBubbles->size();
-  std::vector<Bubble> bubbles;
-  for (unsigned int i=0;i<n;i++) 
-    bubbles.push_back(*static_cast<Bubble*>(m_BrsActiveBubbles->data(i+1)));
-  return bubbles;
-}
+  // Add the bubble to the global state
+  GlobalState::BubbleArray ba = m_GlobalState->GetBubbleArray();
+  ba.push_back(bub);
+  m_GlobalState->SetBubbleArray(ba);
 
-int 
-UserInterfaceLogic
-::GetActiveBubble()
-{
-  return m_HighlightedBubble - 1;
+  // Set the bubble's position
+  m_GlobalState->SetActiveBubble(ba.size() - 1);
+
+  // Update the bubble list in the GUI
+  UpdateBubbleUI();
 }
 
 void 
 UserInterfaceLogic
 ::OnRemoveBubbleAction()
 {
-  m_OutMessage->value("");
-  if (m_HighlightedBubble!=0) 
+  int ibub = m_GlobalState->GetActiveBubble();
+  if(ibub >= 0) 
     {
-    m_BrsActiveBubbles->remove(m_HighlightedBubble);
-    m_HighlightedBubble=0;
-    m_OutMessage->value("Bubble removed");
-    RedrawWindows();
+    // Remove the bubble from the global state
+    GlobalState::BubbleArray ba = m_GlobalState->GetBubbleArray();
+    ba.erase(ba.begin() + ibub);
+    m_GlobalState->SetBubbleArray(ba);
+
+    // Update the active bubble
+    if(ibub == ba.size())
+      m_GlobalState->SetActiveBubble(ibub - 1);
+
+    // Update the bubble list in the GUI
+    UpdateBubbleUI();
     } 
   else
-    m_OutMessage->value("Highlight a bubble in browser window");
-
+    {
+    fl_alert("To remove a bubble, first select a bubble in the list.");
+    }
 }
 
 void 
 UserInterfaceLogic
 ::OnActiveBubblesChange()
 {
-  m_OutMessage->value("");
-  m_HighlightedBubble=m_BrsActiveBubbles->value();
+  // Set the active bubble in the global state
+  m_GlobalState->SetActiveBubble(m_BrsActiveBubbles->value() - 1);
 
-  //  if (!m_HighlightedBubble) cerr << "problem here" << endl;
-
-  if (m_HighlightedBubble) 
-    {
-    m_InBubbleRadius->value(((Bubble*) m_BrsActiveBubbles->
-        data(m_HighlightedBubble))->radius);
-    }
-
-  RedrawWindows();
+  // Update the user interface
+  UpdateBubbleUI();
 }
 
 void 
 UserInterfaceLogic
 ::OnBubbleRadiusChange()
 {
-  m_OutMessage->value("");
-  if (m_HighlightedBubble!=0) 
+  int ibub = m_GlobalState->GetActiveBubble();
+  if(ibub >= 0)
     {
-    ((Bubble*) m_BrsActiveBubbles->
-     data(m_HighlightedBubble))->radius=(int) m_InBubbleRadius->value();
-    char msg[1024];
-    sprintf(msg,"x,y,z=%d,%d,%d; R=%d ",
-      ((Bubble*) m_BrsActiveBubbles->data(m_HighlightedBubble))->
-      center[0]+1, ((Bubble*) m_BrsActiveBubbles->
-        data(m_HighlightedBubble))->center[1]+1,
-      ((Bubble*) m_BrsActiveBubbles->data(m_HighlightedBubble))->
-      center[2]+1,((Bubble*) m_BrsActiveBubbles->
-        data(m_HighlightedBubble))->radius);
-    m_BrsActiveBubbles->text(m_HighlightedBubble, msg);
-    RedrawWindows();
-    }
-  else
-    m_OutMessage->value("Highlight a bubble in browser window");
+    // Update the bubble in the global state
+    GlobalState::BubbleArray ba = m_GlobalState->GetBubbleArray();
+    ba[ibub].radius = m_InBubbleRadius->value();
+    m_GlobalState->SetBubbleArray(ba);
 
+    // Update the bubble list in the GUI
+    UpdateBubbleUI();
+    }
 }
 
 //--------------------------------------------
@@ -965,7 +988,7 @@ UserInterfaceLogic
 ::OnAcceptInitializationAction()
 {
   // Get bubbles, turn them into segmentation
-  vector<Bubble> bubbles = GetBubbleArray();
+  vector<Bubble> bubbles = m_GlobalState->GetBubbleArray();
 
   // Shorthand
   SNAPImageData *snapData = m_Driver->GetSNAPImageData();
@@ -997,13 +1020,11 @@ UserInterfaceLogic
   // Set the UI for the segmentation state
   m_Activation->UpdateFlag(UIF_SNAP_SNAKE_EDITABLE, true);
   
-  m_SNAPWindow3D->ClearScreen(); // reset Mesh object in Window3D_s
-  m_SNAPWindow3D->ResetView();   // reset cursor
+  m_SNAPWindowManager3D->ClearScreen(); // reset Mesh object in Window3D_s
+  m_SNAPWindowManager3D->ResetView();   // reset cursor
 
   // Flip to the next page in the wizard
   SetActiveSegmentationPipelinePage(2);
-
-  m_OutMessage->value("Snake initialized successfully");
 
   m_GlobalState->SetSnakeActive(true);
 
@@ -1055,11 +1076,9 @@ UserInterfaceLogic
   m_BtnRestartInitialization->hide();
   m_BtnAcceptInitialization->show();
 
-  m_SNAPWindow3D->ClearScreen(); // reset Mesh object in Window3D_s
-  m_SNAPWindow3D->ResetView();   // reset cursor
+  m_SNAPWindowManager3D->ClearScreen(); // reset Mesh object in Window3D_s
+  m_SNAPWindowManager3D->ResetView();   // reset cursor
   RedrawWindows();
-
-  m_OutMessage->value("Snake initialization restarted");
 
   // Flip to the second page
   SetActiveSegmentationPipelinePage(1);
@@ -1069,14 +1088,14 @@ void
 UserInterfaceLogic
 ::OnRestartPreprocessingAction()
 {
-  // Clear the bubble list
-  m_HighlightedBubble = 0;
+  // Reset the active bubble
+  m_GlobalState->SetActiveBubble(0);
 
   // Flip to the first page
   SetActiveSegmentationPipelinePage(0);
 
-  // Repaint the screen
-  RedrawWindows();
+  // Repaint the screen and the bubbles
+  UpdateBubbleUI();
 }
 
 void 
@@ -1177,7 +1196,7 @@ UserInterfaceLogic
 
   // Update the mesh if necessary
   if(m_ChkContinuousView3DUpdate->value())
-    m_SNAPWindow3D->UpdateMesh(m_ProgressCommand);
+    m_SNAPWindowManager3D->UpdateMesh(m_ProgressCommand);
   else
     m_Activation->UpdateFlag(UIF_SNAP_MESH_DIRTY, true);
 
@@ -1279,8 +1298,8 @@ UserInterfaceLogic
   SyncIRISToSnake();
 
   // Reset the mesh display
-  m_IRISWindow3D->ClearScreen();
-  m_IRISWindow3D->ResetView();
+  m_IRISWindowManager3D->ClearScreen();
+  m_IRISWindowManager3D->ResetView();
 
   // We are going to preserve the cursor position if it was in the ROI
   Vector3ui newCursor, oldCursor = m_GlobalState->GetCrosshairsPosition();
@@ -1297,8 +1316,8 @@ UserInterfaceLogic
   this->OnCrosshairPositionUpdate();
 
   // Clear the list of bubbles
-  m_BrsActiveBubbles->clear();
-  m_HighlightedBubble = 0;  
+  m_GlobalState->SetBubbleArray(GlobalState::BubbleArray());
+  m_GlobalState->SetActiveBubble(0);
 
   // Activate/deactivate menu items
   m_Activation->UpdateFlag(UIF_IRIS_ACTIVE, true);
@@ -1307,7 +1326,7 @@ UserInterfaceLogic
   m_WinColorMap->hide();
 
   // Restore the SNAP view to four side-by-side windows
-  UpdateSNAPWindowFocus();
+  OnWindowFocus(-1);
   
   // Show IRIS window, Hide the snake window
   ShowIRIS();
@@ -1338,9 +1357,6 @@ UserInterfaceLogic
 
   // Close up SNAP
   this->CloseSegmentationCommon();
-
-  // Message to the user
-  m_OutMessage->value("Accepted snake segmentation");
 }
 
 void 
@@ -1387,9 +1403,6 @@ UserInterfaceLogic
 
   // Clean up SNAP image data
   CloseSegmentationCommon();
-
-  // Message to the user
-  m_OutMessage->value("Snake segmentation cancelled");
 }
 
 void 
@@ -1442,36 +1455,47 @@ UserInterfaceLogic
     openWindows[i]->hide();
 }
 
-void 
+void
 UserInterfaceLogic
-::ShowIRIS()
+::Launch()
 {
   // Make sure the window is visible
   m_WinMain->show();
 
+  // Show all of the GL boxes
+  for(unsigned int i = 0; i < 3; i++)
+    m_SliceWindow[i]->show();
+  m_RenderWindow->show();
+
+  // Show other GL-based windows
+  m_GrpCurrentColor->show();
+  m_OutDrawOverColor->show();
+
+  // Show the IRIS interface
+}
+
+void 
+UserInterfaceLogic
+::ShowIRIS()
+{
   // Show the right wizard page
-  m_WizWindows->value(m_GrpIRISWindows);
   m_WizControlPane->value(
     m_Driver->GetCurrentImageData()->IsGreyLoaded() ? 
     m_GrpToolbarPage : m_GrpWelcomePage);
 
-  // Show and hide the GL windows
-  for(unsigned int i=0;i<3;i++)
-    {
-    m_IRISWindow2D[i]->show();
-    m_SNAPWindow2D[i]->hide();
-    }
+  // Show the right toolbar page under the render window
+  m_WizRenderingToolbar->value(m_GrpRenderingIRISPage);
+
+  // Assign the right window managers to the slice windows
+  for(unsigned int i = 0; i < 3; i++)
+    m_SliceWindow[i]->SetSingleInteractionMode(m_IRISWindowManager2D[i]);
+  m_RenderWindow->SetSingleInteractionMode(m_IRISWindowManager3D);
 
   // Clear the 3D window and reset the view
-  m_IRISWindow3D->ClearScreen();
-  m_IRISWindow3D->ResetView();
+  m_IRISWindowManager3D->ClearScreen();
+  m_IRISWindowManager3D->ResetView();
 
-  // Swap the 3D window visibility
-  m_IRISWindow3D->show();
-  m_SNAPWindow3D->hide();
-
-  m_GrpCurrentColor->show();
-  m_OutDrawOverColor->show();
+  // Force a global redraw
   RedrawWindows();
 }
 
@@ -1480,26 +1504,22 @@ UserInterfaceLogic
 ::ShowSNAP()
 {
   // Restore the IRIS view to four side-by-side windows
-  UpdateIRISWindowFocus();
+  OnWindowFocus(-1);
 
   // Swap the left-side panels
-  m_WizWindows->value(m_GrpSNAPWindows);
   m_WizControlPane->value(m_GrpSNAPPage);
 
-  // Swap the visible and invisible windows
-  for(unsigned int i=0;i<3;i++)
-    {
-    m_SNAPWindow2D[i]->show();
-    m_IRISWindow2D[i]->hide();
-    }
+  // Show the right toolbar page under the render window
+  m_WizRenderingToolbar->value(m_GrpRenderingSNAPPage);
+
+  // Assign the right window managers to the slice windows
+  for(unsigned int i = 0; i < 3; i++)
+    m_SliceWindow[i]->SetSingleInteractionMode(m_SNAPWindowManager2D[i]);
+  m_RenderWindow->SetSingleInteractionMode(m_SNAPWindowManager3D);
 
   // Clear the snap window and reset the view
-  m_SNAPWindow3D->ClearScreen();
-  m_SNAPWindow3D->ResetView();
-
-  // Swap the visible windows
-  m_SNAPWindow3D->show();
-  m_IRISWindow3D->hide();
+  m_SNAPWindowManager3D->ClearScreen();
+  m_SNAPWindowManager3D->ResetView();
 
   // Go to the first page in the SNAP wizard
   SetActiveSegmentationPipelinePage( 0 );
@@ -1522,14 +1542,6 @@ UserInterfaceLogic
   m_InWelcomePageVersion->label(SNAPUISoftVersion);
   m_InAboutPageVersion->label(SNAPUISoftVersion);
 
-  int i;
-  // Register the GUI with its children
-  for (i=0; i<3; i++) m_IRISWindow2D[i]->Register(i,this);
-  m_IRISWindow3D->Register(3,this);
-
-  for (i = 0; i < 3; i++) m_SNAPWindow2D[i]->Register(i,this);
-  m_SNAPWindow3D->Register(3,this);
-
   // Set local variables
   m_FileLoaded = 0;
   m_SegmentationLoaded = 0;
@@ -1546,20 +1558,19 @@ UserInterfaceLogic
 
   // Window title
   this->UpdateMainLabel();
-  m_OutMessage->value("Welcome to SnAP; select File->Load->Grey Data to begin");
 
   m_GlobalState->SetShowSpeed(false);
 
   m_InSNAPLabelOpacity->Fl_Valuator::value(128);
-
-  // Initialize the highlighted bubble
-  m_HighlightedBubble = 0;
 
   //this should probably go into the .h, a #define or something
   m_InStepSize->add("1");
   m_InStepSize->add("2");
   m_InStepSize->add("5");
   m_InStepSize->add("10");
+
+  // Initialize the toolbar at the bottom of 3D window
+  m_ToolbarRenderWindow->spacing(5);
 
   // Apply the special appearance settings that determine startup behavior
   if(m_AppearanceSettings->GetFlagLinkedZoomByDefault())
@@ -1633,21 +1644,16 @@ void
 UserInterfaceLogic
 ::RedrawWindows() 
 {
-  if(m_WizWindows->value() == m_GrpSNAPWindows) 
-    {
-    m_SNAPWindow2D[0]->redraw();
-    m_SNAPWindow2D[1]->redraw();
-    m_SNAPWindow2D[2]->redraw();
-    m_SNAPWindow3D->redraw();
+  // Redraw the OpenGL windows
+  m_SliceWindow[0]->redraw();
+  m_SliceWindow[1]->redraw();
+  m_SliceWindow[2]->redraw();
+  m_RenderWindow->redraw();
+
+  // TODO: Do we really need this?
+  // Redraw the current color swath (?)
+  if(m_GrpSNAPCurrentColor->visible())
     m_GrpSNAPCurrentColor->redraw();
-    }
-  else
-    {
-    m_IRISWindow2D[0]->redraw();
-    m_IRISWindow2D[1]->redraw();
-    m_IRISWindow2D[2]->redraw();
-    m_IRISWindow3D->redraw();
-    }
 }
 
 void 
@@ -1662,17 +1668,7 @@ UserInterfaceLogic
     {
     // What image axis does dim correspond to?
     unsigned int imageAxis = GetImageAxisForDisplayWindow(dim);
-
-    if (!m_GlobalState->GetSNAPActive())
-      {
-      // IRIS Scrollbars (notice the negation of the value!)
-      m_InIRISSliceSlider[dim]->Fl_Valuator::value( -cursor[imageAxis] );      
-      }
-    else
-      {
-      // SNAP Scrollbars (notice the negation of the value!)
-      m_InSNAPSliceSlider[dim]->Fl_Valuator::value( -cursor[imageAxis] );      
-      }
+    m_InSliceSlider[dim]->Fl_Valuator::value( -cursor[imageAxis] );
 
     // Update the little display box at the bottom of the scroll bar
     UpdatePositionDisplay(dim);
@@ -2021,10 +2017,7 @@ UserInterfaceLogic
 ::OnSliceSliderChange(int id) 
 {
   // Get the new value depending on the current state
-  unsigned int value = (unsigned int)
-    (m_GlobalState->GetSNAPActive() ? 
-     - m_InSNAPSliceSlider[id]->value() :
-     - m_InIRISSliceSlider[id]->value());
+  unsigned int value = (unsigned int) ( - m_InSliceSlider[id]->value());
   
   // Get the cursor position
   Vector3ui cursor = m_GlobalState->GetCrosshairsPosition();
@@ -2055,29 +2048,17 @@ UserInterfaceLogic
 {
   // Dump out the slice index of the given window
   IRISOStringStream sIndex;
-
-  // Code depends on SNAP/IRIS mode
-  if(m_GlobalState->GetSNAPActive())
-    {
-    sIndex << std::setw(4) << (1 - m_InSNAPSliceSlider[id]->value());
-    sIndex << " of ";
-    sIndex << (1 - m_InSNAPSliceSlider[id]->minimum());
-    m_OutSNAPSliceIndex[id]->value(sIndex.str().c_str());
-    }
-  else
-    {
-    sIndex << std::setw(4) << (1 - m_InIRISSliceSlider[id]->value());
-    sIndex << " of ";
-    sIndex << (1 - m_InIRISSliceSlider[id]->minimum());
-    m_OutIRISSliceIndex[id]->value(sIndex.str().c_str());
-    }    
+  sIndex << std::setw(4) << (1 - m_InSliceSlider[id]->value());
+  sIndex << " of ";
+  sIndex << (1 - m_InSliceSlider[id]->minimum());
+  m_OutSliceIndex[id]->value(sIndex.str().c_str());
 }
 
 void 
 UserInterfaceLogic
 ::OnAcceptPolygonAction(unsigned int window)
 {
-  if(m_IRISWindow2D[window]->AcceptPolygon())
+  if(m_IRISWindowManager2D[window]->AcceptPolygon())
     {
     // The polygon update was successful
     OnPolygonStateUpdate(window);
@@ -2098,7 +2079,7 @@ void
 UserInterfaceLogic
 ::OnInsertIntoPolygonSelectedAction(unsigned int window)
 {
-  m_IRISWindow2D[window]->InsertPolygonPoints();  
+  m_IRISWindowManager2D[window]->InsertPolygonPoints();  
   OnPolygonStateUpdate(window);
 }
 
@@ -2106,7 +2087,7 @@ void
 UserInterfaceLogic
 ::OnDeletePolygonSelectedAction(unsigned int window)
 {
-  m_IRISWindow2D[window]->DeleteSelectedPolygonPoints();
+  m_IRISWindowManager2D[window]->DeleteSelectedPolygonPoints();
   OnPolygonStateUpdate(window);
 }
 
@@ -2114,7 +2095,7 @@ void
 UserInterfaceLogic
 ::OnPastePolygonAction(unsigned int window)
 {
-  m_IRISWindow2D[window]->PastePolygon();
+  m_IRISWindowManager2D[window]->PastePolygon();
   OnPolygonStateUpdate(window);
 }
 
@@ -2123,7 +2104,7 @@ UserInterfaceLogic
 ::OnPolygonStateUpdate(unsigned int id)
 {
   // Get the drawing object
-  PolygonDrawing *draw = m_IRISWindow2D[id]->GetPolygonDrawing();
+  PolygonDrawing *draw = m_IRISWindowManager2D[id]->GetPolygonDrawing();
 
   if (draw->GetState() == PolygonDrawing::INACTIVE_STATE) 
     {
@@ -2172,32 +2153,6 @@ UserInterfaceLogic
 ::OnMenuShowDisplayOptions()
 {
   m_DlgAppearance->ShowDialog();
-}
-
-void UserInterfaceLogic
-::UpdateIRISWindowFocus(int iWindow)
-{
-  // Get the four panels
-  Fl_Group *panels[] = 
-    { m_GrpIRISSlicePanel[0], m_GrpIRISSlicePanel[1], m_GrpIRISSlicePanel[2], m_GrpIRISView3D };
-  Fl_Gl_Window *boxes[] = 
-    { m_IRISWindow2D[0], m_IRISWindow2D[1], m_IRISWindow2D[2], m_IRISWindow3D };
-
-  // Update the window focus
-  UpdateWindowFocus(m_GrpIRISWindows, panels, boxes, iWindow);
-}
-
-void UserInterfaceLogic
-::UpdateSNAPWindowFocus(int iWindow)
-{
-  // Get the four panels
-  Fl_Group *panels[] = 
-    { m_GrpSNAPSlicePanel[0], m_GrpSNAPSlicePanel[1], m_GrpSNAPSlicePanel[2], m_GrpSNAPView3D };
-  Fl_Gl_Window *boxes[] = 
-    { m_SNAPWindow2D[0], m_SNAPWindow2D[1], m_SNAPWindow2D[2], m_SNAPWindow3D };
-
-  // Update the window focus
-  UpdateWindowFocus(m_GrpSNAPWindows, panels, boxes, iWindow);
 }
 
 void
@@ -2252,18 +2207,18 @@ UserInterfaceLogic
 
 void
 UserInterfaceLogic
-::OnIRISWindowFocus(unsigned int i)
+::OnWindowFocus(unsigned int iWindow)
 {
-  UpdateIRISWindowFocus((int) i);
+  // Get the four panels
+  Fl_Group *panels[] = 
+    { m_GrpSlicePanel[0], m_GrpSlicePanel[1], m_GrpSlicePanel[2], m_GrpView3D };
+  Fl_Gl_Window *boxes[] = 
+    { m_SliceWindow[0], m_SliceWindow[1], m_SliceWindow[2], m_RenderWindow };
+
+  // Update the window focus
+  UpdateWindowFocus(m_GrpRightPane, panels, boxes, iWindow);
 }
 
-
-void
-UserInterfaceLogic
-::OnSNAPWindowFocus(unsigned int i)
-{
-  UpdateSNAPWindowFocus((int) i);
-}
 
 void
 UserInterfaceLogic
@@ -2282,42 +2237,26 @@ UserInterfaceLogic
   this->OnCrosshairPositionUpdate();
 
   // Update the source for slice windows as well as scroll bars
-  if(m_GlobalState->GetSNAPActive())
+  for (unsigned int i=0; i<3; i++) 
     {
-    for (unsigned int i=0; i<3; i++) 
-      {
-      // Connect slices to windows
-      m_SNAPWindow2D[i]->InitializeSlice(m_Driver->GetCurrentImageData());
-      
-      // Get the image axis that corresponds to the display window i
-      unsigned int imageAxis = GetImageAxisForDisplayWindow(i);
+    if(m_GlobalState->GetSNAPActive())
+      m_SNAPWindowManager2D[i]->InitializeSlice(m_Driver->GetCurrentImageData());
+    else
+      m_IRISWindowManager2D[i]->InitializeSlice(m_Driver->GetCurrentImageData());
 
-      // Notice the sliders have a negative range!  That's so that the 1 position is at the 
-      // bottom.  We need to always negate the slider values
-      m_InSNAPSliceSlider[i]->range( 1.0 - size[imageAxis], 0.0 );
-      m_InSNAPSliceSlider[i]->slider_size( 1.0/ size[imageAxis] );
-      m_InSNAPSliceSlider[i]->linesize(1);
-      }
+    // Get the image axis that corresponds to the display window i
+    unsigned int imageAxis = GetImageAxisForDisplayWindow(i);
+
+    // Notice the sliders have a negative range!  That's so that the 1 position 
+    // is at the bottom.  We need to always negate the slider values
+    m_InSliceSlider[i]->range( 1.0 - size[imageAxis], 0.0 );
+    m_InSliceSlider[i]->slider_size( 1.0/ size[imageAxis] );
+    m_InSliceSlider[i]->linesize(1);
     }
-  else
-    {
-    for (unsigned int i=0; i<3; i++) 
-      {
-      m_IRISWindow2D[i]->InitializeSlice(m_Driver->GetCurrentImageData());
       
-      // Get the image axis that corresponds to the display window i
-      unsigned int imageAxis = GetImageAxisForDisplayWindow(i);
-
-      // As with the other sliders, the range is negative
-      m_InIRISSliceSlider[i]->range( 1.0 - size[imageAxis], 0.0 );
-      m_InIRISSliceSlider[i]->slider_size( 1.0/size[imageAxis] );
-      m_InIRISSliceSlider[i]->linesize(1);
-      }      
-    }
-
   // Group the three windows inside the window coordinator
   m_SliceCoordinator->RegisterWindows(
-    reinterpret_cast<GenericSliceWindow **>(m_IRISWindow2D));    
+    reinterpret_cast<GenericSliceWindow **>(m_IRISWindowManager2D));    
 
   // Reset the view in 2D windows to fit
   m_SliceCoordinator->ResetViewToFitInAllWindows();
@@ -2325,17 +2264,20 @@ UserInterfaceLogic
   
 void 
 UserInterfaceLogic
-::OnIRISMeshResetViewAction()
+::OnMeshResetViewAction()
 {
-  m_IRISWindow3D->ResetView();
-  m_IRISWindow3D->redraw();
+  if(m_GlobalState->GetSNAPActive())
+    m_SNAPWindowManager3D->ResetView();
+  else
+    m_IRISWindowManager3D->ResetView();
+  m_RenderWindow->redraw();
 }
 
 void 
 UserInterfaceLogic
 ::OnIRISMeshAcceptAction()
 {
-  m_IRISWindow3D->Accept();
+  m_IRISWindowManager3D->Accept();
   RedrawWindows();
   
   m_Activation->UpdateFlag(UIF_IRIS_MESH_ACTION_PENDING, false);
@@ -2346,8 +2288,9 @@ void
 UserInterfaceLogic
 ::OnIRISMeshUpdateAction()
 {
-  m_IRISWindow3D->UpdateMesh(m_ProgressCommand);
-  m_IRISWindow3D->redraw();
+  // Update the mesh and redraw the window
+  m_IRISWindowManager3D->UpdateMesh(m_ProgressCommand);
+  m_RenderWindow->redraw();
 
   // This is a safeguard in case the progress events do not fire
   m_WinProgress->hide();
@@ -2369,20 +2312,12 @@ UserInterfaceLogic
   m_Activation->UpdateFlag(UIF_IRIS_MESH_DIRTY, true);
 }
 
-void 
-UserInterfaceLogic
-::OnSNAPMeshResetViewAction()
-{
-  m_SNAPWindow3D->ResetView();
-  m_SNAPWindow3D->redraw();
-}
-
 void
 UserInterfaceLogic
 ::OnSNAPMeshUpdateAction()
 {
-  m_SNAPWindow3D->UpdateMesh(m_ProgressCommand);
-  m_SNAPWindow3D->redraw();
+  m_SNAPWindowManager3D->UpdateMesh(m_ProgressCommand);
+  m_RenderWindow->redraw();
 
   // This is a safeguard in case the progress events do not fire
   m_WinProgress->hide();
@@ -2396,7 +2331,7 @@ UserInterfaceLogic
 {
   if (m_ChkContinuousView3DUpdate->value()) 
     {
-    m_SNAPWindow3D->UpdateMesh(m_ProgressCommand);
+    m_SNAPWindowManager3D->UpdateMesh(m_ProgressCommand);
     m_Activation->UpdateFlag(UIF_SNAP_MESH_CONTINUOUS_UPDATE, true);
     }
   else 
@@ -2421,24 +2356,24 @@ UserInterfaceLogic
     switch(mode) 
       {
     case CROSSHAIRS_MODE:
-      m_IRISWindow2D[i]->EnterCrosshairsMode();
-      m_SNAPWindow2D[i]->EnterCrosshairsMode();
+      m_IRISWindowManager2D[i]->EnterCrosshairsMode();
+      m_SNAPWindowManager2D[i]->EnterCrosshairsMode();
       m_TabsToolOptions->value(m_GrpToolOptionCrosshairs);
       break;
 
     case NAVIGATION_MODE:
-      m_IRISWindow2D[i]->EnterZoomPanMode();
-      m_SNAPWindow2D[i]->EnterZoomPanMode();
+      m_IRISWindowManager2D[i]->EnterZoomPanMode();
+      m_SNAPWindowManager2D[i]->EnterZoomPanMode();
       m_TabsToolOptions->value(m_GrpToolOptionZoomPan);
       break;
 
     case POLYGON_DRAWING_MODE:
-      m_IRISWindow2D[i]->EnterPolygonMode();
+      m_IRISWindowManager2D[i]->EnterPolygonMode();
       m_TabsToolOptions->value(m_GrpToolOptionPolygon);
       break;
 
     case ROI_MODE:
-      m_IRISWindow2D[i]->EnterRegionMode();
+      m_IRISWindowManager2D[i]->EnterRegionMode();
       m_TabsToolOptions->value(m_GrpToolOptionSnAP);
       break;
 
@@ -2465,21 +2400,21 @@ UserInterfaceLogic
   switch (mode)
     {
     case TRACKBALL_MODE:
-      m_IRISWindow3D->EnterTrackballMode();
-      m_SNAPWindow3D->EnterTrackballMode();
+      m_IRISWindowManager3D->EnterTrackballMode();
+      m_SNAPWindowManager3D->EnterTrackballMode();
       break;
 
     case CROSSHAIRS_3D_MODE:
-      m_IRISWindow3D->EnterCrosshairsMode();
-      m_SNAPWindow3D->EnterCrosshairsMode();
+      m_IRISWindowManager3D->EnterCrosshairsMode();
+      m_SNAPWindowManager3D->EnterCrosshairsMode();
       break;
 
     case SPRAYPAINT_MODE:
-      m_IRISWindow3D->EnterSpraypaintMode();
+      m_IRISWindowManager3D->EnterSpraypaintMode();
       break;
 
     case SCALPEL_MODE:
-      m_IRISWindow3D->EnterScalpelMode();
+      m_IRISWindowManager3D->EnterScalpelMode();
       break;
 
     default:
@@ -2487,14 +2422,7 @@ UserInterfaceLogic
     }
 
   // Redraw the 3D windows
-  if(m_WizWindows->value() == m_GrpSNAPWindows) 
-    {
-    m_SNAPWindow3D->redraw();
-    }
-  else
-    {
-    m_IRISWindow3D->redraw();
-    }
+  m_RenderWindow->redraw();
 }
 
 
@@ -2554,7 +2482,7 @@ UserInterfaceLogic
 {
   // Blank the screen - useful on a load of new grey data when there is 
   // already a segmentation file present
-  m_IRISWindow3D->ClearScreen(); 
+  m_IRISWindowManager3D->ClearScreen(); 
 
   // Flip over to the toolbar page
   m_WizControlPane->value(m_GrpToolbarPage);
@@ -2656,7 +2584,7 @@ UserInterfaceLogic
     }
     
   // Redraw the crosshairs in the 3D window  
-  m_IRISWindow3D->ResetView(); 
+  m_IRISWindowManager3D->ResetView(); 
 
   // Redraw the intensity mapping window and controls
   m_IntensityCurveUI->SetCurve(m_Driver->GetIntensityCurve());    
@@ -2685,7 +2613,7 @@ UserInterfaceLogic
   // for (unsigned int i=0; i<3; i++) 
   //   m_IRISWindow2D[i]->InitializeSlice(m_Driver->GetCurrentImageData());
 
-  m_IRISWindow3D->ResetView();
+  m_IRISWindowManager3D->ResetView();
   m_Activation->UpdateFlag(UIF_IRIS_MESH_DIRTY, true);
   
   UpdateMainLabel();
@@ -3039,9 +2967,6 @@ void UserInterfaceLogic
     // Update the history for the wizard
     m_SystemInterface->UpdateHistory(
       "GreyImage",m_WizGreyIO->GetSaveFileName());
-
-    // Some silly feedback
-    m_OutMessage->value("Saving segmentation file successful");    
     }
 }
 
@@ -3067,9 +2992,6 @@ void UserInterfaceLogic
     // Store the new filename
     m_GlobalState->SetSegmentationFileName(
       m_WizSegmentationIO->GetSaveFileName());
-
-    // Some silly feedback
-    m_OutMessage->value("Saving segmentation file successful");    
     }
 }
 
@@ -3205,9 +3127,6 @@ UserInterfaceLogic
     // Store the new filename
     m_GlobalState->SetPreprocessingFileName(
       m_WizPreprocessingIO->GetSaveFileName());
-
-    // Some silly feedback
-    m_OutMessage->value("Saving preprocessing file successful");    
     }
 }
 
@@ -3411,7 +3330,7 @@ UserInterfaceLogic
 ::GetWindowUnderFocus(void)
 {
   for(int i = 0; i < 3; i++)
-    if(m_SliceCoordinator->GetWindow(i)->GetFocus())
+    if(m_SliceCoordinator->GetWindow(i)->GetCanvas()->GetFocus())
       return i;
   return -1;
 }
@@ -3483,51 +3402,18 @@ UserInterfaceLogic
   if(itksys::SystemTools::GetFilenameExtension(m_LastSnapshotFileName) == "")
     m_LastSnapshotFileName = m_LastSnapshotFileName + ".png";
 
-  // Delegate between available methods
-  if(m_WizWindows->value() == m_GrpSNAPWindows)
-    if(window < 3)
-      SNAPWindowSaveAsPNG(window, m_LastSnapshotFileName.c_str());
-    else
-      SNAPWindow3DSaveAsPNG(m_LastSnapshotFileName.c_str());
+  // Choose which window to save with
+  if(window < 3)
+    m_SliceWindow[window]->SaveAsPNG(m_LastSnapshotFileName.c_str());
   else
-    if(window < 3)
-      IRISWindowSaveAsPNG(window, m_LastSnapshotFileName.c_str());
-    else
-      IRISWindow3DSaveAsPNG(m_LastSnapshotFileName.c_str());
-}
-
-void
-UserInterfaceLogic
-::IRISWindowSaveAsPNG(unsigned int window, const char *file)
-{
-  m_IRISWindow2D[window]->SaveAsPNG(file);
-}
-
-
-void
-UserInterfaceLogic
-::IRISWindow3DSaveAsPNG(const char *file)
-{
-  m_IRISWindow3D->SaveAsPNG(file);
-}
-
-void
-UserInterfaceLogic
-::SNAPWindowSaveAsPNG(unsigned int window, const char *file)
-{
-  m_SNAPWindow2D[window]->SaveAsPNG(file);
-}
-
-
-void
-UserInterfaceLogic
-::SNAPWindow3DSaveAsPNG(const char *file)
-{
-  m_SNAPWindow3D->SaveAsPNG(file);
+    m_RenderWindow->SaveAsPNG(m_LastSnapshotFileName.c_str());
 }
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.56  2006/01/06 18:45:35  pauly
+ *BUG: Progress bar in SNAP not disappearing at times
+ *
  *Revision 1.55  2006/01/05 23:19:45  pauly
  *BUG: SNAP label file was not being written correctly
  *

@@ -18,12 +18,13 @@
 #include "IRISApplication.h"
 #include "IRISImageData.h"
 #include "OpenGLSliceTexture.h"
-#include "UserInterfaceLogic.h"
+#include "UserInterfaceBase.h"
 
 SliceWindowCoordinator
 ::SliceWindowCoordinator()
 {
   m_Window[0] = m_Window[1] = m_Window[2] = NULL;
+  m_Canvas[0] = m_Canvas[1] = m_Canvas[2] = NULL;
   m_LinkedZoom = false;
   m_WindowsRegistered = false;
 }
@@ -40,6 +41,7 @@ SliceWindowCoordinator
   for(unsigned int i=0;i<3;i++)
     {
     m_Window[i] = windows[i];
+    m_Canvas[i] = m_Window[i]->GetCanvas();
     m_Window[i]->SetManagedZoom(m_LinkedZoom);
     }
   m_WindowsRegistered = true;
@@ -175,8 +177,8 @@ SliceWindowCoordinator
       {
       // Maximum zoom is constrained by the requirement that at least four
       // pixels are visible in at least one dimensions
-      float zMax1 = 0.25 * m_Window[i]->w() / m_Window[i]->GetSliceSpacing()[0];
-      float zMax2 = 0.25 * m_Window[i]->h() / m_Window[i]->GetSliceSpacing()[1];
+      float zMax1 = 0.25 * m_Canvas[i]->w() / m_Window[i]->GetSliceSpacing()[0];
+      float zMax2 = 0.25 * m_Canvas[i]->h() / m_Window[i]->GetSliceSpacing()[1];
       float zMax = zMax1 > zMax2 ? zMax1 : zMax2;
       maxZoom = (maxZoom == 0.0f || maxZoom < zMax) ? zMax : maxZoom;
 

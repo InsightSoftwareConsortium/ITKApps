@@ -13,10 +13,11 @@
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "CrosshairsInteractionMode.h"
+#include "SNAPOpenGL.h"
 #include "IRISApplication.h"
 #include "IRISImageData.h"
-#include "UserInterfaceLogic.h"
 #include "SNAPAppearanceSettings.h"
+#include "UserInterfaceBase.h"
 
 CrosshairsInteractionMode
 ::CrosshairsInteractionMode(GenericSliceWindow *parent) 
@@ -58,7 +59,7 @@ CrosshairsInteractionMode
 ::OnMouseWheel(const FLTKEvent &irisNotUsed(event))
 {
   // Must have the cursor inside the window to process key events
-  if(!m_Parent->GetFocus()) return 0;
+  if(!m_Parent->GetCanvas()->GetFocus()) return 0;
 
   // Get the amount of the scroll
   float scroll = (float) Fl::event_dy();
@@ -135,7 +136,7 @@ CrosshairsInteractionMode
 ::OnKeyDown(const FLTKEvent &event)
 {
   // Must have the cursor inside the window to process key events
-  if(!m_Parent->GetFocus()) return 0;
+  if(!m_Parent->GetCanvas()->GetFocus()) return 0;
 
   // Vector encoding the movement in pixels
   Vector3f xMotion(0.0f);

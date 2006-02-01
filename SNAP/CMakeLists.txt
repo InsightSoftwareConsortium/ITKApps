@@ -144,6 +144,8 @@ SET(UI_CXX
   UserInterface/BasicComponents/FLTKCanvas.cxx
   UserInterface/BasicComponents/FunctionPlot2DBox.cxx
   UserInterface/BasicComponents/FunctionPlot2D.cxx
+  UserInterface/BasicComponents/InteractionModeClient.cxx
+  UserInterface/BasicComponents/RecursiveInteractionMode.cxx
   UserInterface/BasicComponents/SnakeParametersPreviewBox.cxx
   UserInterface/BasicComponents/SnakeParametersPreviewPipeline.cxx
   UserInterface/Common/SNAPAppearanceSettings.cxx

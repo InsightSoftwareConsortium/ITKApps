@@ -25,7 +25,7 @@
 #include "IRISImageData.h"
 #include "SNAPImageData.h"
 #include "ThresholdSettings.h"
-#include "UserInterfaceLogic.h"
+#include "UserInterfaceBase.h"
 
 #include "itkImage.h"
 #include "itkEventObject.h" 
@@ -34,7 +34,7 @@ using namespace itk;
 
 void 
 PreprocessingUILogic
-::Register(UserInterfaceLogic *parent)
+::Register(UserInterfaceBase *parent)
 {
   m_ParentUI = parent;
   m_Driver = parent->GetDriver();
@@ -60,9 +60,7 @@ PreprocessingUILogic
     m_InEdgeExponent->clamp(settings.GetRemappingExponent()));
 
   // Position the window and show it
-  m_WinEdge->position(
-    m_ParentUI->m_WinMain->x() + 200,
-    m_ParentUI->m_WinMain->y() + 480);
+  m_ParentUI->CenterChildWindowInMainWindow(m_WinEdge);
 
   // Get a handle to the snap image data
   SNAPImageData *snapData = m_Driver->GetSNAPImageData();
@@ -163,9 +161,7 @@ PreprocessingUILogic
     }
 
   // Position the window and show it
-  m_WinInOut->position(
-    m_ParentUI->m_WinMain->x() + 200,
-    m_ParentUI->m_WinMain->y() + 480);
+  m_ParentUI->CenterChildWindowInMainWindow(m_WinInOut);
 
   // Get a handle to the snap image data
   SNAPImageData *snapData = m_Driver->GetSNAPImageData();

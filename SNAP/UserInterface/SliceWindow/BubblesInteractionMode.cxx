@@ -16,7 +16,7 @@
 
 #include "IRISApplication.h"
 #include "IRISSliceWindow.h"
-#include "UserInterfaceLogic.h"
+#include "UserInterfaceBase.h"
 #include "IRISImageData.h"
 
 #include <assert.h>
@@ -36,11 +36,11 @@ BubblesInteractionMode
   if (m_GlobalState->GetSnakeActive() == false)
     {
     // Get the list of bubbles
-    std::vector<Bubble> bubbles = m_ParentUI->GetBubbleArray();
+    std::vector<Bubble> bubbles = m_GlobalState->GetBubbleArray();
 
     // draw bubbles
     int numBubbles = bubbles.size();
-    int activeBubble = m_ParentUI->GetActiveBubble();
+    int activeBubble = m_GlobalState->GetActiveBubble();
 
     if (numBubbles > 0)
       {

@@ -13,7 +13,7 @@
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "RestoreSettingsDialogLogic.h"
-#include "UserInterfaceLogic.h"
+#include "UserInterfaceBase.h"
 #include "SystemInterface.h"
 
 #include <vector>
@@ -28,7 +28,7 @@ using namespace std;
 
 void 
 RestoreSettingsDialogLogic
-::DisplayDialog(UserInterfaceLogic *parent, Registry *associatedSettings)
+::DisplayDialog(UserInterfaceBase *parent, Registry *associatedSettings)
 {
   // Remember the code and the system interface
   m_SystemInterface = parent->GetSystemInterface();

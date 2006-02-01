@@ -14,7 +14,7 @@
 =========================================================================*/
 #include "AppearanceDialogUILogic.h"
 #include "SNAPAppearanceSettings.h"
-#include "UserInterfaceLogic.h"
+#include "UserInterfaceBase.h"
 #include "GlobalState.h"
 #include "IRISApplication.h"
 #include "SystemInterface.h"
@@ -52,7 +52,7 @@ AppearanceDialogUILogic
 
 void
 AppearanceDialogUILogic
-::Register(UserInterfaceLogic *parent) 
+::Register(UserInterfaceBase *parent) 
 {
   m_Parent = parent;
   m_Appearance = parent->GetAppearanceSettings();

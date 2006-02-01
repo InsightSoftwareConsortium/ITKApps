@@ -35,6 +35,11 @@ public:
     return OnEitherEvent(event,event);
   }
 
+  int OnKeyDown(const FLTKEvent &event)
+  {
+    return OnEitherEvent(event,event);
+  }
+
   int OnMouseRelease(const FLTKEvent &event, const FLTKEvent &pressEvent)
   {
     return OnEitherEvent(event,pressEvent);

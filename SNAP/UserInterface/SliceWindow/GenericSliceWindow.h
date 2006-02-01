@@ -24,12 +24,13 @@
 #include "SNAPCommonUI.h"
 #include "GreyImageWrapper.h"
 #include "LabelImageWrapper.h"
+#include "RecursiveInteractionMode.h"
 
 // Forward references to parent classes
 class IRISApplication;
 class IRISImageData;
 class GlobalState;
-class UserInterfaceLogic;  
+class UserInterfaceBase;  
 
 // Forward references to interaction modes that work with this window
 class CrosshairsInteractionMode;
@@ -52,18 +53,17 @@ template <class TPixel> class OpenGLSliceTexture;
  * The generic window supports two types of interaction modes: crosshairs mode
  * and zoom/pan mode.  
  */
-class GenericSliceWindow : public FLTKCanvas
+class GenericSliceWindow : public RecursiveInteractionMode
 {
 public:
-  GenericSliceWindow(int x,int y,int w,int h,const char *l=0);
-  virtual ~GenericSliceWindow();
 
   /**
    * Register the window with its parent UI.  This method assigns an Id to 
    * the window, which is equal to the coordinate direction in display space
    * along which the window displays slices.
    */
-  virtual void Register(int id, UserInterfaceLogic *parentUI);
+  GenericSliceWindow(int id, UserInterfaceBase *parentUI, FLTKCanvas *inWindow);
+  virtual ~GenericSliceWindow();
 
   /** Enter the cross-hairs mode of operation */
   virtual void EnterCrosshairsMode();
@@ -85,10 +85,7 @@ public:
   virtual void ResetViewToFit();
 
   /** The FLTK draw method (paints the window) */
-  void draw();
-
-  /** Save as PNG */
-  void SaveAsPNG(const char *file);
+  void OnDraw();
 
   /**
    * Map a point in window coordinates to a point in slice coordinates
@@ -144,7 +141,7 @@ public:
   protected:
     GenericSliceWindow *m_Parent;
     GlobalState *m_GlobalState;
-    UserInterfaceLogic *m_ParentUI;
+    UserInterfaceBase *m_ParentUI;
     IRISApplication *m_Driver;
   };
 
@@ -166,7 +163,7 @@ protected:
   GlobalState *m_GlobalState;
 
   /** Pointer to GUI that contains this Window3D object */
-  UserInterfaceLogic *m_ParentUI;   
+  UserInterfaceBase *m_ParentUI;   
 
   /** The image data object that is displayed in this window */
   IRISImageData *m_ImageData;
@@ -250,9 +247,6 @@ protected:
 
   // Label texture object
   LabelTextureType *m_LabelTexture;
-
-  // dump png
-  const char *m_dumpPNG;
   
   // Check whether the thumbnail should be draw or not
   bool IsThumbnailOn();

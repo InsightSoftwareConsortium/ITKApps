@@ -32,11 +32,8 @@ class SNAPSliceWindow : public GenericSliceWindow
 {
 public:
 
-  SNAPSliceWindow(int x,int y,int w,int h,const char *label=0);
+  SNAPSliceWindow(int id,UserInterfaceBase *parentUI, FLTKCanvas *canvas);
   ~SNAPSliceWindow();
-
-  /** The parent's register method is overridden */
-  void Register(int id,UserInterfaceLogic *parentUI);
 
   /** Overrides the parent's method */
   void InitializeSlice(IRISImageData *imageData);

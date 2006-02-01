@@ -18,7 +18,7 @@
 #include "OpenGLSliceTexture.h"
 #include "IRISApplication.h"
 #include "IRISImageData.h"
-#include "UserInterfaceLogic.h"
+#include "UserInterfaceBase.h"
 #include "CrosshairsInteractionMode.h"
 #include "PolygonInteractionMode.h"
 #include "RegionInteractionMode.h"
@@ -37,8 +37,8 @@ using namespace itk;
 using namespace std;
 
 IRISSliceWindow
-::IRISSliceWindow(int x, int y, int w, int h, const char *l) 
-: GenericSliceWindow(x, y, w, h, l)
+::IRISSliceWindow(int id, UserInterfaceBase *parentUI, FLTKCanvas *canvas) 
+: GenericSliceWindow(id, parentUI, canvas)
 {
   // Initialize the interaction modes
   m_PolygonMode = new PolygonInteractionMode(this);
@@ -49,26 +49,15 @@ IRISSliceWindow
 
   // Initialize polygon slice canvas to NULL
   m_PolygonSlice = NULL;
+
+  // Register the interaction modes
+  m_PolygonMode->Register();
+  m_RegionMode->Register();
 }
 
 IRISSliceWindow
 ::~IRISSliceWindow()
 {
-  // Delete the interaction modes
-  delete m_CrosshairsMode;
-  delete m_ZoomPanMode;
-}
-
-void 
-IRISSliceWindow
-::Register(int id,UserInterfaceLogic *parentUI)
-{
-  // Call the parent's version of this method
-  GenericSliceWindow::Register(id, parentUI);
-
-  // Register the interaction modes
-  m_PolygonMode->Register();
-  m_RegionMode->Register();
 }
 
 void 
@@ -135,7 +124,7 @@ IRISSliceWindow
 #endif /* DRAWING_LOCK */
 
     // VERY IMPORTANT - makes GL state current!
-    make_current(); 
+    m_Canvas->make_current(); 
 
     // Have the polygon drawing object render the polygon slice
     m_PolygonDrawing->AcceptPolygon(m_PolygonSlice);
@@ -217,7 +206,7 @@ IRISSliceWindow
     if (m_PolygonDrawing->GetCachedPolygon()) 
       {
       m_PolygonDrawing->PastePolygon();
-      redraw();
+      m_Canvas->redraw();
       }
 
 #ifdef DRAWING_LOCK
@@ -234,7 +223,7 @@ IRISSliceWindow
 ::ClearPolygon()
 {
   m_PolygonDrawing->Delete();
-  redraw();
+  m_Canvas->redraw();
 }
 
 void 
@@ -242,7 +231,7 @@ IRISSliceWindow
 ::DeleteSelectedPolygonPoints()
 {
   m_PolygonDrawing->Delete();
-  redraw();
+  m_Canvas->redraw();
 }
 
 void 
@@ -250,7 +239,7 @@ IRISSliceWindow
 ::InsertPolygonPoints()
 {
   m_PolygonDrawing->Insert();
-  redraw();
+  m_Canvas->redraw();
 }
 
 

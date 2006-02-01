@@ -91,13 +91,16 @@ protected:
   GlobalState *m_GlobalState;
 
   /** Pointer to GUI that contains this Window3D object */
-  UserInterfaceLogic *m_ParentUI;   
+  UserInterfaceBase *m_ParentUI;   
 
   /** The image data object that is displayed in this window */
   IRISImageData *m_ImageData;
 
-  /** The pointers to three windows managed by this class */
+  /** The pointers to three window interactors managed by this class */
   GenericSliceWindow *m_Window[3];
+
+  /** The pointers to the windows managed by the interactors */
+  FLTKCanvas *m_Canvas[3];
 
   /** Whether or not linked zoom is maintained */
   bool m_LinkedZoom;

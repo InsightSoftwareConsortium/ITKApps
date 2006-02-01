@@ -295,6 +295,10 @@ private:
     public:
       inline ScalarValueType operator()(ScalarValueType x) 
         { return x * x; }
+    
+      // Dummy equality operators, since there is no data here
+      bool operator == (const SquareFunctor &) const { return true; }
+      bool operator != (const SquareFunctor &) const { return false; }
     };
   
   /** A trivial functor to take the g() image to any power */
@@ -303,9 +307,15 @@ private:
     public: 
       inline ScalarValueType operator()(ScalarValueType x) 
         { return vcl_pow(x,power); }
+
+      // Dummy equality operators, since there is no data here
+      bool operator == (const PowFunctor &z) const 
+        { return power == z.power; }
+      
+      bool operator != (const PowFunctor &z) const 
+        { return !(*this == z); }
+
       int power;
-      bool operator!=( const PowFunctor & other ) const
-        { return (this->power != other.power ); }
     };
 
   /** A casting functor to convert between vector types.  */

@@ -169,18 +169,21 @@ private:
     /** Operator used to map pixels to color */
     OverlayPixelType operator()(float in);
 
+    bool operator == (const OverlayFunctor &z) const
+      {
+      return
+        m_Cutoff == z.m_Cutoff &&
+        m_Color == z.m_Color;
+      }
+
+    bool operator != (const OverlayFunctor &z) const
+      { return !(*this == z); }
+
     /** Overlay cutoff */
     float m_Cutoff;
 
     /** Overlay color */
     OverlayPixelType m_Color;
-    
-    /** Comparison operator */
-    bool operator!=( const OverlayFunctor & other ) const
-    {
-      return ( ( this->m_Cutoff != other.m_Cutoff ) ||
-               ( this->m_Color  != other.m_Color  )  );
-    }
   };  
   
   // Type of the display intensity mapping filter used when the 

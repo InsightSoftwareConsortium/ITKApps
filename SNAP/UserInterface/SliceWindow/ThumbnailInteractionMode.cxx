@@ -15,7 +15,7 @@
 #include "ThumbnailInteractionMode.h"
 #include "IRISApplication.h"
 #include "IRISImageData.h"
-#include "UserInterfaceLogic.h"
+#include "UserInterfaceBase.h"
 
 ThumbnailInteractionMode
 ::ThumbnailInteractionMode(GenericSliceWindow *parent) 
@@ -87,7 +87,7 @@ ThumbnailInteractionMode
     m_Parent->m_ViewPosition = m_StartViewPosition - xOffset;
 
     // Tell parent to repaint
-    m_Parent->redraw();
+    m_Parent->GetCanvas()->redraw();
 
     // The event's been handled
     return 1;

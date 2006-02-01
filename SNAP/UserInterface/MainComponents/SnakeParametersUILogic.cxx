@@ -19,6 +19,7 @@
 #endif
 
 #include "SnakeParametersUILogic.h"
+#include "FL/fl_ask.H"
 
 #include "itkEventObject.h" 
 #include "itkImage.h"
@@ -35,7 +36,7 @@
 #include "SnakeParametersPreviewPipeline.h"
 #include "SystemInterface.h"
 #include "ThresholdSettings.h"
-#include "UserInterfaceLogic.h"
+#include "UserInterfaceBase.h"
 
 using namespace itk;
 
@@ -536,7 +537,7 @@ void SnakeParametersUILogic
 }
 
 void SnakeParametersUILogic
-::Register(UserInterfaceLogic *parent)
+::Register(UserInterfaceBase *parent)
 {
   // Get the parent's system object
   m_ParentUI = parent;

@@ -61,6 +61,9 @@ GlobalState
 
   // The preview is not currently valid
   m_SpeedPreviewValid = false;
+
+  // Bubbles
+  m_ActiveBubble = -1;
 }
 
 GlobalState

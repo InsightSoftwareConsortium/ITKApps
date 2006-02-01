@@ -92,6 +92,10 @@ private:
 
       /** The operator that maps label to color */
       DisplayPixelType operator()(const LabelType &x) const;
+
+      // Dummy equality operators, since there is no data here
+      bool operator == (const IntensityFunctor &) const { return true; }
+      bool operator != (const IntensityFunctor &) const { return false; }
   };
 
   // Type of intensity function used to map 3D volume intensity into

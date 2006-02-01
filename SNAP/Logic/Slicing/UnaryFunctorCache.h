@@ -135,6 +135,7 @@ class CachingUnaryFunctor
 {
 public:
   // Typedef to the cache that updates this object
+  typedef CachingUnaryFunctor<TInput,TOutput,TFunctor> Self;
   typedef UnaryFunctorCache<TInput,TOutput,TFunctor> CacheType;
   typedef typename itk::SmartPointer<CacheType> CachePointer;
 
@@ -147,10 +148,14 @@ public:
   /** Default constructor */
   CachingUnaryFunctor() { }
 
-  /** Operator for comparing whether this functor is different from another instance or not */
-  bool operator!=( const CachingUnaryFunctor & other ) const
-          { return (this->m_Parent != other.m_Parent ); }
-    
+  /** Comparison operator necessitated by ITK */
+  bool operator == (const Self &z) const 
+    { return m_Parent != z.m_Parent; }
+
+  /** Comparison operator necessitated by ITK */
+  bool operator != (const Self &z) const 
+    { return !(*this == z); }
+
 private:
   /** Pointer to the cache */
   CachePointer m_Parent;

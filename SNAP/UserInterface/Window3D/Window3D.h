@@ -15,17 +15,18 @@
 #ifndef __Window3D_h_
 #define __Window3D_h_
 
+#include <stdlib.h>
 #include <FL/Fl.H>
 #include <FL/Fl_Gl_Window.H>
+
 #include "SNAPOpenGL.h"
-#include <stdlib.h>
-#include "FLTKCanvas.h"
+#include "RecursiveInteractionMode.h"
 #include "SNAPCommonUI.h"
 #include "Trackball.h"
 #include "MeshObject.h"
 
 // Forward references to parent classes
-class UserInterfaceLogic;
+class UserInterfaceBase;
 class IRISApplication;
 class GlobalState;
 
@@ -64,18 +65,20 @@ struct CutPlaneStruct
  * \class Window3D
  * \brief Window used to display the 3D segmentation
  */
-class Window3D : public FLTKCanvas
+class Window3D : public RecursiveInteractionMode
 {
 public:
 
   enum {X,Y,Z};
 
-  Window3D( int x, int y, int w, int h, const char *l=0 );
+  /**
+   * Constructor: registers this interactor with the parent UI and the 
+   * client window
+   */
+  Window3D(UserInterfaceBase *parentUI, FLTKCanvas *canvas);
+
   virtual ~Window3D(void); /* Needed to be virtual to avoid compiler warning */
   Window3D& operator= ( const Window3D& W ) { return *this; };
-
-  /** Register the parent classes with this application */
-  void Register(int i, UserInterfaceLogic *driver);
 
   /** Initialize the window */
   void Initialize();
@@ -87,10 +90,7 @@ public:
   void ResetView();
 
   /** Perform the GL drawing operations */
-  void draw();
-
-  /** Save as PNG */
-  void SaveAsPNG(const char *file);
+  void OnDraw();
 
   /** Recompute the mesh (slow operation) */
   void UpdateMesh(itk::Command *xProgressCommand);
@@ -114,7 +114,9 @@ public:
    * with this class should be derived */
   class EventHandler : public InteractionMode {
   public:
-    EventHandler(Window3D *parent) {
+    EventHandler(Window3D *parent) 
+      : InteractionMode(parent->GetCanvas()) 
+    {
       m_Parent = parent;
     }    
     void Register() 
@@ -128,7 +130,7 @@ public:
   protected:
     Window3D *m_Parent;
     GlobalState *m_GlobalState;
-    UserInterfaceLogic *m_ParentUI;
+    UserInterfaceBase *m_ParentUI;
     IRISApplication *m_Driver;
   };
 
@@ -161,7 +163,7 @@ private:
   GlobalState *m_GlobalState;
 
   // Pointer to GUI that contains this Window3D object
-  UserInterfaceLogic *m_ParentUI;   
+  UserInterfaceBase *m_ParentUI;   
 
   // Interaction modes
   Crosshairs3DInteractionMode *m_CrosshairsMode;
@@ -171,10 +173,7 @@ private:
 
   // Cut planes 3d mode added by Robin
   enum Win3DMode
-    {
-    WIN3D_NONE, WIN3D_PAN, WIN3D_ZOOM, WIN3D_ROTATE, WIN3D_CUT
-    };
-
+    { WIN3D_NONE, WIN3D_PAN, WIN3D_ZOOM, WIN3D_ROTATE, WIN3D_CUT };
 
   Win3DMode m_Mode;
   Trackball  m_Trackball, m_TrackballBackup;
@@ -182,7 +181,6 @@ private:
   CutPlaneStruct m_Plane;
 
   // id of window
-  int m_Id;
   int m_NeedsInitialization;
   int m_CursorVisible;
 
@@ -219,9 +217,6 @@ private:
   typedef SampleListType::iterator SampleListIterator;
   SampleListType m_Samples;
   
-  // dump png
-  const char *m_dumpPNG;
-  
   void MousePressFunc(int button);
   void MouseReleaseFunc();
   void MouseMotionFunc();
@@ -255,6 +250,9 @@ private:
 
 /*
  *Log: Window3D.h
+ *Revision 1.12  2005/12/12 00:27:45  pauly
+ *ENH: Preparing SNAP for 1.4 release. Snapshot functionality
+ *
  *Revision 1.11  2005/12/08 18:20:46  hjohnson
  *COMP:  Removed compiler warnings from SGI/linux/MacOSX compilers.
  *

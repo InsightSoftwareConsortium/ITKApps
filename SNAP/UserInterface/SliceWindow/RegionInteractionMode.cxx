@@ -17,7 +17,7 @@
 #include "IRISApplication.h"
 #include "IRISImageData.h"
 #include "IRISSliceWindow.h"
-#include "UserInterfaceLogic.h"
+#include "UserInterfaceBase.h"
 #include "IRISVectorTypesToITKConversion.h"
 #include "SNAPAppearanceSettings.h"
 

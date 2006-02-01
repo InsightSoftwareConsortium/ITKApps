@@ -21,7 +21,7 @@
 #include "OpenGLSliceTexture.h"
 #include "SliceWindowCoordinator.h"
 #include "SNAPAppearanceSettings.h"
-#include "UserInterfaceLogic.h"
+#include "UserInterfaceBase.h"
 #include "ZoomPanInteractionMode.h"
 #include "ThumbnailInteractionMode.h"
 
@@ -33,25 +33,27 @@
 
 #include "itkConstantPadImageFilter.h"
 
-#include "GLToPNG.h"
-
 using namespace itk;
 using namespace std;
 
 GenericSliceWindow
-::GenericSliceWindow(int x, int y, int w, int h, const char *l) 
-: FLTKCanvas(x, y, w, h, l)
+::GenericSliceWindow(int index, UserInterfaceBase *ui, FLTKCanvas *canvas)
+: RecursiveInteractionMode(canvas)
 {
-  // Start with a blank ID
-  m_Id = -1;  
+  // Copy parent pointers
+  m_ParentUI = ui;
+  m_Driver = m_ParentUI->GetDriver();
+  m_GlobalState = m_Driver->GetGlobalState();    
+
+  // Set the window ID
+  m_Id = index;
 
   // Initialize the interaction modes
   m_CrosshairsMode = new CrosshairsInteractionMode(this);
   m_ZoomPanMode = new ZoomPanInteractionMode(this);
   m_ThumbnailMode = new ThumbnailInteractionMode(this);
 
-  // Zero out the registered flags
-  m_IsRegistered = false;
+  // The slice is not yet initialized
   m_IsSliceInitialized = false;
 
   // Initialize the Grey slice texture
@@ -72,11 +74,16 @@ GenericSliceWindow
   m_ThumbnailIsDrawing = false;
 
   // Allow focus grabbing
-  SetGrabFocusOnEntry(true);
+  m_Canvas->SetGrabFocusOnEntry(true);
 
-  // dump png no
-  m_dumpPNG = NULL;
-}
+  // Register the sub-interaction modes
+  m_CrosshairsMode->Register();
+  m_ZoomPanMode->Register();
+  m_ThumbnailMode->Register();
+
+  // We have been registered
+  m_IsRegistered = true;
+}    
 
 GenericSliceWindow
 ::~GenericSliceWindow()
@@ -90,35 +97,6 @@ GenericSliceWindow
   delete m_GreyTexture;
   delete m_LabelTexture;
 }
-
-void
-GenericSliceWindow
-::Register(int index, UserInterfaceLogic *ui)
-{
-  // Copy parent pointers
-  m_ParentUI = ui;
-  m_Driver = m_ParentUI->GetDriver();
-  m_GlobalState = m_Driver->GetGlobalState();    
-
-  // This array describes the conjugate axes for the three display orientations
-  // static const unsigned int linkedAxes[3][2] = {{1,2},{0,2},{0,1}};
-  // static const unsigned int linkedAxes[3][2] = {{2,1},{0,2},{0,1}};
-
-  // Initialize the axes indices (these indices map u,v coordinates of the 
-  // slice to the x,y,z coordinates of the display space
-  m_Id = index;
-  // m_DisplayAxes[0] = linkedAxes[m_Id][0];
-  // m_DisplayAxes[1] = linkedAxes[m_Id][1];
-  // m_DisplayAxes[2] = m_Id;
-
-  // Register the interaction modes
-  m_CrosshairsMode->Register();
-  m_ZoomPanMode->Register();
-  m_ThumbnailMode->Register();
-
-  // We have been registered
-  m_IsRegistered = true;
-}    
 
 void 
 GenericSliceWindow
@@ -168,7 +146,7 @@ GenericSliceWindow
 
   // We have been initialized
   m_IsSliceInitialized = true;
-  
+
   // If the is no current interaction mode, enter the crosshairs mode
   if(GetInteractionModeCount() == 0)
     PushInteractionMode(m_CrosshairsMode);
@@ -193,7 +171,8 @@ GenericSliceWindow
   m_ViewPosition = worldSize * 0.5f;
 
   // Reduce the width and height of the slice by the margin
-  Vector2i szCanvas = Vector2i(w(),h()) - Vector2i(2 * m_Margin);
+  Vector2i szCanvas = 
+    Vector2i(m_Canvas->w(),m_Canvas->h()) - Vector2i(2 * m_Margin);
   
   // Compute the ratios of window size to slice size
   Vector2f ratios(
@@ -220,7 +199,7 @@ GenericSliceWindow
   m_ViewZoom = m_OptimalZoom;
 
   // Cause a redraw of the window
-  redraw();
+  m_Canvas->redraw();
 }
 
 Vector3f 
@@ -259,7 +238,8 @@ GenericSliceWindow
 
   // Compute the window coordinates
   Vector2f uvWindow = 
-    m_ViewZoom * (uvScaled - m_ViewPosition) + Vector2f(0.5f*w(),0.5f*h());
+    m_ViewZoom * (uvScaled - m_ViewPosition) + 
+    Vector2f(0.5f * m_Canvas->w(),0.5f * m_Canvas->h());
   
   // That's it, the projection matrix is set up in the scaled-slice coordinates
   return uvWindow;
@@ -272,8 +252,9 @@ GenericSliceWindow
   assert(m_IsSliceInitialized && m_ViewZoom > 0);
 
   // Compute the scaled slice coordinates
+  Vector2f winCenter(0.5f * m_Canvas->w(),0.5f * m_Canvas->h());
   Vector2f uvScaled = 
-    m_ViewPosition + (uvWindow - Vector2f(0.5f*w(),0.5f*h())) / m_ViewZoom;
+    m_ViewPosition + (uvWindow - winCenter) / m_ViewZoom;
   
   // The window coordinates are already in the scaled-slice units
   Vector3f uvSlice(
@@ -287,17 +268,17 @@ GenericSliceWindow
 
 void
 GenericSliceWindow
-::draw()
+::OnDraw()
 {
   // Set up the projection if necessary
-  if(!valid()) 
+  if(!m_Canvas->valid()) 
   {
     // The window will have coordinates (0,0) to (w,h), i.e. the same as the window
     // coordinates.
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluOrtho2D(0.0,w(),0.0,h());
-    glViewport(0,0,w(),h());
+    gluOrtho2D(0.0,m_Canvas->w(),0.0,m_Canvas->h());
+    glViewport(0,0,m_Canvas->w(),m_Canvas->h());
 
     // Establish the model view matrix
     glMatrixMode(GL_MODELVIEW);
@@ -354,7 +335,7 @@ GenericSliceWindow
   // Prepare for overlay drawing.  The model view is set up to correspond
   // to pixel coordinates of the slice
   glPushMatrix();
-  glTranslated(0.5 * w(),0.5 * h(),0.0);
+  glTranslated(0.5 * m_Canvas->w(),0.5 * m_Canvas->h(),0.0);
   glScalef(m_ViewZoom,m_ViewZoom,1.0);
   glTranslated(-m_ViewPosition(0),-m_ViewPosition(1),0.0);
   glScalef(m_SliceSpacing[0],m_SliceSpacing[1],1.0);
@@ -376,13 +357,6 @@ GenericSliceWindow
 
   // Display!
   glFlush();
-  
-  // dump png if requested
-  if (m_dumpPNG != NULL)
-  {
-    vtkImageData* img = GLToVTKImageData(GL_RGBA, 0, 0, w(), h());
-    VTKImageDataToPNG(img, m_dumpPNG);
-  }
 }
 
 void 
@@ -430,7 +404,7 @@ GenericSliceWindow
   m_ThumbnailIsDrawing = true;  
   
   // The dimensions of the canvas on which we are working, in pixels
-  Vector2i xCanvas( w(), h() );
+  Vector2i xCanvas( m_Canvas->w(), m_Canvas->h() );
 
   // The thumbnail will occupy a specified fraction of the target canvas
   float xFraction = 0.01f * 
@@ -487,8 +461,8 @@ GenericSliceWindow
   // Draw a box representing the current zoom level
   glPopMatrix();
   glTranslated(m_ViewPosition[0],m_ViewPosition[1],0.0);
-  w = this->w() * 0.5 / m_ViewZoom;
-  h = this->h() * 0.5 / m_ViewZoom;
+  w = m_Canvas->w() * 0.5 / m_ViewZoom;
+  h = m_Canvas->h() * 0.5 / m_ViewZoom;
 
   glColor3dv(elt.ActiveColor.data_block());
   glBegin(GL_LINE_LOOP);
@@ -571,11 +545,12 @@ GenericSliceWindow
   gl_font(FL_COURIER_BOLD, elt.FontSize);
   int offset = 4 + elt.FontSize * 2;
   int margin = elt.FontSize / 3;
-  
-  gl_draw(labels[0][0],margin,0,offset,h(),FL_ALIGN_LEFT);
-  gl_draw(labels[0][1],w() - (offset+margin),0,offset,h(),FL_ALIGN_RIGHT);
-  gl_draw(labels[1][0],0,0,w(),offset,FL_ALIGN_BOTTOM);
-  gl_draw(labels[1][1],0,h() - (offset+1),w(),offset,FL_ALIGN_TOP);
+  int w = m_Canvas->w(), h = m_Canvas->h();
+
+  gl_draw(labels[0][0],margin,0,offset,h,FL_ALIGN_LEFT);
+  gl_draw(labels[0][1],w - (offset+margin),0,offset,h,FL_ALIGN_RIGHT);
+  gl_draw(labels[1][0],0,0,w,offset,FL_ALIGN_BOTTOM);
+  gl_draw(labels[1][1],0,h - (offset+1),w,offset,FL_ALIGN_TOP);
 
   glPopMatrix();
   glPopAttrib();
@@ -622,7 +597,7 @@ GenericSliceWindow
   // cout << m_Id << " : " << newZoom 
 
   // Repaint the window
-  redraw();
+  m_Canvas->redraw();
 }
 
 GenericSliceWindow *
@@ -642,7 +617,9 @@ GenericSliceWindow
 }
 
 GenericSliceWindow::EventHandler
-::EventHandler(GenericSliceWindow *parent) {
+::EventHandler(GenericSliceWindow *parent) 
+: InteractionMode(parent->GetCanvas())
+{
   m_Parent = parent;
 }
 
@@ -653,15 +630,5 @@ GenericSliceWindow::EventHandler
   m_Driver = m_Parent->m_Driver;
   m_ParentUI = m_Parent->m_ParentUI;
   m_GlobalState = m_Parent->m_GlobalState;
-}
-
-void
-GenericSliceWindow
-::SaveAsPNG(const char *file)
-{
-  m_dumpPNG = file;
-  redraw();
-  Fl::flush();
-  m_dumpPNG = NULL;
 }
 

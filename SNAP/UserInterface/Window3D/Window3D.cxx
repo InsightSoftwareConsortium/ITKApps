@@ -15,12 +15,13 @@
 #include "Window3D.h"
 #include "IRISImageData.h"
 #include "SNAPImageData.h"
-#include "UserInterfaceLogic.h"
+#include "UserInterfaceBase.h"
 #include "GlobalState.h"
 #include <iostream>
 #include "IRISApplication.h"
 #include "ImageRayIntersectionFinder.h"
 #include "SNAPAppearanceSettings.h"
+#include "FLTKCanvas.h"
 
 #include <FL/glut.H>
 
@@ -31,8 +32,6 @@
 #else
 # define itk_cross_3d cross_3d
 #endif
-
-#include "GLToPNG.h"
 
 /** These classes are used internally for m_Ray intersection testing */
 class LabelImageHitTester 
@@ -202,7 +201,7 @@ Scalpel3DInteractionMode
     }
 
   // Redraw the parent
-  m_Parent->redraw();
+  m_Canvas->redraw();
 
   // Eat the event
   return 1;
@@ -219,7 +218,7 @@ OnMouseMotion(const FLTKEvent &event)
   m_EndPoint = event.XCanvas;
 
   // Redraw the parent
-  m_Parent->redraw();
+  m_Canvas->redraw();
 
   // Eat the event
   return 1;
@@ -239,7 +238,7 @@ Scalpel3DInteractionMode
   m_EndPoint = event.XCanvas;
 
   // Redraw the parent
-  m_Parent->redraw();
+  m_Canvas->redraw();
 
   // Eat the event
   return 1;
@@ -256,7 +255,7 @@ Scalpel3DInteractionMode
   m_Inside = false;
   
   // Redraw the parent
-  m_Parent->redraw();
+  m_Canvas->redraw();
 
   // Eat the event
   return 1;
@@ -306,12 +305,20 @@ Spraypaint3DInteractionMode
 
 
 Window3D
-::Window3D( int x, int y, int w, int h, const char *l )
-: FLTKCanvas(x, y, w, h, l)
+::Window3D(UserInterfaceBase *parentUI, FLTKCanvas *canvas)
+: RecursiveInteractionMode(canvas)
 {
+  // Copy parent pointers
+  m_ParentUI = parentUI;
+  m_Driver = m_ParentUI->GetDriver();
+  m_GlobalState = m_Driver->GetGlobalState();    
+
+  // Pass parent pointer to the mesh object
+  this->m_Mesh.Initialize(m_Driver);
+
   // Make sure FLTK canvas does not flip the Y coordinate
-  SetFlipYCoordinate(false);
-  SetGrabFocusOnEntry(true);
+  m_Canvas->SetFlipYCoordinate(false);
+  m_Canvas->SetGrabFocusOnEntry(true);
   
   // Clear the flags
   m_NeedsInitialization = 1;
@@ -335,9 +342,6 @@ Window3D
   
   // Start with the trackball mode, which is prevailing
   PushInteractionMode(m_TrackballMode);
-  
-  // dump png no
-  m_dumpPNG = NULL;
 }
 
 
@@ -375,22 +379,6 @@ Window3D
 {
   PopInteractionMode();
   PushInteractionMode(m_SpraypaintMode);
-}
-
-void 
-Window3D
-::Register(int i, UserInterfaceLogic *ui)
-{
-  // Assign an ID
-  m_Id = i; 
-
-  // Copy parent pointers
-  m_ParentUI = ui;
-  m_Driver = m_ParentUI->GetDriver();
-  m_GlobalState = m_Driver->GetGlobalState();    
-
-  // Pass parent pointer to the mesh object
-  this->m_Mesh.Initialize(m_Driver);
 }
 
 Window3D
@@ -490,7 +478,7 @@ Window3D
 {
   // make_current();
   m_Mesh.GenerateMesh(command);
-  redraw();
+  m_Canvas->redraw();
 }
 
 void 
@@ -531,13 +519,13 @@ Window3D
 
 void 
 Window3D
-::draw()
+::OnDraw()
 {
   // Respond to a resize if necessary
-  if (!valid())
+  if (!m_Canvas->valid())
     {
     Initialize();
-    glViewport(0,0,w(),h());
+    glViewport(0,0,m_Canvas->w(),m_Canvas->h());
     }
   
   // Initialize GL if necessary
@@ -558,7 +546,8 @@ Window3D
 
   // Compute the center of rotation  
   m_CenterOfRotation = m_Origin + 
-    vector_multiply_mixed<float,unsigned int,3>(m_Spacing, m_GlobalState->GetCrosshairsPosition());
+    vector_multiply_mixed<float,unsigned int,3>(
+      m_Spacing, m_GlobalState-> GetCrosshairsPosition());
 
   // Set up the projection matrix
   SetupProjection();
@@ -600,7 +589,7 @@ Window3D
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    gluOrtho2D(0,w(),h(),0);
+    gluOrtho2D(0,m_Canvas->w(),m_Canvas->h(),0);
     
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -658,13 +647,6 @@ Window3D
 
   glFlush();
   // CheckErrors();
-
-  // dump png if requested
-  if (m_dumpPNG != NULL)
-  {
-    vtkImageData* img = GLToVTKImageData(GL_RGBA, 0, 0, w(), h());
-    VTKImageDataToPNG(img, m_dumpPNG);
-  }
 }
 
 void 
@@ -673,7 +655,7 @@ Window3D
 {
   if ( m_Mode != WIN3D_NONE ) return;
   m_Mode = WIN3D_ROTATE;
-  m_Trackball.StartRot(x, y, w(), h());
+  m_Trackball.StartRot(x, y, m_Canvas->w(), m_Canvas->h());
 }
 
 void 
@@ -700,18 +682,21 @@ Window3D
 {
   switch (m_Mode)
     {
-    case WIN3D_ROTATE: m_Trackball.TrackRot(x,y,w(),h()); break;
+    case WIN3D_ROTATE: 
+      m_Trackball.TrackRot(x, y, m_Canvas->w(), m_Canvas->h()); 
+      break;
     case WIN3D_ZOOM:   
       m_Trackball.TrackZoom(y); 
       // this->SetupProjection();
       break;
     case WIN3D_PAN:    
-      m_Trackball.TrackPan(x,y,w(),h(),2*m_ViewHalf[X],2*m_ViewHalf[Y]);
+      m_Trackball.TrackPan(x, y, m_Canvas->w(), m_Canvas->h(),
+        2 * m_ViewHalf[X], 2 * m_ViewHalf[Y]);
       break;
     default: break;
     }
 
-  redraw();
+  m_Canvas->redraw();
 }
 
 void 
@@ -763,7 +748,7 @@ Window3D
     {
     AddSample( hit );
     m_ParentUI->OnIRISMeshEditingAction();
-    redraw();
+    m_Canvas->redraw();
     }
 }
 
@@ -784,7 +769,7 @@ Window3D
     m_ParentUI->OnIRISMeshEditingAction();
     }
         
-  redraw();
+  m_Canvas->redraw();
 }
 
 /**
@@ -805,15 +790,15 @@ Window3D
   m_ViewHalf = m_DefaultHalf / m_Trackball.GetZoom();
   
   double x, y;
-  if(m_ViewHalf[X] * h() > m_ViewHalf[Y] * w())
+  if(m_ViewHalf[X] * m_Canvas->h() > m_ViewHalf[Y] * m_Canvas->w())
     {
     x = m_ViewHalf[X]; 
-    y = h() * x / w();
+    y = m_Canvas->h() * x / m_Canvas->w();
     }
   else
     {
     y = m_ViewHalf[Y]; 
-    x = w() * y / h();
+    x = m_Canvas->w() * y / m_Canvas->h();
     }
 
   // Set up the coordinate projection
@@ -971,7 +956,7 @@ int Window3D::IntersectSegData(int mouse_x, int mouse_y, Vector3i &hit)
   double projmatrix[16];
   GLint viewport[4];
 
-  make_current(); // update GL state
+  m_Canvas->make_current(); // update GL state
   ComputeMatricies( viewport, mvmatrix, projmatrix );
   int x = mouse_x;
   int y = viewport[3] - mouse_y - 1;
@@ -1281,24 +1266,17 @@ Window3D
     {
     // Restore the trackball state
     m_Trackball = m_TrackballBackup;
-    redraw();
+    m_Canvas->redraw();
     return 1;
     }
   return 0;
 }
 
-void
-Window3D
-::SaveAsPNG(const char *file)
-{
-  m_dumpPNG = file;
-  redraw();
-  Fl::flush();
-  m_dumpPNG = NULL;
-}
-
 /*
  *Log: Window3D.cxx
+ *Revision 1.32  2006/01/05 18:03:09  pauly
+ *STYLE: Removed unnecessary console messages from SNAP
+ *
  *Revision 1.31  2005/12/12 00:27:45  pauly
  *ENH: Preparing SNAP for 1.4 release. Snapshot functionality
  *

@@ -31,7 +31,7 @@
 #include "vtkPNGWriter.h"
 
 // convert a GL buffer into vtkImageData
-vtkImageData* GLToVTKImageData(GLenum format, int x, int y, int w, int h);
+vtkImageData* GLToVTKImageData(unsigned int format, int x, int y, int w, int h);
 
 // output vtkImageData as PNG
 void VTKImageDataToPNG(vtkImageData* img, const char* filename);

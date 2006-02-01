@@ -19,7 +19,9 @@
 
 #include "SNAPCommonUI.h"
 #include "FLTKEvent.h"
-#include "FLTKCanvas.h"
+
+// Forward reference to the canvas object
+class FLTKCanvas;
 
 /**
  * \class InteractionMode
@@ -31,15 +33,19 @@
 class InteractionMode
 {
 public:
-    virtual ~InteractionMode(void) {} /* Needed to avoid compiler warning */
+
+  /** Constructor takes the pointer to the target canvas object */
+  InteractionMode(FLTKCanvas *canvas)
+    { this->m_Canvas = canvas; }
+
+  /** Destructor */
+  virtual ~InteractionMode(void) {} 
 
   /**
    * Called when mouse button is pressed.
    */
   virtual int OnMousePress(const FLTKEvent &irisNotUsed(event)) 
-  {
-    return 0;
-  }
+    { return 0; }
 
   /**
    * Called when mouse is pressed.  The event generated when the mouse
@@ -47,9 +53,7 @@ public:
    */
   virtual int OnMouseRelease(const FLTKEvent &irisNotUsed(event),
                              const FLTKEvent &irisNotUsed(pressEvent)) 
-  {
-    return 0;
-  }
+    { return 0; }
 
   /**
    * Called when the mouse is dragged.  The event generated when the mouse
@@ -57,83 +61,71 @@ public:
    */
   virtual int OnMouseDrag(const FLTKEvent &irisNotUsed(event),
                           const FLTKEvent &irisNotUsed(pressEvent)) 
-  {
-    return 0;
-  }
+    { return 0; }
 
   /**
    * Called when mouse enters the canvas.  Return 1 to track motion events.
    */
   virtual int OnMouseEnter(const FLTKEvent &irisNotUsed(event)) 
-  {
-    return 0;
-  }
+    { return 0; }
 
   /**
    * Called when mouse exits the canvas.  
    */
   virtual int OnMouseLeave(const FLTKEvent &irisNotUsed(event)) 
-  {
-    return 0;
-  }
+    { return 0; }
 
   /**
    * Called when mouse moves in the canvas
    */
   virtual int OnMouseMotion(const FLTKEvent &irisNotUsed(event)) 
-  {
-    return 0;
-  }
+    { return 0; }
 
   /**
    * Called when mouse moves in the canvas
    */
   virtual int OnMouseWheel(const FLTKEvent &irisNotUsed(event)) 
-  {
-    return 0;
-  }
+    { return 0; }
 
   /**
    * Called when a key on the keyboard is pressed.
    */
   virtual int OnKeyDown(const FLTKEvent &irisNotUsed(event)) 
-  {
-    return 0;
-  }
+    { return 0; }
 
   /**
    * Called when a key on the keyboard is released.
    */
   virtual int OnKeyUp(const FLTKEvent &irisNotUsed(event)) 
-  {
-    return 0;
-  }
+    { return 0; }
 
   /**
    * Called for FLTK short-cut events
    */
   virtual int OnShortcut(const FLTKEvent &irisNotUsed(event)) 
-  {
-    return 0;
-  }
+    { return 0; }
 
   /**
    * Called for all other FLTK events
    */
   virtual int OnOtherEvent(const FLTKEvent &irisNotUsed(event)) 
-  {
-    return 0;
-  }
+    { return 0; }
 
   /**
    * Can be called when the canvas is redrawing itself. 
    * This is not really an event but a convenience method.
    */
   virtual void OnDraw() 
-  {
-    return;
-  }
+    { return; }
 
+  /** Get the pointer to the client canvas */
+  FLTKCanvas *GetCanvas() const
+    { return m_Canvas; }
+
+protected:
+
+  // The target canvas
+  FLTKCanvas *m_Canvas;
 };
 
 #endif // __InteractionMode_h_

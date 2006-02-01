@@ -57,6 +57,18 @@ public:
     // Return the point
     return p;
     }
+
+  bool operator == (const SpeedColorMap &z)
+    {
+    return 
+      m_DeltaT == z.m_DeltaT && 
+      m_Shift == z.m_Shift && 
+      m_ColorMapSize == z.m_ColorMapSize &&
+      m_ColorEntry == z.m_ColorEntry;
+    }
+
+  bool operator != (const SpeedColorMap &z)
+    { return !(*this == z); }
   
   /** Set the color map by specifying three points (-1, 0 and 1) */
   void SetColorMap(OutputType inMinus, OutputType inZero, OutputType inPlus) 

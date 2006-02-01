@@ -23,25 +23,23 @@
 #include "UserInterface.h"
 
 // Necessary forward references
-class IRISApplication;
-class GlobalState;
 class HelpViewerLogic;
 class IntensityCurveUILogic;
 class PreprocessingUILogic;
 class RestoreSettingsDialogLogic;
 class SnakeParametersUILogic;
-class SystemInterface;
 class ImageInfoCallbackInterface;
 class LabelEditorUILogic;
-
+class IRISSliceWindow;
+class SNAPSliceWindow;
 class GreyImageIOWizardLogic;
 class SegmentationImageIOWizardLogic;
 class PreprocessingImageIOWizardLogic;
 class SliceWindowCoordinator;
 class SimpleFileDialogLogic;
 class ResizeRegionDialogLogic;
-class SNAPAppearanceSettings;
 class AppearanceDialogUILogic;
+class Window3D;
 
 template <class TFlag> class FLTKWidgetActivationManager;
 //template<class TPixel> class ImageIOWizardLogic;
@@ -81,8 +79,8 @@ public:
   /** Destructor */
   virtual ~UserInterfaceLogic();
 
-  /** Hides the snake window and shows the iris window */
-  void ShowIRIS();
+  /** This method launches the user interface */
+  void Launch();
 
   /** Resets the region of interest to contain the entire volume */
   void OnResetROIAction();
@@ -402,35 +400,6 @@ public:
   void OnSnakeStepSizeChange();
 
   /**
-   *
-   * DESCRIPTION:
-   * returns a pointer to an array of Bubble objects contained in
-   * the Active Bubbles browser
-   *
-   * PRECONDITIONS:
-   * - Snake GUI is active
-   *
-   * POSTCONDITIONS:
-   * - a pointer to an array of Bubble objects contained in
-   * the Active Bubbles browser is returned
-   * - returns NULL if Active Bubbles browser is empty
-   */
-  std::vector<Bubble> GetBubbleArray();
-
-  /**
-   *
-   * DESCRIPTION:
-   * returns the currently selected bubble in the bubble browser
-   *
-   * PRECONDITIONS:
-   * - Snake GUI is active
-   *
-   * POSTCONDITIONS:
-   * - the selected bubble or -1 if none is selected
-   */
-  int GetActiveBubble();
-
-  /**
    * Pops up a dialog to choose a preprocessed data file
    * pre: LoadPreproc_win is active
    * post: header information is filled in in the dialog
@@ -573,7 +542,7 @@ public:
   // IRIS: 3D Window callbacks
   void OnIRISMeshUpdateAction();
   void OnIRISMeshAcceptAction();
-  void OnIRISMeshResetViewAction();
+  void OnMeshResetViewAction();
   void OnIRISMeshEditingAction();
   void OnIRISMeshDisplaySettingsUpdate();
    
@@ -595,15 +564,11 @@ public:
   void OnIRISLabelOpacityChange();
   
   // Methods to tweak window positions
-  void OnIRISWindowFocus(unsigned int i);
-  void OnSNAPWindowFocus(unsigned int i);
+  void OnWindowFocus(unsigned int iWindow);
 
   // Save As PNG
   void OnActiveWindowSaveSnapshot(unsigned int window);
-  void IRISWindowSaveAsPNG(unsigned int window, const char *file);
-  void IRISWindow3DSaveAsPNG(const char *file);
-  void SNAPWindowSaveAsPNG(unsigned int window, const char *file);
-  void SNAPWindow3DSaveAsPNG(const char *file);
+
 protected:
 
   /**
@@ -621,19 +586,11 @@ protected:
    */
   void InitializeUI();
 
-  /**
-   * UserInterfaceLogic::ShowSNAP
-   *
-   * DESCRIPTION:
-   *   hides the iris window and shows the snake window
-   *
-   * PRECONDITIONS:
-   *
-   * POSTCONDITIONS:
-   * - the IRIS window is hidden and the snake window is shown
-   *
-   */
+  /** hides the iris window and shows the snake window */
   void ShowSNAP();
+
+  /** Hides the snake window and shows the iris window */
+  void ShowIRIS();
 
   /**
    * DESCRIPTION
@@ -742,9 +699,6 @@ private:
   // activated and deactivated
   FLTKWidgetActivationManager<UIStateFlags> *m_Activation; 
 
-  // Bubble highlighted in the browser
-  int m_HighlightedBubble;
-
   // how many snake iterations per step
   int m_SnakeStepSize;
 
@@ -787,8 +741,15 @@ private:
   /** Help window */
   HelpViewerLogic *m_HelpUI;
 
+  /** Managers for the slice view windows */
+  IRISSliceWindow *m_IRISWindowManager2D[3];
+  SNAPSliceWindow *m_SNAPWindowManager2D[3];
+
   /** A coordinator for the slice windows */
   SliceWindowCoordinator *m_SliceCoordinator;
+
+  /** Managers for the 3D windows */
+  Window3D *m_IRISWindowManager3D, *m_SNAPWindowManager3D;
 
   /** Splash screen timer */
   clock_t m_SplashScreenStartTime;
@@ -841,11 +802,12 @@ private:
   // to four side by side windows
   void UpdateWindowFocus(
     Fl_Group *parent, Fl_Group **panels, Fl_Gl_Window **boxes, int iWindow);
-  void UpdateIRISWindowFocus(int iWindow = -1);
-  void UpdateSNAPWindowFocus(int iWindow = -1);
 
   // Update the color map of the speed image
   void UpdateSpeedColorMap();
+
+  // Update the bubble display
+  void UpdateBubbleUI();
 
   /* Command used for progress tracking */
   itk::SmartPointer<ProgressCommandType> m_ProgressCommand;
@@ -867,6 +829,9 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.30  2005/12/12 00:27:44  pauly
+ *ENH: Preparing SNAP for 1.4 release. Snapshot functionality
+ *
  *Revision 1.29  2005/11/10 23:02:14  pauly
  *ENH: Added support for VoxBo CUB files to ITK-SNAP, as well as some cosmetic touches
  *

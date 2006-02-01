@@ -13,7 +13,7 @@
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "ZoomPanInteractionMode.h"
-#include "UserInterfaceLogic.h"
+#include "UserInterfaceBase.h"
 #include "SliceWindowCoordinator.h"
 
 #include <cmath>
@@ -86,7 +86,7 @@ ZoomPanInteractionMode
   else return 0;
 
   // Redraw the screen
-  m_Parent->redraw();
+  m_Parent->GetCanvas()->redraw();
 
   // Nothing to do here.
   return 1;

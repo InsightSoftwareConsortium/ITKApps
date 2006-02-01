@@ -264,7 +264,7 @@ int main(int argc, char **argv)
   Fl::background(236,233,216);
   
   // Show the IRIS Interface
-  ui->ShowIRIS();
+  ui->Launch();
 
   // Show the splash screen
   ui->ShowSplashScreen();
@@ -385,6 +385,10 @@ int main(int argc, char **argv)
 
 /*
  *Log: SNAPMain.cxx
+ *Revision 1.15  2005/11/07 15:50:33  pauly
+ *COMP: Fixed problem with execinfo.h missing on some platforms. Also fixed
+ *compilation error in GuidedImageIO.h
+ *
  *Revision 1.14  2005/11/03 18:45:29  pauly
  *ENH: Enabled SNAP to read DICOM Series
  *

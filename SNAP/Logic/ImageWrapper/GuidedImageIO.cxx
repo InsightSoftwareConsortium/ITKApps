@@ -25,6 +25,7 @@
 #include "itkGDCMImageIO.h"
 #include "itkGE4ImageIO.h"
 #include "itkGE5ImageIO.h"
+#include "itkNiftiImageIO.h"
 #include "itkSiemensVisionImageIO.h"
 #include "itkVTKImageIO.h"
 #include "itkVoxBoCUBImageIO.h"
@@ -46,6 +47,7 @@ GuidedImageIOBase
   m_EnumFileFormat.AddPair(FORMAT_DICOM, "DICOM");
   m_EnumFileFormat.AddPair(FORMAT_GE4, "GE Version 4");
   m_EnumFileFormat.AddPair(FORMAT_GE5, "GE Version 5");
+  m_EnumFileFormat.AddPair(FORMAT_NIFTI, "NIFTI");
   m_EnumFileFormat.AddPair(FORMAT_SIEMENS, "Siemens Vision");
   m_EnumFileFormat.AddPair(FORMAT_VTK, "VTK");
   m_EnumFileFormat.AddPair(FORMAT_VOXBO_CUB, "VoxBo CUB");
@@ -148,6 +150,8 @@ GuidedImageIO<TPixel>
     m_IOBase = GE4ImageIO::New();
   else if(format == FORMAT_GE5)
     m_IOBase = GE5ImageIO::New();
+  else if(format == FORMAT_NIFTI)
+    m_IOBase = NiftiImageIO::New();
   else if(format == FORMAT_SIEMENS)
     m_IOBase = SiemensVisionImageIO::New();
   else if(format == FORMAT_VTK)

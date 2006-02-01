@@ -23,7 +23,7 @@
 // Forward references to some classes
 class IRISApplication;
 class GlobalState;
-class UserInterfaceLogic;
+class UserInterfaceBase;
 
 /**
  * \class LabelEditorUILogic
@@ -35,7 +35,7 @@ public:
   virtual ~LabelEditorUILogic();
 
   /** Register with the parent user interface */
-  void Register(UserInterfaceLogic *parent);
+  void Register(UserInterfaceBase *parent);
 
   /** Set the active label */
   void SetEditorLabel(unsigned int iLabel);
@@ -59,7 +59,7 @@ public:
   void OnLabelPropertyChange();
 
 private:
-  UserInterfaceLogic *m_Parent;
+  UserInterfaceBase *m_Parent;
   GlobalState *m_GlobalState;
   IRISApplication *m_Driver;
 

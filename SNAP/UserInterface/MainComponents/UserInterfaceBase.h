@@ -15,15 +15,23 @@
 #ifndef __UserInterfaceBase__h_
 #define __UserInterfaceBase__h_
 
+// This should all be gone
 #include "SNAPCommonUI.h"
+#include "GlobalState.h" 
 
-/** Borland Compiler is tricky */
-#include <itkImage.h>
-typedef itk::ImageBase<2> SNAPDummyImageBaseType;
-typedef itk::Image<unsigned char,2> SNAPDummyImageType;
+// Borland compiler stuff. Note to whoever went through the code and added all 
+// these borland things: you just can't add ITK headers to headers like this one
+// that get included in lots of files. This makes compilation time insane!!!
+#if defined(__BORLANDC__)
+#include "SNAPBorlandDummyTypes.h"
+#endif;
 
-// TODO: this is a hack.  Clean all code out of GUI!!!
-#include "GlobalState.h"
+// Forward refences to some classes
+class IRISApplication;
+class SystemInterface;
+class SNAPAppearanceSettings;
+class SliceWindowCoordinator;
+class Fl_Window;
 
 /**
  * \class UserInterfaceBase
@@ -64,9 +72,6 @@ public:
   
   // IRIS: Slice selection actions  
   virtual void OnSliceSliderChange(int id) = 0;
-  virtual void RedrawWindows() = 0;
-  virtual void ResetScrollbars() = 0;
-  virtual void UpdateImageProbe() = 0;
   virtual void UpdatePositionDisplay(int id) = 0;
 
   // IRIS: Zoom/pan interaction callbacks
@@ -89,9 +94,9 @@ public:
   virtual void OnPastePolygonAction(unsigned int window) = 0;
 
   // IRIS: 3D Window callbacks
+  virtual void OnMeshResetViewAction() = 0;
   virtual void OnIRISMeshUpdateAction() = 0;
   virtual void OnIRISMeshAcceptAction() = 0;
-  virtual void OnIRISMeshResetViewAction() = 0;
   
   // IRIS: ROI manipulation callbacks
   virtual void OnResetROIAction() = 0;
@@ -144,7 +149,6 @@ public:
 
   // SNAP: 3D window related callbacks  
   virtual void OnSNAPMeshUpdateAction() = 0;
-  virtual void OnSNAPMeshResetViewAction() = 0;
   virtual void OnSNAPMeshContinuousUpdateAction() = 0;
 
   // virtual void Activate3DAccept(bool on) = 0;
@@ -154,11 +158,34 @@ public:
   virtual void ShowHTMLPage(const char *link) = 0;
 
   // Window size manipulation calls
-  virtual void OnIRISWindowFocus(unsigned int i) = 0;
-  virtual void OnSNAPWindowFocus(unsigned int i) = 0;
+  virtual void OnWindowFocus(unsigned int i) = 0;
 
   // Save as PNG
   virtual void OnActiveWindowSaveSnapshot(unsigned int window) = 0;
+
+  // The following methods are not referenced in the .fl file, but are defined here
+  // so that other classes in the project can include UserInterfaceBase.h instead of
+  // UserInterfaceLogic.h; this way there is not a huge build every time we change
+  // a user interface element
+  virtual IRISApplication *GetDriver() const = 0;
+  virtual SystemInterface *GetSystemInterface() const = 0;
+  virtual SNAPAppearanceSettings *GetAppearanceSettings() const = 0;
+  virtual SliceWindowCoordinator *GetSliceCoordinator() const = 0;
+
+  virtual void OnImageGeometryUpdate() = 0;
+  virtual void RedrawWindows() = 0;
+  virtual void OnIRISMeshDisplaySettingsUpdate() = 0;
+  virtual void ResetScrollbars() = 0;
+  virtual void UpdateImageProbe() = 0;
+  virtual void OnLabelListUpdate() = 0;
+  virtual void OnSegmentationImageUpdate() = 0;
+  virtual void CenterChildWindowInMainWindow(Fl_Window *) = 0;
+  virtual void OnPreprocessingPreviewStatusUpdate(bool) = 0;
+  virtual void OnSpeedImageUpdate() = 0;
+  virtual void OnCrosshairPositionUpdate() = 0;
+  virtual void OnPolygonStateUpdate(unsigned int) = 0;
+  virtual void OnZoomUpdate() = 0;
+  virtual void OnIRISMeshEditingAction() = 0;
 
 protected:
     GlobalState *m_GlobalState;
