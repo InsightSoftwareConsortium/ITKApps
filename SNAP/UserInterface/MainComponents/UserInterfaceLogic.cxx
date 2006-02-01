@@ -481,16 +481,31 @@ UserInterfaceLogic
   // Set bubble radius range according to volume dimensions (world dimensions)
   Vector3ui size = m_Driver->GetCurrentImageData()->GetVolumeExtents();
   Vector3d voxdims = m_Driver->GetSNAPImageData()->GetImageSpacing();
-  double mindim = vector_multiply_mixed<double,unsigned int,3>(voxdims, size).min_value();
+  double mindim = 
+    vector_multiply_mixed<double,unsigned int,3>(voxdims, size).min_value();
 
-  m_InBubbleRadius->value(1);
-  if ((int)(mindim/2) < 1)
-    m_InBubbleRadius->range(1,1);
-  else 
-    {
-    m_InBubbleRadius->range(1,(int)(mindim/2));
-    m_InBubbleRadius->value((int)(mindim/8));
-    }
+  // The largest value of the bubble radius is mindim / 2
+  double xBubbleMax = 0.5 * mindim ;
+
+  // The unit step should be equal or smaller than the smallest voxel edge length
+  // divided by two, and should be a power of 10
+  double xMinVoxelEdge = 0.5 * voxdims.min_value();
+  double xBubbleStep = pow(10, (int)log10(xMinVoxelEdge));
+
+  // It is likely however that 0.1 is not an appropriate step size when min 
+  // voxel size is 0.99, so we try 0.5 and 0.2 as candidates
+  if(5 * xBubbleStep <= xMinVoxelEdge)
+    xBubbleStep *= 5;
+  else if(2 * xBubbleStep <= xMinVoxelEdge)
+    xBubbleStep *= 2;
+
+  // The bubble min is equal to the step size
+  double xBubbleMin = xBubbleStep;
+
+  // Set the value for the radius slider
+  m_InBubbleRadius->range(xBubbleMin, xBubbleMax);
+  m_InBubbleRadius->step(xBubbleStep);
+  m_InBubbleRadius->value(0.25 * xBubbleMax);
   m_InBubbleRadius->redraw();
 
   // Use the current SnakeParameters to determine which type of snake to use
@@ -3411,6 +3426,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.57  2006/02/01 20:21:26  pauly
+ *ENH: An improvement to the main SNAP UI structure: one set of GL windows is used to support SNAP and IRIS modes
+ *
  *Revision 1.56  2006/01/06 18:45:35  pauly
  *BUG: Progress bar in SNAP not disappearing at times
  *
