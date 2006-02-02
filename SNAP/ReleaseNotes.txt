@@ -62,7 +62,14 @@
 
  -  3D window handles images with non-zero origin better
 
+ -  Initialization bubbles have been fixed to be floating point
+
  -  Lots of other small bugs have been fixed!
+
+1.1.3. Programmatic Enhancements
+
+ -  SNAP and IRIS now share the sameset of OpenGL windows. This should prevent
+    crashes on some platforms.
 
 
 1.2. New in Version 1.2
