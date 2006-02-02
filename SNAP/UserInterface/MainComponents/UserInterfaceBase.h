@@ -24,7 +24,7 @@
 // that get included in lots of files. This makes compilation time insane!!!
 #if defined(__BORLANDC__)
 #include "SNAPBorlandDummyTypes.h"
-#endif;
+#endif
 
 // Forward refences to some classes
 class IRISApplication;
@@ -158,7 +158,7 @@ public:
   virtual void ShowHTMLPage(const char *link) = 0;
 
   // Window size manipulation calls
-  virtual void OnWindowFocus(unsigned int i) = 0;
+  virtual void OnWindowFocus(int i) = 0;
 
   // Save as PNG
   virtual void OnActiveWindowSaveSnapshot(unsigned int window) = 0;

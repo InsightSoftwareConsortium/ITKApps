@@ -564,7 +564,7 @@ public:
   void OnIRISLabelOpacityChange();
   
   // Methods to tweak window positions
-  void OnWindowFocus(unsigned int iWindow);
+  void OnWindowFocus(int iWindow);
 
   // Save As PNG
   void OnActiveWindowSaveSnapshot(unsigned int window);
@@ -829,6 +829,9 @@ private:
 
 /*
  *Log: UserInterfaceLogic.h
+ *Revision 1.31  2006/02/01 20:21:26  pauly
+ *ENH: An improvement to the main SNAP UI structure: one set of GL windows is used to support SNAP and IRIS modes
+ *
  *Revision 1.30  2005/12/12 00:27:44  pauly
  *ENH: Preparing SNAP for 1.4 release. Snapshot functionality
  *

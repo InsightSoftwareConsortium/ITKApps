@@ -488,24 +488,34 @@ UserInterfaceLogic
   double xBubbleMax = 0.5 * mindim ;
 
   // The unit step should be equal or smaller than the smallest voxel edge length
-  // divided by two, and should be a power of 10
+  // divided by two, and should be a power of 10. Since FLTK accepts rational step
+  // size, we compute it as a ratio two numbers
   double xMinVoxelEdge = 0.5 * voxdims.min_value();
-  double xBubbleStep = pow(10, (int)log10(xMinVoxelEdge));
-
+  int xBubbleStepA = 1, xBubbleStepB = 1;
+  int xLogVoxelEdge = (int) floor(log10(xMinVoxelEdge));
+  if(xLogVoxelEdge > 0)
+    xBubbleStepA = (int)(0.5 + pow(10.0, xLogVoxelEdge));
+  else if(xLogVoxelEdge < 0)
+    xBubbleStepB = (int)(0.5 + pow(10.0, -xLogVoxelEdge));
+  
   // It is likely however that 0.1 is not an appropriate step size when min 
   // voxel size is 0.99, so we try 0.5 and 0.2 as candidates
-  if(5 * xBubbleStep <= xMinVoxelEdge)
-    xBubbleStep *= 5;
-  else if(2 * xBubbleStep <= xMinVoxelEdge)
-    xBubbleStep *= 2;
+  if(xBubbleStepA * 5.0 / xBubbleStepB <= xMinVoxelEdge)
+    xBubbleStepA *= 5;
+  else if(xBubbleStepA * 2.0 / xBubbleStepB <= xMinVoxelEdge)
+    xBubbleStepA *= 2;
 
-  // The bubble min is equal to the step size
+  // Set the bubble min value
+  double xBubbleStep = xBubbleStepA * 1.0 / xBubbleStepB;
   double xBubbleMin = xBubbleStep;
+
+  // Set the default value so that it falls on the step boundary
+  double xBubbleDefault = floor(0.25 * xBubbleMax / xBubbleStep) * xBubbleStep;
 
   // Set the value for the radius slider
   m_InBubbleRadius->range(xBubbleMin, xBubbleMax);
-  m_InBubbleRadius->step(xBubbleStep);
-  m_InBubbleRadius->value(0.25 * xBubbleMax);
+  m_InBubbleRadius->step(xBubbleStepA, xBubbleStepB);
+  m_InBubbleRadius->value(xBubbleDefault);
   m_InBubbleRadius->redraw();
 
   // Use the current SnakeParameters to determine which type of snake to use
@@ -856,7 +866,7 @@ UserInterfaceLogic
     m_GlobalState->SetBubbleArray(ba);
 
     // Update the active bubble
-    if(ibub == ba.size())
+    if(ibub == (int) ba.size())
       m_GlobalState->SetActiveBubble(ibub - 1);
 
     // Update the bubble list in the GUI
@@ -2222,7 +2232,7 @@ UserInterfaceLogic
 
 void
 UserInterfaceLogic
-::OnWindowFocus(unsigned int iWindow)
+::OnWindowFocus(int iWindow)
 {
   // Get the four panels
   Fl_Group *panels[] = 
@@ -3426,6 +3436,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.58  2006/02/01 21:41:42  pauly
+ *ENH: SNAP: bubble radius changed to floating point
+ *
  *Revision 1.57  2006/02/01 20:21:26  pauly
  *ENH: An improvement to the main SNAP UI structure: one set of GL windows is used to support SNAP and IRIS modes
  *

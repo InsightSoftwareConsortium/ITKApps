@@ -18,9 +18,28 @@
 #include "IRISSliceWindow.h"
 #include "UserInterfaceBase.h"
 #include "IRISImageData.h"
+#include <vnl/vnl_math.h>
 
 #include <assert.h>
 #include <cmath>
+
+const GLubyte stipple[] = {
+  0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
+  0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
+  0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
+  0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
+  0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
+  0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
+  0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
+  0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
+  0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
+  0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
+  0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
+  0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
+  0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
+  0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
+  0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
+  0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55 };
 
 BubblesInteractionMode
 ::BubblesInteractionMode(GenericSliceWindow *parent)
@@ -59,7 +78,8 @@ BubblesInteractionMode
         cl.GetRGBVector(rgb);
 
         // Get the current crosshairs position
-        Vector3ui cursorImage = m_GlobalState->GetCrosshairsPosition();
+        Vector3f cursorImage = 
+          to_float(m_GlobalState->GetCrosshairsPosition()) + Vector3f(0.5f);
 
         // Get the image space dimension that corresponds to this window
         int iid = m_Parent->m_ImageAxes[2];
@@ -81,37 +101,60 @@ BubblesInteractionMode
           
           // Get the center and radius of the i-th bubble
           Vector3f ctrImage = to_float(bubbles[i].center) + Vector3f(0.5f);
-          int radius = bubbles[i].radius;
+          double radius = bubbles[i].radius;
 
           // Remap the center into slice coordinates
           Vector3f ctrSlice = m_Parent->MapImageToSlice(to_float(ctrImage));
 
           // Compute the offset from the center along the slice z-direction
           // in physical coordinates
-          float dcenter = scaling(2) * (cursorImage(iid) - ctrImage(iid));
+          double dcenter = scaling(2) * (cursorImage(iid) - ctrImage(iid));
                     
           // Check if the bubble is intersected by the current slice plane
           if (dcenter >= radius || -dcenter >= radius) continue;
             
           // Compute the radius of the bubble in the cut plane
-          float diskradius = sqrt(fabs(radius*radius - dcenter*dcenter));
+          double diskradius = sqrt(fabs(radius*radius - dcenter*dcenter));
 
           // Draw the bubble
           glColor4ub(rgb[0],rgb[1],rgb[2],alpha);
           glPushMatrix();
+
+          glPushAttrib(GL_POLYGON_BIT | GL_COLOR_BUFFER_BIT);
+          if(activeBubble == i)
+            {
+            glEnable(GL_POLYGON_STIPPLE);
+            glPolygonStipple(stipple);
+            }
           
           glTranslatef(ctrSlice[0], ctrSlice[1], 0.0f);
           glScalef(1.0f / scaling(0),1.0f / scaling(1),1.0f);
           gluDisk(object,0,diskradius,100,1);
+          glPopAttrib();
 
           // If the bubble is active, draw an outline around the bubble
           if(activeBubble == i)
             {
+            glPushAttrib(GL_LINE_BIT | GL_COLOR_BUFFER_BIT);
+
+            glEnable(GL_BLEND);
+            glEnable(GL_LINE_SMOOTH);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glLineWidth(1.5);
+            
             glColor4ub(
               255 - (255 - rgb[0]) / 2,
               255 - (255 - rgb[1]) / 2,
-              255 - (255 - rgb[2]) / 2, alpha);
-            gluDisk(object,diskradius,diskradius+1,100,2);
+              255 - (255 - rgb[2]) / 2, 255);
+            
+            glBegin(GL_LINE_LOOP);
+            for(unsigned int d = 0; d < 360; d+=2)
+              {
+              double rad = d * vnl_math::pi / 180.0;
+              glVertex2f(diskradius * cos(rad), diskradius * sin(rad));
+              }
+            glEnd();
+            glPopAttrib();
             }
           
           glPopMatrix();

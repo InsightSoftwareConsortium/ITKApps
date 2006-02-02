@@ -980,7 +980,7 @@ this->OnSNAPLabelOpacityChange();}
                 callback {OnMeshResetViewAction();}
                 tooltip {Reset the 3D view to default zoom and camera position} xywh {388 685 65 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 180 selection_color 94 labelsize 10 labelcolor 0 align 146
               }
-              Fl_Button {m_BtnaveAsPNG[3]} {
+              Fl_Button {m_BtnSaveAsPNG[3]} {
                 callback {OnActiveWindowSaveSnapshot(3);}
                 tooltip {Save a snapshot of this window as a PNG image} image {Artwork/screencapture.gif} deimage {Artwork/screencapture2.gif} xywh {458 685 20 20} box PLASTIC_UP_BOX color 180 labelsize 9 labelcolor 139 deactivate
               }

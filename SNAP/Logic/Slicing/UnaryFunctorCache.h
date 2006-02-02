@@ -143,14 +143,16 @@ public:
   TOutput operator()(const TInput &in) { return m_Parent->Evaluate(in); }
 
   /** Initialize with a cache object */
-  CachingUnaryFunctor(CacheType *parent) { m_Parent = parent; }
+  CachingUnaryFunctor(CacheType *parent) 
+    { m_Parent = parent; }
 
   /** Default constructor */
-  CachingUnaryFunctor() { }
+  CachingUnaryFunctor() 
+    { m_Parent = NULL; }
 
   /** Comparison operator necessitated by ITK */
   bool operator == (const Self &z) const 
-    { return m_Parent != z.m_Parent; }
+    { return m_Parent == z.m_Parent; }
 
   /** Comparison operator necessitated by ITK */
   bool operator != (const Self &z) const 
