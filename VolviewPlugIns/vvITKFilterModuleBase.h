@@ -3,7 +3,7 @@
     and the VolView Plugin Interface */
 
 #ifndef _vvITKFilterModuleBase_h
-#define _vvITKFilterModulBasee_h
+#define _vvITKFilterModuleBase_h
 
 #include "vtkVVPluginAPI.h"
 
