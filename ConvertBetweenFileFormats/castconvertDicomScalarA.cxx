@@ -36,7 +36,7 @@ int DicomFileConverterScalarA( const std::string &inputPixelComponentType,
     callCorrectReadDicomWriterMacro( int, float );
     callCorrectReadDicomWriterMacro( int, double );
 
-    /** From float to something else. *
+    /** From float to something else. */
     callCorrectReadDicomWriterMacro( float, unsigned char );
     callCorrectReadDicomWriterMacro( float, char );
     callCorrectReadDicomWriterMacro( float, unsigned short );
@@ -48,7 +48,7 @@ int DicomFileConverterScalarA( const std::string &inputPixelComponentType,
     callCorrectReadDicomWriterMacro( float, float );
     callCorrectReadDicomWriterMacro( float, double );
 
-    / * * From double to something else. */
+    /** From double to something else. */
     callCorrectReadDicomWriterMacro( double, unsigned char );
     callCorrectReadDicomWriterMacro( double, char );
     callCorrectReadDicomWriterMacro( double, unsigned short );
