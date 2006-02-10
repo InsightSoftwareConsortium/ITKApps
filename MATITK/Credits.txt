@@ -1,0 +1,23 @@
+/*=========================================================================
+
+  Program:   Insight Segmentation & Registration Toolkit
+  Module:    Credits.txt
+  Language:  C++
+  Date:      $Date$
+  Version:   $Revision$
+  Copyright (c) 2003 Insight Consortium. All rights reserved.
+  See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even 
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     PURPOSE.  See the above copyright notices for more information.
+=========================================================================*/
+
+This application was developed by
+
+Vincent Chu and Dr. Ghassan Hamarneh, 
+Medical Image Analysis Lab, 
+Simon Fraser University, Canada.
+
+http://mial.fas.sfu.ca/researchProject.php?s=308
+
