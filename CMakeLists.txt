@@ -275,6 +275,9 @@ OPTIONAL_APP(EllipsoidInteriorExteriorSpatialFunction)
 # Add an option to build or not build the SymmetricEllipsoidInteriorExteriorSpatialFunction example
 OPTIONAL_APP(SymmetricEllipsoidInteriorExteriorSpatialFunction)
 
+# Add an option to build or not build the ImageCalculator example
+OPTIONAL_APP(ImageCalculator)
+
 # Test the conditions for building the ThinPlateSplines example
 IF(VTK_FOUND)
   IF(FLTK_FOUND)
