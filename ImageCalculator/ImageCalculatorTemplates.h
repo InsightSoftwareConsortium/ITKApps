@@ -490,7 +490,7 @@ private:
 
 /*This fuction reads in the input images and writes the output image , delegating the computations to other functions*/
     template <class PixelType , int dims>
-void ImageCalculatorreadwrite( MetaCommand command )
+void ImageCalculatorReadWrite( MetaCommand command )
 {
     string_tokenizer InputList(command.GetValueAsString("in")," ");
 
@@ -736,38 +736,38 @@ void ImageCalculatorreadwrite( MetaCommand command )
         }
 }
 
-/*This function calls the ImageCalculatorreadwrite function based on the data type specified by the user.*/
+/*This function calls the ImageCalculatorReadWrite function based on the data type specified by the user.*/
     template <unsigned int DIMS>
 void ImageCalculatorProcessND(const std::string & InType, MetaCommand command)
 {
     if ( CompareNoCase( InType, std::string("UCHAR") ) == 0 )
         {
-        ImageCalculatorreadwrite<unsigned char  , DIMS  >(command);
+        ImageCalculatorReadWrite<unsigned char  , DIMS  >(command);
         }
     else if ( CompareNoCase( InType, std::string("SHORT") ) == 0 )
         {
-        ImageCalculatorreadwrite<short , DIMS  >(command);
+        ImageCalculatorReadWrite<short , DIMS  >(command);
         }
     else if ( CompareNoCase( InType, std::string("USHORT") ) == 0 )
         {
-        ImageCalculatorreadwrite<unsigned short , DIMS  >(command);
+        ImageCalculatorReadWrite<unsigned short , DIMS  >(command);
         }
     else if ( CompareNoCase( InType, std::string("INT") ) == 0 )
         {
-        ImageCalculatorreadwrite<int, DIMS  >(command);
+        ImageCalculatorReadWrite<int, DIMS  >(command);
         }
     else if ( CompareNoCase( InType, std::string("UINT") ) == 0 )
         {
-        ImageCalculatorreadwrite<unsigned int, DIMS   >(command);
+        ImageCalculatorReadWrite<unsigned int, DIMS   >(command);
         }
 
     else if ( CompareNoCase( InType, std::string("FLOAT") ) == 0 )
         {
-        ImageCalculatorreadwrite<float, DIMS   >(command);
+        ImageCalculatorReadWrite<float, DIMS   >(command);
         }
     else if ( CompareNoCase( InType, std::string("DOUBLE") ) == 0 )
         {
-        ImageCalculatorreadwrite< double , DIMS   >(command);
+        ImageCalculatorReadWrite< double , DIMS   >(command);
         }
 }
 

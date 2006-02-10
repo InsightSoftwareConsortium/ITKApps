@@ -253,7 +253,7 @@ int main(int argc, char *argv[])
             }
         }
 
-    //Call the ImageCalculatorreadwrite function based on the dimension.
+    //Call the ImageCalculatorReadWrite function based on the dimension.
     const std::string InType(command.GetValueAsString("InputPixelType",
             "PixelType"));
     const int dims = command.GetValueAsInt("InputDimensions","dims");
