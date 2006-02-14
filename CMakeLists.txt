@@ -193,6 +193,9 @@ OPTIONAL_APP(DICOMApp)
 #Build the examples of various fourth-order level set PDEs
 OPTIONAL_APP (LevelSetSurfaceProcessing)
 
+# Add an option to build or not build the ImageCalculator example
+OPTIONAL_APP(ImageCalculator)
+
 # Shared libs are needed for plugins
 # Build Volview plugins. You can't use them unless you have volview
 IF(BUILD_SHARED_LIBS)
@@ -275,8 +278,6 @@ OPTIONAL_APP(EllipsoidInteriorExteriorSpatialFunction)
 # Add an option to build or not build the SymmetricEllipsoidInteriorExteriorSpatialFunction example
 OPTIONAL_APP(SymmetricEllipsoidInteriorExteriorSpatialFunction)
 
-# Add an option to build or not build the ImageCalculator example
-OPTIONAL_APP(ImageCalculator)
 
 # Test the conditions for building the ThinPlateSplines example
 IF(VTK_FOUND)
