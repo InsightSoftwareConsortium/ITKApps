@@ -30,7 +30,6 @@
 #include "itkDifferenceImageFilter.h"
 #include "itksys/SystemTools.hxx"
 
-using namespace std;
 
 #define ITK_TEST_DIMENSION_MAX 6
 
@@ -40,10 +39,10 @@ int main(int argc, char **argv)
 {
   if(argc < 2)
     {
-    cerr << "Usage:" << endl;
-    cerr << "testImage, baselineImage1, [baselineImage2, baselineImage3, ...]" << endl;
-    cerr << "Note that if you supply more than one baselineImage, this test will pass if any" << endl;
-    cerr << "of them match the testImage" << endl;
+    std::cerr << "Usage:" << std::endl;
+    std::cerr << "testImage, baselineImage1, [baselineImage2, baselineImage3, ...]" << std::endl;
+    std::cerr << "Note that if you supply more than one baselineImage, this test will pass if any" << std::endl;
+    std::cerr << "of them match the testImage" << std::endl;
     return -1;
     }
   int bestBaselineStatus = 2001;
@@ -95,7 +94,7 @@ int main(int argc, char **argv)
     std::cerr << "ITK test driver caught an unknown exception!!!\n";
     bestBaselineStatus = -1;
     }
-  cout << bestBaselineStatus << endl;
+  std::cout << bestBaselineStatus << std::endl;
   return bestBaselineStatus;
 }
 
