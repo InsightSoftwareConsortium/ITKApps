@@ -421,28 +421,6 @@ void Typecastimage( typename itk::Image< InPixelType, dims >::Pointer AccImage ,
     typename RealImageType::Pointer image = RealImageType::New ();
     image = toReal->GetOutput ();
 
-    if (dims==3)
-        {
-
-        //The output Image orientation is set to Input Image orientation.
-        itk::SpatialOrientation::ValidCoordinateOrientationFlags inputimage_orient;
-        std::cout<<"Setting orientation of the output image."<<std::endl;
-
-        itk::ExposeMetaData <
-            itk::SpatialOrientation::ValidCoordinateOrientationFlags >
-            (AccImage->GetMetaDataDictionary (), itk::ITK_CoordinateOrientation,
-             inputimage_orient);
-
-        itk::EncapsulateMetaData <
-            itk::SpatialOrientation::ValidCoordinateOrientationFlags >
-            (image->GetMetaDataDictionary (), itk::ITK_CoordinateOrientation,
-             inputimage_orient);
-
-        }
-
-
-
-
     typename  WriterType::Pointer writer = WriterType::New();
     writer->SetFileName(command.GetValueAsString("OutputFilename","filename").c_str() );
     writer->SetInput(image);
@@ -527,16 +505,7 @@ void ImageCalculatorReadWrite( MetaCommand command )
     const double vy = space[1];
     const double vz = space[2];
 
-    itk::SpatialOrientation::ValidCoordinateOrientationFlags Firstimage_orient;
-    if (dims == 3)
-        {
-        //Grab the orientation of the first image.
-        itk::ExposeMetaData <
-            itk::SpatialOrientation::ValidCoordinateOrientationFlags >
-            (reader->GetOutput()->GetMetaDataDictionary (), itk::ITK_CoordinateOrientation,
-             Firstimage_orient);
-
-        }
+    const typename ImageType::DirectionType Firstimage_orient = reader->GetOutput()->GetDirection();
 
     //Create an Accumulator Image.
     typename ImageType::Pointer AccImage = ImageType::New();
@@ -609,20 +578,11 @@ void ImageCalculatorReadWrite( MetaCommand command )
                 std::cout<<"Error::The pixel spacing of the images don't match. \n";
                 exit(-1);
                 }
-            itk::SpatialOrientation::ValidCoordinateOrientationFlags
-                Accumulator_orient;
-
-            itk::ExposeMetaData <
-                itk::SpatialOrientation::ValidCoordinateOrientationFlags >
-                (image->GetMetaDataDictionary (), itk::
-                 ITK_CoordinateOrientation,
-                 Accumulator_orient);
+            typename ImageType::DirectionType Accumulator_orient = image->GetDirection();
             if(Accumulator_orient != Firstimage_orient)
                 {
                 std::cout<<"Error::The orientation of the images are different. \n";
                 exit(-1);
-
-
                 }
             }
 
