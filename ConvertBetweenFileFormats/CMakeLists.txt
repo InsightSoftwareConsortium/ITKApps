@@ -1,15 +1,6 @@
 # This project is intended to be built outside the Insight source tree
 PROJECT(ConvertBetweenFileFormats)
 
-# Find ITK.
-FIND_PACKAGE(ITK)
-IF(ITK_FOUND)
-  INCLUDE(${ITK_USE_FILE})
-ELSE(ITK_FOUND)
-  MESSAGE(FATAL_ERROR
-          "Cannot build without ITK.  Please set ITK_DIR.")
-ENDIF(ITK_FOUND)
-
 ADD_EXECUTABLE(ConvertBetweenFileFormats castconvert.cxx  castconvertDicomScalar.cxx castconvertScalar.cxx  castconvertScalar2D.cxx castconvertScalar3D.cxx castconvertScalar4D.cxx castconvertScalar4DA.cxx castconvertScalar2DA.cxx castconvertScalar3DA.cxx castconvertDicomScalarA.cxx)
 
 TARGET_LINK_LIBRARIES(ConvertBetweenFileFormats  ITKIO ITKCommon)
@@ -17,9 +8,6 @@ TARGET_LINK_LIBRARIES(ConvertBetweenFileFormats  ITKIO ITKCommon)
 INSTALL_TARGETS(/bin ConvertBetweenFileFormats)
 
 IF( BUILD_TESTING )
-
-  ADD_EXECUTABLE(ImageCompare ImageCompare.cxx)
-  TARGET_LINK_LIBRARIES(ImageCompare  ITKIO ITKCommon)
 
   SET(IMAGE_PATH ${ConvertBetweenFileFormats_SOURCE_DIR}/Testing/Data)
   SET(IMAGE_PATH_OUTPUTS ${ConvertBetweenFileFormats_BINARY_DIR})
@@ -45,17 +33,20 @@ IF( BUILD_TESTING )
   ADD_TEST(ccvnt_from_gipl                ${ConvertBetweenFileFormats_BINARY_DIR}/ConvertBetweenFileFormats ${IMAGE_PATH_OUTPUTS}/image_out.gipl   ${IMAGE_PATH_OUTPUTS}/image_in8.mhd)
   ADD_TEST(ccvnt_from_nifti               ${ConvertBetweenFileFormats_BINARY_DIR}/ConvertBetweenFileFormats ${IMAGE_PATH_OUTPUTS}/image_out.nii.gz ${IMAGE_PATH_OUTPUTS}/image_in8.mhd)
 
-  # Compare with original png
-  ADD_TEST(compare_png                    ${ConvertBetweenFileFormats_BINARY_DIR}/ImageCompare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in1.mhd)
- #ADD_TEST(compare_jpg_unsigned_int       ${ConvertBetweenFileFormats_BINARY_DIR}/ImageCompare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in2.mhd)
-  ADD_TEST(compare_tiff                   ${ConvertBetweenFileFormats_BINARY_DIR}/ImageCompare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in3.mhd)
-  ADD_TEST(compare_analyze75              ${ConvertBetweenFileFormats_BINARY_DIR}/ImageCompare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in4.mhd)
-  ADD_TEST(compare_bmp_unsigned_char      ${ConvertBetweenFileFormats_BINARY_DIR}/ImageCompare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in5.mhd)
-  ADD_TEST(compare_nrrd_float             ${ConvertBetweenFileFormats_BINARY_DIR}/ImageCompare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in6.mhd)
-  ADD_TEST(compare_vtk_long               ${ConvertBetweenFileFormats_BINARY_DIR}/ImageCompare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in7.mhd)
-  ADD_TEST(compare_gipl                   ${ConvertBetweenFileFormats_BINARY_DIR}/ImageCompare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in8.mhd)
-  ADD_TEST(ccvnt_compare_nifti            ${ConvertBetweenFileFormats_BINARY_DIR}/ImageCompare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in8.mhd)
+  SET(IMAGE_COMPARE_TESTS ${CXX_TEST_PATH}/ImageCompareTests)
 
-  INSTALL_TARGETS(/bin ImageCompare)
+  # Compare with original png
+  ADD_TEST(compare_png                    ${IMAGE_COMPARE_TESTS} --compare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in1.mhd Dummy)
+ #ADD_TEST(compare_jpg_unsigned_int       ${IMAGE_COMPARE_TESTS} ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in2.mhd)
+  ADD_TEST(compare_tiff                   ${IMAGE_COMPARE_TESTS} --compare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in3.mhd Dummy)
+  ADD_TEST(compare_analyze75              ${IMAGE_COMPARE_TESTS} --compare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in4.mhd Dummy)
+  ADD_TEST(compare_bmp_unsigned_char      ${IMAGE_COMPARE_TESTS} --compare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in5.mhd Dummy)
+  ADD_TEST(compare_nrrd_float             ${IMAGE_COMPARE_TESTS} --compare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in6.mhd Dummy)
+  ADD_TEST(compare_vtk_long               ${IMAGE_COMPARE_TESTS} --compare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in7.mhd Dummy)
+  ADD_TEST(compare_gipl                   ${IMAGE_COMPARE_TESTS} --compare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in8.mhd Dummy)
+  ADD_TEST(ccvnt_compare_nifti            ${IMAGE_COMPARE_TESTS} --compare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in8.mhd Dummy)
+
+  ADD_EXECUTABLE(ImageCompareTests ImageCompareTests.cxx)
+  TARGET_LINK_LIBRARIES(ImageCompareTests ITKCommon ITKIO)
 ENDIF( BUILD_TESTING )
 
