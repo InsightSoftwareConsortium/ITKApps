@@ -5,42 +5,6 @@
 #include <string>
 #include "metaCommand.h"
 
-int usage()
-  {
-  std::cout << "miRegTool [options] fixedImage movingImage" << std::endl;
-  std::cout << "Options:" << std::endl;
-  std::cout << "  -I <method#> : Registration initialization" << std::endl;
-  std::cout << "        0 - NONE" << std::endl;
-  std::cout << "        1 - Image Centers" << std::endl;
-  std::cout << "        2 - Centers of Mass [default]" << std::endl;
-  std::cout << "        3 - Moments" << std::endl;
-  std::cout << "        4 - Landmarks" << std::endl;
-  std::cout << "        5 <#_Of_Tfms> <tfm1> [<tfm2> ...] - Load transform" 
-            << std::endl
-            << "          - if #_of_Tfms is negative, the transforms are" 
-            << std::endl
-            << "            inverted before being applied."
-            << std::endl;
-  std::cout << "  -R <method#>: Registration Method" << std::endl;
-  std::cout << "        0 - NONE" << std::endl;
-  std::cout << "        1 - Rigid [default]" << std::endl;
-  std::cout << "        2 - Affine" << std::endl;
-  std::cout << "        3 - Rigid + Affine" << std::endl;
-  std::cout << "  -O <method#>" << std::endl;
-  std::cout << "        0 - One plus one evolutionary" << std::endl;
-  std::cout << "        1 - Powell line search" << std::endl;
-  std::cout << "        2 - One plus One + Powell line search [default]" 
-            << std::endl;
-  std::cout << "  -i <iterations> : # of iterations for optimizer [1000]"
-            << std::endl;
-  std::cout << "  -s <# of samples> : # of samples for MI computation [20000]"
-            << std::endl;
-  std::cout << "  -L <fixedLandmarksfile> <movingLandmarksfile>" << std::endl;
-  std::cout << "  -T <filename> : save registration transform" << std::endl;
-  std::cout << "  -W <filename> : save registered moving image" << std::endl;
-  return 1;
-  }
-
 int main(int argc, char **argv)
   {
   if(argc > 1)
@@ -48,146 +12,81 @@ int main(int argc, char **argv)
 
     MetaCommand command;
 
-    command.SetOption("RegistrInit","I",false,"Registration initialization (Default is Centers of Mass)");
-    command.AddOptionField("RegistrInit","init",MetaCommand::INT,false,"2");
-  
-    command.SetOption("transform","tr",false,"specification of the transform");
-    command.AddOptionField("transform","filename",MetaCommand::STRING,true);
+    command.SetOption("InitMass", "InitMass", false,
+                      "Initialize registrations using Centers of Mass");
+    command.SetOption("InitCenters", "InitCenters", false,
+                      "Initialize registration using image centers");
+    command.SetOption("InitMoments", "InitMoments", false,
+                      "Initialize registration using image moments");
+    command.SetOption("InitTransform", "InitTransform", false,
+                      "Initialize using transforms <numberOfTransforms> <ListOfTransforms>*");
+    command.AddOptionField("InitTransform", "ListOfTransforms",
+                           MetaCommand::LIST, true);
+    command.SetOption("InitInvTransform", "InitInvTransform", false,
+                    "Initialize using inverse of the transforms <numberOfTransforms> <ListOfTransforms>*");
+    command.AddOptionField("InitInvTransform", "ListOfInvTransforms",
+                           MetaCommand::LIST, true);
+    command.SetOption("InitLandmarks", "InitLandmarks", false,
+      "Initialize using landmarks <fixedLandmarksfile> <movingLandmarksfile>");
+    command.AddOptionField("InitLandmarks", "FixedLandmarksFile",
+                           MetaCommand::STRING, true);
+    command.AddOptionField("InitLandmarks", "MovingLandmarksFile",
+                           MetaCommand::STRING, true);
 
-    command.SetOption("RegistrMethod","R",false,"Registration Method (Default is Rigid)");
-    command.AddOptionField("RegistrMethod","method",MetaCommand::INT,false,"1");
+    command.SetOption("TfmNone", "TfmNone", false,
+                      "Do not perform registration");
+    command.SetOption("TfmRigid", "TfmRigid", false,
+                      "Perform Rigid registration");
+    command.SetOption("TfmAffine", "TfmAffine", false,
+                      "Perform Affine registration");
+    command.SetOption("TfmRigidAffine", "TfmRigidAffine", false,
+                      "Perform Rigid and then Affine registration");
     
-    command.SetOption("-O","O",false,"Default is One plus One + Powell line search");
-    command.AddOptionField("-O","option",MetaCommand::INT,false,"2");
-    
-    command.SetOption("iterations","i",false,"# of iterations for optimizer [1000]");
-    command.AddOptionField("iterations","nb",MetaCommand::INT,false,"500");
+    command.SetOption("OptOnePlusOne", "OptOnePlusOne", false,
+                      "Use One plus One optimizer");
+    command.SetOption("OptGradient", "OptGradient", false,
+                      "Use gradient (with powell line search) optimizer");
+    command.SetOption("OptOnePlusOneGradient", "OptOnePlusOneGradient", false,
+                      "Use One plus One and then gradient optimizers");
+    command.SetOption("OptIterations", "OptIterations", false,
+                      "# of iterations for optimizer");
+    command.AddOptionField("OptIterations", "Number",
+                           MetaCommand::INT, true, "500");
 
-    command.SetOption("samples","s",false,"# of samples for MI computation [20000]");
-    command.AddOptionField("samples","nb",MetaCommand::INT,false,"20000");
+    command.SetOption("MetricSamples", "MetricSamples", false,
+                   "# of samples for mutual information metric");
+    command.AddOptionField("MetricSamples", "Number",
+                           MetaCommand::INT, true, "20000");
 
-    command.SetOption("file","L",false,"<fixedLandmarksfile> <movingLandmarksfile>");
-    command.AddOptionField("file","fixedLandmarksfile",MetaCommand::STRING,true);
-    command.AddOptionField("file","movingLandmarksfile",MetaCommand::STRING,true);
 
-    command.SetOption("saveTrans","T",false,"save registration transform");
-    command.AddOptionField("saveTrans","filename",MetaCommand::STRING,true);
+    command.SetOption("SaveTransform", "SaveTransform", false,
+                      "Save registration transform <Filename>");
+    command.AddOptionField("SaveTransform", "Filename",
+                            MetaCommand::STRING, true);
 
-    command.SetOption("saveMove","W",false,"save registered moving image");
-    command.AddOptionField("saveMove","filename",MetaCommand::STRING,true);
+    command.SetOption("SaveMovingImage", "SaveMovingImage", false,
+                      "Save registered moving image <Filename>");
+    command.AddOptionField("SaveMovingImage", "Filename",
+                           MetaCommand::STRING, true);
 
-  // Fields are added in order
-    command.AddField("fixedImage","fixedImage filename",MetaCommand::STRING,true);
-    command.AddField("movingImage","movingImage filename",MetaCommand::STRING,true);
+    // Fields are added in order
+    command.AddField("FixedImage", "FixedImage's Filename",
+                     MetaCommand::STRING, true);
+    command.AddField("MovingImage","MovingImage's Filename",
+                     MetaCommand::STRING, true);
     
     if(!command.Parse(argc,argv))
       {
       return 1;
       }
 
- 
-  
-//  unsigned long iterations = 500;
-//    unsigned long samples = 20000;
-
-//    int initializationMethod = 2;
-//    int registrationMethod = 1;
-//    int optimizationMethod = 2;
-
-    char fixedImageFilename[255];
-    char movingImageFilename[255];
-
-    int  loadedTransformNumber = 0;
-    std::string loadedTransformFilename[255];
-
-    char outputImageFilename[255];
-    outputImageFilename[0] = '\0';
-
-    char fixedLandmarksFilename[255];
-    fixedLandmarksFilename[0] = '\0';
-    char movingLandmarksFilename[255];
-    movingLandmarksFilename[0] = '\0';
-
-    char outputTransformFilename[255];
-    outputTransformFilename[0] = '\0';
-
-    int initializationMethod = command.GetValueAsInt("RegistrInit","init");
-    if( initializationMethod == 5 )
-    {
-      loadedTransformFilename[0]=command.GetValueAsString("transform","filename");
-    }
-    int registrationMethod = command.GetValueAsInt("RegistrMethod","method");
-    int optimizationMethod = command.GetValueAsInt("-O","option");
-    unsigned long iterations = command.GetValueAsInt("iterations","nb");
-    unsigned long samples = command.GetValueAsInt("samples","nb");
-    strcpy(fixedLandmarksFilename,command.GetValueAsString("file","fixedLandmarksfile").c_str());
-    strcpy(outputTransformFilename,command.GetValueAsString("saveTrans","filename").c_str());
-    strcpy(outputImageFilename,command.GetValueAsString("saveMove","filename").c_str());
-
-    strcpy(fixedImageFilename, command.GetValueAsString("fixedImage").c_str());
-    strcpy(movingImageFilename, command.GetValueAsString("movingImage").c_str());
-    
-/*  int argNum = 1;
-    while (argNum < argc-3 && argv[argNum][0] == '-')
-      {
-      switch(argv[argNum][1])
-        {
-        case 'I':
-          argNum++;
-          initializationMethod = (int)atof(argv[argNum++]);
-          if(initializationMethod == 5)
-            {
-            loadedTransformNumber = (int)atof(argv[argNum++]);
-            for(int i=0; i<abs(loadedTransformNumber); i++)
-              {
-              loadedTransformFilename[i] = argv[argNum++];
-              }
-            }
-          break;
-        case 'R':
-          argNum++;
-          registrationMethod = (int)atof(argv[argNum++]);
-          break;
-        case 'i':
-          argNum++;
-          iterations = (int)atof(argv[argNum++]);
-          break;
-        case 's':
-          argNum++;
-          samples = (int)atof(argv[argNum++]);
-          break;
-        case 'L':
-          argNum++;
-          strcpy(fixedLandmarksFilename, argv[argNum++]);
-          strcpy(movingLandmarksFilename, argv[argNum++]);
-          break;
-        case 'T':
-          argNum++;
-          strcpy(outputTransformFilename, argv[argNum++]);
-          break;
-        case 'O':
-          argNum++;
-          optimizationMethod = (int)atof(argv[argNum++]);
-          break;
-        case 'W':
-          argNum++;
-          strcpy(outputImageFilename, argv[argNum++]);
-          break;
-        default:
-          return usage();
-        }
-      }
-
-    if(argNum != argc-2)
-      {
-      return usage();
-      }
-
-    strcpy(fixedImageFilename, argv[argNum++]);
-    strcpy(movingImageFilename, argv[argNum++]);
-*/
     typedef itk::Image<short, 3>            ImageType;
     typedef ImageRegistrationApp<ImageType> ImageRegistrationAppType;
+
+    /** Create the registration app **/
+    ImageRegistrationAppType::Pointer imageRegistrationApp =
+                                      ImageRegistrationAppType::New();
+
     typedef itk::LandmarkSpatialObject<3>   LandmarkType;
     typedef itk::ImageFileReader<ImageType> ImageReaderType;
     typedef itk::ImageFileWriter<ImageType> ImageWriterType;
@@ -197,11 +96,9 @@ int main(int argc, char **argv)
     typedef itk::SpatialObjectReader<>      GroupReaderType;
     typedef itk::AffineTransform<double, 3> TransformType;
 
-    ImageType::Pointer fixedImage;
-    ImageType::Pointer movingImage;
-
+    /** Read the fixed image **/
     ImageReaderType::Pointer fixedReader = ImageReaderType::New();
-    fixedReader->SetFileName(fixedImageFilename);
+    fixedReader->SetFileName(command.GetValueAsString("FixedImage").c_str());
     try
       {
       fixedReader->Update();
@@ -212,11 +109,12 @@ int main(int argc, char **argv)
                 << std::endl;
       return 1;
       }
-    fixedImage = fixedReader->GetOutput();
+    imageRegistrationApp->SetFixedImage( fixedReader->GetOutput() );
 
+    /** Read the moving image **/
     ImageReaderType::Pointer movingReader = ImageReaderType::New();
     movingReader = ImageReaderType::New();
-    movingReader->SetFileName(movingImageFilename);
+    movingReader->SetFileName(command.GetValueAsString("MovingImage").c_str());
     try
       {
       movingReader->Update();
@@ -227,145 +125,175 @@ int main(int argc, char **argv)
                 << std::endl;
       return 1;
       }
-    movingImage = movingReader->GetOutput();
+    imageRegistrationApp->SetMovingImage( movingReader->GetOutput() );
+    imageRegistrationApp->SetMovingImageRegion( 
+                                movingReader->GetOutput()
+                                            ->GetLargestPossibleRegion() );
 
-    LandmarkType::Pointer fixedLandmarks;
-    LandmarkType::Pointer movingLandmarks;
-    if(strlen(fixedLandmarksFilename)>1)
+    std::cout << "Optimizer number of iterations = "
+              << command.GetValueAsInt("OptIterations", "Number")
+              << std::endl;
+    imageRegistrationApp->SetRigidNumberOfIterations(
+                           command.GetValueAsInt("OptIterations","Number") );
+    imageRegistrationApp->SetAffineNumberOfIterations(
+                           command.GetValueAsInt("OptIterations","Number") );
+    imageRegistrationApp->SetRigidNumberOfSpatialSamples(
+                           command.GetValueAsInt("MetricSamples","Number") );
+    imageRegistrationApp->SetAffineNumberOfSpatialSamples(
+                           command.GetValueAsInt("MetricSamples","Number") );
+
+
+    if( command.GetOptionWasSet("InitMass") )
       {
+      imageRegistrationApp->RegisterUsingMass();
+      }
+    else if( command.GetOptionWasSet("InitCenters") )
+      {
+      imageRegistrationApp->RegisterUsingCenters();
+      }
+    else if( command.GetOptionWasSet("InitMoments") )
+      {
+      imageRegistrationApp->RegisterUsingMoments();
+      }
+    else if( command.GetOptionWasSet("InitTransform") )
+      {
+      typedef ImageRegistrationAppType::LoadedRegTransformType LoadedTType;
+      std::list< std::string > filenames =
+                                     command.GetValueAsList("InitTransform");
+      bool first = true;
+      std::list< std::string >::iterator it = filenames.begin();
+      while( it != filenames.end() )
+        {
+        GroupReaderType::Pointer transformReader = GroupReaderType::New();
+        std::cout << "Loading Transform: " << it->c_str() << std::endl;
+        transformReader->SetFileName( it->c_str() );
+        transformReader->Update();
+        GroupType::Pointer group = transformReader->GetGroup();
+        if( first )
+          {
+          first = false;
+          imageRegistrationApp->SetLoadedTransform(
+                                 *(group->GetObjectToParentTransform()));
+          }
+        else
+          {
+          imageRegistrationApp->CompositeLoadedTransform(
+                                   *(group->GetObjectToParentTransform()));
+          }
+        ++it;
+        }
+      imageRegistrationApp->RegisterUsingLoadedTransform();
+      }
+    else if( command.GetOptionWasSet("InitInvTransform") )
+      {
+      typedef ImageRegistrationAppType::LoadedRegTransformType LoadedTType;
+      std::list< std::string > filenames =
+                                     command.GetValueAsList("InitInvTransform");
+      bool first = true;
+      std::list< std::string >::iterator it = filenames.begin();
+      while( it != filenames.end() )
+        {
+        GroupReaderType::Pointer transformReader = GroupReaderType::New();
+        std::cout << "Loading Transform: " << it->c_str() << std::endl;
+        transformReader->SetFileName( it->c_str() );
+        transformReader->Update();
+        GroupType::Pointer group = transformReader->GetGroup();
+        std::cout << "Inverting" << std::endl;
+        GroupType::TransformType::Pointer transform;
+        transform = group->GetObjectToParentTransform();
+        LoadedTType::Pointer invertedTransform = LoadedTType::New();
+        transform->GetInverse(invertedTransform);
+        transform->SetCenter(invertedTransform->GetCenter());
+        transform->SetMatrix(invertedTransform->GetMatrix());
+        transform->SetOffset(invertedTransform->GetOffset());
+        if( first )
+          {
+          first = false;
+          imageRegistrationApp->SetLoadedTransform(
+                                 *(group->GetObjectToParentTransform()));
+          }
+        else
+          {
+          imageRegistrationApp->CompositeLoadedTransform(
+                                   *(group->GetObjectToParentTransform()));
+          }
+        ++it;
+        }
+      imageRegistrationApp->RegisterUsingLoadedTransform();
+      }
+    else if( command.GetOptionWasSet("InitLandmarks") )
+      {
+      LandmarkType::Pointer fixedLandmarks;
+      LandmarkType::Pointer movingLandmarks;
       LandmarkReaderType::Pointer fixedLandmarkReader =
-                                  LandmarkReaderType::New();
-      fixedLandmarkReader->SetFileName(fixedLandmarksFilename);
+                                    LandmarkReaderType::New();
+      fixedLandmarkReader->SetFileName( command.GetValueAsString(
+                                               "InitLandmarks",
+                                               "FixedLandmarksFile").c_str() );
       fixedLandmarkReader->Update();
       GroupType::Pointer group = fixedLandmarkReader->GetGroup();
       GroupType::ChildrenListType * children = group->GetChildren();
       fixedLandmarks = dynamic_cast< LandmarkType * >
                                       ((*(children->begin())).GetPointer());
-
+  
       LandmarkReaderType::Pointer movingLandmarkReader =
-                                  LandmarkReaderType::New();
-      movingLandmarkReader->SetFileName(movingLandmarksFilename);
+                                    LandmarkReaderType::New();
+      movingLandmarkReader->SetFileName(command.GetValueAsString(
+                                               "InitLandmarks",
+                                               "MovingLandmarksFile").c_str() );
       movingLandmarkReader->Update();
       group = movingLandmarkReader->GetGroup();
       children = group->GetChildren();
       movingLandmarks = dynamic_cast< LandmarkType * >
                                       ((*(children->begin())).GetPointer());
+
+      imageRegistrationApp->RegisterUsingLandmarks( 
+                                    fixedLandmarks.GetPointer(),
+                                    movingLandmarks.GetPointer());
       }
-
-    // Register
-    ImageRegistrationAppType::Pointer imageRegistrationApp =
-        ImageRegistrationAppType::New();
-    imageRegistrationApp->SetFixedImage( fixedImage.GetPointer() );
-    imageRegistrationApp->SetMovingImage( movingImage.GetPointer() );
-    imageRegistrationApp->SetMovingImageRegion( 
-         movingImage->GetLargestPossibleRegion() );
-
-    imageRegistrationApp->SetRigidNumberOfIterations(iterations);
-    imageRegistrationApp->SetAffineNumberOfIterations(iterations);
-    imageRegistrationApp->SetRigidNumberOfSpatialSamples(samples);
-    imageRegistrationApp->SetAffineNumberOfSpatialSamples(samples);
-
-
-    switch(optimizationMethod)
+    else // Default if( command.GetOptionWasSet("InitNone") )
       {
-      default:
-        std::cerr << "Error: Optimization method unknown!" << std::endl;
-        break;
-      case 0:
-        imageRegistrationApp->SetOptimizerToOnePlusOne();
-        break;
-      case 1:
-        imageRegistrationApp->SetOptimizerToGradient();
-        break;
-      case 2:
-        imageRegistrationApp->SetOptimizerToOnePlusOnePlusGradient();
-        break;
+      imageRegistrationApp->RegisterUsingNone();
       }
 
-    switch(initializationMethod)
+    imageRegistrationApp->SetOptimizerToOnePlusOnePlusGradient();
+    if( command.GetOptionWasSet("OptOnePlusOne") )
       {
-      default:
-        std::cerr << "Error: Initialization method unknown!" << std::endl;
-        break;
-      case 0:
-        imageRegistrationApp->RegisterUsingNone();
-        break;
-      case 1:
-        imageRegistrationApp->RegisterUsingCenters();
-        break;
-      case 2:
-        imageRegistrationApp->RegisterUsingMass();
-        break;
-      case 3:
-        imageRegistrationApp->RegisterUsingMoments();
-        break;
-      case 4:
-        if( strlen( movingLandmarksFilename ) > 1 )
-          {
-          imageRegistrationApp->RegisterUsingLandmarks( 
-                                      fixedLandmarks.GetPointer(),
-                                      movingLandmarks.GetPointer());
-          }
-        break;
-      case 5:
-        typedef ImageRegistrationAppType::LoadedRegTransformType LoadedTType;
-        loadedTransformNumber = 1;
-        for(int i=0; i<abs(loadedTransformNumber); i++)
-          {
-          GroupReaderType::Pointer transformReader = GroupReaderType::New();
-          std::cout << "Loading Transform: " << loadedTransformFilename[i].c_str() << std::endl;
-          transformReader->SetFileName(loadedTransformFilename[i].c_str());
-          transformReader->Update();
-          GroupType::Pointer group = transformReader->GetGroup();
-          if(loadedTransformNumber<0)
-            {
-            std::cout << "Inverting" << std::endl;
-            GroupType::TransformType::Pointer transform;
-            transform = group->GetObjectToParentTransform();
-            LoadedTType::Pointer invertedTransform = LoadedTType::New();
-            transform->GetInverse(invertedTransform);
-            transform->SetCenter(invertedTransform->GetCenter());
-            transform->SetMatrix(invertedTransform->GetMatrix());
-            transform->SetOffset(invertedTransform->GetOffset());
-            }
-          if(i == 0)
-            {
-            imageRegistrationApp->SetLoadedTransform(
-                                   *(group->GetObjectToParentTransform()));
-            }
-          else
-            {
-            imageRegistrationApp->CompositeLoadedTransform(
-                                     *(group->GetObjectToParentTransform()));
-            }
-          }
-        imageRegistrationApp->RegisterUsingLoadedTransform();
-        break;
+      imageRegistrationApp->SetOptimizerToOnePlusOne();
       }
+    else if( command.GetOptionWasSet("OptGradient") )
+      {
+      imageRegistrationApp->SetOptimizerToGradient();
+      }
+    else if( command.GetOptionWasSet("OptOnePlusOneGradient") )
+      {
+      imageRegistrationApp->SetOptimizerToOnePlusOnePlusGradient();
+      }
+
     clock_t timeInitEnd = clock();
 
     double finalMetricValue = 0;
-    switch(registrationMethod)
+    if( command.GetOptionWasSet("TfmNone") )
       {
-      default:
-        std::cerr << "Error: Image registration method unknown!" << std::endl;
-        break;
-      case 0:
-        break;
-      case 1:
-        imageRegistrationApp->RegisterUsingRigid();
-        finalMetricValue = imageRegistrationApp->GetRigidMetricValue();
-        break;
-      case 2:
-        imageRegistrationApp->RegisterUsingAffine();
-        finalMetricValue = imageRegistrationApp->GetAffineMetricValue();
-        break;
-      case 3:
-        imageRegistrationApp->RegisterUsingRigid();
-        imageRegistrationApp->RegisterUsingAffine();
-        finalMetricValue = imageRegistrationApp->GetAffineMetricValue();
-        break;
+      //if( imageRegistrationApp->RegisterUsingNone();
       }
+    else if( command.GetOptionWasSet("TfmRigid") )
+      {
+      imageRegistrationApp->RegisterUsingRigid();
+      finalMetricValue = imageRegistrationApp->GetRigidMetricValue();
+      }
+    else if( command.GetOptionWasSet("TfmAffine") )
+      {
+      imageRegistrationApp->RegisterUsingAffine();
+      finalMetricValue = imageRegistrationApp->GetAffineMetricValue();
+      }
+    else if( command.GetOptionWasSet("TfmRigidAffine") )
+      {
+      imageRegistrationApp->RegisterUsingRigid();
+      imageRegistrationApp->RegisterUsingAffine();
+      finalMetricValue = imageRegistrationApp->GetAffineMetricValue();
+      }
+
     clock_t timeRegEnd = clock();
 
     TransformType::MatrixType m = imageRegistrationApp->
@@ -386,10 +314,14 @@ int main(int argc, char **argv)
     std::cout << timeRegEnd - timeInitEnd << " ";
     std::cout << finalMetricValue << std::endl;
     
-    if(strlen(outputImageFilename)>1)
+    if( command.GetOptionWasSet("SaveMovingImage") )
       {
+      std::cout << "Writing registered moving image to "
+                << command.GetValueAsString("SaveMovingImage", "Filename")
+                << std::endl;
       ImageWriterType::Pointer imageWriter = ImageWriterType::New();
-      imageWriter->SetFileName( outputImageFilename );
+      imageWriter->SetFileName(  command.GetValueAsString("SaveMovingImage",
+                                                          "Filename").c_str() );
       imageWriter->SetUseCompression(true);
       imageWriter->SetInput( 
                    imageRegistrationApp->GetFinalRegisteredMovingImage() );
@@ -403,10 +335,12 @@ int main(int argc, char **argv)
         }
       }
 
-    if( strlen( outputTransformFilename ) > 1)
+    if( command.GetOptionWasSet("SaveTransform") )
       {
       GroupWriterType::Pointer transformWriter = GroupWriterType::New();
-      transformWriter->SetFileName(outputTransformFilename);
+      transformWriter->SetFileName( command.GetValueAsString(
+                                                "SaveTransform",
+                                                "Filename").c_str() );
       GroupType::Pointer group = GroupType::New();
       itk::SpatialObject<3>::TransformType::Pointer transform =
           itk::SpatialObject<3>::TransformType::New();

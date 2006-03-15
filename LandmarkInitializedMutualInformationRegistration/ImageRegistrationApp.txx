@@ -160,6 +160,7 @@ ImageRegistrationApp< TImage >
 ::SetFixedImage(TImage * image)
   {
   m_FixedImage = image;
+  m_NoneRegValid = false;
   m_MassRegValid = false;
   m_MomentRegValid = false;
   m_LandmarkRegValid = false;
@@ -176,6 +177,7 @@ ImageRegistrationApp< TImage >
 ::SetMovingImage(TImage * image)
   {
   m_MovingImage = image;
+  m_NoneRegValid = false;
   m_MassRegValid = false;
   m_MomentRegValid = false;
   m_LandmarkRegValid = false;
