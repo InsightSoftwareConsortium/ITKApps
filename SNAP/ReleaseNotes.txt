@@ -71,6 +71,10 @@
  -  SNAP and IRIS now share the sameset of OpenGL windows. This should prevent
     crashes on some platforms.
 
+1.1.4. Other
+
+ -  SNAP available as a universal (Intel/PPC) binary for MacOS at itksnap.org
+
 
 1.2. New in Version 1.2
 -----------------------
