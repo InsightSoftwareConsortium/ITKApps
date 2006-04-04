@@ -6,3 +6,4 @@
 *.pdf           -crlf
 *.png           -crlf
 *.raw           -crlf
+*.sh             crlf=input
