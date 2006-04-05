@@ -198,9 +198,8 @@ OPTIONAL_APP(ImageCalculator)
 
 # Shared libs are needed for plugins
 # Build Volview plugins. You can't use them unless you have volview
-IF(BUILD_SHARED_LIBS)
-  OPTIONAL_APP ( VolviewPlugIns )
-ENDIF(BUILD_SHARED_LIBS)
+OPTIONAL_APP ( VolviewPlugIns )
+
 ENDIF(NOT BORLAND)
 
 
