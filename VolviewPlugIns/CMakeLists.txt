@@ -1,6 +1,10 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 1.6)
 PROJECT(VolviewPlugIns)
 
+# The plugins are always built as shared libraries. VolView contains
+# a vtkDynamicLoader that will find the dll's and load them when the
+# application starts.
+
 # Don't build anything unless the version of CMake is high enough.
 # The matching ELSE/ENDIF should be the last lines in the file.
 IF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 1.5)
