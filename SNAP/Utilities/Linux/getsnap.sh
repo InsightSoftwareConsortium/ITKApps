@@ -49,7 +49,7 @@ logfile=$basedir/buildlog
 CMAKE_REL="CMake-2-0-6"
 ITK_REL="ITK-2-6"
 VTK_REL="release-4-4"
-SNAP_REL="ITKSNAP-1-4"
+SNAP_REL="ITK-SNAP-1-4"
 
 # -------------------------------------------------------------
 # Check for necessary software
