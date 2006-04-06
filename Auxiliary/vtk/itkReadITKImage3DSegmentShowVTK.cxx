@@ -300,6 +300,7 @@ int main(int argc, char * argv [] )
       }
 
     // Bring up the render window and begin interaction.
+    renderer->ResetCamera();
     renWin->Render();
     iren->Start();
 
