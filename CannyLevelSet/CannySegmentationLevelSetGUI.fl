@@ -2,14 +2,14 @@
 version 1.0103 
 header_name {.h} 
 code_name {.cxx}
-class CannyLevelSetGUI {open : {public CannyLevelSetBase}
+class CannySegmentationLevelSetGUI {open : {public CannySegmentationLevelSetBase}
 } {
-  Function {CannyLevelSetGUI()} {open
+  Function {CannySegmentationLevelSetGUI()} {open
   } {
     Fl_Window consoleWindow {
       label {Canny Level Set} open
       xywh {495 138 795 305}
-      code0 {\#include <CannyLevelSetBase.h>}
+      code0 {\#include <CannySegmentationLevelSetBase.h>}
       code1 {\#include <fltkLightButton.h>} visible
     } {
       Fl_Group Connectors {
@@ -205,7 +205,7 @@ class CannyLevelSetGUI {open : {public CannyLevelSetBase}
       }
     }
   }
-  Function {~CannyLevelSetGUI()} {return_type virtual
+  Function {~CannySegmentationLevelSetGUI()} {return_type virtual
   } {}
   Function {Quit( void )} {return_type {virtual void}
   } {}
