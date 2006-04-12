@@ -51,16 +51,22 @@ CannySegmentationLevelSet
 
   this->SetZeroSetValue( zeroSetValueInput->value() );
   m_CannyFilter->SetNumberOfIterations( 
-        static_cast<unsigned int>( shapeDetectionIterationsValueInput->value() ) );
+        static_cast<unsigned int>( cannySegmentationIterationsValueInput->value() ) );
 
   m_CannyFilter->SetMaximumRMSError( 
-               shapeDetectionRMSErrorValueInput->value() );
+               cannySegmentationRMSErrorValueInput->value() );
 
   m_CannyFilter->SetCurvatureScaling(
-               shapeDetectionCurvatureScalingValueInput->value() );
+               cannySegmentationCurvatureScalingValueInput->value() );
 
   m_CannyFilter->SetPropagationScaling(
-               shapeDetectionPropagationScalingValueInput->value() );
+               cannySegmentationPropagationScalingValueInput->value() );
+
+  m_CannyFilter->SetAdvectionScaling(
+               cannySegmentationAdvectionScalingValueInput->value() );
+
+  m_CannyFilter->SetThreshold(
+               cannySegmentationStrenghtThresholdValueInput->value() );
 
   m_DerivativeFilter->SetSigma( sigmaValueInput->value() );
 
@@ -78,6 +84,7 @@ CannySegmentationLevelSet
   gradientMagnitudeButton->Observe( m_DerivativeFilter.GetPointer() );
   edgePotentialButton->Observe( m_SigmoidFilter.GetPointer() );
   fastMarchingResultButton->Observe( m_FastMarchingFilter.GetPointer() );
+  outputCannyEdgesButton->Observe( m_CannyFilter.GetPointer() );
 
   progressSlider->Observe( m_CastImageFilter.GetPointer() );
   progressSlider->Observe( m_DerivativeFilter.GetPointer() );
@@ -138,6 +145,7 @@ CannySegmentationLevelSet
   m_OutputLevelSetViewer.Hide();
   m_ZeroSetImageViewer.Hide();
   m_FastMarchingImageViewer.Hide();
+  m_OutputCannyEdgesViewer.Hide();
   
   m_VTKSegmentedImageViewer->Hide();
 
@@ -277,7 +285,7 @@ CannySegmentationLevelSet
     }
   this->RunCanny();
   m_OutputCannyEdgesViewer.SetImage( m_CastImageFilter->GetOutput() );
-  m_OutputCannyEdgesViewer.SetOverlay( m_CannyFilter->GetCannyImage() );  
+//  m_OutputCannyEdgesViewer.SetOverlay( m_CannyFilter->GetCannyImage() );  
   m_OutputCannyEdgesViewer.Show();
   m_OutputCannyEdgesViewer.SetOverlayOpacity( 1.0 );
 
