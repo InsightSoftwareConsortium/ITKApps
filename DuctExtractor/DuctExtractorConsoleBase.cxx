@@ -43,7 +43,8 @@ DuctExtractorConsoleBase
   
   m_RegionGrower->SetLower( 0.0 );
   m_RegionGrower->SetUpper( 1.0 );
-  m_RegionGrower->SetReplaceValue( 255 );
+  m_RegionGrower->SetReplaceValue( 
+       itk::NumericTraits< MaskPixelType >::One );
 
   m_Smoother->SetInput(  m_Reader->GetOutput()   );
   m_Laplacian->SetInput( m_Smoother->GetOutput() );
