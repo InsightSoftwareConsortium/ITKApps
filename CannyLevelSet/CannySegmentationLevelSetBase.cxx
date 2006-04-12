@@ -61,6 +61,7 @@ CannySegmentationLevelSetBase
   m_CannyFilter->SetMaximumRMSError( 0.02 );
   m_CannyFilter->SetNumberOfIterations( 100 );
   m_CannyFilter->UseImageSpacingOn();
+  m_CannyFilter->SetVariance( 1.0 );
 
   m_ThresholdFilter = ThresholdFilterType::New();
   m_ThresholdFilter->SetInput( m_CannyFilter->GetOutput() );
@@ -206,7 +207,6 @@ void
 CannySegmentationLevelSetBase 
 ::SetSigma( double value )
 {
-  m_CannyFilter->SetVariance( value * value );
   m_DerivativeFilter->SetSigma( value );
 }
 

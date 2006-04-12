@@ -68,6 +68,9 @@ CannySegmentationLevelSet
   m_CannyFilter->SetThreshold(
                cannySegmentationStrenghtThresholdValueInput->value() );
 
+  m_CannyFilter->SetVariance( 
+               cannySegmentationVarianceValueInput->value() );
+
   m_DerivativeFilter->SetSigma( sigmaValueInput->value() );
 
   m_FastMarchingFilter->SetStoppingValue( fastMarchingStoppingValueInput->value() );

@@ -2,7 +2,7 @@
 version 1.0107 
 header_name {.h} 
 code_name {.cxx}
-class CannySegmentationLevelSetGUI {open selected : {public CannySegmentationLevelSetBase}
+class CannySegmentationLevelSetGUI {open : {public CannySegmentationLevelSetBase}
 } {
   Function {CannySegmentationLevelSetGUI()} {open
   } {
@@ -76,7 +76,7 @@ class CannySegmentationLevelSetGUI {open selected : {public CannySegmentationLev
           xywh {335 79 10 55} box UP_BOX color 4
         }
       }
-      Fl_Group controlsGroup {
+      Fl_Group controlsGroup {selected
         xywh {0 5 915 240} deactivate
       } {
         Fl_Light_Button inputImageButton {
@@ -88,7 +88,7 @@ class CannySegmentationLevelSetGUI {open selected : {public CannySegmentationLev
         Fl_Button {} {
           label Canny
           callback {this->RunCanny();}
-          xywh {373 66 162 34} box ROUND_UP_BOX labelsize 12 align 128
+          xywh {373 66 256 34} box ROUND_UP_BOX labelsize 12 align 128
         }
         Fl_Light_Button thresholdedImageButton {
           label Display
@@ -210,7 +210,12 @@ class CannySegmentationLevelSetGUI {open selected : {public CannySegmentationLev
         Fl_Value_Input cannySegmentationStrenghtThresholdValueInput {
           label {Strenght Threshold}
           callback {m_CannyFilter->SetThreshold( o->value() );}
-          xywh {502 21 50 23} labelsize 12 align 8 maximum 100 step 0.01 value 0.1 textsize 12
+          xywh {502 20 50 23} labelsize 12 align 8 maximum 500 step 0.01 value 50 textsize 12
+        }
+        Fl_Value_Input cannySegmentationVarianceValueInput {
+          label Variance
+          callback {m_CannyFilter->SetVariance( o->value() );}
+          xywh {503 43 50 23} labelsize 12 align 8 maximum 200 step 0.01 value 1 textsize 12
         }
       }
       Fl_Slider progressSlider {
