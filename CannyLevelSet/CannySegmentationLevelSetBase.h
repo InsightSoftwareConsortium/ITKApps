@@ -137,6 +137,8 @@ public:
 
   virtual void SetSigma( double value );
 
+  virtual void SetThreshold( double value );
+
 protected:
 
 

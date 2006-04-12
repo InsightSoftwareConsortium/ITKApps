@@ -239,7 +239,7 @@ CannySegmentationLevelSet
  
 /************************************
  *
- *  Show Time Crossing Map Image
+ *  Show LevelSet Output
  *
  ***********************************/
 void
@@ -259,6 +259,31 @@ CannySegmentationLevelSet
 
 
   
+
+ 
+/*******************************************************
+ *
+ *  Show CannyEdges Output overlaid to input image 
+ *
+ ******************************************************/
+void
+CannySegmentationLevelSet
+::ShowOutputCannyEdges( void )
+{
+
+  if( !m_InputImageIsLoaded )
+    {
+    return;
+    }
+  this->RunCanny();
+  m_OutputCannyEdgesViewer.SetImage( m_CastImageFilter->GetOutput() );
+  m_OutputCannyEdgesViewer.SetOverlay( m_CannyFilter->GetCannyImage() );  
+  m_OutputCannyEdgesViewer.Show();
+  m_OutputCannyEdgesViewer.SetOverlayOpacity( 1.0 );
+
+}
+
+
 
 
 /************************************

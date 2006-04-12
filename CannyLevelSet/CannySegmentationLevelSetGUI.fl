@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0103 
+version 1.0107 
 header_name {.h} 
 code_name {.cxx}
 class CannySegmentationLevelSetGUI {open : {public CannySegmentationLevelSetBase}
@@ -8,15 +8,15 @@ class CannySegmentationLevelSetGUI {open : {public CannySegmentationLevelSetBase
   } {
     Fl_Window consoleWindow {
       label {Canny Level Set} open
-      xywh {495 138 795 305}
+      xywh {495 138 920 305} type Double
       code0 {\#include <CannySegmentationLevelSetBase.h>}
       code1 {\#include <fltkLightButton.h>} visible
     } {
       Fl_Group Connectors {
-        xywh {0 0 820 245}
+        xywh {0 0 915 245}
       } {
         Fl_Box {} {
-          xywh {645 55 45 10} box UP_BOX color 4
+          xywh {787 55 45 10} box UP_BOX color 4
         }
         Fl_Box {} {
           xywh {230 80 10 55} box UP_BOX color 4
@@ -25,13 +25,13 @@ class CannySegmentationLevelSetGUI {open : {public CannySegmentationLevelSetBase
           xywh {200 78 80 11} box UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {645 100 45 10} box UP_BOX color 4
+          xywh {787 100 45 10} box UP_BOX color 4
         }
         Fl_Box {} {
           xywh {510 80 10 55} box UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {645 55 10 55} box UP_BOX color 4
+          xywh {787 55 10 55} box UP_BOX color 4
         }
         Fl_Box {} {
           xywh {470 79 80 11} box UP_BOX color 4
@@ -40,7 +40,7 @@ class CannySegmentationLevelSetGUI {open : {public CannySegmentationLevelSetBase
           xywh {68 80 80 10} box UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {590 79 65 11} box UP_BOX color 4
+          xywh {732 79 65 11} box UP_BOX color 4
         }
         Fl_Box {} {
           xywh {415 80 10 120} box UP_BOX color 4
@@ -52,20 +52,26 @@ class CannySegmentationLevelSetGUI {open : {public CannySegmentationLevelSetBase
           xywh {65 190 360 10} box UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {360 80 10 55} box UP_BOX color 4
+          xywh {301 82 10 108} box UP_BOX color 4
         }
         Fl_Box {} {
           xywh {65 45 10 155} box UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {325 79 80 11} box UP_BOX color 4
+          xywh {383 5 10 81} box UP_BOX color 4
+        }
+        Fl_Box {} {
+          xywh {68 5 325 11} box UP_BOX color 4
         }
         Fl_Box {} {
           xywh {445 80 10 120} box UP_BOX color 4
         }
+        Fl_Box {} {
+          xywh {66 5 10 55} box UP_BOX color 4
+        }
       }
-      Fl_Group controlsGroup {
-        xywh {0 5 785 240} deactivate
+      Fl_Group controlsGroup {open
+        xywh {0 5 915 240} deactivate
       } {
         Fl_Light_Button inputImageButton {
           label Display
@@ -74,31 +80,31 @@ class CannySegmentationLevelSetGUI {open : {public CannySegmentationLevelSetBase
           class {fltk::LightButton}
         }
         Fl_Button {} {
-          label {Canny}
+          label Canny
           callback {this->RunCanny();}
-          xywh {381 66 117 34} box ROUND_UP_BOX labelsize 12 align 128
+          xywh {373 66 162 34} box ROUND_UP_BOX labelsize 12 align 128
         }
         Fl_Light_Button thresholdedImageButton {
           label Display
           callback {this->ShowThresholdedImage();}
-          xywh {675 45 90 30} type Normal value 1 selection_color 1 labelsize 12 align 148
+          xywh {816 45 90 30} type Normal value 1 selection_color 1 labelsize 12 align 148
           class {fltk::LightButton}
         }
         Fl_Light_Button thresholdedImageVTKButton {
           label {VTK Render}
           callback {this->ShowThresholdedImageWithVTK();}
-          xywh {675 90 90 25} type Normal value 1 selection_color 1 labelsize 12 align 148
+          xywh {816 90 90 25} type Normal value 1 selection_color 1 labelsize 12 align 148
           class {fltk::LightButton}
         }
         Fl_Button {} {
           label Threshold
           callback {m_ThresholdFilter->Update();}
-          xywh {535 66 87 34} box ROUND_UP_BOX labelsize 12 align 128
+          xywh {676 66 87 34} box ROUND_UP_BOX labelsize 12 align 128
         }
         Fl_Light_Button outputLevelSetButton {
           label {Level Set}
           callback {this->ShowOutputLevelSet();}
-          xywh {500 115 80 24} type Normal value 1 selection_color 1 labelsize 12 align 144
+          xywh {500 105 80 24} type Normal value 1 selection_color 1 labelsize 12 align 144
           class {fltk::LightButton}
         }
         Fl_Button {} {
@@ -141,7 +147,7 @@ class CannySegmentationLevelSetGUI {open : {public CannySegmentationLevelSetBase
         Fl_Button {} {
           label {Fast Marching}
           callback {this->ComputeFastMarching();}
-          xywh {195 178 123 33} box ROUND_UP_BOX labelsize 12 align 128
+          xywh {195 178 149 33} box ROUND_UP_BOX labelsize 12 align 128
         }
         Fl_Light_Button fastMarchingResultButton {
           label Overlay
@@ -177,26 +183,37 @@ class CannySegmentationLevelSetGUI {open : {public CannySegmentationLevelSetBase
         Fl_Value_Input shapeDetectionCurvatureScalingValueInput {
           label {Curvature Scaling}
           callback {m_CannyFilter->SetCurvatureScaling( o->value() );}
-          xywh {439 160 50 23} labelsize 12 align 8 maximum 5 step 0.01 value 0.1 textsize 12
+          xywh {439 166 50 23} labelsize 12 align 8 maximum 100 step 0.01 value 0.1 textsize 12
         }
         Fl_Value_Input shapeDetectionPropagationScalingValueInput {
           label {Propagation Scaling}
-          callback {m_CannyFilter->SetPropagationScaling( o->value() );} selected
-          xywh {439 183 50 23} labelsize 12 align 8 maximum 10 step 0.1 value 1 textsize 12
+          callback {m_CannyFilter->SetPropagationScaling( o->value() );}
+          xywh {439 189 50 23} labelsize 12 align 8 maximum 100 step 0.1 value 1 textsize 12
+        }
+        Fl_Value_Input shapeDetectionAdvectionScalingValueInput {
+          label {Advection Scaling}
+          callback {m_CannyFilter->SetAdvectionScaling( o->value() );}
+          xywh {439 212 50 23} labelsize 12 align 8 maximum 100 step 0.1 value 1 textsize 12
+        }
+        Fl_Light_Button outputCannyEdgesButton {
+          label Edges
+          callback {this->ShowOutputCannyEdges();}
+          xywh {500 133 80 24} type Normal value 1 selection_color 1 labelsize 12 align 144
+          class {fltk::LightButton}
         }
       }
       Fl_Slider progressSlider {
-        xywh {5 250 780 15} type {Horz Fill} selection_color 2
+        xywh {6 250 909 15} type {Horz Fill} selection_color 2
         code0 {\#include <fltkProgressBar.h>}
         class {fltk::ProgressBar}
       }
       Fl_Output statusTextOutput {
-        xywh {5 272 780 25}
+        xywh {5 272 909 25}
       }
       Fl_Button {} {
         label Quit
         callback {this->Quit();}
-        xywh {680 185 90 35} box ROUND_UP_BOX labelsize 12 align 128
+        xywh {817 197 90 35} box ROUND_UP_BOX labelsize 12 align 128
       }
       Fl_Button {} {
         label Load
@@ -230,5 +247,7 @@ class CannySegmentationLevelSetGUI {open : {public CannySegmentationLevelSetBase
   Function {ShowEdgePotentialImage( void )} {return_type {virtual void}
   } {}
   Function {ShowFastMarchingResultImage( void )} {return_type {virtual void}
+  } {}
+  Function {ShowOutputCannyEdges( void )} {selected return_type {virtual void}
   } {}
 } 

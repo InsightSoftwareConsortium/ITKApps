@@ -56,7 +56,7 @@ CannySegmentationLevelSetBase
 
   m_CannyFilter = CannyFilterType::New();
   m_CannyFilter->SetInput(  m_FastMarchingFilter->GetOutput() );
-  m_CannyFilter->SetFeatureImage(   m_SigmoidFilter->GetOutput() );
+  m_CannyFilter->SetFeatureImage(   m_CastImageFilter->GetOutput() );
 
   m_CannyFilter->SetMaximumRMSError( 0.02 );
   m_CannyFilter->SetNumberOfIterations( 100 );
@@ -202,6 +202,21 @@ CannySegmentationLevelSetBase
   m_CannyFilter->SetVariance( value * value );
   m_DerivativeFilter->SetSigma( value );
 }
+
+
+
+/********************************************
+ *
+ *  Set the Threshold value for edge strenght
+ *
+ *******************************************/
+void
+CannySegmentationLevelSetBase 
+::SetThreshold( double value )
+{
+  m_CannyFilter->SetThreshold( value );
+}
+
 
 
 

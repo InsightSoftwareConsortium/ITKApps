@@ -74,6 +74,8 @@ public:
 
   virtual void ShowOutputLevelSet();
 
+  virtual void ShowOutputCannyEdges();
+
   virtual void ShowGradientMagnitudeImage();
 
   virtual void ShowEdgePotentialImage();
@@ -99,6 +101,8 @@ private:
   SegmentedImageViewerType        m_FastMarchingImageViewer;
   
   InternalImageViewerType         m_OutputLevelSetViewer;
+
+  InternalImageViewerType         m_OutputCannyEdgesViewer;
 
   InternalImageViewerType         m_InputImageViewer;
 
