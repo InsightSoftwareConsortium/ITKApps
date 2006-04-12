@@ -188,6 +188,21 @@ CannySegmentationLevelSetBase
 }
 
 
+ 
+
+/********************************************
+ *
+ *  Set the Sigma value
+ *
+ *******************************************/
+void
+CannySegmentationLevelSetBase 
+::SetSigma( double value )
+{
+  m_CannyFilter->SetVariance( value * value );
+  m_DerivativeFilter->SetSigma( value );
+}
+
 
 
 /************************************

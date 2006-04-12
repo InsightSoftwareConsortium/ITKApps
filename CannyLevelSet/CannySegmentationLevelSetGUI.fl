@@ -125,7 +125,7 @@ class CannySegmentationLevelSetGUI {open : {public CannySegmentationLevelSetBase
         }
         Fl_Value_Input sigmaValueInput {
           label Sigma
-          callback {m_DerivativeFilter->SetSigma( o->value() );}
+          callback {this->SetSigma( o->value() );}
           xywh {162 39 35 24} labelsize 12 maximum 50 step 0.1 value 1.2 textsize 12
         }
         Fl_Value_Input zeroSetValueInput {

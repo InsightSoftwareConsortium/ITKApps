@@ -14,8 +14,8 @@
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef SHAPEDETECTIONLEVELSETSBASE
-#define SHAPEDETECTIONLEVELSETSBASE
+#ifndef CANNYLEVELSETSBASE
+#define CANNYLEVELSETSBASE
 
 
 #include "itkImage.h"
@@ -135,6 +135,8 @@ public:
 
   virtual void SetZeroSetValue( InternalPixelType value );
 
+  virtual void SetSigma( double value );
+
 protected:
 
 
@@ -148,7 +150,7 @@ protected:
 
   ThresholdFilterType::Pointer                m_InputThresholdFilter;
   
-  CannyFilterType::Pointer           m_CannyFilter;
+  CannyFilterType::Pointer                    m_CannyFilter;
 
   DerivativeFilterType::Pointer               m_DerivativeFilter;
 
