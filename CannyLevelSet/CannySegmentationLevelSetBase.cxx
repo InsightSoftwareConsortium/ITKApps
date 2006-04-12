@@ -69,6 +69,13 @@ CannySegmentationLevelSetBase
   m_ThresholdFilter->SetInsideValue(   1 );
   m_ThresholdFilter->SetOutsideValue(  0 );
 
+  m_CannyEdgesThresholdFilter = ThresholdFilterType::New();
+  m_CannyEdgesThresholdFilter->SetInput( m_CannyFilter->GetCannyImage() );
+  m_CannyEdgesThresholdFilter->SetUpperThreshold( itk::NumericTraits<InternalPixelType>::Zero ); 
+  m_CannyEdgesThresholdFilter->SetLowerThreshold( itk::NumericTraits<InternalPixelType>::NonpositiveMin() ); 
+  m_CannyEdgesThresholdFilter->SetInsideValue( 0 );
+  m_CannyEdgesThresholdFilter->SetOutsideValue( 1 );
+
   m_SeedImage = SeedImageType::New();
 
   m_SeedValue = 0; // It must be set to the minus distance of the initial level set.
@@ -303,6 +310,7 @@ CannySegmentationLevelSetBase
     this->ComputeFastMarching();
     this->ShowStatus("Computing CannySegmentationLevelSet Filter");
     m_CannyFilter->Update();
+    m_CannyEdgesThresholdFilter->Update();
     }
   catch( itk::ExceptionObject & exp )
     {

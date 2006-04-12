@@ -152,6 +152,8 @@ protected:
 
   ThresholdFilterType::Pointer                m_InputThresholdFilter;
   
+  ThresholdFilterType::Pointer                m_CannyEdgesThresholdFilter;
+
   CannyFilterType::Pointer                    m_CannyFilter;
 
   DerivativeFilterType::Pointer               m_DerivativeFilter;

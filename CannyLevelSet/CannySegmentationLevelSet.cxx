@@ -77,6 +77,8 @@ CannySegmentationLevelSet
 
   m_OutputLevelSetViewer.SetLabel("Output Level Set");
 
+  m_OutputCannyEdgesViewer.SetLabel("Canny Edges");
+
   // Connect Observers in the GUI 
   inputImageButton->Observe( m_ImageReader.GetPointer() );
   thresholdedImageButton->Observe( m_ThresholdFilter.GetPointer() );
@@ -84,7 +86,7 @@ CannySegmentationLevelSet
   gradientMagnitudeButton->Observe( m_DerivativeFilter.GetPointer() );
   edgePotentialButton->Observe( m_SigmoidFilter.GetPointer() );
   fastMarchingResultButton->Observe( m_FastMarchingFilter.GetPointer() );
-  outputCannyEdgesButton->Observe( m_CannyFilter.GetPointer() );
+  outputCannyEdgesButton->Observe( m_CannyEdgesThresholdFilter.GetPointer() );
 
   progressSlider->Observe( m_CastImageFilter.GetPointer() );
   progressSlider->Observe( m_DerivativeFilter.GetPointer() );
@@ -285,7 +287,7 @@ CannySegmentationLevelSet
     }
   this->RunCanny();
   m_OutputCannyEdgesViewer.SetImage( m_CastImageFilter->GetOutput() );
-//  m_OutputCannyEdgesViewer.SetOverlay( m_CannyFilter->GetCannyImage() );  
+  m_OutputCannyEdgesViewer.SetOverlay( m_CannyEdgesThresholdFilter->GetOutput() );  
   m_OutputCannyEdgesViewer.Show();
   m_OutputCannyEdgesViewer.SetOverlayOpacity( 1.0 );
 
