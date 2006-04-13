@@ -75,9 +75,6 @@ CannySegmentationLevelSet
 
   m_FastMarchingFilter->SetStoppingValue( fastMarchingStoppingValueInput->value() );
 
-  m_VTKSegmentedImageViewer = VTKImageViewerType::New();
-  m_VTKSegmentedImageViewer->SetImage( m_ThresholdFilter->GetOutput() );
-
   m_OutputLevelSetViewer.SetLabel("Output Level Set");
 
   m_OutputCannyEdgesViewer.SetLabel("Canny Edges");
@@ -89,7 +86,8 @@ CannySegmentationLevelSet
   gradientMagnitudeButton->Observe( m_DerivativeFilter.GetPointer() );
   edgePotentialButton->Observe( m_SigmoidFilter.GetPointer() );
   fastMarchingResultButton->Observe( m_FastMarchingFilter.GetPointer() );
-  outputCannyEdgesButton->Observe( m_CannyEdgesThresholdFilter.GetPointer() );
+  outputCannyEdgesButton->Observe( m_CannyFilter.GetPointer() );
+  contourExportVTKButton->Observe( m_CannyFilter.GetPointer() );
 
   progressSlider->Observe( m_CastImageFilter.GetPointer() );
   progressSlider->Observe( m_DerivativeFilter.GetPointer() );
@@ -152,8 +150,6 @@ CannySegmentationLevelSet
   m_FastMarchingImageViewer.Hide();
   m_OutputCannyEdgesViewer.Hide();
   
-  m_VTKSegmentedImageViewer->Hide();
-
   consoleWindow->hide();
 }
 
@@ -205,6 +201,24 @@ CannySegmentationLevelSet
 }
 
 
+ 
+/****************************************************************
+ *
+ *  Export contour representing the Iso-value of the LevelSet
+ *
+ ***************************************************************/
+void
+CannySegmentationLevelSet
+::ExportContour( void )
+{
+  const char * filename = fl_file_chooser("Contour filename","*.vtk","");
+  if( !filename )
+    {
+    return;
+    }
+  m_PolyDataWriter->SetFileName( filename );
+  m_PolyDataWriter->Write();
+}
 
  
 /************************************
@@ -386,24 +400,6 @@ CannySegmentationLevelSet
   m_FastMarchingImageViewer.SetOverlayOpacity( 0.5 );
 }
 
-
-
-
-
-
-
- 
-/************************************
- *
- *  Show Homogeneous Image
- *
- ***********************************/
-void
-CannySegmentationLevelSet
-::ShowThresholdedImageWithVTK( void )
-{
-  m_VTKSegmentedImageViewer->Show();
-}
 
 
 

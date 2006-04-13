@@ -25,10 +25,8 @@ ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 INCLUDE_DIRECTORIES(
 ${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer
-${InsightApplications_SOURCE_DIR}/Auxiliary/VtkFltk
 ${InsightApplications_SOURCE_DIR}/Auxiliary/vtk
 ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
-${InsightApplications_BINARY_DIR}/Auxiliary/VtkFltk
 ${CannySegmentationLevelSet_SOURCE_DIR}
 ${CannySegmentationLevelSet_BINARY_DIR}
 )
@@ -52,7 +50,6 @@ vtkImaging
 vtkIO
 vtkFiltering
 vtkCommon
-ITKVtkFltk
 ITKFltkImageViewer
 )
 

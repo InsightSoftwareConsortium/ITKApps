@@ -28,6 +28,26 @@
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 
+#include "itkVTKImageExport.h"
+#include "vtkImageImport.h"
+#include "vtkImageExport.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
+#include "vtkActor.h"
+#include "vtkPolyData.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkContourFilter.h"
+#include "vtkImageData.h"
+#include "vtkDataSet.h"
+#include "vtkProperty.h"
+#include "vtkImagePlaneWidget.h"
+#include "vtkCellPicker.h"
+#include "vtkPolyDataWriter.h"
+#include "vtkProbeFilter.h"
+
+
+
 
 /**
  * \brief CannySegmentationLevelSetsBase class that instantiate
@@ -108,6 +128,10 @@ public:
   typedef FastMarchingFilterType::NodeContainer           NodeContainer;
 
 
+  /** Types for the visualization pipeline */
+  typedef itk::VTKImageExport< InternalImageType >        ExportFilterType;
+
+
 public:
   CannySegmentationLevelSetBase();
   virtual ~CannySegmentationLevelSetBase();
@@ -139,7 +163,11 @@ public:
 
   virtual void SetThreshold( double value );
 
+
 protected:
+
+  virtual void ConnectPipelines( vtkImageImport * importer, 
+                                 ExportFilterType * exporter );
 
 
   ImageReaderType::Pointer                    m_ImageReader;
@@ -169,6 +197,21 @@ protected:
   InternalPixelType                           m_SeedValue;
 
   unsigned int                                m_NumberOfSeeds;
+
+
+  /**  Surface Extraction Pipeline */
+
+  vtkImageImport *                            m_VtkImporter1;
+  vtkImageImport *                            m_VtkImporter2;
+
+  ExportFilterType::Pointer                   m_ItkExporter1;
+  ExportFilterType::Pointer                   m_ItkExporter2;
+
+  vtkContourFilter *                          m_ContourFilter;
+
+  vtkPolyDataWriter *                         m_PolyDataWriter;
+
+  vtkProbeFilter *                            m_ProbeFilter;
 
 };
 

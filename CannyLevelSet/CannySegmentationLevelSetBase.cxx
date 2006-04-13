@@ -85,7 +85,53 @@ CannySegmentationLevelSetBase
 
   m_InputImageIsLoaded  = false;
 
+  m_VtkImporter1 = vtkImageImport::New();
+  m_VtkImporter2 = vtkImageImport::New();
+
+  m_ContourFilter = vtkContourFilter::New();
+
+  m_PolyDataWriter = vtkPolyDataWriter::New();
+
+  m_ItkExporter1 = ExportFilterType::New();
+  m_ItkExporter2 = ExportFilterType::New();
+
+  m_ProbeFilter = vtkProbeFilter::New();
+
+  this->ConnectPipelines( m_VtkImporter1, m_ItkExporter1 );
+  this->ConnectPipelines( m_VtkImporter2, m_ItkExporter2 );
+
+  m_ItkExporter1->SetInput( m_CannyFilter->GetOutput() );
+  m_ItkExporter2->SetInput( m_DerivativeFilter->GetOutput() );
+ 
+  m_ContourFilter->SetInput( m_VtkImporter1->GetOutput() );  
+
+  m_ContourFilter->SetValue( 0, 0.0 ); // Value of the ZeroSet.
+
+  m_ProbeFilter->SetInput( m_ContourFilter->GetOutput() );
+  m_ProbeFilter->SetSource( m_VtkImporter2->GetOutput() );
+  
+  m_PolyDataWriter->SetInput( m_ProbeFilter->GetOutput() );
+
 }
+
+
+void CannySegmentationLevelSetBase
+::ConnectPipelines( vtkImageImport * importer, ExportFilterType * exporter )
+{
+  importer->SetUpdateInformationCallback(exporter->GetUpdateInformationCallback());
+  importer->SetPipelineModifiedCallback(exporter->GetPipelineModifiedCallback());
+  importer->SetWholeExtentCallback(exporter->GetWholeExtentCallback());
+  importer->SetSpacingCallback(exporter->GetSpacingCallback());
+  importer->SetOriginCallback(exporter->GetOriginCallback());
+  importer->SetScalarTypeCallback(exporter->GetScalarTypeCallback());
+  importer->SetNumberOfComponentsCallback(exporter->GetNumberOfComponentsCallback());
+  importer->SetPropagateUpdateExtentCallback(exporter->GetPropagateUpdateExtentCallback());
+  importer->SetUpdateDataCallback(exporter->GetUpdateDataCallback());
+  importer->SetDataExtentCallback(exporter->GetDataExtentCallback());
+  importer->SetBufferPointerCallback(exporter->GetBufferPointerCallback());
+  importer->SetCallbackUserData(exporter->GetCallbackUserData());
+}
+
 
 
 
@@ -98,6 +144,12 @@ CannySegmentationLevelSetBase
 ::~CannySegmentationLevelSetBase()
 {
 
+  m_PolyDataWriter->Delete();
+
+  m_ContourFilter->Delete();
+
+  m_VtkImporter1->Delete();
+  m_VtkImporter2->Delete();
 }
 
 
@@ -150,7 +202,7 @@ CannySegmentationLevelSetBase
 
 
 
- 
+  
 
 /********************************************
  *

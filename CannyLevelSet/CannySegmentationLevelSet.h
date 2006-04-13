@@ -14,14 +14,11 @@
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef SHAPEDETECTIONLEVELSET
-#define SHAPEDETECTIONLEVELSET
+#ifndef CANNYEDGESLEVELSET
+#define CANNYEDGESLEVELSET
 
 #include "CannySegmentationLevelSetGUI.h"
 #include "fltkImageViewer.h"
-
-#include "fltkVTKImageViewer.h"
-
 
 /**
  * \brief CannySegmentationLevelSet class that instantiate
@@ -57,8 +54,6 @@ public:
   typedef fltk::ImageViewer< InternalPixelType, 
                                     ThresholdPixelType >   SegmentedImageViewerType;
 
-  typedef fltk::VTKImageViewer< ThresholdPixelType >       VTKImageViewerType;
-
 
 public:
   CannySegmentationLevelSet();
@@ -84,8 +79,6 @@ public:
 
   virtual void ShowFastMarchingResultImage();
     
-  virtual void ShowThresholdedImageWithVTK();
-
   virtual void Quit();
 
   virtual void SelectSeedPoint( float x, float y, float z );
@@ -93,6 +86,8 @@ public:
   static  void ClickSelectCallback(float x, float y, float z, float value, void * args );
 
   virtual void ClearSeeds();
+
+  virtual void ExportContour();
 
 private:
 
@@ -111,8 +106,6 @@ private:
   InternalImageViewerType         m_EdgePotentialImageViewer;
 
   InternalImageViewerType         m_ZeroSetImageViewer;
-
-  VTKImageViewerType::Pointer     m_VTKSegmentedImageViewer;
 
 };
 
