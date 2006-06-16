@@ -32,6 +32,7 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
+#include "vtkInteractorStyleImage.h" 
 
 /**
  * This will be setup as a callback for a progress event on an ITK
@@ -173,6 +174,8 @@ int main(int argc, char * argv [] )
     vtkImageActor* actor = vtkImageActor::New();
     actor->SetInput(vtkImporter->GetOutput());
     
+    vtkInteractorStyleImage * interactorStyle = vtkInteractorStyleImage::New();
+
     // Create a renderer, render window, and render window interactor to
     // display the results.
     vtkRenderer* renderer = vtkRenderer::New();
@@ -182,6 +185,7 @@ int main(int argc, char * argv [] )
     renWin->SetSize(500, 500);
     renWin->AddRenderer(renderer);
     iren->SetRenderWindow(renWin);
+    iren->SetInteractorStyle( interactorStyle );
     
     // Add the vtkImageActor to the renderer for display.
     renderer->AddActor(actor);
@@ -190,6 +194,14 @@ int main(int argc, char * argv [] )
     // Bring up the render window and begin interaction.
     renWin->Render();
     iren->Start();
+
+    // Release all VTK components
+    actor->Delete();
+    interactorStyle->Delete(); 
+    vtkImporter->Delete();
+    renWin->Delete();
+    renderer->Delete();
+    iren->Delete();
 
     }
   catch( itk::ExceptionObject & e )
