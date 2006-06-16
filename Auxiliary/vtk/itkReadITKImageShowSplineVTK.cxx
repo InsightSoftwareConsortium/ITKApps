@@ -204,6 +204,7 @@ int main(int argc, char * argv [] )
 
     
     spline->SetPlaneSource( planeSource );
+    planeSource->SetNormal( 0.0, 0.0, 1.0 );
   
     spline->SetInteractor( iren );
     spline->On();
@@ -211,6 +212,17 @@ int main(int argc, char * argv [] )
     // Bring up the render window and begin interaction.
     renWin->Render();
     iren->Start();
+
+    // Release all VTK components
+    vtkExporter->Delete();
+    vtkImporter->Delete();
+    actor->Delete();
+    planeSource->Delete();
+    spline->Delete();
+    renWin->Delete();
+    renderer->Delete();
+    iren->Delete();
+
 
     }
   catch( itk::ExceptionObject & e )
