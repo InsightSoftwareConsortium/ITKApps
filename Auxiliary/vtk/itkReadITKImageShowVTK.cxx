@@ -199,6 +199,7 @@ int main(int argc, char * argv [] )
     actor->Delete();
     interactorStyle->Delete(); 
     vtkImporter->Delete();
+    vtkExporter->Delete();
     renWin->Delete();
     renderer->Delete();
     iren->Delete();
