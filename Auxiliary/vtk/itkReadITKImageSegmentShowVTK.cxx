@@ -211,6 +211,19 @@ int main(int argc, char * argv [] )
     renWin->Render();
     iren->Start();
 
+    // Release all VTK components
+    actor->Delete();
+    interactorStyle->Delete(); 
+    polyActor->Delete();
+    vtkImporter1->Delete();
+    vtkImporter2->Delete();
+    contour->Delete();
+    property->Delete();
+    polyMapper->Delete();
+    renWin->Delete();
+    renderer->Delete();
+    iren->Delete();
+
     }
   catch( itk::ExceptionObject & e )
     {
