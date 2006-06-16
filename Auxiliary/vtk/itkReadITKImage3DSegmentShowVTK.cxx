@@ -304,6 +304,23 @@ int main(int argc, char * argv [] )
     renWin->Render();
     iren->Start();
 
+    // Release all VTK components
+    polyActor->Delete();
+    picker->Delete();
+    ipwProp->Delete();
+    vtkImporter1->Delete();
+    vtkImporter2->Delete();
+    xImagePlaneWidget->Delete();
+    yImagePlaneWidget->Delete();
+    zImagePlaneWidget->Delete();
+    contour->Delete();
+    property->Delete();
+    polyMapper->Delete();
+    renWin->Delete();
+    renderer->Delete();
+    iren->Delete();
+
+
     }
   catch( itk::ExceptionObject & e )
     {
