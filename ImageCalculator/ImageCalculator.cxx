@@ -27,11 +27,28 @@
 
 
 //Call ImageCalculator process for 2d images.
-extern void ImageCalculatorProcess2D(const std::string & InType,MetaCommand command);
+extern void ImageCalculatorProcess2D(const std::string & InType,MetaCommand &command);
 
 //Call ImageCalculator process for 3d images.
-extern void ImageCalculatorProcess3D(const std::string & InType,MetaCommand command);
+extern void ImageCalculatorProcess3D(const std::string & InType,MetaCommand &command);
 
+
+bool ValidPixelType(const std::string &PixelType)
+{
+  const char *s = PixelType.c_str();
+  // check to see if valid type
+  if( ( CompareNoCase(s, std::string("UCHAR") ) ) &&
+      ( CompareNoCase(s, std::string("SHORT") ) ) &&
+      ( CompareNoCase(s, std::string("USHORT") ) ) &&
+      ( CompareNoCase(s, std::string("INT") ) ) &&
+      ( CompareNoCase(s, std::string("UINT") ) ) &&
+      ( CompareNoCase(s, std::string("FLOAT") ) ) &&
+      ( CompareNoCase(s, std::string("DOUBLE") ) ) )
+    {
+    return false;
+    }
+  return true;
+}
 
 int main(int argc, char *argv[])
 {
@@ -192,16 +209,9 @@ int main(int argc, char *argv[])
 
   //Test if the input data type is valid
   const std::string PixelType(command.GetValueAsString("InputPixelType","PixelType"));
-  if ( command.GetValueAsString("InputPixelType","PixelType") != "")
+  if (PixelType != "")
     {
-    // check to see if valid type
-    if( ( CompareNoCase( PixelType.c_str(), std::string("UCHAR") ) ) &&
-        ( CompareNoCase( PixelType.c_str(), std::string("SHORT") ) ) &&
-        ( CompareNoCase( PixelType.c_str(), std::string("USHORT") ) ) &&
-        ( CompareNoCase( PixelType.c_str(), std::string("INT") ) ) &&
-        ( CompareNoCase( PixelType.c_str(), std::string("UINT") ) ) &&
-        ( CompareNoCase( PixelType.c_str(), std::string("FLOAT") ) ) &&
-        ( CompareNoCase( PixelType.c_str(), std::string("DOUBLE") ) ) )
+    if(!ValidPixelType(PixelType))
       {
       std::cout << "Error. Invalid data type string specified with -intype!" << std::endl;
       std::cout << "Use one of the following:" << std::endl;
@@ -213,19 +223,12 @@ int main(int argc, char *argv[])
 
   const std::string OutPixelType(command.GetValueAsString("OutputPixelType","PixelType" ));
 
-  if ( command.GetValueAsString("OutputPixelType","PixelType" ) != "")
+  if (OutPixelType!= "")
     {
     // check to see if valid type
-    if( ( CompareNoCase( OutPixelType.c_str(), std::string("UCHAR") ) ) &&
-        ( CompareNoCase( OutPixelType.c_str(), std::string("SHORT") ) ) &&
-        ( CompareNoCase( OutPixelType.c_str(), std::string("USHORT") ) ) &&
-        ( CompareNoCase( OutPixelType.c_str(), std::string("INT") ) ) &&
-        ( CompareNoCase( OutPixelType.c_str(), std::string("UINT") ) ) &&
-        ( CompareNoCase( OutPixelType.c_str(), std::string("FLOAT") ) ) &&
-        ( CompareNoCase( OutPixelType.c_str(), std::string("DOUBLE") ) ))
-
+    if(!ValidPixelType(OutPixelType))
       {
-      std::cout << "Error. Invalid data type string specified with -intype!" << std::endl;
+      std::cout << "Error. Invalid data type string specified with -outtype!" << std::endl;
       std::cout << "Use one of the following:" << std::endl;
       PrintDataTypeStrings();
       exit(-1);
@@ -235,38 +238,35 @@ int main(int argc, char *argv[])
 
 
   //Test that only one operation is set
+  int opcount=0;
+  if(command.GetValueAsBool("Add","add"))
     {
-
-    int opcount=0;
-    if(command.GetValueAsBool("Add","add"))
-      {
-      opcount++;
-      }
-    if(command.GetValueAsBool("Sub","sub"))
-      {
-      opcount++;
-      }
-    if(command.GetValueAsBool("Mul","mul"))
-      {
-      opcount++;
-      }
-    if(command.GetValueAsBool("Div","div"))
-      {
-      opcount++;
-      }
-    if(command.GetValueAsBool("Var","var"))
-      {
-      opcount++;
-      }
-    if(command.GetValueAsBool("Avg","avg"))
-      {
-      opcount++;
-      }
-    if(opcount > 1)
-      {
-      std::cout << "Can only supply one operation to do [-add|-sub|-mul|-div|-var|-avg]" << std::endl;
-      exit(-1);
-      }
+    opcount++;
+    }
+  if(command.GetValueAsBool("Sub","sub"))
+    {
+    opcount++;
+    }
+  if(command.GetValueAsBool("Mul","mul"))
+    {
+    opcount++;
+    }
+  if(command.GetValueAsBool("Div","div"))
+    {
+    opcount++;
+    }
+  if(command.GetValueAsBool("Var","var"))
+    {
+    opcount++;
+    }
+  if(command.GetValueAsBool("Avg","avg"))
+    {
+    opcount++;
+    }
+  if(opcount > 1)
+    {
+    std::cout << "Can only supply one operation to do [-add|-sub|-mul|-div|-var|-avg]" << std::endl;
+    exit(-1);
     }
 
   //Call the ImageCalculatorReadWrite function based on the dimension.
@@ -283,6 +283,8 @@ int main(int argc, char *argv[])
     case 3:
       ImageCalculatorProcess3D(InType,command);
       break;
+    default:
+      return 1;
     }
 
   return 0;

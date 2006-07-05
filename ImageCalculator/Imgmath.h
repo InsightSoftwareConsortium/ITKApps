@@ -38,7 +38,7 @@
 
 
 template <class PixelType, int Dimension>
-typename itk::Image< PixelType, Dimension >::ConstPointer 
+typename itk::Image< PixelType, Dimension >::Pointer 
 Iadd( const itk::Image< PixelType, Dimension > * input1,
       const itk::Image< PixelType, Dimension > * input2 )
 {
@@ -62,7 +62,7 @@ Iadd( const itk::Image< PixelType, Dimension > * input1,
       exit(-1);
       }
   
-  typename ImageType::ConstPointer image = filter->GetOutput();
+  typename ImageType::Pointer image = filter->GetOutput();
 
   return image;
 
@@ -74,7 +74,7 @@ Iadd( const itk::Image< PixelType, Dimension > * input1,
  * image.*/
 
 template <class PixelType, int Dimension>
-typename itk::Image< PixelType, Dimension >::ConstPointer
+typename itk::Image< PixelType, Dimension >::Pointer
 Isub( const itk::Image< PixelType, Dimension > * input1, 
       const itk::Image< PixelType, Dimension > * input2 )
 {
@@ -99,7 +99,7 @@ Isub( const itk::Image< PixelType, Dimension > * input1,
       exit(-1);
       }
 
-  typename ImageType::ConstPointer image =  filter->GetOutput();
+  typename ImageType::Pointer image =  filter->GetOutput();
 
   return image;
 
@@ -110,7 +110,7 @@ Isub( const itk::Image< PixelType, Dimension > * input1,
  * image.*/
 
 template <class PixelType, int Dimension>
-typename itk::Image< PixelType, Dimension >::ConstPointer 
+typename itk::Image< PixelType, Dimension >::Pointer 
 Imul( const itk::Image< PixelType, Dimension > * input1,
       const itk::Image< PixelType, Dimension > * input2 )
 {
@@ -135,7 +135,7 @@ Imul( const itk::Image< PixelType, Dimension > * input1,
       exit(-1);
       }
 
-  typename ImageType::ConstPointer image = filter->GetOutput();
+  typename ImageType::Pointer image = filter->GetOutput();
 
   return image;
 
@@ -146,7 +146,7 @@ Imul( const itk::Image< PixelType, Dimension > * input1,
  * image.*/
 
 template <class PixelType, int Dimension>
-typename itk::Image< PixelType, Dimension >::ConstPointer 
+typename itk::Image< PixelType, Dimension >::Pointer 
 Idiv(const itk::Image< PixelType, Dimension > * input1,
      const itk::Image< PixelType, Dimension > * input2 )
 {
@@ -171,7 +171,7 @@ Idiv(const itk::Image< PixelType, Dimension > * input1,
       exit(-1);
       }
 
-  typename ImageType::ConstPointer image = filter->GetOutput();
+  typename ImageType::Pointer image = filter->GetOutput();
 
   return image;
 
@@ -214,7 +214,7 @@ Iavg( const itk::Image< PixelType, Dimension > * input1, int nimgs )
  * outputs the resultant image*/
 
 template <class PixelType, int Dimension>
-typename itk::Image< PixelType, Dimension >::ConstPointer 
+typename itk::Image< PixelType, Dimension >::Pointer 
 ImageMultiplyConstant( const itk::Image< PixelType, Dimension > * input1, 
                        PixelType constant )
 {
@@ -242,7 +242,7 @@ ImageMultiplyConstant( const itk::Image< PixelType, Dimension > * input1,
     ++out1;
     }
 
-  typename ImageType::ConstPointer constImage = image.GetPointer();
+  typename ImageType::Pointer constImage = image.GetPointer();
 
   return constImage;
 }
@@ -252,7 +252,7 @@ ImageMultiplyConstant( const itk::Image< PixelType, Dimension > * input1,
  * outputs the resultant image*/
 
 template <class PixelType, int Dimension>
-typename itk::Image< PixelType, Dimension >::ConstPointer 
+typename itk::Image< PixelType, Dimension >::Pointer 
 ImageDivideConstant( const itk::Image< PixelType, Dimension > * input1, 
                      PixelType constant )
 {
@@ -280,7 +280,7 @@ ImageDivideConstant( const itk::Image< PixelType, Dimension > * input1,
     ++out1;
     }
 
-  typename ImageType::ConstPointer constImage = image.GetPointer();
+  typename ImageType::Pointer constImage = image.GetPointer();
 
   return constImage;
 }

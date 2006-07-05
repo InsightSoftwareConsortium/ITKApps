@@ -23,7 +23,8 @@ IF( BUILD_TESTING )
        -d 2 -statNPX -statMIN -statAVG -statMAX -statVAR -statSUM  )
 
   #Test for more than 2 images different data types for Input image and output image
-
+  #
+  # Test add
   ADD_TEST(ImageCalculator2DTest2 ${IMAGE_CALCULATOR_TESTS} 
     --compare
         ${ImageCalculator_BINARY_DIR}/Test.png 
@@ -37,8 +38,23 @@ IF( BUILD_TESTING )
         -intype UCHAR -outtype USHORT -add 
         -out ${ImageCalculator_BINARY_DIR}/Test.png 
         -d 2 -statNPX -statMIN -statAVG -statMAX -statVAR -statSUM  )
+  #Test for more than 2 images different data types for Input image and output image
+  #
+  # Test SUB
+  ADD_TEST(ImageCalculator2DTest3 ${IMAGE_CALCULATOR_TESTS} 
+    --compare
+        ${ImageCalculator_BINARY_DIR}/Test.png 
+        ${ImageCalculator_SOURCE_DIR}/TestImages/AllZeroes.png
+    ImageCalculatorTest 
+        -in ${ImageCalculator_SOURCE_DIR}/TestImages/AllHundreds.png 
+            ${ImageCalculator_SOURCE_DIR}/TestImages/AllHundreds.png 
+        -intype UCHAR -outtype USHORT -sub
+        -out ${ImageCalculator_BINARY_DIR}/Test.png 
+        -d 2 -statNPX -statMIN -statAVG -statMAX -statVAR -statSUM  )
 
   # Test for 3d Images and division
+  #
+  # test Divide
   ADD_TEST(ImageCalculator3DTest1 ${IMAGE_CALCULATOR_TESTS} 
     --compare 
         ${ImageCalculator_BINARY_DIR}/Test.hdr 
@@ -51,6 +67,7 @@ IF( BUILD_TESTING )
         -d 3 -statNPX -statMIN -statAVG -statMAX -statVAR -statSUM  )
 
   #A simple scalar multiplcation test
+  # test multiply
   ADD_TEST(ImageCalculator3DTest2 ${IMAGE_CALCULATOR_TESTS} 
     --compare 
         ${ImageCalculator_BINARY_DIR}/Test.hdr
