@@ -4,7 +4,7 @@
 #include "itkImage.h"
 #include "itkImageFileWriter.h"
 #include "itkImageRegionIterator.h"
-
+#include "itkRGBPixel.h"
 enum PixelTypes {
   Char,
   UnsignedChar,
@@ -14,8 +14,13 @@ enum PixelTypes {
   UnsignedInt,
   Float, 
   Double, 
+  ThreeVectorComplex,
+  Rgb,
   Crap
 };
+
+typedef std::complex<float> ThreeVectorComplexPixelType;
+typedef itk::RGBPixel<unsigned char> RGBPixelType;
 
 std::map<PixelTypes,char *> typenames;
 void typenamesInit()
@@ -28,13 +33,15 @@ void typenamesInit()
   typenames[UnsignedInt] = "UnsignedInt";
   typenames[Float] = "Float";
   typenames[Double] = "Double";
+  typenames[ThreeVectorComplex] = "ThreeVectorComplex";
+  typenames[Rgb] = "Rgb";
   typenames[Crap] = "Crap";
 }
 std::string filename;
-int x = -1,y = -1,z = -1;
+int x = -1,y = -1,z = -1, t = -1;
 PixelTypes PType(Crap);
 double value = 0.0;
-int numdims = 2;
+int numdims = -1;
 bool
 ProcessArgs(int argc, char **argv)
 {
@@ -49,6 +56,10 @@ ProcessArgs(int argc, char **argv)
     else if(arg == "-3")
       {
       numdims = 3;
+      }
+    else if(arg == "-4")
+      {
+      numdims = 4;
       }
     else if(arg == "-f" || arg == "--filename")
       {
@@ -65,7 +76,7 @@ ProcessArgs(int argc, char **argv)
       {
       if(argc < 1)
         {
-        std::cerr << "missing value argument";
+        std::cerr << "missing value argument" << std::endl;
         return false;
         }
       --argc;
@@ -74,13 +85,25 @@ ProcessArgs(int argc, char **argv)
       }
     else if(arg == "-d" || arg == "--dim")
       {
-      if(argc >= 3)
+      if(numdims == -1)
+        {
+        std::cerr << "missing Number of Dimensions" << std::endl;
+        return false;
+        }
+      if(argc >= numdims)
         {
         x = atoi(argv[1]);
         y = atoi(argv[2]);
-        z = atoi(argv[3]);
-        argv += 3;
-        argc -= 3;
+        if(numdims > 2)
+          {
+          z = atoi(argv[3]);
+          }
+        if(numdims > 3)
+          {
+          t = atoi(argv[4]);
+          }
+        argv += numdims;
+        argc -= numdims;
         }
       else
         {
@@ -96,13 +119,17 @@ ProcessArgs(int argc, char **argv)
     else if(arg == "uint") { PType = UnsignedInt; }
     else if(arg == "float") { PType = Float; }
     else if(arg == "double") { PType = Double; }
+    else if(arg == "threevectorcomplex") { PType = ThreeVectorComplex; }
+    else if(arg == "rgb") { PType = Rgb; }
     }
   if(PType == Crap)
     {
     std::cerr << "Missing or incorrect pixel type" << std::endl;
     return false;
     }
-  if(x <= 0 || y <= 0 || z <= 0)
+  if(x <= 0 || y <= 0 || 
+     (numdims > 3 && t <= 0) ||
+     (numdims > 2 && z <= 0))
     {
     std::cerr << "Missing or incorrect dimensions:" << x << " " << y << " " << z << std::endl;
     return false;
@@ -111,17 +138,16 @@ ProcessArgs(int argc, char **argv)
     { 
     std::cerr << "Missing filename parameter" << std::endl;
     }
-  if(PType == Crap || x <= 0 || y <= 0 || z <= 0 || filename == "")
-    {
-    return false;
-    }
   return true;
 }
 
 template <typename PixelType,unsigned dim>
 int MakeImage(const std::string &filename,
-               unsigned xdim, unsigned ydim, unsigned zdim,
-               PixelType value)
+              unsigned xdim,
+              unsigned ydim, 
+              unsigned zdim,
+              unsigned tdim,
+              PixelType value)
 {
   typedef typename itk::Image<PixelType,dim> ImageType;
   typedef typename ImageType::Pointer ImagePointerType;
@@ -132,29 +158,33 @@ int MakeImage(const std::string &filename,
   typedef typename ImageFileWriterType::Pointer ImageFileWriterPointerType;
   try
     {
-  SizeType size;
-  size.SetElement(0,xdim);
-  size.SetElement(1,ydim);
-  if(dim > 2)
-    {
-    size.SetElement(2,zdim);
-    }
-  RegionType region;
-  region.SetSize(size);
+    SizeType size;
+    size.SetElement(0,xdim);
+    size.SetElement(1,ydim);
+    if(dim > 2)
+      {
+      size.SetElement(2,zdim);
+      }
+    if(dim > 3)
+      {
+      size.SetElement(3,tdim);
+      }
+    RegionType region;
+    region.SetSize(size);
 
-  ImagePointerType image = ImageType::New();
-  image->SetRegions(region);
-  image->Allocate();
-  IteratorType it(image,region);
-  for(it.GoToBegin(); it != it.End(); ++it)
-    {
-    it.Set(value);
-    }
-  ImageFileWriterPointerType writer =
-    ImageFileWriterType::New();
-  writer->SetFileName(filename.c_str());
-  writer->SetInput(image);
-  writer->Write();
+    ImagePointerType image = ImageType::New();
+    image->SetRegions(region);
+    image->Allocate();
+    IteratorType it(image,region);
+    for(it.GoToBegin(); it != it.End(); ++it)
+      {
+      it.Set(value);
+      }
+    ImageFileWriterPointerType writer =
+      ImageFileWriterType::New();
+    writer->SetFileName(filename.c_str());
+    writer->SetInput(image);
+    writer->Write();
     }
   catch( itk::ExceptionObject &excp )
     {
@@ -163,6 +193,8 @@ int MakeImage(const std::string &filename,
     }
   return 0;
 }
+
+
 int main(int argc,char **argv)
 {
   typenamesInit();
@@ -177,46 +209,62 @@ int main(int argc,char **argv)
   switch(PType)                                                         \
     {                                                                   \
     case Char:                                                          \
-      exit(MakeImage<char,dim>(filename,x,y,z,                          \
+      exit(MakeImage<char,dim>(filename,x,y,z,t,                        \
                                static_cast<char>(value)));              \
       break;                                                            \
     case UnsignedChar:                                                  \
-      exit(MakeImage<unsigned char,dim>(filename,x,y,z,                 \
+      exit(MakeImage<unsigned char,dim>(filename,x,y,z,t,               \
                                         static_cast<unsigned char>(value))); \
       break;                                                            \
     case Short:                                                         \
-      exit(MakeImage<short,dim>(filename,x,y,z,                         \
+      exit(MakeImage<short,dim>(filename,x,y,z,t,                       \
                                 static_cast<short>(value)));            \
       break;                                                            \
     case UnsignedShort:                                                 \
-      exit(MakeImage<unsigned short,dim>(filename,x,y,z,                \
+      exit(MakeImage<unsigned short,dim> \
+           (filename,x,y,z,t,                                           \
                                          static_cast<unsigned short>(value))); \
       break;                                                            \
     case Int:                                                           \
-      exit(MakeImage<int,dim>(filename,x,y,z,                           \
+      exit(MakeImage<int,dim>(filename,x,y,z,t,                         \
                               static_cast<int>(value)));                \
       break;                                                            \
     case UnsignedInt:                                                   \
-      exit(MakeImage<unsigned int,dim>(filename,x,y,z,                  \
+      exit(MakeImage<unsigned int,dim>\
+           (filename,x,y,z,t,                                           \
                                        static_cast<unsigned int>(value))); \
       break;                                                            \
     case Float:                                                         \
-      exit(MakeImage<float,dim>(filename,x,y,z,                         \
+      exit(MakeImage<float,dim>(filename,x,y,z,t,                       \
                                 static_cast<float>(value)));            \
       break;                                                            \
     case Double:                                                        \
-      exit(MakeImage<double,dim>(filename,x,y,z,                        \
+      exit(MakeImage<double,dim>(filename,x,y,z,t,                      \
                                  static_cast<double>(value)));          \
+      break;                                                            \
+    case ThreeVectorComplex:                                            \
+      exit(MakeImage<ThreeVectorComplexPixelType,dim>                   \
+           (filename,x,y,z,t,                                           \
+            static_cast<ThreeVectorComplexPixelType>(value)));          \
+      break;                                                            \
+    case Rgb:                                                           \
+      exit(MakeImage<RGBPixelType,dim>                                  \
+           (filename,x,y,z,t,                                           \
+            static_cast<RGBPixelType>(value)));                         \
       break;                                                            \
     default:                                                            \
       exit(1);                                                          \
     }
-  if(numdims == 3)
+  switch(numdims)
     {
-    AllTypesSwitch(3);
-    }
-  else
-    {
-    AllTypesSwitch(2);
+    case 4:
+      AllTypesSwitch(4);
+      break;
+    case 3:
+      AllTypesSwitch(3);
+      break;
+    case 2:
+      AllTypesSwitch(2);
+      break;
     }
 }
