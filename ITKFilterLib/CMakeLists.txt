@@ -25,7 +25,7 @@ ITKBasicFilters
 )
 
 
-ADD_LIBRARY(Example_ITKFilterLib ITKFilterLib )
+ADD_LIBRARY(Example_ITKFilterLib ITKFilterLib.cxx )
 INSTALL_TARGETS(/lib Example_ITKFilterLib)
 TARGET_LINK_LIBRARIES(Example_ITKFilterLib ITKCommon ITKNumerics ITKIO ITKBasicFilters)
 ADD_EXECUTABLE(Example_ITKFilterLibTest ITKFilterLibTest.cxx )
