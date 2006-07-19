@@ -124,23 +124,26 @@ int main(int argc, char* argv[])
   
   
   ImagePointer input = NULL;
-  ImageReaderType::Pointer imageReader = ImageReaderType::New() ;
-  try
+  if(inputFileName != "")
     {
+    ImageReaderType::Pointer imageReader = ImageReaderType::New() ;
+    try
+      {
       std::cout << "Loading images..." << std::endl ;
       imageReader->SetFileName(inputFileName.c_str()) ;
       imageReader->Update() ;
       input = imageReader->GetOutput() ;
       std::cout << "Images loaded." << std::endl ;
       if (useLog)
-   {
-     logImage(input, input) ;
-   }
-    }
-  catch (itk::ExceptionObject e)
-    {
+        {
+        logImage(input, input) ;
+        }
+      }
+    catch (itk::ExceptionObject e)
+      {
       e.Print(std::cout);
       exit(0) ;
+      }
     }
       
 
