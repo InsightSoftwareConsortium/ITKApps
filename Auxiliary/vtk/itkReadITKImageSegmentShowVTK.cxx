@@ -193,6 +193,7 @@ int main(int argc, char * argv [] )
 
     polyActor->SetMapper( polyMapper );
     polyMapper->SetInput( contour->GetOutput() );
+    polyMapper->ScalarVisibilityOff();
     
 
     vtkProperty * property = vtkProperty::New();
