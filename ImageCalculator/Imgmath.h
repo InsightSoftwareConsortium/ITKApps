@@ -39,8 +39,8 @@
 
 template <class PixelType, int Dimension>
 typename itk::Image< PixelType, Dimension >::Pointer 
-Iadd( const itk::Image< PixelType, Dimension > * input1,
-      const itk::Image< PixelType, Dimension > * input2 )
+Iadd( const typename itk::Image< PixelType, Dimension >::Pointer input1,
+      const typename itk::Image< PixelType, Dimension >::Pointer input2 )
 {
   typedef itk::Image< PixelType, Dimension > ImageType;
 
@@ -75,8 +75,8 @@ Iadd( const itk::Image< PixelType, Dimension > * input1,
 
 template <class PixelType, int Dimension>
 typename itk::Image< PixelType, Dimension >::Pointer
-Isub( const itk::Image< PixelType, Dimension > * input1, 
-      const itk::Image< PixelType, Dimension > * input2 )
+Isub( const typename itk::Image< PixelType, Dimension >::Pointer input1,
+      const typename itk::Image< PixelType, Dimension >::Pointer input2 )
 {
   typedef itk::Image< PixelType, Dimension > ImageType;
 
@@ -111,8 +111,8 @@ Isub( const itk::Image< PixelType, Dimension > * input1,
 
 template <class PixelType, int Dimension>
 typename itk::Image< PixelType, Dimension >::Pointer 
-Imul( const itk::Image< PixelType, Dimension > * input1,
-      const itk::Image< PixelType, Dimension > * input2 )
+Imul( const typename itk::Image< PixelType, Dimension >::Pointer input1,
+      const typename itk::Image< PixelType, Dimension >::Pointer input2 )
 {
 
   typedef typename itk::Image< PixelType, Dimension > ImageType;
@@ -147,8 +147,8 @@ Imul( const itk::Image< PixelType, Dimension > * input1,
 
 template <class PixelType, int Dimension>
 typename itk::Image< PixelType, Dimension >::Pointer 
-Idiv(const itk::Image< PixelType, Dimension > * input1,
-     const itk::Image< PixelType, Dimension > * input2 )
+Idiv(const typename itk::Image< PixelType, Dimension >::Pointer input1,
+     const typename itk::Image< PixelType, Dimension >::Pointer input2 )
 {
 
   typedef itk::Image< PixelType, Dimension > ImageType;
@@ -184,7 +184,7 @@ Idiv(const itk::Image< PixelType, Dimension > * input1,
 
 template <class PixelType, int Dimension>
 typename itk::Image< PixelType, Dimension >::Pointer 
-Iavg( const itk::Image< PixelType, Dimension > * input1, int nimgs )
+Iavg( const typename itk::Image< PixelType, Dimension >::Pointer input1, int nimgs )
 {
 
   typedef itk::Image< PixelType, Dimension >  ImageType;
@@ -215,7 +215,7 @@ Iavg( const itk::Image< PixelType, Dimension > * input1, int nimgs )
 
 template <class PixelType, int Dimension>
 typename itk::Image< PixelType, Dimension >::Pointer 
-ImageMultiplyConstant( const itk::Image< PixelType, Dimension > * input1, 
+ImageMultiplyConstant( const typename itk::Image< PixelType, Dimension >::Pointer input1, 
                        PixelType constant )
 {
   typedef itk::Image< PixelType, Dimension >  ImageType;
@@ -253,7 +253,7 @@ ImageMultiplyConstant( const itk::Image< PixelType, Dimension > * input1,
 
 template <class PixelType, int Dimension>
 typename itk::Image< PixelType, Dimension >::Pointer 
-ImageDivideConstant( const itk::Image< PixelType, Dimension > * input1, 
+ImageDivideConstant( const typename itk::Image< PixelType, Dimension >::Pointer input1,
                      PixelType constant )
 {
   typedef itk::Image< PixelType, Dimension >  ImageType;

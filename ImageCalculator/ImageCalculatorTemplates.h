@@ -122,8 +122,8 @@ namespace Functor
 /*This function if called performs arithmetic operation with a constant value
  * to all the pixels in an input image.*/
 template <class PixelType , int dims>
-typename itk::Image< PixelType, dims >::Pointer 
-Ifilters( itk::Image< PixelType, dims > * input ,  MetaCommand command )
+typename itk::Image< PixelType, dims >::Pointer
+Ifilters( typename itk::Image< PixelType, dims >::Pointer input ,  MetaCommand command )
 {
   typedef itk::Image< PixelType, dims> ImageType;
 
@@ -178,8 +178,8 @@ Ifilters( itk::Image< PixelType, dims > * input ,  MetaCommand command )
 /* This function if called performs arithmetic operation with a constant value
  * to all the pixels in the output image.*/
 template <class PixelType , int dims>
-typename itk::Image< PixelType, dims >::Pointer 
-Ofilters( itk::Image< PixelType, dims > * input , MetaCommand command )
+typename itk::Image< PixelType, dims >::Pointer
+Ofilters( typename itk::Image< PixelType, dims >::Pointer input , MetaCommand command )
 {
   typedef itk::Image< PixelType, dims> ImageType;
   /*Multiplies a constant value to all the pixels of the Output image.*/
@@ -234,7 +234,7 @@ Ofilters( itk::Image< PixelType, dims > * input , MetaCommand command )
 
 /*statfilters performs user specified statistical operations on the output image.*/
 template <class PixelType , int dims>
-void statfilters( const itk::Image< PixelType, dims > * AccImage , MetaCommand command)
+void statfilters( const typename itk::Image< PixelType, dims >::Pointer AccImage , MetaCommand command)
 {
 
   typedef itk::Image< PixelType, dims> ImageType;
@@ -479,7 +479,7 @@ void statfilters( const itk::Image< PixelType, dims > * AccImage , MetaCommand c
 
 /*This function is called when the user wants to write the ouput image to a file. The output image is typecasted to the user specified data type. */
 template <class InPixelType , class PixelType , int dims>
-void Typecastimage( const itk::Image< InPixelType, dims > * AccImage , MetaCommand command )
+void Typecastimage( const typename itk::Image< InPixelType, dims >::Pointer AccImage , MetaCommand command )
 {
   typedef itk::Image<InPixelType , dims>  InputImageType;
   typedef itk::Image<PixelType , dims>    RealImageType;
