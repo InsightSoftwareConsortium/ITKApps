@@ -38,41 +38,47 @@ PURPOSE.  See the above copyright notices for more information.
 #include <metaCommand.h>
 
 
+//    void SetConstant(const PixelType &p) { m_Val = p; } \
 
 #define FunctorClassDeclare(name,op)                    \
   template <class PixelType> class name                 \
   {                                                     \
   public:                                               \
-    name() {};                                          \
+    name(const PixelType &p):m_Val(p) {};               \
+    name() {};                                         \
     ~name() {};                                         \
-    void SetConstant(const PixelType &p) { m_Val = p; } \
-    PixelType operator()(const PixelType &a)            \
+    PixelType operator()(const PixelType &a) const      \
     {                                                   \
       return static_cast<PixelType>(a op m_Val);        \
     }                                                   \
-    bool operator ==(const name & other )               \
+    bool operator ==(const name & other ) const         \
     { return this == &other; }                          \
-    bool operator !=(const name & other )               \
+    bool operator !=(const name & other ) const         \
     { return !(*this == other); }                       \
+  protected:                                            \
   private:                                              \
+    name(name & cpd) {};                                \
     PixelType m_Val;                                    \
   };
+
 #define FunctorClassDeclare2(name,op)                   \
   template <class PixelType> class name                 \
   {                                                     \
   public:                                               \
-    name() {};                                          \
+    name(const PixelType &p):m_Val(p) {};               \
+    name() {};                                         \
     ~name() {};                                         \
-    void SetConstant(const PixelType &p) { m_Val = p; } \
-    PixelType operator()(const PixelType &a)            \
+    PixelType operator()(const PixelType &a) const      \
     {                                                   \
       return static_cast<PixelType>(op);                \
     }                                                   \
-    bool operator ==(const name & other )               \
+    bool operator ==(const name & other ) const         \
     { return this == &other; }                          \
-    bool operator !=(const name & other )               \
+    bool operator !=(const name & other ) const         \
     { return !(*this == other); }                       \
+  protected:                                            \
   private:                                              \
+    name(name & cpd) {};                                \
     PixelType m_Val;                                    \
   };
 
@@ -86,15 +92,14 @@ namespace Functor
   FunctorClassDeclare2(binarydecimate,a > 0 ? 255 : 0);
   FunctorClassDeclare2(squareroot,sqrt((double)a));
 }
+    //op##functor.SetConstant(constvalue);                        \
+
 #define FunctorProcess(op,constvalue)                           \
   {                                                             \
-    typename Functor::op<PixelType> op##functor;                \
-    op##functor.SetConstant(constvalue);                        \
+    typename Functor::op<PixelType> op##functor(constvalue);    \
     typedef typename                                            \
-      itk::UnaryFunctorImageFilter<ImageType,                   \
-    ImageType,                                                  \
-    Functor::op<PixelType> >                                    \
-      FilterType;                                               \
+      itk::UnaryFunctorImageFilter<ImageType, ImageType,        \
+    Functor::op<PixelType> > FilterType;                        \
     typename FilterType::Pointer filter = FilterType::New();    \
     filter->SetFunctor(op##functor);                            \
     filter->SetInput(input);                                    \
