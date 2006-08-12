@@ -37,9 +37,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ImageCalculatorUtils.h"
 #include <metaCommand.h>
 
-
-//    void SetConstant(const PixelType &p) { m_Val = p; } \
-
 #define FunctorClassDeclare(name,op)                    \
   template <class PixelType> class name                 \
   {                                                     \
@@ -92,7 +89,6 @@ namespace Functor
   FunctorClassDeclare2(binarydecimate,a > 0 ? 255 : 0);
   FunctorClassDeclare2(squareroot,sqrt((double)a));
 }
-    //op##functor.SetConstant(constvalue);                        \
 
 #define FunctorProcess(op,constvalue)                           \
   {                                                             \
