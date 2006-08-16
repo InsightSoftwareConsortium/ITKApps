@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 1.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 PROJECT(InsightApplications)
 
 
@@ -14,7 +14,7 @@ ENDIF(NOT WIN32)
 
 # Don't build anything unless the version of CMake is high enough.
 # The matching ELSE/ENDIF should be the last lines in the file.
-IF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 1.5)
+IF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.3)
 
 FIND_PACKAGE(ITK)
 IF(ITK_FOUND)
@@ -92,15 +92,13 @@ ENDIF(USE_FLTK)
 # The fluid-generated fltk sources have many warnings.  This macro
 # will disable warnings for the generated files on some compilers.
 MACRO(ITK_DISABLE_FLTK_GENERATED_WARNINGS files)
-  IF(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 1.6)
-    IF(CMAKE_COMPILER_IS_GNUCXX)
-      FOREACH(f ${files})
-        STRING(REGEX REPLACE "\\.fl$" ".cxx" SRC "${f}")
-        STRING(REGEX REPLACE ".*/([^/]*)$" "\\1" SRC "${SRC}")
-        SET_SOURCE_FILES_PROPERTIES(${SRC} PROPERTIES COMPILE_FLAGS -w)
-      ENDFOREACH(f)
-    ENDIF(CMAKE_COMPILER_IS_GNUCXX)
-  ENDIF(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 1.6)
+  IF(CMAKE_COMPILER_IS_GNUCXX)
+    FOREACH(f ${files})
+      STRING(REGEX REPLACE "\\.fl$" ".cxx" SRC "${f}")
+      STRING(REGEX REPLACE ".*/([^/]*)$" "\\1" SRC "${SRC}")
+      SET_SOURCE_FILES_PROPERTIES(${SRC} PROPERTIES COMPILE_FLAGS -w)
+    ENDFOREACH(f)
+  ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 ENDMACRO(ITK_DISABLE_FLTK_GENERATED_WARNINGS)
 
 # Macro for adding resources to GUI application on the Mac
@@ -324,8 +322,8 @@ ITKBasicFilters
 
 # If the version of CMake was too old, complain and build nothing.
 # These should be the last lines in this file.
-ELSE("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 1.5)
+ELSE("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.3)
   MESSAGE(SEND_ERROR
           "This version of CMake is too old to build InsightApplications.  "
-          "Please upgrade to CMake 1.6.")
-ENDIF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 1.5)
+          "Please upgrade to CMake 2.4.")
+ENDIF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.3)
