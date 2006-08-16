@@ -25,6 +25,7 @@ extern void PrintDataTypeStrings(void);
 //This function compares strings.
 extern int CompareNoCase( const std::string &s, const std::string& s2 );
 
+extern int PrimaryImageCalculatorRoutinte(int argc, char *argv[]);
 
 
 #endif // __ImageCalculator_h__
