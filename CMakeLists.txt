@@ -12,9 +12,6 @@ IF(NOT WIN32)
   OPTION(BUILD_SHARED_LIBS "Build Insight-Applications with shared libraries." OFF)
 ENDIF(NOT WIN32)
 
-# Don't build anything unless the version of CMake is high enough.
-# The matching ELSE/ENDIF should be the last lines in the file.
-IF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.3)
 
 FIND_PACKAGE(ITK)
 IF(ITK_FOUND)
@@ -320,10 +317,4 @@ ITKCommon
 ITKBasicFilters
 )
 
-# If the version of CMake was too old, complain and build nothing.
-# These should be the last lines in this file.
-ELSE("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.3)
-  MESSAGE(SEND_ERROR
-          "This version of CMake is too old to build InsightApplications.  "
-          "Please upgrade to CMake 2.4.")
-ENDIF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.3)
+
