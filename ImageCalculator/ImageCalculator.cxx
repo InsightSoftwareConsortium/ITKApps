@@ -22,7 +22,7 @@
 
 int main(int argc, char *argv[])
 {
-    PrimaryImageCalculatorRoutinte(argc, argv);
+    return PrimaryImageCalculatorRoutinte(argc, argv);
 }
 
 
