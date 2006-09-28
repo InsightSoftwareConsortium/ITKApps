@@ -31,7 +31,7 @@ ENDIF(BUILD_TESTING)
 
 #-----------------------------------------------------------------------------
 # ITK build patented algorithms
-OPTION(ITK_USE_PATENTED "Build algorithms that are covered with Patents. It is YOUR responsibility to obbtain a license from the patent holder in order to user these methods." OFF)
+OPTION(ITK_USE_PATENTED "Build algorithms that are covered with Patents. It is YOUR responsibility to obtain a license from the patent holder in order to user these methods." OFF)
 MARK_AS_ADVANCED(ITK_USE_PATENTED)
 
 # Determine what packages are available
@@ -43,30 +43,47 @@ IF(USE_VTK)
     INCLUDE (${VTK_USE_FILE})
 
     # Test for VTK using std libs
-    IF(NOT VTK_USE_ANSI_STDLIB)
-      MESSAGE("Warning.  Your VTK was not built with the VTK_USE_ANSI_STDLIB "
-              "option ON.  Link errors may occur.  Consider re-building VTK "
-              "with this option ON.  For MSVC 6, you MUST turn on the VTK "
-              "option.  ITK will not link otherwise.")
-    ENDIF(NOT VTK_USE_ANSI_STDLIB)
+    IF(WIN32) # It seems that the following message is only relavant for MSVC 6 installs
+      IF(NOT VTK_USE_ANSI_STDLIB)
+        MESSAGE("Warning.  Your VTK was not built with the VTK_USE_ANSI_STDLIB "
+                "option ON.  Link errors may occur.  Consider re-building VTK "
+                "with this option ON.  For MSVC 6, you MUST turn on the VTK "
+                "option.  ITK will not link otherwise.")
+      ENDIF(NOT VTK_USE_ANSI_STDLIB)
+    ENDIF(WIN32)
 
-    # Test for VTK building Hybrid
-    IF(NOT VTK_USE_HYBRID)
-      MESSAGE("Your VTK was not built with the VTK_USE_HYBRID option ON.  "
-              "Please reconfigure and recompile VTK with this option before "
-              "trying to use it with ITK.")
-      SET(VTK_FOUND 0)
-    ENDIF(NOT VTK_USE_HYBRID)
 
-    # If VTK was built using Patented, add an option for using patented code
-    # in InsightApplications (SNAP in particular)
-    IF(VTK_USE_PATENTED)
-      OPTION(USE_VTK_PATENTED "Use VTK Patented Libraries (optional)" OFF)
-      MARK_AS_ADVANCED(USE_VTK_PATENTED)
-      IF(USE_VTK_PATENTED)
-        ADD_DEFINITIONS(-DUSE_VTK_PATENTED)
-      ENDIF(USE_VTK_PATENTED)
-    ENDIF(VTK_USE_PATENTED)
+## New versions of VTK have removed the HYBRID option, and it is now linked ot the RENDERING option
+## The PATENTED option also no longer exists in version 4.5 and greater, and these features no longer
+## need a special flag set.
+    IF( "${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}" LESS 4.5 )
+      # Test for VTK building Hybrid
+      IF(NOT VTK_USE_HYBRID)
+          MESSAGE("Your VTK was not built with the VTK_USE_HYBRID option ON.  "
+                  "Please reconfigure and recompile VTK with this option before "
+                  "trying to use it with ITK.")
+          SET(VTK_FOUND 0)
+        ENDIF(NOT VTK_USE_HYBRID)
+
+      # If VTK was built using Patented, add an option for using patented code
+      # in InsightApplications (SNAP in particular)
+      IF(VTK_USE_PATENTED)
+        OPTION(USE_VTK_PATENTED "Use VTK Patented Libraries (optional)" OFF)
+        MARK_AS_ADVANCED(USE_VTK_PATENTED)
+        IF(USE_VTK_PATENTED)
+          ADD_DEFINITIONS(-DUSE_VTK_PATENTED)
+        ENDIF(USE_VTK_PATENTED)
+      ENDIF(VTK_USE_PATENTED)
+    ELSE( "${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}" LESS 4.5 )
+        IF(NOT VTK_USE_RENDERING)
+          MESSAGE("Your VTK was not built with the VTK_USE_RENDERING option ON.  "
+                  "Please reconfigure and recompile VTK with this option before "
+                  "trying to use it with ITK.")
+          SET(VTK_FOUND 0)
+    ENDIF(NOT VTK_USE_RENDERING)
+
+    ENDIF( "${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}" LESS 4.5 )
+
   ENDIF (VTK_FOUND)
 ENDIF(USE_VTK)
 
