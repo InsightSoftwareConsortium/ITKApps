@@ -117,11 +117,11 @@ namespace Functor
 
 /*This function if called performs arithmetic operation with a constant value
  * to all the pixels in an input image.*/
-template <class PixelType , int dims>
-typename itk::Image< PixelType, dims >::Pointer
-Ifilters( typename itk::Image< PixelType, dims >::Pointer input ,  MetaCommand command )
+template <class ImageType>
+typename ImageType::Pointer
+Ifilters( typename ImageType::Pointer input ,  MetaCommand command )
 {
-  typedef itk::Image< PixelType, dims> ImageType;
+  typedef typename ImageType::PixelType PixelType;
 
   /*Multiplies a constant value to all the pixels of the Input image.*/
   if(command.GetValueAsString("IMulC","constant")!= "" )
@@ -173,11 +173,11 @@ Ifilters( typename itk::Image< PixelType, dims >::Pointer input ,  MetaCommand c
 
 /* This function if called performs arithmetic operation with a constant value
  * to all the pixels in the output image.*/
-template <class PixelType , int dims>
-typename itk::Image< PixelType, dims >::Pointer
-Ofilters( typename itk::Image< PixelType, dims >::Pointer input , MetaCommand command )
+template <class ImageType>
+typename ImageType::Pointer
+Ofilters( typename ImageType::Pointer input , MetaCommand command )
 {
-  typedef itk::Image< PixelType, dims> ImageType;
+  typedef typename ImageType::PixelType PixelType;
   /*Multiplies a constant value to all the pixels of the Output image.*/
   if(command.GetValueAsString("OMulC","constant")!= "" )
     {
@@ -229,11 +229,10 @@ Ofilters( typename itk::Image< PixelType, dims >::Pointer input , MetaCommand co
 
 
 /*statfilters performs user specified statistical operations on the output image.*/
-template <class PixelType , int dims>
-void statfilters( const typename itk::Image< PixelType, dims >::Pointer AccImage , MetaCommand command)
+template <class ImageType>
+void statfilters( const typename ImageType::Pointer AccImage , MetaCommand command)
 {
-
-  typedef itk::Image< PixelType, dims> ImageType;
+  const unsigned int dims(ImageType::ImageDimension);
 
   std::map<std::string,std::string> StatDescription;
   std::map<std::string,float>       StatValues;
@@ -258,10 +257,11 @@ void statfilters( const typename itk::Image< PixelType, dims >::Pointer AccImage
   bool havestatmask=false;
   int MaskValue = 0;
   //If user gives an Input Mask Calculate the statistics of the image in the mask
-  typedef itk::ImageFileReader<itk::Image < unsigned int , dims> > ReaderType;
+  typedef typename itk::Image<unsigned int, ImageType::ImageDimension> UIntImageType;
+  typedef typename itk::ImageFileReader<UIntImageType> ReaderType;
   typename ReaderType::Pointer reader = ReaderType::New();
 
-  typedef itk::LabelStatisticsImageFilter<ImageType , itk::Image < unsigned int , dims> > LabelFilterType;
+  typedef itk::LabelStatisticsImageFilter<ImageType , UIntImageType> LabelFilterType;
   typename LabelFilterType::Pointer MaskStatsfilter = LabelFilterType::New();
   typename LabelFilterType::Pointer MaskAbsStatsfilter = LabelFilterType::New();
   if( command.GetValueAsString("Statmask","File Name") != "" )
@@ -541,14 +541,16 @@ private:
 
 /*This fuction reads in the input images and writes the output image ,
  * delegating the computations to other functions*/
-template <class PixelType , int dims>
+template <class ImageType>
 void ImageCalculatorReadWrite( MetaCommand &command )
 {
   string_tokenizer InputList(command.GetValueAsString("in")," ");
 
-  typedef itk::Image<PixelType,dims> ImageType;
-  typedef itk::ImageFileReader<ImageType> ReaderType;
+  const unsigned int dims(ImageType::ImageDimension);
 
+  //  typedef itk::Image<PixelType,dims> ImageType;
+  typedef typename itk::ImageFileReader<ImageType> ReaderType;
+  typedef typename ImageType::PixelType PixelType;
   //Read the first Image
   typename ReaderType::Pointer reader = ReaderType::New();
   reader->SetFileName(InputList.at(0).c_str());
@@ -586,13 +588,13 @@ void ImageCalculatorReadWrite( MetaCommand &command )
   //Create an Accumulator Image.
   typename ImageType::Pointer AccImage;
 
-  AccImage = Ifilters<PixelType , dims>(reader->GetOutput(),command);
+  AccImage = Ifilters<ImageType>(reader->GetOutput(),command);
   typename ImageType::Pointer SqrImageSum;
   
   /*For variance image first step is to square the input image.*/
   if(command.GetValueAsBool("Var","var") )
     {
-    SqrImageSum = Imul<PixelType , dims>(reader->GetOutput() , reader->GetOutput());
+    SqrImageSum = Imul<ImageType>(reader->GetOutput() , reader->GetOutput());
     }
 
 
@@ -614,7 +616,7 @@ void ImageCalculatorReadWrite( MetaCommand &command )
       }
 
 
-    typename ImageType::Pointer image = Ifilters<PixelType , dims>(reader2->GetOutput() ,command);
+    typename ImageType::Pointer image = Ifilters<ImageType>(reader2->GetOutput() ,command);
     typename ImageType::SizeType size;
     size = image->GetRequestedRegion().GetSize();
 
@@ -672,41 +674,41 @@ void ImageCalculatorReadWrite( MetaCommand &command )
     /*Call the multiplication function*/
     if(command.GetValueAsBool("Mul","mul"))
       {
-      AccImage  = Imul<PixelType , dims>(AccImage , image );
+      AccImage  = Imul<ImageType>(AccImage , image );
       }
     
     /*Call the addition function*/
     if(command.GetValueAsBool("Add","add"))
       {
-      AccImage  = Iadd<PixelType , dims>(AccImage , image );
+      AccImage  = Iadd<ImageType>(AccImage , image );
       }
 
     /*Call the subtraction function*/
     if(command.GetValueAsBool("Sub","sub"))
       {
-      AccImage  = Isub<PixelType , dims>(AccImage , image );
+      AccImage  = Isub<ImageType>(AccImage , image );
       }
 
     /*Call the divisionion function*/
     if(command.GetValueAsBool("Div","div"))
       {
-      AccImage  = Idiv<PixelType , dims>(AccImage , image );
+      AccImage  = Idiv<ImageType>(AccImage , image );
       }
     
     /*For Average we add the images first*/
     if(command.GetValueAsBool("Avg","avg"))
       {
-      AccImage  = Iadd<PixelType , dims>(AccImage , image);
+      AccImage  = Iadd<ImageType>(AccImage , image);
       }
     
     /*For variance we add the square image to the image in the current
       iteration and store the sum of the square image.*/
     if(command.GetValueAsBool("Var","var") )
       {
-      AccImage  = Iadd<PixelType , dims>(AccImage , image );
+      AccImage  = Iadd<ImageType>(AccImage , image );
       typename ImageType::Pointer multimage = 
-        Imul<PixelType , dims>(image , image );
-      SqrImageSum  = Iadd<PixelType , dims>(SqrImageSum, multimage );
+        Imul<ImageType>(image , image );
+      SqrImageSum  = Iadd<ImageType>(SqrImageSum, multimage );
       }
     }
 
@@ -714,21 +716,21 @@ void ImageCalculatorReadWrite( MetaCommand &command )
   //To get the average image we divide the accumulator image with the total number of images.
   if(command.GetValueAsBool("Avg","avg"))
     {
-    AccImage  = Iavg<PixelType , dims>(AccImage , NumImages);
+    AccImage  = Iavg<ImageType>(AccImage , NumImages);
     }
 
   //Image variance is calculated.
   if(command.GetValueAsBool("Var","var")  )
     {
     typename ImageType::Pointer NumSqrImageSum = 
-      ImageMultiplyConstant<PixelType, dims>( SqrImageSum, 
+      ImageMultiplyConstant<ImageType>( SqrImageSum, 
                                               static_cast<PixelType>(NumImages));
-    AccImage = Imul<PixelType , dims>(AccImage,AccImage);
-    AccImage = Isub<PixelType , dims>(NumSqrImageSum,AccImage);
-    AccImage =ImageDivideConstant<PixelType , dims>(AccImage,static_cast<PixelType>(NumImages*NumImages-NumImages));
+    AccImage = Imul<ImageType>(AccImage,AccImage);
+    AccImage = Isub<ImageType>(NumSqrImageSum,AccImage);
+    AccImage =ImageDivideConstant<ImageType>(AccImage,static_cast<PixelType>(NumImages*NumImages-NumImages));
     }
 
-  AccImage = Ofilters<PixelType , dims>(AccImage,command);
+  AccImage = Ofilters<ImageType>(AccImage,command);
 
   const std::string OutType(command.GetValueAsString("OutputPixelType","PixelType" ));
   
@@ -776,7 +778,7 @@ void ImageCalculatorReadWrite( MetaCommand &command )
       }
 
     //Caluculate Statistics of the Image.
-    statfilters<PixelType , dims>(AccImage,command);
+    statfilters<ImageType>(AccImage,command);
     }
 }
 
@@ -786,31 +788,31 @@ void ImageCalculatorProcessND(const std::string & InType, MetaCommand &command)
 {
   if ( CompareNoCase( InType, std::string("UCHAR") ) == 0 )
     {
-    ImageCalculatorReadWrite<unsigned char  , DIMS  >(command);
+    ImageCalculatorReadWrite<typename itk::Image<unsigned char  , DIMS > >(command);
     }
   else if ( CompareNoCase( InType, std::string("SHORT") ) == 0 )
     {
-    ImageCalculatorReadWrite<short , DIMS  >(command);
+    ImageCalculatorReadWrite<typename itk::Image<short , DIMS > >(command);
     }
   else if ( CompareNoCase( InType, std::string("USHORT") ) == 0 )
     {
-    ImageCalculatorReadWrite<unsigned short , DIMS  >(command);
+    ImageCalculatorReadWrite<typename itk::Image<unsigned short , DIMS > >(command);
     }
   else if ( CompareNoCase( InType, std::string("INT") ) == 0 )
     {
-    ImageCalculatorReadWrite<int, DIMS  >(command);
+    ImageCalculatorReadWrite<typename itk::Image<int, DIMS > >(command);
     }
   else if ( CompareNoCase( InType, std::string("UINT") ) == 0 )
     {
-    ImageCalculatorReadWrite<unsigned int, DIMS   >(command);
+    ImageCalculatorReadWrite<typename itk::Image<unsigned int, DIMS  > >(command);
     }
   else if ( CompareNoCase( InType, std::string("FLOAT") ) == 0 )
     {
-    ImageCalculatorReadWrite<float, DIMS   >(command);
+    ImageCalculatorReadWrite<typename itk::Image<float, DIMS  > >(command);
     }
   else if ( CompareNoCase( InType, std::string("DOUBLE") ) == 0 )
     {
-    ImageCalculatorReadWrite< double , DIMS   >(command);
+    ImageCalculatorReadWrite<typename itk::Image< double , DIMS  > >(command);
     }
 }
 
