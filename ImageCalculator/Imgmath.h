@@ -1,7 +1,28 @@
+/*=========================================================================
+
+  Program:   Insight Segmentation & Registration Toolkit
+  Module:    Imgmath.h
+  Language:  C++
+  Date:      $Date$
+  Version:   $Revision$
+
+  Copyright (c) Insight Software Consortium. All rights reserved.
+  See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
 #ifndef _ITKMATH_H_
 #define _ITKMATH_H_
 
-/*This file contains the functions to perform pixel by pixel mathematical operations on 2 images. The functions use image region iterators to enhance the speed of the algorithm.*/
+/* This file contains the functions to perform pixel by pixel mathematical
+ * operations on 2 images. All the functions are performed by using ITK
+ * filters. 
+ */
+
 
 #include "itkImage.h"
 #include "itkSquaredDifferenceImageFilter.h"
