@@ -92,7 +92,7 @@ namespace Functor
 
 #define FunctorProcess(op,constvalue)                           \
   {                                                             \
-    typename Functor::op<PixelType> op##functor(constvalue);    \
+    Functor::op<PixelType> op##functor(constvalue);             \
     typedef                                                     \
       itk::UnaryFunctorImageFilter<ImageType, ImageType,        \
     Functor::op<PixelType> > FilterType;                        \
@@ -256,8 +256,8 @@ void statfilters( const typename ImageType::Pointer AccImage , MetaCommand comma
   bool havestatmask=false;
   int MaskValue = 0;
   //If user gives an Input Mask Calculate the statistics of the image in the mask
-  typedef typename itk::Image<unsigned int, ImageType::ImageDimension> UIntImageType;
-  typedef typename itk::ImageFileReader<UIntImageType> ReaderType;
+  typedef itk::Image<unsigned int, ImageType::ImageDimension> UIntImageType;
+  typedef itk::ImageFileReader<UIntImageType> ReaderType;
   typename ReaderType::Pointer reader = ReaderType::New();
 
   typedef itk::LabelStatisticsImageFilter<ImageType , UIntImageType> LabelFilterType;
@@ -548,7 +548,7 @@ void ImageCalculatorReadWrite( MetaCommand &command )
   const unsigned int dims(ImageType::ImageDimension);
 
   //  typedef itk::Image<PixelType,dims> ImageType;
-  typedef typename itk::ImageFileReader<ImageType> ReaderType;
+  typedef itk::ImageFileReader<ImageType> ReaderType;
   typedef typename ImageType::PixelType PixelType;
   //Read the first Image
   typename ReaderType::Pointer reader = ReaderType::New();
