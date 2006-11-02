@@ -250,7 +250,8 @@ int main(int argc,char **argv)
     case Rgb:                                                           \
       exit(MakeImage<RGBPixelType,dim>                                  \
            (filename,x,y,z,t,                                           \
-            static_cast<RGBPixelType>(value)));                         \
+            static_cast<RGBPixelType>(                                  \
+              static_cast<unsigned char>(value))));                     \
       break;                                                            \
     default:                                                            \
       exit(1);                                                          \
