@@ -93,7 +93,7 @@ namespace Functor
 #define FunctorProcess(op,constvalue)                           \
   {                                                             \
     typename Functor::op<PixelType> op##functor(constvalue);    \
-    typedef typename                                            \
+    typedef                                                     \
       itk::UnaryFunctorImageFilter<ImageType, ImageType,        \
     Functor::op<PixelType> > FilterType;                        \
     typename FilterType::Pointer filter = FilterType::New();    \
@@ -104,7 +104,7 @@ namespace Functor
   }
 #define FunctorProcess2(op)                                     \
   {                                                             \
-    typedef typename                                            \
+    typedef                                                     \
       itk::UnaryFunctorImageFilter<ImageType,                   \
     ImageType,                                                  \
     Functor::op<PixelType> >                                    \
@@ -167,7 +167,6 @@ Ifilters( typename ImageType::Pointer input ,  MetaCommand command )
     {
     FunctorProcess2(squareroot);
     }
-  //return typename itk::Image< PixelType, dims >::Pointer();
   return input;
 }
 
@@ -788,31 +787,31 @@ void ImageCalculatorProcessND(const std::string & InType, MetaCommand &command)
 {
   if ( CompareNoCase( InType, std::string("UCHAR") ) == 0 )
     {
-    ImageCalculatorReadWrite<typename itk::Image<unsigned char  , DIMS > >(command);
+    ImageCalculatorReadWrite< itk::Image<unsigned char  , DIMS > >(command);
     }
   else if ( CompareNoCase( InType, std::string("SHORT") ) == 0 )
     {
-    ImageCalculatorReadWrite<typename itk::Image<short , DIMS > >(command);
+    ImageCalculatorReadWrite< itk::Image<short , DIMS > >(command);
     }
   else if ( CompareNoCase( InType, std::string("USHORT") ) == 0 )
     {
-    ImageCalculatorReadWrite<typename itk::Image<unsigned short , DIMS > >(command);
+    ImageCalculatorReadWrite< itk::Image<unsigned short , DIMS > >(command);
     }
   else if ( CompareNoCase( InType, std::string("INT") ) == 0 )
     {
-    ImageCalculatorReadWrite<typename itk::Image<int, DIMS > >(command);
+    ImageCalculatorReadWrite< itk::Image<int, DIMS > >(command);
     }
   else if ( CompareNoCase( InType, std::string("UINT") ) == 0 )
     {
-    ImageCalculatorReadWrite<typename itk::Image<unsigned int, DIMS  > >(command);
+    ImageCalculatorReadWrite< itk::Image<unsigned int, DIMS  > >(command);
     }
   else if ( CompareNoCase( InType, std::string("FLOAT") ) == 0 )
     {
-    ImageCalculatorReadWrite<typename itk::Image<float, DIMS  > >(command);
+    ImageCalculatorReadWrite< itk::Image<float, DIMS  > >(command);
     }
   else if ( CompareNoCase( InType, std::string("DOUBLE") ) == 0 )
     {
-    ImageCalculatorReadWrite<typename itk::Image< double , DIMS  > >(command);
+    ImageCalculatorReadWrite< itk::Image< double , DIMS  > >(command);
     }
 }
 
