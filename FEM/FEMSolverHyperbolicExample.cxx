@@ -270,17 +270,11 @@ int main(int ac, char** av)
     std::cout << comment << "GenerateGFN()" << std::endl;
     SH.GenerateGFN();          // Generate global freedom numbers for system DOFs
 
-    LinearSystemWrapperItpack lsw_itpack;
+
     LinearSystemWrapperDenseVNL lsw_dvnl;
     LinearSystemWrapperVNL lsw_vnl;
 
     switch(w) {
-    case 2:
-      // Itpack 
-      std::cout << std::endl << comment << ">>>>>Using LinearSystemWrapperItpack" << std::endl;
-      lsw_itpack.SetMaximumNonZeroValuesInMatrix(1000000);
-      SH.SetLinearSystemWrapper(&lsw_itpack);
-      break;
     case 1:
       // Dense VNL
       std::cout << std::endl << comment << ">>>>>Using LinearSystemWrapperDenseVNL" << std::endl;
