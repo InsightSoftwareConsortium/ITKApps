@@ -96,6 +96,7 @@ ELSE( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
   TARGET_LINK_LIBRARIES( Curves3DExtractorLib
                          ITKBasicFilters ITKIO ITKFltkImageViewer )
+  ADD_DEPENDENCIES(Curves3DExtractorLib ITKFltkImageViewer)
 
   SET(Curves3DExtractor_SRCS
   main.cxx

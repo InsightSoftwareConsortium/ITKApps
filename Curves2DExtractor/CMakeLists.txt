@@ -39,6 +39,10 @@ INSTALL_TARGETS(/lib Curves2DExtractorLib)
 TARGET_LINK_LIBRARIES(Curves2DExtractorLib
                       ITKBasicFilters ITKIO ITKFltkImageViewer)
 
+IF(NOT BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
+  ADD_DEPENDENCIES(Curves2DExtractorLib ITKFltkImageViewer)
+ENDIF(NOT BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
+
 SET(Curves2DExtractor_SRCS
 main.cxx
 ${Curves2DExtractor_FLTK_UI_SRCS}
