@@ -36,7 +36,7 @@ vtkWSBoundingBoxManager::vtkWSBoundingBoxManager()
 
 bounding_box_t vtkWSBoundingBoxManager::GetBoundingBox(unsigned long n)
 {
-  vtkBoundingBoxHash::iterator boxPtr = BoundingBoxTable.find(n);
+  vtkWSBoundingBoxHash::iterator boxPtr = BoundingBoxTable.find(n);
   if (boxPtr == BoundingBoxTable.end())
     {
       vtkWarningMacro(<< "No box with label " << n << " can be found.");
@@ -50,7 +50,7 @@ bounding_box_t vtkWSBoundingBoxManager::GetBoundingBox(unsigned long n)
 }
 
 void vtkWSBoundingBoxManager
-::GetBoundingBox(vtkBoundingBox *box, unsigned long   n)
+::GetBoundingBox(vtkWSBoundingBox *box, unsigned long   n)
 {
   bounding_box_t res = this->GetBoundingBox(n);
   box->SetExtent(res.x0, res.x1, res.y0, res.y1, res.z0, res.z1);
@@ -83,7 +83,7 @@ void vtkWSBoundingBoxManager::GenerateBoundingBoxes()
   unsigned long *dataPtr
     = (unsigned long *)(this->LabeledImage->GetScalarPointer(sx0, sy0, sz0));
 
-  vtkBoundingBoxHash::iterator boxPtr;
+  vtkWSBoundingBoxHash::iterator boxPtr;
   bounding_box_t tempBox;
   
   for (z = sz0; z <= sz1; z++)
@@ -101,7 +101,7 @@ void vtkWSBoundingBoxManager::GenerateBoundingBoxes()
                   tempBox.z0 = tempBox.z1 = z;
                   
                   BoundingBoxTable.insert(
-                         vtkBoundingBoxHash::value_type(*dataPtr, tempBox) );
+                    vtkWSBoundingBoxHash::value_type(*dataPtr, tempBox) );
 
                 }
               else

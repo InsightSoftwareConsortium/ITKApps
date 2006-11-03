@@ -1,7 +1,7 @@
 SET(WSTCommon_SRCS
   vtkBinaryVolume.cxx
   vtkBinaryVolumeLogic.cxx
-  vtkBoundingBox.cxx
+  vtkWSBoundingBox.cxx
   vtkITKWatershedFilterAndWriter.h
   vtkLookupTableEquivalencyHash.cxx
   vtkWSBoundingBoxManager.cxx

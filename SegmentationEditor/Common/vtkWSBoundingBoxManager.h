@@ -19,8 +19,8 @@
 #ifndef __vtkWSBoundingBoxManager_
 #define __vtkWSBoundingBoxManager_
 
-#include "vtkBoundingBoxHash.h"
-#include "vtkBoundingBox.h"
+#include "vtkWSBoundingBoxHash.h"
+#include "vtkWSBoundingBox.h"
 #include "vtkImageData.h"
 
 class VTK_EXPORT vtkWSBoundingBoxManager : public vtkObject
@@ -38,7 +38,7 @@ public:
   void GenerateBoundingBoxes();
 
   bounding_box_t GetBoundingBox(unsigned long n);
-  void GetBoundingBox(vtkBoundingBox *box, unsigned long n);       
+  void GetBoundingBox(vtkWSBoundingBox *box, unsigned long n);       
 
   // Merges a list of boxes into a single box, returned as an array of 6 ints
   // [x0 x1 y0 y1 z0 z1].  Input is an array of unsigned long labels whose
@@ -52,7 +52,7 @@ protected:
   ~vtkWSBoundingBoxManager() {}
 
 private:
-  vtkBoundingBoxHash BoundingBoxTable;
+  vtkWSBoundingBoxHash BoundingBoxTable;
   vtkImageData *LabeledImage;
   
   

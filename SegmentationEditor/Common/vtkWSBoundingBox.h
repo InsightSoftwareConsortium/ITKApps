@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    vtkBoundingBox.h
+  Module:    vtkWSBoundingBox.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -15,19 +15,19 @@
 
 =========================================================================*/
 
-// .Name vtkBoundingBox
+// .Name vtkWSBoundingBox
 // .Section Description
-#ifndef __vtkBoundingBox_
-#define __vtkBoundingBox_
+#ifndef __vtkWSBoundingBox_
+#define __vtkWSBoundingBox_
 
 #include "vtkObject.h"
 
-class VTK_EXPORT vtkBoundingBox: public vtkObject
+class VTK_EXPORT vtkWSBoundingBox: public vtkObject
 {
 public:
-  static vtkBoundingBox *New();
+  static vtkWSBoundingBox *New();
 
-  vtkTypeMacro(vtkBoundingBox,vtkObject);
+  vtkTypeMacro(vtkWSBoundingBox,vtkObject);
   void PrintSelf(ostream&, vtkIndent) {}
 
   const int *GetExtent() const
@@ -35,11 +35,11 @@ public:
       return Extent;
     }
   void SetExtent(int x0, int x1, int y0, int y1, int z0, int z1);
-  void Merge(const vtkBoundingBox *);
+  void Merge(const vtkWSBoundingBox *);
   
 protected:
-  vtkBoundingBox();
-  ~vtkBoundingBox() {}
+  vtkWSBoundingBox();
+  ~vtkWSBoundingBox() {}
   
 private:
   int Extent[6];
