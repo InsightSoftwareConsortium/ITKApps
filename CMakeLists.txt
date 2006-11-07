@@ -297,13 +297,20 @@ IF(VTK_FOUND)
     OPTIONAL_APP(ThinPlateSplines)
   ENDIF(FLTK_FOUND)
 
-  SET(VTK_CMAKE_DIR ${VTK_SOURCE_DIR}/CMake)
   IF(VTK_WRAP_TCL)
-    INCLUDE(${VTK_CMAKE_DIR}/vtkWrapTcl.cmake)
+    FIND_FILE(ITK_VTK_WRAP_TCL vtkWrapTcl.cmake 
+      ${VTK_SOURCE_DIR}/CMake
+      ${VTK_DIR}/CMake
+      )
+    INCLUDE(${ITK_VTK_WRAP_TCL})
   ENDIF(VTK_WRAP_TCL)
 
   IF(VTK_WRAP_PYTHON)
-    INCLUDE(${VTK_CMAKE_DIR}/vtkWrapPython.cmake)
+    FIND_FILE(ITK_VTK_WRAP_PYTHON vtkWrapPython.cmake 
+      ${VTK_SOURCE_DIR}/CMake
+      ${VTK_DIR}/CMake
+      )
+    INCLUDE(${ITK_VTK_WRAP_PYTHON})
   ENDIF(VTK_WRAP_PYTHON)
 
   IF(VTK_WRAP_TCL)
