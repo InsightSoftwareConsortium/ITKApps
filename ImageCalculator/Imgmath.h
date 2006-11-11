@@ -156,7 +156,7 @@ typename ImageType::Pointer Idiv(typename ImageType::Pointer input1,typename Ima
 template <class ImageType>
 typename ImageType::Pointer Iavg(typename ImageType::Pointer input1, int nimgs)
 {
-  typename ImageType ::Pointer image;
+  typename ImageType::Pointer image = ImageType::New();
   image->SetRegions(input1->GetBufferedRegion());
   image->CopyInformation(input1);
   image->Allocate();
@@ -178,7 +178,7 @@ typename ImageType::Pointer IMask(typename ImageType::Pointer input1,typename Im
 
 {
 
-  typename ImageType ::Pointer image;
+  typename ImageType ::Pointer image = ImageType::New();
   image->SetRegions(input1->GetBufferedRegion());
   image->CopyInformation(input1);
   image->Allocate();
