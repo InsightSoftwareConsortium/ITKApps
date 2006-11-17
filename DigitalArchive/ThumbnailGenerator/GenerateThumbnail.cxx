@@ -27,16 +27,29 @@ int main( int argc, char ** argv )
     return -1;
     }
 
+  std::cout << "Running ITK Thumbnail generator on: " << argv[1] << std::endl;
+
   typedef  signed short      PixelType;
-  const   unsigned int       Dimension = 2;
+  const   unsigned int       Dimension = 3;
   typedef itk::Image< PixelType, Dimension >    ImageType;
 
   typedef itk::ImageFileReader< ImageType >  ReaderType;
 
   ReaderType::Pointer reader = ReaderType::New();
-
   const char * inputFilename  = argv[1];
   reader->SetFileName( inputFilename );
+
+  try
+    {
+    reader->Update();
+    }
+  catch (itk::ExceptionObject & e)
+    {
+    std::cerr << "exception in file reader " << std::endl;
+    std::cerr << e.GetDescription() << std::endl;
+    std::cerr << e.GetLocation() << std::endl;
+    return EXIT_FAILURE;
+    }
 
   typedef unsigned char WritePixelType;
   typedef itk::Image< WritePixelType, 2 > WriteImageType;
@@ -48,16 +61,16 @@ int main( int argc, char ** argv )
   rescaler->SetOutputMinimum(   0 );
   rescaler->SetOutputMaximum( 255 );
   
-  typedef itk::ImageFileWriter< WriteImageType >  Writer2Type;
-  Writer2Type::Pointer writer2 = Writer2Type::New();
-  writer2->SetFileName( argv[2] );
+  typedef itk::ImageFileWriter< WriteImageType >  WriterType;
+  WriterType::Pointer writer = WriterType::New();
+  writer->SetFileName( argv[2] );
  
   rescaler->SetInput( reader->GetOutput() );
-  writer2->SetInput( rescaler->GetOutput() );
+  writer->SetInput( rescaler->GetOutput() );
 
   try
     {
-    writer2->Update();
+    writer->Update();
     }
   catch (itk::ExceptionObject & e)
     {
