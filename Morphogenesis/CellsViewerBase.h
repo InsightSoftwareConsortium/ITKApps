@@ -29,6 +29,10 @@
 #include "fltkClippingPlane3DDrawer.h"
 #include <map>
 
+#ifdef GetCurrentTime
+#undef GetCurrentTime
+#endif
+
 namespace bio {
 
 template <typename TInputImage>
