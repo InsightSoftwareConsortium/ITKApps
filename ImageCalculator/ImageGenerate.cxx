@@ -189,6 +189,7 @@ int MakeImage(const std::string &filename,
   catch( itk::ExceptionObject &excp )
     {
     std::cerr << "Can't write " << filename << std::endl;
+    std::cerr << excp << std::endl;
     return 1;
     }
   return 0;
@@ -268,4 +269,5 @@ int main(int argc,char **argv)
       AllTypesSwitch(2);
       break;
     }
+  return EXIT_SUCCESS;
 }
