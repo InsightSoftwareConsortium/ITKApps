@@ -119,12 +119,20 @@ int main(int argc, char* argv[])
       imageReader->SetFileName(fileName.c_str()) ;
       imageReader->Update() ;
       image = imageReader->GetOutput() ;
+      ImageType::DirectionType ImageDirection=image->GetDirection();
       if (maskFileName != "")
         {
-          maskReader->SetFileName(maskFileName.c_str()) ;
-          maskReader->Update() ;
-          mask = maskReader->GetOutput() ;
-          maskAvailable = true ;
+        maskReader->SetFileName(maskFileName.c_str()) ;
+        maskReader->Update() ;
+        mask = OrientImage<MaskType>(maskReader->GetOutput(),ImageDirection);
+        if(image->GetDirection() != mask->GetDirection()
+          || image->GetSpacing() != mask->GetSpacing()
+          || image->GetLargestPossibleRegion().GetSize() != mask->GetLargestPossibleRegion().GetSize())
+          {
+          std::cout <<  "Input image and input mask must have same orientation, dimensions, and voxel spacings." << std::endl;
+          exit(-1);
+          }
+        maskAvailable = true ;
         }
     }
   catch (itk::ExceptionObject e)

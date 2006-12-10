@@ -157,23 +157,38 @@ int main(int argc, char* argv[])
       imageReader->SetFileName(inputFileName.c_str()) ;
       imageReader->Update() ;
       input = imageReader->GetOutput() ;
+      ImageType::DirectionType ImageDirection=input->GetDirection();
       filter->SetInput(input) ;
       std::cout << "Input image loaded." << std::endl ;
       if (inputMaskFileName != "")
         {
-          maskReader->SetFileName(inputMaskFileName.c_str()) ;
-          maskReader->Update() ;
-          inputMask = maskReader->GetOutput() ;
-          filter->SetInputMask(inputMask) ;
-          std::cout << "Input mask image loaded." << std::endl ;
+        maskReader->SetFileName(inputMaskFileName.c_str()) ;
+        maskReader->Update() ;
+        inputMask = OrientImage<MaskType>(maskReader->GetOutput(),ImageDirection);
+        if(input->GetDirection() != inputMask->GetDirection()
+          || input->GetSpacing() != inputMask->GetSpacing()
+          || input->GetLargestPossibleRegion().GetSize() != inputMask->GetLargestPossibleRegion().GetSize())
+          {
+          std::cout <<  "Input image and input mask must have same orientation, dimensions, and voxel spacings." << std::endl;
+          exit(-1);
+          }
+        filter->SetInputMask(inputMask) ;
+        std::cout << "Input mask image loaded." << std::endl ;
         }
       if (outputMaskFileName != "")
         {
-          maskReader2->SetFileName(outputMaskFileName.c_str()) ;
-          maskReader2->Update() ;
-          outputMask = maskReader2->GetOutput() ;
-          filter->SetOutputMask(outputMask) ;
-          std::cout << "Output mask image loaded." << std::endl ;
+        maskReader2->SetFileName(outputMaskFileName.c_str()) ;
+        maskReader2->Update() ;
+        outputMask = OrientImage<MaskType>(maskReader2->GetOutput(),ImageDirection);
+        if(input->GetDirection() != outputMask->GetDirection()
+          || input->GetSpacing() != outputMask->GetSpacing()
+          || input->GetLargestPossibleRegion().GetSize() != outputMask->GetLargestPossibleRegion().GetSize())
+          {
+          std::cout <<  "Input image and input mask must have same orientation, dimensions, and voxel spacings." << std::endl;
+          exit(-1);
+          }
+        filter->SetOutputMask(outputMask) ;
+        std::cout << "Output mask image loaded." << std::endl ;
         }
       std::cout << "Images loaded." << std::endl ;
     }

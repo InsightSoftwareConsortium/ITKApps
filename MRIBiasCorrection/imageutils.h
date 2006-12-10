@@ -9,8 +9,8 @@ Version:   $Revision$
 Copyright (c) 2002 Insight Consortium. All rights reserved.
 See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
 
-This software is distributed WITHOUT ANY WARRANTY; without even 
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkImageRegionIterator.h"
 #include "itkImageRegionIteratorWithIndex.h"
 #include "itkNumericTraits.h"
+#include "itkOrientImageFilter.h"
 
 #include "myutils.h"
 
@@ -46,14 +47,14 @@ void copyImage(ImagePointer source , ImagePointer target)
   ImageType::RegionType s_region = source->GetLargestPossibleRegion() ;
   ImageIterator s_iter(source, s_region ) ;
 
-  
+
   if (target->GetLargestPossibleRegion().GetSize() != s_region.GetSize())
     {
       target->SetLargestPossibleRegion(s_region) ;
       target->SetBufferedRegion(s_region) ;
       target->Allocate() ;
     }
-      
+
   ImageIterator t_iter(target, s_region) ;
 
   s_iter.GoToBegin() ;
@@ -67,7 +68,7 @@ void copyImage(ImagePointer source , ImagePointer target)
 }
 
 
-void logImage(ImagePointer source, ImagePointer target) 
+void logImage(ImagePointer source, ImagePointer target)
 {
   print_line("Applying logarithm to the image values...") ;
   ImageType::RegionType region ;
@@ -82,7 +83,7 @@ void logImage(ImagePointer source, ImagePointer target)
 
   itk::ImageRegionIteratorWithIndex<ImageType> s_iter(source, region) ;
   itk::ImageRegionIteratorWithIndex<ImageType> t_iter(target, region) ;
-  
+
   s_iter.GoToBegin() ;
   t_iter.GoToBegin() ;
 
@@ -91,7 +92,7 @@ void logImage(ImagePointer source, ImagePointer target)
   while (!s_iter.IsAtEnd())
     {
       pixel = s_iter.Get() ;
-      
+
       log_pixel =  log( pixel + 1 ) ;
       if (pixel < itk::NumericTraits< ImageType::PixelType>::Zero)
         t_iter.Set( itk::NumericTraits< ImageType::PixelType >::Zero ) ;
@@ -102,6 +103,25 @@ void logImage(ImagePointer source, ImagePointer target)
       ++t_iter ;
     }
   print_line("Conversion done.") ;
+}
+
+/** Orient an image with the given orientation...
+ */
+template <class OrienterImageType>
+typename OrienterImageType::Pointer
+OrientImage(const typename OrienterImageType::Pointer & input, const typename OrienterImageType::DirectionType & DesiredDirection)
+{
+  //TODO:  change spatial orientation to use direction cosigns here.q
+
+  typename itk::OrientImageFilter<OrienterImageType,OrienterImageType>::Pointer orienter =
+    itk::OrientImageFilter<OrienterImageType,OrienterImageType>::New();
+  orienter->SetDesiredCoordinateDirection(DesiredDirection);
+  orienter->UseImageDirectionOn();
+  orienter->SetInput(input);
+  orienter->Update();
+
+  typename OrienterImageType::Pointer  image = orienter->GetOutput();
+  return image;
 }
 
 #endif

@@ -9,8 +9,8 @@ Version:   $Revision$
 Copyright (c) 2002 Insight Consortium. All rights reserved.
 See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
 
-This software is distributed WITHOUT ANY WARRANTY; without even 
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
@@ -23,16 +23,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include "OptionList.h"
 #include <itkMRIBiasFieldCorrectionFilter.h>
 #include <itkMinimumMaximumImageCalculator.h>
-#include <itkBinaryThresholdImageFilter.h> 
+#include <itkBinaryThresholdImageFilter.h>
 #include <itkImageRegionIterator.h>
 #include <itkZeroCrossingBasedEdgeDetectionImageFilter.h>
-#include <itkBinaryBallStructuringElement.h> 
-#include <itkBinaryCrossStructuringElement.h> 
-#include <itkBinaryDilateImageFilter.h> 
+#include <itkBinaryBallStructuringElement.h>
+#include <itkBinaryCrossStructuringElement.h>
+#include <itkBinaryDilateImageFilter.h>
 #include <itkMaskImageFilter.h>
 #include <itkCastImageFilter.h>
 #include <itkIndent.h>
-#include <itkHistogram.h> 
+#include <itkHistogram.h>
 #include "imageutils.h"
 
 typedef itk::MRIBiasFieldCorrectionFilter<ImageType, ImageType, MaskType> Corrector ;
@@ -69,7 +69,7 @@ void print_usage()
   print_line("        output image file name [meta image format]" );
   print_line("--class-mean mean(1),...,mean(i)" ) ;
   print_line("        intensity means  of the differen i tissue classes") ;
-  print_line("--class-sigma sig(1),...,sig(i)" ) ; 
+  print_line("--class-sigma sig(1),...,sig(i)" ) ;
   print_line("        intensity sigmas of the different i tissue clases") ;
   print_line("        NOTE: The sigmas should be listed in the SAME ORDER") ;
   print_line("              of means");
@@ -90,7 +90,7 @@ void print_usage()
   print_line("        [default 1.05]" ) ;
   print_line("--shrink double") ;
   print_line("        stepsize shrink factor ") ;
-  print_line("        [default growth^(-0.25)]" ) ; 
+  print_line("        [default growth^(-0.25)]" ) ;
   print_line("--volume-max-iteration int") ;
   print_line("        maximal number of iterations for 3D volume correction") ;
   print_line("        [default 20]" ) ;
@@ -153,31 +153,31 @@ static double compute_PercVal(ImagePointer& input, double quantile)
   float maxval = minMaxCalc->GetMaximum();
   float minval = minMaxCalc->GetMinimum();
   int numBins =  (int) (maxval - minval + 1);
-  
+
   // Histogram computation
   HistogramType::SizeType size;
   size[0] = numBins;
   //std::cout << "Histo values " << minval <<" ...  " << maxval << " -> " << numBins << std::endl ;
-  
+
   HistogramType::MeasurementVectorType minValVector, maxValVector;
   minValVector[0] = minval;
   maxValVector[0] = maxval + 1;
-  
+
   HistogramType::Pointer histogram = HistogramType::New();
   histogram->Initialize( size, minValVector, maxValVector );
-  
+
   // put each image pixel into the histogram
   HistogramType::MeasurementVectorType measurement;
   Iterator iter (input, input->GetBufferedRegion());
-  while ( !iter.IsAtEnd() )   
+  while ( !iter.IsAtEnd() )
     {
       float value = iter.Get();
       measurement[0] = value;
       histogram->IncreaseFrequency( measurement , 1 );
-      
+
       ++iter;
     }
-  
+
   // Compute 10% level
   ImageType::RegionType imageRegion = input->GetBufferedRegion();
   int numVoxels = imageRegion.GetSize(0) * imageRegion.GetSize(1) * imageRegion.GetSize(2);
@@ -188,13 +188,13 @@ static double compute_PercVal(ImagePointer& input, double quantile)
   HistogramType::IndexType index;
   HistogramType::InstanceIdentifier instance;
   bool exitLoop = false;
-  
-  for (histoIter = histogram->Begin() ; (histoIter != histogram->End() && ! exitLoop ) ; ++histoIter) 
-    { 
+
+  for (histoIter = histogram->Begin() ; (histoIter != histogram->End() && ! exitLoop ) ; ++histoIter)
+    {
       curVoxval  = curVoxval + histoIter.GetFrequency();
-      if (curVoxval >= PercVoxval) 
+      if (curVoxval >= PercVoxval)
    {
-     instance =  histoIter.GetInstanceIdentifier(); 
+     instance =  histoIter.GetInstanceIdentifier();
      index =       histogram->GetIndex(instance);
      maxValVector = histogram->GetHistogramMaxFromIndex(index);
      PercIntval = maxValVector[0];
@@ -221,7 +221,7 @@ static void remove_edges(ImagePointer input, ImagePointer& NoEdgeImage)
   variance[0] = 2.5;
   variance[1] = 2.5;
   variance[2] = 2.5;
-  
+
   //std::cout << " edge detection" << std::endl;
   zeroCrossFilterType::Pointer edgeFilter = zeroCrossFilterType::New();
   edgeFilter->SetInput(input);
@@ -231,14 +231,14 @@ static void remove_edges(ImagePointer input, ImagePointer& NoEdgeImage)
   castFilterType::Pointer convFilter = castFilterType::New();
   convFilter->SetInput(edgeFilter->GetOutput());
   convFilter->Update();
- 
+
   StructuringElementType structuringElement;
   int ballSize = 1;
-  structuringElement.SetRadius( ballSize ); 
+  structuringElement.SetRadius( ballSize );
   structuringElement.CreateStructuringElement( );
-  
+
   //   //std::cout << "dilate  edge image" << std::endl;
-  dilateFilterType::Pointer dilateFilter = dilateFilterType::New();  
+  dilateFilterType::Pointer dilateFilter = dilateFilterType::New();
   dilateFilter->SetInput(convFilter->GetOutput());
   dilateFilter->SetDilateValue (1);
   dilateFilter->SetKernel( structuringElement );
@@ -265,9 +265,48 @@ static void remove_edges(ImagePointer input, ImagePointer& NoEdgeImage)
   maskFilter->SetInput1(input);
   maskFilter->SetInput2(NotFilter->GetOutput());
   maskFilter->Update();
-  
+
   NoEdgeImage = maskFilter->GetOutput();
 }
+
+static int ImageMaskDisagreement(ImagePointer imgPtr, MaskPointer maskPtr)
+{
+  if(imgPtr->GetDirection() != maskPtr->GetDirection())
+    {
+    std::cout <<  "image and mask must have same GetDirection() matrix values";
+    return 1;
+    }
+  const int nDims = imgPtr->GetSpacing().Size();
+  for (int i=0; i<nDims; i++) {
+    float err = 0.0;
+    float ppn = 0.0;
+    if (imgPtr->GetSpacing()[i] < maskPtr->GetSpacing()[i])
+    {
+      err += maskPtr->GetSpacing()[i] - imgPtr->GetSpacing()[i];
+      ppn += imgPtr->GetSpacing()[i];
+    }
+    if (imgPtr->GetSpacing()[i] > maskPtr->GetSpacing()[i])
+    {
+      err += imgPtr->GetSpacing()[i] - maskPtr->GetSpacing()[i];
+      ppn += maskPtr->GetSpacing()[i];
+    }
+    if (ppn != 0.0)
+    {
+      if (err/ppn > 0.01)
+      {
+      std::cout <<  "image and mask must have same voxel spacings";
+      return 1;
+      }
+    }
+  }
+  if(imgPtr->GetLargestPossibleRegion().GetSize() != maskPtr->GetLargestPossibleRegion().GetSize())
+    {
+    std::cout <<  "image and mask must have same GetLargestPossibleRegion().GetSize() vector values";
+    return 1;
+    }
+  return 0;
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -300,8 +339,8 @@ int main(int argc, char* argv[])
   int sliceDirection = 2;
   std::vector<double> InclassMeans ;
   std::vector<double> InclassSigmas ;
-  int volumeMaximumIteration = 200; 
-  int interSliceMaximumIteration = 200; 
+  int volumeMaximumIteration = 200;
+  int interSliceMaximumIteration = 200;
   double initialRadius = 1.01;
   double growth = 1.05;
   double shrink = pow(growth, -0.25);
@@ -322,7 +361,7 @@ int main(int argc, char* argv[])
       options.GetStringOption("output", &outputFileName, true) ;
       options.GetStringOption("input-mask", &inputMaskFileName, false) ;
       options.GetStringOption("output-mask", &outputMaskFileName, false) ;
-      
+
       useAutoOutputmask = options.GetBooleanOption("use-auto-outputmask", true, false) ;
       useAutoInputmask = options.GetBooleanOption("use-auto-inputmask", true, false) ;
       outputmaskPerc = options.GetDoubleOption("outputmaskPerc", outputmaskPerc, false) ;
@@ -349,18 +388,18 @@ int main(int argc, char* argv[])
       initialRadius = options.GetDoubleOption("init-step-size", 1.01, false) ;
 
       // get the filter operation option
-      usingSlabIdentification = 
+      usingSlabIdentification =
         options.GetBooleanOption("use-slab-identification", false, false) ;
-      useIntersliceCorrection = 
+      useIntersliceCorrection =
         options.GetBooleanOption("use-interslice-correction", false, false) ;
     }
   catch(OptionList::RequiredOptionMissing e)
     {
-      std::cout << "Error: The '" << e.OptionTag 
-                << "' option is required but missing." 
+      std::cout << "Error: The '" << e.OptionTag
+                << "' option is required but missing."
                 << std::endl ;
     }
-  
+
   Corrector::Pointer filter = Corrector::New() ;
 
   try
@@ -369,23 +408,34 @@ int main(int argc, char* argv[])
       imageReader->SetFileName(inputFileName.c_str()) ;
       imageReader->Update() ;
       input = imageReader->GetOutput() ;
+      ImageType::DirectionType ImageDirection=input->GetDirection();
       filter->SetInput(input) ;
       std::cout << "Input image loaded." << std::endl ;
       if (inputMaskFileName != "")
         {
-          maskReader->SetFileName(inputMaskFileName.c_str()) ;
-          maskReader->Update() ;
-          inputMask = maskReader->GetOutput() ;
-          filter->SetInputMask(inputMask) ;
-          std::cout << "Input mask image loaded." << std::endl ;
+        maskReader->SetFileName(inputMaskFileName.c_str()) ;
+        maskReader->Update() ;
+        inputMask = OrientImage<MaskType>(maskReader->GetOutput(),ImageDirection);
+        if(ImageMaskDisagreement(input, inputMask))
+          {
+          std::cout <<  ", comparing input to inputMask." << std::endl;
+          exit(-1);
+          }
+        filter->SetInputMask(inputMask) ;
+        std::cout << "Input mask image loaded." << std::endl ;
         }
       if (outputMaskFileName != "")
         {
-          maskReader2->SetFileName(outputMaskFileName.c_str()) ;
-          maskReader2->Update() ;
-          outputMask = maskReader2->GetOutput() ;
-          filter->SetOutputMask(outputMask) ;
-          std::cout << "Output mask image loaded." << std::endl ;
+        maskReader2->SetFileName(outputMaskFileName.c_str()) ;
+        maskReader2->Update() ;
+        outputMask = OrientImage<MaskType>(maskReader2->GetOutput(),ImageDirection);
+        if(ImageMaskDisagreement(input, outputMask))
+          {
+          std::cout <<  ", comparing input to outputMask." << std::endl;
+          exit(-1);
+          }
+        filter->SetOutputMask(outputMask) ;
+        std::cout << "Output mask image loaded." << std::endl ;
         }
       std::cout << "Images loaded." << std::endl ;
     }
@@ -408,14 +458,14 @@ int main(int argc, char* argv[])
      filter->SetNumberOfLevels( level ) ;
      std::cout << "Setting multires schedule: " << level << std::endl ;
      Corrector::ScheduleType CorrSchedule ( level, 3) ;
-     for( int lev = 0; lev < level; lev++ ) // Copy schedule 
+     for( int lev = 0; lev < level; lev++ ) // Copy schedule
        {
          for( int dim = 0; dim < 3; dim++ )
       {
         CorrSchedule[lev][dim] = schedule[lev * 3 + dim];
       }
        }
-     
+
      filter->SetSchedule(CorrSchedule) ;
    }
       else
@@ -433,19 +483,19 @@ int main(int argc, char* argv[])
     {
     classMeans.SetElement(i, InclassMeans[i]);
     }
-  for (unsigned int i = 0; i < InclassSigmas.size(); i++) 
+  for (unsigned int i = 0; i < InclassSigmas.size(); i++)
     {
     classSigmas.SetElement(i, InclassSigmas[i]);
     }
-  
+
   try
     {
-      if (outputMaskFileName == "" && useAutoOutputmask ) 
+      if (outputMaskFileName == "" && useAutoOutputmask )
    {
      // generate output mask using 10% treshold
      double percVal = compute_PercVal(input, outputmaskPerc);
      std::cout << "Computing OutputMask: " <<  outputmaskPerc << " percent histo is at : " << percVal << std::endl;
-     
+
      // Threshold the image
      threshFilterType::Pointer threshFilter = threshFilterType::New();
      threshFilter->SetInput(input);
@@ -454,7 +504,7 @@ int main(int argc, char* argv[])
      threshFilter->SetOutsideValue( BG_VAL );
      threshFilter->SetInsideValue( TRESH_VAL );
      threshFilter->Update();
-     
+
      outputMask = threshFilter->GetOutput() ;
      filter->SetOutputMask(outputMask) ;
      // DEBUG
@@ -465,13 +515,13 @@ int main(int argc, char* argv[])
        writer->Write() ;
      }
    }
-      
-      if (inputMaskFileName == "" && useAutoInputmask ) 
+
+      if (inputMaskFileName == "" && useAutoInputmask )
    {
      // setting inputmask
      double percVal = compute_PercVal(input, outputmaskPerc);
      std::cout << "Computing InputMask:" <<  outputmaskPerc << "  percent histo is at : " << percVal << std::endl;
-     
+
      ImagePointer NoEdgeImage ;
      // remove partial volume voxel using an edge map
      remove_edges(input, NoEdgeImage);
@@ -501,7 +551,7 @@ int main(int argc, char* argv[])
       e.Print(std::cout) ;
       exit(0) ;
     }
-      
+
   //filter->DebugOn() ;
   try
     {
@@ -531,7 +581,7 @@ int main(int argc, char* argv[])
     {
       // writes the corrected image
       std::cout << "Writing corrected image..." << std::endl ;
-      
+
       castFilterType::Pointer convFilter = castFilterType::New();
       convFilter->SetInput(filter->GetOutput());
       convFilter->Update();
@@ -547,34 +597,34 @@ int main(int argc, char* argv[])
     }
 
   std::cout << " coefficients :" ;
-  Corrector::BiasFieldType::CoefficientArrayType coefficients = 
+  Corrector::BiasFieldType::CoefficientArrayType coefficients =
     filter->GetEstimatedBiasFieldCoefficients() ;
 
   Corrector::BiasFieldType::CoefficientArrayType::iterator iter =
     coefficients.begin() ;
 
-  while (iter != coefficients.end()) 
+  while (iter != coefficients.end())
     {
       std::cout << *iter << " " ;
       iter++ ;
-    } 
+    }
   std::cout << std::endl ;
 
   // write coeffs into a separate file
   std::string outFileNameCoef = outputFileName + std::string(".bcoef");
-  
-  std::ofstream efile(outFileNameCoef.c_str(), std::ios::out);  
+
+  std::ofstream efile(outFileNameCoef.c_str(), std::ios::out);
   if (!efile) {
     std::cerr << "Error: open(w) of file \"" << outFileNameCoef << "\" failed." << std::endl;
     exit(-1);
   }
   efile.precision(16);
   iter = coefficients.begin() ;
-  while (iter != coefficients.end()) 
+  while (iter != coefficients.end())
     {
       efile << *iter << " " ;
       iter++ ;
-    } 
+    }
   efile.close();
 
   return 0 ;
