@@ -419,7 +419,7 @@ void statfilters( const typename ImageType::Pointer AccImage , MetaCommand comma
       {
 
       typename ImageType::SizeType  size;
-      size = reader->GetOutput()->GetRequestedRegion().GetSize();
+      size = reader->GetOutput()->GetLargestPossibleRegion().GetSize();
       float NumberOfPixels = size[0]*size[1];
       if(dims==3)
         {
@@ -430,7 +430,7 @@ void statfilters( const typename ImageType::Pointer AccImage , MetaCommand comma
     else
       {
       typename ImageType::SizeType  size;
-      size = AccImage->GetRequestedRegion().GetSize();
+      size = AccImage->GetLargestPossibleRegion().GetSize();
       float NumberOfPixels = size[0]*size[1];
       if(dims==3)
         {
@@ -553,7 +553,7 @@ void ImageCalculatorReadWrite( MetaCommand &command )
   //Read the first Image
   typename ReaderType::Pointer reader = ReaderType::New();
   reader->SetFileName(InputList.at(0).c_str());
-  
+
   std::cout << "Reading 1st Image..." << InputList.at(0).c_str() << std::endl;
 
   try
@@ -566,31 +566,11 @@ void ImageCalculatorReadWrite( MetaCommand &command )
     throw excp;
     }
 
-
-  typename ImageType::SizeType  size;
-  size = reader->GetOutput()->GetRequestedRegion().GetSize();
-
-  typename ImageType::SpacingType  space;
-  space=reader->GetOutput()->GetSpacing();
-
-
-  const int nx = size[0];
-  const int ny = size[1];
-  const int nz = size[2];
-
-  const double vx = space[0];
-  const double vy = space[1];
-  const double vz = space[2];
-
-  const typename ImageType::DirectionType Firstimage_orient = reader->GetOutput()->GetDirection();
-
   //Create an Accumulator Image.
-  typename ImageType::Pointer AccImage;
+  typename ImageType::Pointer AccImage = Ifilters<ImageType>(reader->GetOutput(),command);
 
-  AccImage = Ifilters<ImageType>(reader->GetOutput(),command);
-  typename ImageType::Pointer SqrImageSum;
-  
   /*For variance image first step is to square the input image.*/
+  typename ImageType::Pointer SqrImageSum;
   if(command.GetValueAsBool("Var","var") )
     {
     SqrImageSum = Imul<ImageType>(reader->GetOutput() , reader->GetOutput());
@@ -616,58 +596,24 @@ void ImageCalculatorReadWrite( MetaCommand &command )
 
 
     typename ImageType::Pointer image = Ifilters<ImageType>(reader2->GetOutput() ,command);
-    typename ImageType::SizeType size;
-    size = image->GetRequestedRegion().GetSize();
 
-    typename ImageType::SpacingType  space;
-    space =image->GetSpacing();
-
-    const int tempnx = size[0];
-    const int tempny = size[1];
-
-    const double tempvx = space[0];
-    const double tempvy = space[1];
-
-    //Check whether the image dimensions and the spacing are the same.
-    if( (nx != tempnx) || (ny != tempny) )
+   //Check whether the image dimensions and the spacing are the same.
+    if( (AccImage->GetLargestPossibleRegion().GetSize() != image->GetLargestPossibleRegion().GetSize()) )
       {
       std::cout<<"Error::The size of the images don't match. \n";
       exit(-1);
       }
 
-    if( (vx != tempvx) || (vy != tempvy) )
+    if( AccImage->GetSpacing() != image->GetSpacing() )
       {
       std::cout<<"Error::The pixel spacing of the images don't match. \n";
       exit(-1);
       }
-
-    if(dims==3)
+    if(AccImage->GetDirection() != image->GetDirection())
       {
-      const int tempnz = size[2];
-      const double tempvz = space[2];
-      if( (nz != tempnz))
-        {
-        std::cout<<"Error::The size of the images don't match. \n";
-        exit(-1);
-        }
-      if( (vz != tempvz) )
-        {
-        std::cout<<"Error::The pixel spacing of the images don't match. \n";
-        exit(-1);
-        }
-        
-      typename ImageType::DirectionType Accumulator_orient = image->GetDirection();
-        
-      if(Accumulator_orient != Firstimage_orient)
-        {
-        std::cout<<"Error::The orientation of the images are different. \n";
-        exit(-1);
-        }
+      std::cout<<"Error::The orientation of the images are different. \n";
+      exit(-1);
       }
-
-
-
-
 
     //Do the math for the Accumulator image and the image read in for each iteration.
     /*Call the multiplication function*/
