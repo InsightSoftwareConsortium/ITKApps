@@ -48,8 +48,8 @@ ITKIO
 ITKFltkImageViewer
 ITKVtkFltk
 vtkRendering
-vtkGraphics
 vtkHybrid
+vtkGraphics
 vtkImaging
 vtkIO
 vtkFiltering
