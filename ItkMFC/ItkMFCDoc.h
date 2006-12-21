@@ -29,6 +29,7 @@ public:
   public:
   virtual BOOL OnNewDocument();
   virtual void OnFileOpen();
+  virtual void OnFileSave();
   virtual void Serialize(CArchive& ar);
   //}}AFX_VIRTUAL
 

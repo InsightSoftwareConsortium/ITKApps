@@ -23,6 +23,7 @@ BEGIN_MESSAGE_MAP(CItkMFCDoc, CDocument)
     //    DO NOT EDIT what you see in these blocks of generated code!
   //}}AFX_MSG_MAP
   ON_COMMAND(ID_FILE_OPEN, CItkMFCDoc::OnFileOpen)
+  ON_COMMAND(ID_FILE_SAVE, CItkMFCDoc::OnFileSave)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -73,6 +74,37 @@ void CItkMFCDoc::OnFileOpen()
     {
     CString fmt;
     fmt.Format("Load image failed:\n%s",excp.GetDescription() );
+    ::AfxMessageBox(fmt);
+    }
+
+}
+
+
+void CItkMFCDoc::OnFileSave()
+{
+  CString strFilter;
+
+  strFilter = "MetaImage|*.mhd;*.mha|Analyze|*.hdr|VTK Image|*.vtk|JPEG|*.jpeg|TIFF Image|*.tiff|PNG Image|*.png|GIPL Image|*.gipl||";
+
+  CFileDialog dlg(TRUE, NULL, NULL, OFN_FILEMUSTEXIST, strFilter);
+
+  HRESULT hResult;
+  hResult = (int)dlg.DoModal();
+  if( hResult != IDOK )
+    {
+    return;
+    }
+
+  m_ItkPipeline.SetOutputFileName( dlg.GetFileName() );
+
+  try
+    {
+    m_ItkPipeline.SaveOutputFile();
+    }
+  catch( itk::ExceptionObject & excp )
+    {
+    CString fmt;
+    fmt.Format("Save image failed:\n%s",excp.GetDescription() );
     ::AfxMessageBox(fmt);
     }
 

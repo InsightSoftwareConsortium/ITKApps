@@ -24,6 +24,7 @@ public:
   void SetInputFileName(  const char * filename );
   void SetOutputFileName( const char * filename );
   void LoadInputFile();
+  void SaveOutputFile();
 
 private:
 

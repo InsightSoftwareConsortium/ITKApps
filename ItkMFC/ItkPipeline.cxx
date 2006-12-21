@@ -41,3 +41,12 @@ ItkPipeline
   m_ImageReader->Update();
 }
 
+
+
+void
+ItkPipeline
+::SaveOutputFile()
+{
+  m_ImageWriter->Update();
+}
+
