@@ -29,11 +29,6 @@ IF(BUILD_TESTING)
   ENABLE_TESTING()
 ENDIF(BUILD_TESTING)
 
-#-----------------------------------------------------------------------------
-# ITK build patented algorithms
-OPTION(ITK_USE_PATENTED "Build algorithms that are covered with Patents. It is YOUR responsibility to obtain a license from the patent holder in order to user these methods." OFF)
-MARK_AS_ADVANCED(ITK_USE_PATENTED)
-
 # Determine what packages are available
 # Add an option to use or not use VTK
 OPTION(USE_VTK "Use VTK (The Visualization Toolkit) (some applications need this)" OFF)
