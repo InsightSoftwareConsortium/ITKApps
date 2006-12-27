@@ -15,14 +15,7 @@
 #ifndef __OpenGLSliceTexture_h_
 #define __OpenGLSliceTexture_h_
 
-#include <FL/gl.h>
-#include <GL/glu.h>
-
-#ifndef _WIN32
-#ifndef GLU_VERSION_1_2
-#define GLU_VERSION_1_2 1
-#endif
-#endif
+#include "SNAPOpenGL.h"
 
 #include "itkImage.h"
 #include "itkConstantPadImageFilter.h"

@@ -23,7 +23,7 @@
 #include "SNAPAppearanceSettings.h"
 #include "FLTKCanvas.h"
 
-#include <FL/glut.H>
+#include "SNAPOpenGL.h"
 
 #include <vxl_version.h>
 #if VXL_VERSION_DATE_FULL > 20040406
@@ -1274,6 +1274,9 @@ Window3D
 
 /*
  *Log: Window3D.cxx
+ *Revision 1.33  2006/02/01 20:21:27  pauly
+ *ENH: An improvement to the main SNAP UI structure: one set of GL windows is used to support SNAP and IRIS modes
+ *
  *Revision 1.32  2006/01/05 18:03:09  pauly
  *STYLE: Removed unnecessary console messages from SNAP
  *

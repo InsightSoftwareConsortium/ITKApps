@@ -32,7 +32,12 @@
 #if HAVE_GL
 #  include <FL/Fl_Gl_Window.H>
 #  include <FL/gl.h>
-#  include <GL/glu.h>
+#ifdef __APPLE__
+#include <OpenGL/glu.h>
+#else
+#include <GL/glu.h>
+#endif
+
 #else
 #  include <FL/Fl_Box.H>
 #endif /* HAVE_GL */

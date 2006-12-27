@@ -20,7 +20,7 @@
 
 // Include OpenGL headers according to the platform
 #ifdef __APPLE__
-  #include <GL/glu.h>
+  #include <OpenGL/glu.h>
   #include <FL/gl.h>
 #else
   #include <FL/gl.h>
