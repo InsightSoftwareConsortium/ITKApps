@@ -262,7 +262,7 @@ public class GzipFilter extends MediaFilter
         // now create an input stream and return it       
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                                                                                                                                
-        ImageIO.write(buf,"jpeg",baos); 
+        ImageIO.write(thumbnail,"jpeg",baos); 
 
         // now get the array
         ByteArrayInputStream bais = new ByteArrayInputStream ( baos.toByteArray());
