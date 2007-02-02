@@ -27,7 +27,7 @@
 class OptionList
 {
 public:
-  typedef std::multimap<std::string, std::string> OptionMap ;
+  typedef std::multimap<const std::string, std::string> OptionMap ;
   typedef std::vector<std::string> StringVector ;
 
   OptionList(int argc, char* argv[]) ;
@@ -36,7 +36,7 @@ public:
   class RequiredOptionMissing 
   {
   public:
-    RequiredOptionMissing(std::string tag)
+    RequiredOptionMissing(const std::string tag)
     {
       OptionTag = tag ;
     }
@@ -44,46 +44,46 @@ public:
     std::string OptionTag ;
   } ;
  
-  int GetOption(std::string option_tag, StringVector* values) ;
-  int DumpOption(std::string option_tag, bool withTag = true, 
+  int GetOption(const std::string option_tag, StringVector* values) ;
+  int DumpOption(const std::string option_tag, bool withTag = true,
                  bool withNewLine = false) ;
 
-  int GetMultiDoubleOption(std::string tag, 
+  int GetMultiDoubleOption(const std::string tag,
                            std::vector<double>* args, 
                            bool required) ;
 
-  int GetMultiDoubleOption(std::string tag, 
+  int GetMultiDoubleOption(const std::string tag,
                            itk::Array<double>* args, 
                            bool required) ;
 
 
-  double GetDoubleOption(std::string tag, double default_value, bool required);
+  double GetDoubleOption(const std::string tag, double default_value, bool required);
 
-  bool GetBooleanOption(std::string tag, bool default_value, bool required);
+  bool GetBooleanOption(const std::string tag, bool default_value, bool required);
 
-  int GetMultiIntOption(std::string tag, 
+  int GetMultiIntOption(const std::string tag,
                         std::vector<int>* args,
                         bool required);
 
-  int GetIntOption(std::string tag, int default_value, bool required) ;
+  int GetIntOption(const std::string tag, int default_value, bool required) ;
   
-  int GetMultiUCharOption(std::string tag, 
+  int GetMultiUCharOption(const std::string tag,
                           std::vector< unsigned char >* args,
                           bool required);
 
-  unsigned char GetUCharOption(std::string tag, unsigned char default_value, 
+  unsigned char GetUCharOption(const std::string tag, unsigned char default_value,
                                bool required) ;
 
-  int GetMultiUIntOption(std::string tag, 
+  int GetMultiUIntOption(const std::string tag,
                           std::vector< unsigned int >* args,
                           bool required);
 
-  unsigned int GetUIntOption(std::string tag, unsigned int default_value, 
+  unsigned int GetUIntOption(const std::string tag, unsigned int default_value,
                                bool required) ;
 
-  int GetStringOption(std::string tag, std::string* ret, bool required);
+  int GetStringOption(const std::string tag, std::string* ret, bool required);
   
-  int GetMultiStringOption(std::string tag, std::vector< std::string >* ret,
+  int GetMultiStringOption(const std::string tag, std::vector< std::string >* ret,
                            bool required);
 protected:
 
