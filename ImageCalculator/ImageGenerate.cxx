@@ -22,7 +22,7 @@ enum PixelTypes {
 typedef std::complex<float> ThreeVectorComplexPixelType;
 typedef itk::RGBPixel<unsigned char> RGBPixelType;
 
-std::map<PixelTypes,char *> typenames;
+std::map<PixelTypes,const char *> typenames;
 void typenamesInit()
 {
   typenames[Char] = "Char";
