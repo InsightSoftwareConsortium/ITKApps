@@ -47,13 +47,13 @@ ITKBasicFilters
 ITKIO
 ITKFltkImageViewer
 ITKVtkFltk
+vtkCommon
+vtkFiltering
+vtkIO
+vtkImaging
+vtkGraphics
 vtkRendering
 vtkHybrid
-vtkGraphics
-vtkImaging
-vtkIO
-vtkFiltering
-vtkCommon
 )
 
 IF(VTK_USE_VOLUMERENDERING)

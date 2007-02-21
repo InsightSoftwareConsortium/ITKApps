@@ -73,13 +73,13 @@ TARGET_LINK_LIBRARIES(
   ITKStatistics
 
 
-  vtkRendering
+  vtkCommon
+  vtkFiltering
   vtkGraphics
-  vtkHybrid
   vtkImaging
   vtkIO
-  vtkFiltering
-  vtkCommon
+  vtkRendering
+  vtkHybrid
   vtkVolumeRendering
 
 
