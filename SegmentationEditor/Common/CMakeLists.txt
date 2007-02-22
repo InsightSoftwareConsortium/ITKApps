@@ -8,7 +8,7 @@ SET(WSTCommon_SRCS
   vtkWSLookupTableManager.cxx
 )
 
-SET_SOURCE_FILES_PROPERTIES(vtkLookupTableEquivalencyHash.cxx  WRAP_EXCLUDE)
+SET_SOURCE_FILES_PROPERTIES(vtkLookupTableEquivalencyHash.cxx vtkITKWatershedFilterAndWriter.h WRAP_EXCLUDE)
 
 ADD_LIBRARY(vtkWSTCommon  ${WSTCommon_SRCS})
 INSTALL_TARGETS(/lib vtkWSTCommon)
