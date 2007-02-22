@@ -22,7 +22,11 @@
 #ifdef WIN32
 typedef void (CALLBACK *TessCallback)();
 #else
+#ifdef __APPLE__
+typedef GLvoid (*TessCallback)(...);
+#else
 typedef void (*TessCallback)();
+#endif
 #endif
 
 void 
