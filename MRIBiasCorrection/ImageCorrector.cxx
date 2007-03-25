@@ -261,9 +261,9 @@ int main(int argc, char* argv[])
     {
       std::cout << "Error: Invalid number of Coefficients for the bias field." 
                 << std::endl ;
-      std::cout << "given size: " << m.Given 
+      std::cout << "given size: " << m.m_Given 
                 << "required size: " 
-                << m.Required  
+                << m.m_Required  
                 << std::endl ;
       exit(0) ;
     }
