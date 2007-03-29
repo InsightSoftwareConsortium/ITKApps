@@ -33,7 +33,8 @@ guiMainImplementation
   m_FixedImage = 0;
   m_MovingImage = 0;
   m_InitializedMovingImage = 0; //ImageType::New();
-  m_RegisteredMovingImage = 0; //ImageType::New();
+  m_AffineRegisteredMovingImage = 0; //ImageType::New();
+  m_DeformableRegisteredMovingImage = 0;
 
   m_FixedLandmarkSpatialObject = LandmarkSpatialObjectType::New();
   m_MovingLandmarkSpatialObject = LandmarkSpatialObjectType::New();
@@ -54,6 +55,7 @@ guiMainImplementation
 
   tkInitializationMethodChoice->value(3);
   tkRegistrationMethodChoice->value(1);
+  tkUseDeformable->value(0);
   }
 
 guiMainImplementation
@@ -194,6 +196,7 @@ guiMainImplementation
   tkResultImageViewer->activate();
 
   tkInitializationView->deactivate();
+  tkAffineRegisteredView->deactivate();
   tkRegisteredView->deactivate();
   this->SelectImageSet(0);
   this->SetViewAxis(2);
@@ -235,9 +238,18 @@ void
 guiMainImplementation
 ::SaveFinalRegisteredImage()
   {
-  itkFlFileWriter< ImageType >( m_RegisteredMovingImage.GetPointer(),
+  if (m_DeformableRegisteredMovingImage)
+    {
+    itkFlFileWriter< ImageType >( m_DeformableRegisteredMovingImage.GetPointer(),
                                 "Save registered image file...",
                                 "*.mh?", "", 0 );
+    }
+  else if (m_AffineRegisteredMovingImage)
+    {
+    itkFlFileWriter< ImageType >( m_AffineRegisteredMovingImage.GetPointer(),
+                                "Save registered image file...",
+                                "*.mh?", "", 0 );
+    }
   }
 
 /////////////////////////////////////////////////
@@ -314,16 +326,24 @@ guiMainImplementation
     }
   else if ( i == 1)
     {
-    if ( m_RegisteredMovingImage )
+    if ( m_InitializedMovingImage )
       {
       tkResultImageViewer->SetSecondInputImage(m_InitializedMovingImage);
       }
     }
   else if ( i == 2)
     {
-    if ( m_RegisteredMovingImage )
+    if ( m_AffineRegisteredMovingImage )
       {
-      tkResultImageViewer->SetSecondInputImage(m_RegisteredMovingImage);
+      tkResultImageViewer->SetSecondInputImage(m_AffineRegisteredMovingImage);
+      }
+    }
+  else if ( i == 3 )
+    {
+    if ( m_DeformableRegisteredMovingImage )
+      {
+      tkResultImageViewer->SetSecondInputImage(
+                              m_DeformableRegisteredMovingImage);
       }
     }
 
@@ -735,8 +755,8 @@ void
 guiMainImplementation
 ::ShowRegionOfInterestWindow()
   {
-  tkMovingImageViewer->HideLandmarks();
-  tkMovingImageViewer->ShowRegionOfInterest();
+  tkFixedImageViewer->HideLandmarks();
+  tkFixedImageViewer->ShowRegionOfInterest();
 
   tkROIViewAxisX->value(tkViewAxisX->value());
   tkROIViewAxisY->value(tkViewAxisY->value());
@@ -749,9 +769,9 @@ void
 guiMainImplementation
 ::ApplyRegionOfInterest()
   {
-  tkMovingImageViewer->ApplyRegionOfInterest();
-  tkMovingImageViewer->HideRegionOfInterest();
-  tkMovingImageViewer->ShowLandmarks();
+  tkFixedImageViewer->ApplyRegionOfInterest();
+  tkFixedImageViewer->HideRegionOfInterest();
+  tkFixedImageViewer->ShowLandmarks();
   tkRegionOfInterestWindow->hide();
   }
 
@@ -759,8 +779,8 @@ void
 guiMainImplementation
 ::CancelRegionOfInterest()
   {
-  tkMovingImageViewer->HideRegionOfInterest();
-  tkMovingImageViewer->ShowLandmarks();
+  tkFixedImageViewer->HideRegionOfInterest();
+  tkFixedImageViewer->ShowLandmarks();
   tkRegionOfInterestWindow->hide();
   }
 
@@ -815,7 +835,7 @@ guiMainImplementation
     step = -1 * (int) tkROIStep->value();
     }
   
-  tkMovingImageViewer->MoveRegionOfInterest(axis, step);
+  tkFixedImageViewer->MoveRegionOfInterest(axis, step);
   }
 
 void 
@@ -869,7 +889,7 @@ guiMainImplementation
     step = (int) tkROIStep->value();
     }
   
-  tkMovingImageViewer->ResizeRegionOfInterest(axis, step);
+  tkFixedImageViewer->ResizeRegionOfInterest(axis, step);
   }
 
 /////////////////////////////////////////////////
@@ -918,6 +938,14 @@ guiMainImplementation
       m_ImageRegistrationApp->GetAffineNumberOfIterations());
   tkAffineNumberOfSpatialSamples->value(
       m_ImageRegistrationApp->GetAffineNumberOfSpatialSamples());
+      
+  //set deformable advance option values
+  tkDeformableNumberOfIterations->value(
+      m_ImageRegistrationApp->GetDeformableNumberOfIterations());
+  tkDeformableNumberOfSpatialSamples->value(
+      m_ImageRegistrationApp->GetDeformableNumberOfSpatialSamples());
+  tkDeformableNumberOfControlPoints->value(
+      m_ImageRegistrationApp->GetDeformableNumberOfControlPoints());
   }
 
 void
@@ -981,6 +1009,14 @@ guiMainImplementation
   m_ImageRegistrationApp->SetAffineNumberOfSpatialSamples
     ((unsigned int) tkAffineNumberOfSpatialSamples->value());
 
+  //set deformable advance option values
+  m_ImageRegistrationApp->SetDeformableNumberOfIterations(
+                (unsigned int) tkDeformableNumberOfIterations->value());
+  m_ImageRegistrationApp->SetDeformableNumberOfSpatialSamples(
+                (unsigned int) tkDeformableNumberOfSpatialSamples->value());
+  m_ImageRegistrationApp->SetDeformableNumberOfControlPoints(
+                (unsigned int) tkDeformableNumberOfControlPoints->value());
+                
   tkAdvancedOptionsWindow->hide();
   }
 
@@ -1060,6 +1096,19 @@ guiMainImplementation
   
   outputFile << "AffineNumberOfSpatialSamples " 
              << m_ImageRegistrationApp->GetAffineNumberOfSpatialSamples() 
+             << std::endl;
+             
+  // set deformable advance option values
+  outputFile << "DeformableNumberOfIterations "
+             << m_ImageRegistrationApp->GetDeformableNumberOfIterations()
+             << std::endl;
+             
+  outputFile << "DeformableNumberOfSpatialSamples "
+             << m_ImageRegistrationApp->GetDeformableNumberOfSpatialSamples()
+             << std::endl;
+             
+  outputFile << "DeformableNumberOfControlPoints "
+             << m_ImageRegistrationApp->GetDeformableNumberOfControlPoints()
              << std::endl;
   }
 
@@ -1146,10 +1195,18 @@ guiMainImplementation
       (unsigned int)options["AffineNumberOfIterations"]);
   m_ImageRegistrationApp->SetAffineNumberOfSpatialSamples(
       (unsigned int)options["AffineNumberOfSpatialSamples"]);
+      
+  //Deformable
+  m_ImageRegistrationApp->SetDeformableNumberOfIterations(
+      (unsigned int)options["DeformableNumberOfIterations"]);
+  m_ImageRegistrationApp->SetDeformableNumberOfSpatialSamples(
+      (unsigned int)options["DeformableNumberOfSpatialSamples"]);
+  m_ImageRegistrationApp->SetDeformableNumberOfControlPoints(
+      (unsigned int)options["DeformableNumberOfControlPoints"]);
   }
 
 /////////////////////////////////////////////////
-// Registartion related functions
+// Registration related functions
 /////////////////////////////////////////////////
 
 void
@@ -1161,24 +1218,20 @@ guiMainImplementation
 
   if( filename )
     {
-    typedef itk::SpatialObjectWriter< >         WriterType;
-    typedef itk::GroupSpatialObject< >          GroupType;
-    typedef itk::ScalableAffineTransform< double, 3 > 
-                                                TransformType;
-
-    WriterType::Pointer writer = WriterType::New();
+    TransformWriterType::Pointer writer = TransformWriterType::New();
     writer->SetFileName(filename);
-      
-    GroupType::Pointer grp = GroupType::New();
-    TransformType::Pointer transform = TransformType::New();
-    transform->SetCenter( m_ImageRegistrationApp->GetFinalTransform()
-                                                ->GetCenter() );
-    transform->SetMatrix( m_ImageRegistrationApp->GetFinalTransform()
-                                                ->GetMatrix() );
-    transform->SetOffset( m_ImageRegistrationApp->GetFinalTransform()
-                                                ->GetOffset() );
-    grp->SetObjectToParentTransform( transform.GetPointer() );
-    writer->SetInput( grp );
+    
+    if (!m_DeformableRegisteredMovingImage)
+      {
+      writer->SetInput(m_ImageRegistrationApp->GetFinalTransform());
+      }
+    else
+      {
+      writer->SetInput(m_ImageRegistrationApp->GetFinalTransform());
+      writer->AddTransform(
+                 m_ImageRegistrationApp->GetFinalDeformableTransform());
+      }
+    
     writer->Update();
     }
   }
@@ -1259,10 +1312,10 @@ guiMainImplementation
   RegionType region;
   region = m_MovingImage->GetLargestPossibleRegion();
   if ( tkRegionUseUserRegion->value() == 1
-        && tkMovingImageViewer->IsRegionOfInterestAvailable() )
+        && tkFixedImageViewer->IsRegionOfInterestAvailable() )
     {
     std::cout << "Registration using user roi." << std::endl;
-    region = tkMovingImageViewer->GetRegionOfInterest();
+    region = tkFixedImageViewer->GetRegionOfInterest();
     }
   else if ( tkRegionUseLandmarkRegion->value() == 1 
             && tkMovingImageViewer->GetNumberOfLandmarks() == 4 
@@ -1272,7 +1325,7 @@ guiMainImplementation
     region = tkMovingImageViewer->ComputeLandmarkRegion(
                                   tkRegionScale->value());
     }
-  m_ImageRegistrationApp->SetMovingImageRegion(region);
+  m_ImageRegistrationApp->SetFixedImageRegion(region);
 
   clock_t timeRegStart = clock();
   switch(tkRegistrationMethodChoice->value())
@@ -1306,17 +1359,35 @@ guiMainImplementation
       break;
       }
     }
+
   clock_t timeEnd = clock();
 
   
   this->ChangeStatusDisplay("Resampling the moving image...");
-  m_RegisteredMovingImage = 
+  m_AffineRegisteredMovingImage = 
     m_ImageRegistrationApp->GetFinalRegisteredMovingImage();
 
-  tkRegisteredView->activate();
+  tkAffineRegisteredView->activate();
   
   tkDisplayMovingImageChoice->value(2);
   this->SelectImageSet(2);
+  this->ChangeStatusDisplay("Registration done");
+   
+  if (tkUseDeformable->value())
+    {
+    this->ChangeStatusDisplay("Registering using the deformable method...");
+    m_ImageRegistrationApp->RegisterUsingDeformable();
+    
+    this->ChangeStatusDisplay("Resampling the moving image...");
+    m_DeformableRegisteredMovingImage = 
+        m_ImageRegistrationApp->GetFinalRegisteredMovingImage();
+      
+    tkRegisteredView->activate();
+    
+    tkDisplayMovingImageChoice->value(3);
+    this->SelectImageSet(3);
+    }
+
   this->ChangeStatusDisplay("Registration done");
   
   std::cout << "Time for initialization = " 

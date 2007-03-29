@@ -37,6 +37,8 @@
 #include <itkImageFileWriter.h>
 #include "itkSpatialObjectReader.h"
 #include "itkSpatialObjectWriter.h"
+#include "itkTransformFileWriter.h"
+#include "itkTransformFileReader.h"
 
 #include "guiMain.h"
 #include "ImageRegistrationApp.h"
@@ -74,6 +76,7 @@ class guiMainImplementation : public guiMain
     typedef itk::AffineTransform<double, 3>     AffineTransformType ;
     typedef itk::LinearInterpolateImageFunction< ImageType, double > 
                                                 InterpolatorType ;
+    typedef itk::TransformFileWriter            TransformWriterType;
     
     guiMainImplementation();
     virtual ~guiMainImplementation();
@@ -173,7 +176,8 @@ class guiMainImplementation : public guiMain
     ImageType::Pointer m_FixedImage ;
     ImageType::Pointer m_MovingImage ;
     ImageType::Pointer m_InitializedMovingImage ;
-    ImageType::Pointer m_RegisteredMovingImage ;
+    ImageType::Pointer m_AffineRegisteredMovingImage ;
+    ImageType::Pointer m_DeformableRegisteredMovingImage ;
 
     std::string m_LastLoadedImagePath;
     bool m_FixedImageLoaded;

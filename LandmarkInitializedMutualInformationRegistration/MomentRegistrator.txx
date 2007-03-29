@@ -91,7 +91,7 @@ MomentRegistrator< TImage >
                                                             movingCenterPoint);
 
       typename TransformType::OffsetType offset;
-      offset = fixedCenterPoint - movingCenterPoint;
+      offset = movingCenterPoint - fixedCenterPoint;
 
       newTransform->SetCenter(movingCenterPoint);
       newTransform->SetOffset(offset);
@@ -126,7 +126,7 @@ MomentRegistrator< TImage >
         }
   
       typename TransformType::OffsetType offset;
-      offset = fixedImageCenterOfMass - movingImageCenterOfMass;
+      offset = movingImageCenterOfMass - fixedImageCenterOfMass;
       
       if(m_NumberOfMoments == 1) // Centers of mass
         {
@@ -135,10 +135,10 @@ MomentRegistrator< TImage >
         }
       else  // m_NumberOfMoments == 2 // Principle axes
         {
-        newTransform->SetCenter(movingImageCenterOfMass);
-        newTransform->SetMatrix(movingImageAxesTransform->GetMatrix());
-        newTransform->SetOffset(movingImageAxesTransform->GetOffset());
-        newTransform->Compose(fixedImageAxesTransform, true);
+        newTransform->SetCenter(fixedImageCenterOfMass);
+        newTransform->SetMatrix(fixedImageAxesTransform->GetMatrix());
+        newTransform->SetOffset(fixedImageAxesTransform->GetOffset());
+        newTransform->Compose(movingImageAxesTransform, true);
         }
       }
 

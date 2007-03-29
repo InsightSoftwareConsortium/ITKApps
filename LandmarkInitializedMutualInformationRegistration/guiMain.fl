@@ -4,7 +4,7 @@ header_name {.h}
 code_name {.cxx}
 class guiMain {open
 } {
-  Function {~guiMain()} {open return_type {virtual }
+  Function {~guiMain()} {open return_type virtual
   } {}
   Function {guiMain()} {open
   } {
@@ -34,15 +34,20 @@ class guiMain {open
             callback {SelectImageSet(1) ;}
             xywh {15 15 100 20} labelsize 10
           }
-          menuitem tkRegisteredView {
-            label {Registered Images}
+          menuitem tkAffineRegisteredView {
+            label {Affine Registered Images}
             callback {SelectImageSet(2) ;}
             xywh {25 25 100 20} labelsize 10 deactivate
+          }
+          menuitem tkRegisteredView {
+            label {Registered Images}
+            callback {SelectImageSet(3) ;}
+            xywh {35 35 100 20} labelsize 10 deactivate
           }
         }
         Fl_Choice tkInitializationMethodChoice {
           label {Initialization:} open
-          xywh {410 666 100 19} box PLASTIC_UP_BOX down_box BORDER_BOX color 255 selection_color 255 labelsize 10 align 36 when 1 textsize 10
+          xywh {370 666 100 19} box PLASTIC_UP_BOX down_box BORDER_BOX color 255 selection_color 255 labelsize 10 align 36 when 1 textsize 10
         } {
           menuitem tkInitNoneMethod {
             label None
@@ -67,7 +72,7 @@ class guiMain {open
         }
         Fl_Choice tkRegistrationMethodChoice {
           label {Registration:} open
-          xywh {590 666 100 19} box PLASTIC_UP_BOX down_box BORDER_BOX color 255 selection_color 255 labelsize 10 align 36 when 1 textsize 10
+          xywh {545 666 100 19} box PLASTIC_UP_BOX down_box BORDER_BOX color 255 selection_color 255 labelsize 10 align 36 when 1 textsize 10
         } {
           menuitem tkRegNoneMethod {
             label None
@@ -90,15 +95,15 @@ class guiMain {open
           label Register
           callback {//PreRegister();
 Register();}
-          xywh {740 666 155 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 63 selection_color 63 labelsize 10
+          xywh {790 666 120 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 63 selection_color 63 labelsize 10
         }
         Fl_Button {} {
           label Quit
           callback {Quit();}
-          xywh {910 665 135 20} box PLASTIC_UP_BOX color 1 labelsize 10
+          xywh {930 665 115 20} box PLASTIC_UP_BOX color 1 labelsize 10
         }
         Fl_Box tkResultImageViewer {
-          label label selected
+          label label
           xywh {475 56 573 601} box FLAT_BOX color 42 deactivate resizable
           code0 {\#include <GLTwoImageSliceView.h>}
           class {GLTwoImageSliceView< short, unsigned char >}
@@ -297,6 +302,10 @@ Register();}
           callback {UpdateFixedSliceNumber();}
           xywh {430 72 16 278} type {Vert Fill} box PLASTIC_DOWN_BOX color 247 selection_color 247 labelsize 8 step 1
         }
+        Fl_Round_Button tkUseDeformable {
+          label Deformable
+          xywh {670 670 80 15} down_box ROUND_DOWN_BOX labelsize 10
+        }
       }
       Fl_Menu_Bar {} {
         xywh {1 0 1060 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 selection_color 247 labelsize 9 textsize 9
@@ -489,14 +498,14 @@ tkMovingImageViewer->DrawRegionOfInterest() ;}
     }
     Fl_Window tkAdvancedOptionsWindow {
       label {Advanced Registration Options} open
-      xywh {1191 158 405 520} type Double box PLASTIC_UP_BOX color 159 labelsize 10 resizable visible
+      xywh {871 158 405 520} type Double box PLASTIC_UP_BOX color 159 labelsize 10 resizable visible
     } {
-      Fl_Tabs {} {
+      Fl_Tabs {} {open
         xywh {15 15 385 465} labelsize 12
       } {
         Fl_Group {} {
           label Region
-          xywh {25 50 365 430}
+          xywh {25 50 365 430} hide
         } {
           Fl_Box {} {
             label {Rigid / Affine}
@@ -600,6 +609,27 @@ tkMovingImageViewer->DrawRegionOfInterest() ;}
           Fl_Value_Input tkAffineSkewScale {
             label Skew
             xywh {235 205 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+          }
+        }
+        Fl_Group {} {
+          label Deformable open selected
+          xywh {15 40 375 430}
+        } {
+          Fl_Value_Input tkDeformableNumberOfIterations {
+            label {Number of Iterations:}
+            xywh {300 310 65 25} labeltype EMBOSSED_LABEL labelsize 12 maximum 10000 value 200
+          }
+          Fl_Value_Input tkDeformableNumberOfSpatialSamples {
+            label {Number of Spatial Samples:}
+            xywh {300 350 65 25} labeltype EMBOSSED_LABEL labelsize 12 maximum 10000 value 50
+          }
+          Fl_Box {} {
+            label Scales
+            xywh {110 85 205 125} box THIN_DOWN_FRAME labeltype EMBOSSED_LABEL labelsize 12 align 1
+          }
+          Fl_Value_Input tkDeformableNumberOfControlPoints {
+            label {Control points}
+            xywh {235 100 65 25} labelsize 12 minimum 5 maximum 100 step 1 value 5
           }
         }
       }

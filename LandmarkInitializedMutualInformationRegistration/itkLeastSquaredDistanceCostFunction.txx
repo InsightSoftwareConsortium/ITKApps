@@ -189,12 +189,12 @@ LeastSquaredDistanceCostFunction<TTransform>
     for( unsigned int i=0; i<pointSetSize; i++)
       {
       transformedPoint.SetPosition(m_Transform->TransformPoint(
-                                      m_MovingPointSet->GetPoint(i)
+                                      m_FixedPointSet->GetPoint(i)
                                                       ->GetPosition()));
       pointSquaredDistance = 0;
       for( unsigned int j=0; j<3; j++)
         {
-        double tf = (m_FixedPointSet->GetPoint(i)->GetPosition()[j] -
+        double tf = (m_MovingPointSet->GetPoint(i)->GetPosition()[j] -
                                  transformedPoint.GetPosition()[j]);
         pointSquaredDistance += tf * tf;
         }

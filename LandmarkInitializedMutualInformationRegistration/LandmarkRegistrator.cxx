@@ -84,9 +84,9 @@ LandmarkRegistrator
     fixedCenter[j] /= m_FixedLandmarkSet->GetNumberOfPoints();
     movingCenter[j] /= m_MovingLandmarkSet->GetNumberOfPoints();
     }
-  m_InitialTransformParameters[3] = fixedCenter[0]-movingCenter[0];
-  m_InitialTransformParameters[4] = fixedCenter[1]-movingCenter[1];
-  m_InitialTransformParameters[5] = fixedCenter[2]-movingCenter[2];
+  m_InitialTransformParameters[3] = movingCenter[0]-fixedCenter[0];
+  m_InitialTransformParameters[4] = movingCenter[1]-fixedCenter[1];
+  m_InitialTransformParameters[5] = movingCenter[2]-fixedCenter[2];
 
   vnl_vector<double> v1(3);
   vnl_vector<double> v2(3);
@@ -115,9 +115,9 @@ LandmarkRegistrator
             - fixedCenter.GetVnlVector());
       v2.normalize();
       
-      vTemp = m * v1;
+      vTemp = m * v2;
       vTemp.normalize();
-      mat = outer_product(v2, vTemp);
+      mat = outer_product(v1, vTemp);
       vsrTemp.Set(mat);
 
       vct[0] = vsr.GetX() + weight * vsrTemp.GetX();
@@ -166,7 +166,7 @@ LandmarkRegistrator
     {
     m_Metric->SetFixedPointSet(m_FixedLandmarkSet);
     m_Metric->SetMovingPointSet(m_MovingLandmarkSet);
-    m_Metric->SetCenter(movingCenter);
+    m_Metric->SetCenter(fixedCenter);
 
     m_Optimizer->SetInitialPosition(m_InitialTransformParameters);
     m_Optimizer->SetScales(m_OptimizerScales);
@@ -194,7 +194,7 @@ LandmarkRegistrator
 
   m_Transform = TransformType::New();
   m_Transform->SetParameters(m_Optimizer->GetCurrentPosition());
-  m_Transform->SetCenter(movingCenter);
+  m_Transform->SetCenter(fixedCenter);
   }
 
 void 

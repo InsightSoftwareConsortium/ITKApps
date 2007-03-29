@@ -21,6 +21,8 @@
 #include <time.h>
 #include <string>
 #include "metaCommand.h"
+#include "itkTransformBase.h"
+#include "itkTransformFactory.h"
 
 int main(int argc, char **argv)
   {
@@ -58,6 +60,8 @@ int main(int argc, char **argv)
                       "Perform Affine registration");
     command.SetOption("TfmRigidAffine", "TfmRigidAffine", false,
                       "Perform Rigid and then Affine registration");
+    command.SetOption("TfmDeformable", "TfmDeformable", false,
+                      "Perform Deformable registration");
     
     command.SetOption("OptOnePlusOne", "OptOnePlusOne", false,
                       "Use One plus One optimizer");
@@ -111,8 +115,12 @@ int main(int argc, char **argv)
     typedef LandmarkReaderType::GroupType   GroupType;
     typedef itk::SpatialObjectWriter<>      GroupWriterType;
     typedef itk::SpatialObjectReader<>      GroupReaderType;
+    typedef itk::TransformFileReader        TransformReaderType;
+    typedef itk::TransformFileWriter        TransformWriterType;
     typedef itk::AffineTransform<double, 3> TransformType;
-
+    typedef itk::BSplineDeformableTransform<double, 3, 3> DeformableTransformType ;
+    typedef itk::TransformFileReader::TransformListType * TransformListType;
+    
     /** Read the fixed image **/
     ImageReaderType::Pointer fixedReader = ImageReaderType::New();
     fixedReader->SetFileName(command.GetValueAsString("FixedImage").c_str());
@@ -143,8 +151,9 @@ int main(int argc, char **argv)
       return 1;
       }
     imageRegistrationApp->SetMovingImage( movingReader->GetOutput() );
-    imageRegistrationApp->SetMovingImageRegion( 
-                                movingReader->GetOutput()
+
+    imageRegistrationApp->SetFixedImageRegion( 
+                                fixedReader->GetOutput()
                                             ->GetLargestPossibleRegion() );
 
     std::cout << "Optimizer number of iterations = "
@@ -175,27 +184,63 @@ int main(int argc, char **argv)
     else if( command.GetOptionWasSet("InitTransform") )
       {
       typedef ImageRegistrationAppType::LoadedRegTransformType LoadedTType;
+      typedef ImageRegistrationAppType::DeformableTransformType LoadedDefTType;
       std::list< std::string > filenames =
                                      command.GetValueAsList("InitTransform");
       bool first = true;
       std::list< std::string >::iterator it = filenames.begin();
       while( it != filenames.end() )
         {
-        GroupReaderType::Pointer transformReader = GroupReaderType::New();
+        TransformReaderType::Pointer transformReader = TransformReaderType::New();
         std::cout << "Loading Transform: " << it->c_str() << std::endl;
         transformReader->SetFileName( it->c_str() );
-        transformReader->Update();
-        GroupType::Pointer group = transformReader->GetGroup();
-        if( first )
+        
+        //Register the transform into the TransformFactory, required for the BSplineTransform
+        itk::TransformFactory<LoadedDefTType>::RegisterTransform();
+        
+        try
           {
-          first = false;
-          imageRegistrationApp->SetLoadedTransform(
-                                 *(group->GetObjectToParentTransform()));
+          transformReader->Update();
           }
-        else
+        catch( itk::ExceptionObject & excp )
           {
-          imageRegistrationApp->CompositeLoadedTransform(
-                                   *(group->GetObjectToParentTransform()));
+          std::cerr << "Error while reading the transform file" << std::endl;
+          std::cerr << excp << std::endl;
+          std::cerr << "[FAILED]" << std::endl;
+          return EXIT_FAILURE;
+          }
+        
+        TransformListType transforms = transformReader->GetTransformList();
+
+        itk::TransformFileReader::TransformListType::const_iterator TransformIt = transforms->begin();
+        std::cout << transforms->size() << std::endl;
+        for (unsigned int i = 0 ; i < transforms->size() ; i++)
+          {
+          if(!strcmp((*TransformIt)->GetNameOfClass(),"AffineTransform"))
+            {
+            LoadedTType::Pointer affine_read = static_cast<LoadedTType*>((*TransformIt).GetPointer());
+            LoadedTType::ConstPointer m_affine = affine_read;
+            if ( first )
+              {
+              first = false;
+              imageRegistrationApp->SetLoadedTransform(
+                                    *m_affine.GetPointer());
+              }
+            else
+              {
+              imageRegistrationApp->CompositeLoadedTransform(
+                                        *m_affine.GetPointer());
+              }
+            }
+
+          if (!strcmp((*TransformIt)->GetNameOfClass(),"BSplineDeformableTransform"))
+            {
+            LoadedDefTType::Pointer bspline_read = static_cast<LoadedDefTType*>((*TransformIt).GetPointer());
+            LoadedDefTType::ConstPointer m_bspline = bspline_read;
+            imageRegistrationApp->SetLoadedDeformableTransform(
+                                    *m_bspline.GetPointer());
+            }
+          ++TransformIt;
           }
         ++it;
         }
@@ -204,38 +249,71 @@ int main(int argc, char **argv)
     else if( command.GetOptionWasSet("InitInvTransform") )
       {
       typedef ImageRegistrationAppType::LoadedRegTransformType LoadedTType;
+      typedef ImageRegistrationAppType::DeformableTransformType LoadedDefTType;
       std::list< std::string > filenames =
                                      command.GetValueAsList("InitInvTransform");
       bool first = true;
       std::list< std::string >::iterator it = filenames.begin();
       while( it != filenames.end() )
         {
-        GroupReaderType::Pointer transformReader = GroupReaderType::New();
+        TransformReaderType::Pointer transformReader = TransformReaderType::New();
         std::cout << "Loading Transform: " << it->c_str() << std::endl;
         transformReader->SetFileName( it->c_str() );
-        transformReader->Update();
-        GroupType::Pointer group = transformReader->GetGroup();
-        std::cout << "Inverting" << std::endl;
-        GroupType::TransformType::Pointer transform;
-        transform = group->GetObjectToParentTransform();
+        
+        //Register the transform into the TransformFactory, required for the BSplineTransform
+        itk::TransformFactory<LoadedDefTType>::RegisterTransform();
+        
+        try
+          {
+          transformReader->Update();
+          }
+        catch( itk::ExceptionObject & excp )
+          {
+          std::cerr << "Error while reading the transform file" << std::endl;
+          std::cerr << excp << std::endl;
+          std::cerr << "[FAILED]" << std::endl;
+          return EXIT_FAILURE;
+          }
+          
         LoadedTType::Pointer invertedTransform = LoadedTType::New();
-        transform->GetInverse(invertedTransform);
-        transform->SetCenter(invertedTransform->GetCenter());
-        transform->SetMatrix(invertedTransform->GetMatrix());
-        transform->SetOffset(invertedTransform->GetOffset());
-        if( first )
+        
+        TransformListType transforms = transformReader->GetTransformList();
+        
+        itk::TransformFileReader::TransformListType::const_iterator TransformIt = transforms->begin();
+        for (unsigned int i = 0 ; i < transforms->size() ; i++)
           {
-          first = false;
-          imageRegistrationApp->SetLoadedTransform(
-                                 *(group->GetObjectToParentTransform()));
-          }
-        else
-          {
-          imageRegistrationApp->CompositeLoadedTransform(
-                                   *(group->GetObjectToParentTransform()));
-          }
+          if(!strcmp((*TransformIt)->GetNameOfClass(),"AffineTransform"))
+            {
+            LoadedTType::Pointer affine_read = static_cast<LoadedTType*>((*TransformIt).GetPointer());
+            affine_read->GetInverse(invertedTransform);
+            affine_read->SetCenter(invertedTransform->GetCenter());
+            affine_read->SetMatrix(invertedTransform->GetMatrix());
+            affine_read->SetOffset(invertedTransform->GetOffset());
+            LoadedTType::ConstPointer m_affine = affine_read;
+            if ( first )
+              {
+              first = false;
+              imageRegistrationApp->SetLoadedTransform( *m_affine.GetPointer() );
+              }
+            else
+              {
+              imageRegistrationApp->CompositeLoadedTransform(
+                                      *m_affine.GetPointer());
+              }
+            }
+
+          if (!strcmp((*TransformIt)->GetNameOfClass(),"BSplineDeformableTransform"))
+            {
+            LoadedDefTType::Pointer bspline_read = static_cast<LoadedDefTType*>((*TransformIt).GetPointer());
+            LoadedDefTType::ConstPointer m_bspline = bspline_read;
+            imageRegistrationApp->SetLoadedDeformableTransform(
+                                    *m_bspline.GetPointer());
+            }
+          ++TransformIt;
+          }        
         ++it;
         }
+
       imageRegistrationApp->RegisterUsingLoadedTransform();
       }
     else if( command.GetOptionWasSet("InitLandmarks") )
@@ -310,6 +388,12 @@ int main(int argc, char **argv)
       imageRegistrationApp->RegisterUsingAffine();
       finalMetricValue = imageRegistrationApp->GetAffineMetricValue();
       }
+    
+    if ( command.GetOptionWasSet("TfmDeformable") )
+      {
+      imageRegistrationApp->RegisterUsingDeformable();
+      finalMetricValue = imageRegistrationApp->GetDeformableMetricValue();
+      }
 
     clock_t timeRegEnd = clock();
 
@@ -354,21 +438,20 @@ int main(int argc, char **argv)
 
     if( command.GetOptionWasSet("SaveTransform") )
       {
-      GroupWriterType::Pointer transformWriter = GroupWriterType::New();
-      transformWriter->SetFileName( command.GetValueAsString(
+      TransformWriterType::Pointer transformWriter = TransformWriterType::New();
+      transformWriter->SetFileName(command.GetValueAsString(
                                                 "SaveTransform",
-                                                "Filename").c_str() );
-      GroupType::Pointer group = GroupType::New();
-      itk::SpatialObject<3>::TransformType::Pointer transform =
-          itk::SpatialObject<3>::TransformType::New();
-      transform->SetCenter(imageRegistrationApp
-                            ->GetFinalTransform()->GetCenter());
-      transform->SetMatrix(imageRegistrationApp
-                            ->GetFinalTransform()->GetMatrix());
-      transform->SetOffset(imageRegistrationApp
-                            ->GetFinalTransform()->GetOffset());
-      group->SetObjectToParentTransform( transform.GetPointer() );
-      transformWriter->SetInput( group );
+                                                "Filename").c_str());
+      
+      if (!imageRegistrationApp->GetFinalDeformableTransform())
+        {
+        transformWriter->SetInput(imageRegistrationApp->GetFinalTransform());
+        }
+      else
+        {
+        transformWriter->SetInput(imageRegistrationApp->GetFinalTransform());
+        transformWriter->AddTransform(imageRegistrationApp->GetFinalDeformableTransform());
+        }
       transformWriter->Update();
       }
 
