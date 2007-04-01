@@ -827,12 +827,12 @@ ImageRegistrationApp< TImage >
   registrator->SetMovingImage( m_MovingImage ) ;
 
   //Update the ROI
-  TImage::RegionType::SizeType size;
-  TImage::RegionType region;
+  typename TImage::RegionType::SizeType size;
+  typename TImage::RegionType region;
   
-  TImage::RegionType::SizeType movingSize = 
+  typename TImage::RegionType::SizeType movingSize = 
                             m_MovingImage->GetLargestPossibleRegion().GetSize();
-  TImage::RegionType::SizeType fixedSize = 
+  typename TImage::RegionType::SizeType fixedSize = 
                             m_FixedImage->GetLargestPossibleRegion().GetSize();
 
   registrator->SetFixedImageRegion( m_FixedImageRegion );
