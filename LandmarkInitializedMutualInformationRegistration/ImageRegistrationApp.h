@@ -240,9 +240,9 @@ class ImageRegistrationApp : public Object
     typename AffineTransformType::Pointer        m_FinalTransform;
     typename DeformableTransformType::Pointer    m_FinalDeformableTransform;
     
-    typename DeformableParametersType            m_FinalParameters;
+    DeformableParametersType            m_FinalParameters;
     
-    typename ImagePointer                        m_FinalDeformableImageP;
+    ImagePointer                        m_FinalDeformableImageP;
   
     double m_RigidMetricValue;
     double m_AffineMetricValue;
