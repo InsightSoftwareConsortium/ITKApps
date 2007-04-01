@@ -219,7 +219,7 @@ int main(int argc, char **argv)
           if(!strcmp((*TransformIt)->GetNameOfClass(),"AffineTransform"))
             {
             LoadedTType::Pointer affine_read = static_cast<LoadedTType*>((*TransformIt).GetPointer());
-            LoadedTType::ConstPointer m_affine = affine_read;
+            LoadedTType::ConstPointer m_affine = affine_read.GetPointer();
             if ( first )
               {
               first = false;
@@ -236,7 +236,7 @@ int main(int argc, char **argv)
           if (!strcmp((*TransformIt)->GetNameOfClass(),"BSplineDeformableTransform"))
             {
             LoadedDefTType::Pointer bspline_read = static_cast<LoadedDefTType*>((*TransformIt).GetPointer());
-            LoadedDefTType::ConstPointer m_bspline = bspline_read;
+            LoadedDefTType::ConstPointer m_bspline = bspline_read.GetPointer();
             imageRegistrationApp->SetLoadedDeformableTransform(
                                     *m_bspline.GetPointer());
             }
@@ -289,7 +289,7 @@ int main(int argc, char **argv)
             affine_read->SetCenter(invertedTransform->GetCenter());
             affine_read->SetMatrix(invertedTransform->GetMatrix());
             affine_read->SetOffset(invertedTransform->GetOffset());
-            LoadedTType::ConstPointer m_affine = affine_read;
+            LoadedTType::ConstPointer m_affine = affine_read.GetPointer();
             if ( first )
               {
               first = false;
@@ -305,7 +305,7 @@ int main(int argc, char **argv)
           if (!strcmp((*TransformIt)->GetNameOfClass(),"BSplineDeformableTransform"))
             {
             LoadedDefTType::Pointer bspline_read = static_cast<LoadedDefTType*>((*TransformIt).GetPointer());
-            LoadedDefTType::ConstPointer m_bspline = bspline_read;
+            LoadedDefTType::ConstPointer m_bspline = bspline_read.GetPointer();
             imageRegistrationApp->SetLoadedDeformableTransform(
                                     *m_bspline.GetPointer());
             }
