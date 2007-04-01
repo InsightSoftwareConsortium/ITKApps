@@ -1,3 +1,20 @@
+/*=========================================================================
+
+  Program:   Insight Segmentation & Registration Toolkit
+  Module:    DeformableRegistrator.txx
+  Language:  C++
+  Date:      $Date$
+  Version:   $Revision$
+
+  Copyright (c) Insight Software Consortium. All rights reserved.
+  See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
 #ifndef __DeformableRegistrator_txx
 #define __DeformableRegistrator_txx
 
@@ -70,7 +87,7 @@ DeformableRegistrator< TImage >
   TransformType::SpacingType spacing   = this->GetFixedImage()->GetSpacing();
   TransformType::OriginType  origin    = this->GetFixedImage()->GetOrigin();
   
-  TImage::SizeType fixedImageSize = this->GetFixedImageRegion().GetSize();
+  typename TImage::SizeType fixedImageSize = this->GetFixedImageRegion().GetSize();
 
   for(unsigned int r=0; r<3; r++)
     {
