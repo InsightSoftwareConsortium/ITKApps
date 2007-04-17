@@ -79,7 +79,7 @@ bool ValidPixelType(const std::string &PixelType)
 }
 
 //Ensure that the template code is only compiled once for both the real program and the test programs.
-int PrimaryImageCalculatorRoutinte(int argc, char *argv[])
+int PrimaryImageCalculatorRoutine(int argc, char *argv[])
 {
   MetaCommand command;
   /*Input Image filenames. Any  number of input images may be given. The input filenames must be preceded by the number of inputs given.*/

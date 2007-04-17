@@ -98,9 +98,9 @@ namespace Functor
     Functor::op<PixelType> > FilterType;                        \
     typename FilterType::Pointer filter = FilterType::New();    \
     filter->SetFunctor(op##functor);                            \
-    filter->SetInput(input);                                    \
+    filter->SetInput(IntermediateImage);                                    \
     filter->Update();                                           \
-    return filter->GetOutput();                                 \
+    IntermediateImage=filter->GetOutput();                                 \
   }
 #define FunctorProcess2(op)                                     \
   {                                                             \
@@ -110,9 +110,9 @@ namespace Functor
     Functor::op<PixelType> >                                    \
       FilterType;                                               \
     typename FilterType::Pointer filter = FilterType::New();    \
-    filter->SetInput(input);                                    \
+    filter->SetInput(IntermediateImage);                                    \
     filter->Update();                                           \
-    return filter->GetOutput();                                 \
+    IntermediateImage=filter->GetOutput();                                 \
   }
 
 /*This function if called performs arithmetic operation with a constant value
@@ -122,30 +122,36 @@ typename ImageType::Pointer
 Ifilters( typename ImageType::Pointer input ,  MetaCommand command )
 {
   typedef typename ImageType::PixelType PixelType;
+  std::stringstream EffectiveInputFilters;
 
+  typename ImageType::Pointer IntermediateImage=input;
   /*Multiplies a constant value to all the pixels of the Input image.*/
   if(command.GetValueAsString("IMulC","constant")!= "" )
     {
-    const PixelType temp=static_cast<PixelType>(command.GetValueAsInt("IMulC","constant"));
+    const PixelType temp=static_cast<PixelType>(command.GetValueAsFloat("IMulC","constant"));
+    EffectiveInputFilters << "-ifmulc " << static_cast<double>(temp) << " ";
     FunctorProcess(mult,temp);
     }
   /*Divides a constant value from all the pixels of the Input image.*/
   if(command.GetValueAsString("IDivC","constant")!= "" )
     {
-    const PixelType temp=static_cast<PixelType>(command.GetValueAsInt("IDivC","constant"));
+    const PixelType temp=static_cast<PixelType>(command.GetValueAsFloat("IDivC","constant"));
+    EffectiveInputFilters << "-ifdivc " << static_cast<double>(temp) << " ";
     FunctorProcess(divide,temp);
     }
   /*Adds a constant value to all the pixels of the Input image.*/
   if(command.GetValueAsString("IAddC","constant") != "" )
     {
-    const PixelType temp=static_cast<PixelType>(command.GetValueAsInt("IAddC","constant"));
+    const PixelType temp=static_cast<PixelType>(command.GetValueAsFloat("IAddC","constant"));
+    EffectiveInputFilters << "-ifaddc " << static_cast<double>(temp) << " ";
     FunctorProcess(add,temp);
     }
 
   /*Subtracts a constant value from all the pixels of the Input image.*/
   if(command.GetValueAsString("ISubC","constant") != "" )
     {
-    const PixelType temp=static_cast<PixelType>(command.GetValueAsInt("ISubC","constant"));
+    const PixelType temp=static_cast<PixelType>(command.GetValueAsFloat("ISubC","constant"));
+    EffectiveInputFilters << "-ifsubc " << static_cast<double>(temp) << " ";
     FunctorProcess(subtract,temp);
     }
 
@@ -153,76 +159,87 @@ Ifilters( typename ImageType::Pointer input ,  MetaCommand command )
   /*Make Binary Output image.*/
   if(command.GetValueAsBool("Ifbin","ifbin") )
     {
+    EffectiveInputFilters << "-ifbin " ;
     FunctorProcess2(binarydecimate);
     }
 
   /*Squares the pixels of the Input image.*/
   if(command.GetValueAsBool("ISqr","ifsqr") )
     {
+    EffectiveInputFilters << "-ifsqr " ;
     FunctorProcess2(square);
     }
 
   /*Takes the square root of the pixels in the Input image.*/
   if(command.GetValueAsBool("ISqrt","ifsqrt") )
     {
+    EffectiveInputFilters << "-ifsqrt " ;
     FunctorProcess2(squareroot);
     }
-  return input;
+  std::cout << "--Storage type effective  input filter options:  " <<  EffectiveInputFilters.str() <<  std::endl;
+  return IntermediateImage;
 }
 
 /* This function if called performs arithmetic operation with a constant value
- * to all the pixels in the output image.*/
+ * to all the pixels in tee output image.*/
 template <class ImageType>
 typename ImageType::Pointer
 Ofilters( typename ImageType::Pointer input , MetaCommand command )
 {
   typedef typename ImageType::PixelType PixelType;
+  std::stringstream EffectiveOutputFilters;
+  typename ImageType::Pointer IntermediateImage=input;
   /*Multiplies a constant value to all the pixels of the Output image.*/
   if(command.GetValueAsString("OMulC","constant")!= "" )
     {
-    const PixelType temp=static_cast<PixelType>(command.GetValueAsInt("OMulC","constant"));
+    const PixelType temp=static_cast<PixelType>(command.GetValueAsFloat("OMulC","constant"));
+    EffectiveOutputFilters << "-ofmulc " << static_cast<double>(temp) << " ";
     FunctorProcess(mult,temp);
     }
   /*Divides a constant value from all the pixels of the Output image.*/
   if(command.GetValueAsString("ODivC","constant")!= "" )
     {
-    const PixelType temp=static_cast<PixelType>(command.GetValueAsInt("ODivC","constant"));
+    const PixelType temp=static_cast<PixelType>(command.GetValueAsFloat("ODivC","constant"));
+    EffectiveOutputFilters << "-ofdivc " << static_cast<double>(temp) << " ";
     FunctorProcess(divide,temp);
     }
 
   /*Adds a constant value to all the pixels of the Output image.*/
   if(command.GetValueAsString("OAddC","constant") != "" )
     {
-    const PixelType temp=static_cast<PixelType>(command.GetValueAsInt("OAddC","constant"));
+    const PixelType temp=static_cast<PixelType>(command.GetValueAsFloat("OAddC","constant"));
+    EffectiveOutputFilters << "-ofaddc " << static_cast<double>(temp) << " ";
     FunctorProcess(add,temp);
     }
 
   /*Subtracts a constant value from all the pixels of the Output image.*/
   if(command.GetValueAsString("OSubC","constant") != "" )
     {
-    const PixelType temp=static_cast<PixelType>(command.GetValueAsInt("OSubC","constant"));
+    const PixelType temp=static_cast<PixelType>(command.GetValueAsFloat("OSubC","constant"));
+    EffectiveOutputFilters << "-ofsubc " << static_cast<double>(temp) << " ";
     FunctorProcess(subtract,temp);
+    }
+  /*Make Binary Output image.*/
+  if(command.GetValueAsBool("Ofbin","ofbin") )
+    {
+    EffectiveOutputFilters << "-ofbin " ;
+    FunctorProcess2(binarydecimate);
     }
   /*Squares the pixels of the Output image.*/
   if(command.GetValueAsBool("OSqr","ofsqr") )
     {
+    EffectiveOutputFilters << "-ofsqr " ;
     FunctorProcess2(square);
     }
-
-  /*Make Binary Output image.*/
-  if(command.GetValueAsBool("Ofbin","ofbin") )
-    {
-    FunctorProcess2(binarydecimate);
-    }
-
-
   /*Takes the square root of the pixels in the Output image.*/
   if(command.GetValueAsBool("OSqrt","ofsqrt") )
     {
+    EffectiveOutputFilters << "-ofsqrt " ;
     FunctorProcess2(squareroot);
     }
   // return typename itk::Image< PixelType, dims >::Pointer();
-  return input;
+  std::cout << "--Storage type effective output filter options:  " <<  EffectiveOutputFilters.str() <<  std::endl;
+  return IntermediateImage;
 
 }
 
@@ -265,9 +282,9 @@ void statfilters( const typename ImageType::Pointer AccImage , MetaCommand comma
   typename LabelFilterType::Pointer MaskAbsStatsfilter = LabelFilterType::New();
   if( command.GetValueAsString("Statmask","File Name") != "" )
     {
-      
+
     reader->SetFileName(command.GetValueAsString("Statmask","File Name").c_str());
-    
+
     try
       {
       reader->Update();
@@ -278,11 +295,11 @@ void statfilters( const typename ImageType::Pointer AccImage , MetaCommand comma
       std::cerr << excp << std::endl;
       throw excp;
       }
-    
+
     havestatmask = true;
-    
+
     if( command.GetValueAsString("Statmaskvalue","constant") == "" )
-      { 
+      {
       std::cout<<"Error: If a mask image is given, a pixel value should be"
                <<  " entered and the Statistics in the input image will be calculated for"
                <<  " the pixels masked by this value.\n Skipping Statistics , Writing"
@@ -290,7 +307,7 @@ void statfilters( const typename ImageType::Pointer AccImage , MetaCommand comma
       return;
       }
 
-    MaskValue = command.GetValueAsInt("Statmaskvalue","constant");
+    MaskValue = command.GetValueAsFloat("Statmaskvalue","constant");
     MaskStatsfilter->SetInput(AccImage);
     MaskStatsfilter->SetLabelInput(reader->GetOutput());
     MaskStatsfilter->Update();
@@ -304,10 +321,10 @@ void statfilters( const typename ImageType::Pointer AccImage , MetaCommand comma
     MaskAbsStatsfilter->SetLabelInput(reader->GetOutput());
     MaskAbsStatsfilter->Update();
     }
-  
+
   StatDescription["AVG:"]="Average of all pixel values";
   StatDescription["MAVG:"]="Average of all pixel values where mask > 0";
-  
+
   if(command.GetValueAsBool("StatAvg","statAVG"))
     {
     if(havestatmask)
@@ -319,7 +336,7 @@ void statfilters( const typename ImageType::Pointer AccImage , MetaCommand comma
       StatValues["AVG:"]=Statsfilter->GetMean();
       }
     }
-  
+
   StatDescription["VAR:"]="Variance of all pixel values";
   StatDescription["MVAR:"]="Variance of all pixel values where mask > 0";
 
@@ -334,7 +351,7 @@ void statfilters( const typename ImageType::Pointer AccImage , MetaCommand comma
       StatValues["VAR:"]=Statsfilter->GetVariance();
       }
     }
-  
+
   StatDescription["SUM:"]="Sum of all pixel values";
   StatDescription["MSUM:"]="Sum of all pixel values where mask > 0";
 
@@ -349,7 +366,7 @@ void statfilters( const typename ImageType::Pointer AccImage , MetaCommand comma
       StatValues["SUM:"]=Statsfilter->GetSum();
       }
     }
-  
+
   StatDescription["MIN:"]="Minimum of all pixel values";
   StatDescription["MMIN:"]="Minimum of all pixel values where mask > 0";
 
@@ -364,10 +381,10 @@ void statfilters( const typename ImageType::Pointer AccImage , MetaCommand comma
       StatValues["MIN:"]=Statsfilter->GetMinimum();
       }
     }
-  
+
   StatDescription["MAX:"]="Maximum of all pixel values";
   StatDescription["MMAX:"]="Maximum of all pixel values where mask > 0";
-  
+
   if(command.GetValueAsBool("StatMAX","statMAX"))
     {
     if(havestatmask)
@@ -379,7 +396,7 @@ void statfilters( const typename ImageType::Pointer AccImage , MetaCommand comma
       StatValues["MAX:"]=Statsfilter->GetMaximum();
       }
     }
-  
+
   StatDescription["AMN:"]="Minimum of the absolute value of the pixel values";
   StatDescription["MAMN:"]="Minimum of the absolute value of the pixel values where mask > 0";
 
@@ -394,10 +411,10 @@ void statfilters( const typename ImageType::Pointer AccImage , MetaCommand comma
       StatValues["AMN:"]=AbsStatsfilter->GetMinimum();
       }
     }
-  
+
   StatDescription["AMX:"]="Maximum of the absolute value of the pixel values";
   StatDescription["MAMX:"]="Maximum of the absolute value of the pixel values where mask > 0";
-  
+
   if(command.GetValueAsBool("StatAMX","statAMX") )
     {
     if(havestatmask)
@@ -409,7 +426,7 @@ void statfilters( const typename ImageType::Pointer AccImage , MetaCommand comma
       StatValues["AMX:"]=AbsStatsfilter->GetMaximum() ;
       }
     }
-  
+
   StatDescription["NPX:"]="Number of pixels used in calculations";
   StatDescription["MNPX:"]="Number of pixels used in calculations where mask > 0";
 
@@ -474,40 +491,41 @@ void statfilters( const typename ImageType::Pointer AccImage , MetaCommand comma
 
 /*This function is called when the user wants to write the ouput image to a file. The output image is typecasted to the user specified data type. */
 template <class InPixelType , class PixelType , int dims>
-void Typecastimage( const typename itk::Image< InPixelType, dims >::Pointer AccImage , MetaCommand command )
+void ProcessOutputStage( const typename itk::Image< InPixelType, dims >::Pointer AccImage , const std::string outputImageFilename, MetaCommand command)
 {
   typedef itk::Image<InPixelType , dims>  InputImageType;
-  typedef itk::Image<PixelType , dims>    RealImageType;
-  typedef itk::CastImageFilter< InputImageType, RealImageType> CastToRealFilterType;
-  typename CastToRealFilterType::Pointer toReal = CastToRealFilterType::New();
+  typedef itk::Image<PixelType , dims>    OutputImageType;
+  typedef itk::CastImageFilter< InputImageType, OutputImageType> CastToOutputFilterType;
+  typename CastToOutputFilterType::Pointer ToOutputTypeFilter = CastToOutputFilterType::New();
 
 
-  typedef itk::ImageFileWriter< RealImageType > WriterType;
-  toReal->SetInput( AccImage );
-  toReal->Update();
+  typedef itk::ImageFileWriter< OutputImageType > WriterType;
+  ToOutputTypeFilter->SetInput( AccImage );
+  ToOutputTypeFilter->Update();
 
-  typename RealImageType::Pointer image = RealImageType::New ();
-  image = toReal->GetOutput ();
+  typename OutputImageType::Pointer OutputImage = Ofilters<OutputImageType>(ToOutputTypeFilter->GetOutput(),command);
 
   typename  WriterType::Pointer writer = WriterType::New();
-  writer->SetFileName(command.GetValueAsString("OutputFilename","filename").c_str() );
-  writer->SetInput(image);
+  writer->SetFileName(outputImageFilename);
+  writer->SetInput(OutputImage);
 
-  try 
+  try
     {
     writer->Update();
     }
-  catch (itk::ExceptionObject &err) 
+  catch (itk::ExceptionObject &err)
     {
     std::cout << "Exception Object caught: " << std::endl;
     std::cout << err << std::endl;
     exit(-1);
     }
+    //Caluculate Statistics of the Image.
+    statfilters<OutputImageType>(OutputImage,command);
 }
 
 
 
-class string_tokenizer : public std::vector<std::string> 
+class string_tokenizer : public std::vector<std::string>
 {
 public:
   string_tokenizer(const std::string &s, const char *const sep = " ")
@@ -621,7 +639,7 @@ void ImageCalculatorReadWrite( MetaCommand &command )
       {
       AccImage  = Imul<ImageType>(AccImage , image );
       }
-    
+
     /*Call the addition function*/
     if(command.GetValueAsBool("Add","add"))
       {
@@ -639,19 +657,19 @@ void ImageCalculatorReadWrite( MetaCommand &command )
       {
       AccImage  = Idiv<ImageType>(AccImage , image );
       }
-    
+
     /*For Average we add the images first*/
     if(command.GetValueAsBool("Avg","avg"))
       {
       AccImage  = Iadd<ImageType>(AccImage , image);
       }
-    
+
     /*For variance we add the square image to the image in the current
       iteration and store the sum of the square image.*/
     if(command.GetValueAsBool("Var","var") )
       {
       AccImage  = Iadd<ImageType>(AccImage , image );
-      typename ImageType::Pointer multimage = 
+      typename ImageType::Pointer multimage =
         Imul<ImageType>(image , image );
       SqrImageSum  = Iadd<ImageType>(SqrImageSum, multimage );
       }
@@ -667,48 +685,47 @@ void ImageCalculatorReadWrite( MetaCommand &command )
   //Image variance is calculated.
   if(command.GetValueAsBool("Var","var")  )
     {
-    typename ImageType::Pointer NumSqrImageSum = 
-      ImageMultiplyConstant<ImageType>( SqrImageSum, 
+    typename ImageType::Pointer NumSqrImageSum =
+      ImageMultiplyConstant<ImageType>( SqrImageSum,
                                               static_cast<PixelType>(NumImages));
     AccImage = Imul<ImageType>(AccImage,AccImage);
     AccImage = Isub<ImageType>(NumSqrImageSum,AccImage);
     AccImage =ImageDivideConstant<ImageType>(AccImage,static_cast<PixelType>(NumImages*NumImages-NumImages));
     }
 
-  AccImage = Ofilters<ImageType>(AccImage,command);
 
   const std::string OutType(command.GetValueAsString("OutputPixelType","PixelType" ));
-  
+
   //The resultant Image is written.
   if(command.GetValueAsString("OutputFilename","filename" ) != "")
     {
-    std::cout << "Before write..." <<  command.GetValueAsString("OutputFilename","filename" ) << std::endl;
-
+    const std::string outputFilename(command.GetValueAsString("OutputFilename","filename"));
+    std::cout << "Before write..." <<  outputFilename << std::endl;
     //Type cast image according to the output type specified. Default is float.
     if ( command.GetValueAsString("OutputPixelType","PixelType" ) != "" )
       {
       // process the string for the data type
       if ( CompareNoCase( OutType.c_str(), std::string("UCHAR") ) == 0 ) {
-      Typecastimage< PixelType , unsigned char , dims >(AccImage,command);
+      ProcessOutputStage< PixelType , unsigned char , dims >(AccImage,outputFilename,command);
       }
       else if ( CompareNoCase( OutType.c_str(), std::string("SHORT") ) == 0 ) {
-      Typecastimage< PixelType , short , dims  >(AccImage,command);
+      ProcessOutputStage< PixelType , short , dims  >(AccImage,outputFilename,command);
       }
       else if ( CompareNoCase( OutType.c_str(), std::string("USHORT") ) == 0 ) {
-      Typecastimage< PixelType , unsigned short , dims  >(AccImage,command);
+      ProcessOutputStage< PixelType , unsigned short , dims  >(AccImage,outputFilename,command);
       }
       else if ( CompareNoCase( OutType.c_str(), std::string("INT") ) == 0 ) {
-      Typecastimage< PixelType , int , dims  >(AccImage,command);
+      ProcessOutputStage< PixelType , int , dims  >(AccImage,outputFilename,command);
       }
       else if ( CompareNoCase( OutType.c_str(), std::string("UINT") ) == 0 ) {
-      Typecastimage< PixelType , unsigned int , dims  >(AccImage,command);
+      ProcessOutputStage< PixelType , unsigned int , dims  >(AccImage,outputFilename,command);
       }
       else if ( CompareNoCase( OutType.c_str(), std::string("FLOAT") ) == 0 ) {
-      Typecastimage< PixelType , float , dims  >(AccImage,command);
+      ProcessOutputStage< PixelType , float , dims  >(AccImage,outputFilename,command);
       }
       else if ( CompareNoCase( OutType.c_str(), std::string("DOUBLE") ) == 0 ) {
 
-      Typecastimage< PixelType, double , dims  >(AccImage,command);
+      ProcessOutputStage< PixelType, double , dims  >(AccImage,outputFilename,command);
       }
       else {
       std::cout << "Error. Invalid data type for -outtype!  Use one of these:" << std::endl;
@@ -719,11 +736,9 @@ void ImageCalculatorReadWrite( MetaCommand &command )
     else
       {
       //Default is the Input Pixel Type.
-      Typecastimage<PixelType , PixelType , dims  >(AccImage,command);
+      ProcessOutputStage<PixelType , PixelType , dims  >(AccImage,outputFilename,command);
       }
 
-    //Caluculate Statistics of the Image.
-    statfilters<ImageType>(AccImage,command);
     }
 }
 
