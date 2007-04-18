@@ -271,7 +271,6 @@ void statfilters( const typename ImageType::Pointer AccImage , MetaCommand comma
 
 
   bool havestatmask=false;
-  int MaskValue = 0;
   //If user gives an Input Mask Calculate the statistics of the image in the mask
   typedef itk::Image<unsigned int, ImageType::ImageDimension> UIntImageType;
   typedef itk::ImageFileReader<UIntImageType> ReaderType;
@@ -280,6 +279,9 @@ void statfilters( const typename ImageType::Pointer AccImage , MetaCommand comma
   typedef itk::LabelStatisticsImageFilter<ImageType , UIntImageType> LabelFilterType;
   typename LabelFilterType::Pointer MaskStatsfilter = LabelFilterType::New();
   typename LabelFilterType::Pointer MaskAbsStatsfilter = LabelFilterType::New();
+
+  unsigned int MaskValue = 0;
+
   if( command.GetValueAsString("Statmask","File Name") != "" )
     {
 
@@ -307,7 +309,9 @@ void statfilters( const typename ImageType::Pointer AccImage , MetaCommand comma
       return;
       }
 
-    MaskValue = command.GetValueAsFloat("Statmaskvalue","constant");
+    MaskValue = 
+      static_cast<unsigned int>
+      (command.GetValueAsFloat("Statmaskvalue","constant"));
     MaskStatsfilter->SetInput(AccImage);
     MaskStatsfilter->SetLabelInput(reader->GetOutput());
     MaskStatsfilter->Update();
