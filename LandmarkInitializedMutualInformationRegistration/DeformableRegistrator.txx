@@ -27,7 +27,9 @@ DeformableRegistrator< TImage >
   {
   this->SetTransform(TransformType::New());
   
-  this->SetInterpolator(InterpolatorType::New());
+  InterpolatorType::Pointer interpolator = InterpolatorType::New();
+  interpolator->SetSplineOrder( 3 );
+  this->SetInterpolator(interpolator);
   
   m_OptimizerMethod = LBFGS;
   m_OptimizerNumberOfIterations = 1000 ;

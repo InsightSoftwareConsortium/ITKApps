@@ -31,7 +31,7 @@
 #include "itkNormalVariateGenerator.h"
 #include "itkFRPROptimizer.h"
 
-#include "itkLinearInterpolateImageFunction.h"
+#include "itkBSplineInterpolateImageFunction.h"
 #include "itkStatisticsImageFilter.h"
 #include "itkRegionOfInterestImageFilter.h"
 
@@ -63,7 +63,7 @@ class DeformableRegistrator : public ImageRegistrationMethod < TImage, TImage >
     typedef Statistics::NormalVariateGenerator  OptimizerNormalGeneratorType;
     typedef TransformType::ParametersType       ParametersType ;
     typedef TransformType::ParametersType       ScalesType ;
-    typedef LinearInterpolateImageFunction< TImage, double > 
+    typedef BSplineInterpolateImageFunction< TImage, double > 
                                                 InterpolatorType ;
     typedef MattesMutualInformationImageToImageMetric< TImage, TImage >
                                                 MetricType ;

@@ -987,7 +987,7 @@ guiMainImplementation
 
   // set affine advance option values
   ImageRegistrationAppType::AffineScalesType affineScales;
-  affineScales.set_size(15);
+  affineScales.set_size(12);
   affineScales[0] = tkAffineRotationScale->value();
   affineScales[1] = tkAffineRotationScale->value();
   affineScales[2] = tkAffineRotationScale->value();
@@ -1000,9 +1000,6 @@ guiMainImplementation
   affineScales[9] = tkAffineSkewScale->value();
   affineScales[10] = tkAffineSkewScale->value();
   affineScales[11] = tkAffineSkewScale->value();
-  affineScales[12] = tkAffineSkewScale->value();
-  affineScales[13] = tkAffineSkewScale->value();
-  affineScales[14] = tkAffineSkewScale->value();
   m_ImageRegistrationApp->SetAffineScales(affineScales);
   m_ImageRegistrationApp->SetAffineNumberOfIterations(
                (unsigned int) tkAffineNumberOfIterations->value());
