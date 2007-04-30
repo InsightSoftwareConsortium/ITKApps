@@ -149,7 +149,7 @@ ImageRegistrationApp< TImage >
 
   m_AffineNumberOfIterations = 500 ;
   m_AffineNumberOfSpatialSamples = 40000 ;
-  m_AffineScales.set_size(12) ;
+  m_AffineScales.set_size(15) ;
   m_AffineScales[0] = 200; // rotations
   m_AffineScales[1] = 200;
   m_AffineScales[2] = 200;
@@ -162,6 +162,9 @@ ImageRegistrationApp< TImage >
   m_AffineScales[9] = 400; // skew
   m_AffineScales[10] = 400;
   m_AffineScales[11] = 400;
+  m_AffineScales[12] = 400;
+  m_AffineScales[13] = 400;
+  m_AffineScales[14] = 400;
   m_AffineRegTransform = AffineRegTransformType::New() ;
   m_AffineRegTransform->SetIdentity();
   m_AffineAffineTransform = AffineTransformType::New();

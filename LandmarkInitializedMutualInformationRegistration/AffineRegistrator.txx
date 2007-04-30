@@ -34,7 +34,7 @@ AffineRegistrator< TImage >
   
   m_OptimizerMethod = ONEPLUSONEPLUSGRADIENT;
   m_OptimizerNumberOfIterations = 500 ;
-  m_OptimizerScales.set_size(12) ; 
+  m_OptimizerScales.set_size(15) ; 
   m_OptimizerScales[0] = 100; // rotations
   m_OptimizerScales[1] = 100;
   m_OptimizerScales[2] = 100;
@@ -47,6 +47,9 @@ AffineRegistrator< TImage >
   m_OptimizerScales[9] = 200; // skew
   m_OptimizerScales[10] = 200;
   m_OptimizerScales[11] = 200;
+  m_OptimizerScales[12] = 200;
+  m_OptimizerScales[13] = 200;
+  m_OptimizerScales[14] = 200;
   
   this->SetMetric(MetricType::New());
   m_MetricNumberOfSpatialSamples = 40000 ;
