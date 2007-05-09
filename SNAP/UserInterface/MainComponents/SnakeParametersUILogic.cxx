@@ -546,9 +546,9 @@ void SnakeParametersUILogic
   // Get the edge and region example image file names
   string fnImage[2];
   fnImage[0] = 
-    m_SystemInterface->GetFileInRootDirectory("Images2D/EdgeForcesExample.hdr");
+    m_SystemInterface->GetFileInRootDirectory("Images2D/EdgeForcesExample.png");
   fnImage[1] = 
-    m_SystemInterface->GetFileInRootDirectory("Images2D/RegionForcesExample.hdr");
+    m_SystemInterface->GetFileInRootDirectory("Images2D/RegionForcesExample.png");
 
   // Typedefs
   typedef itk::ImageFileReader<ExampleImageType> ReaderType;
