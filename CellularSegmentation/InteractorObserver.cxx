@@ -49,6 +49,7 @@ InteractorObserver
       //point selected when mouse button pressed!!
     const int x = Fl::event_x();
     const int y = Fl::event_y();
+    m_Motion = false;
     m_SliceViewer->SelectPoint( x, y );
     }
 }
