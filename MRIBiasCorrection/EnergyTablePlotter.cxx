@@ -40,7 +40,7 @@ void print_usage()
   print_line("        intensity sigmas of the different i tissue clases") ;
   print_line("        NOTE: The sigmas should be listed in the SAME ORDER") ;
   print_line("              of means");
-  print_line("        and each value should be SEPERATED BY A SPACE)") ;
+  print_line("        and each value should be SEPARATED BY A SPACE)") ;
   print_line("--use-log [yes|no]") ;
   print_line("        if yes, assume a multiplicative bias field") ;
   print_line("        [default yes]") ;

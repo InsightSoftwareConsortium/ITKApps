@@ -47,7 +47,7 @@ void print_usage()
   print_line("        intensity sigmas of the different i tissue clases") ;
   print_line("        NOTE: The sigmas should be listed in the SAME ORDER") ;
   print_line("              of means");
-  print_line("        and each value should be SEPERATED BY A SPACE)") ;
+  print_line("        and each value should be SEPARATED BY A SPACE)") ;
   print_line("--input-mask file" ) ;
   print_line("        mask input with file [meta image format]");
   print_line("--output-mask file") ;
