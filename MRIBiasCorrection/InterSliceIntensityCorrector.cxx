@@ -42,7 +42,7 @@ void print_usage()
   print_line("--input file") ;
   print_line("        input data set [meta image format]" );
   print_line("--class-mean mean(1),...,mean(i)" ) ;
-  print_line("        intensity means  of the differen i tissue classes") ;
+  print_line("        intensity means  of the different i tissue classes") ;
   print_line("--class-sigma sig(1),...,sig(i)" ) ; 
   print_line("        intensity sigmas of the different i tissue clases") ;
   print_line("        NOTE: The sigmas should be listed in the SAME ORDER") ;
