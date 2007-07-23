@@ -48,7 +48,7 @@
 //
 // Software Guide : EndLatex
 // Software Guide : BeginCodeSnippet
-#include "itkCenteredEuler3DTransform.h"
+#include "itkEuler3DTransform.h"
 // Software Guide : EndCodeSnippet
 
 // Software Guide : BeginLatex
@@ -487,7 +487,7 @@ int main( int argc, char *argv[] )
   typedef   float     InternalPixelType;
   typedef itk::Image< InternalPixelType, Dimension > InternalImageType;
 
-  typedef itk::CenteredEuler3DTransform< double >  TransformType;
+  typedef itk::Euler3DTransform< double >  TransformType;
 
   typedef itk::RegularStepGradientDescentOptimizer       OptimizerType;
 
