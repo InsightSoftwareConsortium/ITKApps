@@ -280,7 +280,6 @@ void statfilters( const typename ImageType::Pointer AccImage , MetaCommand comma
   typename LabelFilterType::Pointer MaskStatsfilter = LabelFilterType::New();
   typename LabelFilterType::Pointer MaskAbsStatsfilter = LabelFilterType::New();
 
-  unsigned int MaskValue = 0;
 
   if( command.GetValueAsString("Statmask","File Name") != "" )
     {
@@ -309,9 +308,6 @@ void statfilters( const typename ImageType::Pointer AccImage , MetaCommand comma
       return;
       }
 
-    MaskValue = 
-      static_cast<unsigned int>
-      (command.GetValueAsFloat("Statmaskvalue","constant"));
     MaskStatsfilter->SetInput(AccImage);
     MaskStatsfilter->SetLabelInput(reader->GetOutput());
     MaskStatsfilter->Update();
@@ -324,6 +320,12 @@ void statfilters( const typename ImageType::Pointer AccImage , MetaCommand comma
     MaskAbsStatsfilter->SetInput(MaskAbsfilter->GetOutput());
     MaskAbsStatsfilter->SetLabelInput(reader->GetOutput());
     MaskAbsStatsfilter->Update();
+    }
+  unsigned int MaskValue=321231;
+  if(havestatmask)
+    {
+    MaskValue = static_cast<unsigned int>
+      (command.GetValueAsInt("Statmaskvalue","constant"));
     }
 
   StatDescription["AVG:"]="Average of all pixel values";
