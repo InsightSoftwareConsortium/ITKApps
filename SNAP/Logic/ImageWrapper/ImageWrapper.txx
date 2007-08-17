@@ -604,7 +604,10 @@ ImageWrapper<TPixel>
   m_Image->TransformIndexToPhysicalPoint(xIndex, xPoint);
 
   Vector3d xOut;
-  for(size_t q = 0; q < 3; q++) xOut[q] = xPoint[q];
+  for(unsigned int q = 0; q < 3; q++)
+    {
+    xOut[q] = xPoint[q];
+    }
 
   return xOut;
 }

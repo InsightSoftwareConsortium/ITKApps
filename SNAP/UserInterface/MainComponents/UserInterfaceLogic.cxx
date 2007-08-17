@@ -2553,7 +2553,7 @@ UserInterfaceLogic
 
   // Update the image info window controls
   GreyImageWrapper *wrpGrey = m_Driver->GetCurrentImageData()->GetGrey();
-  for(size_t d = 0; d < 3; d++)
+  for(unsigned int d = 0; d < 3; d++)
     {
     m_OutImageInfoDimensions[d]->value(wrpGrey->GetSize()[d]);
     m_OutImageInfoOrigin[d]->value(wrpGrey->GetImage()->GetOrigin()[d]);
@@ -3436,6 +3436,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.59  2006/02/02 01:23:10  pauly
+ *BUG: Fixed SNAP bugs in the last checkin
+ *
  *Revision 1.58  2006/02/01 21:41:42  pauly
  *ENH: SNAP: bubble radius changed to floating point
  *
