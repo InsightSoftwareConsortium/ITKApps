@@ -64,7 +64,7 @@ int main( int argc, char ** argv )
   size[2] = 0;
 
   InputImageType::IndexType start = inputRegion.GetIndex();
-  const unsigned int sliceNumber = (inputRegion.GetSize()[2])/2.0;
+  const unsigned int sliceNumber = (unsigned int)((inputRegion.GetSize()[2])/2.0);
   start[2] = sliceNumber;
 
   InputImageType::RegionType desiredRegion;
