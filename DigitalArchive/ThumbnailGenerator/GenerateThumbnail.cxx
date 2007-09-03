@@ -16,6 +16,7 @@
 #include "itkImageFileWriter.h"
 #include "itkImage.h"
 #include "itkRescaleIntensityImageFilter.h"
+#include "itkExtractImageFilter.h"
 
 int main( int argc, char ** argv )
 {
@@ -29,11 +30,12 @@ int main( int argc, char ** argv )
 
   std::cout << "Running ITK Thumbnail generator on: " << argv[1] << std::endl;
 
-  typedef  signed short      PixelType;
-  const   unsigned int       Dimension = 3;
-  typedef itk::Image< PixelType, Dimension >    ImageType;
-
-  typedef itk::ImageFileReader< ImageType >  ReaderType;
+  typedef  signed short   InputPixelType;
+  typedef itk::Image< InputPixelType, 3 >    InputImageType;
+  typedef unsigned char   OutputPixelType;
+  typedef itk::Image< OutputPixelType, 2 > OutputImageType;
+ 
+  typedef itk::ImageFileReader< InputImageType >  ReaderType;
 
   ReaderType::Pointer reader = ReaderType::New();
   const char * inputFilename  = argv[1];
@@ -51,21 +53,40 @@ int main( int argc, char ** argv )
     return EXIT_FAILURE;
     }
 
-  typedef unsigned char WritePixelType;
-  typedef itk::Image< WritePixelType, 2 > WriteImageType;
+ // Extract the middle-axial slice
+  typedef itk::ExtractImageFilter< InputImageType, InputImageType > FilterType;
+  FilterType::Pointer filter = FilterType::New();
+ 
+  InputImageType::RegionType inputRegion =
+           reader->GetOutput()->GetLargestPossibleRegion();
+
+  InputImageType::SizeType size = inputRegion.GetSize();
+  size[2] = 0;
+
+  InputImageType::IndexType start = inputRegion.GetIndex();
+  const unsigned int sliceNumber = (inputRegion.GetSize()[2])/2.0;
+  start[2] = sliceNumber;
+
+  InputImageType::RegionType desiredRegion;
+  desiredRegion.SetSize(  size  );
+  desiredRegion.SetIndex( start );
+
+  filter->SetExtractionRegion( desiredRegion );
+  filter->Update();
+
   typedef itk::RescaleIntensityImageFilter< 
-               ImageType, WriteImageType > RescaleFilterType;
+               InputImageType, OutputImageType > RescaleFilterType;
 
   RescaleFilterType::Pointer rescaler = RescaleFilterType::New();
 
   rescaler->SetOutputMinimum(   0 );
   rescaler->SetOutputMaximum( 255 );
   
-  typedef itk::ImageFileWriter< WriteImageType >  WriterType;
+  typedef itk::ImageFileWriter< OutputImageType >  WriterType;
   WriterType::Pointer writer = WriterType::New();
   writer->SetFileName( argv[2] );
  
-  rescaler->SetInput( reader->GetOutput() );
+  rescaler->SetInput( filter->GetOutput() );
   writer->SetInput( rescaler->GetOutput() );
 
   try
