@@ -33,6 +33,7 @@ int main( int argc, char ** argv )
   typedef  signed short   InputPixelType;
   typedef itk::Image< InputPixelType, 3 >    InputImageType;
   typedef unsigned char   OutputPixelType;
+  typedef itk::Image< InputPixelType, 2 > InputImageType2;
   typedef itk::Image< OutputPixelType, 2 > OutputImageType;
  
   typedef itk::ImageFileReader< InputImageType >  ReaderType;
@@ -53,8 +54,8 @@ int main( int argc, char ** argv )
     return EXIT_FAILURE;
     }
 
- // Extract the middle-axial slice
-  typedef itk::ExtractImageFilter< InputImageType, InputImageType > FilterType;
+  // Extract the middle-axial slice
+  typedef itk::ExtractImageFilter< InputImageType, InputImageType2 > FilterType;
   FilterType::Pointer filter = FilterType::New();
  
   InputImageType::RegionType inputRegion =
@@ -67,15 +68,18 @@ int main( int argc, char ** argv )
   const unsigned int sliceNumber = (unsigned int)((inputRegion.GetSize()[2])/2.0);
   start[2] = sliceNumber;
 
+  std::cout << "Slice number = " << start[2] << std::endl;
+
   InputImageType::RegionType desiredRegion;
   desiredRegion.SetSize(  size  );
   desiredRegion.SetIndex( start );
-
+  
+  filter->SetInput(reader->GetOutput());
   filter->SetExtractionRegion( desiredRegion );
   filter->Update();
 
   typedef itk::RescaleIntensityImageFilter< 
-               InputImageType, OutputImageType > RescaleFilterType;
+               InputImageType2, OutputImageType > RescaleFilterType;
 
   RescaleFilterType::Pointer rescaler = RescaleFilterType::New();
 
