@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0108 
+version 1.0107 
 header_name {.h} 
 code_name {.cxx}
 class SnakeParametersUI {open : {private SnakeParametersUIBase}
@@ -71,7 +71,7 @@ OnPropagationWeightChange(o);}
               Fl_Value_Slider m_InCurvatureWeightEasy {
                 callback {o->take_focus();
 OnCurvatureWeightChange(o);}
-                xywh {55 190 225 15} type Horizontal color 52 labelsize 12 align 4 step 0.01 value 0.7
+                xywh {55 190 225 15} type Horizontal color 52 labelsize 12 align 4 value 0.7
               }
               Fl_Group {} {
                 label spherical open
@@ -118,7 +118,7 @@ OnCurvatureWeightChange(o);}
               Fl_Value_Slider m_InAdvectionWeightEasy {
                 callback {o->take_focus();
 OnAdvectionWeightChange(o);}
-                xywh {55 290 225 15} type Horizontal color 52 labelsize 12 align 4 maximum 5 step 0.01 value 0.7
+                xywh {55 290 225 15} type Horizontal color 52 labelsize 12 align 4 maximum 5 value 0.7
               }
               Fl_Group {} {
                 label {large effect} open
@@ -293,7 +293,7 @@ OnTimeStepChange(o);}
               label {Noise reduction:}
               callback {o->take_focus();
 OnSmoothingWeightChange(o);}
-              tooltip {Experimental feature: additional smoothing of the snake} xywh {185 255 145 20} type Horizontal labelsize 11 align 4 step 0.01 value 0.1 textsize 11 deactivate
+              tooltip {Experimental feature: additional smoothing of the snake} xywh {185 255 145 20} type Horizontal labelsize 11 align 4 value 0.1 textsize 11 deactivate
             }
           }
           Fl_Group {} {
@@ -451,7 +451,7 @@ OnSmoothingWeightChange(o);}
           } {
             Fl_Value_Slider m_InTimeStepClassic {
               callback {OnTimeStepChange(o);}
-              xywh {25 100 150 15} type Horizontal labelsize 10 align 5 step 0.01 value 0.1 deactivate
+              xywh {25 100 150 15} type Horizontal labelsize 10 align 5 value 0.1 deactivate
             }
             Fl_Check_Button m_BtnTimeStepAutoClassic {
               label {Compute automatically}
@@ -475,7 +475,7 @@ OnSmoothingWeightChange(o);}
             Fl_Value_Slider m_InCurvatureWeightClassic {
               label {c_MCF:}
               callback {OnCurvatureWeightChange(o);}
-              xywh {25 185 150 15} type Horizontal labelsize 10 align 5 step 0.01 value 0.7
+              xywh {25 185 150 15} type Horizontal labelsize 10 align 5 value 0.7
             }
             Fl_Value_Slider m_InCurvatureExponentClassic {
               label {r_MCF:}
