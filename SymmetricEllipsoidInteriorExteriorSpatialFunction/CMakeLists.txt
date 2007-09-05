@@ -1,4 +1,4 @@
-PROJECT( SymmetricEllipsoidInteriorExteriorSpatialFunction )
+PROJECT( SymmetricEllipsoidInteriorExteriorSpatialFunctionExample )
 
 IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
@@ -13,36 +13,11 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 
-INCLUDE_DIRECTORIES(
-${ITK_SOURCE_DIR}/Code/Common
-${ITK_SOURCE_DIR}/Code/IO
-${ITK_SOURCE_DIR}/Code/BasicFilters
-${SymmetricEllipsoidInteriorExteriorSpatialFunction_SOURCE_DIR}
-)
+ADD_EXECUTABLE(SymmetricEllipsoidInteriorExteriorSpatialFunctionExample 
+  itkSymmetricEllipsoidInteriorExteriorSpatialFunctionExample.cxx)
 
-LINK_DIRECTORIES(
-${ITK_BINARY_DIR}/Code/Common
-${ITK_BINARY_DIR}/Code/IO
-${ITK_BINARY_DIR}/Code/BasicFilters
-)
+TARGET_LINK_LIBRARIES(SymmetricEllipsoidInteriorExteriorSpatialFunctionExample
+  ITKIO ITKBasicFilters ITKCommon)
 
-SET(SYMMETRIC_ELLIPSOID_SPATIAL_FUNCTION_SRCS
-itkSymmetricEllipsoidInteriorExteriorSpatialFunctionExample.cxx
-)
-
-LINK_LIBRARIES (
-ITKCommon
-ITKIO
-ITKBasicFilters
-)
-
-
-IF(UNIX)
-  LINK_LIBRARIES (
-  -lm
-  )
-ENDIF(UNIX)
-
-ADD_EXECUTABLE(itkSymmetricEllipsoidInteriorExteriorSpatialFunctionExample ${SYMMETRIC_ELLIPSOID_SPATIAL_FUNCTION_SRCS})
-INSTALL_TARGETS(/bin itkSymmetricEllipsoidInteriorExteriorSpatialFunctionExample)
+INSTALL_TARGETS(/bin SymmetricEllipsoidInteriorExteriorSpatialFunctionExample)
 
