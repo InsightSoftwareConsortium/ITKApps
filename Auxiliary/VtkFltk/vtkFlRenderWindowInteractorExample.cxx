@@ -64,17 +64,21 @@ int main()
   ren1->AddActor( coneActor );
   ren1->SetBackground( 0.1, 0.2, 0.4 );
 
-  for(unsigned int i=0; i<511; i++)
+  for( unsigned int i=0; i<50; i++ )
     {
     Fl::wait(0.01);
     Fl::check();
     }
- 
+
+  style->Delete();
   cone->Delete();
   coneMapper->Delete();
   coneActor->Delete();
   ren1->Delete();
   renWin->Delete();
+
+  renderWindowInteractor->Delete();
+  delete form;
 
   return 0;
 }
