@@ -33,7 +33,7 @@ IF( BUILD_TESTING )
   ADD_TEST(ccvnt_from_gipl                ${ConvertBetweenFileFormats_BINARY_DIR}/ConvertBetweenFileFormats ${IMAGE_PATH_OUTPUTS}/image_out.gipl   ${IMAGE_PATH_OUTPUTS}/image_in8.mhd)
   ADD_TEST(ccvnt_from_nifti               ${ConvertBetweenFileFormats_BINARY_DIR}/ConvertBetweenFileFormats ${IMAGE_PATH_OUTPUTS}/image_out.nii.gz ${IMAGE_PATH_OUTPUTS}/image_in8.mhd)
 
-  SET(IMAGE_COMPARE_TESTS ${CXX_TEST_PATH}/ImageCompareTests)
+  SET(IMAGE_COMPARE_TESTS ${ConvertBetweenFileFormats_BINARY_DIR}/ImageCompareTests)
 
   # Compare with original png
   ADD_TEST(compare_png                    ${IMAGE_COMPARE_TESTS} --compare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in1.mhd Dummy)
