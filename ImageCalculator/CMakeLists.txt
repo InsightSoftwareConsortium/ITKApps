@@ -11,7 +11,7 @@ INSTALL_TARGETS(/bin ImageCalculator )
 
 IF( BUILD_TESTING )
  
-  SET(IMAGE_CALCULATOR_TESTS ${CXX_TEST_PATH}/ImageCalculatorTests)
+  SET(IMAGE_CALCULATOR_TESTS ${ImageCalculator_BINARY_DIR}/ImageCalculatorTests)
   SET(IC_TSTDATA ${ImageCalculator_SOURCE_DIR}/TestImages)
   SET(IC_STATCMDS -statNPX -statMIN -statAVG -statMAX -statVAR -statSUM)
   SET(IC_BIN "${ImageCalculator_BINARY_DIR}")
