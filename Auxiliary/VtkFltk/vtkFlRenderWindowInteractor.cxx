@@ -255,6 +255,16 @@ void vtkFlRenderWindowInteractor::resize( int x, int y, int w, int h ) {
     Fl_Gl_Window::resize( x, y, w, h ); 
 }
 //---------------------------------------------------------------------------
+// manage the process of hiding the window
+void vtkFlRenderWindowInteractor::hide() {
+  vtkRenderWindow * renderWindow = vtkRenderWindowInteractor::GetRenderWindow();
+  if( renderWindow )
+    {
+    renderWindow->Finalize();
+    }
+  this->Fl_Gl_Window::hide();
+}
+//---------------------------------------------------------------------------
 // main FLTK event handler
 int vtkFlRenderWindowInteractor::handle( int event ) {
     if( !Enabled ) return 0;

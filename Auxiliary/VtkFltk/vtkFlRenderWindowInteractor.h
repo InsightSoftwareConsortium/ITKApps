@@ -59,6 +59,7 @@ class vtkFlRenderWindowInteractor : public Fl_Gl_Window, public vtkRenderWindowI
    int DestroyTimer();
    void OnTimer(void);
    void TerminateApp();
+   void hide();
   };
 
 #endif

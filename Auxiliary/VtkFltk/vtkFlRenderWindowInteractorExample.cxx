@@ -70,6 +70,24 @@ int main()
     Fl::check();
     }
 
+  form->hide();
+
+  for( unsigned int i=0; i<50; i++ )
+    {
+    Fl::wait(0.01);
+    Fl::check();
+    }
+
+  form->show();
+
+  for( unsigned int i=0; i<50; i++ )
+    {
+    Fl::wait(0.01);
+    Fl::check();
+    }
+
+  form->hide();
+
   style->Delete();
   cone->Delete();
   coneMapper->Delete();
