@@ -132,7 +132,9 @@ int main( int argc, char * argv[] )
 
   resampler->SetInterpolator( interpolator );
 
-  resampler->SetDefaultPixelValue( 1000 ); // highlight regions without source
+  // highlight regions without source
+  const OutputPixelType defaultPixelValue = 100;
+  resampler->SetDefaultPixelValue( defaultPixelValue ); 
 
 
   double spacing[ Dimension ];
