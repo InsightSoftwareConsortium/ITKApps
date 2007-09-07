@@ -64,7 +64,9 @@ int main()
   ren1->AddActor( coneActor );
   ren1->SetBackground( 0.1, 0.2, 0.4 );
 
-  for( unsigned int i=0; i<50; i++ )
+  unsigned int i=0;
+
+  for( i=0; i<50; i++ )
     {
     Fl::wait(0.01);
     Fl::check();
@@ -72,7 +74,7 @@ int main()
 
   form->hide();
 
-  for( unsigned int i=0; i<50; i++ )
+  for( i=0; i<50; i++ )
     {
     Fl::wait(0.01);
     Fl::check();
@@ -80,7 +82,7 @@ int main()
 
   form->show();
 
-  for( unsigned int i=0; i<50; i++ )
+  for( i=0; i<50; i++ )
     {
     Fl::wait(0.01);
     Fl::check();
