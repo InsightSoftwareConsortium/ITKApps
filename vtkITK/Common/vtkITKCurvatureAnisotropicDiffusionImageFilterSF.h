@@ -1,29 +1,29 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkITKCurvatureAnisotropicDiffusionImageFilterSS.h
+  Module:    vtkITKCurvatureAnisotropicDiffusionImageFilterSF.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
 */
-// .NAME vtkITKCurvatureAnisotropicDiffusionImageFilterSS - Wrapper class around itk::CurvatureAnisotropicDiffusionImageFilterImageFilter
+// .NAME vtkITKCurvatureAnisotropicDiffusionImageFilterSF - Wrapper class around itk::CurvatureAnisotropicDiffusionImageFilterImageFilter
 // .SECTION Description
-// vtkITKCurvatureAnisotropicDiffusionImageFilterSS
+// vtkITKCurvatureAnisotropicDiffusionImageFilterSF
 
 
-#ifndef __vtkITKCurvatureAnisotropicDiffusionImageFilterSS_h
-#define __vtkITKCurvatureAnisotropicDiffusionImageFilterSS_h
+#ifndef __vtkITKCurvatureAnisotropicDiffusionImageFilterSF_h
+#define __vtkITKCurvatureAnisotropicDiffusionImageFilterSF_h
 
 
-#include "vtkITKImageToImageFilterSS.h"
+#include "vtkITKImageToImageFilterSF.h"
 #include "itkCurvatureAnisotropicDiffusionImageFilter.h"
 #include "vtkObjectFactory.h"
 
-class VTK_EXPORT vtkITKCurvatureAnisotropicDiffusionImageFilterSS : public vtkITKImageToImageFilterSS
+class VTK_EXPORT vtkITKCurvatureAnisotropicDiffusionImageFilterSF : public vtkITKImageToImageFilterSF
 {
  public:
-  static vtkITKCurvatureAnisotropicDiffusionImageFilterSS *New();
-  vtkTypeRevisionMacro(vtkITKCurvatureAnisotropicDiffusionImageFilterSS, vtkITKImageToImageFilterSS);
+  static vtkITKCurvatureAnisotropicDiffusionImageFilterSF *New();
+  vtkTypeRevisionMacro(vtkITKCurvatureAnisotropicDiffusionImageFilterSF, vtkITKImageToImageFilterSF);
 
   double GetTimeStep ()
   {
@@ -75,19 +75,19 @@ class VTK_EXPORT vtkITKCurvatureAnisotropicDiffusionImageFilterSS : public vtkIT
 protected:
   //BTX
   typedef itk::CurvatureAnisotropicDiffusionImageFilter<Superclass::InputImageType,Superclass::OutputImageType> ImageFilterType;
-  vtkITKCurvatureAnisotropicDiffusionImageFilterSS() : Superclass ( ImageFilterType::New() ){};
-  ~vtkITKCurvatureAnisotropicDiffusionImageFilterSS() {};
+  vtkITKCurvatureAnisotropicDiffusionImageFilterSF() : Superclass ( ImageFilterType::New() ){};
+  ~vtkITKCurvatureAnisotropicDiffusionImageFilterSF() {};
   ImageFilterType* GetImageFilterPointer() { return dynamic_cast<ImageFilterType*> ( m_Filter.GetPointer() ); }
 
   //ETX
   
 private:
-  vtkITKCurvatureAnisotropicDiffusionImageFilterSS(const vtkITKCurvatureAnisotropicDiffusionImageFilterSS&);  // Not implemented.
-  void operator=(const vtkITKCurvatureAnisotropicDiffusionImageFilterSS&);  // Not implemented.
+  vtkITKCurvatureAnisotropicDiffusionImageFilterSF(const vtkITKCurvatureAnisotropicDiffusionImageFilterSF&);  // Not implemented.
+  void operator=(const vtkITKCurvatureAnisotropicDiffusionImageFilterSF&);  // Not implemented.
 };
 
-vtkCxxRevisionMacro(vtkITKCurvatureAnisotropicDiffusionImageFilterSS, "$Revision: 1.2 $");
-vtkStandardNewMacro(vtkITKCurvatureAnisotropicDiffusionImageFilterSS);
+vtkCxxRevisionMacro(vtkITKCurvatureAnisotropicDiffusionImageFilterSF, "$Revision: 1.1 $");
+vtkStandardNewMacro(vtkITKCurvatureAnisotropicDiffusionImageFilterSF);
 
 #endif
 
