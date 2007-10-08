@@ -31,6 +31,7 @@ Some important configuration details:
 
      * VTK requires VTK version 4.4 and must be built ANSI_STDLIB
        (the ANSI_STDLIB flag is only a concern with VisualStudio 6.0).
+       VTK should also be build with the flag VTK_USE_HYBRID ON.
 
      * CMake version 2.4.3 or later should be used.
 
