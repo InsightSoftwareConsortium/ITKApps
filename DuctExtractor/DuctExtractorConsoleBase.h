@@ -29,7 +29,7 @@ class DuctExtractorConsoleBase
 {
 
 public:
-  typedef   unsigned short                    InputPixelType;
+  typedef   signed short                      InputPixelType;
   typedef   float                             PixelType;
   typedef   unsigned char                     MaskPixelType;
 
