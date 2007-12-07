@@ -328,7 +328,7 @@ int main( int argc, char *argv[] )
   translation[1] = ty;
   translation[2] = tz;
 
-  const double PI = atan( 1.0 ) / 4.0;
+  const double PI = atan( 1.0 ) * 4.0;
 
   transform->SetTranslation(translation);
   transform->SetRotation( PI/180.0*rx, PI/180.0*ry, PI/180.0*rz);
