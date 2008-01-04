@@ -19,7 +19,7 @@
 #include "itkImage.h"
 
 #include "DeformableRegistration3DTimeSeries.h"
-#include <FL/Fl.h>
+#include <FL/Fl.H>
 //#include <windows.h>
 
 //int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,

@@ -17,7 +17,7 @@
 
 
 #include "DeformableRegistration3DTimeSeries.h"
-#include "FL/Fl_File_Chooser.h"
+#include "FL/Fl_File_Chooser.H"
 #include "itkImageFileWriter.h"
 #include <iostream>
 #include "itkImageRegionIterator.h"
