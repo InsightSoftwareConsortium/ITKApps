@@ -8,8 +8,7 @@
 /**
  *
  */
-QtSlicer::QtSlicer( QWidget* parent,  const char* name, bool modal, WFlags fl )
-    : Gui( parent, name, modal, fl )
+QtSlicer::QtSlicer( QWidget* parent,  const char* name, bool modal, Qt::WFlags fl )
 {
 }
 
@@ -24,36 +23,38 @@ void QtSlicer::DisplayPosition(int x,int y ,int z,float value)
 {
   char* tempchar = new char[20];
   sprintf(tempchar,"%d",x);
-  PositionX->setText(tr(tempchar));
+  PositionX->setText(QString(tempchar));
   sprintf(tempchar,"%d",y);
-  PositionY->setText(tr(tempchar));
+  PositionY->setText(QString(tempchar));
   sprintf(tempchar,"%d",z);
-  PositionZ->setText(tr(tempchar));
+  PositionZ->setText(QString(tempchar));
   sprintf(tempchar,"%3.1f",value);
-  PixelValue->setText(tr(tempchar));
+  PixelValue->setText(QString(tempchar));
   delete tempchar;
 }
 
 void QtSlicer::Help()
 {
-  HelpWindow* helpWindow = new HelpWindow(this,"Help ...");
-  helpWindow->show();
+  Ui::HelpWindow * helpWindow = new Ui::HelpWindow();
+
+  // FIXME: Used in Qt3, not needed in Qt4:
+  // helpWindow->show();
 }
 
 void QtSlicer::SetInputImage(ImageType * newImData)
 {
   this->OpenGlWindow->SetInputImage(newImData);
-  this->Slider1->setMaxValue(newImData->GetLargestPossibleRegion().GetSize()[2]-1);
+  this->Slider1->setMaximum(newImData->GetLargestPossibleRegion().GetSize()[2]-1);
 
   // Set the slice slider at z/2
   this->Slider1->setValue(newImData->GetLargestPossibleRegion().GetSize()[2]/2);
   this->DisplaySliceNumber(newImData->GetLargestPossibleRegion().GetSize()[2]/2);
 
-  this->IntensityMin->setMinValue( static_cast<int>( this->OpenGlWindow->GetIntensityMin() ));
-  this->IntensityMin->setMaxValue( static_cast<int>( this->OpenGlWindow->GetIntensityMax() ));
+  this->IntensityMin->setMinimum( static_cast<int>( this->OpenGlWindow->GetIntensityMin() ));
+  this->IntensityMin->setMaximum( static_cast<int>( this->OpenGlWindow->GetIntensityMax() ));
   this->IntensityMin->setValue( static_cast<int>( this->OpenGlWindow->GetIntensityMin() ));
-  this->IntensityMax->setMinValue( static_cast<int>( this->OpenGlWindow->GetIntensityMin() ));
-  this->IntensityMax->setMaxValue( static_cast<int>( this->OpenGlWindow->GetIntensityMax() ));
+  this->IntensityMax->setMinimum( static_cast<int>( this->OpenGlWindow->GetIntensityMin() ));
+  this->IntensityMax->setMaximum( static_cast<int>( this->OpenGlWindow->GetIntensityMax() ));
   this->IntensityMax->setValue( static_cast<int>( this->OpenGlWindow->GetIntensityMax() ));
   
   char* tempchar = new char[20];

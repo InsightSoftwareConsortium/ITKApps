@@ -2,6 +2,7 @@
 
  Program:   Insight Segmentation & Registration Toolkit
  Module:    QtGlSliceView.cxx
+  this->m_TestPassed = true;
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
@@ -19,10 +20,18 @@
 
 #include "QtGlSliceView.h"
 #include "itkMinimumMaximumImageCalculator.h"
+#include <QMouseEvent>
+#include <QKeyEvent>
  
 
-QtGlSliceView::QtGlSliceView( QWidget *parent, const char *name)
-: QGLWidget(parent, name)
+#if QT_VERSION < 0x040000
+/*! constructor */
+QtGlSliceView::QtGlSliceView(QWidget* parent, const char* name, Qt::WFlags f)
+#if QT_VERSION < 0x030000
+  : QWidget(parent, name, f | 0x10000000)  // WWinOwnDC
+#else
+  : QWidget(parent, name, f | Qt::WWinOwnDC )
+#endif
 {
   cValidOverlayData     = false;
   cViewOverlayData      = false;
@@ -49,23 +58,48 @@ QtGlSliceView::QtGlSliceView( QWidget *parent, const char *name)
   cWinImData = NULL;
   cWinZBuffer = NULL;
 }
+#endif
   
   
-QtGlSliceView::
-QtGlSliceView( QGLFormat glf, QWidget *parent, const char *name)
-: QGLWidget(glf,parent, name)
-{    
+
+#if QT_VERSION >= 0x040000
+/*! constructor */
+QtGlSliceView::QtGlSliceView(QWidget* p, Qt::WFlags f)
+  : QWidget(p, f | Qt::MSWindowsOwnDC)
+{
   cValidOverlayData     = false;
   cViewOverlayData      = false;
   cViewOverlayCallBack  = NULL;
   cOverlayOpacity       = 0.0;
   cWinOverlayData       = NULL;
+  cViewAxisLabel = true;
+  cViewOverlayData = true;
+  cViewDetails = true;
+  cViewCrosshairs = true;
+  cViewValue = true;
+  cClickMode = CM_SELECT;
+  
   cColorTable = ColorTableType::New();
   cColorTable->useDiscrete();
+  cW = 0;
+  cH = 0;
+  for(unsigned int i=0;i<3;i++)
+  {
+    cFlipX[i]=false;
+    cFlipY[i]=false;
+    cFlipZ[i]=false;
+  }
+  cWinImData = NULL;
+  cWinZBuffer = NULL;
 }
-  
+#endif
 
   
+QtGlSliceView::~QtGlSliceView()
+{
+}
+
+
 void 
 QtGlSliceView::
 SetInputImage(ImageType * newImData)
@@ -834,7 +868,8 @@ void QtGlSliceView::mouseMoveEvent( QMouseEvent *event )
       this->clickSelect(p[0], p[1], p[2]);
     }
    }
-   this->updateGL();
+// FIXME   this->updateGL();
+   this->update();
 }
 
 /** catches the mouse press to react appropriate
@@ -842,9 +877,9 @@ void QtGlSliceView::mouseMoveEvent( QMouseEvent *event )
  *  timer, which calls the appropriate interaction routine */
 void QtGlSliceView::mousePressEvent( QMouseEvent *event ) 
 {
-   if( event->button() & LeftButton ) 
+   if( event->button() & Qt::LeftButton ) 
    {
-      if( event->state() & ShiftButton ) 
+      if( event->modifiers() & Qt::ShiftModifier ) 
       {
          // left mouse mouse and shift button
          /*this->mouseEventActive = true;
@@ -852,14 +887,14 @@ void QtGlSliceView::mousePressEvent( QMouseEvent *event )
                            this->shiftLeftButtonFunction );*/
       }
    }
-   else if( event->button() & MidButton )
+   else if( event->button() & Qt::MidButton )
    {
       // middle mouse button
       //this->mouseEventActive = true;
       //QObject::connect( this->stepTimer, SIGNAL(timeout()),
       //                  this->middleButtonFunction );
    }
-   else if( event->button() & RightButton ) 
+   else if( event->button() & Qt::RightButton ) 
    {
       // right mouse button
       //this->mouseEventActive = true;
@@ -876,16 +911,17 @@ void QtGlSliceView::mousePressEvent( QMouseEvent *event )
       this->stepTimer->start( this->interactionTime );
    }*/
 
-   this->updateGL();
+// FIXME   this->updateGL();
+   this->update();
 }
 
 
 void QtGlSliceView::ChangeSlice(int value)
 {
   sliceNum(value);
-  update();
   paintGL();
-  this->updateGL();
+// FIXME   this->updateGL();
+  this->update();
 }
 
 
@@ -934,36 +970,38 @@ void QtGlSliceView::clickSelect(float newX, float newY, float newZ)
   ind[2] = (unsigned long)cClickSelect[2];
   cClickSelectV = cImData->GetPixel(ind);
  
+#if QT_VERSION < 0x040000
   emit Position(ind[0],ind[1],ind[2],cClickSelectV);
+#endif
 
 }
 
 void QtGlSliceView::IntensityMax(int value)
 {
   cIWMax = value;
-  update();
-  this->updateGL();
+// FIXME   this->updateGL();
+   this->update();
 }
 
 void QtGlSliceView::IntensityMin(int value)
 {
   cIWMin = value;
-  update();
-  this->updateGL();
+// FIXME   this->updateGL();
+   this->update();
 }
  
 void QtGlSliceView::ZoomIn()
 {
   cWinZoom += 1;
-  update();
-  this->updateGL();
+// FIXME   this->updateGL();
+   this->update();
 }
  
 void QtGlSliceView::ZoomOut()
 {
   cWinZoom -= 1;
-  update();
-  this->updateGL();
+// FIXME   this->updateGL();
+   this->update();
 }
  
 

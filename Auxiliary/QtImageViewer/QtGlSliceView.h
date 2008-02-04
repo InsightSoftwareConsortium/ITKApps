@@ -82,8 +82,9 @@ struct ClickPoint
 * See SliceView.h for details...
   **/
 //  
-    class QtGlSliceView : 
-    public QGLWidget
+class QtGlSliceView : 
+//     public QGLWidget
+    public QWidget
 {
   Q_OBJECT
 
@@ -119,14 +120,16 @@ protected:
   void paintGL();
 
 public:
-/*! FLTK required constructor - must use imData() to complete 
-  definition */
-  //QtGlSliceView(int x, int y, int w, int h, const char *l);
-  
 
-  QtGlSliceView( QWidget *parent = 0, const char *name = 0 );
-  QtGlSliceView( QGLFormat glf, QWidget *parent = 0, const char *name = 0 );
+#if QT_VERSION < 0x040000
+  //! constructor for Qt 3
+  QtGlSliceView(QWidget* parent = NULL, const char* name = NULL, Qt::WFlags f = 0);
+#else
+  //! constructor for Qt 4
+  QtGlSliceView(QWidget* parent = NULL, Qt::WFlags f = 0);
+#endif
 
+  virtual  ~QtGlSliceView();
 
   /*! Specify the 3D image to view slice by slice */
   virtual void SetInputImage(ImageType * newImData);
@@ -182,7 +185,9 @@ public slots:
   
 signals:
 
+#if QT_VERSION < 0x040000
   void Position(int, int, int, float);
+#endif
 
 protected:
     

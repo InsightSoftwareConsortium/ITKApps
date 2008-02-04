@@ -10,9 +10,7 @@
 #include "itkImageRegionIteratorWithIndex.h"
 
 #include <qwindowsstyle.h>
-#include <qplatinumstyle.h>
 #include <qmotifstyle.h>
-#include <qmotifplusstyle.h>
 #include <qcdestyle.h>
 
 int main( int argc, char* argv[] ) 
@@ -20,13 +18,11 @@ int main( int argc, char* argv[] )
 
   QApplication myApp( argc, argv );
 
-  QtSlicer m_GUI( 0, 0, TRUE );
-  myApp.setMainWidget(&m_GUI);
+  QtSlicer myGUI( 0, 0, TRUE );
 
-  m_GUI.setCaption( "Insight Qt Slicer" );
-  myApp.setStyle( new QPlatinumStyle );
+  myApp.setStyle( new QMotifStyle );
   QPalette p( QColor( 239, 239, 239 ) );
-  myApp.setPalette( p, TRUE );
+  myApp.setPalette( p );
 
   typedef double                            PixelType;
   typedef itk::Image<PixelType, 3>          ImageType;
@@ -34,11 +30,14 @@ int main( int argc, char* argv[] )
 
   ReaderType::Pointer reader = ReaderType::New();
   
-  QString s = QFileDialog::getOpenFileName(".","Images (*.*)", 0, "open file dialog","Chose an image filename" );
+  QString caption = "Chose an image filename";
+  QString directory = ".";
+  QString filter = "Images (*.*)";
 
-  reader->SetFileName( s.latin1() );
+  QString filename = QFileDialog::getOpenFileName( 0, caption, directory, filter );
+
+  reader->SetFileName( filename.toLatin1() );
   
-  std::cout << "loading image " << s.latin1() << " ... ";
   try
     {
     reader->Update();
@@ -51,11 +50,12 @@ int main( int argc, char* argv[] )
     }
  
   std::cout << "Done!" << std::endl;
-  m_GUI.SetInputImage( reader->GetOutput() );
+  myGUI.SetInputImage( reader->GetOutput() );
   
   try
     {
-    m_GUI.exec();
+    //myGUI.show();
+    myApp.exec();
     }
   catch (itk::ExceptionObject & e)
     {

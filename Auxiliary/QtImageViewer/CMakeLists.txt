@@ -7,25 +7,24 @@ INCLUDE (${CMAKE_ROOT}/Modules/FindGLU.cmake)
 #
 #  Find where ITK was Built or Installed.
 #
-FIND_PACKAGE(ITK)
+FIND_PACKAGE(ITK REQUIRED)
 IF(ITK_FOUND)
   INCLUDE(${ITK_USE_FILE})
-ELSE(ITK_FOUND)
-  MESSAGE(FATAL_ERROR
-          "Cannot build VolviewPlugIns without ITK.  Please set ITK_DIR.")
 ENDIF(ITK_FOUND)
 
 
+FIND_PACKAGE(Qt4 REQUIRED) 
 
+INCLUDE(${QT_USE_FILE})
 
-INCLUDE (${CMAKE_ROOT}/Modules/FindQt.cmake)
+MESSAGE(${QT_INCLUDE_DIR})
 
 INCLUDE_DIRECTORIES(
  ${QT_INCLUDE_DIR}
+ ${QT_INCLUDE_DIR}/Qt
  ${QtSlicer_BINARY_DIR}
  ${QtSlicer_SOURCE_DIR}
 )
-
 
 
 LINK_LIBRARIES(
@@ -42,32 +41,31 @@ SET(QtSlicer_SRCS
   QtSlicer.cxx
 )
 
-SET(QtSlicer_GUI_SRCS
+QT4_AUTOMOC(${QtSlicer_SRCS})
+
+QT4_WRAP_UI(QtSlicer_UIS_H
   QtSlicerGUI.ui
   QtSlicerHelpGUI.ui
-)
+  )
 
 
 SET(QtSlicer_MOC_SRCS
   QtGlSliceView.h
 )
 
-IF(QT_WRAP_UI)
-  QT_WRAP_UI(QtSlicer QtSlicer_HDRS  QtSlicer_SRCS  QtSlicer_GUI_SRCS )
-ENDIF(QT_WRAP_UI)
-
-IF(QT_WRAP_CPP)
-  QT_WRAP_CPP(QtSlicer QtSlicer_SRCS QtSlicer_MOC_SRCS)
-ENDIF(QT_WRAP_CPP)
-
 ADD_DEFINITIONS(-DQT_DLL)
 
 ADD_DEFINITIONS(-DQT_THREAD_SUPPORT)
 
-ADD_EXECUTABLE(QtSlicer QtSlicer_SRCS)
+ADD_EXECUTABLE(QtSlicer 
+  ${QtSlicer_SRCS}
+  ${QtSlicer_UIS_H}
+  )
+
+TARGET_LINK_LIBRARIES(QtSlicer
+  ${QT_LIBRARIES}
+  )
+
 INSTALL_TARGETS(/bin QtSlicer)
-
-
-
 
 
