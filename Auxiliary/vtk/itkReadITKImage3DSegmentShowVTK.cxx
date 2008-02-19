@@ -113,17 +113,20 @@ int main(int argc, char * argv [] )
   
   try
     {
-    typedef unsigned char PixelType;
+    typedef signed short  InputPixelType;
+    typedef unsigned char MaskPixelType;
+
     const unsigned int Dimension = 3;
-    typedef itk::Image< PixelType, Dimension > ImageType;
+    typedef itk::Image< InputPixelType, Dimension > InputImageType;
+    typedef itk::Image< MaskPixelType,  Dimension > MaskImageType;
     
-    typedef itk::ImageFileReader< ImageType > ReaderType;
+    typedef itk::ImageFileReader< InputImageType > ReaderType;
 
     ReaderType::Pointer reader  = ReaderType::New();
     reader->SetFileName( argv[1] );
     reader->Update();
 
-    typedef itk::ConfidenceConnectedImageFilter<ImageType,ImageType> SegmentationFilterType;
+    typedef itk::ConfidenceConnectedImageFilter<InputImageType,MaskImageType> SegmentationFilterType;
 
     SegmentationFilterType::Pointer filter = SegmentationFilterType::New();
 
@@ -136,12 +139,12 @@ int main(int argc, char * argv [] )
 
     // Obtain center index of the image
     // 
-    ImageType::Pointer inputImage = reader->GetOutput();
-    ImageType::SizeType  size  = inputImage->GetBufferedRegion().GetSize();
-    ImageType::IndexType start = inputImage->GetBufferedRegion().GetIndex();
+    InputImageType::Pointer inputImage = reader->GetOutput();
+    InputImageType::SizeType  size  = inputImage->GetBufferedRegion().GetSize();
+    InputImageType::IndexType start = inputImage->GetBufferedRegion().GetIndex();
 
     // set a seed by default in the center of the image.
-    ImageType::IndexType seed;
+    InputImageType::IndexType seed;
     seed[0] = start[0] + size[0] / 2;
     seed[1] = start[1] + size[1] / 2;
     seed[2] = start[2] + size[2] / 2;
@@ -156,9 +159,11 @@ int main(int argc, char * argv [] )
     filter->SetSeed( seed );
       
     
-    typedef itk::VTKImageExport< ImageType > ExportFilterType;
-    ExportFilterType::Pointer itkExporter1 = ExportFilterType::New();
-    ExportFilterType::Pointer itkExporter2 = ExportFilterType::New();
+    typedef itk::VTKImageExport< InputImageType > ExportFilter1Type;
+    typedef itk::VTKImageExport< MaskImageType  > ExportFilter2Type;
+
+    ExportFilter1Type::Pointer itkExporter1 = ExportFilter1Type::New();
+    ExportFilter2Type::Pointer itkExporter2 = ExportFilter2Type::New();
 
     itkExporter1->SetInput( reader->GetOutput() );
     itkExporter2->SetInput( filter->GetOutput() );
