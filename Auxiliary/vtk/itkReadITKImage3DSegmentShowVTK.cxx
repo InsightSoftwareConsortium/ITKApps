@@ -107,7 +107,7 @@ int main(int argc, char * argv [] )
     {
     std::cerr << "Missing parameters" << std::endl;
     std::cerr << "Usage: " << argv[0] << " inputImageFilename ";
-    std::cerr << "[seedX seedY seedZ] [output.vtk] [surface=0 wireframe=1]" << std::endl;
+    std::cerr << "[seedX seedY seedZ] [output.vtk] [surface=0 wireframe=1] [sigmaMultiplier]" << std::endl;
     return 1;
     }
   
@@ -136,6 +136,11 @@ int main(int argc, char * argv [] )
     filter->SetReplaceValue(255);
     filter->SetMultiplier(2.5);
 
+    if( argc > 7 )
+      {
+      filter->SetMultiplier( atof( argv[7] ) );
+      }
+      
 
     // Obtain center index of the image
     // 
