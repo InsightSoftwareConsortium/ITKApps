@@ -419,8 +419,8 @@ ENDIF(UNIX)
 #############################################
 
 # Shorthand to source and binary directories
-SET(MY_SOURCE_DIR ${InsightApplications_SOURCE_DIR}/SNAP)
-SET(MY_BINARY_DIR ${InsightApplications_BINARY_DIR}/SNAP)
+SET(MY_SOURCE_DIR ${SNAP_SOURCE_DIR})
+SET(MY_BINARY_DIR ${SNAP_BINARY_DIR})
 
 # Due to a limitation in Visual studio 6.0 on the length of include directories
 # that can be specified, (here we are including all the include directories from
