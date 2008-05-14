@@ -105,7 +105,7 @@ public:
   typedef itk::LinearInterpolateImageFunction<
     ImageType> ImageInterpolatorType;
   typedef itk::VectorLinearInterpolateImageFunction<
-    VectorImageType,float> VectorInterpolatorType;
+    VectorImageType,double> VectorInterpolatorType;
 
   typedef typename ImageType::IndexType IndexType;
   typedef typename ImageInterpolatorType::ContinuousIndexType 
