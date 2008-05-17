@@ -32,6 +32,9 @@ extern std::ostream &snaperr;
 // From ITK we use SmartPointer so many times that it is necessary
 #include <itkSmartPointer.h>
 
+// Macro definitions and OStream OString helpers
+#include <itkMacro.h>
+
 // Include the VectorNx defintions
 #include "IRISVectorTypes.h"
 
