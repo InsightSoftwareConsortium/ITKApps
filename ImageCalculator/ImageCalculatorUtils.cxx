@@ -83,12 +83,14 @@ int PrimaryImageCalculatorRoutine(int argc, char *argv[])
 {
   MetaCommand command;
   /*Input Image filenames. Any  number of input images may be given. The input filenames must be preceded by the number of inputs given.*/
-  command.SetOption("in","in",true,"InputFile names");
+  command.SetOption("in","",true,"InputFile names");
+  command.SetOptionLongTag("in","in");
   command.AddOptionField("in","in",MetaCommand::STRING,true);
   command.SetOptionComplete("in",true);
 
   //The images will be read using the Input pixel type.All the operations are performed in this pixel type.
-  command.SetOption("InputPixelType","intype",false,"InputPixel Type");
+  command.SetOption("InputPixelType","",false,"InputPixel Type");
+  command.SetOptionLongTag("InputPixelType","intype");
   command.AddOptionField("InputPixelType","PixelType",MetaCommand::STRING,false,"FLOAT");
 
   //The dimensions of the input images. All the images should be of the same dimension.
@@ -97,137 +99,170 @@ int PrimaryImageCalculatorRoutine(int argc, char *argv[])
 
 
   //Output filename.
-  command.SetOption("OutputFilename","out",false,"OutputFile name");
+  command.SetOption("OutputFilename","",false,"OutputFile name");
+  command.SetOptionLongTag("OutputFilename","out");
   command.AddOptionField("OutputFilename","filename",MetaCommand::STRING,false);
 
   //The images will be written in this type. The default is input pixel type.
-  command.SetOption("OutputPixelType","outtype",false,"OutputPixel Type");
+  command.SetOption("OutputPixelType","",false,"OutputPixel Type");
+  command.SetOptionLongTag("OutputPixelType","outtype");
   command.AddOptionField("OutputPixelType","PixelType",MetaCommand::STRING,false,"FLOAT");
 
   //Add the images.
-  command.SetOption("Add","add",false,"Add Images");
+  command.SetOption("Add","",false,"Add Images");
+  command.SetOptionLongTag("Add","add");
   command.AddOptionField("Add","add",MetaCommand::FLAG,false);
 
   //Subtract the images.
-  command.SetOption("Sub","sub",false,"Subtract Images");
+  command.SetOption("Sub","",false,"Subtract Images");
+  command.SetOptionLongTag("Sub","sub");
   command.AddOptionField("Sub","sub",MetaCommand::FLAG,false);
 
   //Divide the images.
-  command.SetOption("Div","div",false,"Divide Images");
+  command.SetOption("Div","",false,"Divide Images");
+  command.SetOptionLongTag("Div","div");
   command.AddOptionField("Div","div",MetaCommand::FLAG,false);
 
   //Multiply the images.
-  command.SetOption("Mul","mul",false,"Multiply Images");
+  command.SetOption("Mul","",false,"Multiply Images");
+  command.SetOptionLongTag("Mul","mul");
   command.AddOptionField("Mul","mul",MetaCommand::FLAG,false);
 
   //Get the variance image
-  command.SetOption("Var","var",false,"Variance of Images");
+  command.SetOption("Var","",false,"Variance of Images");
+  command.SetOptionLongTag("Var","var");
   command.AddOptionField("Var","var",MetaCommand::FLAG,false);
 
   //Get the Average image
-  command.SetOption("Avg","avg",false,"Average Images");
+  command.SetOption("Avg","",false,"Average Images");
+  command.SetOptionLongTag("Avg","avg");
   command.AddOptionField("Avg","avg",MetaCommand::FLAG,false);
 
 
   //Multiply the output with a constant scalar value.
-  command.SetOption("OMulC","ofmulc",false,"Multiply Output Image with constant value");
+  command.SetOption("OMulC","",false,"Multiply Output Image with constant value");
+  command.SetOptionLongTag("OMulC","ofmulc");
   command.AddOptionField("OMulC","constant",MetaCommand::INT,false);
 
   //Multiply the inputs with a constant scalar value.
-  command.SetOption("IMulC","ifmulc",false,"Multiply Accumulator Image with constant value");
+  command.SetOption("IMulC","",false,"Multiply Accumulator Image with constant value");
+  command.SetOptionLongTag("IMulC","ifmulc");
   command.AddOptionField("IMulC","constant",MetaCommand::INT,false);
 
   //Divide the output with a constant scalar value.
-  command.SetOption("ODivC","ofdivc",false,"Divide Output Image with constant value");
+  command.SetOption("ODivC","",false,"Divide Output Image with constant value");
+  command.SetOptionLongTag("ODivC","ofdivc");
   command.AddOptionField("ODivC","constant",MetaCommand::INT,false);
 
   //Divide the inputs with a constant scalar value.
-  command.SetOption("IDivC","ifdivc",false,"Divide Accumulator Image with constant value");
+  command.SetOption("IDivC","",false,"Divide Accumulator Image with constant value");
+  command.SetOptionLongTag("IDivC","ifdivc");
   command.AddOptionField("IDivC","constant",MetaCommand::INT,false);
 
   //Add a constant scalar value to the output.
-  command.SetOption("OAddC","ofaddc",false,"Add Output Image with constant value");
+  command.SetOption("OAddC","",false,"Add Output Image with constant value");
+  command.SetOptionLongTag("OAddC","ofaddc");
   command.AddOptionField("OAddC","constant",MetaCommand::INT,false);
 
   //Add a constant scalar value to the inputs.
-  command.SetOption("IAddC","ifaddc",false,"Add Accumulator Image with constant value");
+  command.SetOption("IAddC","",false,"Add Accumulator Image with constant value");
+  command.SetOptionLongTag("IAddC","ifaddc");
   command.AddOptionField("IAddC","constant",MetaCommand::INT,false);
 
   //Subtract a constant scalar value from the output.
-  command.SetOption("OSubC","ofsubc",false,"Subtract Output Image with constant value");
+  command.SetOption("OSubC","",false,"Subtract Output Image with constant value");
+  command.SetOptionLongTag("OSubC","ofsubc");
   command.AddOptionField("OSubC","constant",MetaCommand::INT,false);
 
   //Subtract a constant scalar value from the inputs.
-  command.SetOption("ISubC","ifsubc",false,"Subtract Accumulator Image with constant value");
+  command.SetOption("ISubC","",false,"Subtract Accumulator Image with constant value");
+  command.SetOptionLongTag("ISubC","ifsubc");
   command.AddOptionField("ISubC","constant",MetaCommand::INT,false);
 
   //Square the output image pixel values.
-  command.SetOption("OSqr","ofsqr",false,"Square Accumulator Image before writing");
+  command.SetOption("OSqr","",false,"Square Accumulator Image before writing");
+  command.SetOptionLongTag("OSqr","ofsqr");
   command.AddOptionField("OSqr","ofsqr",MetaCommand::FLAG,false);
 
   //Input Binary Image.
-  command.SetOption("Ifbin","ifbin",false,"Input Binary Image.");
+  command.SetOption("Ifbin","",false,"Input Binary Image.");
+  command.SetOptionLongTag("Ifbin","ifbin");
   command.AddOptionField("Ifbin","ifbin",MetaCommand::FLAG,false);
 
   //Output Binary Image.
-  command.SetOption("Ofbin","ofbin",false,"Output Binary Image.");
+  command.SetOption("Ofbin","",false,"Output Binary Image.");
+  command.SetOptionLongTag("Ofbin","ofbin");
   command.AddOptionField("Ofbin","ofbin",MetaCommand::FLAG,false);
 
 
   //Square the input image pixel values.
-  command.SetOption("ISqr","ifsqr",false,"Square Accumulator Image After reading");
+  command.SetOption("ISqr","",false,"Square Accumulator Image After reading");
+  command.SetOptionLongTag("ISqr","ifsqr");
   command.AddOptionField("ISqr","ifsqr",MetaCommand::FLAG,false);
 
   //Get the square root of the output image pixel values.
-  command.SetOption("OSqrt","ofsqrt",false,"Square Root  Accumulator Image before writing");
+  command.SetOption("OSqrt","",false,"Square Root  Accumulator Image before writing");
+  command.SetOptionLongTag("OSqrt","ofsqrt");
   command.AddOptionField("OSqrt","ofsqrt",MetaCommand::FLAG,false);
 
   //Get the square root of the input image pixel values.
-  command.SetOption("ISqrt","ifsqrt",false,"Sqrt Accumulator Image After reading");
+  command.SetOption("ISqrt","",false,"Sqrt Accumulator Image After reading");
+  command.SetOptionLongTag("ISqrt","ifsqrt");
   command.AddOptionField("ISqrt","ifsqrt",MetaCommand::FLAG,false);
 
   //Get the average pixel value of the output image.
-  command.SetOption("StatAvg","statAVG",false,"Average Output Image Value");
+  command.SetOption("StatAvg","",false,"Average Output Image Value");
+  command.SetOptionLongTag("StatAvg","statAVG");
   command.AddOptionField("StatAvg","statAVG",MetaCommand::FLAG,false);
 
   //Get the variance of the pixel value of the output image.
-  command.SetOption("StatVAR","statVAR",false,"Variance of output Image");
+  command.SetOption("StatVAR","",false,"Variance of output Image");
+  command.SetOptionLongTag("StatVAR","statVAR");
   command.AddOptionField("StatVAR","statVAR",MetaCommand::FLAG,false);
 
   //Get the sum of the pixel value of the output image.
-  command.SetOption("StatSUM","statSUM",false,"Sum of output Image Values");
+  command.SetOption("StatSUM","",false,"Sum of output Image Values");
+  command.SetOptionLongTag("StatSUM","statSUM");
   command.AddOptionField("StatSUM","statSUM",MetaCommand::FLAG,false);
 
   //Mask the output image with another image. The statistics are given for the masked portion.
-  command.SetOption("Statmask","statmask",false,"Image to mask against.");
+  command.SetOption("Statmask","",false,"Image to mask against.");
+  command.SetOptionLongTag("Statmask","statmask");
   command.AddOptionField("Statmask","File Name",MetaCommand::STRING,false);
 
   //If a mask is given then a pixel value should be entered and statitsics will be calculated for input image under this value in the mask.
-  command.SetOption("Statmaskvalue","statmaskvalue",false,"Statistics in the image will be calculated for the pixels masked by this value.");
+  command.SetOption("Statmaskvalue","",false,"Statistics in the image will be calculated for the pixels masked by this value.");
+  command.SetOptionLongTag("Statmaskvalue","statmaskvalue");
   command.AddOptionField("Statmaskvalue","constant",MetaCommand::INT,false);
 
   //Get the number of pixels in the output image.
-  command.SetOption("StatNPX","statNPX",false,"Number of Pixels.");
+  command.SetOption("StatNPX","",false,"Number of Pixels.");
+  command.SetOptionLongTag("StatNPX","statNPX");
   command.AddOptionField("StatNPX","statNPX",MetaCommand::FLAG,false);
 
   //Get the maximum pixel value of the output image.
-  command.SetOption("StatMAX","statMAX",false,"Maximum of  Pixels.");
+  command.SetOption("StatMAX","",false,"Maximum of  Pixels.");
+  command.SetOptionLongTag("StatMAX","statMAX");
   command.AddOptionField("StatMAX","statMAX",MetaCommand::FLAG,false);
 
   //Get the minimum pixel value of the output image.
-  command.SetOption("StatMIN","statMIN",false,"Minimum of Pixels.");
+  command.SetOption("StatMIN","",false,"Minimum of Pixels.");
+  command.SetOptionLongTag("StatMIN","statMIN");
   command.AddOptionField("StatMIN","statMIN",MetaCommand::FLAG,false);
 
   //Get the absolute maximum pixel value of the output image.
-  command.SetOption("StatAMX","statAMX",false,"Absolute Maximum of Pixels.");
+  command.SetOption("StatAMX","",false,"Absolute Maximum of Pixels.");
+  command.SetOptionLongTag("StatAMX","statAMX");
   command.AddOptionField("StatAMX","statAMX",MetaCommand::FLAG,false);
 
   //Get the absolute minimum pixel value of the output image.
-  command.SetOption("StatAMN","statAMN",false,"Absolute Minimum of Pixels.");
+  command.SetOption("StatAMN","",false,"Absolute Minimum of Pixels.");
+  command.SetOptionLongTag("StatAMN","statAMN");
   command.AddOptionField("StatAMN","statAMN",MetaCommand::FLAG,false);
 
   //Show the description of the stat values which can be calculated.
-  command.SetOption("Statallcodes","statallcodes",false,"Prints the coding of statistical varibles.");
+  command.SetOption("Statallcodes","",false,"Prints the coding of statistical varibles.");
+  command.SetOptionLongTag("Statallcodes","statallcodes");
   command.AddOptionField("Statallcodes","statallcodes",MetaCommand::FLAG,false);
 
   if (!command.Parse(argc,argv))

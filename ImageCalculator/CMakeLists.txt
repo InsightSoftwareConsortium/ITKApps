@@ -13,18 +13,18 @@ IF( BUILD_TESTING )
  
   SET(IMAGE_CALCULATOR_TESTS ${ImageCalculator_BINARY_DIR}/ImageCalculatorTests)
   SET(IC_TSTDATA ${ImageCalculator_SOURCE_DIR}/TestImages)
-  SET(IC_STATCMDS -statNPX -statMIN -statAVG -statMAX -statVAR -statSUM)
+  SET(IC_STATCMDS --statNPX --statMIN --statAVG --statMAX --statVAR --statSUM)
   SET(IC_BIN "${ImageCalculator_BINARY_DIR}")
-  SET(IC_OUT -out "${IC_BIN}/Test.png")
+  SET(IC_OUT --out "${IC_BIN}/Test.png")
   #Test to show arithmetic operation and printing the statistics.
   ADD_TEST(ImageCalculator2DTest1 ${IMAGE_CALCULATOR_TESTS} 
     --compare 
        "${IC_BIN}/Test.png"
        "${IC_TSTDATA}/AllHundreds.png"
     ImageCalculatorTest 
-       -in "${IC_TSTDATA}/UpperHalfHundreds.png"
+       --in "${IC_TSTDATA}/UpperHalfHundreds.png"
            "${IC_TSTDATA}/LowerHalfHundreds.png"
-       -intype UCHAR -outtype UCHAR -add 
+       --intype UCHAR --outtype UCHAR --add 
        ${IC_OUT} 
        -d 2 ${IC_STATCMDS}  )
 
@@ -36,12 +36,12 @@ IF( BUILD_TESTING )
         "${IC_BIN}/Test.png"
         "${IC_TSTDATA}/AllFiveHundreds.png"
     ImageCalculatorTest 
-        -in "${IC_TSTDATA}/AllHundreds.png"
+        --in "${IC_TSTDATA}/AllHundreds.png"
             "${IC_TSTDATA}/AllHundreds.png"
             "${IC_TSTDATA}/AllHundreds.png"
             "${IC_TSTDATA}/AllHundreds.png"
             "${IC_TSTDATA}/AllHundreds.png"
-        -intype UCHAR -outtype USHORT -add 
+        --intype UCHAR --outtype USHORT --add 
         ${IC_OUT} 
         -d 2 ${IC_STATCMDS}  )
 
@@ -52,9 +52,9 @@ IF( BUILD_TESTING )
         "${IC_BIN}/Test.png"
         "${IC_TSTDATA}/AllZeroes.png"
     ImageCalculatorTest 
-        -in "${IC_TSTDATA}/AllHundreds.png"
+        --in "${IC_TSTDATA}/AllHundreds.png"
             "${IC_TSTDATA}/AllHundreds.png"
-        -intype UCHAR -outtype USHORT -sub
+        --intype UCHAR --outtype USHORT --sub
         ${IC_OUT} 
         -d 2 ${IC_STATCMDS}  )
   #
@@ -64,9 +64,9 @@ IF( BUILD_TESTING )
         "${IC_BIN}/Test.png"
         "${IC_TSTDATA}/AllHundreds.png"
     ImageCalculatorTest 
-        -in "${IC_TSTDATA}/AllTens.png"
+        --in "${IC_TSTDATA}/AllTens.png"
             "${IC_TSTDATA}/AllTens.png"
-        -intype UCHAR -outtype UCHAR -mul
+        --intype UCHAR --outtype UCHAR --mul
         ${IC_OUT} 
         -d 2 ${IC_STATCMDS}  )
   #
@@ -76,9 +76,9 @@ IF( BUILD_TESTING )
         "${IC_BIN}/Test.png"
         "${IC_TSTDATA}/AllTens.png"
     ImageCalculatorTest 
-        -in "${IC_TSTDATA}/AllHundreds.png"
+        --in "${IC_TSTDATA}/AllHundreds.png"
             "${IC_TSTDATA}/AllTens.png"
-        -intype UCHAR -outtype UCHAR -div
+        --intype UCHAR --outtype UCHAR --div
         ${IC_OUT} 
         -d 2 ${IC_STATCMDS}  )
 
@@ -89,9 +89,9 @@ IF( BUILD_TESTING )
         "${IC_BIN}/Test.png"
         "${IC_TSTDATA}/AllFifties.png"
     ImageCalculatorTest 
-        -in "${IC_TSTDATA}/LowerHalfHundreds.png"
+        --in "${IC_TSTDATA}/LowerHalfHundreds.png"
             "${IC_TSTDATA}/UpperHalfHundreds.png"
-        -intype UCHAR -outtype UCHAR -avg
+        --intype UCHAR --outtype UCHAR --avg
         ${IC_OUT} 
         -d 2 ${IC_STATCMDS}  )
 
@@ -103,9 +103,9 @@ IF( BUILD_TESTING )
         "${IC_BIN}/Test.png"
         "${IC_TSTDATA}/AllHundreds.png"
     ImageCalculatorTest 
-        -in "${IC_TSTDATA}/AllTens.png"
+        --in "${IC_TSTDATA}/AllTens.png"
             "${IC_TSTDATA}/AllZeroes.png"
-        -ifsqr -intype UCHAR -outtype UCHAR -sub
+        --ifsqr --intype UCHAR --outtype UCHAR --sub
         ${IC_OUT} 
         -d 2 ${IC_STATCMDS}  )
   #
@@ -115,9 +115,9 @@ IF( BUILD_TESTING )
         "${IC_BIN}/Test.png"
         "${IC_TSTDATA}/AllTens.png"
     ImageCalculatorTest 
-        -in "${IC_TSTDATA}/AllHundreds.png"
+        --in "${IC_TSTDATA}/AllHundreds.png"
             "${IC_TSTDATA}/AllZeroes.png"
-        -ifsqrt -intype UCHAR -outtype USHORT -sub
+        --ifsqrt --intype UCHAR --outtype USHORT --sub
         ${IC_OUT} 
         -d 2 ${IC_STATCMDS}  )
 
@@ -129,10 +129,10 @@ IF( BUILD_TESTING )
         "${IC_BIN}/Test.hdr"
         "${IC_TSTDATA}/AllTwos.hdr"
     ImageCalculatorTest  
-        -in "${IC_TSTDATA}/TwoHundred.hdr"
+        --in "${IC_TSTDATA}/TwoHundred.hdr"
             "${IC_TSTDATA}/Hundred.hdr"
-        -intype UCHAR -outtype UCHAR -div 
-        -out "${IC_BIN}/Test.hdr"
+        --intype UCHAR --outtype UCHAR --div 
+        --out "${IC_BIN}/Test.hdr"
         -d 3 ${IC_STATCMDS}  )
 
   #A simple scalar multiplcation test
@@ -142,10 +142,10 @@ IF( BUILD_TESTING )
         "${IC_BIN}/Test.hdr"
         "${IC_TSTDATA}/TwoHundred.hdr"
     ImageCalculatorTest 
-        -in "${IC_TSTDATA}/Hundred.hdr"
-        -intype UCHAR -outtype UCHAR 
-        -out "${IC_BIN}/Test.hdr"
-        -d 3 ${IC_STATCMDS} -ofmulc 2  )
+        --in "${IC_TSTDATA}/Hundred.hdr"
+        --intype UCHAR --outtype UCHAR 
+        --out "${IC_BIN}/Test.hdr"
+        -d 3 ${IC_STATCMDS} --ofmulc 2  )
 
   #A simple scalar multiplcation test
   # test multiply
@@ -154,10 +154,10 @@ IF( BUILD_TESTING )
         "${IC_BIN}/Test.hdr"
         "${IC_TSTDATA}/TwoHundred.hdr"
     ImageCalculatorTest 
-        -in "${IC_TSTDATA}/Hundred.hdr"
-        -intype UCHAR -outtype UCHAR 
-        -out "${IC_BIN}/Test.hdr"
-        -d 3 ${IC_STATCMDS} -ifmulc 2  )
+        --in "${IC_TSTDATA}/Hundred.hdr"
+        --intype UCHAR --outtype UCHAR 
+        --out "${IC_BIN}/Test.hdr"
+        -d 3 ${IC_STATCMDS} --ifmulc 2  )
 
   #A simple scalar division test
   # test 
@@ -166,10 +166,10 @@ IF( BUILD_TESTING )
         "${IC_BIN}/Test.hdr"
         "${IC_TSTDATA}/Hundred.hdr"
     ImageCalculatorTest 
-        -in "${IC_TSTDATA}/TwoHundred.hdr"
-        -intype UCHAR -outtype UCHAR 
-        -out "${IC_BIN}/Test.hdr"
-        -d 3 ${IC_STATCMDS} -ofdivc 2  )
+        --in "${IC_TSTDATA}/TwoHundred.hdr"
+        --intype UCHAR --outtype UCHAR 
+        --out "${IC_BIN}/Test.hdr"
+        -d 3 ${IC_STATCMDS} --ofdivc 2  )
 
   #A simple scalar divide test
   # test diviply
@@ -178,10 +178,10 @@ IF( BUILD_TESTING )
         "${IC_BIN}/Test.hdr"
         "${IC_TSTDATA}/Hundred.hdr"
     ImageCalculatorTest 
-        -in "${IC_TSTDATA}/TwoHundred.hdr"
-        -intype UCHAR -outtype UCHAR 
-        -out "${IC_BIN}/Test.hdr"
-        -d 3 ${IC_STATCMDS} -ifdivc 2  )
+        --in "${IC_TSTDATA}/TwoHundred.hdr"
+        --intype UCHAR --outtype UCHAR 
+        --out "${IC_BIN}/Test.hdr"
+        -d 3 ${IC_STATCMDS} --ifdivc 2  )
 
   #A simple scalar addition test
   # test 
@@ -190,19 +190,19 @@ IF( BUILD_TESTING )
         "${IC_BIN}/Test.png"
         "${IC_TSTDATA}/AllHundreds.png"
     ImageCalculatorTest 
-        -in "${IC_TSTDATA}/AllFifties.png"
-        -intype UCHAR -outtype UCHAR 
+        --in "${IC_TSTDATA}/AllFifties.png"
+        --intype UCHAR --outtype UCHAR 
         ${IC_OUT}
-        -d 2 ${IC_STATCMDS} -ifaddc 50 )
+        -d 2 ${IC_STATCMDS} --ifaddc 50 )
   ADD_TEST(ImageCalc2DTestOAdd ${IMAGE_CALCULATOR_TESTS} 
     --compare 
         "${IC_BIN}/Test.png"
         "${IC_TSTDATA}/AllHundreds.png"
     ImageCalculatorTest 
-        -in "${IC_TSTDATA}/AllFifties.png"
-        -intype UCHAR -outtype UCHAR 
+        --in "${IC_TSTDATA}/AllFifties.png"
+        --intype UCHAR --outtype UCHAR 
         ${IC_OUT}
-        -d 2 ${IC_STATCMDS} -ofaddc 50 )
+        -d 2 ${IC_STATCMDS} --ofaddc 50 )
 
 
   ADD_EXECUTABLE(ImageCalculatorTests ImageCalculatorTests.cxx ImageCalculatorUtils.cxx ImageCalculatorProcess2D.cxx ImageCalculatorProcess3D.cxx)
