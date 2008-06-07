@@ -1,4 +1,5 @@
 PROJECT(ImageCalculator)
+SET(CXX_TEST_PATH ${EXECUTABLE_OUTPUT_PATH})
 
 ADD_EXECUTABLE(ImageCalculator  ImageCalculator.cxx ImageCalculatorProcess2D.cxx ImageCalculatorProcess3D.cxx ImageCalculatorUtils.cxx)
 TARGET_LINK_LIBRARIES(ImageCalculator ITKCommon ITKIO ITKAlgorithms ITKBasicFilters )
@@ -11,7 +12,7 @@ INSTALL_TARGETS(/bin ImageCalculator )
 
 IF( BUILD_TESTING )
  
-  SET(IMAGE_CALCULATOR_TESTS ${ImageCalculator_BINARY_DIR}/ImageCalculatorTests)
+  SET(IMAGE_CALCULATOR_TESTS ${CXX_TEST_PATH}/ImageCalculatorTests)
   SET(IC_TSTDATA ${ImageCalculator_SOURCE_DIR}/TestImages)
   SET(IC_STATCMDS --statNPX --statMIN --statAVG --statMAX --statVAR --statSUM)
   SET(IC_BIN "${ImageCalculator_BINARY_DIR}")
