@@ -262,8 +262,6 @@ public:
 
     const unsigned int numberOfComponents = this->GetPluginInfo()->InputVolumeNumberOfComponents;
 
-    const unsigned int numberOfPixelsPerSlice = size[0] * size[1];
-
     if( numberOfComponents == 1 )
       {
       m_Filter->GetOutput()->SetRegions(region);
