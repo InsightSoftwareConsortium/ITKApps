@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #if !defined(__ImageCalculatorTemplates_h____)
 #define __ImageCalculatorTemplates_h____
 
+#define ITK_CONCEPT_NO_CHECKING
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkImage.h"
