@@ -37,6 +37,20 @@ void PrintDataTypeStrings(void)
   std::cout << "DOUBLE" << std::endl;
 }
 
+void
+ReplaceSubWithSub(std::string& s, const char *o, const char  *n)
+{
+  if (s.size())
+    {
+    std::string from(o), to(n);
+    std::string::size_type start = 0;
+    while ((start = s.find(from, start)) != std::string::npos)
+      {
+      s.replace(start, from.size(), to);
+      start += to.size();
+      }
+    }
+}
 
 int CompareNoCase( const std::string &s, const std::string& s2 )
 {

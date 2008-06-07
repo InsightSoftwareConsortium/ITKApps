@@ -562,12 +562,23 @@ private:
   }
 };
 
-/*This fuction reads in the input images and writes the output image ,
+/*This function reads in the input images and writes the output image ,
  * delegating the computations to other functions*/
 template <class ImageType>
 void ImageCalculatorReadWrite( MetaCommand &command )
 {
-  string_tokenizer InputList(command.GetValueAsString("in")," ");
+  // Replace backslash blank with a unique string
+  std::string tempFilenames = command.GetValueAsString("in");
+  ReplaceSubWithSub(tempFilenames, "\\ ", "BACKSLASH_BLANK");
+
+  // Now split into separate filenames
+  string_tokenizer InputList(tempFilenames," ");
+
+  // Finally, return the blanks to the filenames
+  for (size_t i = 0; i < InputList.size(); i++)
+    {
+    ReplaceSubWithSub(InputList[i], "BACKSLASH_BLANK", " ");
+    }
 
   const unsigned int dims(ImageType::ImageDimension);
 
