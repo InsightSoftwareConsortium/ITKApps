@@ -15,3 +15,14 @@ FOREACH(exe vtk2itk vtk2itkDouble itkCurvatureFlowToVTK
     TARGET_LINK_LIBRARIES(${exe} ITKBasicFilters ITKIO vtkRendering vtkIO vtkHybrid)
   ENDIF(VTK_KITS MATCHES WIDGETS)
 ENDFOREACH(exe)
+
+ADD_LIBRARY(ITKVTKIntegration 
+  vtkRegistrationMonitor.cxx
+  vtkKWImage.cxx
+  vtkKWImageIO.cxx
+  )
+
+ADD_EXECUTABLE(itkRegisterITKMonitorVTK itkRegisterITKMonitorVTK)
+
+TARGET_LINK_LIBRARIES(itkRegisterITKMonitorVTK 
+  ITKVTKIntegration ITKBasicFilters ITKIO vtkRendering vtkIO vtkHybrid)
