@@ -1,4 +1,10 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+
+IF(COMMAND CMAKE_POLICY)
+  CMAKE_POLICY(SET CMP0003 NEW)
+ENDIF(COMMAND CMAKE_POLICY)
+
+
 PROJECT(InsightApplications)
 
 
@@ -245,8 +251,8 @@ IF(FLTK_FOUND)
   OPTIONAL_APP(VoronoiSegmentation)
   IF(ITK_USE_PATENTED)
     OPTIONAL_APP(SimpleFuzzyConnectedness)
-    OPTIONAL_APP(RegionGrowingSegmentation)
   ENDIF(ITK_USE_PATENTED)
+  OPTIONAL_APP(RegionGrowingSegmentation)
   OPTIONAL_APP(ThresholdSegmentationLevelSetFltkGui)
   IF(VTK_FOUND)
     OPTIONAL_APP(ThresholdSegmentationLevelSet)
