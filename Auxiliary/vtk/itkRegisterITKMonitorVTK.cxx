@@ -271,10 +271,10 @@ int main( int argc, char *argv[] )
 
   optimizer->SetScales( optimizerScales );
 
-  optimizer->SetMaximumStepLength( 1.0000  ); 
-  optimizer->SetMinimumStepLength( 0.0001 );
+  optimizer->SetMaximumStepLength( 10.000 ); 
+  optimizer->SetMinimumStepLength(  0.001 );
 
-  optimizer->SetNumberOfIterations( 300 );
+  optimizer->SetNumberOfIterations( 100 );
   optimizer->MaximizeOff();
 
   const unsigned long numberOfImagePixels = 
@@ -286,7 +286,7 @@ int main( int argc, char *argv[] )
   metric->SetNumberOfSpatialSamples( numberOfSpatialSamples );
 
 
-  metric->SetNumberOfHistogramBins( 64 );
+  metric->SetNumberOfHistogramBins( 32 );
 
 
   CommandIterationUpdate::Pointer observer = CommandIterationUpdate::New();
@@ -316,7 +316,7 @@ int main( int argc, char *argv[] )
   monitor.SetFixedSurface( fixedContour->GetOutput() );
   monitor.SetMovingSurface( movingContour->GetOutput() );
 
-  monitor.SetNumberOfIterationPerUpdate( 15 );
+  monitor.SetNumberOfIterationPerUpdate( 10 );
 
   monitor.Observe( optimizer, transform );
 
