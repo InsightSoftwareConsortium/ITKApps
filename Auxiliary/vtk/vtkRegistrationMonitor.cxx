@@ -25,6 +25,8 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
 #include "vtkMatrix4x4.h"
+#include "vtkPNGWriter.h"
+#include "vtkWindowToImageFilter.h"
 
 #define DeleteIfNotNullMacro(x) \
   if( this->x ) this->x->Delete();
@@ -51,15 +53,16 @@ vtkRegistrationMonitor::vtkRegistrationMonitor()
   this->RenderWindow             = vtkRenderWindow::New();
   this->RenderWindowInteractor   = vtkRenderWindowInteractor::New();
 
+  this->WindowToImageFilter      = vtkWindowToImageFilter::New();
+  this->ScreenShotWriter         = vtkPNGWriter::New();
+
   // ITK Objects, does not require to call Delete()
   this->StartObserver       = ObserverType::New();
   this->IterationObserver   = ObserverType::New();
 
-  this->StartObserver->SetCallbackFunction( 
-    this, & Self::StartVisualization );
+  this->StartObserver->SetCallbackFunction( this, & Self::StartVisualization );
 
-  this->IterationObserver->SetCallbackFunction( 
-    this, & Self::Update );
+  this->IterationObserver->SetCallbackFunction( this, & Self::Update );
 
   this->CurrentIterationNumber = 0;
   this->NumberOfIterationPerUpdate = 1;
@@ -81,6 +84,9 @@ vtkRegistrationMonitor::~vtkRegistrationMonitor()
   DeleteIfNotNullMacro( MovingActor );
   DeleteIfNotNullMacro( MovingProperty );
   DeleteIfNotNullMacro( MovingMapper );
+
+  DeleteIfNotNullMacro( WindowToImageFilter );
+  DeleteIfNotNullMacro( ScreenShotWriter );
 }
 
 /** Set the Fixed Surface */
@@ -93,6 +99,18 @@ void vtkRegistrationMonitor::SetFixedSurface(vtkPolyData* surface)
 void vtkRegistrationMonitor::SetMovingSurface(vtkPolyData* surface)
 {
   this->MovingSurface = surface;
+}
+
+/** Set directory for saving screenshots */
+void vtkRegistrationMonitor::SetScreenshotOutputDirectory( const char * directory )
+{
+  this->ScreenshotOutputDirectory = directory;
+}
+
+/** Set base of the screenshots filename */
+void vtkRegistrationMonitor::SetScreenshotBaseName( const char * filenamebase )
+{
+  this->ScreenshotBaseName = filenamebase;
 }
 
 /** Set transform */
@@ -117,6 +135,7 @@ void vtkRegistrationMonitor::StartVisualization()
   static bool visualizationPipelineInitialized = false;
 
   this->CurrentIterationNumber = 0;
+  this->CurrentScreenshotNumber = 0;
 
   if( visualizationPipelineInitialized )
     {
@@ -166,6 +185,9 @@ void vtkRegistrationMonitor::StartVisualization()
   this->Renderer->AddActor( this->FixedActor );
   this->Renderer->AddActor( this->MovingActor );
 
+  // Connect the filters for generating screenshots 
+  this->WindowToImageFilter->SetInput( this->RenderWindow );
+  this->ScreenShotWriter->SetInput( this->WindowToImageFilter->GetOutput() );
 
   // Bring up the render window and begin interaction.
   this->Renderer->ResetCamera();
@@ -223,4 +245,20 @@ void vtkRegistrationMonitor::Update()
  
   this->Renderer->ResetCamera();
   this->RenderWindowInteractor->Render();
+
+  //
+  //  Generate the screenshot
+  //
+  ::itk::OStringStream screenshotFileName;
+  screenshotFileName << this->ScreenshotOutputDirectory << "/";
+  screenshotFileName << this->ScreenshotBaseName;
+  screenshotFileName << setw(3) << setfill('0');
+  screenshotFileName << this->CurrentScreenshotNumber;
+  screenshotFileName << ".png";
+ 
+  std::cout << "screenshotFileName " << screenshotFileName.str() << std::endl;
+  
+  this->ScreenShotWriter->SetFileName( screenshotFileName.str().c_str() );
+  this->ScreenShotWriter->Update();
+  this->CurrentScreenshotNumber++;
 }

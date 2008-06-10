@@ -46,6 +46,8 @@
 #include "metaCommand.h"
 #include "metaOutput.h"
 
+#include "itksys/SystemTools.hxx"
+
 //  The following section of code implements a Command observer
 //  that will monitor the evolution of the registration process.
 //
@@ -317,6 +319,13 @@ int main( int argc, char *argv[] )
   monitor.SetMovingSurface( movingContour->GetOutput() );
 
   monitor.SetNumberOfIterationPerUpdate( 10 );
+
+  std::string screenshotDirectory = itksys::SystemTools::GetFilenamePath( outputImageFileName );
+
+  std::cout <<  screenshotDirectory << std::endl; 
+
+  monitor.SetScreenshotOutputDirectory( screenshotDirectory.c_str() );
+  monitor.SetScreenshotBaseName( "registrationScreenshot" );
 
   monitor.Observe( optimizer, transform );
 

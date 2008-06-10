@@ -30,6 +30,8 @@ class vtkMatrix4x4;
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkRenderWindowInteractor;
+class vtkWindowToImageFilter;
+class vtkPNGWriter;
 
 
 /** \class vtkRegistrationMonitor 
@@ -56,6 +58,16 @@ public:
     
   void Observe( OptimizerType * optimizer, TransformType * transform );
 
+  /** Set the directory where the screenshots will be saved */
+  void SetScreenshotOutputDirectory( const char * directory );
+
+  /** Set the base part of the filename used for screen shots.
+      The final filenames will have the form
+      directory/filenamebase000.png
+      directory/filenamebase001.png
+      .etc
+   */
+  void SetScreenshotBaseName( const char * filenamebase );
 
 private:
   
@@ -76,6 +88,10 @@ private:
   vtkRenderWindow*                RenderWindow;
   vtkRenderWindowInteractor*      RenderWindowInteractor;
 
+  // Screen shots generation
+  vtkWindowToImageFilter*         WindowToImageFilter;
+  vtkPNGWriter*                   ScreenShotWriter;
+
   typedef itk::SimpleMemberCommand< Self >  ObserverType;
 
   ObserverType::Pointer           IterationObserver;
@@ -87,6 +103,10 @@ private:
 
   unsigned int                    CurrentIterationNumber;
   unsigned int                    NumberOfIterationPerUpdate;
+
+  std::string                     ScreenshotOutputDirectory;
+  std::string                     ScreenshotBaseName;
+  unsigned int                    CurrentScreenshotNumber;
 
   // These methods will only be called by the Observer
   void Update();
