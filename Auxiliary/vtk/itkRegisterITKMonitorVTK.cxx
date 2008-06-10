@@ -310,8 +310,8 @@ int main( int argc, char *argv[] )
   fixedContour->SetInput( fixedKWImage->GetVTKImage() );
   movingContour->SetInput( movingKWImage->GetVTKImage() );
 
-  fixedContour->SetValue(  0,  300.0 ); // Clinical trial data
-  movingContour->SetValue( 0, 7000.0 ); // Atlas
+  fixedContour->SetValue(  0, 50.0 ); // level for iso-contour
+  movingContour->SetValue( 0, 50.0 ); // level for iso-contour
 
   monitor.SetFixedSurface( fixedContour->GetOutput() );
   monitor.SetMovingSurface( movingContour->GetOutput() );
