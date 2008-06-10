@@ -120,7 +120,7 @@ int main( int argc, char *argv[] )
   
   const    unsigned int    Dimension = 3;
   typedef  signed short    FixedPixelType;
-  typedef  unsigned short  MovingPixelType;
+  typedef  signed short    MovingPixelType;
   typedef  float           InternalPixelType;
 
   typedef itk::OrientedImage< FixedPixelType, Dimension >   InputFixedImageType;
