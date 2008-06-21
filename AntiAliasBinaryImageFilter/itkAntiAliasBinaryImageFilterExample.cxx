@@ -23,7 +23,7 @@
 #include "param.h"
 
 
-void die(char *s)
+void die(const char *s)
 {
   std::cerr << s << std::endl;
   exit(-1);

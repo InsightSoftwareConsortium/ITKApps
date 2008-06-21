@@ -16,6 +16,7 @@
 #include "vnl/vnl_inverse.h"
 
 #include <cmath>
+#include <cstdlib>
 #include <IRISVectorTypes.h>
 
 Vector3ui IRISSNAPdummyVector;

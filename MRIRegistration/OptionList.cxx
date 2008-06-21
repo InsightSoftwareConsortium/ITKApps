@@ -15,6 +15,7 @@
 
 =========================================================================*/
 #include "OptionList.h"
+#include <cstdlib>
 
 OptionList::OptionList(int argc, char* argv[])
 {

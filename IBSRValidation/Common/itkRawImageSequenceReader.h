@@ -89,7 +89,7 @@ public:
   itkStaticConstMacro (ImageDimension, unsigned int, TOutputImage::ImageDimension);
 
   /** The size of the output image. */
-  typedef Size<itkGetStaticConstMacro(ImageDimension)>  Size;
+  typedef itk::Size<itkGetStaticConstMacro(ImageDimension)>  Size;
 
   /** The region of the output image. */
   typedef ImageRegion<itkGetStaticConstMacro(ImageDimension)>  Region;

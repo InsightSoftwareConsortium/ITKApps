@@ -327,7 +327,7 @@ SNAPLevelSetFunction<TImageType>
                  GlobalDataStruct *) const
 {
   IndexType idx = neighborhood.GetIndex();
-  ContinuousIndexType cdx;
+  typename VectorInterpolatorType::ContinuousIndexType cdx;
   for (unsigned i = 0; i < ImageDimension; ++i)
     {
     cdx[i] = static_cast<double>(idx[i]) - offset[i];

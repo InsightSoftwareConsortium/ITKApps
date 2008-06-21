@@ -14,6 +14,7 @@
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
+#include <cstring> // needed for itkMetaDataObject.h
 #include "itkVoxBoCUBImageIO.h"
 #include "itkIOCommon.h"
 #include "itkExceptionObject.h"

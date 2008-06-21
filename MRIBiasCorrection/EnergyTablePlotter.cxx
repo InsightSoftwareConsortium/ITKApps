@@ -17,6 +17,7 @@
 #include <string>
 #include <vector>
 #include <vnl/vnl_math.h>
+#include <cstdlib>
 
 #include "myutils.h"
 #include "OptionList.h"
