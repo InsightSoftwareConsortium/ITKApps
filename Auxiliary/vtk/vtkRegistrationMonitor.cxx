@@ -18,6 +18,7 @@
 #include "vtkRegistrationMonitor.h"
 
 #include "vtkRenderer.h"
+#include "vtkCamera.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkActor.h"
@@ -150,6 +151,13 @@ void vtkRegistrationMonitor::StartVisualization()
   // Set the background to something grayish
   this->Renderer->SetBackground(0.4392, 0.5020, 0.5647);
 
+  vtkCamera * camera = this->Renderer->GetActiveCamera();
+
+  camera->SetPosition( 200, 200, 150 );
+  camera->SetViewUp( 0, 0, 1 );
+  camera->SetClippingRange( 0.1, 10000.0 );
+  camera->SetFocalPoint( 90.0, 108.0, 90.0 );
+
   // Setup the Fixed Surface infrastructure
   this->FixedActor->SetMapper( this->FixedMapper );
   this->FixedMapper->SetInput( this->FixedSurface );
@@ -160,7 +168,7 @@ void vtkRegistrationMonitor::StartVisualization()
   this->FixedProperty->SetSpecular(0.5);
   this->FixedProperty->SetColor(0.785,0.0,0.0);
   this->FixedProperty->SetLineWidth(2.0);
-  this->FixedProperty->SetRepresentationToPoints();
+  this->FixedProperty->SetRepresentationToSurface();
 
   this->FixedActor->SetProperty( this->FixedProperty );
 
@@ -175,7 +183,7 @@ void vtkRegistrationMonitor::StartVisualization()
   this->MovingProperty->SetSpecular(0.5);
   this->MovingProperty->SetColor(0.0,0.0,0.785);
   this->MovingProperty->SetLineWidth(2.0);
-  this->MovingProperty->SetRepresentationToPoints();
+  this->MovingProperty->SetRepresentationToSurface();
 
   this->MovingActor->SetProperty( this->MovingProperty );
 
@@ -258,7 +266,8 @@ void vtkRegistrationMonitor::Update()
  
   std::cout << "screenshotFileName " << screenshotFileName.str() << std::endl;
   
+  this->WindowToImageFilter->Update();
   this->ScreenShotWriter->SetFileName( screenshotFileName.str().c_str() );
-  this->ScreenShotWriter->Update();
+  this->ScreenShotWriter->Write();
   this->CurrentScreenshotNumber++;
 }
