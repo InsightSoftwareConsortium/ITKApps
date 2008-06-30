@@ -54,8 +54,8 @@ vtkRegistrationMonitor::vtkRegistrationMonitor()
   this->RenderWindow             = vtkRenderWindow::New();
   this->RenderWindowInteractor   = vtkRenderWindowInteractor::New();
 
-  this->WindowToImageFilter      = vtkWindowToImageFilter::New();
-  this->ScreenShotWriter         = vtkPNGWriter::New();
+//  this->WindowToImageFilter      = vtkWindowToImageFilter::New();
+//  this->ScreenShotWriter         = vtkPNGWriter::New();
 
   // ITK Objects, does not require to call Delete()
   this->StartObserver       = ObserverType::New();
@@ -86,8 +86,8 @@ vtkRegistrationMonitor::~vtkRegistrationMonitor()
   DeleteIfNotNullMacro( MovingProperty );
   DeleteIfNotNullMacro( MovingMapper );
 
-  DeleteIfNotNullMacro( WindowToImageFilter );
-  DeleteIfNotNullMacro( ScreenShotWriter );
+//  DeleteIfNotNullMacro( WindowToImageFilter );
+//  DeleteIfNotNullMacro( ScreenShotWriter );
 }
 
 /** Set the Fixed Surface */
@@ -194,8 +194,8 @@ void vtkRegistrationMonitor::StartVisualization()
   this->Renderer->AddActor( this->MovingActor );
 
   // Connect the filters for generating screenshots 
-  this->WindowToImageFilter->SetInput( this->RenderWindow );
-  this->ScreenShotWriter->SetInput( this->WindowToImageFilter->GetOutput() );
+//  this->WindowToImageFilter->SetInput( this->RenderWindow );
+//  this->ScreenShotWriter->SetInput( this->WindowToImageFilter->GetOutput() );
 
   // Bring up the render window and begin interaction.
   this->Renderer->ResetCamera();
@@ -252,7 +252,6 @@ void vtkRegistrationMonitor::Update()
   this->FixedActor->SetUserMatrix( this->Matrix );
  
   this->Renderer->ResetCamera();
-  this->RenderWindowInteractor->Render();
 
   //
   //  Generate the screenshot
@@ -266,8 +265,39 @@ void vtkRegistrationMonitor::Update()
  
   std::cout << "screenshotFileName " << screenshotFileName.str() << std::endl;
   
-  this->WindowToImageFilter->Update();
-  this->ScreenShotWriter->SetFileName( screenshotFileName.str().c_str() );
-  this->ScreenShotWriter->Write();
+//  this->WindowToImageFilter->Update();
+
+  this->RenderWindowInteractor->Render();
+
+//  this->ScreenShotWriter->SetFileName( screenshotFileName.str().c_str() );
+//  this->ScreenShotWriter->Write();
+
+
+  //
+  // Section copied from IGSTK : igstkView class.
+  // Trying to aviod the bug of the first image being saved at every iteration.
+  //
+  vtkWindowToImageFilter * windowToImageFilter = vtkWindowToImageFilter::New();
+
+  vtkPNGWriter * writer = vtkPNGWriter::New();
+
+  windowToImageFilter->SetInput( this->RenderWindow );
+
+  windowToImageFilter->Update();
+
+  writer->SetInput( windowToImageFilter->GetOutput() );
+  
+  writer->SetFileName( screenshotFileName.str().c_str() );
+  
+  this->RenderWindow->Render();
+  
+  writer->Write();
+
+  writer->SetInput( NULL );
+  windowToImageFilter->SetInput( NULL );
+
+  windowToImageFilter->Delete();
+  writer->Delete();
+
   this->CurrentScreenshotNumber++;
 }
