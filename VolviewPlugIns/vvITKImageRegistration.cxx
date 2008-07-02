@@ -58,6 +58,10 @@ public:
   ImageRegistrationRunner();
 
   // Description:
+  // The destructor
+  virtual ~ImageRegistrationRunner() {};
+
+  // Description:
   // Imports the two input images from Volview into ITK
   virtual void ImportPixelBuffer( vtkVVPluginInfo *info, 
                                   const vtkVVProcessDataStruct * pds );
