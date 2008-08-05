@@ -37,8 +37,6 @@ static int ProcessData(void *inf, vtkVVProcessDataStruct *pds)
 
   vtkVVPluginInfo *info = (vtkVVPluginInfo *)inf;
 
-  const unsigned int Dimension = 3;
-
   try 
   {
   switch( info->InputVolumeScalarType )

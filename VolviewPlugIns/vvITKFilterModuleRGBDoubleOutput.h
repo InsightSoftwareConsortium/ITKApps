@@ -145,8 +145,6 @@ public:
     this->InitializeProgressValue();
     this->SetCurrentFilterProgressWeight( 1.0 );
 
-    const unsigned int numberOfComponents = this->GetPluginInfo()->InputVolumeNumberOfComponents;
-
     this->ImportPixelBuffer( pds );
 
      // Execute the filter
@@ -198,8 +196,6 @@ public:
     const unsigned int totalNumberOfPixels = region.GetNumberOfPixels();
 
 
-
-    const unsigned int numberOfComponents = this->GetPluginInfo()->InputVolumeNumberOfComponents;
 
     const unsigned int numberOfPixelsPerSlice = size[0] * size[1];
 

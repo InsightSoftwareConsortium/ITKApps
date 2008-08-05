@@ -34,10 +34,6 @@ class CannySegmentationLevelSetModuleRunner
 
       itk::Index<3> seedPosition;
 
-      // Take the first marker as the seed point
-      const MarkersCoordinatesType * seedCoordinates = info->Markers;
-
-
       ModuleType  module;
       module.SetPluginInfo( info );
       module.SetUpdateMessage("Computing Canny Segmentation LevelSet Module...");

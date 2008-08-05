@@ -66,8 +66,6 @@ public:
 
     MaskImageFilterType * maskingFilter = this->GetFilter();
 
-    vtkVVPluginInfo *info = this->GetPluginInfo();
-
     maskingFilter->SetInput1(  this->GetInput1()  );
     maskingFilter->SetInput2(  this->GetInput2()  );
 

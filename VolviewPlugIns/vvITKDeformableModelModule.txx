@@ -190,7 +190,7 @@ DeformableModelModule<TInputPixelType>
   this->PostProcessData( pds );
 
   char tmp[1024];
-  sprintf( tmp, "The resulting mesh has\n %d Points \n %d Cells ", 
+  sprintf( tmp, "The resulting mesh has\n %ld Points \n %ld Cells ", 
                                 m_DeformableModelFilter->GetOutput()->GetNumberOfPoints(),
                                 m_DeformableModelFilter->GetOutput()->GetNumberOfCells() );
   info->SetProperty( info, VVP_REPORT_TEXT, tmp );

@@ -410,7 +410,7 @@ static int UpdateGUI(void *inf)
          3*sizeof(float));
 
   // really the memory consumption is double of the input image
-  sprintf(tmp,"%f", info->InputVolumeScalarSize * 2);
+  sprintf(tmp,"%d", info->InputVolumeScalarSize * 2);
   info->SetProperty(info, VVP_PER_VOXEL_MEMORY_REQUIRED, tmp); 
 
   // what output format is selected
