@@ -2,7 +2,7 @@ FOREACH(exe vtk2itk vtk2itkDouble itkCurvatureFlowToVTK
             itkVTKtoITKtoVTK itkPNGVTKtoITKtoVTK itkReadITKImageShowVTK
             itkReadITKImageShowSplineVTK
             vtkPolyDataToITKMesh itkReadITKImageSegmentShowVTK
-            itkReadITKImage3DSegmentShowVTK itkReadITKImage3DExtractContourVTK.cxx)
+            itkReadITKImage3DSegmentShowVTK itkReadITKImage3DExtractContourVTK)
   ADD_EXECUTABLE(${exe} ${exe}.cxx)
   INSTALL_TARGETS(/bin ${exe})
 
