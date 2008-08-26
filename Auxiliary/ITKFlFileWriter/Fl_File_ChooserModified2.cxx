@@ -945,7 +945,9 @@ Fl_File_ChooserModified::update_preview()
     Fl::check();
 
     // Scan the buffer for printable chars...
-    for (ptr = preview_text_; *ptr && (isprint(*ptr) || isspace(*ptr)); ptr ++);
+    for (ptr = preview_text_; *ptr && (isprint(*ptr) || isspace(*ptr)); ptr ++)
+      {
+      }
 
     if (*ptr || ptr == preview_text_) {
       // Non-printable file, just show a big ?...

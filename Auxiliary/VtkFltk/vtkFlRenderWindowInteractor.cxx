@@ -47,8 +47,8 @@ Fl_Gl_Window( 0, 0, 300, 300, "" ), vtkRenderWindowInteractor()
     this->end();
 }
 //---------------------------------------------------------------------------
-vtkFlRenderWindowInteractor::vtkFlRenderWindowInteractor( int x, int y, int w, int h, const char *l ) : 
-Fl_Gl_Window( x, y, w, h, l ), vtkRenderWindowInteractor()
+vtkFlRenderWindowInteractor::vtkFlRenderWindowInteractor( int lx, int ly, int lw, int lh, const char *ll ) : 
+Fl_Gl_Window( lx, ly, lw, lh, ll ), vtkRenderWindowInteractor()
 {
     // this is a subclass of Fl_Group, call end so children cant be added
     this->end();
@@ -81,7 +81,7 @@ void vtkFlRenderWindowInteractor::Initialize()
     return;
     }
 
-    int *size = RenderWindow->GetSize();
+    int *lsize = RenderWindow->GetSize();
     // enable everything and start rendering
     Enable();
     
@@ -90,8 +90,8 @@ void vtkFlRenderWindowInteractor::Initialize()
     //RenderWindow->Render();
 
     // set the size in the render window interactor
-    Size[0] = size[0];
-    Size[1] = size[1];
+    Size[0] = lsize[0];
+    Size[1] = lsize[1];
 
     // this is initialized
     Initialized = 1;
@@ -248,11 +248,11 @@ void vtkFlRenderWindowInteractor::draw(void){
     }
 }
 //---------------------------------------------------------------------------
-void vtkFlRenderWindowInteractor::resize( int x, int y, int w, int h ) {
+void vtkFlRenderWindowInteractor::resize( int lx, int ly, int lw, int lh ) {
     // make sure VTK knows about the new situation
-    UpdateSize( w, h );
+    UpdateSize( lw, lh );
     // resize the FLTK window by calling ancestor method
-    Fl_Gl_Window::resize( x, y, w, h ); 
+    Fl_Gl_Window::resize( lx, ly, lw, lh ); 
 }
 //---------------------------------------------------------------------------
 // manage the process of hiding the window

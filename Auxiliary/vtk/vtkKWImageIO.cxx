@@ -194,7 +194,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWImageIO );
-vtkCxxRevisionMacro(vtkKWImageIO, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkKWImageIO, "$Revision: 1.2 $");
 
 //----------------------------------------------------------------------------
 vtkKWImageIO::vtkKWImageIO()
@@ -232,7 +232,7 @@ void vtkKWImageIO::SetDirectory( const std::string & directory )
 void vtkKWImageIO::ReadImage()
 {
   // Find out the pixel type of the image in file
-  typedef itk::ImageIOBase::IOComponentType  PixelType;
+  typedef itk::ImageIOBase::IOComponentType  ScalarPixelType;
 
   itk::ImageIOBase::Pointer imageIO = 
     itk::ImageIOFactory::CreateImageIO( this->FileName.c_str(), 
@@ -249,7 +249,7 @@ void vtkKWImageIO::ReadImage()
   imageIO->SetFileName( this->FileName.c_str() );
   imageIO->ReadImageInformation();
 
-  PixelType pixelType = imageIO->GetComponentType();
+  ScalarPixelType pixelType = imageIO->GetComponentType();
 
   // Use the pixel type to instantiate the appropriate reader
   switch( pixelType )
@@ -328,7 +328,7 @@ void vtkKWImageIO::ReadImage()
 void vtkKWImageIO::ReadImageSeries()
 {
   //Extract the series UID of the selected dicom image
-  typedef itk::ImageIOBase::IOComponentType  PixelType;
+  typedef itk::ImageIOBase::IOComponentType  ScalarPixelType;
 
   itk::GDCMImageIO::Pointer imageIO = 
                                    itk::GDCMImageIO::New();
@@ -367,7 +367,7 @@ void vtkKWImageIO::ReadImageSeries()
   fileNames = nameGenerator->GetFileNames( seriesIdentifier );
   this->SetSeriesFileNames( fileNames );
 
-  PixelType pixelType = imageIO->GetComponentType();
+  ScalarPixelType pixelType = imageIO->GetComponentType();
 
   // Use the pixel type to instantiate the appropriate reader
   switch( pixelType )
@@ -446,7 +446,7 @@ void vtkKWImageIO::ReadImageSeries()
 void vtkKWImageIO::ReadAndCastImage()
 {
   // Find out the pixel type of the image in file
-  typedef itk::ImageIOBase::IOComponentType  PixelType;
+  typedef itk::ImageIOBase::IOComponentType  ScalarPixelType;
 
   itk::ImageIOBase::Pointer imageIO = 
     itk::ImageIOFactory::CreateImageIO( this->FileName.c_str(), 
@@ -463,7 +463,7 @@ void vtkKWImageIO::ReadAndCastImage()
   imageIO->SetFileName( this->FileName.c_str() );
   imageIO->ReadImageInformation();
 
-  PixelType pixelType = imageIO->GetComponentType();
+  ScalarPixelType pixelType = imageIO->GetComponentType();
 
   // Use the pixel type to instantiate the appropriate reader
   switch( pixelType )
@@ -547,9 +547,9 @@ vtkKWImageIO::PixelType vtkKWImageIO::GetImagePixelType()
 // Write Image 
 void vtkKWImageIO::WriteImage()
 {
-  typedef itk::ImageIOBase::IOComponentType  PixelType;
+  typedef itk::ImageIOBase::IOComponentType  ScalarPixelType;
 
-  PixelType pixelType = this->ImageToBeWritten->GetITKScalarPixelType();
+  ScalarPixelType pixelType = this->ImageToBeWritten->GetITKScalarPixelType();
 
   // Use the pixel type to instantiate the appropriate reader
   switch( pixelType )

@@ -26,3 +26,7 @@ ADD_EXECUTABLE(itkRegisterITKMonitorVTK itkRegisterITKMonitorVTK)
 
 TARGET_LINK_LIBRARIES(itkRegisterITKMonitorVTK 
   ITKVTKIntegration ITKBasicFilters ITKIO vtkRendering vtkIO vtkHybrid)
+
+IF(CMAKE_COMPILER_IS_GNUCXX)
+  SET_SOURCE_FILES_PROPERTIES (itkRegisterITKMonitorVTK.cxx PROPERTIES COMPILE_FLAGS -Wno-unused-parameter)
+ENDIF(CMAKE_COMPILER_IS_GNUCXX)
