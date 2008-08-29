@@ -95,7 +95,7 @@ private:
 // progress Callback
 template <class PixelType> 
 void ImageRegistrationRunner<PixelType>::
-ProgressUpdate( itk::Object * caller, const itk::EventObject & event )
+ProgressUpdate( itk::Object * itkNotUsed(caller), const itk::EventObject & event )
 {
   char tstr[1024];
   if( typeid( itk::IterationEvent ) == typeid( event ) )

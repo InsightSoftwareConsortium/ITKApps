@@ -235,7 +235,7 @@ public:
   } // end of ImportPixelBuffer
 
   virtual void 
-  ExportPixelBuffer( unsigned int component, 
+  ExportPixelBuffer( unsigned int itkNotUsed(component), 
                      const vtkVVProcessDataStruct * pds )
   {
     
