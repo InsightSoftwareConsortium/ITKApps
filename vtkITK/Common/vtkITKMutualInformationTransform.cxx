@@ -63,7 +63,7 @@
 typedef itk::Size<3> SizeType;
 typedef itk::Index<3> IndexType;
 
-vtkCxxRevisionMacro(vtkITKMutualInformationTransform, "$Revision: 1.20 $");
+vtkCxxRevisionMacro(vtkITKMutualInformationTransform, "$Revision: 1.21 $");
 vtkStandardNewMacro(vtkITKMutualInformationTransform);
 
 //----------------------------------------------------------------------------
@@ -836,7 +836,7 @@ void vtkITKMutualInformationTransform::SetFixedImageExtent(int xMin, int xMax, i
   int sizeY = yMax-yMin+1;
   int sizeZ = zMax-zMin+1;
 
-  SizeType size = {sizeX, sizeY, sizeZ};
+  SizeType size = {{sizeX, sizeY, sizeZ}};
   IndexType index = {{xMin, yMin, zMin}};
   FixedImageExtent.SetIndex(index);
   FixedImageExtent.SetSize(size);
