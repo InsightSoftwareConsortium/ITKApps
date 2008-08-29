@@ -40,3 +40,7 @@ INSTALL_TARGETS(/bin ThinPlateSplines)
 
 TARGET_LINK_LIBRARIES(ThinPlateSplines ITKBasicFilters ITKIO
                       ITKFltkImageViewer ITKVtkFltk vtkHybrid)
+IF(CMAKE_COMPILER_IS_GNUCXX)
+  SET_SOURCE_FILES_PROPERTIES (ThinPlateSplinesApplication.cxx PROPERTIES COMPILE_FLAGS -Wno-cast-qual)
+  SET_SOURCE_FILES_PROPERTIES (main.cxx PROPERTIES COMPILE_FLAGS -Wno-cast-qual)
+ENDIF(CMAKE_COMPILER_IS_GNUCXX)
