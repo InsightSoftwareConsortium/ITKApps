@@ -70,3 +70,7 @@ ${ThresholdSegmentationLevelSetFltkGui_FLTK_UI_SRCS}
 ADD_EXECUTABLE(ThresholdSegmentationLevelSetFltkGui ${ThresholdSegmentationLevelSetFltkGui_SRCS})
 INSTALL_TARGETS(/bin ThresholdSegmentationLevelSetFltkGui)
 
+IF(CMAKE_COMPILER_IS_GNUCXX)
+  SET_SOURCE_FILES_PROPERTIES (SegmenterConsole.cxx PROPERTIES COMPILE_FLAGS -Wno-cast-qual)
+  SET_SOURCE_FILES_PROPERTIES (Segmenter.cxx PROPERTIES COMPILE_FLAGS -Wno-cast-qual)
+ENDIF(CMAKE_COMPILER_IS_GNUCXX)
