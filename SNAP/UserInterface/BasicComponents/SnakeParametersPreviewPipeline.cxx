@@ -440,7 +440,7 @@ SnakeParametersPreviewPipeline
 
 void
 SnakeParametersPreviewPipeline
-::Update(Fl_Gl_Window *context)
+::Update(Fl_Gl_Window *itkNotUsed(context))
 {
   // Check what work needs to be done
   if(m_ControlsModified)

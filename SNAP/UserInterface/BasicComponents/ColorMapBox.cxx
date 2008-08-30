@@ -16,8 +16,8 @@
 #include "SNAPOpenGL.h"
 
 ColorMapBox
-::ColorMapBox(int x,int y,int w,int h,const char *label)
-  : FLTKCanvas(x, y, w, h, label)
+::ColorMapBox(int lx,int ly,int lw,int lh,const char *llabel)
+  : FLTKCanvas(lx, ly, lw, lh, llabel)
 {
   m_RangeStart = 0.0;
   m_RangeEnd = 0.0;
@@ -56,9 +56,9 @@ ColorMapBox
 
   // Get the colors
   unsigned int n = 256;
-  for(unsigned int i = 0; i <= n; i++)
+  for(unsigned int ii = 0; ii <= n; ii++)
     {
-    double u = i * 1.0 / n;
+    double u = ii * 1.0 / n;
     double t = m_RangeStart + u * (m_RangeEnd - m_RangeStart);
     SpeedColorMap::OutputType xColor = m_ColorMap(t);
     

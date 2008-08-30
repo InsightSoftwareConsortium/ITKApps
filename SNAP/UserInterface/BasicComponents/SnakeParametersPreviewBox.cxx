@@ -24,8 +24,8 @@ extern void fl_alert(const char *, ...);
 using namespace itk;                              
                               
 SnakeParametersPreviewBox
-::SnakeParametersPreviewBox(int x, int y, int w, int h, const char *label)
-: FLTKCanvas(x,y,w,h,label), m_Interactor(this)
+::SnakeParametersPreviewBox(int lx, int ly, int lw, int lh, const char *llabel)
+: FLTKCanvas(lx,ly,lw,lh,llabel), m_Interactor(this)
 {
   // Initialize the texture object
   m_Texture = new TextureType();
@@ -129,10 +129,10 @@ SnakeParametersPreviewBox
   // Draw the vectors from the curve
   glColor3d(1.0,0.0,0.0);
   glBegin(GL_LINES);
-  for(unsigned int i=0;i<list.size();i+=4)
+  for(unsigned int ii=0;ii<list.size();ii+=4)
     {
     // A reference so we can access the point in shorthand
-    const SnakeParametersPreviewPipeline::SampledPoint &p = list[i];
+    const SnakeParametersPreviewPipeline::SampledPoint &p = list[ii];
     
     // Decide which force to draw, depending on the current state
     double force = 0;
@@ -161,33 +161,6 @@ SnakeParametersPreviewBox
   }
 
   glEnd();  
-
-/*
-  const SnakeParametersPreviewPipeline::ImagePointList
-    &plist = m_Pipeline->GetImagePoints();
-  
-  glBegin(GL_LINES);
-  for(unsigned int j=0;j<plist.size();j++)
-    {
-    const SnakeParametersPreviewPipeline::PointInfo &point = plist[j];
-    
-    float length = 10.0f;
-    switch(m_ForceToDisplay)
-      {
-      case CURVATURE_FORCE   : length *= point.CurvatureForce; break;
-      case ADVECTION_FORCE   : length *= point.AdvectionForce; break;
-      case PROPAGATION_FORCE : length *= point.PropagationForce; break;
-      case TOTAL_FORCE       : 
-        length *= (point.CurvatureForce + point.AdvectionForce + 
-                   point.PropagationForce); break;
-      }
-    
-    SnakeParametersPreviewPipeline::SampledPoint p = point.point;
-    glVertex2d(p.x[0],p.x[1]);
-    glVertex2d(p.x[0] + length * p.n[0],p.x[1] + length * p.n[1]);
-    }
-  glEnd();
-*/
 
   // Draw the interactor
   m_Interactor.OnDraw();

@@ -518,15 +518,15 @@ TestCompareLevelSets
 
   // Now, we have a speed image and a level set image.  We are ready to
   // test different segmenters
-  typedef SpeedImageWrapper::ImageType FloatImageType;
+  typedef SpeedImageWrapper::ImageType FloatSpeedImageType;
   typedef itk::DenseFiniteDifferenceImageFilter<
-    FloatImageType,FloatImageType> DenseFilterType;  
+    FloatSpeedImageType,FloatSpeedImageType> DenseFilterType;  
   typedef itk::SparseFieldLevelSetImageFilter<
-    FloatImageType,FloatImageType> SparseFilterType;
+    FloatSpeedImageType,FloatSpeedImageType> SparseFilterType;
   typedef itk::ParallelSparseFieldLevelSetImageFilter<
-    FloatImageType,FloatImageType> ParallelSparseFilterType;
+    FloatSpeedImageType,FloatSpeedImageType> ParallelSparseFilterType;
   typedef itk::NarrowBandLevelSetImageFilter<
-    FloatImageType,FloatImageType> NarrowFilterType;
+    FloatSpeedImageType,FloatSpeedImageType> NarrowFilterType;
 
   typedef LevelSetExtensionFilter<DenseFilterType> DenseExtensionFilter;
   typedef LevelSetExtensionFilter<SparseFilterType> SparseExtensionFilter;
@@ -537,7 +537,7 @@ TestCompareLevelSets
   std::vector<Bubble> dummy;
   snap->InitializeSegmentation(
     parameters,dummy,app->GetGlobalState()->GetDrawingColorLabel());
-  SNAPLevelSetFunction<FloatImageType> *phi = snap->GetLevelSetFunction();
+  SNAPLevelSetFunction<FloatSpeedImageType> *phi = snap->GetLevelSetFunction();
 
   // Decide on a number of iterations
   unsigned int nIterations = registry["Iterations"][10];
@@ -578,7 +578,7 @@ TestCompareLevelSets
 
   // Create a filter for filling in the interior of a distance transform
   typedef itk::UnaryFunctorImageFilter<
-    FloatImageType,LabelImageWrapper::ImageType,InteriorFunctor> InteriorFilter;
+    FloatSpeedImageType,LabelImageWrapper::ImageType,InteriorFunctor> InteriorFilter;
   InteriorFilter::Pointer fltInterior = InteriorFilter::New();
 
   // Run and save the three filters
@@ -773,20 +773,20 @@ TestCompareLevelSets
     
   // Now, we have a speed image and a level set image.  We are ready to
   // test different segmenters
-  typedef SpeedImageWrapper::ImageType FloatImageType;
+  typedef SpeedImageWrapper::ImageType FloatSpeedImagetype;
   typedef itk::DenseFiniteDifferenceImageFilter<
-    FloatImageType,FloatImageType> DenseFilterType;  
+    FloatSpeedImagetype,FloatSpeedImagetype> DenseFilterType;  
   typedef itk::SparseFieldLevelSetImageFilter<
-    FloatImageType,FloatImageType> SparseFilterType;
+    FloatSpeedImagetype,FloatSpeedImagetype> SparseFilterType;
   typedef itk::NarrowBandLevelSetImageFilter<
-    FloatImageType,FloatImageType> NarrowFilterType;
+    FloatSpeedImagetype,FloatSpeedImagetype> NarrowFilterType;
 
   typedef LevelSetExtensionFilter<DenseFilterType> DenseExtensionFilter;
   typedef LevelSetExtensionFilter<SparseFilterType> SparseExtensionFilter;
   typedef LevelSetExtensionFilter<NarrowFilterType> NarrowExtensionFilter;
 
   // Pull out the finite difference function
-  SNAPLevelSetFunction<FloatImageType> *phi = snap->GetLevelSetFunction();
+  SNAPLevelSetFunction<FloatSpeedImagetype> *phi = snap->GetLevelSetFunction();
 
   // Decide on a number of iterations
   unsigned int nIterations = 10;
@@ -822,7 +822,7 @@ TestCompareLevelSets
 
   // Create a filter for filling in the interior of a distance transform
   typedef itk::UnaryFunctorImageFilter<
-    FloatImageType,LabelImageWrapper::ImageType,InteriorFunctor> InteriorFilter;
+    FloatSpeedImagetype,LabelImageWrapper::ImageType,InteriorFunctor> InteriorFilter;
   InteriorFilter::Pointer fltInterior = InteriorFilter::New();
 
   // Run and save the narrow filter

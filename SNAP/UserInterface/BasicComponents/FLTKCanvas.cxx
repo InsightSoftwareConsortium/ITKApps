@@ -24,8 +24,8 @@
 using namespace std;
 
 FLTKCanvas
-::FLTKCanvas(int x, int y, int w, int h, const char *label)
-: Fl_Gl_Window(x,y,w,h,label)
+::FLTKCanvas(int lx, int ly, int lw, int lh, const char *llabel)
+: Fl_Gl_Window(lx,ly,lw,lh,llabel)
 {
   m_Dragging = false;
   m_FlipYCoordinate = true;
@@ -131,43 +131,43 @@ FLTKCanvas
   for (list<InteractionMode *>::iterator it = m_Interactors.begin();
       it != m_Interactors.end();it++)
     {
-    InteractionMode *mode = *it;
+    InteractionMode *lmode = *it;
     int result;
 
     // Delegate the event base on the ID
     switch (eventID)
       {
       case FL_PUSH : 
-        result = mode->OnMousePress(event);
+        result = lmode->OnMousePress(event);
         break;
       case FL_DRAG : 
-        result = mode->OnMouseDrag(event,m_DragStartEvent);
+        result = lmode->OnMouseDrag(event,m_DragStartEvent);
         break;
       case FL_RELEASE : 
-        result = mode->OnMouseRelease(event,m_DragStartEvent);
+        result = lmode->OnMouseRelease(event,m_DragStartEvent);
         break;
       case FL_ENTER : 
-        result = mode->OnMouseEnter(event);
+        result = lmode->OnMouseEnter(event);
         break;
       case FL_LEAVE : 
-        result = mode->OnMouseLeave(event);
+        result = lmode->OnMouseLeave(event);
         break;
       case FL_MOVE : 
-        result = mode->OnMouseMotion(event);
+        result = lmode->OnMouseMotion(event);
         break;
       case FL_MOUSEWHEEL :
-        result = mode->OnMouseWheel(event);
+        result = lmode->OnMouseWheel(event);
         break;
       case FL_KEYDOWN :
-        result = mode->OnKeyDown(event);
+        result = lmode->OnKeyDown(event);
         break;
       case FL_KEYUP :
-        result = mode->OnKeyUp(event);
+        result = lmode->OnKeyUp(event);
         break;
       case FL_SHORTCUT :
-        result = mode->OnShortcut(event);
+        result = lmode->OnShortcut(event);
       default:
-        result = mode->OnOtherEvent(event);
+        result = lmode->OnOtherEvent(event);
       };
 
     // Break out if the event was taken care of

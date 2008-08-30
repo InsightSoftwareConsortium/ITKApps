@@ -16,8 +16,8 @@
 #include "SNAPOpenGL.h"
 
 FunctionPlot2DBox
-::FunctionPlot2DBox(int x,int y,int w,int h,const char *label)
-  : FLTKCanvas(x,y,w,h,label)
+::FunctionPlot2DBox(int lx,int ly,int lw,int lh,const char *llabel)
+  : FLTKCanvas(lx,ly,lw,lh,llabel)
 {
 }
 

@@ -624,7 +624,7 @@ ImageIOWizardLogic<TPixel>
     m_Image->DisconnectPipeline();
 
     // Check if the image is really valid
-    if(rc = CheckImageValidity())
+    if((rc = CheckImageValidity()))
       {
       // Try to determine the RAI code
       GuessImageOrientation();
@@ -1107,7 +1107,7 @@ void ImageIOWizardLogic<TPixel>
 ::OnOrientationPageSelect() 
 {
   // Return the currently set RAI
-  static char *raiList = "RLAPIS";
+  static const char *raiList = "RLAPIS";
 
   // Compute the RAI code based on the state of the drop-downs
   char rai[4];

@@ -30,8 +30,8 @@ using namespace std;
 unsigned int IntensityCurveBox::CURVE_RESOLUTION = 64;
 
 IntensityCurveBox
-::IntensityCurveBox(int x, int y, int w, int h, const char *label)
-: FLTKCanvas(x,y,w,h,label), m_DefaultHandler(this)
+::IntensityCurveBox(int lx, int ly, int lw, int lh, const char *llabel)
+: FLTKCanvas(lx,ly,lw,lh,llabel), m_DefaultHandler(this)
 {
   // Start with the blank curve
   m_Curve = NULL;
@@ -121,15 +121,15 @@ IntensityCurveBox
       xHeightMax = log(xHeightMax) / log(10.0);
 
     // Continue by computing each bin's height
-    unsigned int i;
-    for(i=0;i < m_Histogram.size();i++)
+    unsigned int ii;
+    for(ii=0;ii < m_Histogram.size();ii++)
       {
       // Process the histogram height based on options
-      xHeight[i] = m_Histogram[i];
+      xHeight[ii] = m_Histogram[ii];
       if(m_HistogramLog)
-        xHeight[i] = (xHeight[i] > 0) ? log(xHeight[i]) / log(10.0) : 0;
-      if(xHeight[i] > xHeightMax)
-        xHeight[i] = xHeightMax / 0.9f;
+        xHeight[ii] = (xHeight[ii] > 0) ? log(xHeight[ii]) / log(10.0) : 0;
+      if(xHeight[ii] > xHeightMax)
+        xHeight[ii] = xHeightMax / 0.9f;
       }
 
     // Draw the horizontal lines at various powers of 10 if in log mode
@@ -151,11 +151,11 @@ IntensityCurveBox
 
     // Paint the bars as quads
     glBegin(GL_QUADS);
-    for(i=0;i < m_Histogram.size();i++)
+    for(ii=0;ii < m_Histogram.size();ii++)
       {
       // Compute the physical height of the bin
-      float xBin = xWidth * i;
-      float hBin = xHeight[i] * 0.9f / xHeightMax;
+      float xBin = xWidth * ii;
+      float hBin = xHeight[ii] * 0.9f / xHeightMax;
 
       // Paint the bar
       glVertex2f(xBin,0);
@@ -171,11 +171,11 @@ IntensityCurveBox
       // Draw the vertical lines between the histogram bars
       glBegin(GL_LINE_STRIP);
       glColor3d(0.0, 0.0, 0.0);
-      for(i = 0; i < m_Histogram.size(); i++)
+      for(ii = 0; ii < m_Histogram.size(); ii++)
         {
         // Compute the physical height of the bin
-        float xBin = xWidth * i;
-        float hBin = xHeight[i] * 0.9f / xHeightMax;
+        float xBin = xWidth * ii;
+        float hBin = xHeight[ii] * 0.9f / xHeightMax;
 
         // Draw around the bar, starting at the lower left corner
         glVertex2f(xBin, 0.0f);
@@ -208,7 +208,7 @@ IntensityCurveBox
 
   float t = 0.0;
   float tStep = 1.0f / (CURVE_RESOLUTION);
-  for (unsigned int i=0;i<=CURVE_RESOLUTION;i++) 
+  for (unsigned int ii=0;ii<=CURVE_RESOLUTION;ii++) 
     {
     glVertex2f(t,m_Curve->Evaluate(t));
     t+=tStep;
@@ -220,8 +220,8 @@ IntensityCurveBox
   for (unsigned int c=0;c<m_Curve->GetControlPointCount();c++) 
     {
     // Get the next control point
-    float t,x;
-    m_Curve->GetControlPoint(c,t,x);
+    float tt,xx;
+    m_Curve->GetControlPoint(c,tt,xx);
 
     // Draw a quad around the control point
 
@@ -230,20 +230,20 @@ IntensityCurveBox
 
     glColor3d(1,1,0.5);
     glBegin(GL_QUADS);
-    glVertex2d(t,x-ry);
-    glVertex2d(t+rx,x);
-    glVertex2d(t,x+ry);
-    glVertex2d(t-rx,x);
+    glVertex2d(tt,xx-ry);
+    glVertex2d(tt+rx,xx);
+    glVertex2d(tt,xx+ry);
+    glVertex2d(tt-rx,xx);
     glEnd();       
 
     glColor3d(0,0,0);
     glLineWidth(1.0);
     glColor3d(1.0,0.0,0.0);
     glBegin(GL_LINE_LOOP);
-    glVertex2d(t,x-ry);
-    glVertex2d(t+rx,x);
-    glVertex2d(t,x+ry);
-    glVertex2d(t-rx,x);
+    glVertex2d(tt,xx-ry);
+    glVertex2d(tt+rx,xx);
+    glVertex2d(tt,xx+ry);
+    glVertex2d(tt-rx,xx);
     glEnd();
 
     }
@@ -257,7 +257,7 @@ IntensityCurveBox
 
 int 
   IntensityCurveBox
-::GetControlPointInVincinity(float x, float y, int pixelRadius) 
+::GetControlPointInVincinity(float xx, float yy, int pixelRadius) 
 {
   float rx = pixelRadius * 1.0f / w();
   float ry = pixelRadius * 1.0f / h();
@@ -267,19 +267,21 @@ int
   float minDistance = 1.0f;
   int nearestPoint = -1;
 
-  for (unsigned int c=0;c<m_Curve->GetControlPointCount();c++) {
+  for (unsigned int c=0;c<m_Curve->GetControlPointCount();c++)
+    {
 
     // Get the next control point
     float cx,cy;
     m_Curve->GetControlPoint(c,cx,cy);
 
     // Check the distance to the control point
-    float d = (cx - x) * (cx - x) * fx + (cy - y) * (cy - y) * fy;
-    if (minDistance >= d) {
+    float d = (cx - xx) * (cx - xx) * fx + (cy - yy) * (cy - yy) * fy;
+    if (minDistance >= d)
+      {
       minDistance = d;
       nearestPoint = c;
+      }
     }
-  }
 
   // Negative: return -1
   return nearestPoint;
@@ -322,10 +324,10 @@ IntensityCurveBox
   m_HistogramMax = 0;
 
   // Put the frequencies into the bins
-  for(unsigned int i=0;i<nFrequencies;i++)
+  for(unsigned int ii=0;ii<nFrequencies;ii++)
     {
-    unsigned int iBin = i / m_HistogramBinSize;
-    m_Histogram[iBin] += frequency[i];
+    unsigned int iBin = ii / m_HistogramBinSize;
+    m_Histogram[iBin] += frequency[ii];
 
     // Compute the maximum frequency
     if(m_HistogramMax < m_Histogram[iBin])

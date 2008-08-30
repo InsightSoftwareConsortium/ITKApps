@@ -165,7 +165,7 @@ bool LoadUserPreferencesInteractive(SystemInterface &system)
 #include <signal.h>
 #include <execinfo.h>
 
-void SegmentationFaultHandler(int sig)
+void SegmentationFaultHandler(int itkNotUsed(sig))
 {
   cerr << "*************************************" << endl;
   cerr << "ITK-SNAP: Segmentation Fault!   " << endl;
@@ -385,6 +385,9 @@ int main(int argc, char **argv)
 
 /*
  *Log: SNAPMain.cxx
+ *Revision 1.16  2006-02-01 20:21:26  pauly
+ *ENH: An improvement to the main SNAP UI structure: one set of GL windows is used to support SNAP and IRIS modes
+ *
  *Revision 1.15  2005/11/07 15:50:33  pauly
  *COMP: Fixed problem with execinfo.h missing on some platforms. Also fixed
  *compilation error in GuidedImageIO.h

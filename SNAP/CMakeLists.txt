@@ -623,3 +623,7 @@ CONFIGURE_FILE(
 
 # Add an option to install SNAP into /usr/local or something
 INSTALL_TARGETS(/bin InsightSNAP)
+
+IF(CMAKE_COMPILER_IS_GNUCXX)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-cast-qual -Wno-unused")
+ENDIF(CMAKE_COMPILER_IS_GNUCXX)

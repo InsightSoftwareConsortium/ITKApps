@@ -197,9 +197,6 @@ SNAPImageData
   // Store the label color
   m_SnakeColorLabel = labelColor;
 
-  // Types of images used here
-  typedef Image<float,3> FloatImageType;
-
   // Initialize the level set initialization wrapper, set pixels to 1.0
   m_SnakeInitializationWrapper.InitializeToWrapper(&m_GreyWrapper, 1.0f);
 

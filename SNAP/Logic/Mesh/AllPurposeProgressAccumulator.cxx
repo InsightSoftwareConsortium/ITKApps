@@ -181,7 +181,7 @@ AllPurposeProgressAccumulator
 void 
 AllPurposeProgressAccumulator
 ::CallbackVTK(
-  vtkObject *source, unsigned long eventId, void *clientdata, void *callData)
+  vtkObject *source, unsigned long eventId, void *clientdata, void *itkNotUsed(callData))
 {
   // Figure out the pointers
   vtkAlgorithmClass *alg = dynamic_cast<vtkAlgorithmClass *>(source);
@@ -364,7 +364,7 @@ AllPurposeProgressAccumulator
 
 void 
 AllPurposeProgressAccumulator
-::DebugPrint(void *source, const char *state, double p)
+::DebugPrint(void *itkNotUsed(source), const char *itkNotUsed(state), double itkNotUsed(p))
 {
   /*
   if(m_Source[source].Type == ITK)

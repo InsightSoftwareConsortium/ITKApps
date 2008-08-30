@@ -99,7 +99,6 @@ SystemInterface
 {
   // Get the directory where the SNAP executable was launched
   using namespace itksys;
-  typedef std::string StringType;
 
   // This is the directory we're trying to set
   StringType sRootDir = "";
