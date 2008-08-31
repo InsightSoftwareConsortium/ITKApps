@@ -25,7 +25,6 @@
 
 #include <itkConnectedThresholdImageFilter.h>
 #include <itkConfidenceConnectedImageFilter.h>
-#include <itkSimpleFuzzyConnectednessScalarImageFilter.h>
 
 #include <itkBilateralImageFilter.h>
 #include <itkCurvatureFlowImageFilter.h>
@@ -76,7 +75,12 @@ public:
   /** Cast filter needed because Curvature flow expects double images */
   typedef   itk::CastImageFilter< 
                  InputImageType, 
-                 InternalImageType >     CastImageFilterType;
+                 InternalImageType >     Cast1ImageFilterType;
+
+  /** Cast filter needed because Sobel expects double images */
+  typedef   itk::CastImageFilter< 
+                 OutputImageType, 
+                 InternalImageType >     Cast2ImageFilterType;
 
   /** Null filter used to select smoothing filter */
   typedef   itk::CastImageFilter< 
@@ -116,20 +120,15 @@ public:
                  InternalImageType, 
                  OutputImageType >     ConfidenceConnectedImageFilterType;
 
-  /** Fuzzy Connected Image Filter */
-  typedef   itk::SimpleFuzzyConnectednessScalarImageFilter< 
-                 InternalImageType, 
-                 OutputImageType >     FuzzyConnectedImageFilterType;
-
   /** Sobel Filter for extracting the contour of a segmented region */
   typedef   itk::SobelEdgeDetectionImageFilter<
-                 OutputImageType, 
-                 OutputImageType >     SobelImageFilterType;
+                 InternalImageType, 
+                 InternalImageType >     SobelImageFilterType;
 
   /** Maximum Filter for composing the edge with the original image */
   typedef   itk::MaximumImageFilter<
                  InternalImageType, 
-                 OutputImageType,
+                 InternalImageType,
                  InternalImageType >     MaximumImageFilterType;
 
 
@@ -144,7 +143,6 @@ public:
   virtual void WriteOutputImage(const char * filename);
   virtual void WriteConnectedThresholdImage()=0;
   virtual void WriteConfidenceConnectedImage()=0;
-  virtual void WriteFuzzyConnectedImage()=0;
 
   virtual void ShowStatus(const char * text)=0;
 
@@ -161,7 +159,9 @@ protected:
 
   bool                                        m_InputImageIsLoaded;
 
-  CastImageFilterType::Pointer                m_CastImageFilter;
+  Cast1ImageFilterType::Pointer               m_Cast1ImageFilter;
+
+  Cast2ImageFilterType::Pointer               m_Cast2ImageFilter;
 
   NullImageFilterType::Pointer                m_NullImageFilter;
 
@@ -176,8 +176,6 @@ protected:
   ConnectedThresholdImageFilterType::Pointer  m_ConnectedThresholdImageFilter;
 
   ConfidenceConnectedImageFilterType::Pointer m_ConfidenceConnectedImageFilter;
-
-  FuzzyConnectedImageFilterType::Pointer      m_FuzzyConnectedImageFilter;
 
   SobelImageFilterType::Pointer               m_SobelImageFilter;
 

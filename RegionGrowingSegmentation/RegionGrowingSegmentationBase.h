@@ -26,7 +26,6 @@
 
 #include "itkConnectedThresholdImageFilter.h"
 #include "itkConfidenceConnectedImageFilter.h"
-#include "itkSimpleFuzzyConnectednessScalarImageFilter.h"
 
 #include "itkCurvatureFlowImageFilter.h"
 #include "itkGradientAnisotropicDiffusionImageFilter.h"
@@ -113,11 +112,6 @@ public:
                  InternalImageType, 
                  OutputImageType >     ConfidenceConnectedImageFilterType;
 
-  /** Fuzzy Connected Image Filter */
-  typedef   itk::SimpleFuzzyConnectednessScalarImageFilter< 
-                 InternalImageType, 
-                 OutputImageType >     FuzzyConnectedImageFilterType;
-
 public:
   RegionGrowingSegmentationBase();
   virtual ~RegionGrowingSegmentationBase();
@@ -129,7 +123,6 @@ public:
   virtual void WriteOutputImage(const char * filename);
   virtual void WriteConnectedThresholdImage()=0;
   virtual void WriteConfidenceConnectedImage()=0;
-  virtual void WriteFuzzyConnectedImage()=0;
 
   virtual void ShowStatus(const char * text)=0;
 
@@ -161,8 +154,6 @@ protected:
   ConnectedThresholdImageFilterType::Pointer  m_ConnectedThresholdImageFilter;
 
   ConfidenceConnectedImageFilterType::Pointer m_ConfidenceConnectedImageFilter;
-
-  FuzzyConnectedImageFilterType::Pointer      m_FuzzyConnectedImageFilter;
 
 };
 

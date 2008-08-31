@@ -33,20 +33,20 @@ RegionGrowingSegmentationBase2D
   m_ImageWriter                  = ImageWriterType::New();
 
 
-  m_CastImageFilter = CastImageFilterType::New();
-  m_CastImageFilter->SetInput( m_ImageReader->GetOutput() );
+  m_Cast1ImageFilter = Cast1ImageFilterType::New();
+  m_Cast1ImageFilter->SetInput( m_ImageReader->GetOutput() );
 
   m_BilateralImageFilter = BilateralImageFilterType::New();
-  m_BilateralImageFilter->SetInput( m_CastImageFilter->GetOutput() );
+  m_BilateralImageFilter->SetInput( m_Cast1ImageFilter->GetOutput() );
 
   m_CurvatureFlowImageFilter = CurvatureFlowImageFilterType::New();
-  m_CurvatureFlowImageFilter->SetInput( m_CastImageFilter->GetOutput() );
+  m_CurvatureFlowImageFilter->SetInput( m_Cast1ImageFilter->GetOutput() );
 
   m_CurvatureAnisotropicDiffusionImageFilter = CurvatureAnisotropicDiffusionImageFilterType::New();
-  m_CurvatureAnisotropicDiffusionImageFilter->SetInput( m_CastImageFilter->GetOutput() );
+  m_CurvatureAnisotropicDiffusionImageFilter->SetInput( m_Cast1ImageFilter->GetOutput() );
   
   m_GradientAnisotropicDiffusionImageFilter = GradientAnisotropicDiffusionImageFilterType::New();
-  m_GradientAnisotropicDiffusionImageFilter->SetInput( m_CastImageFilter->GetOutput() );
+  m_GradientAnisotropicDiffusionImageFilter->SetInput( m_Cast1ImageFilter->GetOutput() );
   
   m_NullImageFilter = NullImageFilterType::New();
   m_NullImageFilter->SetInput( m_CurvatureFlowImageFilter->GetOutput() );
@@ -57,14 +57,14 @@ RegionGrowingSegmentationBase2D
   m_ConfidenceConnectedImageFilter = ConfidenceConnectedImageFilterType::New();
   m_ConfidenceConnectedImageFilter->SetInput( m_NullImageFilter->GetOutput() );
 
-  m_FuzzyConnectedImageFilter = FuzzyConnectedImageFilterType::New();
-  m_FuzzyConnectedImageFilter->SetInput( m_NullImageFilter->GetOutput() );
+  m_Cast2ImageFilter = Cast2ImageFilterType::New();
+  m_Cast2ImageFilter->SetInput( m_ConfidenceConnectedImageFilter->GetOutput() );
 
   m_SobelImageFilter = SobelImageFilterType::New();
-  m_SobelImageFilter->SetInput( m_ConfidenceConnectedImageFilter->GetOutput() );
+  m_SobelImageFilter->SetInput( m_Cast2ImageFilter->GetOutput() );
 
   m_MaximumImageFilter = MaximumImageFilterType::New();
-  m_MaximumImageFilter->SetInput1( m_CastImageFilter->GetOutput() );
+  m_MaximumImageFilter->SetInput1( m_Cast1ImageFilter->GetOutput() );
   m_MaximumImageFilter->SetInput2( m_SobelImageFilter->GetOutput() );
 
   m_InputImageIsLoaded  = false;
@@ -110,8 +110,8 @@ RegionGrowingSegmentationBase2D
   typedef  itk::MinimumMaximumImageCalculator< InternalImageType > MinimumMaximumCalculatorType;
   MinimumMaximumCalculatorType::Pointer calculator = MinimumMaximumCalculatorType::New();
 
-  m_CastImageFilter->Update();
-  calculator->SetImage( m_CastImageFilter->GetOutput() );
+  m_Cast1ImageFilter->Update();
+  calculator->SetImage( m_Cast1ImageFilter->GetOutput() );
   calculator->ComputeMaximum();
   const float maximumValue = calculator->GetMaximum();
   const float factor = 1.1;

@@ -72,7 +72,6 @@ public:
   virtual void ShowInputImage(void);
   virtual void ShowConnectedThresholdImage(void);
   virtual void ShowConfidenceConnectedImage(void);
-  virtual void ShowFuzzyConnectedImage(void);
   virtual void ShowHomogeneousImage(void);
   virtual void ShowBilateralImage(void);
   virtual void ShowCurvatureFlowImage(void);
@@ -83,7 +82,6 @@ public:
 
   virtual void WriteConnectedThresholdImage();
   virtual void WriteConfidenceConnectedImage();
-  virtual void WriteFuzzyConnectedImage();
 
   virtual void Quit(void);
 
@@ -102,7 +100,6 @@ private:
 
   OutputImageViewerPointer       m_ConnectedThresholdImageViewer;
   OutputImageViewerPointer       m_ConfidenceConnectedImageViewer;
-  OutputImageViewerPointer       m_FuzzyConnectedImageViewer;
 
   InputImageViewerPointer        m_InputImageViewer;
 

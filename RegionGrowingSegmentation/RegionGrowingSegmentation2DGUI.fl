@@ -1,36 +1,34 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0104 
+version 1.0107 
 header_name {.h} 
 code_name {.cxx}
 class RegionGrowingSegmentation2DGUI {open : {public RegionGrowingSegmentationBase2D}
 } {
-  Function {RegionGrowingSegmentation2DGUI()} {} {
+  Function {RegionGrowingSegmentation2DGUI()} {open
+  } {
     Fl_Window consoleWindow {
-      label {Region Growing Segmentation} open
-      xywh {345 258 1075 440} type Double
+      label {Region Growing Segmentation} open selected
+      xywh {474 372 985 440} type Double
       code0 {\#include <RegionGrowingSegmentationBase2D.h>}
       code1 {\#include <fltkLightButton.h>} visible
     } {
-      Fl_Group Connectors {
-        xywh {0 0 1070 390}
+      Fl_Group Connectors {open
+        xywh {0 0 985 380}
       } {
         Fl_Box {} {
-          xywh {725 38 108 10} box UP_BOX color 4
+          xywh {725 88 108 10} box UP_BOX color 4
         }
         Fl_Box {} {
           xywh {55 55 9 90} box UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {575 36 68 10} box UP_BOX color 4
+          xywh {575 86 68 10} box UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {575 142 69 10} box UP_BOX color 4
+          xywh {575 192 69 10} box UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {575 240 68 10} box UP_BOX color 4
-        }
-        Fl_Box {} {
-          xywh {573 36 9 214} box UP_BOX color 4
+          xywh {573 86 9 118} box UP_BOX color 4
         }
         Fl_Box {} {
           xywh {500 147 9 48} box UP_BOX color 4
@@ -39,23 +37,20 @@ class RegionGrowingSegmentation2DGUI {open : {public RegionGrowingSegmentationBa
           xywh {520 142 60 9} box UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {726 142 104 10} box UP_BOX color 4
-        }
-        Fl_Box {} {
-          xywh {725 240 108 10} box UP_BOX color 4
+          xywh {726 192 104 10} box UP_BOX color 4
         }
         Fl_Box {} {
           xywh {422 141 52 9} box UP_BOX color 4
         }
         Fl_Box {} {
-          xywh {846 142 60 10} box UP_BOX color 4
+          xywh {846 192 60 10} box UP_BOX color 4
         }
         Fl_Box {} {
           xywh {75 141 52 9} box UP_BOX color 4
         }
       }
-      Fl_Group controlsGroup {open selected
-        xywh {5 5 1065 385} deactivate
+      Fl_Group controlsGroup {open
+        xywh {5 5 985 370} deactivate
       } {
         Fl_Light_Button inputImageButton {
           label {Input Image}
@@ -66,24 +61,24 @@ class RegionGrowingSegmentation2DGUI {open : {public RegionGrowingSegmentationBa
         Fl_Light_Button thresholdConnectedImageButton {
           label Display
           callback {this->ShowConnectedThresholdImage();}
-          xywh {786 31 70 25} type Normal value 1 selection_color 1 labelsize 12 align 148
+          xywh {786 81 70 25} type Normal value 1 selection_color 1 labelsize 12 align 148
           class {fltk::LightButton}
         }
         Fl_Button {} {
           label {Connected Threshold}
           callback {m_ConnectedThresholdImageFilter->Update();}
-          xywh {605 24 170 37} box ROUND_UP_BOX labelsize 12 align 128
+          xywh {605 74 170 37} box ROUND_UP_BOX labelsize 12 align 128
         }
         Fl_Counter lowerThresholdCounter {
           label Lower
           callback {m_ConnectedThresholdImageFilter->SetLower( static_cast<InputPixelType>( o->value() ) );}
-          xywh {643 61 121 25} labelsize 12 align 4 minimum 0 maximum 65535 step 1 value 100 textsize 12
+          xywh {643 111 121 25} labelsize 12 align 4 minimum 0 maximum 65535 step 1 value 100 textsize 12
           code0 {o->lstep(10.0);}
         }
         Fl_Counter upperThresholdCounter {
           label Upper
           callback {m_ConnectedThresholdImageFilter->SetUpper( static_cast<InputPixelType>( o->value() ) );}
-          xywh {643 86 121 25} labelsize 12 align 4 minimum 0 maximum 65535 step 1 value 200 textsize 12
+          xywh {643 136 121 25} labelsize 12 align 4 minimum 0 maximum 65535 step 1 value 200 textsize 12
           code0 {o->lstep( 10.0 );}
         }
         Fl_Group seedGroup {
@@ -116,50 +111,39 @@ class RegionGrowingSegmentation2DGUI {open : {public RegionGrowingSegmentationBa
         Fl_Button {} {
           label {Confidence Connected}
           callback {m_ConfidenceConnectedImageFilter->Update();}
-          xywh {605 129 170 37} box ROUND_UP_BOX labelsize 12 align 128
+          xywh {605 179 170 37} box ROUND_UP_BOX labelsize 12 align 128
         }
         Fl_Light_Button confidenceConnectedImageButton {
           label Display
           callback {this->ShowConfidenceConnectedImage();}
-          xywh {787 135 70 25} type Normal value 1 selection_color 1 labelsize 12 align 148
-          class {fltk::LightButton}
-        }
-        Fl_Button {} {
-          label {Fuzzy Connected}
-          callback {m_FuzzyConnectedImageFilter->Update();}
-          xywh {605 227 170 37} box ROUND_UP_BOX labelsize 12 align 128
-        }
-        Fl_Light_Button fuzzyConnectedImageButton {
-          label Display
-          callback {this->ShowFuzzyConnectedImage();}
-          xywh {788 233 69 26} type Normal value 1 selection_color 1 labelsize 12 align 148
+          xywh {787 185 70 25} type Normal value 1 selection_color 1 labelsize 12 align 148
           class {fltk::LightButton}
         }
         Fl_Light_Button composedImageButton {
           label {Display Composed}
           callback {this->ShowComposedImage();}
-          xywh {885 129 79 36} type Normal value 1 selection_color 1 labelsize 12 align 148
+          xywh {885 179 79 36} type Normal value 1 selection_color 1 labelsize 12 align 148
           class {fltk::LightButton}
         }
         Fl_Choice {} {
           xywh {170 290 225 30} down_box BORDER_BOX
         } {
-          menuitem {} {
+          MenuItem {} {
             label {Bilateral }
             callback {this->SelectSmoothingFilter( 0 );}
             xywh {30 30 100 20}
           }
-          menuitem {} {
+          MenuItem {} {
             label {Curvature Flow}
             callback {this->SelectSmoothingFilter( 1 );}
             xywh {0 0 100 20}
           }
-          menuitem {} {
+          MenuItem {} {
             label {Gradient Anisotropic Diffusion}
             callback {this->SelectSmoothingFilter( 2 );}
             xywh {10 10 100 20}
           }
-          menuitem {} {
+          MenuItem {} {
             label {Curvature Anisotropic Diffusion}
             callback {this->SelectSmoothingFilter( 3 );}
             xywh {20 20 100 20}
@@ -298,56 +282,36 @@ class RegionGrowingSegmentation2DGUI {open : {public RegionGrowingSegmentationBa
         Fl_Button {} {
           label Save
           callback {this->WriteConnectedThresholdImage();}
-          xywh {783 56 75 27} box ROUND_UP_BOX labelsize 12 align 128
+          xywh {783 106 75 27} box ROUND_UP_BOX labelsize 12 align 128
         }
         Fl_Button {} {
           label Save
           callback {this->WriteConfidenceConnectedImage();}
-          xywh {785 160 75 27} box ROUND_UP_BOX labelsize 12 align 128
-        }
-        Fl_Button {} {
-          label Save
-          callback {this->WriteFuzzyConnectedImage();}
-          xywh {785 258 75 27} box ROUND_UP_BOX labelsize 12 align 128
+          xywh {785 210 75 27} box ROUND_UP_BOX labelsize 12 align 128
         }
       }
       Fl_Slider progressSlider {
-        xywh {10 382 1060 15} type {Horz Fill} selection_color 2
+        xywh {10 382 945 15} type {Horz Fill} selection_color 2
         code0 {\#include <fltkProgressBar.h>}
         class {fltk::ProgressBar}
       }
       Fl_Output statusTextOutput {
-        xywh {10 405 1060 25}
+        xywh {10 405 945 25}
       }
       Fl_Value_Input multiplierValueInput {
         label Multiplier
         callback {m_ConfidenceConnectedImageFilter->SetMultiplier( o->value() );}
-        xywh {697 167 55 25} labelsize 12 minimum 1 maximum 100 value 2.5 textsize 12
+        xywh {697 217 55 25} labelsize 12 minimum 1 maximum 100 value 2.5 textsize 12
       }
       Fl_Value_Input iterationsConfidenceValueInput {
         label Iterations
         callback {m_ConfidenceConnectedImageFilter->SetNumberOfIterations( static_cast<unsigned int>( o->value() ) );}
-        xywh {697 193 55 25} labelsize 12 minimum 1 maximum 100 value 10 textsize 12
-      }
-      Fl_Value_Input fuzzyMeanValueInput {
-        label Mean
-        callback {m_FuzzyConnectedImageFilter->SetMean( o->value() );}
-        xywh {700 265 55 25} labelsize 12 minimum 1 maximum 100 value 2.5 textsize 12
-      }
-      Fl_Value_Input fuzzyVarianceValueInput {
-        label Variance
-        callback {m_FuzzyConnectedImageFilter->SetVariance( o->value() );}
-        xywh {700 291 55 25} labelsize 12 minimum 1 maximum 100 value 2.5 textsize 12
-      }
-      Fl_Value_Input fuzzyThresholdValueInput {
-        label Threshold
-        callback {m_FuzzyConnectedImageFilter->SetThreshold( o->value() );}
-        xywh {700 317 55 25} labelsize 12 step 0.01 value 0.5 textsize 12
+        xywh {697 243 55 25} labelsize 12 minimum 1 maximum 100 value 10 textsize 12
       }
       Fl_Button {} {
         label Quit
         callback {this->Quit();}
-        xywh {830 330 90 35} box ROUND_UP_BOX labelsize 12 align 128
+        xywh {826 330 90 35} box ROUND_UP_BOX labelsize 12 align 128
       }
       Fl_Button {} {
         label Load
@@ -373,8 +337,6 @@ class RegionGrowingSegmentation2DGUI {open : {public RegionGrowingSegmentationBa
   Function {ShowHomogeneousImage( void )} {return_type {virtual void}
   } {}
   Function {ShowConfidenceConnectedImage( void )} {return_type {virtual void}
-  } {}
-  Function {ShowFuzzyConnectedImage( void )} {return_type {virtual void}
   } {}
   Function {ShowCurvatureFlowImage( void )} {return_type {virtual void}
   } {}

@@ -85,8 +85,6 @@ public:
 
   virtual void ShowConfidenceConnectedImage();
 
-  virtual void ShowFuzzyConnectedImage();
-
   virtual void ShowHomogeneousImage();
   virtual void ShowCurvatureFlowImage();
   virtual void ShowGradientAnisotropicDiffusionImage();
@@ -96,7 +94,6 @@ public:
 
   virtual void WriteConnectedThresholdImage();
   virtual void WriteConfidenceConnectedImage();
-  virtual void WriteFuzzyConnectedImage();
 
   virtual void Quit();
 
@@ -115,7 +112,6 @@ private:
 
   OutputImageViewerType       m_ConnectedThresholdImageViewer;
   OutputImageViewerType       m_ConfidenceConnectedImageViewer;
-  OutputImageViewerType       m_FuzzyConnectedImageViewer;
 
   InputImageViewerType        m_InputImageViewer;
 

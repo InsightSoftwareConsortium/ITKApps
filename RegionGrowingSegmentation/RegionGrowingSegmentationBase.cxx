@@ -55,9 +55,6 @@ RegionGrowingSegmentationBase
   m_ConfidenceConnectedImageFilter = ConfidenceConnectedImageFilterType::New();
   m_ConfidenceConnectedImageFilter->SetInput( m_NullImageFilter->GetOutput() );
 
-  m_FuzzyConnectedImageFilter = FuzzyConnectedImageFilterType::New();
-  m_FuzzyConnectedImageFilter->SetInput( m_NullImageFilter->GetOutput() );
-
   m_InputImageIsLoaded  = false;
 
 }

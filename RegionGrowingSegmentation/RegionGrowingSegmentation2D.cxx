@@ -37,7 +37,6 @@
 
     m_ConnectedThresholdImageViewer             = OutputImageViewerType::New();
     m_ConfidenceConnectedImageViewer            = OutputImageViewerType::New();
-    m_FuzzyConnectedImageViewer                 = OutputImageViewerType::New();
 
     m_HomogeneousImageViewer                    = InternalImageViewerType::New();
     m_ComposedImageViewer                       = InternalImageViewerType::New();
@@ -49,7 +48,6 @@
     m_CurvatureAnisotropicDiffusionImageViewer->SetInteractionMode( fltk::Image2DViewerWindow::ClickMode );
     m_ConnectedThresholdImageViewer->SetInteractionMode( fltk::Image2DViewerWindow::ClickMode );
     m_ConfidenceConnectedImageViewer->SetInteractionMode( fltk::Image2DViewerWindow::ClickMode );
-    m_FuzzyConnectedImageViewer->SetInteractionMode( fltk::Image2DViewerWindow::ClickMode );
     m_HomogeneousImageViewer->SetInteractionMode( fltk::Image2DViewerWindow::ClickMode );
     m_ComposedImageViewer->SetInteractionMode( fltk::Image2DViewerWindow::ClickMode );
     m_InputImageViewer->SetInteractionMode( fltk::Image2DViewerWindow::ClickMode );
@@ -73,9 +71,6 @@
 
     m_ConfidenceConnectedImageViewer->SetLabel("Confidence Connected Image");
     m_ConfidenceConnectedImageViewer->SetImage( m_ConfidenceConnectedImageFilter->GetOutput() );  
-
-    m_FuzzyConnectedImageViewer->SetLabel("Fuzzy Connected Image");
-    m_FuzzyConnectedImageViewer->SetImage( m_FuzzyConnectedImageFilter->GetOutput() );  
 
     m_HomogeneousImageViewer->SetLabel("Homogeneous Image");
 
@@ -126,10 +121,6 @@
     m_ConfidenceConnectedImageFilter->SetNumberOfIterations( 
         static_cast<InputPixelType>( iterationsConfidenceValueInput->value() ) );
 
-    m_FuzzyConnectedImageFilter->SetMean( fuzzyMeanValueInput->value() );
-    m_FuzzyConnectedImageFilter->SetVariance( fuzzyVarianceValueInput->value() );
-    m_FuzzyConnectedImageFilter->SetThreshold( fuzzyThresholdValueInput->value() );
-
     // Connect Observers in the GUI 
     inputImageButton->Observe( m_ImageReader.GetPointer() );
     homogeneousImageButton->Observe( m_NullImageFilter.GetPointer() );
@@ -137,13 +128,13 @@
     confidenceConnectedImageButton->Observe( m_ConfidenceConnectedImageFilter.GetPointer() );
     composedImageButton->Observe( m_SobelImageFilter.GetPointer() );
     composedImageButton->Observe( m_MaximumImageFilter.GetPointer() );
-    fuzzyConnectedImageButton->Observe( m_FuzzyConnectedImageFilter.GetPointer() );
     bilateralImageButton->Observe( m_BilateralImageFilter.GetPointer() );
     curvatureFlowImageButton->Observe( m_CurvatureFlowImageFilter.GetPointer() );
     gradientAnisotropicDiffusionImageButton->Observe( m_GradientAnisotropicDiffusionImageFilter.GetPointer() );
     curvatureAnisotropicDiffusionImageButton->Observe( m_CurvatureAnisotropicDiffusionImageFilter.GetPointer() );
 
-    progressSlider->Observe( m_CastImageFilter.GetPointer() );
+    progressSlider->Observe( m_Cast1ImageFilter.GetPointer() );
+    progressSlider->Observe( m_Cast2ImageFilter.GetPointer() );
     progressSlider->Observe( m_NullImageFilter.GetPointer() );
     progressSlider->Observe( m_ImageReader.GetPointer() );
     progressSlider->Observe( m_BilateralImageFilter.GetPointer() );
@@ -152,7 +143,6 @@
     progressSlider->Observe( m_GradientAnisotropicDiffusionImageFilter.GetPointer() );
     progressSlider->Observe( m_ConnectedThresholdImageFilter.GetPointer() );
     progressSlider->Observe( m_ConfidenceConnectedImageFilter.GetPointer() );
-    progressSlider->Observe( m_FuzzyConnectedImageFilter.GetPointer() );
     progressSlider->Observe( m_SobelImageFilter.GetPointer() );
     progressSlider->Observe( m_MaximumImageFilter.GetPointer() );
 
@@ -263,22 +253,6 @@
   }
 
     
-  /************************************
-   *
-   *  Write Fuzzy Connectedness Image
-   *
-   ***********************************/
-  void
-  RegionGrowingSegmentation2D
-  ::WriteFuzzyConnectedImage( void )
-  {
-    m_ImageWriter->SetInput( 
-          m_FuzzyConnectedImageFilter->GetOutput() );
-
-    this->WriteOutputImage();
-  }
-
-   
   /************************************
    *
    *  Write Confidence Connected Image
@@ -435,26 +409,6 @@
    
   /************************************
    *
-   *  Show Fuzzy Connected Image
-   *
-   ***********************************/
-  void
-  RegionGrowingSegmentation2D
-  ::ShowFuzzyConnectedImage( void )
-  {
-    m_FuzzyConnectedImageFilter->Update();
-    m_FuzzyConnectedImageViewer->SetImage( m_FuzzyConnectedImageFilter->GetOutput() );  
-    m_FuzzyConnectedImageViewer->Show();
-
-  }
-
-
-
-
-
-   
-  /************************************
-   *
    *  Show Homogeneous Image
    *
    ***********************************/
@@ -585,8 +539,6 @@ RegionGrowingSegmentation2D
 
   m_ConnectedThresholdImageFilter->SetSeed( seed );
   m_ConfidenceConnectedImageFilter->SetSeed( seed );
-  m_FuzzyConnectedImageFilter->SetObjectSeed( seed );
-
 }
 
 
