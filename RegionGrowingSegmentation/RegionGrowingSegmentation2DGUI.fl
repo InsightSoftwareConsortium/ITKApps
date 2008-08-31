@@ -126,7 +126,7 @@ class RegionGrowingSegmentation2DGUI {open : {public RegionGrowingSegmentationBa
         }
         Fl_Button {} {
           label {Fuzzy Connected}
-          callback {m_ConfidenceConnectedImageFilter->Update();}
+          callback {m_FuzzyConnectedImageFilter->Update();}
           xywh {605 227 170 37} box ROUND_UP_BOX labelsize 12 align 128
         }
         Fl_Light_Button fuzzyConnectedImageButton {
