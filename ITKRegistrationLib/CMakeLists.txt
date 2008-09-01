@@ -21,10 +21,14 @@ ${ITKRegistrationLib_SOURCE_DIR}/../IBSRValidation/Common
 )
 
 
-### HERE:  Modified this line
 ADD_LIBRARY(Example_ITKRegistrationLib ITKRegistrationLib.cxx )
 INSTALL_TARGETS(/lib Example_ITKRegistrationLib)
 TARGET_LINK_LIBRARIES(Example_ITKRegistrationLib ITKNumerics ITKIO ITKBasicFilters ITKCommon )
+
 ADD_EXECUTABLE(Example_ITKRegistrationLibTest ITKRegistrationLibTest.cxx)
 INSTALL_TARGETS(/bin Example_ITKRegistrationLibTest)
 TARGET_LINK_LIBRARIES(Example_ITKRegistrationLibTest Example_ITKRegistrationLib)
+
+IF(CMAKE_COMPILER_IS_GNUCXX)
+  SET_SOURCE_FILES_PROPERTIES (ITKRegistrationLib.cxx PROPERTIES COMPILE_FLAGS -w)
+ENDIF(CMAKE_COMPILER_IS_GNUCXX)
