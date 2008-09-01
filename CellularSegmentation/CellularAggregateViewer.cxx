@@ -249,9 +249,9 @@ CellularAggregateViewer
     m_CellularAggregate->GetVoronoi( id1, voronoiRegion );
               
     VoronoiRegionType::PointIdIterator neighbor = voronoiRegion->PointIdsBegin();
-    VoronoiRegionType::PointIdIterator end      = voronoiRegion->PointIdsEnd();
+    VoronoiRegionType::PointIdIterator pend      = voronoiRegion->PointIdsEnd();
 
-    while( neighbor != end )
+    while( neighbor != pend )
       {
       const IdentifierType id2 = (*neighbor);  
       

@@ -53,6 +53,8 @@ FLTK_WRAP_UI(CellularSegmentation
   CellularSegmentationApplicationGUI.fl
   )
 
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${APPLICATION_SOURCES} ${CellularSegmentation_FLTK_UI_SRCS}")
+
 ADD_EXECUTABLE(CellularSegmentation
     ${APPLICATION_SOURCES} ${CellularSegmentation_FLTK_UI_SRCS})
 INSTALL_TARGETS(/bin CellularSegmentation)
