@@ -14,17 +14,25 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 
-LINK_LIBRARIES (
+ADD_EXECUTABLE(itk2DThresholdSegmentationLevelSetImageFilter itk2DThresholdSegmentationLevelSetImageFilter.cxx)
+INSTALL_TARGETS(/bin itk2DThresholdSegmentationLevelSetImageFilter)
+TARGET_LINK_LIBRARIES (itk2DThresholdSegmentationLevelSetImageFilter
 ITKAlgorithms
 ITKBasicFilters
 ITKCommon
 ITKIO
 )
 
-ADD_EXECUTABLE(itk2DThresholdSegmentationLevelSetImageFilter itk2DThresholdSegmentationLevelSetImageFilter.cxx)
-INSTALL_TARGETS(/bin itk2DThresholdSegmentationLevelSetImageFilter)
+
 ADD_EXECUTABLE(itk2DCannySegmentationLevelSetImageFilter itk2DCannySegmentationLevelSetImageFilter.cxx)
 INSTALL_TARGETS(/bin itk2DCannySegmentationLevelSetImageFilter)
+TARGET_LINK_LIBRARIES (itk2DCannySegmentationLevelSetImageFilter
+ITKAlgorithms
+ITKBasicFilters
+ITKCommon
+ITKIO
+)
+
 
 
 
