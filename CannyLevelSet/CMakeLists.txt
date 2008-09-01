@@ -36,22 +36,6 @@ CannySegmentationLevelSetGUI.fl
 )
 
 FLTK_WRAP_UI( CannySegmentationLevelSet ${CannySegmentationLevelSet_GUI_SRCS} )
-ITK_DISABLE_FLTK_GENERATED_WARNINGS("${CannySegmentationLevelSet_SRCS}")
-
-LINK_LIBRARIES (
-ITKCommon
-ITKNumerics
-ITKBasicFilters
-ITKIO
-vtkRendering
-vtkGraphics
-vtkHybrid
-vtkImaging
-vtkIO
-vtkFiltering
-vtkCommon
-ITKFltkImageViewer
-)
 
 SET(CannySegmentationLevelSet_SRCS
 CannySegmentationLevelSetBase.cxx
@@ -59,6 +43,24 @@ CannySegmentationLevelSet.cxx
 ${CannySegmentationLevelSet_FLTK_UI_SRCS}
 )
 
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${CannySegmentationLevelSet_SRCS}")
+
 ADD_GUI_EXECUTABLE(CannySegmentationLevelSet "${CannySegmentationLevelSet_SRCS}")
+TARGET_LINK_LIBRARIES (
+  CannySegmentationLevelSet
+  ITKCommon
+  ITKNumerics
+  ITKBasicFilters
+  ITKIO
+  vtkRendering
+  vtkGraphics
+  vtkHybrid
+  vtkImaging
+  vtkIO
+  vtkFiltering
+  vtkCommon
+  ITKFltkImageViewer
+)
+
 
 
