@@ -24,15 +24,6 @@ ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
 ${VoronoiSegmentation_SOURCE_DIR}
 )
 
-LINK_LIBRARIES (
-ITKCommon
-ITKNumerics
-ITKBasicFilters
-ITKIO
-ITKFltkImageViewer
-
-)
-
 SET(Project_FLTK_SRCS
 VDSegGrayUI.fl
 )
@@ -47,6 +38,15 @@ ${VoronoiSegmentation_FLTK_UI_SRCS}
 )
 
 ADD_GUI_EXECUTABLE(VoronoiSegmentation   "${Project_SRCS}")
+TARGET_LINK_LIBRARIES (VoronoiSegmentation
+ITKCommon
+ITKNumerics
+ITKBasicFilters
+ITKIO
+ITKFltkImageViewer
+
+)
+
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
   SET_SOURCE_FILES_PROPERTIES (VDSegMain.cpp PROPERTIES COMPILE_FLAGS -Wno-cast-qual)
