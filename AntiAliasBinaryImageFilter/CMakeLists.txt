@@ -20,7 +20,9 @@ ${AntiAliasBinaryImageFilter_SOURCE_DIR}
 ${AntiAliasBinaryImageFilter_SOURCE_DIR}/../StreamedWatershedSegmentation/ParameterFileParser
 )
 
-LINK_LIBRARIES (
+ADD_EXECUTABLE(itkAntiAliasBinaryImageFilterExample itkAntiAliasBinaryImageFilterExample.cxx)
+INSTALL_TARGETS(/bin itkAntiAliasBinaryImageFilterExample)
+TARGET_LINK_LIBRARIES (itkAntiAliasBinaryImageFilterExample
   param
   ITKAlgorithms
   ITKBasicFilters
@@ -28,8 +30,15 @@ LINK_LIBRARIES (
   ITKIO
   )
 
-ADD_EXECUTABLE(itkAntiAliasBinaryImageFilterExample itkAntiAliasBinaryImageFilterExample.cxx)
-INSTALL_TARGETS(/bin itkAntiAliasBinaryImageFilterExample)
+
 ADD_EXECUTABLE(itkSampleDataGenerator itkSampleDataGenerator.cxx)
 INSTALL_TARGETS(/bin itkSampleDataGenerator)
+TARGET_LINK_LIBRARIES (itkSampleDataGenerator
+  param
+  ITKAlgorithms
+  ITKBasicFilters
+  ITKCommon
+  ITKIO
+  )
+
 
