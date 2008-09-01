@@ -13,7 +13,10 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 
-LINK_LIBRARIES (
+ADD_EXECUTABLE(itk2DAnisotropicDiffusionImageFilter itk2DAnisotropicDiffusionImageFilter.cxx)
+INSTALL_TARGETS(/bin itk2DAnisotropicDiffusionImageFilter)
+
+TARGET_LINK_LIBRARIES (itk2DAnisotropicDiffusionImageFilter
   ITKAlgorithms
   ITKBasicFilters
   ITKCommon
@@ -21,8 +24,6 @@ LINK_LIBRARIES (
   ITKNumerics
   )
 
-ADD_EXECUTABLE(itk2DAnisotropicDiffusionImageFilter itk2DAnisotropicDiffusionImageFilter.cxx)
-INSTALL_TARGETS(/bin itk2DAnisotropicDiffusionImageFilter)
 
 
 
