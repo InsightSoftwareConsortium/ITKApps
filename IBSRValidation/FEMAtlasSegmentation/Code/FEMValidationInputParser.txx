@@ -76,7 +76,6 @@ ImagePointer& image )
 
   typedef  itk::ImageFileReader< ImageType >      FileSourceType;
 
-  const unsigned int ImageDimension=ImageType::ImageDimension;
   typedef  itk::RawImageIO< PixelType,ImageDimension>   RawReaderType;
 
   typename FileSourceType::Pointer reffilter = FileSourceType::New();
@@ -138,7 +137,6 @@ LabelImagePointer& image )
 
   typedef  itk::ImageFileReader< LabelImageType >      FileSourceType;
 
-  const unsigned int ImageDimension=ImageType::ImageDimension;
   typedef  itk::RawImageIO< PixelType,ImageDimension>   RawReaderType;
 
   typename FileSourceType::Pointer reffilter = FileSourceType::New();

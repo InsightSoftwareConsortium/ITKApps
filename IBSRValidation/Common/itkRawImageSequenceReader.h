@@ -35,7 +35,7 @@ public:
   itkTypeMacro( RawImageSequenceReaderException, ExceptionObject );
 
   /** Constructor. */
-  RawImageSequenceReaderException(char *file, unsigned int line, 
+  RawImageSequenceReaderException(const char *file, unsigned int line, 
                            const char* message = "Error in IO") : 
     ExceptionObject(file, line)
     {

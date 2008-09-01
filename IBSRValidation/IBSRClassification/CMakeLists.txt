@@ -18,17 +18,33 @@ ${IBSRClassification_SOURCE_DIR}/../Common
 ${IBSRClassification_SOURCE_DIR}
 )
 
-LINK_LIBRARIES (
+ADD_EXECUTABLE(GaussianIBSRClassificationApp Code/GaussianClassifierValidationApp.cxx)
+INSTALL_TARGETS(/bin GaussianIBSRClassificationApp)
+TARGET_LINK_LIBRARIES (GaussianIBSRClassificationApp
 ITKBasicFilters
 ITKIO
 )
 
-ADD_EXECUTABLE(GaussianIBSRClassificationApp Code/GaussianClassifierValidationApp.cxx)
-INSTALL_TARGETS(/bin GaussianIBSRClassificationApp)
+
 ADD_EXECUTABLE(KmeansIBSRClassificationApp Code/KmeansClassifierValidationApp.cxx)
 INSTALL_TARGETS(/bin KmeansIBSRClassificationApp)
+TARGET_LINK_LIBRARIES (KmeansIBSRClassificationApp
+ITKBasicFilters
+ITKIO
+)
+
+
 ADD_EXECUTABLE(MRFGaussianIBSRClassificationApp Code/MRFGaussianClassifierValidationApp.cxx)
 INSTALL_TARGETS(/bin MRFGaussianIBSRClassificationApp)
+TARGET_LINK_LIBRARIES (MRFGaussianIBSRClassificationApp
+ITKBasicFilters
+ITKIO
+)
+
+
 ADD_EXECUTABLE(MRFKmeansIBSRClassificationApp Code/MRFKmeansClassifierValidationApp.cxx)
 INSTALL_TARGETS(/bin MRFKmeansIBSRClassificationApp)
-
+TARGET_LINK_LIBRARIES (MRFKmeansIBSRClassificationApp
+ITKBasicFilters
+ITKIO
+)

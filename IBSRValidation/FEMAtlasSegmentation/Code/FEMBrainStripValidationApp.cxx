@@ -48,7 +48,7 @@ typedef itk::FEMBrainStripValidationApp<ImageType,LabelImageType,RealImageType> 
 
 int main(int argc, char *argv[])
 {
-  char* paramname;
+  const char* paramname;
   if ( argc < 2 )
     {
     std::cout << "Parameter file name missing" << std::endl;
