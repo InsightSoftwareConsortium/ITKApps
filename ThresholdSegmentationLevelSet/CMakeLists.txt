@@ -40,7 +40,15 @@ ThresholdSegmentationLevelSetGUI.fl
 FLTK_WRAP_UI( ThresholdSegmentationLevelSet ${ThresholdSegmentationLevelSet_GUI_SRCS} )
 ITK_DISABLE_FLTK_GENERATED_WARNINGS("${ThresholdSegmentationLevelSet_GUI_SRCS}")
 
-LINK_LIBRARIES (
+SET(ThresholdSegmentationLevelSet_SRCS
+ThresholdSegmentationLevelSetBase.cxx
+ThresholdSegmentationLevelSet.cxx
+${ThresholdSegmentationLevelSet_FLTK_UI_SRCS}
+)
+
+ADD_GUI_EXECUTABLE(ThresholdSegmentationLevelSet "${ThresholdSegmentationLevelSet_SRCS}")
+
+TARGET_LINK_LIBRARIES (ThresholdSegmentationLevelSet
 ITKCommon
 ITKNumerics
 ITKBasicFilters
@@ -57,18 +65,10 @@ vtkHybrid
 )
 
 IF(VTK_USE_VOLUMERENDERING)
- LINK_LIBRARIES(
+ TARGET_LINK_LIBRARIES(ThresholdSegmentationLevelSet
  vtkVolumeRendering
-)
+ )
 ENDIF(VTK_USE_VOLUMERENDERING)
-
-SET(ThresholdSegmentationLevelSet_SRCS
-ThresholdSegmentationLevelSetBase.cxx
-ThresholdSegmentationLevelSet.cxx
-${ThresholdSegmentationLevelSet_FLTK_UI_SRCS}
-)
-
-ADD_GUI_EXECUTABLE(ThresholdSegmentationLevelSet "${ThresholdSegmentationLevelSet_SRCS}")
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
   SET_SOURCE_FILES_PROPERTIES (ThresholdSegmentationLevelSet.cxx PROPERTIES COMPILE_FLAGS -Wno-cast-qual)
