@@ -29,6 +29,10 @@ INCLUDE_DIRECTORIES(
   ${InsightApplications_BINARY_DIR}/FastMarchingLevelSet
 )
 
+SET(FastMarchingLevelSet_GUI_SRCS
+FastMarchingLevelSetGUI.fl
+)
+
 FLTK_WRAP_UI(FastMarchingLevelSet FastMarchingLevelSetGUI.fl)
 
 SET(FastMarchingLevelSet_SRCS
@@ -36,6 +40,8 @@ SET(FastMarchingLevelSet_SRCS
   FastMarchingLevelSet.cxx
   ${FastMarchingLevelSet_FLTK_UI_SRCS}
   )
+
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${FastMarchingLevelSet_SRCS}")
 
 ADD_GUI_EXECUTABLE(FastMarchingLevelSet "${FastMarchingLevelSet_SRCS}")
 
