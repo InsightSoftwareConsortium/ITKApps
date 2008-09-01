@@ -462,7 +462,7 @@ RegionGrowingSegmentation
  *****************************************/
 void
 RegionGrowingSegmentation
-::ClickSelectCallback(float x, float y, float z, float value, void * args )
+::ClickSelectCallback(float x, float y, float z, float itkNotUsed(value), void * args )
 {
 
   RegionGrowingSegmentation * self = 

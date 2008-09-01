@@ -39,8 +39,8 @@ FLTK_WRAP_UI( RegionGrowingSegmentation   RegionGrowingSegmentationGUI.fl)
 FLTK_WRAP_UI( RegionGrowingSegmentation2D RegionGrowingSegmentation2DGUI.fl)
 
 
-ITK_DISABLE_FLTK_GENERATED_WARNINGS(RegionGrowingSegmentationGUI.fl)
-ITK_DISABLE_FLTK_GENERATED_WARNINGS(RegionGrowingSegmentation2DGUI.fl)
+ITK_DISABLE_FLTK_GENERATED_WARNINGS(RegionGrowingSegmentationGUI.cxx)
+ITK_DISABLE_FLTK_GENERATED_WARNINGS(RegionGrowingSegmentation2DGUI.cxx)
 
 
 SET(RegionGrowingSegmentation2D_SRCS
@@ -57,7 +57,8 @@ ${RegionGrowingSegmentation_FLTK_UI_SRCS}
 )
 
 
-LINK_LIBRARIES (
+ADD_GUI_EXECUTABLE(RegionGrowingSegmentation2D "${RegionGrowingSegmentation2D_SRCS}")
+TARGET_LINK_LIBRARIES (RegionGrowingSegmentation2D
 ITKCommon
 ITKNumerics
 ITKBasicFilters
@@ -73,7 +74,27 @@ vtkFiltering
 vtkCommon
 )
 
-
-ADD_GUI_EXECUTABLE(RegionGrowingSegmentation2D "${RegionGrowingSegmentation2D_SRCS}")
 ADD_GUI_EXECUTABLE(RegionGrowingSegmentation "${RegionGrowingSegmentation_SRCS}")
+TARGET_LINK_LIBRARIES (RegionGrowingSegmentation
+ITKCommon
+ITKNumerics
+ITKBasicFilters
+ITKIO
+ITKFltkImageViewer
+ITKVtkFltk
+vtkRendering
+vtkGraphics
+vtkHybrid
+vtkImaging
+vtkIO
+vtkFiltering
+vtkCommon
+)
+
+IF(CMAKE_COMPILER_IS_GNUCXX)
+  SET_SOURCE_FILES_PROPERTIES (RegionGrowingSegmentation.cxx PROPERTIES COMPILE_FLAGS -Wno-cast-qual)
+  SET_SOURCE_FILES_PROPERTIES (RegionGrowingSegmentation2D.cxx PROPERTIES COMPILE_FLAGS -Wno-cast-qual)
+ENDIF(CMAKE_COMPILER_IS_GNUCXX)
+
+
 
