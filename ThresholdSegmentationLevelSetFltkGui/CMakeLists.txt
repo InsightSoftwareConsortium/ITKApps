@@ -50,14 +50,6 @@ ImageViewerGUI.fl
 )
 
 FLTK_WRAP_UI(ThresholdSegmentationLevelSetFltkGui  ${ThresholdSegmentationLevelSetFltkGui_GUI_SRCS})
-ITK_DISABLE_FLTK_GENERATED_WARNINGS("${ThresholdSegmentationLevelSetFltkGui_GUI_SRCS}")
-
-LINK_LIBRARIES (
-ITKBasicFilters
-ITKIO
-ITKNumerics
-ITKFltkImageViewer
-)
 
 SET(ThresholdSegmentationLevelSetFltkGui_SRCS
 SegmenterConsole.cxx
@@ -67,10 +59,17 @@ ImageViewer.txx
 ${ThresholdSegmentationLevelSetFltkGui_FLTK_UI_SRCS}
 )
 
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${ThresholdSegmentationLevelSetFltkGui_SRCS}")
+
 ADD_EXECUTABLE(ThresholdSegmentationLevelSetFltkGui ${ThresholdSegmentationLevelSetFltkGui_SRCS})
 INSTALL_TARGETS(/bin ThresholdSegmentationLevelSetFltkGui)
 
-IF(CMAKE_COMPILER_IS_GNUCXX)
-  SET_SOURCE_FILES_PROPERTIES (SegmenterConsole.cxx PROPERTIES COMPILE_FLAGS -Wno-cast-qual)
-  SET_SOURCE_FILES_PROPERTIES (Segmenter.cxx PROPERTIES COMPILE_FLAGS -Wno-cast-qual)
-ENDIF(CMAKE_COMPILER_IS_GNUCXX)
+TARGET_LINK_LIBRARIES (ThresholdSegmentationLevelSetFltkGui
+ITKBasicFilters
+ITKIO
+ITKNumerics
+ITKFltkImageViewer
+)
+
+
+
