@@ -38,9 +38,18 @@ ShapeDetectionLevelSetGUI.fl
 )
 
 FLTK_WRAP_UI( ShapeDetectionLevelSet ${ShapeDetectionLevelSet_GUI_SRCS} )
+
+SET(ShapeDetectionLevelSet_SRCS
+ShapeDetectionLevelSetBase.cxx
+ShapeDetectionLevelSet.cxx
+${ShapeDetectionLevelSet_FLTK_UI_SRCS}
+)
+
 ITK_DISABLE_FLTK_GENERATED_WARNINGS("${ShapeDetectionLevelSet_SRCS}")
 
-LINK_LIBRARIES (
+ADD_GUI_EXECUTABLE(ShapeDetectionLevelSet "${ShapeDetectionLevelSet_SRCS}")
+
+TARGET_LINK_LIBRARIES (ShapeDetectionLevelSet
 ITKCommon
 ITKNumerics
 ITKBasicFilters
@@ -56,11 +65,4 @@ ITKVtkFltk
 ITKFltkImageViewer
 )
 
-SET(ShapeDetectionLevelSet_SRCS
-ShapeDetectionLevelSetBase.cxx
-ShapeDetectionLevelSet.cxx
-${ShapeDetectionLevelSet_FLTK_UI_SRCS}
-)
-
-ADD_GUI_EXECUTABLE(ShapeDetectionLevelSet "${ShapeDetectionLevelSet_SRCS}")
 
