@@ -57,6 +57,7 @@ ITKIO
 ITKMetaIO
 ITKBasicFilters
 ITKStatistics
+ITKNumerics
 ITKFlFileWriter
 ITKFltkImageViewer
 )
