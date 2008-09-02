@@ -68,6 +68,7 @@ TARGET_LINK_LIBRARIES (ThresholdSegmentationLevelSetFltkGui
 ITKBasicFilters
 ITKIO
 ITKNumerics
+ITKAlgorithms
 ITKFltkImageViewer
 )
 
