@@ -493,6 +493,7 @@ ENDIF( CMAKE_GENERATOR MATCHES "Visual Studio 6" )
 # ITK Libraries
 SET(SNAP_ITK_LIBS
   ITKIO
+  ITKBasicFilters
 )
 
 # Core VTK libraries
