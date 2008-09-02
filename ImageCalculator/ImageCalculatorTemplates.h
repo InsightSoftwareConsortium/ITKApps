@@ -545,8 +545,8 @@ public:
   }
 
 protected:
-  string_tokenizer &operator=(const string_tokenizer &rhs) { return *this; };//explicitly prevent this
-  string_tokenizer(const string_tokenizer &rhs) {};//explicitly prevent this
+  string_tokenizer &operator=(const string_tokenizer &) { return *this; };//explicitly prevent this
+  string_tokenizer(const string_tokenizer &) {};//explicitly prevent this
 
 private:
   void init(const std::string &input, const char *const sep = " ")
