@@ -27,7 +27,7 @@
 class OptionList
 {
 public:
-  typedef std::multimap<const std::string, std::string> OptionMap ;
+  typedef std::multimap<std::string, std::string> OptionMap ;
   typedef std::vector<std::string> StringVector ;
 
   OptionList(int argc, char* argv[]) ;
