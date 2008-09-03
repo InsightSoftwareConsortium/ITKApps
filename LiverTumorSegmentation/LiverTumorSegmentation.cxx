@@ -1,24 +1,38 @@
+/*=========================================================================
 
+  Program:   Insight Segmentation & Registration Toolkit
+  Module:    LiverTumorSegmentation.cxx
+  Language:  C++
+  Date:      $Date$
+  Version:   $Revision$
 
+  Copyright (c) 2002 Insight Consortium. All rights reserved.
+  See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
 
+     This software is distributed WITHOUT ANY WARRANTY; without even 
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
 #include "LiverTumorSegmentation.h"
-
 #include "FL/Fl_File_Chooser.H"
-
 #include "vtkImageShiftScale.h"
-
 #include "ClickedPointEvent.h"
-
 #include "vtkImageBlend.h"
 
-static char *LiverTumorSegmentationModuleNames[] = { "Threshold Module",
-  "Threshold Level Set Module", "Confidence Connected Module", 
-  "Connected Threshold Module", "Isolated Connected Module", 
-  "Fast Marching Module", "Geodesic Active Contour Module", "Watershed Module"
-    }; 
+static const char *LiverTumorSegmentationModuleNames[] = {
+  "Threshold Module",
+  "Threshold Level Set Module",
+  "Confidence Connected Module", 
+  "Connected Threshold Module",
+  "Isolated Connected Module", 
+  "Fast Marching Module",
+  "Geodesic Active Contour Module",
+  "Watershed Module"
+}; 
 
 LiverTumorSegmentation::LiverTumorSegmentation()
-  {
+{
   m_AxialViewer.SetOrientation(    ISIS::ImageSliceViewer::Axial    );
   m_CoronalViewer.SetOrientation(  ISIS::ImageSliceViewer::Coronal  );
   m_SaggitalViewer.SetOrientation( ISIS::ImageSliceViewer::Saggital );
@@ -74,9 +88,9 @@ LiverTumorSegmentation::LiverTumorSegmentation()
 LiverTumorSegmentation::~LiverTumorSegmentation()
 {
   if( m_ShiftScaleImageFilter )
-  {
+    {
     m_ShiftScaleImageFilter->Delete();
-  }
+    }
 }
 
 
@@ -127,12 +141,12 @@ void LiverTumorSegmentation::Load( void )
     this->LoadPostProcessing();
     sprintf( m_MessageString, "File %s has been loaded successfully.", filename );
     m_MessageBar->label( m_MessageString );
-  }
+    }
   else
-  {
+    {
     sprintf( m_MessageString, "File %s loading unsuccessful.", filename );
     m_MessageBar->label( m_MessageString );
-  }
+    }
 }
 
 
@@ -270,7 +284,7 @@ void LiverTumorSegmentation::OnSegmentationModuleSelection( int module )
   m_Parameter103->hide();
   
   switch( module )
-  {
+    {
     case THRESHOLD:
       m_Parameter001->label("Lower Threshold");
       ftmp = this->m_ThresholdLevelSetModule.GetLowerThreshold();
@@ -417,21 +431,21 @@ void LiverTumorSegmentation::OnSegmentationModuleSelection( int module )
 
     case WATERSHED:
       break;
-  }
+    }
 }
 
 
 void LiverTumorSegmentation::OnSegmentationParametersOk( int module )
 {
   switch( module )
-  {
+    {
     case THRESHOLD:
 
       this->m_ThresholdLevelSetModule.SetLowerThreshold( atof(m_Parameter001->value() ) );
       this->m_ThresholdLevelSetModule.SetUpperThreshold( atof(m_Parameter002->value() ) );
       break;
 
-     case CONFIDENCE_CONNECTED:
+    case CONFIDENCE_CONNECTED:
       this->m_ConfidenceConnectedModule.SetMultiplier( atof(m_Parameter001->value() ) );
       this->m_ConfidenceConnectedModule.SetNumberOfIterations( (unsigned int)atof(m_Parameter002->value() ) );
       this->m_ConfidenceConnectedModule.SetInitialNeighborhoodRadius( (unsigned int)atof(m_Parameter003->value() ) );
@@ -467,8 +481,8 @@ void LiverTumorSegmentation::OnSegmentationParametersOk( int module )
 
     case WATERSHED:
       break;
-   }
-   m_SegmentationParametersWindow->hide();
+    }
+  m_SegmentationParametersWindow->hide();
 }
 
 
@@ -538,7 +552,7 @@ void LiverTumorSegmentation::SyncAllViews(void)
     }
   // Sync the selected point in all the views even if it is outside the image
   sprintf( m_MessageString, "Clicked Point:Indices(%ld,%ld,%ld),Position(%4.3f,%4.3f,%4.3f),Value(%4.3f)", 
-    index[0],index[1],index[2],m_SeedPoint[0], m_SeedPoint[1], m_SeedPoint[2], m_SeedValue );
+           index[0],index[1],index[2],m_SeedPoint[0], m_SeedPoint[1], m_SeedPoint[2], m_SeedValue );
 
   m_MessageBar->label( m_MessageString );
 
@@ -551,25 +565,25 @@ void LiverTumorSegmentation::SyncAllViews(void)
 
 void LiverTumorSegmentation::OnSegmentation( void )
 {
-   if (!LiverTumorSegmentationBase::DoSegmentation( m_ModuleType ))
-      return;
+  if (!LiverTumorSegmentationBase::DoSegmentation( m_ModuleType ))
+    return;
 
   m_RescaleIntensity->SetInput( m_LoadedVolume );
-    m_SegmentedVolumeRescaleIntensity->SetInput( m_SegmentedVolume );
+  m_SegmentedVolumeRescaleIntensity->SetInput( m_SegmentedVolume );
       
-    /* Put on Image Blending with Input and Segmented image. */
-    m_ShiftScaleImageFilter->SetInput( m_vtkImageBlender->GetOutput() );
-    m_ShiftScaleImageFilter->UpdateWholeExtent();
+  /* Put on Image Blending with Input and Segmented image. */
+  m_ShiftScaleImageFilter->SetInput( m_vtkImageBlender->GetOutput() );
+  m_ShiftScaleImageFilter->UpdateWholeExtent();
       
-    m_AxialViewer.Render();
-    m_CoronalViewer.Render();
-    m_SaggitalViewer.Render();
+  m_AxialViewer.Render();
+  m_CoronalViewer.Render();
+  m_SaggitalViewer.Render();
       
-    /* Switch on Opacity Control knob. */
-    this->SetSegmentedVolumeOpacityControlOn( m_SegmentedVolumeOpacity );
+  /* Switch on Opacity Control knob. */
+  this->SetSegmentedVolumeOpacityControlOn( m_SegmentedVolumeOpacity );
       
-    m_MessageBar->label( "Segmentation completed." );      
- }
+  m_MessageBar->label( "Segmentation completed." );      
+}
 
 
 double LiverTumorSegmentation::GetImageScale( void )
@@ -616,51 +630,24 @@ double LiverTumorSegmentation::GetSegmentedVolumeOpacity( void )
 bool LiverTumorSegmentation::SetSegmentedVolumeOpacity( const double value )
 {
   if ((value>=0.0f) && (value<=1.0f))
-  {
+    {
     m_SegmentedVolumeOpacity = value;
 
     m_vtkImageBlender->SetOpacity(0, 1.0 - m_SegmentedVolumeOpacity );
     m_vtkImageBlender->SetOpacity(1, m_SegmentedVolumeOpacity );
 
     return true;
-  }
+    }
   return false;
 }
 
 
 void LiverTumorSegmentation::OnOpacityControl( double opacity )
 {
-    this->SetSegmentedVolumeOpacity( opacity );
+  this->SetSegmentedVolumeOpacity( opacity );
     
-    m_ShiftScaleImageFilter->UpdateWholeExtent();
-    m_AxialViewer.Render();
-    m_CoronalViewer.Render();
-    m_SaggitalViewer.Render();
+  m_ShiftScaleImageFilter->UpdateWholeExtent();
+  m_AxialViewer.Render();
+  m_CoronalViewer.Render();
+  m_SaggitalViewer.Render();
 }
-
-
-//void LiverTumorSegmentation::LoadSegmentedVolume( void )
-//{
-//  const char *filename = fl_file_chooser("Segmented Volume Filename","*.*","");
-//
-//  temp_VolumeReader->SetFileName( filename );
-//  temp_VolumeReader->Update();
-//  m_SegmentedVolume = temp_VolumeReader->GetOutput();
-//    
-//  m_ShiftScaleImageFilter->UpdateWholeExtent();
-//
-//  m_AxialViewer.Render();
-//  m_CoronalViewer.Render();
-//  m_SaggitalViewer.Render();
-//}
-
-
-//void LiverTumorSegmentation::DoDebug( void )
-//{
-//  m_SeedIndex[0] = 56;
-//  m_SeedIndex[1] = 69;
-//  m_SeedIndex[2] = 91;
-//  this->OnSegmentation();
-//}
-
-

@@ -78,13 +78,18 @@ FLTK_WRAP_UI(LiverTumorSegmentationExample
   DicomImageReaderGUI.fl
   LiverTumorSegmentationGUI.fl
   )
+MESSAGE(ERROR "${LiverTumorSegmentationExample_FLTK_UI_SRCS}")
+
+ITK_DISABLE_FLTK_GENERATED_WARNINGS(
+  "main.cxx;LiverTumorSegmentation.cxx;${LiverTumorSegmentationExample_FLTK_UI_SRCS}"
+)
 
 ADD_EXECUTABLE(LiverTumorSegmentationExample
     main.cxx
     ${LIVER_TUMOR_SEGMENTATION_EXAMPLE_HEADS}
     ${LIVER_TUMOR_SEGMENTATION_EXAMPLE_SRCS}
-                ${LiverTumorSegmentationExample_FLTK_UI_SRCS}
-                )
+    ${LiverTumorSegmentationExample_FLTK_UI_SRCS}
+    )
 INSTALL_TARGETS(/bin LiverTumorSegmentationExample)
 
 TARGET_LINK_LIBRARIES( LiverTumorSegmentationExample
