@@ -1,7 +1,5 @@
 PROJECT(MIRegistration)
 
-
-
 IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
   FIND_PACKAGE(ITK)
@@ -20,17 +18,6 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 
-LINK_LIBRARIES(
-  vtkRendering
-  vtkGraphics
-  vtkImaging
-  vtkIO
-  vtkFiltering
-  vtkCommon
-)
-
-LINK_LIBRARIES(ITKCommon ITKIO ITKNumerics)
-
 SET(MIRegistration_SRCS
 OptionList
 MIRegistration
@@ -38,3 +25,15 @@ MIRegistration
 
 ADD_EXECUTABLE(MIRegistration ${MIRegistration_SRCS})
 INSTALL_TARGETS(/bin MIRegistration)
+
+TARGET_LINK_LIBRARIES(MIRegistration
+  vtkRendering
+  vtkGraphics
+  vtkImaging
+  vtkIO
+  vtkFiltering
+  vtkCommon
+  ITKCommon
+  ITKIO
+  ITKNumerics)
+
