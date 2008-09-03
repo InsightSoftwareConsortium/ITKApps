@@ -59,22 +59,23 @@ SET(EditorFltkGui_GUI_SRCS
 EditorConsoleGUI.fl
 )
 
-LINK_LIBRARIES (
-ITKBasicFilters
-ITKIO
-ITKNumerics
-vtkCommon
-vtkFiltering
-vtkImaging
-vtkIO
-vtkRendering
-ITKVtkFltk
-ITKFltkImageViewer
-)
-
 FLTK_WRAP_UI(EditorFltkGui   ${EditorFltkGui_GUI_SRCS})
-ITK_DISABLE_FLTK_GENERATED_WARNINGS("${EditorFltkGui_GUI_SRCS}")
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("EditorConsole.cxx;${EditorFltkGui_GUI_SRCS}")
 
 ADD_EXECUTABLE(EditorFltkGui ${EditorFltkGui_SRCS} ${EditorFltkGui_FLTK_UI_SRCS})
 INSTALL_TARGETS(/bin EditorFltkGui)
+
+TARGET_LINK_LIBRARIES (EditorFltkGui
+  ITKBasicFilters
+  ITKIO
+  ITKNumerics
+  vtkCommon
+  vtkFiltering
+  vtkImaging
+  vtkIO
+  vtkRendering
+  ITKVtkFltk
+  ITKFltkImageViewer
+)
+
 

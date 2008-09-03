@@ -47,8 +47,8 @@ vtkFlImageViewer()
   this->end();
 }
 //---------------------------------------------------------------------------
-SegmentedViewer::SegmentedViewer( int x, int y, int w, int h, const char *) : 
-vtkFlImageViewer(x,y,w,h)
+SegmentedViewer::SegmentedViewer( int lx, int ly, int lw, int lh, const char *) : 
+vtkFlImageViewer(lx,ly,lw,lh)
 {
 }
 //---------------------------------------------------------------------------
@@ -71,8 +71,8 @@ SegmentedViewer * SegmentedViewer::New()
 //---------------------------------------------------------------------------
 // main FLTK event handler
 int SegmentedViewer::handle( int event ) {
-  int x = Fl::event_x();
-  int y = Fl::event_y();
+  int ex = Fl::event_x();
+  int ey = Fl::event_y();
 
   int button = Fl::event_button();
 
@@ -81,12 +81,12 @@ int SegmentedViewer::handle( int event ) {
       case FL_PUSH: 
         if( (Fl::get_key(FL_Shift_L)) || (Fl::get_key(FL_Shift_R)) ) {
           if(button == 1) {
-            AppendRegion(x,y);
+            AppendRegion(ex,ey);
           }
         }
         else {
           if(button == 1) {
-            SelectRegion(x,y);
+            SelectRegion(ex,ey);
           }
         }
         break;
@@ -130,19 +130,19 @@ void SegmentedViewer::SetSourceViewer(SourceViewer* v) {
   sourceViewer = v;
 }
 //---------------------------------------------------------------------------
-void SegmentedViewer::SelectRegion(int x, int y) {
+void SegmentedViewer::SelectRegion(int lx, int ly) {
   
   float magX = resampler->GetAxisMagnificationFactor(0);
   float magY = resampler->GetAxisMagnificationFactor(1);
   
-  int z = this->GetZSlice();
+  int lz = this->GetZSlice();
 
   vtkImageData* input = this->GetInput();
 
   // y is flipped upside down
-  int* size = this->GetSize();
-  int height = size[1];
-  y = height-y;
+  int* lsize = this->GetSize();
+  int height = lsize[1];
+  ly = height-ly;
 
   // make sure point is in the whole extent of the image
 
@@ -154,19 +154,19 @@ void SegmentedViewer::SelectRegion(int x, int y) {
   int zMin = extent[4];
   int zMax = extent[5];
 
-  if( (x < xMin) || (x > xMax) || (y < yMin) || (y > yMax) || (z < zMin) || (z > zMax)) {
+  if( (lx < xMin) || (lx > xMax) || (ly < yMin) || (ly > yMax) || (lz < zMin) || (lz > zMax)) {
     return;
   }
 
   if( magX != 0 ) {
-    x = (int)(x/magX);
+    lx = (int)(lx/magX);
   }
 
   if( magY != 0 ) {
-    y = (int)(y/magY);
+    ly = (int)(ly/magY);
   }
 
-  WSmanager->CompileEquivalenciesFor( x, y, z, dataReader->GetOutput() );
+  WSmanager->CompileEquivalenciesFor( lx, ly, lz, dataReader->GetOutput() );
   WSmanager->ClearHighlightedValuesToSameColor();
   WSmanager->HighlightComputedEquivalencyList();
 
@@ -176,19 +176,19 @@ void SegmentedViewer::SelectRegion(int x, int y) {
 }
 
 //---------------------------------------------------------------------------
-void SegmentedViewer::AppendRegion(int x, int y) {
+void SegmentedViewer::AppendRegion(int lx, int ly) {
   
   float magX = resampler->GetAxisMagnificationFactor(0);
   float magY = resampler->GetAxisMagnificationFactor(1);
   
-  int z = this->GetZSlice();
+  int lz = this->GetZSlice();
 
   vtkImageData* input = this->GetInput();
 
   // y is flipped upside down
-  int* size = this->GetSize();
-  int height = size[1];
-  y = height-y;
+  int* lsize = this->GetSize();
+  int height = lsize[1];
+  ly = height-ly;
 
   // make sure point is in the whole extent of the image
 
@@ -200,19 +200,19 @@ void SegmentedViewer::AppendRegion(int x, int y) {
   int zMin = extent[4];
   int zMax = extent[5];
 
-  if( (x < xMin) || (x > xMax) || (y < yMin) || (y > yMax) || (z < zMin) || (z > zMax)) {
+  if( (lx < xMin) || (lx > xMax) || (ly < yMin) || (ly > yMax) || (lz < zMin) || (lz > zMax)) {
     return;
   }
 
   if( magX != 0 ) {
-    x =(int)(x/magX);
+    lx =(int)(lx/magX);
   }
 
   if( magY != 0 ) {
-    y = (int)(y/magY);
+    ly = (int)(ly/magY);
   }
 
-  WSmanager->AppendEquivalenciesFor( x, y, z, dataReader->GetOutput() );
+  WSmanager->AppendEquivalenciesFor( lx, ly, lz, dataReader->GetOutput() );
   WSmanager->ClearHighlightedValuesToSameColor();
   WSmanager->HighlightComputedEquivalencyList();
 

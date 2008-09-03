@@ -47,13 +47,13 @@ Fl_Gl_Window( 0, 0, 300, 300, "" ), vtkImageViewer()
   this->end();
 }
 //---------------------------------------------------------------------------
-vtkFlImageViewer::vtkFlImageViewer( int x, int y, int w, int h, const char *l ) : 
-  Fl_Gl_Window( x, y, w, h, l ), vtkImageViewer()
+vtkFlImageViewer::vtkFlImageViewer( int lx, int ly, int lw, int lh, const char *l ) : 
+  Fl_Gl_Window( lx, ly, lw, lh, l ), vtkImageViewer()
 {
-  int size[2];
-  size[0] = 256;
-  size[1] = 256;
-  this->SetSize(size);
+  int lsize[2];
+  lsize[0] = 256;
+  lsize[1] = 256;
+  this->SetSize(lsize);
   // this is a subclass of Fl_Group, call end so children cant be added
   this->end();
 }
@@ -92,11 +92,11 @@ void vtkFlImageViewer::draw(void){
   Render();
 }
 //---------------------------------------------------------------------------
-void vtkFlImageViewer::resize( int x, int y, int w, int h ) {
+void vtkFlImageViewer::resize( int lx, int ly, int lw, int lh ) {
   //UpdateSize( w, h );
 
   // resize the FLTK window by calling ancestor method
-  Fl_Gl_Window::resize( x, y, w, h ); 
+  Fl_Gl_Window::resize( lx, ly, lw, lh ); 
 }
 //---------------------------------------------------------------------------
 // main FLTK event handler

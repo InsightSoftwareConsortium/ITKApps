@@ -47,8 +47,8 @@ BinaryViewer::BinaryViewer() :
   this->end();
 }
 //---------------------------------------------------------------------------
-BinaryViewer::BinaryViewer( int x, int y, int w, int h, const char * ) : 
-  vtkFlImageViewer(x,y,w,h)
+BinaryViewer::BinaryViewer( int lx, int ly, int lw, int lh, const char * ) : 
+  vtkFlImageViewer(lx,ly,lw,lh)
 {
 }
 //---------------------------------------------------------------------------

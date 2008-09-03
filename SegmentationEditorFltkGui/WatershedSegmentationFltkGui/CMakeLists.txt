@@ -37,7 +37,7 @@ fltkRGBImageViewerGUI.fl
 )
 
 FLTK_WRAP_UI(WatershedSegmentationFltkGui3D   ${WatershedSegmentationFltkGui3D_GUI_SRCS})
-ITK_DISABLE_FLTK_GENERATED_WARNINGS("${WatershedSegmentationFltkGui3D_GUI_SRCS}")
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("Segmenter3D;SegmenterConsole3D.cxx;${WatershedSegmentationFltkGui3D_FLTK_UI_SRCS}")
 
 ADD_EXECUTABLE(WatershedSegmentationFltkGui3D ${WatershedSegmentationFltkGui3D_SRCS} ${WatershedSegmentationFltkGui3D_FLTK_UI_SRCS})
 INSTALL_TARGETS(/bin WatershedSegmentationFltkGui3D)

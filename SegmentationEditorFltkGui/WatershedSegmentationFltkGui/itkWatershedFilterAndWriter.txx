@@ -33,9 +33,6 @@ WatershedFilterAndWriter<TInputImageType>
   Superclass::GenerateData();
 
   // Now set up the writers for this data
-  typedef typename Superclass::ScalarType ScalarType;
-  typedef typename Superclass::OutputImageType OutputImageType;
-  
   typename WatershedSegmentTreeWriter<ScalarType>::Pointer treeWriter
     = WatershedSegmentTreeWriter<ScalarType>::New();
 

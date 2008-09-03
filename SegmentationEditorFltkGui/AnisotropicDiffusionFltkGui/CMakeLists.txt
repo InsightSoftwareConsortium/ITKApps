@@ -27,8 +27,9 @@ liFilterConsole2DGUI.fl
 
 FLTK_WRAP_UI(AnisotropicDiffusionFltkGui3D   ${AnisotropicDiffusionFltkGui3D_GUI_SRCS})
 FLTK_WRAP_UI(AnisotropicDiffusionFltkGui2D   ${AnisotropicDiffusionFltkGui2D_GUI_SRCS})
-ITK_DISABLE_FLTK_GENERATED_WARNINGS("${AnisotropicDiffusionFltkGui3D_GUI_SRCS}")
-ITK_DISABLE_FLTK_GENERATED_WARNINGS("${AnisotropicDiffusionFltkGui2D_GUI_SRCS}")
+
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("Filters3D;liFilterConsole3D.cxx;${AnisotropicDiffusionFltkGui3D_FLTK_UI_SRCS}")
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("liFilterConsole2D.cxx;${AnisotropicDiffusionFltkGui2D_FLTK_UI_SRCS}")
 
 ADD_EXECUTABLE(AnisotropicDiffusionFltkGui3D ${AnisotropicDiffusionFltkGui3D_SRCS} ${AnisotropicDiffusionFltkGui3D_FLTK_UI_SRCS})
 INSTALL_TARGETS(/bin AnisotropicDiffusionFltkGui3D)

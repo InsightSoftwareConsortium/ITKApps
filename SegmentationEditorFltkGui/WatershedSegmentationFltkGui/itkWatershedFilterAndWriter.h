@@ -41,6 +41,9 @@ public:
   typedef WatershedImageFilter<TInputImageType> Superclass;
   typedef SmartPointer<Self> Pointer;
   typedef SmartPointer<const Self> ConstPointer;
+  typedef typename Superclass::ScalarType ScalarType;
+  typedef typename Superclass::OutputImageType OutputImageType;
+  
   itkNewMacro(Self);
   itkTypeMacro(WatershedFilterAndWriter, WatershedImageFilter);
 

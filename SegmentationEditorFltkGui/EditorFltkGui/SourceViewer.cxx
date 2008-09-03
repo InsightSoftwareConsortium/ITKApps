@@ -50,8 +50,8 @@ vtkFlImageViewer()
   this->end();
 }
 //---------------------------------------------------------------------------
-SourceViewer::SourceViewer( int x, int y, int w, int h, const char * ) : 
-vtkFlImageViewer(x,y,w,h)
+SourceViewer::SourceViewer( int lx, int ly, int lw, int lh, const char * ) : 
+vtkFlImageViewer(lx,ly,lw,lh)
 {
   binaryVolume = 0;
 }
@@ -75,8 +75,8 @@ SourceViewer * SourceViewer::New()
 //---------------------------------------------------------------------------
 // main FLTK event handler
 int SourceViewer::handle( int event ) {
-  int x = Fl::event_x();
-  int y = Fl::event_y();
+  int ex = Fl::event_x();
+  int ey = Fl::event_y();
 
   int button = Fl::event_button();
 
@@ -84,26 +84,26 @@ int SourceViewer::handle( int event ) {
     {
       case FL_PUSH: 
         if(button == 1) {
-          PaintPixels(x, y);
+          PaintPixels(ex, ey);
         } 
         else if(button == 2) {
           if( (Fl::get_key(FL_Shift_L)) || (Fl::get_key(FL_Shift_R)) ) {
-            labeledViewer->AppendRegion(x,y);
+            labeledViewer->AppendRegion(ex,ey);
           }
           else {
-            labeledViewer->SelectRegion(x,y);
+            labeledViewer->SelectRegion(ex,ey);
           }
         }
        else if(button == 3) {
-         UnpaintPixels(x, y);
+         UnpaintPixels(ex, ey);
        }
          break;
       case FL_DRAG:
         if(button == 1) {
-          PaintPixels(x, y);
+          PaintPixels(ex, ey);
         } 
         else if(button == 3) {
-          UnpaintPixels(x, y);
+          UnpaintPixels(ex, ey);
         }
 
       case FL_FOCUS:
@@ -148,18 +148,18 @@ void SourceViewer::SetBinaryViewer(BinaryViewer* v) {
   binaryViewer = v;
 }
 //---------------------------------------------------------------------------
-void SourceViewer::PaintPixels(int x, int y) {
+void SourceViewer::PaintPixels(int lx, int ly) {
   float magX = resampler->GetAxisMagnificationFactor(0);
   float magY = resampler->GetAxisMagnificationFactor(1);
 
   vtkImageData* input = this->GetInput();
 
-  int z = this->GetZSlice();
+  int lz = this->GetZSlice();
 
   // y is flipped upside down
-  int* size = this->GetSize();
-  int height = size[1];
-  y = height-y;
+  int* lsize = this->GetSize();
+  int height = lsize[1];
+  ly = height-ly;
 
   // make sure point is in the whole extento f the image
   int* extent = input->GetWholeExtent();
@@ -171,24 +171,24 @@ void SourceViewer::PaintPixels(int x, int y) {
   int zMin = extent[4];
   int zMax = extent[5];
 
-  if( (x < xMin) || (x > xMax) || (y < yMin) || (y > yMax) || (z < zMin) || (z > zMax)) {
+  if( (lx < xMin) || (lx > xMax) || (ly < yMin) || (ly > yMax) || (lz < zMin) || (lz > zMax)) {
      return;
   }
 
   if( magX != 0 ) {
-    x = static_cast<int>(x/magX);
+    lx = static_cast<int>(lx/magX);
   }
 
   if( magY != 0 ) {
-    y = static_cast<int>(y/magY);
+    ly = static_cast<int>(ly/magY);
   }
 
-  binaryVolume->SetWithRadius(x, y, z);
+  binaryVolume->SetWithRadius(lx, ly, lz);
   binaryVolume->Modified();
 
   int paintRadiusValue = binaryVolume->GetPaintRadius();
 
-  binaryVolume->SetUpdateExtent(x-paintRadiusValue, x+paintRadiusValue, y-paintRadiusValue, y+paintRadiusValue, z, z);
+  binaryVolume->SetUpdateExtent(lx-paintRadiusValue, lx+paintRadiusValue, ly-paintRadiusValue, ly+paintRadiusValue, lz, lz);
 
   binaryViewer->Render();
   this->Render();
@@ -196,18 +196,18 @@ void SourceViewer::PaintPixels(int x, int y) {
   binaryVolume->SetUpdateExtentToWholeExtent();
 }
 //---------------------------------------------------------------------------
-void SourceViewer::UnpaintPixels(int x, int y) {
+void SourceViewer::UnpaintPixels(int lx, int ly) {
   float magX = resampler->GetAxisMagnificationFactor(0);
   float magY = resampler->GetAxisMagnificationFactor(1);
 
   vtkImageData* input = this->GetInput();
 
-  int z = this->GetZSlice();
+  int lz = this->GetZSlice();
   
   // y is flipped upside down
-  int* size = this->GetSize();
-  int height = size[1];
-  y = height-y;
+  int* lsize = this->GetSize();
+  int height = lsize[1];
+  ly = height-ly;
 
   // make sure point is in the whole extento f the image
   int* extent = input->GetWholeExtent();
@@ -218,23 +218,23 @@ void SourceViewer::UnpaintPixels(int x, int y) {
   int zMin = extent[4];
   int zMax = extent[5];
 
-  if( (x < xMin) || (x > xMax) || (y < yMin) || (y > yMax) || (z < zMin) || (z > zMax)) {
+  if( (lx < xMin) || (lx > xMax) || (ly < yMin) || (ly > yMax) || (lz < zMin) || (lz > zMax)) {
      return;
   }
 
   if( magX != 0 ) {
-    x = static_cast<int>(x/magX);
+    lx = static_cast<int>(lx/magX);
   }
 
   if( magY != 0 ) {
-    y = static_cast<int>(y/magY);
+    ly = static_cast<int>(ly/magY);
   }
 
   int paintRadiusValue = binaryVolume->GetPaintRadius();
-  binaryVolume->UnsetWithRadius(x, y, z);
+  binaryVolume->UnsetWithRadius(lx, ly, lz);
   binaryVolume->Modified();
 
-  binaryVolume->SetUpdateExtent(x-paintRadiusValue, x+paintRadiusValue, y-paintRadiusValue, y+paintRadiusValue, z, z);
+  binaryVolume->SetUpdateExtent(lx-paintRadiusValue, lx+paintRadiusValue, ly-paintRadiusValue, ly+paintRadiusValue, lz, lz);
 
   binaryViewer->Render();
   this->Render();
