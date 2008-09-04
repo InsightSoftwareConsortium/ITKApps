@@ -31,18 +31,8 @@ ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
 ${SimpleFuzzyConnectedness_SOURCE_DIR}
 )
 
-LINK_LIBRARIES (
-ITKCommon
-ITKNumerics
-ITKBasicFilters
-ITKIO
-ITKFltkImageViewer
-
-)
 
 FLTK_WRAP_UI(SimpleFuzzyConnectedness FuzzySegGrayUI.fl)
-
-ITK_DISABLE_FLTK_GENERATED_WARNINGS(FuzzySegGrayUI.fl)
 
 SET(Project_SRCS
 FuzzySegMain.cpp
@@ -50,6 +40,16 @@ FuzzySegGrayRun.cxx
 ${SimpleFuzzyConnectedness_FLTK_UI_SRCS}
 )
 
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${Project_SRCS}")
+
 
 ADD_GUI_EXECUTABLE(SimpleFuzzyConnectedness   "${Project_SRCS}")
+TARGET_LINK_LIBRARIES (SimpleFuzzyConnectedness
+ITKCommon
+ITKNumerics
+ITKBasicFilters
+ITKIO
+ITKFltkImageViewer
+
+)
 
