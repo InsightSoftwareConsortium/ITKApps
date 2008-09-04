@@ -25,13 +25,14 @@ INCLUDE_DIRECTORIES (
   ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
 )
 
-LINK_LIBRARIES (
+
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("DicomImageViewer.cxx")
+
+ADD_GUI_EXECUTABLE( DicomImageViewer DicomImageViewer.cxx )
+TARGET_LINK_LIBRARIES (DicomImageViewer
   ITKBasicFilters
   ITKIO
   ITKFltkImageViewer
 )
-
-
-ADD_GUI_EXECUTABLE( DicomImageViewer DicomImageViewer.cxx )
 
 
