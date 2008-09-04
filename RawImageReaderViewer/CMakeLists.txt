@@ -23,18 +23,11 @@ ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
 ${RawImageReaderViewer_SOURCE_DIR}
 )
 
-LINK_LIBRARIES (
-ITKBasicFilters
-ITKIO
-ITKFltkImageViewer
-)
-
 SET(RawImageReaderViewer_GUI_SRCS
 itkRawImageReaderViewerGUI.fl
 )
 
 FLTK_WRAP_UI(RawImageReaderViewer   ${RawImageReaderViewer_GUI_SRCS})
-ITK_DISABLE_FLTK_GENERATED_WARNINGS("${RawImageReaderViewer_GUI_SRCS}")
 
 SET(RawImageReaderViewer_SRCS
 itkRawImageReaderViewer.cxx
@@ -42,5 +35,13 @@ RawImageReaderViewer.cxx
 ${RawImageReaderViewer_FLTK_UI_SRCS}
 )
 
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${RawImageReaderViewer_SRCS}")
 ADD_GUI_EXECUTABLE(RawImageReaderViewer   "${RawImageReaderViewer_SRCS}")
+
+TARGET_LINK_LIBRARIES (RawImageReaderViewer
+ITKBasicFilters
+ITKIO
+ITKFltkImageViewer
+)
+
 
