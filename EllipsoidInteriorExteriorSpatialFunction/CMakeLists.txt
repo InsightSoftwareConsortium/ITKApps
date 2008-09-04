@@ -25,19 +25,19 @@ SET(ELLIPSOID_SPATIAL_FUNCTION_SRCS
 itkEllipsoidInteriorExteriorSpatialFunctionExample.cxx
 )
 
-LINK_LIBRARIES (
+ADD_EXECUTABLE(itkEllipsoidInteriorExteriorSpatialFunctionExample ${ELLIPSOID_SPATIAL_FUNCTION_SRCS})
+INSTALL_TARGETS(/bin itkEllipsoidInteriorExteriorSpatialFunctionExample)
+
+TARGET_LINK_LIBRARIES (itkEllipsoidInteriorExteriorSpatialFunctionExample
 ITKCommon
 ITKIO
 ITKBasicFilters
 )
-
-
 IF(UNIX)
-  LINK_LIBRARIES (
+  TARGET_LINK_LIBRARIES (itkEllipsoidInteriorExteriorSpatialFunctionExample
   -lm
   )
 ENDIF(UNIX)
 
-ADD_EXECUTABLE(itkEllipsoidInteriorExteriorSpatialFunctionExample ${ELLIPSOID_SPATIAL_FUNCTION_SRCS})
-INSTALL_TARGETS(/bin itkEllipsoidInteriorExteriorSpatialFunctionExample)
+
 
