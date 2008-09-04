@@ -511,12 +511,12 @@ for (unsigned int n=0; n < (*ee)->GetNumberOfNodes(); n++) {
         for (; !iter.IsAtEnd(); ++iter) {
           ind = iter.GetIndex();
           wind = iter.GetIndex();
-          VectorType disp = iter.Get();
+          VectorType ldisp = iter.Get();
 
           //std::cout << ind << std::endl;
 
           for (int n=0; n<2; n++) {
-            wind[n] += (long int) (disp[n]+0.5);
+            wind[n] += (long int) (ldisp[n]+0.5);
 //             if (wind[n] >= 0 && (unsigned int) wind[n] < (unsigned int) size[n]) {
 //             inside=true;
 //             //std::cout << "inside\n";

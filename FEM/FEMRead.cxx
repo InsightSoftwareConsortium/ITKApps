@@ -42,7 +42,7 @@
  */
 int main( int argc, char *argv[] ) {
 
-char* filename;
+const char* filename;
 
   if (argc>=2)
   {
