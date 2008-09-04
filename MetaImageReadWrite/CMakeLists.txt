@@ -14,10 +14,9 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 
-LINK_LIBRARIES (
+ADD_EXECUTABLE(MetaImageReadWrite MetaImageReadWrite.cxx )
+INSTALL_TARGETS(/bin MetaImageReadWrite)
+TARGET_LINK_LIBRARIES (MetaImageReadWrite
   ITKBasicFilters
   ITKIO
     )
-
-ADD_EXECUTABLE(MetaImageReadWrite MetaImageReadWrite.cxx )
-INSTALL_TARGETS(/bin MetaImageReadWrite)
