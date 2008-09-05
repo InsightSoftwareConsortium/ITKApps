@@ -15,6 +15,8 @@
 
 =========================================================================*/
 
+#ifndef __ImageViewer_txx
+#define __ImageViewer_txx
 #include "ImageViewer.h"
 
 
@@ -518,3 +520,5 @@ ImageViewer<ImagePixelType,OverlayPixelType>
 }
 
 //} // end namespace itk
+
+#endif
