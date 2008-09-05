@@ -106,13 +106,16 @@ CellularAggregate
 
   switch( Cell::Dimension )
   {
+#if CELL_DIMENSION == 2
   case 2:
     glColor3f( 1.0, 0.0, 0.0 ); 
     break;
+#else
   case 3:
     GLfloat color[] = { 1.0, 0.0, 0.0, 1.0 };
     glMaterialfv(GL_FRONT,GL_DIFFUSE,color);
     break;
+#endif
   }
  
   // Draw edges connecting neighbor cells
@@ -148,14 +151,17 @@ CellularAggregate
 
         switch( Cell::Dimension )
         {
+#if CELL_DIMENSION == 2
         case 2:
           glVertex3f( position1[0], position1[1], 0.0 );
           glVertex3f( position2[0], position2[1], 0.0 );
           break;
+#else
         case 3:
           glVertex3f( position1[0], position1[1], position1[2] );
           glVertex3f( position2[0], position2[1], position2[2] );
           break;
+#endif
         }
 
         ++neighbor;

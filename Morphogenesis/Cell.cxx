@@ -341,12 +341,14 @@ Cell
 
   switch( Dimension )
   {
+#if CELL_DIMENSION == 2
   case 2:
     glTranslated( position[0], position[1], 0.0 );
     glColor3f( m_Color.GetRed(), 
                m_Color.GetGreen(), 
                m_Color.GetBlue() );
     break;
+#else
   case 3:  
     glTranslated( position[0], position[1], position[2] );
     GLfloat color[] = { 
@@ -357,6 +359,7 @@ Cell
       };
     glMaterialfv(GL_FRONT,GL_DIFFUSE,color);
     break;
+#endif
   }
 
   const double scale = m_Radius / 5.0;
@@ -373,17 +376,20 @@ Cell
     glNewList( DisplayList, GL_COMPILE_AND_EXECUTE );
     switch( Dimension )
       {
+#if CELL_DIMENSION == 2
       case 2: 
         {
         DrawCircle();
         break;
         }
+#else
       case 3: 
         {
         DrawSphere();
         //DrawIcosaedron();
         break;
         }
+#endif
       }
     glEndList();
     }
