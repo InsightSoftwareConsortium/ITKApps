@@ -215,8 +215,7 @@ class ImageRegistrationApp : public Object
 
     typedef enum { ONEPLUSONE,
                    GRADIENT,
-                   ONEPLUSONEPLUSGRADIENT,
-                   LBFGS
+                   ONEPLUSONEPLUSGRADIENT
                  } OptimizerMethodType;
 
     typename NoneRegTransformType::Pointer       m_NoneRegTransform ;

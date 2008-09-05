@@ -31,6 +31,8 @@ INCLUDE_DIRECTORIES(
 # them to the build process of the target
 FLTK_WRAP_UI(Curves2DExtractorLib ceExtractorConsoleGUI.fl)
 ITK_DISABLE_FLTK_GENERATED_WARNINGS(ceExtractorConsoleGUI.fl)
+ITK_DISABLE_FLTK_GENERATED_WARNINGS(ceExtractorConsole.cxx)
+ITK_DISABLE_FLTK_GENERATED_WARNINGS(main.cxx)
 
 ADD_LIBRARY(Curves2DExtractorLib  ceExtractorConsole.cxx
             ceExtractorConsoleBase.cxx ${Curves2DExtractorLib_FLTK_UI_SRCS})

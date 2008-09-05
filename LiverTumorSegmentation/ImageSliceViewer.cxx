@@ -1,3 +1,8 @@
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4018 )
+#pragma warning ( disable : 4284 )
+#endif
+
 #include "ImageSliceViewer.h"
 
 #include "vtkImageData.h"
