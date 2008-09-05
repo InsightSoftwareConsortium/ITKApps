@@ -35,15 +35,6 @@ ${FLTK_INCLUDE_PATH}
 ${OPENGL_INCLUDE_PATH}
 )
 
-LINK_DIRECTORIES(
-${ITK_BINARY_DIR}/Code/Common
-${ITK_BINARY_DIR}/Code/BasicFilters
-${ITK_BINARY_DIR}/Code/Algorithms
-${ITK_BINARY_DIR}/Code/IO
-${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
-${ThresholdSegmentationLevelSetFltkGui_BINARY_DIR}
-)
-
 SET(ThresholdSegmentationLevelSetFltkGui_GUI_SRCS
 SegmenterConsoleGUI.fl
 ImageViewerGUI.fl
@@ -55,7 +46,6 @@ SET(ThresholdSegmentationLevelSetFltkGui_SRCS
 SegmenterConsole.cxx
 SegmenterConsoleBase.cxx
 Segmenter.cxx
-ImageViewer.txx
 ${ThresholdSegmentationLevelSetFltkGui_FLTK_UI_SRCS}
 )
 
