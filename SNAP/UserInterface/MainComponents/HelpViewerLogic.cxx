@@ -84,7 +84,10 @@ HelpViewerLogic
     return;
 
   // Clear the forward stack
-  m_LinkList.erase(++m_Iterator,m_LinkList.end());
+  if(m_Iterator != m_LinkList.end())
+    {
+    m_LinkList.erase(++m_Iterator,m_LinkList.end());
+    }
 
   // Add the new link to the list
   m_LinkList.push_back(string(url));
