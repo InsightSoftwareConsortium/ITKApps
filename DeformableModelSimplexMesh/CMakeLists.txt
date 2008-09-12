@@ -55,6 +55,10 @@ FLTK_WRAP_UI(DeformableModelSimplexMesh
   DeformableModelApplicationGUI.fl
   )
 
+ITK_DISABLE_FLTK_GENERATED_WARNINGS(
+  "InteractorObserver;${DeformableModelSimplexMesh_FLTK_UI_SRCS}"
+)
+
 ADD_EXECUTABLE(DeformableModelSimplexMesh ${APPLICATION_SOURCES} ${DeformableModelSimplexMesh_FLTK_UI_SRCS})
 INSTALL_TARGETS(/bin DeformableModelSimplexMesh)
 

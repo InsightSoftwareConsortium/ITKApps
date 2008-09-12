@@ -35,7 +35,7 @@ INCLUDE_DIRECTORIES(
 )
 
 FLTK_WRAP_UI(GeodesicActiveContour GeodesicActiveContourGUI.fl)
-ITK_DISABLE_FLTK_GENERATED_WARNINGS(GeodesicActiveContourGUI.fl)
+ITK_DISABLE_FLTK_GENERATED_WARNINGS("${GeodesicActiveContour_FLTK_UI_SRCS};GeodesicActiveContour.cxx")
 
 SET(GeodesicActiveContour_SRCS
   GeodesicActiveContourBase.cxx

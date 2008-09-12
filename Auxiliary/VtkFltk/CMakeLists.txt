@@ -6,6 +6,11 @@ INCLUDE_DIRECTORIES(
 
 FLTK_WRAP_UI(ITKVtkFltk fltkVTKImageViewerGUI.fl)
 
+ITK_DISABLE_FLTK_GENERATED_WARNINGS(
+  "vtkFlRenderWindowInteractor.cxx;${ITKVtkFltk_FLTK_UI_SRCS}"
+)
+
+
 ADD_LIBRARY(ITKVtkFltk
   vtkFlRenderWindowInteractor.cxx
   fltkVTKImageViewerBase.cxx

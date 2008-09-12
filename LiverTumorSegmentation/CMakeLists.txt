@@ -80,7 +80,7 @@ FLTK_WRAP_UI(LiverTumorSegmentationExample
   )
 
 ITK_DISABLE_FLTK_GENERATED_WARNINGS(
-  "main.cxx;LiverTumorSegmentation.cxx;${LiverTumorSegmentationExample_FLTK_UI_SRCS}"
+  "main.cxx;InteractorObserver;LiverTumorSegmentation.cxx;${LiverTumorSegmentationExample_FLTK_UI_SRCS}"
 )
 
 ADD_EXECUTABLE(LiverTumorSegmentationExample
