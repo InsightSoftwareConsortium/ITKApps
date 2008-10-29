@@ -136,6 +136,7 @@ void ReadDicomSeriesCastWriteImage( std::string inputDirectoryName, std::string 
   /** Connect the pipeline. */
   caster->SetInput(  seriesReader->GetOutput()  );
   writer->SetInput(  caster->GetOutput()  );
+  writer->UseCompressionOn();
 
   /**  Do the actual  conversion.  */
   writer->Update();
@@ -171,6 +172,7 @@ void ReadCastWriteImage( std::string inputFileName, std::string outputFileName )
   typename ImageWriterType::Pointer  writer = ImageWriterType::New();
   caster->SetShift( 0.0 );
   caster->SetScale( 1.0 );
+  writer->UseCompressionOn();
   writer->SetFileName( outputFileName.c_str()  );
 
   /*
