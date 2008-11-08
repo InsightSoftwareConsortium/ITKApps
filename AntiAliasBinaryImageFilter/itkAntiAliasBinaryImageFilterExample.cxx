@@ -55,12 +55,13 @@ int main(int argc, char *argv[] )
 
   unsigned long size[3];
 
-  float max_error;
+  float max_error = 0.01;
   unsigned int i;
-  unsigned int number_of_layers;
-  int output_type;
+  unsigned int number_of_layers = 2;
+  int output_type = 0;
 
-  std::string input_filename, output_filename;
+  std::string input_filename;
+  std::string output_filename = "antializedImage.mha";
 
   itk::AntiAliasBinaryImageFilter<BinaryImageType, RealImageType>::Pointer
     antialiaser = itk::AntiAliasBinaryImageFilter<BinaryImageType, RealImageType>::New();
