@@ -83,54 +83,7 @@ CellularAggregateViewer
 CellularAggregateViewer
 ::~CellularAggregateViewer()
 {
-
-  if( m_Renderer )
-    {
-    m_Renderer->RemoveActor( m_SurfaceActor );
-    m_Renderer = NULL;
-    }
-  if( m_GlyphFilter )
-    {
-    m_GlyphFilter->Delete();
-    m_GlyphFilter = NULL;
-    }
-  if( m_CellGlyphTransformFilter )
-    {
-    m_CellGlyphTransformFilter->Delete();
-    m_CellGlyphTransformFilter = NULL;
-    }
-  if( m_CellGlyphTransform )
-    {
-    m_CellGlyphTransform->Delete();
-    m_CellGlyphTransform = NULL;
-    }
-  if( m_Delaunay2DFilter )
-    {
-    m_Delaunay2DFilter->Delete();
-    m_Delaunay2DFilter = NULL;
-    }
-  if( m_CellGlyphSource )
-    {
-    m_CellGlyphSource->Delete();
-    m_CellGlyphSource = NULL;
-    }
-  if( m_SurfaceActor )
-    {
-    m_SurfaceActor->Delete();
-    m_SurfaceActor = NULL;
-    }
-  if( m_SurfaceMapper )
-    {
-    m_SurfaceMapper->Delete();
-    m_SurfaceMapper = NULL;
-    }
-  if( m_PolyData )
-    {
-    m_PolyData->Delete();
-    m_PolyData = NULL;
-    }
 }
-
 
 
 void
@@ -156,7 +109,7 @@ void
 CellularAggregateViewer
 ::DrawCellWalls(void) const
 {
-  vtkPoints* newPoints = vtkPoints::New();
+  vtkSmartPointer< vtkPoints > newPoints = vtkPoints::New();
 
   MeshConstPointer mesh = this->m_CellularAggregate->GetMesh();
     
@@ -184,7 +137,6 @@ CellularAggregateViewer
     }
 
   this->m_PolyData->SetPoints(newPoints);
-  newPoints->Delete();
 
   m_GlyphFilter->SetInput( this->m_PolyData );
   m_SurfaceMapper->SetInput( m_GlyphFilter->GetOutput() );
@@ -198,7 +150,7 @@ CellularAggregateViewer
   
   MeshConstPointer mesh = this->m_CellularAggregate->GetMesh();
 
-  vtkPoints* newPoints = vtkPoints::New();
+  vtkSmartPointer< vtkPoints > newPoints = vtkPoints::New();
 
   const unsigned int numberOfPoints = mesh->GetNumberOfPoints();
 
@@ -228,10 +180,9 @@ CellularAggregateViewer
     }
 
   this->m_PolyData->SetPoints(newPoints);
-  newPoints->Delete();
 
   // Adding now the triangle strips
-  vtkCellArray *lines  = vtkCellArray::New();
+  vtkSmartPointer< vtkCellArray > lines  = vtkCellArray::New();
   lines->Allocate( lines->EstimateSize( numberOfPoints, 20));
 
   vtkIdType pointIds[2];
@@ -271,7 +222,6 @@ CellularAggregateViewer
     }
 
   this->m_PolyData->SetLines( lines );
-  lines->Delete();
 
   m_SurfaceMapper->SetInput( m_PolyData );
 
@@ -294,7 +244,7 @@ void
 CellularAggregateViewer
 ::DrawDelaunay(void) const
 {
-  vtkPoints* newPoints = vtkPoints::New();
+  vtkSmartPointer< vtkPoints > newPoints = vtkPoints::New();
 
   MeshConstPointer mesh = this->m_CellularAggregate->GetMesh();
 
@@ -322,7 +272,6 @@ CellularAggregateViewer
     }
 
   this->m_PolyData->SetPoints(newPoints);
-  newPoints->Delete();
 
   if( pointId > 3 )
     {

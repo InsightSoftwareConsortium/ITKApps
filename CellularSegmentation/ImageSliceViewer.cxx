@@ -26,18 +26,14 @@ ImageSliceViewer
 
   m_Renderer->AddActor( m_Actor );
 
-  m_Actor->Delete();
-
   m_Camera = m_Renderer->GetActiveCamera();
   m_Camera->ParallelProjectionOn();
 
   m_RenderWindow->AddRenderer( m_Renderer );
 
-  m_Renderer->Delete();
-
   this->SetOrientation( Axial );
 
-  InteractorObserver * observer = InteractorObserver::New();
+  vtkSmartPointer< InteractorObserver > observer = InteractorObserver::New();
   observer->SetImageSliceViewer( this );
   m_InteractorObserver = observer;
 
@@ -61,29 +57,13 @@ ImageSliceViewer
 
   m_SliceNum = 0;
 
-  m_SphereMapper->Delete();
 }
-
 
 
 ImageSliceViewer
 ::~ImageSliceViewer()
 {
-  if( m_RenderWindow )
-    {
-    m_RenderWindow->Delete();
-    }   
-
-  if( m_InteractorObserver )
-    {
-    m_InteractorObserver->Delete();
-    }
-  if( m_Sphere )
-    {
-    m_Sphere->Delete();
-    }   
 }
-
 
 
 void
@@ -194,9 +174,8 @@ void
 {
   m_RenderWindow->SetInteractor( interactor );
 
-  vtkInteractorStyleImage * interactorStyle = vtkInteractorStyleImage::New();
+  vtkSmartPointer< vtkInteractorStyleImage > interactorStyle = vtkInteractorStyleImage::New();
   interactor->SetInteractorStyle( interactorStyle );
-  interactorStyle->Delete();
   interactor->AddObserver( ::vtkCommand::LeftButtonPressEvent, m_InteractorObserver );
   interactor->AddObserver( ::vtkCommand::LeftButtonReleaseEvent, m_InteractorObserver );
   interactor->AddObserver( ::vtkCommand::MouseMoveEvent, m_InteractorObserver );

@@ -11,6 +11,7 @@
 #include "vtkSphereSource.h" 
 #include "vtkPolyDataMapper.h" 
 #include "vtkPolyData.h" 
+#include "vtkSmartPointer.h" 
 
 #include "itkEventObject.h"
 #include "itkCommand.h"
@@ -117,19 +118,19 @@ protected:
 
 public:
 
-  vtkImageActor     * m_Actor;
+  vtkSmartPointer< vtkImageActor >     m_Actor;
 
-  vtkRenderer       * m_Renderer;
+  vtkSmartPointer< vtkRenderer >       m_Renderer;
 
-  vtkCamera         * m_Camera;
+  vtkSmartPointer< vtkCamera >         m_Camera;
 
-  vtkRenderWindow   * m_RenderWindow;
+  vtkSmartPointer< vtkRenderWindow >   m_RenderWindow;
 
   OrientationType     m_Orientation;
 
   int                 m_SliceNum;
 
-  vtkCommand        * m_InteractorObserver;
+  vtkSmartPointer< vtkCommand >        m_InteractorObserver;
 
   itk::Object::Pointer   m_Notifier;
 
@@ -141,11 +142,9 @@ public:
 
   double              m_SelectPoint[3];
 
-  vtkActor          * m_SphereActor;
-  vtkSphereSource   * m_Sphere;
-  vtkPolyDataMapper * m_SphereMapper;
-
-  
+  vtkSmartPointer< vtkActor >           m_SphereActor;
+  vtkSmartPointer< vtkSphereSource >    m_Sphere;
+  vtkSmartPointer< vtkPolyDataMapper >  m_SphereMapper;
 };
 
 

@@ -28,15 +28,16 @@
 #include "itkObjectFactory.h"
 #include "itkBioCellularAggregate.h"
 
-class vtkPolyData;
-class vtkPolyDataMapper;
-class vtkRenderer;
-class vtkActor;
-class vtkDelaunay2D;
-class vtkGlyph2D;
-class vtkCylinderSource;
-class vtkTransform;
-class vtkTransformPolyDataFilter;
+#include "vtkPolyData.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkRenderer.h"
+#include "vtkActor.h"
+#include "vtkDelaunay2D.h"
+#include "vtkGlyph2D.h"
+#include "vtkCylinderSource.h"
+#include "vtkTransform.h"
+#include "vtkTransformPolyDataFilter.h"
+#include "vtkSmartPointer.h"
 
 namespace itk {
 
@@ -106,15 +107,15 @@ protected:
 private:
   CellularAggregateConstPointer   m_CellularAggregate;
 
-  vtkPolyData          *m_PolyData;
-  vtkRenderer          *m_Renderer;
-  vtkPolyDataMapper    *m_SurfaceMapper;
-  vtkActor             *m_SurfaceActor;
-  vtkDelaunay2D        *m_Delaunay2DFilter;
-  vtkGlyph2D           *m_GlyphFilter;
-  vtkCylinderSource    *m_CellGlyphSource;
-  vtkTransform         *m_CellGlyphTransform;       
-  vtkTransformPolyDataFilter *m_CellGlyphTransformFilter; 
+  vtkSmartPointer< vtkPolyData >                  m_PolyData;
+  vtkSmartPointer< vtkRenderer >                  m_Renderer;
+  vtkSmartPointer< vtkPolyDataMapper >            m_SurfaceMapper;
+  vtkSmartPointer< vtkActor >                     m_SurfaceActor;
+  vtkSmartPointer< vtkDelaunay2D >                m_Delaunay2DFilter;
+  vtkSmartPointer< vtkGlyph2D >                   m_GlyphFilter;
+  vtkSmartPointer< vtkCylinderSource >            m_CellGlyphSource;
+  vtkSmartPointer< vtkTransform  >                m_CellGlyphTransform;       
+  vtkSmartPointer< vtkTransformPolyDataFilter >   m_CellGlyphTransformFilter; 
 
   DisplayOptionType     m_DisplayOption;
 };
