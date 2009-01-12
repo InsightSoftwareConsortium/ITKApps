@@ -131,6 +131,9 @@ CellularAggregate
       PointType position1;
       PointType position2;
 
+      position1.Fill(0.0);
+      position2.Fill(0.0);
+
       m_Mesh->GetPoint( id1, &position1 );
 
       VoronoiRegionAutoPointer voronoiRegion;
@@ -683,7 +686,7 @@ CellularAggregate
 
       const IdentifierType cell2Id = (*neighbor);  
 
-      Cell     * cell2;
+      Cell     * cell2 = NULL;
       PointType  position2;
       
       if( !m_Mesh->GetPoint(      cell2Id, &position2 ) )
@@ -741,7 +744,7 @@ CellularAggregate
 
     PointsConstIterator   point2It   = beginPoints;
 
-    Cell  * cell1;
+    Cell  * cell1 = NULL;
 
     IdentifierType cell1Id = point1It.Index();
     m_Mesh->GetPointData( cell1Id, &cell1 );
