@@ -17,6 +17,8 @@
 #ifndef __castconverthelpers_h__
 #define __castconverthelpers_h__
 
+#include "castconvertConfigure.h"
+
 /** Basic Image support. */
 #include "itkImage.h"
 #include "itkImageIORegion.h"
@@ -37,6 +39,16 @@
 /** One of these is used to cast the image. */
 #include "itkShiftScaleImageFilter.h"
 #include "itkRescaleIntensityImageFilter.h"
+
+#ifdef USE_VTK
+#include "itkImageToVTKImageFilter.h"
+#include "vtkSmartPointer.h"
+#include "vtkImageData.h"
+#include "vtkXMLImageDataWriter.h"
+#include "vtkMetaImageWriter.h"
+#include "vtkPointData.h"
+#include "vtkDataArray.h"
+#endif
 
 /** Print image information from the reader and the writer. */
 template< class ReaderType, class WriterType >
@@ -138,6 +150,26 @@ void ReadDicomSeriesCastWriteImage( std::string inputDirectoryName, std::string 
   writer->SetInput(  caster->GetOutput()  );
   writer->UseCompressionOn();
 
+  // Handle .vti files as well.
+#ifdef USE_VTK
+  if (outputFileName.rfind(".vti") == (outputFileName.size()-4))
+    {
+    typedef itk::ImageToVTKImageFilter< OutputImageType > ITKToVTKFilterType;
+    typename ITKToVTKFilterType::Pointer itktovtk = ITKToVTKFilterType::New();
+    caster->Update();
+    itktovtk->SetInput( caster->GetOutput() );
+    itktovtk->Update();
+    
+    vtkSmartPointer< vtkXMLImageDataWriter > writer_vti 
+      = vtkSmartPointer< vtkXMLImageDataWriter >::New();
+    writer_vti->SetFileName(outputFileName.c_str());
+    writer_vti->SetInput( itktovtk->GetOutput() );
+    writer_vti->Write();
+    std::cout << "Wrote: " << outputFileName << std::endl;
+    return;
+    }
+#endif
+
   /**  Do the actual  conversion.  */
   writer->Update();
 
@@ -184,9 +216,35 @@ void ReadCastWriteImage( std::string inputFileName, std::string outputFileName )
   */
   /** Connect the pipeline. */
   caster->SetInput( reader->GetOutput() );
-  writer->SetInput( caster->GetOutput() );
+
+  // Handle .vti files as well.
+#ifdef USE_VTK
+  std::cout << __FILE__ << __LINE__ << std::endl;
+  if (outputFileName.rfind(".vti") == (outputFileName.size()-4))
+    {
+      std::cout << __FILE__ << __LINE__ << std::endl;
+    typedef itk::ImageToVTKImageFilter< OutputImageType > ITKToVTKFilterType;
+    typename ITKToVTKFilterType::Pointer itktovtk = ITKToVTKFilterType::New();
+    caster->Update();
+    itktovtk->SetInput( caster->GetOutput() );
+    itktovtk->Update();
+    
+    vtkSmartPointer< vtkXMLImageDataWriter > writer_vti 
+      = vtkSmartPointer< vtkXMLImageDataWriter >::New();
+    writer_vti->SetFileName(outputFileName.c_str());
+    writer_vti->SetInput( itktovtk->GetOutput() );
+
+    // necessary to give the data array a name others reading it fails !!
+    itktovtk->GetOutput()->GetPointData()->GetScalars()->SetName("Scalars_");
+
+    writer_vti->Write();
+    std::cout << "Wrote: " << outputFileName << std::endl;
+    return;
+    }
+#endif
 
   /** Do the actual conversion. */
+  writer->SetInput( caster->GetOutput() );
   writer->Update();
 
   /** Print information. */
