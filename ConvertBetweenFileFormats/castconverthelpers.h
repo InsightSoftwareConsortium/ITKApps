@@ -164,6 +164,10 @@ void ReadDicomSeriesCastWriteImage( std::string inputDirectoryName, std::string 
       = vtkSmartPointer< vtkXMLImageDataWriter >::New();
     writer_vti->SetFileName(outputFileName.c_str());
     writer_vti->SetInput( itktovtk->GetOutput() );
+
+    // necessary to give the data array a name others reading it fails !!
+    itktovtk->GetOutput()->GetPointData()->GetScalars()->SetName("Scalars_");
+    
     writer_vti->Write();
     std::cout << "Wrote: " << outputFileName << std::endl;
     return;
@@ -219,10 +223,8 @@ void ReadCastWriteImage( std::string inputFileName, std::string outputFileName )
 
   // Handle .vti files as well.
 #ifdef USE_VTK
-  std::cout << __FILE__ << __LINE__ << std::endl;
   if (outputFileName.rfind(".vti") == (outputFileName.size()-4))
     {
-      std::cout << __FILE__ << __LINE__ << std::endl;
     typedef itk::ImageToVTKImageFilter< OutputImageType > ITKToVTKFilterType;
     typename ITKToVTKFilterType::Pointer itktovtk = ITKToVTKFilterType::New();
     caster->Update();
