@@ -106,7 +106,7 @@ int  main(  int  argc,  char *argv[] )
   std::string  input = argv[ 1 ];
   std::string outputFileName = argv[ 2 ];
   std::string outputPixelComponentType = "";
-  if ( argc == 4 ) outputPixelComponentType = argv[ 3 ];
+  if ( argc >= 4 ) outputPixelComponentType = argv[ 3 ];
 
   /** Make sure last character of input != "/".
   * Otherwise FileIsDirectory() won't work.
@@ -119,6 +119,7 @@ int  main(  int  argc,  char *argv[] )
   /** Check if input is a file or a directory. */
   bool exists = itksys::SystemTools::FileExists( input.c_str() );
   bool isDir = itksys::SystemTools::FileIsDirectory( input.c_str() );
+  bool isVTI = (input.rfind(".vti") == (input.size()-4));
   bool isDICOM = false;
   std::string inputFileName, inputDirectoryName;
 
@@ -180,12 +181,12 @@ int  main(  int  argc,  char *argv[] )
   ReaderType::Pointer testReader = ReaderType::New();
 
   /** Setup the testReader. */
-  if ( !isDICOM )
+  if ( !isDICOM && !isVTI )
   {
     /** Set the inputFileName in the testReader. */
     testReader->SetFileName( inputFileName.c_str() );
   }
-  else
+  else if (!isVTI)
   {
     /** Get a name of a 2D image. */
     GDCMNamesGeneratorType::Pointer nameGenerator = GDCMNamesGeneratorType::New();
@@ -202,19 +203,30 @@ int  main(  int  argc,  char *argv[] )
 
   } // end isDICOM
 
-  /** Generate all information. */
-  testReader->GenerateOutputInformation();
 
-  /** Extract the ImageIO from the testReader. */
-  ImageIOBaseType::Pointer testImageIOBase = testReader->GetImageIO();
+  // The defaults are arbitrary. They are computed from GenerateOutputInformation
+  // below. For VTI files, these are computed from the actual input image itself.
+  unsigned int inputDimension = 3;
+  unsigned int numberOfComponents = 1;
+  std::string inputPixelComponentType = "short";
+  std::string pixelType = "scalar";
 
   /** Get the component type, number of components, dimension and pixel type. */
-  unsigned int inputDimension = testImageIOBase->GetNumberOfDimensions();
-  unsigned int numberOfComponents = testImageIOBase->GetNumberOfComponents();
-  std::string inputPixelComponentType = testImageIOBase->GetComponentTypeAsString(
-    testImageIOBase->GetComponentType() );
-  std::string pixelType = testImageIOBase->GetPixelTypeAsString(
-    testImageIOBase->GetPixelType() );
+  if (!isVTI)
+    {
+    /** Generate all information. */
+    testReader->GenerateOutputInformation();
+
+    /** Extract the ImageIO from the testReader. */
+    ImageIOBaseType::Pointer testImageIOBase = testReader->GetImageIO();
+
+    numberOfComponents = testImageIOBase->GetNumberOfComponents();
+    inputDimension = testImageIOBase->GetNumberOfDimensions();
+    inputPixelComponentType = testImageIOBase->GetComponentTypeAsString(
+      testImageIOBase->GetComponentType() );
+    pixelType = testImageIOBase->GetPixelTypeAsString(
+      testImageIOBase->GetPixelType() );
+    }
 
   /** TASK 3:
    * Do some preparations.
