@@ -6,13 +6,15 @@ CONFIGURE_FILE( ${CMAKE_CURRENT_SOURCE_DIR}/castconvertConfigure.h.in
 
 ADD_EXECUTABLE(ConvertBetweenFileFormats castconvert.cxx  castconvertDicomScalar.cxx castconvertScalar.cxx  castconvertScalar2D.cxx castconvertScalar3D.cxx castconvertScalar4D.cxx castconvertScalar4DA.cxx castconvertScalar2DA.cxx castconvertScalar3DA.cxx castconvertDicomScalarA.cxx)
 
+INCLUDE_DIRECTORIES( 
+    ${CMAKE_CURRENT_SOURCE_DIR} 
+    ${CMAKE_CURRENT_BINARY_DIR} 
+    )
+
 TARGET_LINK_LIBRARIES(ConvertBetweenFileFormats  ITKIO ITKCommon )
 IF (VTK_FOUND)
   TARGET_LINK_LIBRARIES(ConvertBetweenFileFormats vtkIO vtkCommon vtkFiltering vtkImaging )
-  INCLUDE_DIRECTORIES( 
-    ${CMAKE_CURRENT_SOURCE_DIR} 
-    ${CMAKE_CURRENT_BINARY_DIR} 
-    ${InsightApplications_SOURCE_DIR}/Auxiliary/vtk )
+  INCLUDE_DIRECTORIES( ${InsightApplications_SOURCE_DIR}/Auxiliary/vtk )
 ENDIF (VTK_FOUND)
 
 INSTALL_TARGETS(/bin ConvertBetweenFileFormats)
