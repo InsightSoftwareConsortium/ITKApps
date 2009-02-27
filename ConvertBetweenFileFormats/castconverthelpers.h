@@ -279,28 +279,12 @@ void ReadCastWriteImage( std::string inputFileName, std::string outputFileName )
 // to deal with since VTK does not have templated images while ITK does.
 #ifdef USE_VTK
 
-#if defined(VTK_TYPE_USE___INT64)
-  #define vtkitkTemplateMacro___INT64 \
-    vtkTemplateMacroCase_si64(VTK___INT64, __int64, call);
-#else 
-  #define vtkitkTemplateMacro___INT64 
-#endif
-
-#if defined(VTK_TYPE_USE___INT64) && defined(VTK_TYPE_CONVERT_UI64_TO_DOUBLE)
-  #define vtkitkTemplateMacro___UINT64 \
-    vtkTemplateMacroCase_ui64(VTK_UNSIGNED___INT64, unsigned __int64, call);
-#else 
-  #define vtkitkTemplateMacro___UINT64
-#endif
-
 // ITK's support for 64 bit types, long long etc is poor, not as exhaustive
 // as VTK. Define an alternate macro here that ignores those types. Nobody
 // will use them anyway.
 #define vtkitkTemplateMacro(call)                                           \
   vtkTemplateMacroCase(VTK_DOUBLE, double, call);                           \
   vtkTemplateMacroCase(VTK_FLOAT, float, call);                             \
-  vtkitkTemplateMacro___INT64                                               \
-  vtkitkTemplateMacro___UINT64                                              \
   vtkTemplateMacroCase(VTK_LONG, long, call);                               \
   vtkTemplateMacroCase(VTK_UNSIGNED_LONG, unsigned long, call);             \
   vtkTemplateMacroCase(VTK_INT, int, call);                                 \
