@@ -236,12 +236,15 @@ OPTIONAL_APP(MIValidation)
 # Build the Intensity based 2D-3D Registration application
 OPTIONAL_APP(IntensityBased2D3DRegistration)
 
+# Build the application for converting file formats
+# and for applying basic image operations.
+OPTIONAL_APP(ConvertBetweenFileFormats)
+
 # Applications requiring MetaImages and Fltk GUI
 IF(FLTK_FOUND)
   IF(WIN32)
     ADD_DEFINITIONS(-DWIN32)
   ENDIF(WIN32)
-  OPTIONAL_APP(ConvertBetweenFileFormats)
   OPTIONAL_APP(DigitalArchive)
   OPTIONAL_APP(DistanceMapFilter)
   OPTIONAL_APP(DicomImageViewer)
