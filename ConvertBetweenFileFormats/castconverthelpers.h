@@ -199,8 +199,10 @@ void ReadCastWriteImage( std::string inputFileName, std::string outputFileName )
   typedef typename itk::ShiftScaleImageFilter<
     InputImageType, OutputImageType >                         ShiftScaleFilterType;
   typedef typename itk::ImageFileWriter< OutputImageType >    ImageWriterType;
+#ifdef USE_VTK
   typedef itk::VTKImageToImageFilter< InputImageType > VTKToITKFilterType;
   typename VTKToITKFilterType::Pointer vtktoitk = NULL;
+#endif
   typename ImageReaderType::Pointer reader = ImageReaderType::New();
   typename ShiftScaleFilterType::Pointer caster = ShiftScaleFilterType::New();
   typename ImageWriterType::Pointer  writer = ImageWriterType::New();
