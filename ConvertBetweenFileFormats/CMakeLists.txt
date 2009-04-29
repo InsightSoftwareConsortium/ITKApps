@@ -39,7 +39,10 @@ IF( BUILD_TESTING )
   ADD_TEST(ccvnt_from_jpg_unsigned_int    ${ConvertBetweenFileFormats_BINARY_DIR}/ConvertBetweenFileFormats ${IMAGE_PATH_OUTPUTS}/image_out.jpg    ${IMAGE_PATH_OUTPUTS}/image_in2.mhd unsigned_short)
   ADD_TEST(ccvnt_from_tiff                ${ConvertBetweenFileFormats_BINARY_DIR}/ConvertBetweenFileFormats ${IMAGE_PATH_OUTPUTS}/image_out.tiff   ${IMAGE_PATH_OUTPUTS}/image_in3.mhd)
   ADD_TEST(ccvnt_from_analyze75           ${ConvertBetweenFileFormats_BINARY_DIR}/ConvertBetweenFileFormats ${IMAGE_PATH_OUTPUTS}/image_out.hdr    ${IMAGE_PATH_OUTPUTS}/image_in4.mhd)
-  ADD_TEST(ccvnt_from_bmp_unsigned_char   ${ConvertBetweenFileFormats_BINARY_DIR}/ConvertBetweenFileFormats ${IMAGE_PATH_OUTPUTS}/image_out.bmp    ${IMAGE_PATH_OUTPUTS}/image_in5.mhd unsigned_short)
+  #
+  # Disabling this test because BMP are now only supporting reading of RGB images.
+  # ADD_TEST(ccvnt_from_bmp_unsigned_char   ${ConvertBetweenFileFormats_BINARY_DIR}/ConvertBetweenFileFormats ${IMAGE_PATH_OUTPUTS}/image_out.bmp    ${IMAGE_PATH_OUTPUTS}/image_in5.mhd unsigned_short)
+  #
   ADD_TEST(ccvnt_from_nrrd_float          ${ConvertBetweenFileFormats_BINARY_DIR}/ConvertBetweenFileFormats ${IMAGE_PATH_OUTPUTS}/image_out.nrrd   ${IMAGE_PATH_OUTPUTS}/image_in6.mhd unsigned_short)
   ADD_TEST(ccvnt_from_vtk_long            ${ConvertBetweenFileFormats_BINARY_DIR}/ConvertBetweenFileFormats ${IMAGE_PATH_OUTPUTS}/image_out.vtk    ${IMAGE_PATH_OUTPUTS}/image_in7.mhd unsigned_short)
   ADD_TEST(ccvnt_from_gipl                ${ConvertBetweenFileFormats_BINARY_DIR}/ConvertBetweenFileFormats ${IMAGE_PATH_OUTPUTS}/image_out.gipl   ${IMAGE_PATH_OUTPUTS}/image_in8.mhd)
@@ -52,7 +55,10 @@ IF( BUILD_TESTING )
  #ADD_TEST(compare_jpg_unsigned_int       ${IMAGE_COMPARE_TESTS} ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in2.mhd)
   ADD_TEST(compare_tiff                   ${IMAGE_COMPARE_TESTS} --compare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in3.mhd Dummy)
   ADD_TEST(compare_analyze75              ${IMAGE_COMPARE_TESTS} --compare ${IMAGE_PATH}/BigEndian.mhd ${IMAGE_PATH_OUTPUTS}/image_in4.mhd Dummy)
-  ADD_TEST(compare_bmp_unsigned_char      ${IMAGE_COMPARE_TESTS} --compare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in5.mhd Dummy)
+  #
+  # Disabling this test because BMP are now only supporting reading of RGB images.
+  # ADD_TEST(compare_bmp_unsigned_char      ${IMAGE_COMPARE_TESTS} --compare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in5.mhd Dummy)
+  #
   ADD_TEST(compare_nrrd_float             ${IMAGE_COMPARE_TESTS} --compare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in6.mhd Dummy)
   ADD_TEST(compare_vtk_long               ${IMAGE_COMPARE_TESTS} --compare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in7.mhd Dummy)
   ADD_TEST(compare_gipl                   ${IMAGE_COMPARE_TESTS} --compare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in8.mhd Dummy)
