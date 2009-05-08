@@ -144,7 +144,11 @@ void print_usage()
 static double compute_PercVal(ImagePointer& input, double quantile)
 {
   typedef itk::MinimumMaximumImageCalculator< ImageType > minMaxCalcType;
+#ifdef ITK_USE_REVIEW_STATISTICS
+  typedef itk::Statistics::Histogram<double> HistogramType;
+#else
   typedef itk::Statistics::Histogram<double, 1> HistogramType;
+#endif
   typedef itk::ImageRegionIterator< ImageType > Iterator;
 
   minMaxCalcType::Pointer minMaxCalc = minMaxCalcType::New();
@@ -156,10 +160,17 @@ static double compute_PercVal(ImagePointer& input, double quantile)
 
   // Histogram computation
   HistogramType::SizeType size;
+#ifdef ITK_USE_REVIEW_STATISTICS
+  size.SetSize(1);
+#endif
   size[0] = numBins;
   //std::cout << "Histo values " << minval <<" ...  " << maxval << " -> " << numBins << std::endl ;
 
   HistogramType::MeasurementVectorType minValVector, maxValVector;
+#ifdef ITK_USE_REVIEW_STATISTICS
+  minValVector.SetSize(1);
+  maxValVector.SetSize(1);
+#endif
   minValVector[0] = minval;
   maxValVector[0] = maxval + 1;
 
@@ -168,6 +179,9 @@ static double compute_PercVal(ImagePointer& input, double quantile)
 
   // put each image pixel into the histogram
   HistogramType::MeasurementVectorType measurement;
+#ifdef ITK_USE_REVIEW_STATISTICS
+  measurement.SetSize(1);
+#endif
   Iterator iter (input, input->GetBufferedRegion());
   while ( !iter.IsAtEnd() )
     {
@@ -184,7 +198,7 @@ static double compute_PercVal(ImagePointer& input, double quantile)
   double PercVoxval = (double) numVoxels / (100.0000001 - quantile);
   double curVoxval = 0;
   double PercIntval = 0;
-  HistogramType::Iterator histoIter;
+  HistogramType::ConstIterator histoIter(histogram);
   HistogramType::IndexType index;
   HistogramType::InstanceIdentifier instance;
   bool exitLoop = false;

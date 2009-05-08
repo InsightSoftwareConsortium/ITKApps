@@ -1,32 +1,36 @@
-PROJECT(GaussianMinimumErrorClassifier)
+IF (NOT ITK_USE_REVIEW_STATISTICS)
 
-IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
+  PROJECT(GaussianMinimumErrorClassifier)
 
-  FIND_PACKAGE(ITK)
-  IF(ITK_FOUND)
-    INCLUDE(${ITK_USE_FILE})
-  ELSE(ITK_FOUND)
-    MESSAGE(FATAL_ERROR
-            "Cannot build InsightApplications without ITK.  Please set ITK_DIR.")
-  ENDIF(ITK_FOUND)
+  IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
-ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
+    FIND_PACKAGE(ITK)
+    IF(ITK_FOUND)
+      INCLUDE(${ITK_USE_FILE})
+    ELSE(ITK_FOUND)
+      MESSAGE(FATAL_ERROR
+              "Cannot build InsightApplications without ITK.  Please set ITK_DIR.")
+    ENDIF(ITK_FOUND)
+
+  ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 
-INCLUDE_DIRECTORIES(
-${GaussianMinimumErrorClassifier_SOURCE_DIR}
-${GaussianMinimumErrorClassifier_SOURCE_DIR}/../MRIBiasCorrection
-)
+  INCLUDE_DIRECTORIES(
+  ${GaussianMinimumErrorClassifier_SOURCE_DIR}
+  ${GaussianMinimumErrorClassifier_SOURCE_DIR}/../MRIBiasCorrection
+  )
 
-SET (GaussianMinimumErrorClassifier_SRCS
-${GaussianMinimumErrorClassifier_SOURCE_DIR}/../MRIBiasCorrection/OptionList.cxx
-GaussianMinimumErrorClassifier.cxx
-)
+  SET (GaussianMinimumErrorClassifier_SRCS
+  ${GaussianMinimumErrorClassifier_SOURCE_DIR}/../MRIBiasCorrection/OptionList.cxx
+  GaussianMinimumErrorClassifier.cxx
+  )
 
-ADD_EXECUTABLE(GaussianMinimumErrorClassifier ${GaussianMinimumErrorClassifier_SRCS})
-INSTALL_TARGETS(/bin GaussianMinimumErrorClassifier)
-TARGET_LINK_LIBRARIES (GaussianMinimumErrorClassifier
-ITKCommon
-ITKBasicFilters
-ITKIO
-)
+  ADD_EXECUTABLE(GaussianMinimumErrorClassifier ${GaussianMinimumErrorClassifier_SRCS})
+  INSTALL_TARGETS(/bin GaussianMinimumErrorClassifier)
+  TARGET_LINK_LIBRARIES (GaussianMinimumErrorClassifier
+    ITKCommon
+    ITKBasicFilters
+    ITKIO
+  )
+
+ENDIF (NOT ITK_USE_REVIEW_STATISTICS)

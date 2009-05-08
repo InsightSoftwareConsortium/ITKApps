@@ -192,9 +192,11 @@ IF(NOT BORLAND)
 # Test the conditions for building the MRIBiasCorrection example
 OPTIONAL_APP(MRIBiasCorrection)
 
-# Add an option to build or not build the
-# GaussianMinimumErrorClassifier example
-OPTIONAL_APP(GaussianMinimumErrorClassifier)
+IF (NOT ITK_USE_REVIEW_STATISTICS)
+  # Add an option to build or not build the
+  # GaussianMinimumErrorClassifier example
+  OPTIONAL_APP(GaussianMinimumErrorClassifier)
+ENDIF (NOT ITK_USE_REVIEW_STATISTICS)
 
 # Build the AntiAliasBinaryImageFilter example
 OPTIONAL_APP(AntiAliasBinaryImageFilter)
