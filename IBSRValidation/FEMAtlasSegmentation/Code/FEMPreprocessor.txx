@@ -17,8 +17,6 @@
 #ifndef _FEMPreprocessor_txx
 #define _FEMPreprocessor_txx
 
-#include "itkImageToListAdaptor.h"
-#include "itkMeanCalculator.h"
 #include "FEMPreprocessor.h"
 #include "itkMinimumMaximumImageFilter.h"
 #include "itkShiftScaleImageFilter.h"
