@@ -27,8 +27,13 @@
 #include "itkEventObject.h"
 #include "itkTimeProbe.h"
 
+#ifdef ITK_USE_REVIEW_STATISTICS
+#include "itkSampleToHistogramFilter.h"
+#include "itkImageToListSampleAdaptor.h"
+#else
 #include "itkListSampleToHistogramGenerator.h"
 #include "itkScalarImageToListAdaptor.h"
+#endif
 
 #include "itkResampleImageFilter.h"
 #include "itkRescaleIntensityImageFilter.h"
@@ -262,22 +267,40 @@ void DeformableRegistration3DTimeSeries
   //Compute the histogram of the current 3D time series
   if(m_3dview_selected)
     {
+#ifdef ITK_USE_REVIEW_STATISTICS
+    typedef itk::Statistics::ImageToListSampleAdaptor< OutputImageType >   AdaptorType;
+#else
     typedef itk::Statistics::ScalarImageToListAdaptor< OutputImageType >   AdaptorType;
+#endif
     AdaptorType::Pointer adaptor = AdaptorType::New();
     adaptor->SetImage(  m_extractfilter->GetOutput());
     typedef OutputPixelType        HistogramMeasurementType;
+#ifdef ITK_USE_REVIEW_STATISTICS
+    typedef itk::Statistics::Histogram< HistogramMeasurementType > HistogramType;
+    typedef itk::Statistics::SampleToHistogramFilter< 
+                AdaptorType, HistogramType > GeneratorType;
+#else
     typedef itk::Statistics::ListSampleToHistogramGenerator< 
                                                   AdaptorType, 
                                                   HistogramMeasurementType 
                                                                   > GeneratorType;
+    typedef GeneratorType::HistogramType  HistogramType;
+#endif
     GeneratorType::Pointer generator = GeneratorType::New();
 
-    typedef GeneratorType::HistogramType  HistogramType;
 
     HistogramType::SizeType size;
+#ifdef ITK_USE_REVIEW_STATISTICS
+    size.SetSize(1);
+#endif
     size[0]=694;//4095  
+#ifdef ITK_USE_REVIEW_STATISTICS
+    generator->SetInput( adaptor );
+    generator->SetHistogramSize(size);
+#else
     generator->SetListSample( adaptor );
     generator->SetNumberOfBins( size );
+#endif
     generator->SetMarginalScale( 10.0 );
     generator->Update();
     HistogramType::ConstPointer histogram = generator->GetOutput();
