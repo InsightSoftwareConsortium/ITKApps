@@ -198,7 +198,11 @@ static double compute_PercVal(ImagePointer& input, double quantile)
   double PercVoxval = (double) numVoxels / (100.0000001 - quantile);
   double curVoxval = 0;
   double PercIntval = 0;
+#ifdef ITK_USE_REVIEW_STATISTICS
   HistogramType::ConstIterator histoIter(histogram);
+#else 
+  HistogramType::Iterator histoIter;
+#endif
   HistogramType::IndexType index;
   HistogramType::InstanceIdentifier instance;
   bool exitLoop = false;
