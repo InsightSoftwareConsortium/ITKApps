@@ -229,9 +229,6 @@ ENDIF(NOT BORLAND)
 # Build the FloodFilledSpatialFunctionExample
 OPTIONAL_APP(FloodFilledSpatialFunction)
 
-# Build the Multiresolution Registration example
-OPTIONAL_APP(MultiResMIRegistration)
-
 # Build the MI Validation application
 OPTIONAL_APP(MIValidation)
 
@@ -247,6 +244,7 @@ IF(FLTK_FOUND)
   IF(WIN32)
     ADD_DEFINITIONS(-DWIN32)
   ENDIF(WIN32)
+  OPTIONAL_APP(MultiResMIRegistration)
   OPTIONAL_APP(DigitalArchive)
   OPTIONAL_APP(DistanceMapFilter)
   OPTIONAL_APP(DicomImageViewer)
