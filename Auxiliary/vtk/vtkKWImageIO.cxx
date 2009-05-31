@@ -194,7 +194,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWImageIO );
-vtkCxxRevisionMacro(vtkKWImageIO, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(vtkKWImageIO, "$Revision: 1.3 $");
 
 //----------------------------------------------------------------------------
 vtkKWImageIO::vtkKWImageIO()
@@ -354,6 +354,10 @@ void vtkKWImageIO::ReadImageSeries()
     std::cerr << "Series UID not found: " << std::endl;
     return; 
     }
+
+  // This is needed to remove a extraneous terminator returned by
+  // ExposeMetaData
+  seriesIdentifier = seriesIdentifier.c_str();
 
   //Generate filenames of the DICOM series that belong
   //to the DICOM volume of the selected image  
