@@ -116,6 +116,39 @@ namespace Functor
     IntermediateImage=filter->GetOutput();                                 \
   }
 
+#include "itkDiscreteGaussianImageFilter.h"
+
+/*This function if called performs arithmetic operation with a constant value
+ * to all the pixels in an input image.*/
+template <class ImageType>
+typename ImageType::Pointer
+DoGaussian( typename ImageType::Pointer input ,  const double sigma )
+{
+  typedef itk::Image<float,ImageType::ImageDimension> InternalImageType;
+  //Cast to float
+  typedef itk::CastImageFilter<ImageType,InternalImageType> ToFloatCasterType;
+  typename ToFloatCasterType::Pointer toFloatCaster=ToFloatCasterType::New();
+  toFloatCaster->SetInput(input);
+
+  typedef itk::DiscreteGaussianImageFilter<InternalImageType, InternalImageType >  FilterType;
+  /*============Filter the inputVolume using DiscreteGaussianImageFilter
+   *   Include setting the x and y directions of the input images and setting order·
+   *     to be zero, and including normalizing Gaussian filter==================*/
+  typename FilterType::Pointer filter = FilterType::New();
+  filter->SetVariance( sigma );
+  filter->SetMaximumError( 0.01 );
+  filter->SetInput(toFloatCaster->GetOutput());
+  filter->Update();
+
+
+  typedef itk::CastImageFilter<InternalImageType,ImageType> FromFloatCasterType;
+  typename FromFloatCasterType::Pointer fromFloatCaster=FromFloatCasterType::New();
+  fromFloatCaster->SetInput(filter->GetOutput());
+  fromFloatCaster->Update();
+  //Cast to data type
+  return fromFloatCaster->GetOutput();
+}
+
 /*This function if called performs arithmetic operation with a constant value
  * to all the pixels in an input image.*/
 template <class ImageType>
@@ -156,6 +189,13 @@ Ifilters( typename ImageType::Pointer input ,  MetaCommand command )
     FunctorProcess(subtract,temp);
     }
 
+  /*Gaussian Filters input image with value of sigma image.*/
+  if(command.GetValueAsString("IGaussianSigma","constant") != "" )
+    {
+    const double temp=static_cast<double>(command.GetValueAsFloat("IGaussianSigma","constant"));
+    EffectiveInputFilters << "-ifgaussiansigma " << static_cast<double>(temp) << " ";
+    IntermediateImage=DoGaussian<ImageType>(IntermediateImage,temp);
+    }
 
   /*Make Binary Output image.*/
   if(command.GetValueAsBool("Ifbin","ifbin") )
@@ -220,6 +260,14 @@ Ofilters( typename ImageType::Pointer input , MetaCommand command )
     EffectiveOutputFilters << "-ofsubc " << static_cast<double>(temp) << " ";
     FunctorProcess(subtract,temp);
     }
+  /*Gaussian Filters output image with value of sigma image.*/
+  if(command.GetValueAsString("OGaussianSigma","constant") != "" )
+    {
+    const double temp=static_cast<double>(command.GetValueAsFloat("OGaussianSigma","constant"));
+    EffectiveOutputFilters << "-ofgaussiansigma " << static_cast<double>(temp) << " ";
+    IntermediateImage=DoGaussian<ImageType>(IntermediateImage,temp);
+    }
+
   /*Make Binary Output image.*/
   if(command.GetValueAsBool("Ofbin","ofbin") )
     {

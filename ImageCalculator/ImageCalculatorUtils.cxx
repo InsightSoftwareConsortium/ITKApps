@@ -156,42 +156,42 @@ int PrimaryImageCalculatorRoutine(int argc, char *argv[])
   //Multiply the output with a constant scalar value.
   command.SetOption("OMulC","",false,"Multiply Output Image with constant value");
   command.SetOptionLongTag("OMulC","ofmulc");
-  command.AddOptionField("OMulC","constant",MetaCommand::INT,false);
+  command.AddOptionField("OMulC","constant",MetaCommand::FLOAT,false);
 
   //Multiply the inputs with a constant scalar value.
   command.SetOption("IMulC","",false,"Multiply Accumulator Image with constant value");
   command.SetOptionLongTag("IMulC","ifmulc");
-  command.AddOptionField("IMulC","constant",MetaCommand::INT,false);
+  command.AddOptionField("IMulC","constant",MetaCommand::FLOAT,false);
 
   //Divide the output with a constant scalar value.
   command.SetOption("ODivC","",false,"Divide Output Image with constant value");
   command.SetOptionLongTag("ODivC","ofdivc");
-  command.AddOptionField("ODivC","constant",MetaCommand::INT,false);
+  command.AddOptionField("ODivC","constant",MetaCommand::FLOAT,false);
 
   //Divide the inputs with a constant scalar value.
   command.SetOption("IDivC","",false,"Divide Accumulator Image with constant value");
   command.SetOptionLongTag("IDivC","ifdivc");
-  command.AddOptionField("IDivC","constant",MetaCommand::INT,false);
+  command.AddOptionField("IDivC","constant",MetaCommand::FLOAT,false);
 
   //Add a constant scalar value to the output.
   command.SetOption("OAddC","",false,"Add Output Image with constant value");
   command.SetOptionLongTag("OAddC","ofaddc");
-  command.AddOptionField("OAddC","constant",MetaCommand::INT,false);
+  command.AddOptionField("OAddC","constant",MetaCommand::FLOAT,false);
 
   //Add a constant scalar value to the inputs.
   command.SetOption("IAddC","",false,"Add Accumulator Image with constant value");
   command.SetOptionLongTag("IAddC","ifaddc");
-  command.AddOptionField("IAddC","constant",MetaCommand::INT,false);
+  command.AddOptionField("IAddC","constant",MetaCommand::FLOAT,false);
 
   //Subtract a constant scalar value from the output.
   command.SetOption("OSubC","",false,"Subtract Output Image with constant value");
   command.SetOptionLongTag("OSubC","ofsubc");
-  command.AddOptionField("OSubC","constant",MetaCommand::INT,false);
+  command.AddOptionField("OSubC","constant",MetaCommand::FLOAT,false);
 
   //Subtract a constant scalar value from the inputs.
   command.SetOption("ISubC","",false,"Subtract Accumulator Image with constant value");
   command.SetOptionLongTag("ISubC","ifsubc");
-  command.AddOptionField("ISubC","constant",MetaCommand::INT,false);
+  command.AddOptionField("ISubC","constant",MetaCommand::FLOAT,false);
 
   //Square the output image pixel values.
   command.SetOption("OSqr","",false,"Square Accumulator Image before writing");
@@ -207,6 +207,16 @@ int PrimaryImageCalculatorRoutine(int argc, char *argv[])
   command.SetOption("Ofbin","",false,"Output Binary Image.");
   command.SetOptionLongTag("Ofbin","ofbin");
   command.AddOptionField("Ofbin","ofbin",MetaCommand::FLAG,false);
+
+  //Gaussian Filter with value of sigma to the output.
+  command.SetOption("OGaussianSigma","",false,"Gaussian smooth output image with sigma value");
+  command.SetOptionLongTag("OGaussianSigma","ofgaussiansigma");
+  command.AddOptionField("OGaussianSigma","constant",MetaCommand::FLOAT,false,"");
+
+  //Gaussian Filter with value of sigma to the inputs.
+  command.SetOption("IGaussianSigma","",false,"Gaussian smooth input image with sigma value");
+  command.SetOptionLongTag("IGaussianSigma","ifgaussiansigma");
+  command.AddOptionField("IGaussianSigma","constant",MetaCommand::FLOAT,false,"");
 
 
   //Square the input image pixel values.
@@ -247,7 +257,7 @@ int PrimaryImageCalculatorRoutine(int argc, char *argv[])
   //If a mask is given then a pixel value should be entered and statitsics will be calculated for input image under this value in the mask.
   command.SetOption("Statmaskvalue","",false,"Statistics in the image will be calculated for the pixels masked by this value.");
   command.SetOptionLongTag("Statmaskvalue","statmaskvalue");
-  command.AddOptionField("Statmaskvalue","constant",MetaCommand::INT,false);
+  command.AddOptionField("Statmaskvalue","constant",MetaCommand::INT,false,"");
 
   //Get the number of pixels in the output image.
   command.SetOption("StatNPX","",false,"Number of Pixels.");
