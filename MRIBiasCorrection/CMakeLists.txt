@@ -14,7 +14,7 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 
-INCLUDE_DIRECTORIES(${InsightApplications_SOURCE_DIR}/MRIBiasCorrection)
+INCLUDE_DIRECTORIES(MRIBiasCorrection_SOURCE_DIR)
 
 FOREACH(exe BiasFieldEstimator BiasImageGenerator IntensityHistogram3D
             InterSliceIntensityCorrector SlabIdentifier EnergyTablePlotter

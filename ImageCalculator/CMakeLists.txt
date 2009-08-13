@@ -1,5 +1,5 @@
 PROJECT(ImageCalculator)
-SET(CXX_TEST_PATH ${EXECUTABLE_OUTPUT_PATH})
+SET(CXX_TEST_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 ADD_EXECUTABLE(ImageCalculator  ImageCalculator.cxx ImageCalculatorProcess2D.cxx ImageCalculatorProcess3D.cxx ImageCalculatorUtils.cxx)
 TARGET_LINK_LIBRARIES(ImageCalculator ITKCommon ITKIO ITKAlgorithms ITKBasicFilters )
