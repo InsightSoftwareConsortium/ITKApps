@@ -194,7 +194,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWImageIO );
-vtkCxxRevisionMacro(vtkKWImageIO, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkKWImageIO, "$Revision: 1.4 $");
 
 //----------------------------------------------------------------------------
 vtkKWImageIO::vtkKWImageIO()
@@ -342,7 +342,15 @@ void vtkKWImageIO::ReadImageSeries()
   // Now that we found the appropriate ImageIO class, ask it to 
   // read the meta data from the image file.
   imageIO->SetFileName( this->FileName.c_str() );
-  imageIO->ReadImageInformation();
+  try
+    {
+    imageIO->ReadImageInformation();
+    }
+  catch(std::exception &e)
+    {
+    std::cerr << "Could not read: " << this->FileName.c_str() << std::endl;
+    return; 
+    }
 
   itk::MetaDataDictionary & dict = imageIO->GetMetaDataDictionary();
  
