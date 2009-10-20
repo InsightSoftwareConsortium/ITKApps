@@ -194,7 +194,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWImageIO );
-vtkCxxRevisionMacro(vtkKWImageIO, "$Revision: 1.4 $");
+vtkCxxRevisionMacro(vtkKWImageIO, "$Revision: 1.5 $");
 
 //----------------------------------------------------------------------------
 vtkKWImageIO::vtkKWImageIO()
@@ -346,9 +346,16 @@ void vtkKWImageIO::ReadImageSeries()
     {
     imageIO->ReadImageInformation();
     }
-  catch(std::exception &e)
+  catch( itk::ExceptionObject & excp )
     {
     std::cerr << "Could not read: " << this->FileName.c_str() << std::endl;
+    std::cerr << excp << std::endl;
+    return; 
+    }
+  catch( std::exception & excp )
+    {
+    std::cerr << "Could not read: " << this->FileName.c_str() << std::endl;
+    std::cerr << excp.what() << std::endl;
     return; 
     }
 
