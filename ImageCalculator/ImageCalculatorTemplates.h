@@ -592,7 +592,7 @@ public:
 
 protected:
   string_tokenizer &operator=(const string_tokenizer &) { return *this; };//explicitly prevent this
-  string_tokenizer(const string_tokenizer &) {};//explicitly prevent this
+  string_tokenizer(const string_tokenizer &):std::vector<std::string>() {};//explicitly prevent this
 
 private:
   void init(const std::string &input, const char *const sep = " ")
@@ -686,10 +686,19 @@ void ImageCalculatorReadWrite( MetaCommand &command )
       exit(-1);
       }
 
-    if( AccImage->GetSpacing() != image->GetSpacing() )
+    vnl_vector_fixed<double,3> spacingDifference;
+    spacingDifference[0]=AccImage->GetSpacing()[0]-image->GetSpacing()[0];
+    spacingDifference[1]=AccImage->GetSpacing()[1]-image->GetSpacing()[1];
+    spacingDifference[2]=AccImage->GetSpacing()[2]-image->GetSpacing()[2];
+
+    if(spacingDifference.two_norm() > 0.0001) //HACK:  Should be a percentage of the actaul spacing size.
       {
-      std::cout<<"Error::The pixel spacing of the images don't match. \n";
+      std::cout<<"ERROR: ::The pixel spacing of the images are not close enough. \n";
       exit(-1);
+      }
+    else if( AccImage->GetSpacing() != image->GetSpacing() )
+      {
+      std::cout<<"WARNING: ::The pixel spacing of the images don't match exactly. \n";
       }
     if(AccImage->GetDirection() != image->GetDirection())
       {
