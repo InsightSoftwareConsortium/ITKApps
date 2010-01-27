@@ -345,12 +345,7 @@ ceExtractorConsole
 
   this->ShowStatus("File Saved");
 
-  controlsGroup->activate();
-
-  m_InputViewer->Update();
-
-
-  m_Reader->InvokeEvent( itk::EndEvent() );
+  m_Writer->InvokeEvent( itk::EndEvent() );
 
 }
 

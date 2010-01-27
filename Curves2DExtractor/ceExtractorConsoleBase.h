@@ -18,6 +18,7 @@
 #define ce_FilterConsoleBase_h
 
 #include "itkImage.h"
+#include "itkRGBPixel.h"
 #include "itkRecursiveGaussianImageFilter.h"
 #include "itkAddImageFilter.h"
 #include "itkBinaryMagnitudeImageFilter.h"
@@ -61,6 +62,9 @@ public:
   typedef   itk::Image< VectorType, 2 >           VectorImageType;
   typedef   itk::Image< CovariantVectorType, 2 >  CovariantVectorImageType;
 
+  typedef itk::RGBPixel< unsigned char >          OutputPixelType;
+  typedef itk::Image< OutputPixelType, 2 >        OutputImageType;
+
   typedef   itk::Point<float,2>                   MeshPointDataType;
 
   typedef   itk::Mesh< MeshPointDataType, 3 >     MeshType;
@@ -69,7 +73,7 @@ public:
                             InputImageType >      VolumeReaderType;
 
   typedef   itk::ImageFileWriter< 
-                            InputImageType >      VolumeWriterType;
+                            OutputImageType >     VolumeWriterType;
 
   typedef   itk::Mesh< MeshType::PointType, 2 >   ImageSpaceMeshType;
 

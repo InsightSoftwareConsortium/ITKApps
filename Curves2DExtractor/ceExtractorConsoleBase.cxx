@@ -20,7 +20,7 @@
 #endif
 
 #include "ceExtractorConsoleBase.h"
-
+#include "itkMinimumMaximumImageCalculator.h"
 
 /************************************
  *
@@ -34,6 +34,7 @@ ceExtractorConsoleBase
   m_ImageLoaded = false;
 
   m_Reader     = VolumeReaderType::New();
+  m_Writer     = VolumeWriterType::New();
 
   m_RescaleIntensitySmoothed   = RescaleIntensityFilterType::New();
   m_RescaleIntensityMedialness = RescaleIntensityFilterType::New();
@@ -203,7 +204,7 @@ ceExtractorConsoleBase
   }
 
   m_Reader->SetFileName( filename );
-  m_Reader->Update();
+  m_Reader->UpdateLargestPossibleRegion();
 
   InputImageType::Pointer inputImage = m_Reader->GetOutput();
 
@@ -231,8 +232,69 @@ ceExtractorConsoleBase
     return;
   }
 
+  m_InverseParametricFilter->Update();
+
+  // THIS CODE MUST BE MOVED INTO A NEW FILTER
+  InputImageType::ConstPointer inputImage = m_Reader->GetOutput();
+
+  typedef itk::MinimumMaximumImageCalculator< InputImageType > CalculatorType;
+  CalculatorType::Pointer calculator = CalculatorType::New();
+  calculator->SetImage( inputImage );
+  calculator->Compute();
+
+  InputPixelType minimumValue = calculator->GetMinimum();
+  InputPixelType maximumValue = calculator->GetMaximum();
+
+  InputImageType::RegionType region = inputImage->GetLargestPossibleRegion();
+
+  OutputImageType::Pointer outputImage = OutputImageType::New();
+  outputImage->CopyInformation( inputImage );
+  outputImage->SetRegions( region );
+  outputImage->Allocate();
+  OutputPixelType black;
+  black.Fill(0);
+  outputImage->FillBuffer( black );
+
+  typedef itk::ImageRegionIterator< OutputImageType > OutputIterator;
+  typedef itk::ImageRegionConstIterator< InputImageType  > InputIterator;
+
+  InputIterator it( inputImage, region );
+  OutputIterator ot( outputImage, region );
+
+  it.GoToBegin();
+  ot.GoToBegin();
+  
+  OutputPixelType pixelValue;
+
+  typedef OutputPixelType::ValueType  OutputValueType;
+
+  const double factor = 
+    itk::NumericTraits< OutputValueType >::max() / ( maximumValue - minimumValue );
+
+  while( !it.IsAtEnd() )
+    {
+    OutputValueType normalizedValue = 
+      static_cast< OutputValueType >( (it.Get() - minimumValue) * factor );
+    pixelValue.Fill( normalizedValue );
+    ot.Set( pixelValue );
+    ++it;
+    ++ot;
+    }
+  // END OF CODE TO MOVE INTO A NEW FILTER
+
+  m_Writer->SetInput( outputImage );
+  
   m_Writer->SetFileName( filename );
-  m_Writer->Update();
+
+  try
+    {
+    m_Writer->Update();
+    }
+  catch( itk::ExceptionObject & excp )
+    {
+    std::cerr << excp << std::endl;
+    return;
+    }
 
 }
 
