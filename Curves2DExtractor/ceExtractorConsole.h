@@ -51,6 +51,8 @@ public:
   virtual void Hide(void);
   virtual void Load(void);
   virtual void Load(const char * filename);
+  virtual void SaveOutput(void);
+  virtual void SaveOutput(const char * filename);
   virtual void Quit(void);
   virtual void ShowStatus(const char * text);
   virtual void ShowInput(void);

@@ -1,17 +1,17 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0011 
+version 1.0109 
 header_name {.h} 
-code_name {.cxx} 
-gridx 5 
-gridy 5 
-snap 3
+code_name {.cxx}
 class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
 } {
-  Function {ceExtractorConsoleGUI()} {} {
+  Function {ceExtractorConsoleGUI()} {open
+  } {
     Fl_Window consoleWindow {
       label {2D Curves Extractor Console} open
-      xywh {5 23 1012 391}
-      code0 {\#if defined(_MSC_VER)\n\#pragma warning ( disable : 4786 )\n\#endif}
+      xywh {534 117 1010 390} type Double
+      code0 {\#if defined(_MSC_VER)
+\#pragma warning ( disable : 4786 )
+\#endif}
       code1 {\#include <ceExtractorConsoleBase.h>}
       code2 {\#include <fltkLightButton.h>} visible
     } {
@@ -145,7 +145,7 @@ class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
           xywh {915 115 10 50} box UP_BOX color 4
         }
       }
-      Fl_Group controlsGroup {
+      Fl_Group controlsGroup {open
         xywh {5 5 995 255} box DOWN_FRAME deactivate
       } {
         Fl_Light_Button inputButton {
@@ -268,6 +268,11 @@ class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
           xywh {870 150 100 40} type Normal value 1 selection_color 1 align 148
           class {fltk::LightButton}
         }
+        Fl_Button {} {
+          label Save
+          callback {SaveOutput();}
+          xywh {875 190 90 30} box ROUND_UP_BOX
+        }
       }
       Fl_Slider progressSlider {
         xywh {5 324 825 15} type {Horz Fill} selection_color 2
@@ -334,5 +339,7 @@ class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
   Function {ShowCurve2DPoints( void )} {return_type {virtual void}
   } {}
   Function {ShowExtractedParametricPoints( void )} {return_type {virtual void}
+  } {}
+  Function {SaveOutput( void )} {selected return_type {virtual void}
   } {}
 } 

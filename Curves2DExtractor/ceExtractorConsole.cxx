@@ -295,7 +295,67 @@ ceExtractorConsole
 
 }
 
-   
+ 
+/************************************
+ *
+ *  Save
+ *
+ ***********************************/
+void
+ceExtractorConsole
+::SaveOutput( void )
+{
+
+  const char * filename = fl_file_chooser("Image filename","*.*","curves.mha");
+  if( !filename )
+  {
+    return;
+  }
+
+  this->SaveOutput( filename );
+
+}
+
+
+
+ 
+/************************************
+ *
+ *  SaveOutput
+ *
+ ***********************************/
+void
+ceExtractorConsole
+::SaveOutput( const char * filename )
+{
+
+  this->ShowStatus("Saving output image file...");
+  
+  try 
+  {
+    ceExtractorConsoleBase::SaveOutput( filename );
+  }
+  catch(...)
+  {
+    this->ShowStatus("Problems writing file format");
+    controlsGroup->deactivate();
+    return;
+  }
+
+
+  this->ShowStatus("File Saved");
+
+  controlsGroup->activate();
+
+  m_InputViewer->Update();
+
+
+  m_Reader->InvokeEvent( itk::EndEvent() );
+
+}
+
+
+  
 /************************************
  *
  *  Show

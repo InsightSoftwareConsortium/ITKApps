@@ -218,6 +218,28 @@ ceExtractorConsoleBase
  
 /************************************
  *
+ *  SaveOutput
+ *
+ ***********************************/
+void
+ceExtractorConsoleBase 
+::SaveOutput( const char * filename )
+{
+
+  if( !filename )
+  {
+    return;
+  }
+
+  m_Writer->SetFileName( filename );
+  m_Writer->Update();
+
+}
+
+
+ 
+/************************************
+ *
  *  Show Progress
  *
  ***********************************/

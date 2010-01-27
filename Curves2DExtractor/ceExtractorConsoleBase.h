@@ -27,6 +27,7 @@
 #include "itkImageToParametricSpaceFilter.h"
 #include "itkMesh.h"
 #include "itkImageFileReader.h"
+#include "itkImageFileWriter.h"
 #include "itkJoinImageFilter.h"
 #include "itkSphereSpatialFunction.h"
 #include "itkInteriorExteriorMeshFilter.h"
@@ -66,6 +67,9 @@ public:
 
   typedef   itk::ImageFileReader< 
                             InputImageType >      VolumeReaderType;
+
+  typedef   itk::ImageFileWriter< 
+                            InputImageType >      VolumeWriterType;
 
   typedef   itk::Mesh< MeshType::PointType, 2 >   ImageSpaceMeshType;
 
@@ -149,6 +153,7 @@ public:
   ceExtractorConsoleBase();
   virtual ~ceExtractorConsoleBase();
   virtual void Load(const char * filename);
+  virtual void SaveOutput(const char * filename);
   virtual void ShowProgress(float);
   virtual void ShowStatus(const char * text);
   virtual void ShowSpatialFunctionControl( void );
@@ -158,6 +163,7 @@ public:
 
 protected:
   VolumeReaderType::Pointer               m_Reader;
+  VolumeWriterType::Pointer               m_Writer;
 
   InputGaussianFilterType::Pointer        m_Hx;
   InputGaussianFilterType::Pointer        m_Hy;
