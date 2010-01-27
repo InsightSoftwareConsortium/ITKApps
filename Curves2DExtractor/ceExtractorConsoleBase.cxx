@@ -208,9 +208,6 @@ ceExtractorConsoleBase
 
   InputImageType::Pointer inputImage = m_Reader->GetOutput();
 
-  inputImage->SetRequestedRegion( 
-      inputImage->GetLargestPossibleRegion() );
-
   m_ImageLoaded = true;
 
 }
@@ -280,6 +277,36 @@ ceExtractorConsoleBase
     ++it;
     ++ot;
     }
+
+
+  ImageSpaceMeshType::ConstPointer outputMesh = m_InverseParametricFilter->GetOutput();
+  typedef ImageSpaceMeshType::PointsContainer   OutputPointsContainer;
+  typedef OutputPointsContainer::ConstPointer   OutputPointsContainerConstPointer;
+  typedef OutputPointsContainer::ConstIterator  OutputPointsConstIterator;
+
+  OutputPointsContainerConstPointer outputPoints = outputMesh->GetPoints();
+
+  OutputPointsConstIterator pointItr = outputPoints->Begin();
+  OutputPointsConstIterator pointEnd = outputPoints->End();
+
+  OutputPixelType curveColor;
+  curveColor.SetRed(255);
+  curveColor.SetGreen(0);
+  curveColor.SetBlue(0);
+
+  OutputImageType::IndexType    outputIndex;
+  ImageSpaceMeshType::PointType outputPoint;
+
+  while( pointItr != pointEnd )
+    {
+    outputPoint = pointItr.Value();
+    outputIndex[0] = outputPoint[0];
+    outputIndex[1] = outputPoint[1];
+    outputImage->SetPixel( outputIndex, curveColor );
+    ++pointItr;
+    }
+
+  
   // END OF CODE TO MOVE INTO A NEW FILTER
 
   m_Writer->SetInput( outputImage );
