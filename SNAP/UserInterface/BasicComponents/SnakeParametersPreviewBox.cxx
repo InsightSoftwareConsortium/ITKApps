@@ -21,8 +21,7 @@
 
 extern void fl_alert(const char *, ...);
 
-using namespace itk;                              
-                              
+
 SnakeParametersPreviewBox
 ::SnakeParametersPreviewBox(int lx, int ly, int lw, int lh, const char *llabel)
 : FLTKCanvas(lx,ly,lw,lh,llabel), m_Interactor(this)
@@ -193,7 +192,7 @@ SnakeParametersPreviewBox::Interactor
     {
     // The closest point index
     m_ActiveControl = 0;
-    double minDistance;
+    double minDistance = itk::NumericTraits< double >::max();
 
     // Get a hold of the control points
     const SnakeParametersPreviewPipeline::ControlPointList 

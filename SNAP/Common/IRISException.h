@@ -17,7 +17,6 @@
 
 #include "SNAPCommon.h"
 
-using std::string;
 
 /** 
  * \class IRISException
@@ -25,7 +24,7 @@ using std::string;
  */
 class IRISException {
 protected:
-  string m_SimpleMessage;
+  std::string m_SimpleMessage;
 
 public:
   IRISException();

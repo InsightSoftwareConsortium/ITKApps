@@ -30,9 +30,6 @@
 #include "itkGDCMSeriesFileNames.h"
 #include <itksys/SystemTools.hxx>
 
-using std::map;
-using namespace itk;
-using namespace itk::SpatialOrientation;
 
 template <class TPixel>
 ImageIOWizardLogic<TPixel>
@@ -89,7 +86,7 @@ ImageIOWizardLogic<TPixel>
   m_FileFormatDescription[GuidedImageIOBase::FORMAT_VTK] = "VTK Image File";
 
   // Initialize the DICOM directory lister
-  m_DICOMLister = GDCMSeriesFileNames::New();
+  m_DICOMLister = itk::GDCMSeriesFileNames::New();
   
   // Initialize the text buffers
   m_SummaryTextBuffer = new Fl_Text_Buffer();
@@ -630,7 +627,7 @@ ImageIOWizardLogic<TPixel>
       GuessImageOrientation();
       }
     }
-  catch(ExceptionObject &exc)
+  catch(itk::ExceptionObject &exc)
   {
     // Clear the image and image IO
     m_Image = NULL;
@@ -756,69 +753,69 @@ ImageIOWizardLogic<TPixel>
   else
     {
     // Get the meta data for the image
-    MetaDataDictionary &mdd = m_Image->GetMetaDataDictionary();
+    itk::MetaDataDictionary &mdd = m_Image->GetMetaDataDictionary();
 
     // Find the entry dealing with orientation
-    typedef MetaDataObject<ValidCoordinateOrientationFlags> ObjectType;
+    typedef itk::MetaDataObject<itk::SpatialOrientation::ValidCoordinateOrientationFlags> ObjectType;
     ObjectType *entry = 
-      reinterpret_cast<ObjectType *> ( mdd[ITK_CoordinateOrientation].GetPointer() );
+      reinterpret_cast<ObjectType *> ( mdd[itk::ITK_CoordinateOrientation].GetPointer() );
 
     // If the entry has a value, map it to RAI
     if(entry)
       {
       // This is a really dumb way to process the flag, but it's the only way that
       // is guaranteed to stay up to date with ITK's flags. Thanks, VIM, for macros! 
-      ValidCoordinateOrientationFlags flag = entry->GetMetaDataObjectValue();
+      itk::SpatialOrientation::ValidCoordinateOrientationFlags flag = entry->GetMetaDataObjectValue();
       switch(flag) 
         {
-        case ITK_COORDINATE_ORIENTATION_RIP : SetRAI("RIP"); break;
-        case ITK_COORDINATE_ORIENTATION_LIP : SetRAI("LIP"); break;
-        case ITK_COORDINATE_ORIENTATION_RSP : SetRAI("RSP"); break;
-        case ITK_COORDINATE_ORIENTATION_LSP : SetRAI("LSP"); break;
-        case ITK_COORDINATE_ORIENTATION_RIA : SetRAI("RIA"); break;
-        case ITK_COORDINATE_ORIENTATION_LIA : SetRAI("LIA"); break;
-        case ITK_COORDINATE_ORIENTATION_RSA : SetRAI("RSA"); break;
-        case ITK_COORDINATE_ORIENTATION_LSA : SetRAI("LSA"); break;
-        case ITK_COORDINATE_ORIENTATION_IRP : SetRAI("IRP"); break;
-        case ITK_COORDINATE_ORIENTATION_ILP : SetRAI("ILP"); break;
-        case ITK_COORDINATE_ORIENTATION_SRP : SetRAI("SRP"); break;
-        case ITK_COORDINATE_ORIENTATION_SLP : SetRAI("SLP"); break;
-        case ITK_COORDINATE_ORIENTATION_IRA : SetRAI("IRA"); break;
-        case ITK_COORDINATE_ORIENTATION_ILA : SetRAI("ILA"); break;
-        case ITK_COORDINATE_ORIENTATION_SRA : SetRAI("SRA"); break;
-        case ITK_COORDINATE_ORIENTATION_SLA : SetRAI("SLA"); break;
-        case ITK_COORDINATE_ORIENTATION_RPI : SetRAI("RPI"); break;
-        case ITK_COORDINATE_ORIENTATION_LPI : SetRAI("LPI"); break;
-        case ITK_COORDINATE_ORIENTATION_RAI : SetRAI("RAI"); break;
-        case ITK_COORDINATE_ORIENTATION_LAI : SetRAI("LAI"); break;
-        case ITK_COORDINATE_ORIENTATION_RPS : SetRAI("RPS"); break;
-        case ITK_COORDINATE_ORIENTATION_LPS : SetRAI("LPS"); break;
-        case ITK_COORDINATE_ORIENTATION_RAS : SetRAI("RAS"); break;
-        case ITK_COORDINATE_ORIENTATION_LAS : SetRAI("LAS"); break;
-        case ITK_COORDINATE_ORIENTATION_PRI : SetRAI("PRI"); break;
-        case ITK_COORDINATE_ORIENTATION_PLI : SetRAI("PLI"); break;
-        case ITK_COORDINATE_ORIENTATION_ARI : SetRAI("ARI"); break;
-        case ITK_COORDINATE_ORIENTATION_ALI : SetRAI("ALI"); break;
-        case ITK_COORDINATE_ORIENTATION_PRS : SetRAI("PRS"); break;
-        case ITK_COORDINATE_ORIENTATION_PLS : SetRAI("PLS"); break;
-        case ITK_COORDINATE_ORIENTATION_ARS : SetRAI("ARS"); break;
-        case ITK_COORDINATE_ORIENTATION_ALS : SetRAI("ALS"); break;
-        case ITK_COORDINATE_ORIENTATION_IPR : SetRAI("IPR"); break;
-        case ITK_COORDINATE_ORIENTATION_SPR : SetRAI("SPR"); break;
-        case ITK_COORDINATE_ORIENTATION_IAR : SetRAI("IAR"); break;
-        case ITK_COORDINATE_ORIENTATION_SAR : SetRAI("SAR"); break;
-        case ITK_COORDINATE_ORIENTATION_IPL : SetRAI("IPL"); break;
-        case ITK_COORDINATE_ORIENTATION_SPL : SetRAI("SPL"); break;
-        case ITK_COORDINATE_ORIENTATION_IAL : SetRAI("IAL"); break;
-        case ITK_COORDINATE_ORIENTATION_SAL : SetRAI("SAL"); break;
-        case ITK_COORDINATE_ORIENTATION_PIR : SetRAI("PIR"); break;
-        case ITK_COORDINATE_ORIENTATION_PSR : SetRAI("PSR"); break;
-        case ITK_COORDINATE_ORIENTATION_AIR : SetRAI("AIR"); break;
-        case ITK_COORDINATE_ORIENTATION_ASR : SetRAI("ASR"); break;
-        case ITK_COORDINATE_ORIENTATION_PIL : SetRAI("PIL"); break;
-        case ITK_COORDINATE_ORIENTATION_PSL : SetRAI("PSL"); break;
-        case ITK_COORDINATE_ORIENTATION_AIL : SetRAI("AIL"); break;
-        case ITK_COORDINATE_ORIENTATION_ASL : SetRAI("ASL"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIP : SetRAI("RIP"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LIP : SetRAI("LIP"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSP : SetRAI("RSP"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LSP : SetRAI("LSP"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIA : SetRAI("RIA"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LIA : SetRAI("LIA"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSA : SetRAI("RSA"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LSA : SetRAI("LSA"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IRP : SetRAI("IRP"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ILP : SetRAI("ILP"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SRP : SetRAI("SRP"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SLP : SetRAI("SLP"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IRA : SetRAI("IRA"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ILA : SetRAI("ILA"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SRA : SetRAI("SRA"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SLA : SetRAI("SLA"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPI : SetRAI("RPI"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LPI : SetRAI("LPI"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI : SetRAI("RAI"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LAI : SetRAI("LAI"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPS : SetRAI("RPS"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LPS : SetRAI("LPS"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAS : SetRAI("RAS"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LAS : SetRAI("LAS"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PRI : SetRAI("PRI"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PLI : SetRAI("PLI"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ARI : SetRAI("ARI"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ALI : SetRAI("ALI"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PRS : SetRAI("PRS"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PLS : SetRAI("PLS"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ARS : SetRAI("ARS"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ALS : SetRAI("ALS"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IPR : SetRAI("IPR"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SPR : SetRAI("SPR"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IAR : SetRAI("IAR"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SAR : SetRAI("SAR"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IPL : SetRAI("IPL"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SPL : SetRAI("SPL"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IAL : SetRAI("IAL"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SAL : SetRAI("SAL"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PIR : SetRAI("PIR"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PSR : SetRAI("PSR"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIR : SetRAI("AIR"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASR : SetRAI("ASR"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PIL : SetRAI("PIL"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PSL : SetRAI("PSL"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIL : SetRAI("AIL"); break;
+        case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASL : SetRAI("ASL"); break;
         default: SetRAI("RAI"); break;
         }
       flagGuessed = true;
@@ -896,7 +893,7 @@ ImageIOWizardLogic<TPixel>
     m_OutSummaryOrigin->value(sout.str().c_str());
     
     // TODO: This is a workaround on an itk bug with RawImageIO
-    if(m_ImageIO->GetComponentType() != ImageIOBase::UNKNOWNCOMPONENTTYPE)
+    if(m_ImageIO->GetComponentType() != itk::ImageIOBase::UNKNOWNCOMPONENTTYPE)
       {
       // There actually is a type in the IO object
       m_OutSummaryPixelType->value(
@@ -913,8 +910,8 @@ ImageIOWizardLogic<TPixel>
 
     // Dump the contents of the meta data dictionary
     m_SummaryTextBuffer->text("");
-    MetaDataDictionary &mdd = m_ImageIO->GetMetaDataDictionary();
-    MetaDataDictionary::ConstIterator itMeta = mdd.Begin();
+    itk::MetaDataDictionary &mdd = m_ImageIO->GetMetaDataDictionary();
+    itk::MetaDataDictionary::ConstIterator itMeta = mdd.Begin();
     while(itMeta != mdd.End())
       {
       // Get the metadata as a generic object
@@ -925,7 +922,7 @@ ImageIOWizardLogic<TPixel>
       if( typeid(std::string) == meta->GetMetaDataObjectTypeInfo() )
         {
         // Cast the value to a string and print it
-        typedef MetaDataObject<std::string> ObjectType;
+        typedef itk::MetaDataObject<std::string> ObjectType;
         std::string value = ((ObjectType *)(meta))->GetMetaDataObjectValue();
 
         // For some weird reason, some of the strings returned by this method 
@@ -1374,8 +1371,10 @@ ImageIOWizardLogic<TPixel>
     // Hide the dialog
     m_WinOutput->hide();
     }
-  catch(ExceptionObject &exc)
-    { fl_alert("Error saving file: %s",exc.GetDescription()); }
+  catch(itk::ExceptionObject &exc)
+    {
+    fl_alert("Error saving file: %s",exc.GetDescription());
+    }
   
   // Restore the cursor
   m_WinOutput->cursor(FL_CURSOR_DEFAULT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);

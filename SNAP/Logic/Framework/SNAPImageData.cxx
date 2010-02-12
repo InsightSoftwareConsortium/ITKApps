@@ -39,7 +39,6 @@
 
 #include "SNAPImageData.h"
 
-using namespace itk;
 
 SNAPImageData
 ::SNAPImageData(IRISApplication *parent)
@@ -96,7 +95,9 @@ SNAPImageData
 
   // Provide a progress callback (if one is provided)
   if(progressCallback)
-    filter->AddObserver(ProgressEvent(),progressCallback);
+    {
+    filter->AddObserver(itk::ProgressEvent(),progressCallback);
+    }
 
   // Run the filter on the whole image
   filter->UpdateLargestPossibleRegion();
@@ -128,7 +129,9 @@ SNAPImageData
 
   // Provide a progress callback (if one is provided)
   if(progressCallback)
-    filter->AddObserver(ProgressEvent(),progressCallback);
+    {
+    filter->AddObserver(itk::ProgressEvent(),progressCallback);
+    }
 
   // Run the filter
   filter->UpdateLargestPossibleRegion();
@@ -210,8 +213,8 @@ SNAPImageData
   LabelImageType::RegionType region = imgInput->GetBufferedRegion();
 
   // Create iterators to perform the copy
-  typedef ImageRegionConstIterator<LabelImageType> SourceIterator;
-  typedef ImageRegionIteratorWithIndex<FloatImageType> TargetIterator;  
+  typedef itk::ImageRegionConstIterator<LabelImageType> SourceIterator;
+  typedef itk::ImageRegionIteratorWithIndex<FloatImageType> TargetIterator;  
   SourceIterator itSource(imgInput,region);
   TargetIterator itTarget(imgLevelSet,region);
 
@@ -247,7 +250,7 @@ SNAPImageData
   for(unsigned int iBubble=0; iBubble < bubbles.size(); iBubble++)
     {
     // Compute the extents of the bubble
-    typedef Point<float,3> PointType;
+    typedef itk::Point<float,3> PointType;
     PointType ptLower,ptUpper,ptCenter;
 
     // Compute the physical position of the bubble center

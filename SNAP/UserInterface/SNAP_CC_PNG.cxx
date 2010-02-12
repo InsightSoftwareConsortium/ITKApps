@@ -37,7 +37,6 @@
 
 #include <limits>
 
-using namespace std;
 
 // Define the verbose output stream
 ostream &verbose = cout;
@@ -419,6 +418,9 @@ int main(int argc, char **argv)
 
 /*
  *Log: SNAP_CC_PNG.cxx
+ *Revision 1.2  2006-02-01 20:21:26  pauly
+ *ENH: An improvement to the main SNAP UI structure: one set of GL windows is used to support SNAP and IRIS modes
+ *
  *Revision 1.1  2005/12/12 00:27:45  pauly
  *ENH: Preparing SNAP for 1.4 release. Snapshot functionality
  *

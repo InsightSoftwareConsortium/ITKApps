@@ -29,8 +29,6 @@
 #include "itkBinaryThresholdImageFilter.h"
 #include "itkImageRegionConstIteratorWithIndex.h"
 
-using namespace std;
-using namespace itk;
 
 IRISMeshPipeline
 ::IRISMeshPipeline()
@@ -99,7 +97,7 @@ IRISMeshPipeline
     }
 
   // Create an iterator for parsing the image
-  typedef ImageRegionConstIteratorWithIndex<InputImageType> InputIterator;
+  typedef itk::ImageRegionConstIteratorWithIndex<InputImageType> InputIterator;
   InputIterator it(m_InputImage,m_InputImage->GetLargestPossibleRegion());
 
   // Parse through the image using an iterator and compute the bounding boxes

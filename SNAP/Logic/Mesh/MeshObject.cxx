@@ -58,8 +58,6 @@
 // System includes
 #include <cstdlib>
 
-using namespace itk;
-using namespace std;
 
 MeshObject
 ::MeshObject() 
@@ -105,7 +103,7 @@ MeshObject
   Reset();
 
   // An array of meshes to be generated
-  vector<vtkPolyData *> meshes;
+  std::vector<vtkPolyData *> meshes;
 
   // The mesh is constructed differently depending on whether there is an
   // actively evolving level set or not
@@ -360,6 +358,9 @@ MeshObject
 
 /*
  *Log: MeshObject.cxx
+ *Revision 1.19  2005-12-08 18:20:45  hjohnson
+ *COMP:  Removed compiler warnings from SGI/linux/MacOSX compilers.
+ *
  *Revision 1.18  2005/11/23 14:32:15  ibanez
  *BUG: 2404. Patch provided by Paul Yushkevish.
  *

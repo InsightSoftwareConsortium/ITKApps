@@ -24,7 +24,6 @@
 #include <ctime>
 #include <iomanip>
 
-using namespace std;
 
 SystemInterface
 ::SystemInterface()
@@ -64,7 +63,7 @@ SystemInterface
   test.getUserdataPath(userDataPath,1024);
   
   // Construct a valid path
-  m_UserPreferenceFile = string(userDataPath) + "/" + "UserPreferences.txt";
+  m_UserPreferenceFile = std::string(userDataPath) + "/" + "UserPreferences.txt";
 
   // Check if the file exists, may throw an exception here
   if(itksys::SystemTools::FileExists(m_UserPreferenceFile.c_str()))
@@ -73,7 +72,7 @@ SystemInterface
     ReadFromFile(m_UserPreferenceFile.c_str());
 
     // Check if the preferences contain a version string
-    string version = Entry("System.CreatedBySNAPVersion")["00000000"];
+    std::string version = Entry("System.CreatedBySNAPVersion")["00000000"];
 
     // If the version is less than the latest incompatible version, delete the
     // contents of the version
@@ -152,7 +151,7 @@ SystemInterface
   if(!sRootDir.length() && sExeFullPath.length())
     {
     // Create a search list for the filename
-    vector<StringType> vPathList;
+    std::vector<StringType> vPathList;
 
     // Look at the directory where the exe sits
     vPathList.push_back(
@@ -200,7 +199,7 @@ SystemInterface
 ::GetFileInRootDirectory(const char *fnRelative)
 {
   // Construct the file name
-  string path = m_DataDirectory + "/" + fnRelative;
+  std::string path = m_DataDirectory + "/" + fnRelative;
 
   // Make sure the file exists ?
 
@@ -217,15 +216,15 @@ SystemInterface
   fl_filename_absolute(buffer,1024,file);
 
   // Convert to unix slashes for consistency
-  string path(buffer);
+  std::string path(buffer);
   itksys::SystemTools::ConvertToUnixSlashes(path);
 
   // Convert the filename to a numeric string (to prevent clashes with the Registry class)
   path = EncodeFilename(path);
 
   // Get the key associated with this filename
-  string key = Key("ImageAssociation.Mapping.Element[%s]",path.c_str());
-  string code = Entry(key)[""];
+  std::string key = Key("ImageAssociation.Mapping.Element[%s]",path.c_str());
+  std::string code = Entry(key)[""];
 
   // If the code does not exist, return w/o success
   if(code.length() == 0) return false;
@@ -253,15 +252,16 @@ SystemInterface
     }
 }
 
-string
+std::string
 SystemInterface
-::EncodeFilename(const string &src)
+::EncodeFilename(const std::string &src)
 {
   IRISOStringStream sout;
   
   for(unsigned int i=0;i<src.length();i++)
-    sout << setw(2) << setfill('0') << hex << (int)src[i];
-
+    {
+    sout << std::setw(2) << std::setfill('0') << std::hex << (int)src[i];
+    }
   return sout.str();
 }
 
@@ -274,7 +274,7 @@ SystemInterface
   fl_filename_absolute(buffer,1024,file);
 
   // Convert to unix slashes for consistency
-  string path(buffer);
+  std::string path(buffer);
   itksys::SystemTools::ConvertToUnixSlashes(path);
   path = EncodeFilename(path);
 
@@ -283,12 +283,12 @@ SystemInterface
 
   // Create a key for the file
   IRISOStringStream scode;
-  scode << setfill('0') << setw(16) << hex << timestr;
+  scode << std::setfill('0') << std::setw(16) << std::hex << timestr;
   
   // Look for the file in the registry (may already exist, if not use the
   // code just generated
-  string key = Key("ImageAssociation.Mapping.Element[%s]",path.c_str());
-  string code = Entry(key)[scode.str().c_str()];
+  std::string key = Key("ImageAssociation.Mapping.Element[%s]",path.c_str());
+  std::string code = Entry(key)[scode.str().c_str()];
   
   // Put the key in the registry
   Entry(key) << code;
@@ -358,7 +358,7 @@ SystemInterface
 ::GetHistory(const char *key)
 {
   // Get the history array
-  return Folder("IOHistory").Folder(string(key)).GetArray(string(""));
+  return Folder("IOHistory").Folder(std::string(key)).GetArray(std::string(""));
 }
 
 /** Update a filename history list with another filename */
@@ -367,7 +367,7 @@ SystemInterface
 ::UpdateHistory(const char *key, const char *filename)
 {
   // Create a string for the new file
-  string file(filename);
+  std::string file(filename);
 
   // Get the current history registry
   HistoryListType array = GetHistory(key);
@@ -386,7 +386,7 @@ SystemInterface
     array.erase(array.begin(),array.begin() + array.size() - 20);
 
   // Store the new array to the registry
-  Folder("IOHistory").Folder(string(key)).PutArray(array);
+  Folder("IOHistory").Folder(std::string(key)).PutArray(array);
 
   // Save the preferences at this point
   SaveUserPreferences();

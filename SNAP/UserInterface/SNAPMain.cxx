@@ -35,12 +35,10 @@
 
 #include <itksys/SystemTools.hxx>
 
-//#include <limits>
 
-using namespace std;
 
 // Define the verbose output stream
-ostream &verbose = cout;
+std::ostream &verbose = std::cout;
 
 // MAX grey value - TODO find somewhere to stick this
 const GreyType MAXGREYVAL = itk::NumericTraits<GreyType>::max();
@@ -60,8 +58,8 @@ bool LoadImageFromFileInteractive(
     }
   catch(itk::ExceptionObject &exc)
     {
-    cerr << "Error loading file '" << file << "'" << endl;
-    cerr << "Reason: " << exc << endl;
+    std::cerr << "Error loading file '" << file << "'" << std::endl;
+    std::cerr << "Reason: " << exc << std::endl;
     return false;
     }
 }
@@ -101,8 +99,8 @@ bool FindDataDirectoryInteractive(const char *sExePath, SystemInterface &system)
     else
       {
       // The file we're looking for
-      string sMissingFile = system.GetProgramDataDirectoryTokenFileName();
-      string sTitle = "Find a directory that contains file " + sMissingFile;
+      std::string sMissingFile = system.GetProgramDataDirectoryTokenFileName();
+      std::string sTitle = "Find a directory that contains file " + sMissingFile;
 
       // Look for the file using a file chooser
       Fl_File_Chooser fc(sMissingFile.c_str(),"Directory Token File (*.txt)",
@@ -119,7 +117,7 @@ bool FindDataDirectoryInteractive(const char *sExePath, SystemInterface &system)
       if(!file) continue;
 
       // Make sure that the filename matches and get the path
-      string sBrowseName = itksys::SystemTools::GetFilenameName(file);
+      std::string sBrowseName = itksys::SystemTools::GetFilenameName(file);
              
       // If not, check if they've selected a valid directory
       if(sBrowseName != sMissingFile)
@@ -130,7 +128,7 @@ bool FindDataDirectoryInteractive(const char *sExePath, SystemInterface &system)
         }
 
       // Make sure that the filename matches and get the path
-      string sBrowsePath = itksys::SystemTools::GetFilenamePath(file);
+      std::string sBrowsePath = itksys::SystemTools::GetFilenamePath(file);
 
       // Set the path
       system["System.ProgramDataDirectory"] << sBrowsePath;
@@ -167,13 +165,13 @@ bool LoadUserPreferencesInteractive(SystemInterface &system)
 
 void SegmentationFaultHandler(int itkNotUsed(sig))
 {
-  cerr << "*************************************" << endl;
-  cerr << "ITK-SNAP: Segmentation Fault!   " << endl;
-  cerr << "BACKTRACE: " << endl;
+  std::cerr << "*************************************" << std::endl;
+  std::cerr << "ITK-SNAP: Segmentation Fault!   " << std::endl;
+  std::cerr << "BACKTRACE: " << std::endl;
   void *array[50];
   int nsize = backtrace(array, 50);
   backtrace_symbols_fd(array, nsize, 2);
-  cerr << "*************************************" << endl;
+  std::cerr << "*************************************" << std::endl;
   exit(-1);
 }
 
@@ -222,22 +220,22 @@ int main(int argc, char **argv)
   if(!parser.TryParseCommandLine(argc,argv,parseResult))
     {
     // Print usage info and exit
-    cerr << "ITK-SnAP Command Line Usage:" << endl;
-    cerr << "   snap [options]" << endl;
+    std::cerr << "ITK-SnAP Command Line Usage:" << std::endl;
+    std::cerr << "   snap [options]" << std::endl;
     
-    cerr << "Options:" << endl;
+    std::cerr << "Options:" << std::endl;
     
-    cerr << "   --grey, -g FILE              : " <<
-      "Load greyscale image FILE" << endl;
+    std::cerr << "   --grey, -g FILE              : " <<
+      "Load greyscale image FILE" << std::endl;
     
-    cerr << "   --segmentation, -s FILE      : " <<
-      "Load segmentation image FILE" << endl;
+    std::cerr << "   --segmentation, -s FILE      : " <<
+      "Load segmentation image FILE" << std::endl;
     
-    cerr << "   --labels, -l FILE            : " <<
-      "Load label description file FILE" << endl;
+    std::cerr << "   --labels, -l FILE            : " <<
+      "Load label description file FILE" << std::endl;
     
-    cerr << "   --orientation, --rai XYZ     : " << 
-      "Use 3 letter orientation code XYZ, def: RAI" << endl;
+    std::cerr << "   --orientation, --rai XYZ     : " << 
+      "Use 3 letter orientation code XYZ, def: RAI" << std::endl;
     return -1;
     }
 
@@ -283,7 +281,7 @@ int main(int argc, char **argv)
       if(ImageCoordinateGeometry::IsRAICodeValid(newRAI))
         raiCode = newRAI;
       else
-        cerr << "Invalid orientation code: '" << newRAI << "'. " << endl;
+        std::cerr << "Invalid orientation code: '" << newRAI << "'. " << std::endl;
       }
 
     // Update the splash screen
@@ -297,8 +295,8 @@ int main(int argc, char **argv)
       }  
     catch(itk::ExceptionObject &exc)
       {
-      cerr << "Error loading file '" << fnGrey << "'" << endl;
-      cerr << "Reason: " << exc << endl;
+      std::cerr << "Error loading file '" << fnGrey << "'" << std::endl;
+      std::cerr << "Reason: " << exc << std::endl;
       return -1;
       }
 
@@ -319,8 +317,8 @@ int main(int argc, char **argv)
         }
       catch(itk::ExceptionObject &exc)
         {
-        cerr << "Error loading file '" << fname << "'" << endl;
-        cerr << "Reason: " << exc << endl;
+        std::cerr << "Error loading file '" << fname << "'" << std::endl;
+        std::cerr << "Reason: " << exc << std::endl;
         return -1;
         }
       }    
@@ -349,8 +347,8 @@ int main(int argc, char **argv)
       }
     catch(itk::ExceptionObject &exc)
       {
-      cerr << "Error reading label descriptions: " << 
-        exc.GetDescription() << endl;
+      std::cerr << "Error reading label descriptions: " << 
+        exc.GetDescription() << std::endl;
       }
     }
 
@@ -385,6 +383,9 @@ int main(int argc, char **argv)
 
 /*
  *Log: SNAPMain.cxx
+ *Revision 1.17  2008-08-30 19:31:47  lorensen
+ *COMP: gcc warnings.
+ *
  *Revision 1.16  2006-02-01 20:21:26  pauly
  *ENH: An improvement to the main SNAP UI structure: one set of GL windows is used to support SNAP and IRIS modes
  *

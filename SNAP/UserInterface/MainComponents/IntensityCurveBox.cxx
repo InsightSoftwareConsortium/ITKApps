@@ -26,7 +26,7 @@
 #include "SNAPOpenGL.h"
 #include <FL/fl_draw.H>
 
-using namespace std;
+
 unsigned int IntensityCurveBox::CURVE_RESOLUTION = 64;
 
 IntensityCurveBox
@@ -113,7 +113,7 @@ IntensityCurveBox
     // Compute the heights of all the histogram bars
     float xWidth = 1.0f / m_Histogram.size();
     unsigned int xPixelsPerBin = w() / m_Histogram.size();
-    vector<double> xHeight(m_Histogram.size(), 0.0);
+    std::vector<double> xHeight(m_Histogram.size(), 0.0);
 
     // Start by computing the maximum (cutoff) height
     float xHeightMax = m_HistogramMax * m_HistogramMaxLevel;

@@ -36,8 +36,6 @@
 #pragma warning ( disable : 4503 )
 #endif
 
-using namespace itk;
-
 // Create an inverting functor
 class InvertFunctor {
 public:
@@ -120,7 +118,7 @@ SNAPLevelSetDriver<VDimension>
   if(m_Parameters.GetSolver() == SnakeParameters::PARALLEL_SPARSE_FIELD_SOLVER)
     {
     // Define an extension to the appropriate filter class
-    typedef ParallelSparseFieldLevelSetImageFilter<
+    typedef itk::ParallelSparseFieldLevelSetImageFilter<
       FloatImageType, FloatImageType> LevelSetFilterType;
     typedef typename LevelSetFilterType::Pointer LevelSetFilterPointer;
     LevelSetFilterPointer filter = LevelSetFilterType::New();
@@ -159,7 +157,7 @@ SNAPLevelSetDriver<VDimension>
   else if(m_Parameters.GetSolver() == SnakeParameters::DENSE_SOLVER)
     {
     // Define an extension to the appropriate filter class
-    typedef DenseFiniteDifferenceImageFilter<
+    typedef itk::DenseFiniteDifferenceImageFilter<
       FloatImageType,FloatImageType> LevelSetFilterType;
     typedef LevelSetExtensionFilter<LevelSetFilterType> ExtensionFilter;
     typename ExtensionFilter::Pointer filter = ExtensionFilter::New();

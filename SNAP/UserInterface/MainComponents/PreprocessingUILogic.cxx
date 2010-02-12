@@ -30,7 +30,6 @@
 #include "itkImage.h"
 #include "itkEventObject.h" 
 
-using namespace itk;
 
 void 
 PreprocessingUILogic
@@ -719,7 +718,7 @@ PreprocessingUILogic
 ::OnEdgeProgress(itk::Object *object, const itk::EventObject &irisNotUsed(event))
 {
   // Get the value of the progress
-  float progress = reinterpret_cast<ProcessObject *>(object)->GetProgress();
+  float progress = reinterpret_cast<itk::ProcessObject *>(object)->GetProgress();
   
   // Display the filter's progress
   m_OutEdgeProgress->value(progress);
@@ -733,7 +732,7 @@ PreprocessingUILogic
 ::OnThresholdProgress(itk::Object *object, const itk::EventObject &irisNotUsed(event))
 {
   // Get the value of the progress
-  float progress = reinterpret_cast<ProcessObject *>(object)->GetProgress();
+  float progress = reinterpret_cast<itk::ProcessObject *>(object)->GetProgress();
   
   // Display the filter's progress
   m_OutThresholdProgress->value(progress);

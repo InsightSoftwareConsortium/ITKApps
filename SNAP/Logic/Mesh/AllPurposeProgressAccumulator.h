@@ -30,7 +30,6 @@
   #define vtkAlgorithmClass vtkAlgorithm
 #endif
 
-using namespace itk;
 
 /**
  * \class AllPurposeProgressAccumulator
@@ -47,16 +46,16 @@ using namespace itk;
  * execution, you have to advance multiple runs for one source manually using
  * the method StartNextRun.
  */
-class AllPurposeProgressAccumulator : public ProcessObject
+class AllPurposeProgressAccumulator : public itk::ProcessObject
 {
 public:
   /** Standard class typedefs. */
   typedef AllPurposeProgressAccumulator   Self;
-  typedef Object                          Superclass;
-  typedef SmartPointer<Self>              Pointer;
-  typedef SmartPointer<const Self>        ConstPointer;
+  typedef itk::ProcessObject              Superclass;
+  typedef itk::SmartPointer<Self>         Pointer;
+  typedef itk::SmartPointer<const Self>   ConstPointer;
 
-  typedef EventObject                     EventType;
+  typedef itk::EventObject                EventType;
 
   /** Standard New method. */
   itkNewMacro(Self);

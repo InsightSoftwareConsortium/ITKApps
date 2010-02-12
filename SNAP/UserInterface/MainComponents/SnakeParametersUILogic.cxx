@@ -38,7 +38,6 @@
 #include "ThresholdSettings.h"
 #include "UserInterfaceBase.h"
 
-using namespace itk;
 
 void 
 SnakeParametersUILogic
@@ -494,7 +493,7 @@ void SnakeParametersUILogic
   // Make sure the parameters are of valid type
   if(parameters.GetSnakeType() != m_Parameters.GetSnakeType())
     {
-    string message = 
+    std::string message = 
       (m_Parameters.GetSnakeType() == SnakeParameters::EDGE_SNAKE) ?
       "Warning!  The snake evolution parameters in the file are for the\n"
       "REGION COMPETITION mode.  SnAP is currently in EDGE STOPPING mode.\n"
@@ -544,11 +543,9 @@ void SnakeParametersUILogic
   m_SystemInterface = parent->GetSystemInterface();
   
   // Get the edge and region example image file names
-  string fnImage[2];
-  fnImage[0] = 
-    m_SystemInterface->GetFileInRootDirectory("Images2D/EdgeForcesExample.png");
-  fnImage[1] = 
-    m_SystemInterface->GetFileInRootDirectory("Images2D/RegionForcesExample.png");
+  std::string fnImage[2];
+  fnImage[0] = m_SystemInterface->GetFileInRootDirectory("Images2D/EdgeForcesExample.png");
+  fnImage[1] = m_SystemInterface->GetFileInRootDirectory("Images2D/RegionForcesExample.png");
 
   // Typedefs
   typedef itk::ImageFileReader<ExampleImageType> ReaderType;
@@ -586,7 +583,7 @@ void SnakeParametersUILogic
 
   // Load the points from the registry
   std::vector<Vector2d> points;
-  string fnPreset = m_SystemInterface->GetFileInRootDirectory(
+  std::string fnPreset = m_SystemInterface->GetFileInRootDirectory(
       "Presets/SnakeParameterPreviewCurve.txt");
   try 
     {

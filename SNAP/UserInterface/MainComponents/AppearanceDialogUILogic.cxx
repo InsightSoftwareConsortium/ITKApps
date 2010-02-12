@@ -20,7 +20,6 @@
 #include "SystemInterface.h"
 #include <string>
 
-using namespace std;
 
 const int
 AppearanceDialogUILogic
@@ -139,7 +138,7 @@ AppearanceDialogUILogic
   if(i == 6) return;
 
   // Start with stock orientations
-  string axes[3] = {string("RPS"),string("AIL"),string("RIP")};
+  std::string axes[3] = {std::string("RPS"),std::string("AIL"),std::string("RIP")};
 
   // Switch the configurable directions
   if(m_ChkOptionsViews2DRightIsLeft->value() == 0)
@@ -152,9 +151,9 @@ AppearanceDialogUILogic
     }
 
   // Check if the configuration is different
-  if(axes[order[i][0]] != string(m_Parent->GetDriver()->GetDisplayToAnatomyRAI(0)) ||
-     axes[order[i][1]] != string(m_Parent->GetDriver()->GetDisplayToAnatomyRAI(1)) ||
-     axes[order[i][2]] != string(m_Parent->GetDriver()->GetDisplayToAnatomyRAI(2)))
+  if(axes[order[i][0]] != std::string(m_Parent->GetDriver()->GetDisplayToAnatomyRAI(0)) ||
+     axes[order[i][1]] != std::string(m_Parent->GetDriver()->GetDisplayToAnatomyRAI(1)) ||
+     axes[order[i][2]] != std::string(m_Parent->GetDriver()->GetDisplayToAnatomyRAI(2)))
     {
     // Assign the configuration
     m_Parent->GetDriver()->SetDisplayToAnatomyRAI(

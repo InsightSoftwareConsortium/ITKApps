@@ -5,8 +5,6 @@
 #include <fstream>
 #include <string>
 
-using namespace std;
-using namespace itk;
 
 ColorLabelTable
 ::ColorLabelTable()
@@ -74,15 +72,15 @@ ColorLabelTable
 void
 ColorLabelTable
 ::LoadFromFile(const char *file)
-  throw(ExceptionObject)
+  throw(itk::ExceptionObject)
 {
   // Create a stream for reading the file
-  ifstream fin(file);
-  string line;
+  std::ifstream fin(file);
+  std::string line;
 
   // Create a temporary array of color labels
-  vector<ColorLabel> xTempLabels;
-  vector<size_t> xTempLabelIds;
+  std::vector<ColorLabel> xTempLabels;
+  std::vector<size_t> xTempLabelIds;
 
   // Check that the file is readable
   if(!fin.good())
@@ -178,10 +176,10 @@ ColorLabelTable
 void
 ColorLabelTable
 ::SaveToFile(const char *file)
-  throw(ExceptionObject)
+  throw(itk::ExceptionObject)
 {
   // Open the file for writing
-  ofstream fout(file);
+  std::ofstream fout(file);
   
   // Check that the file is readable
   if(!fout.good())
@@ -191,20 +189,20 @@ ColorLabelTable
     }
 
   // Print out a header to the file
-  fout << "################################################"<< endl;
-  fout << "# ITK-SnAP Label Description File"               << endl;
-  fout << "# File format: "                                 << endl;
-  fout << "# IDX   -R-  -G-  -B-  -A--  VIS MSH  LABEL"     << endl;
-  fout << "# Fields: "                                      << endl;
-  fout << "#    IDX:   Zero-based index "                   << endl;
-  fout << "#    -R-:   Red color component (0..255)"        << endl;
-  fout << "#    -G-:   Green color component (0..255)"      << endl;
-  fout << "#    -B-:   Blue color component (0..255)"       << endl;
-  fout << "#    -A-:   Label transparency (0.00 .. 1.00)"   << endl;
-  fout << "#    VIS:   Label visibility (0 or 1)"           << endl;
-  fout << "#    IDX:   Label mesh visibility (0 or 1)"      << endl;
-  fout << "#  LABEL:   Label description "                  << endl;
-  fout << "################################################"<< endl;
+  fout << "################################################"<< std::endl;
+  fout << "# ITK-SnAP Label Description File"               << std::endl;
+  fout << "# File format: "                                 << std::endl;
+  fout << "# IDX   -R-  -G-  -B-  -A--  VIS MSH  LABEL"     << std::endl;
+  fout << "# Fields: "                                      << std::endl;
+  fout << "#    IDX:   Zero-based index "                   << std::endl;
+  fout << "#    -R-:   Red color component (0..255)"        << std::endl;
+  fout << "#    -G-:   Green color component (0..255)"      << std::endl;
+  fout << "#    -B-:   Blue color component (0..255)"       << std::endl;
+  fout << "#    -A-:   Label transparency (0.00 .. 1.00)"   << std::endl;
+  fout << "#    VIS:   Label visibility (0 or 1)"           << std::endl;
+  fout << "#    IDX:   Label mesh visibility (0 or 1)"      << std::endl;
+  fout << "#  LABEL:   Label description "                  << std::endl;
+  fout << "################################################"<< std::endl;
 
   // Print out the labels
   for(unsigned int i=0;i<MAX_COLOR_LABELS;i++)
@@ -212,15 +210,15 @@ ColorLabelTable
     const ColorLabel &cl = GetColorLabel(i);
     if(cl.IsValid())
       {
-      fout << "  "  << right << setw(3) << i;
-      fout << "   " << right << setw(3) << (int) cl.GetRGB(0);
-      fout << "  "  << right << setw(3) << (int) cl.GetRGB(1);
-      fout << "  "  << right << setw(3) << (int) cl.GetRGB(2);
-      fout << "  "  << right << setw(7) 
-        << setprecision(2) << (cl.GetAlpha() / 255.0f);
-      fout << "  "  << right << setw(1) << (cl.IsVisible() ? 1 : 0);
-      fout << "  "  << right << setw(1) << (cl.IsVisibleIn3D() ? 1 : 0);
-      fout << "    \"" << cl.GetLabel() << "\"" << endl;
+      fout << "  "  << std::right << std::setw(3) << i;
+      fout << "   " << std::right << std::setw(3) << (int) cl.GetRGB(0);
+      fout << "  "  << std::right << std::setw(3) << (int) cl.GetRGB(1);
+      fout << "  "  << std::right << std::setw(3) << (int) cl.GetRGB(2);
+      fout << "  "  << std::right << std::setw(7) 
+        << std::setprecision(2) << (cl.GetAlpha() / 255.0f);
+      fout << "  "  << std::right << std::setw(1) << (cl.IsVisible() ? 1 : 0);
+      fout << "  "  << std::right << std::setw(1) << (cl.IsVisibleIn3D() ? 1 : 0);
+      fout << "    \"" << cl.GetLabel() << "\"" << std::endl;
       }
     }
 

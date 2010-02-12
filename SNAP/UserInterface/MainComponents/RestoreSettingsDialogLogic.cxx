@@ -24,7 +24,6 @@
 #pragma warning ( disable : 4503 )
 #endif
 
-using namespace std;
 
 void 
 RestoreSettingsDialogLogic

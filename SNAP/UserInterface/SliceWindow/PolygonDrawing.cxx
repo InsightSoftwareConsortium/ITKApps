@@ -21,7 +21,6 @@
 #include <cstdlib>
 #include <algorithm>
 
-using namespace std;
 
 // glu Tess callbacks
 
@@ -660,7 +659,7 @@ PolygonDrawing
     }
     break;
 
-  default: cerr << "PolygonDrawing::Handle(): unknown m_State " << m_State << endl;
+  default: std::cerr << "PolygonDrawing::Handle(): unknown m_State " << m_State << std::endl;
   }
 
   return 0;
@@ -669,6 +668,9 @@ PolygonDrawing
 
 /*
  *Log: PolygonDrawing.cxx
+ *Revision 1.10  2005-12-19 03:43:12  pauly
+ *ENH: SNAP enhancements and bug fixes for 1.4 release
+ *
  *Revision 1.9  2005/12/08 18:20:46  hjohnson
  *COMP:  Removed compiler warnings from SGI/linux/MacOSX compilers.
  *

@@ -17,7 +17,6 @@
 #include <assert.h>
 #include <iostream>
 
-using namespace std;
 
 void 
 CommandLineArgumentParser
@@ -25,19 +24,19 @@ CommandLineArgumentParser
 {
   // Create a structure for the command
   OptionType option;
-  option.CommonName = string(name);
+  option.CommonName = std::string(name);
   option.NumberOfParameters = nParameters;
 
   // Add the option to the map
-  m_OptionMap[string(name)] = option;
+  m_OptionMap[std::string(name)] = option;
 }
 
 void 
 CommandLineArgumentParser
 ::AddSynonim(const char *option, const char *synonim)
 {
-  string strOption(option);
-  string strSynonim(synonim);
+  std::string strOption(option);
+  std::string strSynonim(synonim);
 
   // The option should exist!
   assert(m_OptionMap.find(strOption) != m_OptionMap.end());
@@ -64,7 +63,7 @@ CommandLineArgumentParser
   for(int i=1; i < argc; i++)
     {
     // Get the next argument
-    string arg(argv[i]);
+    std::string arg(argv[i]);
 
     // Check if the argument is known
     if(m_OptionMap.find(arg) == m_OptionMap.end())
@@ -72,7 +71,7 @@ CommandLineArgumentParser
       if(failOnUnknownTrailingParameters)
         {
         // Unknown argument found
-        cerr << "Unrecognized command line option '" << arg << "'" << endl;
+        std::cerr << "Unrecognized command line option '" << arg << "'" << std::endl;
         return false;
         }
       else return true;
@@ -83,8 +82,8 @@ CommandLineArgumentParser
     if(i+nParameters >= argc) 
       {
       // Too few parameters
-      cerr << "Too few parameters to command line option '" << arg 
-        << "'" << endl;
+      std::cerr << "Too few parameters to command line option '" << arg 
+        << "'" << std::endl;
       return false;
       }
 
@@ -93,7 +92,7 @@ CommandLineArgumentParser
 
     // Pass in the parameters
     for(int j=0;j<nParameters;j++,i++)
-      outResult.AddParameter(m_OptionMap[arg].CommonName,string(argv[i+1]));
+      outResult.AddParameter(m_OptionMap[arg].CommonName,std::string(argv[i+1]));
     
     }
 
@@ -107,7 +106,7 @@ bool
 CommandLineArgumentParseResult
 ::IsOptionPresent(const char *option)
 {
-  return (m_OptionMap.find(string(option)) != m_OptionMap.end());
+  return (m_OptionMap.find(std::string(option)) != m_OptionMap.end());
 }
 
 const char * 
@@ -115,9 +114,9 @@ CommandLineArgumentParseResult
 ::GetOptionParameter(const char *option, unsigned int number)
 {
   assert(IsOptionPresent(option));
-  assert(number < m_OptionMap[string(option)].size());
+  assert(number < m_OptionMap[std::string(option)].size());
 
-  return m_OptionMap[string(option)][number].c_str();
+  return m_OptionMap[std::string(option)][number].c_str();
 }
 
 void  

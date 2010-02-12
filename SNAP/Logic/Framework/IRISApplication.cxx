@@ -46,7 +46,6 @@
 #include <stdio.h>
 #include <sstream>
 
-using namespace itk;
 
 IRISApplication
 ::IRISApplication() 
@@ -145,12 +144,14 @@ IRISApplication
   // of the current drawing color
   LabelType passThroughLabel = m_GlobalState->GetDrawingColorLabel();
 
-  typedef ImageRegionIterator<LabelImageType> IteratorType;  
+  typedef itk::ImageRegionIterator<LabelImageType> IteratorType;  
   IteratorType itLabel(imgNewLabel,imgNewLabel->GetBufferedRegion());  
   while(!itLabel.IsAtEnd())
     {
     if(itLabel.Value() != passThroughLabel)
+      {
       itLabel.Value() = (LabelType) 0;
+      }
     ++itLabel;
     }
 
@@ -409,8 +410,8 @@ IRISApplication
     }  
   
   // Create iterators for copying from one to the other
-  typedef ImageRegionConstIterator<SourceImageType> SourceIteratorType;
-  typedef ImageRegionIterator<TargetImageType> TargetIteratorType;
+  typedef itk::ImageRegionConstIterator<SourceImageType> SourceIteratorType;
+  typedef itk::ImageRegionIterator<TargetImageType> TargetIteratorType;
   SourceIteratorType itSource(source,source->GetLargestPossibleRegion());
   TargetIteratorType itTarget(target,roi.GetROI());
 
@@ -514,7 +515,7 @@ IRISApplication
 
 void 
 IRISApplication
-::ExportSegmentationStatistics(const char *file)  throw(ExceptionObject)
+::ExportSegmentationStatistics(const char *file)  throw(itk::ExceptionObject)
 {
   unsigned int i;
   
@@ -631,7 +632,7 @@ IRISApplication
     m_CurrentImageData->GetSegmentation()->GetImage();
   
   // Get an iterator for the image
-  typedef ImageRegionIteratorWithIndex<
+  typedef itk::ImageRegionIteratorWithIndex<
     LabelImageWrapper::ImageType> IteratorType;
   IteratorType it(imgLabel, imgLabel->GetBufferedRegion());
 
@@ -685,7 +686,8 @@ IRISApplication
   Vector3ui lIndex;
   Vector3ui lSize = xLabelWrapper->GetSize();
 
-  double delta[3][3], dratio[3];
+  double delta[3][3];
+  double dratio[3];
   int    signrx, signry, signrz;
 
   double rx = ray[0];
@@ -833,7 +835,7 @@ IRISApplication
   GreyImageType::Pointer imgGrey = io.ReadImage(filename, regGrey);
 
   // Get the orientation from the registry
-  string sOrient = (rai == NULL)
+  std::string sOrient = (rai == NULL)
     ? regGrey["Orientation"]["RAI"]
     : rai;
 

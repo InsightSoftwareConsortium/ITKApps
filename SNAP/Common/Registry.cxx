@@ -25,7 +25,6 @@
 #pragma warning ( disable : 4786 )
 #endif
 
-using namespace std;
 
 RegistryValue
 ::RegistryValue()
@@ -113,7 +112,7 @@ Registry
 
 void 
 Registry
-::Write(ostream &sout,const StringType &prefix)
+::Write(std::ostream &sout,const StringType &prefix)
 {
   // Write the entries in this folder
   for(EntryIterator ite = m_EntryMap.begin();ite != m_EntryMap.end(); ++ite)
@@ -125,7 +124,7 @@ Registry
       sout << prefix << Encode(ite->first) << " = ";
 
       // Write the encoded value
-      sout << Encode(ite->second.GetInternalString()) << endl;
+      sout << Encode(ite->second.GetInternalString()) << std::endl;
       }
     }
 
@@ -212,14 +211,16 @@ Registry
 ::RemoveKeys(const char *match)
 {
   // Create a match substring
-  string sMatch = (match) ? match : 0;
+  std::string sMatch = (match) ? match : 0;
 
   // Search and delete from the map
   EntryMapType newMap;
   for(EntryIterator it=m_EntryMap.begin(); it != m_EntryMap.end(); it++)
     {
     if(it->first.find(sMatch) != 0)
+      {
       newMap[it->first] = it->second;
+        }
     }
 
   m_EntryMap = newMap;
@@ -245,7 +246,7 @@ Registry
       {
       // Replace character by a escape string
       oss << '%';
-      oss << setw(2) << setfill('0') << hex << (int)input[i];
+      oss << std::setw(2) << std::setfill('0') << std::hex << (int)input[i];
       }
     else
       {
@@ -310,7 +311,7 @@ Registry::Decode(const StringType &input)
 
 void
 Registry
-::Read(istream &sin, ostream &oss) 
+::Read(std::istream &sin, std::ostream &oss) 
 {
   unsigned int lineNumber = 1;
   while(sin.good())
@@ -336,23 +337,23 @@ Registry
     if(iOper == line.npos)
       {
       // Not a valid line
-      oss << std::setw(5) << lineNumber << " : Missing '='; line ignored." << endl;
+      oss << std::setw(5) << lineNumber << " : Missing '='; line ignored." << std::endl;
       continue;
       }
     if(iOper == iToken)
       {
       // Missing key
-      oss << std::setw(5) << lineNumber << " : Missing key before '='; line ignored." << endl;
+      oss << std::setw(5) << lineNumber << " : Missing key before '='; line ignored." << std::endl;
       continue;
       }
 
     // Extract the key
-    string key = Decode(
+    std::string key = Decode(
       line.substr(iToken,line.find_first_of(" \t\v\r\n=",iToken) - iToken));
 
     // Extract the value
     StringType::size_type iValue = line.find_first_not_of(" \t\v\r\n=",iOper);
-    string value = "";
+    std::string value = "";
     if (iValue != line.npos) 
       {
       value = line.substr(iValue);
@@ -367,7 +368,7 @@ Registry
 
 Registry &
 Registry
-::Folder(const string &key) 
+::Folder(const std::string &key) 
 {
   // Find the first separator in the key string
   StringType::size_type iDot = key.find_first_of('.');
@@ -419,15 +420,17 @@ Registry
 ::WriteToFile(const char *pathname, const char *header) 
 {
   // Open the file
-  ofstream sout(pathname,std::ios::out);
+  std::ofstream sout(pathname,std::ios::out);
 
   // Set the stream to be picky
   sout.exceptions(std::ios::failbit);
 
   // Write the header
   if(header)
-    sout << header << endl;
- 
+    {
+    sout << header << std::endl;
+    }
+
   // Write to the stream
   Write(sout,"");
 }
@@ -443,7 +446,7 @@ Registry
   IRISOStringStream serr;
       
   // Create output stream
-  ifstream sin(pathname,std::ios::in);
+  std::ifstream sin(pathname,std::ios::in);
   if(!sin.good())
     throw IOException("Unable to open the Registry file");
 

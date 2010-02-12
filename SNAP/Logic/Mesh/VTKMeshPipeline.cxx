@@ -16,9 +16,6 @@
 #include "AllPurposeProgressAccumulator.h"
 #include <map>
 
-using namespace std;
-using namespace itk;
-
 
 VTKMeshPipeline
 ::VTKMeshPipeline()

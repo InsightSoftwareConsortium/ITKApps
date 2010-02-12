@@ -16,7 +16,6 @@
 #include <FL/Fl_Shared_Image.H>
 #include <FL/filename.H>
 
-using namespace std;
 
 // Callback for when links are clicked
 const char *HelpViewerLogicLinkCallback(Fl_Widget *w, const char *uri)
@@ -90,7 +89,7 @@ HelpViewerLogic
     }
 
   // Add the new link to the list
-  m_LinkList.push_back(string(url));
+  m_LinkList.push_back(std::string(url));
 
   // Point to the end of the list
   m_Iterator = m_LinkList.end();

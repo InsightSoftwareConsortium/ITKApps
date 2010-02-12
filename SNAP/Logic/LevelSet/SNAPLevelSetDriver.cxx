@@ -27,7 +27,6 @@
 #pragma warning ( disable : 4503 )
 #endif
 
-using namespace itk;
 
 template<unsigned int VDimension>
 SNAPLevelSetDriver<VDimension>

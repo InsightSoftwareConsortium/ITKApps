@@ -17,7 +17,6 @@
 #include "SNAPCommon.h"
 #include <assert.h>
 
-using namespace std;
 
 IntensityCurveVTK
 ::IntensityCurveVTK()
@@ -186,7 +185,7 @@ IntensityCurveVTK
     this->GetControlPoint(iPoint, t, x);
 
     // Create a folder in the registry
-    string key = registry.Key("ControlPoint[%d]",iPoint);
+    std::string key = registry.Key("ControlPoint[%d]",iPoint);
     Registry &folder = registry.Folder(key);
     folder["tValue"] << (double) t;
     folder["xValue"] << (double) x;

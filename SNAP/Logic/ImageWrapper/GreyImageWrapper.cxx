@@ -19,7 +19,6 @@
 #include "itkFunctionBase.h"
 #include "itkUnaryFunctorImageFilter.h"
 
-using namespace itk;
 
 // Create an instance of ImageWrapper of appropriate type
 template class ImageWrapper<GreyType>;

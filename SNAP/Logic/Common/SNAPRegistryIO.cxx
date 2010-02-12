@@ -24,7 +24,6 @@
 #pragma warning ( disable : 4786 )
 #endif
 
-using namespace std;
 
 SNAPRegistryIO
 ::SNAPRegistryIO()

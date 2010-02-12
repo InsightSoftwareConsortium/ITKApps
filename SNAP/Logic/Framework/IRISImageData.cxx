@@ -64,7 +64,6 @@ typedef itk::SmartPointer<IRISIMageDataDummyFunctorType> IRISIMageDataDummyFunct
 #include <iostream>
 #include <iomanip>
 
-using namespace itk;
 
 void 
 IRISImageData

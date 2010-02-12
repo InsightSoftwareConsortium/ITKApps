@@ -34,8 +34,6 @@
 #include "itkImageSeriesReader.h"
 #include "itkGDCMSeriesFileNames.h"
 
-using namespace itk;
-using namespace std;
 
 GuidedImageIOBase
 ::GuidedImageIOBase()
@@ -92,12 +90,12 @@ void GuidedImageIOBase
 
 
 template<typename TRaw> 
-ImageIOBase *
+itk::ImageIOBase *
 GuidedImageIOBase::RawIOGenerator<TRaw>
 ::CreateRawImageIO(Registry &folder)
 {
   // Create the Raw IO
-  typedef RawImageIO<TRaw,3> IOType;  
+  typedef itk::RawImageIO<TRaw,3> IOType;  
   typename IOType::Pointer rawIO = IOType::New();
   
   // Set the header size
@@ -139,25 +137,25 @@ GuidedImageIO<TPixel>
 
   // Choose the approach based on the file format
   if(format == FORMAT_MHA)
-    m_IOBase = MetaImageIO::New();
+    m_IOBase = itk::MetaImageIO::New();
   else if(format == FORMAT_ANALYZE)
-    m_IOBase = AnalyzeImageIO::New();
+    m_IOBase = itk::AnalyzeImageIO::New();
   else if(format == FORMAT_GIPL)
-    m_IOBase = GiplImageIO::New();
+    m_IOBase = itk::GiplImageIO::New();
   else if(format == FORMAT_DICOM)
-    m_IOBase = GDCMImageIO::New();
+    m_IOBase = itk::GDCMImageIO::New();
   else if(format == FORMAT_GE4)
-    m_IOBase = GE4ImageIO::New();
+    m_IOBase = itk::GE4ImageIO::New();
   else if(format == FORMAT_GE5)
-    m_IOBase = GE5ImageIO::New();
+    m_IOBase = itk::GE5ImageIO::New();
   else if(format == FORMAT_NIFTI)
-    m_IOBase = NiftiImageIO::New();
+    m_IOBase = itk::NiftiImageIO::New();
   else if(format == FORMAT_SIEMENS)
-    m_IOBase = SiemensVisionImageIO::New();
+    m_IOBase = itk::SiemensVisionImageIO::New();
   else if(format == FORMAT_VTK)
-    m_IOBase = VTKImageIO::New();
+    m_IOBase = itk::VTKImageIO::New();
   else if(format == FORMAT_VOXBO_CUB)
-    m_IOBase = VoxBoCUBImageIO::New();
+    m_IOBase = itk::VoxBoCUBImageIO::New();
   else if(format == FORMAT_RAW)
     {
     // Get the Raw header sub-folder
@@ -204,39 +202,43 @@ GuidedImageIO<TPixel>
   if(format == FORMAT_DICOM)
     {
     // Create an image series reader 
-    typedef ImageSeriesReader<ImageType> ReaderType;
+    typedef itk::ImageSeriesReader<ImageType> ReaderType;
     typename ReaderType::Pointer reader = ReaderType::New();
 
     // Set the IO
     reader->SetImageIO(m_IOBase);
 
     // Check if the array of filenames has been provided for us
-    FilenamesContainer fids = 
+    itk::FilenamesContainer fids = 
       folder.Folder("DICOM.SliceFiles").GetArray(std::string("NULL"));
     
     // If no filenames were specified, read the first series in the directory
     if(fids.size() == 0)
       {
       // Create a names generator. The input must be a directory 
-      typedef GDCMSeriesFileNames NamesGeneratorType;
+      typedef itk::GDCMSeriesFileNames NamesGeneratorType;
       NamesGeneratorType::Pointer nameGenerator = NamesGeneratorType::New();
       nameGenerator->SetDirectory(FileName);
 
       // Get the list of series in the directory
-      const SerieUIDContainer &sids = nameGenerator->GetSeriesUIDs();
+      const itk::SerieUIDContainer &sids = nameGenerator->GetSeriesUIDs();
 
       // There must be at least of series
       if(sids.size() == 0)
-        throw ExceptionObject("No DICOM series found in the DICOM directory");
-    
+        {
+        throw itk::ExceptionObject("No DICOM series found in the DICOM directory");
+        }
+
       // Read the first DICOM series in the directory
       fids = nameGenerator->GetFileNames(sids.front().c_str());
       }
     
     // Check that there are filenames
     if(fids.size() == 0)
-      throw ExceptionObject("No DICOM files found in the DICOM directory");
-    
+      {
+      throw itk::ExceptionObject("No DICOM files found in the DICOM directory");
+      }
+
     // Set the filenames and read
     reader->SetFileNames(fids);
     reader->Update();
@@ -247,7 +249,7 @@ GuidedImageIO<TPixel>
   else
     {
     // Just read a single image
-    typedef ImageFileReader<ImageType> ReaderType;
+    typedef itk::ImageFileReader<ImageType> ReaderType;
     typename ReaderType::Pointer reader = ReaderType::New();
   
     // Configure the reader

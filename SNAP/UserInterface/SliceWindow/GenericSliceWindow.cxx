@@ -33,8 +33,6 @@
 
 #include "itkConstantPadImageFilter.h"
 
-using namespace itk;
-using namespace std;
 
 GenericSliceWindow
 ::GenericSliceWindow(int index, UserInterfaceBase *ui, FLTKCanvas *canvas)

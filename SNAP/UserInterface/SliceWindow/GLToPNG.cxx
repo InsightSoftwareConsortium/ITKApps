@@ -15,7 +15,6 @@
 #include "GLToPNG.h"
 
 #include <iostream>
-using namespace std;
 
 vtkImageData* GLToVTKImageData(unsigned int format, int x, int y, int w, int h) 
 {

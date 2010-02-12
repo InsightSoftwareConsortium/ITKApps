@@ -15,7 +15,6 @@
 #include "SpeedImageWrapper.h"
 #include "ImageWrapper.txx"
 
-using namespace itk;
 
 SpeedImageWrapper
 ::SpeedImageWrapper()

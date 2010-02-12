@@ -70,8 +70,6 @@
 #pragma warning ( disable : 4503 )
 #endif
 
-using namespace itk;
-using namespace std;
 
 /**
  * \class GreyImageInfoCallback
@@ -1013,7 +1011,7 @@ UserInterfaceLogic
 ::OnAcceptInitializationAction()
 {
   // Get bubbles, turn them into segmentation
-  vector<Bubble> bubbles = m_GlobalState->GetBubbleArray();
+  std::vector<Bubble> bubbles = m_GlobalState->GetBubbleArray();
 
   // Shorthand
   SNAPImageData *snapData = m_Driver->GetSNAPImageData();
@@ -1386,10 +1384,10 @@ UserInterfaceLogic
 
 void 
 UserInterfaceLogic
-::OnITKProgressEvent(itk::Object *source, const EventObject &)
+::OnITKProgressEvent(itk::Object *source, const itk::EventObject &)
 {
   // Get the elapsed progress
-  itk::ProcessObject *po = reinterpret_cast<ProcessObject *>(source);
+  itk::ProcessObject *po = reinterpret_cast<itk::ProcessObject *>(source);
   float progress = po->GetProgress();
 
   // Update the progress bar and value
@@ -1463,7 +1461,7 @@ UserInterfaceLogic
   OnGreyImageUnload();
 
   // Create an array of open windows
-  vector<Fl_Window *> openWindows;
+  std::vector<Fl_Window *> openWindows;
   openWindows.push_back(Fl::first_window());
 
   // Add all the open windows to the list
@@ -1852,8 +1850,8 @@ UserInterfaceLogic
   mainLabel << SNAPSoftVersion << ": ";
 
   // Get the grey and segmentation file names
-  string fnGrey = m_GlobalState->GetGreyFileName();
-  string fnSeg = m_GlobalState->GetSegmentationFileName();
+  std::string fnGrey = m_GlobalState->GetGreyFileName();
+  std::string fnSeg = m_GlobalState->GetSegmentationFileName();
 
   // Grey file name
   if (fnGrey.length()) 
@@ -2495,7 +2493,7 @@ UserInterfaceLogic
   // current settings and associates them with the grey image file
   
   // Make sure there is actually an image
-  string fnGrey = m_GlobalState->GetGreyFileName();
+  std::string fnGrey = m_GlobalState->GetGreyFileName();
   if(fnGrey.length())
     m_SystemInterface->AssociateCurrentSettingsWithCurrentImageFile(
       fnGrey.c_str(),m_Driver);
@@ -2747,7 +2745,7 @@ UserInterfaceLogic
     }
 
   // Get the recent file name
-  string fnRecent = m_RecentFileNames[iRecent];
+  std::string fnRecent = m_RecentFileNames[iRecent];
 
   // Show a wait cursor
   m_WinMain->cursor(FL_CURSOR_WAIT,FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR);
@@ -3211,8 +3209,8 @@ UserInterfaceLogic
 ::ShowHTMLPage(const char *link)
 {
   // Get the path to the file name
-  string completeLink = string("HTMLHelp/") +  link;
-  string file = 
+  std::string completeLink = std::string("HTMLHelp/") +  link;
+  std::string file = 
     m_SystemInterface->GetFileInRootDirectory(completeLink.c_str());
 
   // Show the help window
@@ -3436,6 +3434,9 @@ UserInterfaceLogic
 
 /*
  *Log: UserInterfaceLogic.cxx
+ *Revision 1.60  2007-08-17 13:32:34  ibanez
+ *COMP: Solving ambiguous calls to operator[] in itkFixedArray due to use of size_t type as index.
+ *
  *Revision 1.59  2006/02/02 01:23:10  pauly
  *BUG: Fixed SNAP bugs in the last checkin
  *

@@ -33,8 +33,6 @@
 #include "itkImage.h"
 #include "itkImageRegionIteratorWithIndex.h"
 
-using namespace itk;
-using namespace std;
 
 IRISSliceWindow
 ::IRISSliceWindow(int id, UserInterfaceBase *parentUI, FLTKCanvas *canvas) 
@@ -71,7 +69,7 @@ IRISSliceWindow
   m_PolygonDrawing->Reset();
 
   // Initialize the polygon drawing canvas
-  Size<2> imgSize;
+  itk::Size<2> imgSize;
   imgSize[0] = m_SliceSize(0);
   imgSize[1] = m_SliceSize(1);
   m_PolygonSlice = PolygonSliceType::New();
@@ -142,7 +140,7 @@ IRISSliceWindow
     slice->Update();
 
     // Create an iterator to iterate over the slice
-    typedef ImageRegionIteratorWithIndex<PolygonSliceType> PolygonIterator;
+    typedef itk::ImageRegionIteratorWithIndex<PolygonSliceType> PolygonIterator;
     PolygonIterator itPolygon(m_PolygonSlice,
                               m_PolygonSlice->GetLargestPossibleRegion());
 
@@ -159,7 +157,7 @@ IRISSliceWindow
       if((pxPolygon != 0) ^  m_GlobalState->GetPolygonInvert())
         {
         // Get the corresponding segmentation image pixel
-        Index<2> idx = itPolygon.GetIndex();
+        itk::Index<2> idx = itPolygon.GetIndex();
         LabelType pxLabel = slice->GetPixel(idx);
 
         // Check if we should be overriding that pixel

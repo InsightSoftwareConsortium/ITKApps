@@ -21,7 +21,6 @@
 #include "SNAPOpenGL.h"
 #include "GLToPNG.h"
 
-using namespace std;
 
 FLTKCanvas
 ::FLTKCanvas(int lx, int ly, int lw, int lh, const char *llabel)
@@ -128,7 +127,7 @@ FLTKCanvas
     }
 
   // Propagate the event through the stack
-  for (list<InteractionMode *>::iterator it = m_Interactors.begin();
+  for (std::list<InteractionMode *>::iterator it = m_Interactors.begin();
       it != m_Interactors.end();it++)
     {
     InteractionMode *lmode = *it;

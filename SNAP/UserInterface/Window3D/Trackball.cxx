@@ -17,8 +17,6 @@
 #include <iostream>
 #include <math.h>
 
-using std::cerr;
-using std::endl;
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -192,6 +190,9 @@ Trackball
 
 /*
  *Log: Trackball.cxx
+ *Revision 1.6  2004-08-26 18:29:20  pauly
+ *ENH: New user interface for configuring the UI options
+ *
  *Revision 1.5  2003/10/02 14:55:53  pauly
  *ENH: Development during the September code freeze
  *

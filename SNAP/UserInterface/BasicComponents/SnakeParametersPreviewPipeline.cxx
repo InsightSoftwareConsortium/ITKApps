@@ -41,9 +41,6 @@
 #define vtkFloatingPointType float
 #endif
 
-using namespace std;
-using namespace itk;
-
 extern void fl_alert(const char *, ...);
 
 /**
@@ -267,7 +264,7 @@ public:
     { return m_Driver->GetCurrentState(); }
 
   // Get the evolving contour
-  vector<Vector2d> &GetEvolvingContour()
+  std::vector<Vector2d> &GetEvolvingContour()
     { return m_CurrentCurve; }
 
 private:
@@ -287,7 +284,7 @@ private:
   vtkContourFilter *m_VTKContour;
 
   // The zero level set, as it evolves
-  vector<Vector2d> m_CurrentCurve;
+  std::vector<Vector2d> m_CurrentCurve;
 
   bool m_DriverDirty, m_ContourDirty;
 };
@@ -385,7 +382,7 @@ SnakeParametersPreviewPipeline
     m_SpeedImage = image;
 
     // Create a filter to compute a gradient image
-    typedef GradientImageFilter<FloatImageType> GradientFilter;
+    typedef itk::GradientImageFilter<FloatImageType> GradientFilter;
     GradientFilter::Pointer filter = GradientFilter::New();
 
     // Set up and run the filter
@@ -548,9 +545,9 @@ SnakeParametersPreviewPipeline
 ::UpdateForces()
 {
   // Image interpolator types
-  typedef LinearInterpolateImageFunction<
+  typedef itk::LinearInterpolateImageFunction<
     FloatImageType,double> LerpType;
-  typedef VectorLinearInterpolateImageFunction<
+  typedef itk::VectorLinearInterpolateImageFunction<
     VectorImageType,double> VectorLerpType;
   
   // Create the speed image interpolator

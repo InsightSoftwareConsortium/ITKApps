@@ -448,7 +448,7 @@ TestCompareLevelSets
   }
 
   // Get the experiment ID
-  string expID = registry["ExperimentId"]["000"];
+  std::string expID = registry["ExperimentId"]["000"];
 
   // Some image pointers
   GreyImageWrapper::ImagePointer grey;
@@ -513,7 +513,7 @@ TestCompareLevelSets
     }
 
   // Done with the initialization.  Open an output dump file
-  string targetPath = registry["OutputPath"]["."] + string("/");
+  std::string targetPath = registry["OutputPath"]["."] + std::string("/");
   std::ofstream fout((targetPath + "report." + expID + ".txt").c_str());
 
   // Now, we have a speed image and a level set image.  We are ready to
@@ -610,7 +610,7 @@ TestCompareLevelSets
   
   // Write each result to a file
   fltInterior->SetInput(fltNarrow->GetOutput());
-  string file = targetPath + "CompareLevelSets." + expID + ".narrow.gipl";
+  std::string file = targetPath + "CompareLevelSets." + expID + ".narrow.gipl";
   SaveImageToFile(file.c_str(),fltInterior->GetOutput());
   
   fltInterior->SetInput(fltDense->GetOutput());

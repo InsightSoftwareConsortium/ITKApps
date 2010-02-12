@@ -20,8 +20,6 @@
 #include <iostream>
 #include <iomanip>
 
-using namespace itk;
-using namespace std;
 
 const unsigned int SNAPTestDriver::NUMBER_OF_TESTS = 5;
 const char *SNAPTestDriver::m_TestNames[] = { "ImageWrapper",
@@ -50,7 +48,7 @@ template <class TPixel>
 SNAPTestDriver::TemplatedTestCreator<TPixel>
 ::TemplatedTestCreator(const char *name)
 {
-  string strName = name;
+  std::string strName = name;
 
   if(strName == "ImageWrapper")
     m_Test = new TestImageWrapper<TPixel>();
@@ -70,7 +68,7 @@ TestBase *
 SNAPTestDriver
 ::CreateNonTemplateTest(const char *name)
 {
-  string strName = name;
+  std::string strName = name;
   TestBase *test = NULL;
 
   if(strName == "CompareLevelSets")
@@ -163,7 +161,7 @@ SNAPTestDriver
     if(!test && (test = TemplatedTestCreator<unsigned char>(name).GetTest()))
       {
       // Get the template type or a blank string
-      string type = parms.IsOptionPresent("type") ? 
+      std::string type = parms.IsOptionPresent("type") ? 
         parms.GetOptionParameter("type") : "";
 
       // Instantiate the template test of the right type

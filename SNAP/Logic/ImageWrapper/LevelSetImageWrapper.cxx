@@ -19,7 +19,6 @@
 // Create an instance of ImageWrapper of appropriate type
 template class ImageWrapper<float>;
 
-using namespace itk;
 
 LevelSetImageWrapper::DisplayPixelType
 LevelSetImageWrapper::MappingFunctor

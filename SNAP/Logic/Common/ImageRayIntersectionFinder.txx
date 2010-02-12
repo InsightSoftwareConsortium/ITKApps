@@ -25,7 +25,8 @@ ImageRayIntersectionFinder<TPixel,THitTester>
   typename ImageType::SizeType size = 
     image->GetLargestPossibleRegion().GetSize();
 
-  double delta[3][3], dratio[3];
+  double delta[3][3];
+  double dratio[3];
   int    signrx, signry, signrz;
 
   double rayLen = ray.two_norm();
