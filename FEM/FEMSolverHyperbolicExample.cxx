@@ -22,13 +22,10 @@
 
 #include "FEMSolverHyperbolicExample.h"
 
-using namespace std;
-using namespace itk;
-using namespace fem;
 
 #if DEBUG_FEM_TESTS
 
-void PrintK(SolverHyperbolic& S, char comment, ostream& of)
+void PrintK(itk::fem::SolverHyperbolic& S, char comment, std::ostream& of)
 // Print K - the global stiffness matrix
 {
   LinearSystemWrapper::Pointer lsw = S.GetLinearSystemWrapper();
@@ -49,7 +46,7 @@ void PrintK(SolverHyperbolic& S, char comment, ostream& of)
   std::cout << "];" << std::endl;
 }  
 
-void PrintF(SolverHyperbolic& S, char comment, ostream& of)
+void PrintF(itk::fem::SolverHyperbolic& S, char comment, std::ostream& of)
 // Print F - the global load vector
 {
   LinearSystemWrapper::Pointer lsw = S.GetLinearSystemWrapper();
@@ -66,7 +63,7 @@ void PrintF(SolverHyperbolic& S, char comment, ostream& of)
 
 #if FORMAT_OUTPUT_ASCII
 
-void PrintNodalCoordinates(SolverHyperbolic& S, char comment, ostream& of)
+void PrintNodalCoordinates(itk::fem::SolverHyperbolic& S, char comment, std::ostream& of)
 // Print the nodal coordinates
 {
   of << std::endl << comment << "Nodal coordinates: " << std::endl;
@@ -85,33 +82,55 @@ void PrintNodalCoordinates(SolverHyperbolic& S, char comment, ostream& of)
    of << "];" << std::endl;
 }
 
-void PrintElementCoordinates(SolverHyperbolic& S, char comment, ostream& of, int iter)
+void PrintElementCoordinates(itk::fem::SolverHyperbolic& S, char comment, std::ostream& of, int iter)
 // Useful for display purposes - lets you draw each element
 // individually, instead of just a stream of nodes
 {
   of << std::endl << comment << "Element coordinates: " << std::endl;
   int ct = 1;
 
-  for (Solver::ElementArray::iterator e = S.el.begin(); e != S.el.end(); e++) {
+  const unsigned int invalidID = itk::fem::Element::InvalidDegreeOfFreedomID;
+
+  for (Solver::ElementArray::iterator e = S.el.begin(); e != S.el.end(); e++)
+    {
     of << "e(" << ct << "," << (iter+1) << ",:,:)=[";
-    if (IDL_OUTPUT) { of << " ["; }
-    for (unsigned int n=0; n < (*e)->GetNumberOfNodes(); n++) {
 
-      // FIXME: this will generate errors in IDL - needs to be comma-delimited
-      Element::VectorType nc = (*e)->GetNodeCoordinates(n);
-
-      for (unsigned int d=0, dof; ( dof = (*e)->GetNode(n)->GetDegreeOfFreedom(d) ) != Element::InvalidDegreeOfFreedomID; d++) {
-  std::cout << S.GetSolution(dof) << std::endl;
-        nc[d] += S.GetSolution(dof);
+    if (IDL_OUTPUT) 
+      {
+      of << " [";
       }
+
+    for (unsigned int n=0; n < (*e)->GetNumberOfNodes(); n++) 
+      {
+      // FIXME: this will generate errors in IDL - needs to be comma-delimited
+      itk::fem::Element::VectorType nc = (*e)->GetNodeCoordinates(n);
+
+      for (unsigned int d=0, dof; ( dof = (*e)->GetNode(n)->GetDegreeOfFreedom(d) ) != invalidID; d++)
+        {
+        std::cout << S.GetSolution(dof) << std::endl;
+        nc[d] += S.GetSolution(dof);
+        }
       of << nc;
 
-      if (IDL_OUTPUT) {
-        if ((e+1) != S.el.end()) { of << " ], $" << std::endl; }
-        else { of << "]"; }
+      if (IDL_OUTPUT)
+        {
+        if ((e+1) != S.el.end())
+          {
+          of << " ], $" << std::endl;
+          }
+        else
+          {
+          of << "]";
+          }
+        }
+      else
+        {
+        if (MATLAB_OUTPUT)
+          {
+          of << std::endl;
+          }
+        }
       }
-      else if (MATLAB_OUTPUT) { of << std::endl; }
-    }
     of << "];" << std::endl;
     ct++;
   }
@@ -121,23 +140,47 @@ void PrintElementCoordinates(SolverHyperbolic& S, char comment, ostream& of, int
 
 #if OUTPUT 
 
-void PrintU(SolverHyperbolic& S, char comment, ostream& of, int iter)
+void PrintU(itk::fem::SolverHyperbolic& S, char comment, std::ostream& of, int iter)
 // Print the displacements
 {
   of << std::endl << comment << "Displacements: " << std::endl;
 
   of << "u(" << (iter+1) << ",:,:)=[";
-  for(Solver::NodeArray::iterator n = S.node.begin(); n!=S.node.end(); n++) {
-    if (IDL_OUTPUT) { of << " ["; }
-    for( unsigned int d=0, dof; (dof=(*n)->GetDegreeOfFreedom(d))!=Element::InvalidDegreeOfFreedomID; d++ ) {
-      if (d > 0 && d != Element::InvalidDegreeOfFreedomID) { of <<", "; }
+  for(itk::fem::Solver::NodeArray::iterator n = S.node.begin(); n!=S.node.end(); n++) 
+    {
+    if (IDL_OUTPUT) 
+      { 
+      of << " [";
+      }
+
+    const unsigned int invalidID = itk::fem::Element::InvalidDegreeOfFreedomID;
+
+    for( unsigned int d=0, dof; (dof=(*n)->GetDegreeOfFreedom(d))!= invalidID; d++ )
+      {
+      if (d > 0 && d != invalidID)
+        {
+        of <<", ";
+        }
       of << S.GetSolution(dof);
-    }
-    if (IDL_OUTPUT) { 
-      if ((n+1) != S.node.end()) { of << " ], $" << std::endl; }
-      else { of << "]"; }
-    }
-    else if (MATLAB_OUTPUT) { of << std::endl; }
+      }
+    if (IDL_OUTPUT)
+      { 
+      if ((n+1) != S.node.end())
+        {
+        of << " ], $" << std::endl;
+        }
+      else
+        {
+        of << "]";
+        }
+      }
+    else
+      {
+      if (MATLAB_OUTPUT)
+        {
+        of << std::endl;
+        }
+      }
   }
   of << "];" << std::endl;
 }
@@ -148,8 +191,8 @@ void PrintU(SolverHyperbolic& S, char comment, ostream& of, int iter)
 int main(int ac, char** av)
 {
   // File I/O streams
-  ifstream f;
-  ofstream of, of2;
+  std::ifstream f;
+  std::ofstream of, of2;
 
   // NOTE TO THE USER: You should change the output path to something
   // appropriate for your system.  Also, if you would like to run the 
@@ -220,7 +263,7 @@ int main(int ac, char** av)
     while (ch < 0 || ch >= numfiles) {
       for (int j=0; j < numfiles; j++) { std::cout << j << ": " << filelist[j] << std::endl; }
       std::cout << std::endl << "Select an FEM problem to solve:  ";
-      cin >> ch;
+      std::cin >> ch;
     }
     
     // Print the name of the selected problem
@@ -256,7 +299,7 @@ int main(int ac, char** av)
     // and read the input file
 
     std::cout << comment << "Solver()" << std::endl;
-    SolverHyperbolic SH;
+    itk::fem::SolverHyperbolic SH;
     SH.SetTimeStep(.5);
 
     std::cout << comment << "Read()" << std::endl;
@@ -271,8 +314,8 @@ int main(int ac, char** av)
     SH.GenerateGFN();          // Generate global freedom numbers for system DOFs
 
 
-    LinearSystemWrapperDenseVNL lsw_dvnl;
-    LinearSystemWrapperVNL lsw_vnl;
+    itk::fem::LinearSystemWrapperDenseVNL lsw_dvnl;
+    itk::fem::LinearSystemWrapperVNL lsw_vnl;
 
     switch(w) {
     case 1:
@@ -303,7 +346,7 @@ int main(int ac, char** av)
 
     // Find out the dimensions of the array that will be sent to Matlab/IDL 
     // In Matlab, the dimensions of the array will be [ndof, nndel, nelems, niter]
-    Solver::ElementArray::iterator elit = SH.el.begin();
+    itk::fem::Solver::ElementArray::iterator elit = SH.el.begin();
     unsigned char nelems = SH.el.size();
     unsigned char nndel = (*elit)->GetNumberOfNodes();
     unsigned char ndof = (*elit)->GetNumberOfDegreesOfFreedomPerNode();
@@ -406,9 +449,9 @@ int main(int ac, char** av)
       // Output the new positions of the elements in the mesh ** in
       // binary format **
 #if FORMAT_OUTPUT_BINARY
-      for (Solver::ElementArray::iterator ee = SH.el.begin(); ee != SH.el.end(); ee++) {
+      for (itk::fem::Solver::ElementArray::iterator ee = SH.el.begin(); ee != SH.el.end(); ee++) {
 for (unsigned int n=0; n < (*ee)->GetNumberOfNodes(); n++) {
-        Element::VectorType nc = (*ee)->GetNode(n)->GetCoordinates();
+        itk::fem::Element::VectorType nc = (*ee)->GetNode(n)->GetCoordinates();
         for (unsigned int dof = 0; dof < (*ee)->GetNumberOfDegreesOfFreedomPerNode(); dof++) {
           double ans = nc[dof] + SH.GetSolution((*ee)->GetNode(n)->GetDegreeOfFreedom(dof));
           for (unsigned i = 0; i < sizeof(double); i++) {
@@ -423,14 +466,14 @@ for (unsigned int n=0; n < (*ee)->GetNumberOfNodes(); n++) {
       // iteration frequency (specified by FIELD_FREQ, usu. 10)
 #if OUTPUT_FIELD      
       if (nit % FIELD_FREQ == 0 || nit == niter-1) {
-      OStringStream s;
+      itk::OStringStream s;
       s << (fieldctr+100);
       std::string fn;
 
       // Interpolate to get the vector field
       FieldType::IndexType index = fieldIter.GetIndex();
       vnl_vector<double> gloPt, locPt, solVec;
-      Element::ConstPointer elem;
+      itk::fem::Element::ConstPointer elem;
 
       gloPt.set_size(2);
       locPt.set_size(2);
@@ -447,7 +490,7 @@ for (unsigned int n=0; n < (*ee)->GetNumberOfNodes(); n++) {
           //std::cout << gloPt << " --> " << locPt << std::endl;
 
           int nodes = elem->GetNumberOfNodes();
-          Element::VectorType shapef(nodes);
+          itk::fem::Element::VectorType shapef(nodes);
           shapef = elem->ShapeFunctions(locPt);
 
           float sol;

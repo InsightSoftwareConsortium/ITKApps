@@ -65,12 +65,9 @@
 
 #define FIELD_FREQ          10
 
-using namespace std;
-using namespace itk;
-using namespace fem;
 
-void PrintK(SolverHyperbolic&, char, ostream&);
-void PrintF(SolverHyperbolic&, char, ostream&);
-void PrintNodalCoordinates(SolverHyperbolic&, char, ostream&);
-void PrintElementCoordinates(SolverHyperbolic&, char, ostream&, int);
-void PrintU(SolverHyperbolic&, char, ostream&, int);
+void PrintK(itk::fem::SolverHyperbolic&, char, std::ostream&);
+void PrintF(itk::fem::SolverHyperbolic&, char, std::ostream&);
+void PrintNodalCoordinates(itk::fem::SolverHyperbolic&, char, std::ostream&);
+void PrintElementCoordinates(itk::fem::SolverHyperbolic&, char, std::ostream&, int);
+void PrintU(itk::fem::SolverHyperbolic&, char, std::ostream&, int);

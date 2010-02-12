@@ -24,10 +24,6 @@
 #include "itkFEMLinearSystemWrapperVNL.h"
 #include <iostream>
 
-using namespace itk::fem;
-using namespace std;
-
-
 
 
 /**
@@ -41,12 +37,12 @@ int main( int, char * [] ) {
    * to all objects that define the FEM problem. One solver object
    * effectively defines one FEM problem.
    */
-  Solver S;
+  itk::fem::Solver S;
 
   /*
    * Set the linear system wrapper object that we wish to use.
    */
-  LinearSystemWrapperVNL vnlSolver;
+  itk::fem::LinearSystemWrapperVNL vnlSolver;
   vnlSolver.SetMaximumNonZeroValuesInMatrix(1000,1000);
   S.SetLinearSystemWrapper(&vnlSolver);
 
@@ -71,14 +67,14 @@ int main( int, char * [] ) {
    */
   
   /* We'll need these pointers to create and initialize the objects. */
-  Node::Pointer n1;
+  itk::fem::Node::Pointer n1;
 
   /*
    * We create the objects in a standard itk way by calling the New()
    * static function in the class.
    */
-  n1=Node::New();
-  Element::VectorType pt(2);
+  n1 = itk::fem::Node::New();
+  itk::fem::Element::VectorType pt(2);
 
   /*
    * Initialize the data members inside the node objects. Basically here
@@ -98,28 +94,28 @@ int main( int, char * [] ) {
    * If smart pointers are not used, the operators have no effect on the
    * compiled code.
    */
-  S.node.push_back( FEMP<Node>(&*n1) );
+  S.node.push_back( itk::fem::FEMP<itk::fem::Node>(&*n1) );
      
   /*
    * Create three more nodes in the same way.
    */
-  n1=Node::New();
+  n1 = itk::fem::Node::New();
   pt[0]=0.0;
   pt[1]=3.0;
   n1->SetCoordinates(pt);
-  S.node.push_back( FEMP<Node>(&*n1) );
+  S.node.push_back( itk::fem::FEMP<itk::fem::Node>(&*n1) );
 
-  n1=Node::New();
+  n1=itk::fem::Node::New();
   pt[0]=4.0;
   pt[1]=3.0;
   n1->SetCoordinates(pt);
-  S.node.push_back( FEMP<Node>(&*n1) );
+  S.node.push_back( itk::fem::FEMP<itk::fem::Node>(&*n1) );
 
-  n1=Node::New();
+  n1=itk::fem::Node::New();
   pt[0]=0.0;
   pt[1]=0.0;
   n1->SetCoordinates(pt);
-  S.node.push_back( FEMP<Node>(&*n1) );
+  S.node.push_back( itk::fem::FEMP<itk::fem::Node>(&*n1) );
 
   /*
    * Automatically assign the global numbers (IDs) to
@@ -138,15 +134,15 @@ int main( int, char * [] ) {
    * Then we have to create the materials that will define
    * the elements.
    */
-  MaterialLinearElasticity::Pointer m;
-  m=MaterialLinearElasticity::New();
+  itk::fem::MaterialLinearElasticity::Pointer m;
+  m=itk::fem::MaterialLinearElasticity::New();
   m->GN=0;       /* Global number of the material */
   m->E=30000.0;  /* Young modulus */
   m->A=0.02;     /* Crossection area */
   m->I=0.004;    /* Momemt of inertia */
-  S.mat.push_back( FEMP<Material>(&*m) );
+  S.mat.push_back( itk::fem::FEMP<itk::fem::Material>(&*m) );
 
-  m=MaterialLinearElasticity::New();
+  m=itk::fem::MaterialLinearElasticity::New();
   m->GN=1;       /* Global number of the material */
   m->E=200000.0;  /* Young modulus */
   m->A=0.001;     /* Crossection area */
@@ -155,9 +151,9 @@ int main( int, char * [] ) {
    * the Bar element, which doesn't need this constant.
    */
   m->I=0.0;
-  S.mat.push_back( FEMP<Material>(&*m) );
+  S.mat.push_back( itk::fem::FEMP<itk::fem::Material>(&*m) );
 
-  m=MaterialLinearElasticity::New();
+  m=itk::fem::MaterialLinearElasticity::New();
   m->GN=2;       /* Global number of the material */
   m->E=200000.0;  /* Young modulus */
   m->A=0.003;     /* Crossection area */
@@ -166,7 +162,7 @@ int main( int, char * [] ) {
    * the Bar element, which doesn't need this constant.
    */
   m->I=0.0;
-  S.mat.push_back( FEMP<Material>(&*m) );
+  S.mat.push_back( itk::fem::FEMP<itk::fem::Material>(&*m) );
 
 
 
@@ -178,10 +174,10 @@ int main( int, char * [] ) {
    * spring in 2D space ) and 2 Beam elements that also
    * accounts for bending.
    */
-  Element2DC1Beam::Pointer e1;
-  Element2DC0LinearLineStress::Pointer e2;
+  itk::fem::Element2DC1Beam::Pointer e1;
+  itk::fem::Element2DC0LinearLineStress::Pointer e2;
 
-  e1=Element2DC1Beam::New();
+  e1=itk::fem::Element2DC1Beam::New();
 
   /*
    * Initialize the pointers to correct node objects. We use the
@@ -193,42 +189,42 @@ int main( int, char * [] ) {
   e1->SetNode(1, &*S.node.Find(1) );
 
   /* same for material */
-  e1->m_mat=dynamic_cast<MaterialLinearElasticity*>( &*S.mat.Find(0) );
-  S.el.push_back( FEMP<Element>(&*e1) );
+  e1->m_mat=dynamic_cast<itk::fem::MaterialLinearElasticity*>( &*S.mat.Find(0) );
+  S.el.push_back( itk::fem::FEMP<itk::fem::Element>(&*e1) );
 
   /* Create the other elements */
-  e1=Element2DC1Beam::New();
+  e1=itk::fem::Element2DC1Beam::New();
   e1->GN=1;
   e1->SetNode(0, &*S.node.Find(1) );
   e1->SetNode(1, &*S.node.Find(2) );
-  e1->m_mat=dynamic_cast<MaterialLinearElasticity*>( &*S.mat.Find(0) );
-  S.el.push_back( FEMP<Element>(&*e1) );
+  e1->m_mat=dynamic_cast<itk::fem::MaterialLinearElasticity*>( &*S.mat.Find(0) );
+  S.el.push_back( itk::fem::FEMP<itk::fem::Element>(&*e1) );
 
   /*
    * Note that Bar2D element defines only two degrees of freedom
    * per node, while Beam2D defines three. In this case Bar only shares
    * the first two with Beam.
    */
-  e2=Element2DC0LinearLineStress::New();
+  e2=itk::fem::Element2DC0LinearLineStress::New();
   e2->GN=2;
   e2->SetNode(0, &*S.node.Find(0) );
   e2->SetNode(1, &*S.node.Find(3) );
-  e2->m_mat=dynamic_cast<MaterialLinearElasticity*>( &*S.mat.Find(1) );
-  S.el.push_back( FEMP<Element>(&*e2) );
+  e2->m_mat=dynamic_cast<itk::fem::MaterialLinearElasticity*>( &*S.mat.Find(1) );
+  S.el.push_back( itk::fem::FEMP<itk::fem::Element>(&*e2) );
 
-  e2=Element2DC0LinearLineStress::New();
+  e2=itk::fem::Element2DC0LinearLineStress::New();
   e2->GN=3;
   e2->SetNode(0, &*S.node.Find(1) );
   e2->SetNode(1, &*S.node.Find(3) );
-  e2->m_mat=dynamic_cast<MaterialLinearElasticity*>( &*S.mat.Find(2) );
-  S.el.push_back( FEMP<Element>(&*e2) );
+  e2->m_mat=dynamic_cast<itk::fem::MaterialLinearElasticity*>( &*S.mat.Find(2) );
+  S.el.push_back( itk::fem::FEMP<itk::fem::Element>(&*e2) );
 
-  e2=Element2DC0LinearLineStress::New();
+  e2=itk::fem::Element2DC0LinearLineStress::New();
   e2->GN=4;
   e2->SetNode(0, &*S.node.Find(2) );
   e2->SetNode(1, &*S.node.Find(3) );
-  e2->m_mat=dynamic_cast<MaterialLinearElasticity*>( &*S.mat.Find(1) );
-  S.el.push_back( FEMP<Element>(&*e2) );
+  e2->m_mat=dynamic_cast<itk::fem::MaterialLinearElasticity*>( &*S.mat.Find(1) );
+  S.el.push_back( itk::fem::FEMP<itk::fem::Element>(&*e2) );
 
 
 
@@ -245,9 +241,9 @@ int main( int, char * [] ) {
    * 
    * This is done by using the LoadBC class.
    */
-  LoadBC::Pointer l1;
+  itk::fem::LoadBC::Pointer l1;
 
-  l1=LoadBC::New();
+  l1=itk::fem::LoadBC::New();
 
   /*
    * Here we're saying that the first degree of freedom at first node
@@ -259,23 +255,23 @@ int main( int, char * [] ) {
   l1->m_element = &*S.el.Find(0);
   l1->m_dof = 0;
   l1->m_value = vnl_vector<double>(1,0.0);
-  S.load.push_back( FEMP<Load>(&*l1) );
+  S.load.push_back( itk::fem::FEMP<itk::fem::Load>(&*l1) );
 
   /*
    * In a same way we also fix the second DOF in a first node and the
    * second DOF in a third node (it's only fixed in Y direction).
    */
-  l1=LoadBC::New();
+  l1=itk::fem::LoadBC::New();
   l1->m_element = &*S.el.Find(0);
   l1->m_dof = 1;
   l1->m_value = vnl_vector<double>(1,0.0);
-  S.load.push_back( FEMP<Load>(&*l1) );
+  S.load.push_back( itk::fem::FEMP<itk::fem::Load>(&*l1) );
 
-  l1=LoadBC::New();
+  l1=itk::fem::LoadBC::New();
   l1->m_element = &*S.el.Find(1);
   l1->m_dof = 4;
   l1->m_value = vnl_vector<double>(1,0.0);
-  S.load.push_back( FEMP<Load>(&*l1) );
+  S.load.push_back( itk::fem::FEMP<itk::fem::Load>(&*l1) );
 
 
   /*
@@ -283,15 +279,15 @@ int main( int, char * [] ) {
    * by a vector [20,-20] in global coordinate system. The force acts on tthe
    * second node of the third element in a system.
    */
-  LoadNode::Pointer l2;
+  itk::fem::LoadNode::Pointer l2;
 
-  l2=LoadNode::New();
+  l2=itk::fem::LoadNode::New();
   l2->m_element=S.el.Find(2);
   l2->m_pt=1;
   l2->F=vnl_vector<double>(2);
   l2->F[0]=20;
   l2->F[1]=-20;
-  S.load.push_back( FEMP<Load>(&*l2) );
+  S.load.push_back( itk::fem::FEMP<itk::fem::Load>(&*l2) );
 
 
 
@@ -355,7 +351,7 @@ int main( int, char * [] ) {
     std::cout<<"\b\b\b \b\n";
   }
 
-  cout<<"\n";
+  std::cout << "\n";
 
   return 0;
 
