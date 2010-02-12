@@ -97,7 +97,6 @@ SystemInterface
 ::FindDataDirectory(const char *pathToExe)
 {
   // Get the directory where the SNAP executable was launched
-  using namespace itksys;
 
   // This is the directory we're trying to set
   StringType sRootDir = "";
