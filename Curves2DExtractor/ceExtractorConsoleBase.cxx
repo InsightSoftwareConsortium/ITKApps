@@ -294,14 +294,17 @@ ceExtractorConsoleBase
   curveColor.SetGreen(0);
   curveColor.SetBlue(0);
 
+  typedef OutputImageType::IndexType    IndexType;
+  typedef IndexType::IndexValueType     IndexValueType;
+
   OutputImageType::IndexType    outputIndex;
   ImageSpaceMeshType::PointType outputPoint;
 
   while( pointItr != pointEnd )
     {
     outputPoint = pointItr.Value();
-    outputIndex[0] = outputPoint[0];
-    outputIndex[1] = outputPoint[1];
+    outputIndex[0] = static_cast< IndexValueType >( outputPoint[0] );
+    outputIndex[1] = static_cast< IndexValueType >( outputPoint[1] );
     outputImage->SetPixel( outputIndex, curveColor );
     ++pointItr;
     }
