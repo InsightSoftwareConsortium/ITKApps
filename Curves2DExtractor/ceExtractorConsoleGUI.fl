@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0109 
+version 1.0107 
 header_name {.h} 
 code_name {.cxx}
 class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
@@ -295,7 +295,7 @@ class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
       }
       Fl_Button {} {
         label Execute
-        callback {Execute();}
+        callback {Execute();} selected
         xywh {305 275 215 30} box ROUND_UP_BOX
       }
     }
@@ -340,6 +340,6 @@ class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
   } {}
   Function {ShowExtractedParametricPoints( void )} {return_type {virtual void}
   } {}
-  Function {SaveOutput( void )} {selected return_type {virtual void}
+  Function {SaveOutput( void )} {return_type {virtual void}
   } {}
 } 
