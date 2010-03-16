@@ -23,9 +23,16 @@ ADD_LIBRARY(ITKVTKIntegration
   )
 
 ADD_EXECUTABLE(itkRegisterITKMonitorVTK itkRegisterITKMonitorVTK)
-
 TARGET_LINK_LIBRARIES(itkRegisterITKMonitorVTK 
   ITKVTKIntegration ITKNumerics ITKBasicFilters ITKIO vtkRendering vtkIO vtkHybrid)
+
+ADD_EXECUTABLE(ExtractIsoSurface ExtractIsoSurface.cxx)
+TARGET_LINK_LIBRARIES(ExtractIsoSurface 
+  ITKVTKIntegration ITKNumerics ITKBasicFilters ITKIO vtkRendering vtkIO vtkHybrid)
+
+ADD_EXECUTABLE(ScreenShotGenerator ScreenShotGenerator.cxx)
+TARGET_LINK_LIBRARIES(ScreenShotGenerator vtkRendering vtkIO vtkHybrid)
+
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
   SET_SOURCE_FILES_PROPERTIES (itkRegisterITKMonitorVTK.cxx PROPERTIES COMPILE_FLAGS -Wno-unused-parameter)
