@@ -149,7 +149,9 @@ int main(int argc, char **argv)
   qb.show();
 
   QString s = QFileDialog::getOpenFileName(0, 
-    "Chose an image filename", ".", "*.mha", 0 );
+    "Chose an image filename", ".",
+    "MetaImage (*.mhd *.mha);; PNG (*.png);; JPEG (*.jpg *.jpeg);; TIFF (*.tif);; All files (*.*)"
+    );
 
   reader->SetFileName( s.toLatin1() );
 
