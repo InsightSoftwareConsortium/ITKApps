@@ -67,7 +67,7 @@ int main(int argc, char **argv)
 
   horizontalPosition += buttonWidth + buttonSpace;
 
-  itk::QtLightIndicator  cc( &qb, "State" );
+  itk::QtLightIndicator  cc( &qb );
   cc.setGeometry( horizontalPosition, 20, buttonWidth, buttonHeight );
   cc.Modified();
 
@@ -76,7 +76,7 @@ int main(int argc, char **argv)
   QPushButton  qt( "Quit", &qb );
   qt.setGeometry( horizontalPosition, 20, buttonWidth, buttonHeight );
 
-  itk::QtProgressBar qs( &qb, "Progress");
+  itk::QtProgressBar qs( &qb );
   qs.setGeometry( 10, 60, 600, 30 );
   
 
@@ -146,12 +146,12 @@ int main(int argc, char **argv)
   QObject::connect( &qt, SIGNAL(clicked()), &app, SLOT(quit()) );
 
 
-  app.setMainWidget( &qb );
   qb.show();
 
-  QString s = QFileDialog::getOpenFileName(".","Images (*.png *.mha)", 0, "open file dialog","Chose an image filename" );
+  QString s = QFileDialog::getOpenFileName(0, 
+    "Chose an image filename", ".", "*.mha", 0 );
 
-  reader->SetFileName( s.latin1() );
+  reader->SetFileName( s.toLatin1() );
 
   return app.exec();
 

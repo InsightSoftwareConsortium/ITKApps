@@ -13,7 +13,7 @@ public:
   typedef itk::MemberCommand< QtProgressBar >  RedrawCommandType;
 
   /** Constructor */
-  QtProgressBar( QWidget *parent, char * name);
+  QtProgressBar( QWidget *parent );
 
   /** Get Command */
   RedrawCommandType * GetRedrawCommand( void ) const;

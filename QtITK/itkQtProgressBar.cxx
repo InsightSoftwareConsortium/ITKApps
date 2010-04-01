@@ -25,15 +25,13 @@ namespace itk {
 
 
 /** Constructor */
-QtProgressBar::QtProgressBar( 
-                  QWidget *parent, 
-                  char * name):QProgressBar(parent,name)
+QtProgressBar::QtProgressBar( QWidget *parent):QProgressBar(parent)
 {
   m_RedrawCommand = RedrawCommandType::New();
   m_RedrawCommand->SetCallbackFunction( this, &QtProgressBar::ProcessEvent );
   m_RedrawCommand->SetCallbackFunction( this, &QtProgressBar::ConstProcessEvent );
 
-  this->setTotalSteps( 100 );
+  this->setMaximum( 100 );
   this->reset();
 
 }
@@ -62,9 +60,9 @@ QtProgressBar::ProcessEvent( itk::Object * caller,
              dynamic_cast< itk::ProcessObject *>( caller );
 
     const int value = static_cast<int>( 
-                        process->GetProgress() * this->totalSteps() );
+                        process->GetProgress() * this->maximum() );
 
-    this->setProgress( value );
+    this->setValue( value );
     }
 }
 
@@ -81,9 +79,9 @@ QtProgressBar::ConstProcessEvent( const itk::Object * caller,
               dynamic_cast< const itk::ProcessObject *>( caller );
 
     const int value = static_cast<int>( 
-                        process->GetProgress() * this->totalSteps() );
+                        process->GetProgress() * this->maximum() );
 
-    this->setProgress( value );
+    this->setValue( value );
     }
 }
  
