@@ -40,7 +40,7 @@
 #include "itkShiftScaleImageFilter.h"
 #include "itkRescaleIntensityImageFilter.h"
 
-#ifdef USE_VTK
+#ifdef VTK_FOUND
 #include "itkImageToVTKImageFilter.h"
 #include "itkVTKImageToImageFilter.h"
 #include "vtkSmartPointer.h"
@@ -153,7 +153,7 @@ void ReadDicomSeriesCastWriteImage( std::string inputDirectoryName, std::string 
   writer->UseCompressionOn();
 
   // Handle .vti files as well.
-#ifdef USE_VTK
+#ifdef VTK_FOUND
   if (outputFileName.rfind(".vti") == (outputFileName.size()-4))
     {
     typedef itk::ImageToVTKImageFilter< OutputImageType > ITKToVTKFilterType;
@@ -199,7 +199,7 @@ void ReadCastWriteImage( std::string inputFileName, std::string outputFileName )
   typedef typename itk::ShiftScaleImageFilter<
     InputImageType, OutputImageType >                         ShiftScaleFilterType;
   typedef typename itk::ImageFileWriter< OutputImageType >    ImageWriterType;
-#ifdef USE_VTK
+#ifdef VTK_FOUND
   typedef itk::VTKImageToImageFilter< InputImageType > VTKToITKFilterType;
   typename VTKToITKFilterType::Pointer vtktoitk = NULL;
 #endif
@@ -213,7 +213,7 @@ void ReadCastWriteImage( std::string inputFileName, std::string outputFileName )
   reader->SetFileName( inputFileName.c_str() );
 
 
-#ifdef USE_VTK
+#ifdef VTK_FOUND
   if (inputFileName.rfind(".vti") == (inputFileName.size()-4))
     {
     // Handle .vti files as well.
@@ -235,7 +235,7 @@ void ReadCastWriteImage( std::string inputFileName, std::string outputFileName )
   //typename RescaleFilterType::Pointer caster = RescaleFilterType::New();
   caster->SetInput( reader->GetOutput() );
 
-#ifdef USE_VTK
+#ifdef VTK_FOUND
     }
 
   if (outputFileName.rfind(".vti") == (outputFileName.size()-4))
@@ -277,7 +277,7 @@ void ReadCastWriteImage( std::string inputFileName, std::string outputFileName )
 
 // Read VTI files and write out ITK/VTI images. We have some templated macros
 // to deal with since VTK does not have templated images while ITK does.
-#ifdef USE_VTK
+#ifdef VTK_FOUND
 
 // ITK's support for 64 bit types, long long etc is poor, not as exhaustive
 // as VTK. Define an alternate macro here that ignores those types. Nobody
