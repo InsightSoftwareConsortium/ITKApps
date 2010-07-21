@@ -287,6 +287,7 @@ int PrimaryImageCalculatorRoutine(int argc, char *argv[])
   command.SetOptionLongTag("Statallcodes","statallcodes");
   command.AddOptionField("Statallcodes","statallcodes",MetaCommand::FLAG,false);
 
+  command.SetParseFailureOnUnrecognizedOption(true);
   if (!command.Parse(argc,argv))
     {
     return 1;

@@ -37,13 +37,15 @@ void typenamesInit()
   typenames[Rgb] = "Rgb";
   typenames[Crap] = "Crap";
 }
-std::string filename;
-int x = -1,y = -1,z = -1, t = -1;
-PixelTypes PType(Crap);
-double value = 0.0;
-int numdims = -1;
+
+
 bool
-ProcessArgs(int argc, char **argv)
+ProcessArgs(int argc, char **argv,
+  std::string & filename,
+  int &x, int &y, int &z, int &t,
+  PixelTypes & PType,
+  double & value,
+  int & numdims)
 {
   while(--argc)
     {
@@ -199,7 +201,13 @@ int MakeImage(const std::string &filename,
 int main(int argc,char **argv)
 {
   typenamesInit();
-  if(!ProcessArgs(argc,argv))
+//TODO:  These globals should be removed!
+  std::string filename;
+  int x = -1,y = -1,z = -1, t = -1;
+  PixelTypes PType(Crap);
+  double value = 0.0;
+  int numdims = -1;
+  if(!ProcessArgs(argc,argv,filename,x,y,z,t,PType,value,numdims))
     {
     exit(1);
     }
