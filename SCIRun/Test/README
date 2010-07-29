@@ -2,21 +2,21 @@ OVERVIEW
 --------
 The following are instructions for validating the ITK filter XML files against
 the Insight Code. For simplicity, assume that PATH_TO_SCIRUN represents
-the full path to the InsightApplications/SCIRun directory.
+the full path to the ITKApps/SCIRun directory.
 
 
 REQUIREMENTS
 ------------
-Validation requires java and the xalan jar files (InsightApplications/SCIRun/Thirdparty/*.jar). 
+Validation requires java and the xalan jar files (ITKApps/SCIRun/Thirdparty/*.jar). 
 
 VALIDATION PROCESS
 ------------------
-All itk XML files are located in InsightApplications/SCIRun/ITK.
+All itk XML files are located in ITKApps/SCIRun/ITK.
 For each itk XML file, a temporary cc file needs to be generated. This is done
 using java, xalan, and the XSL file in the SCIRun/Test directory.
 
 The following is an example (assuming current directory is 
-InsightApplications/SCIRun/Test) for the BinaryThresholdImageFilter:
+ITKApps/SCIRun/Test) for the BinaryThresholdImageFilter:
 
    > java -classpath PATH_TO_SCIRUN/Thirdparty/xercesImpl.jar:PATH_TO_SCIRUN/Thirdparty/xml-apis.jar:PATH_TO_SCIRUN/Thirdparty/xalan.jar:PATH_TO_SCIRUN/Examples/CodeGenerator SCIRun.GenerateSCIRunCode Validate PATH_TO_SCIRUN/ITK/itk_BinaryThresholdImageFilter.xml PATH_TO_SCIRUN/Test/Validate.xsl PATH_TO_SCIRUN/Test/validate.cc
 

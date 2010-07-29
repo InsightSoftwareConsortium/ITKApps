@@ -3,13 +3,13 @@
 # This is an example of how to use java and xalan to validate the itk XML files against
 # the Insight code. This perl script is meant to be run inside of the SCIRun/Test directory.
 # The variables $path_to_SCIRun, $ITK_SRC, and $ITK_BIN should be set specific to your machine.
-#       $path_to_SCIRun = the full path to the InsightApplications/SCIRun directory
+#       $path_to_SCIRun = the full path to the ITKApps/SCIRun directory
 #       $ITK_SRC = the full path to the Insight source directory (InsightToolkit)
 #       $ITK_BIN = the full path to the Inisght binary directory
 
 
-# Set absolute path to InsightApplications/SCIRun
-$path_to_SCIRun = "/scratch/darbyb/TEST/InsightApplications/SCIRun";
+# Set absolute path to ITKApps/SCIRun
+$path_to_SCIRun = "/scratch/darbyb/TEST/ITKApps/SCIRun";
 
 $ITK_SRC = "/home/sci/darbyb/work/projects/SCIRunITK/InsightToolkit-1.4.0";
 $ITK_BIN = "/home/sci/darbyb/work/projects/SCIRunITK/InsightBin";

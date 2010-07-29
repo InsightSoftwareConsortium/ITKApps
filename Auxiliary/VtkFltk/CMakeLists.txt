@@ -1,7 +1,7 @@
 # This directory only builds if FLTK and VTK can be found
 INCLUDE_DIRECTORIES(
-  ${InsightApplications_SOURCE_DIR}/Auxiliary/VtkFltk
-  ${InsightApplications_SOURCE_DIR}/Auxiliary/vtk
+  ${ITKApps_SOURCE_DIR}/Auxiliary/VtkFltk
+  ${ITKApps_SOURCE_DIR}/Auxiliary/vtk
 )
 
 FLTK_WRAP_UI(ITKVtkFltk fltkVTKImageViewerGUI.fl)

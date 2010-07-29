@@ -1,5 +1,5 @@
-InsightApplications README
---------------------------
+ITKApps README
+--------------
 
 This directory contains a variety of applications written with ITK. Many are
 quite simple, come are complex and include GUI. Insight/Applications was
@@ -20,7 +20,7 @@ directory. Please do not give CMake any of the subdirectories, since in
 that case the application will lack elements required for the global configuration.
 
 Once you configure the entire set of applications you can build applications
-selectively. In VisualStudio you can do this by loading the InsightApplications
+selectively. In VisualStudio you can do this by loading the ITKApps
 workspace (.dsw) or solution (.sln) and then, from the IDE, selecting one of the 
 specific projects that you want to build. In Linux you can simply "cd" in to the
 appropriate subdirectory of the binary tree and type "make" at that level.

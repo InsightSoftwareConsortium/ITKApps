@@ -8,7 +8,7 @@ AppPublisher=itksnap.org
 AppPublisherURL=http://www.itksnap.org
 AppSupportURL=http://www.itksnap.org/bb
 AppUpdatesURL=http://www.itksnap.org/download/snap
-DefaultDirName={pf}\InsightApplications\SNAP
+DefaultDirName={pf}\ITKApps\SNAP
 DefaultGroupName=InsightSNAP
 AllowNoIcons=yes
 

@@ -12,19 +12,19 @@ special instructions in step 3.
    the options VTK_USE_PATENTED, and VTK_WRAP_TCL set to "On".  This
    application was last tested with VTK 4.2 and VTK 4.4.
 
-   * Configure and build InsightApplications with USE_VTK set to "On".
+   * Configure and build ITKApps with USE_VTK set to "On".
 
 2. To run this application:
    
-   cd <InsightApplications-source>/SegmentationEditor/Scripts/
+   cd <ITKApps-source>/SegmentationEditor/Scripts/
 
-    where <InsightApplications-source> is the source directory of your build
+    where <ITKApps-source> is the source directory of your build
     (the source code that you downloaded).
 
-   <InsightApplications-build>/SegmentationEditor/Wrapping/Tcl/WSTITK Main.tcl
+   <ITKApps-build>/SegmentationEditor/Wrapping/Tcl/WSTITK Main.tcl
 
-    where <InsightApplications-build> is the directory where you built
-    InsightApplications.  Note that WSTITK will be found in EXECUTABLE_OUTPUT_PATH
+    where <ITKApps-build> is the directory where you built
+    ITKApps.  Note that WSTITK will be found in EXECUTABLE_OUTPUT_PATH
     instead if one was specified during the CMake configuration process.
 
 3. When you run the application for the first time, a window will pop

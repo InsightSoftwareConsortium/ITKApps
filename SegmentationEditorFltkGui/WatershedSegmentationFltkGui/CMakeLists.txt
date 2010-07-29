@@ -5,8 +5,8 @@ ${ITK_SOURCE_DIR}/Code/Common
 ${ITK_SOURCE_DIR}/Code/BasicFilters
 ${ITK_SOURCE_DIR}/Code/Algorithms
 ${ITK_SOURCE_DIR}/Code/IO
-${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer
-${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
+${ITKApps_SOURCE_DIR}/Auxiliary/FltkImageViewer
+${ITKApps_BINARY_DIR}/Auxiliary/FltkImageViewer
 ${WatershedSegmentationFltkGui_SOURCE_DIR}
 ${WatershedSegmentationFltkGui_BINARY_DIR}
 ${FLTK_INCLUDE_PATH}
@@ -18,7 +18,7 @@ ${ITK_BINARY_DIR}/Code/Common
 ${ITK_BINARY_DIR}/Code/BasicFilters
 ${ITK_BINARY_DIR}/Code/Algorithms
 ${ITK_BINARY_DIR}/Code/IO
-${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
+${ITKApps_BINARY_DIR}/Auxiliary/FltkImageViewer
 ${WatershedSegmentationFltkGui_BINARY_DIR}
 )
 

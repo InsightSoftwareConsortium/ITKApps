@@ -213,14 +213,14 @@ function get_itk {
 }
 
 # -------------------------------------------------------------
-# Check out and build InsightApplications
+# Check out and build ITKApps
 # -------------------------------------------------------------
 function get_app {
   cd $basedir/app
 
-  # Use CVS to check out InsightApplications
-  echo "Checking out InsightApplications (Release $SNAP_REL) from CVS"
-  cvs -qd :pserver:anonymous@www.itk.org:/cvsroot/Insight co -r $SNAP_REL InsightApplications >> $logfile
+  # Use CVS to check out ITKApps
+  echo "Checking out ITKApps (Release $SNAP_REL) from CVS"
+  cvs -qd :pserver:anonymous@www.itk.org:/cvsroot/Insight co -r $SNAP_REL ITKApps >> $logfile
 
   # Configure VTK using CMake
   echo "Building SNAP"
@@ -245,7 +245,7 @@ function get_app {
     -DFLTK_IMAGES_LIBRARY:FILEPATH="$basedir/fltk/install/lib/libfltk_images.a" \
     -DSNAP_USE_XFT_LIBRARY:BOOL=ON \
     -DCMAKE_INSTALL_PREFIX:PATH=$instdir \
-    $basedir/app/InsightApplications >> $logfile
+    $basedir/app/ITKApps >> $logfile
 
   # Make only in the SNAP directory
   cd SNAP

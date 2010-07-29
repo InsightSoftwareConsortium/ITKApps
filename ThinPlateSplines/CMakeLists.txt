@@ -8,7 +8,7 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
     INCLUDE(${ITK_USE_FILE})
   ELSE(ITK_FOUND)
     MESSAGE(FATAL_ERROR
-            "Cannot build InsightApplications without ITK.  Please set ITK_DIR.")
+            "Cannot build ITKApps without ITK.  Please set ITK_DIR.")
   ENDIF(ITK_FOUND)
 
   FIND_PACKAGE(FLTK)
@@ -25,11 +25,11 @@ ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 
 INCLUDE_DIRECTORIES(
-  ${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer
-  ${InsightApplications_SOURCE_DIR}/Auxiliary/VtkFltk
-  ${InsightApplications_SOURCE_DIR}/ThinPlateSplines
-  ${InsightApplications_SOURCE_DIR}/ThinPlateSplines
-  ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
+  ${ITKApps_SOURCE_DIR}/Auxiliary/FltkImageViewer
+  ${ITKApps_SOURCE_DIR}/Auxiliary/VtkFltk
+  ${ITKApps_SOURCE_DIR}/ThinPlateSplines
+  ${ITKApps_SOURCE_DIR}/ThinPlateSplines
+  ${ITKApps_BINARY_DIR}/Auxiliary/FltkImageViewer
 )
 
 FLTK_WRAP_UI(ThinPlateSplines ThinPlateSplinesApplicationGUI.fl)

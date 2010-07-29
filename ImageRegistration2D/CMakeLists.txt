@@ -8,7 +8,7 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
     INCLUDE(${ITK_USE_FILE})
   ELSE(ITK_FOUND)
     MESSAGE(FATAL_ERROR
-            "Cannot build InsightApplications without ITK.  Please set ITK_DIR.")
+            "Cannot build ITKApps without ITK.  Please set ITK_DIR.")
   ENDIF(ITK_FOUND)
 
   FIND_PACKAGE(FLTK)
@@ -21,12 +21,12 @@ ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 
 INCLUDE_DIRECTORIES(
-  ${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer
-  ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
-  ${InsightApplications_SOURCE_DIR}/Auxiliary/vtk
-  ${InsightApplications_BINARY_DIR}/Auxiliary/vtk
-  ${InsightApplications_SOURCE_DIR}/ImageRegistration2D
-  ${InsightApplications_BINARY_DIR}/ImageRegistration2D
+  ${ITKApps_SOURCE_DIR}/Auxiliary/FltkImageViewer
+  ${ITKApps_BINARY_DIR}/Auxiliary/FltkImageViewer
+  ${ITKApps_SOURCE_DIR}/Auxiliary/vtk
+  ${ITKApps_BINARY_DIR}/Auxiliary/vtk
+  ${ITKApps_SOURCE_DIR}/ImageRegistration2D
+  ${ITKApps_BINARY_DIR}/ImageRegistration2D
 )
 
 FLTK_WRAP_UI(ImageRegistration2D ImageRegistrationConsoleGUI.fl)

@@ -8,7 +8,7 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
     INCLUDE(${ITK_USE_FILE})
   ELSE(ITK_FOUND)
     MESSAGE(FATAL_ERROR
-            "Cannot build InsightApplications without ITK.  Please set ITK_DIR.")
+            "Cannot build ITKApps without ITK.  Please set ITK_DIR.")
   ENDIF(ITK_FOUND)
 
   FIND_PACKAGE(FLTK)
@@ -22,8 +22,8 @@ ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 IF(UNIX)
   INCLUDE( ${CMAKE_ROOT}/Modules/FindX11.cmake )
 ENDIF(UNIX)
-CONFIGURE_FILE(${InsightApplications_SOURCE_DIR}/LandmarkInitializedMutualInformationRegistration/Help/Index.html
-               ${InsightApplications_BINARY_DIR}/LandmarkInitializedMutualInformationRegistration/Help/Index.html COPYONLY)
+CONFIGURE_FILE(${ITKApps_SOURCE_DIR}/LandmarkInitializedMutualInformationRegistration/Help/Index.html
+               ${ITKApps_BINARY_DIR}/LandmarkInitializedMutualInformationRegistration/Help/Index.html COPYONLY)
 
 INCLUDE_DIRECTORIES(
   ${ITK_SOURCE_DIR}/Code/Common
@@ -34,11 +34,11 @@ INCLUDE_DIRECTORIES(
   ${ITK_SOURCE_DIR}/Code/Numerics/Statistics
   ${ITK_SOURCE_DIR}/Utilities/MetaIO
   ${ITK_SOURCE_DIR}/Utilities/MetaIO/SaptialObject
-  ${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer
-  ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
-  ${InsightApplications_SOURCE_DIR}/Auxiliary/ITKFlFileWriter
-  ${InsightApplications_SOURCE_DIR}/LandmarkInitializedMutualInformationRegistration
-  ${InsightApplications_BINARY_DIR}/LandmarkInitializedMutualInformationRegistration
+  ${ITKApps_SOURCE_DIR}/Auxiliary/FltkImageViewer
+  ${ITKApps_BINARY_DIR}/Auxiliary/FltkImageViewer
+  ${ITKApps_SOURCE_DIR}/Auxiliary/ITKFlFileWriter
+  ${ITKApps_SOURCE_DIR}/LandmarkInitializedMutualInformationRegistration
+  ${ITKApps_BINARY_DIR}/LandmarkInitializedMutualInformationRegistration
 )
 
 FLTK_WRAP_UI(imageRegTool guiMain.fl)

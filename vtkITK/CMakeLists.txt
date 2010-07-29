@@ -8,7 +8,7 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
     INCLUDE(${ITK_USE_FILE})
   ELSE(ITK_FOUND)
     MESSAGE(FATAL_ERROR
-            "Cannot build InsightApplications without ITK.  Please set ITK_DIR.")
+            "Cannot build ITKApps without ITK.  Please set ITK_DIR.")
   ENDIF(ITK_FOUND)
 
   FIND_PACKAGE(VTK)

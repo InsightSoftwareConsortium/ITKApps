@@ -152,7 +152,7 @@ public:
  *FIX: A large number of bugs has been fixed for 1.4 release
  *
  *Revision 1.1  2003/07/12 04:52:25  pauly
- *Initial checkin of SNAP application  to the InsightApplications tree
+ *Initial checkin of SNAP application  to the ITKApps tree
  *
  *Revision 1.7  2003/07/12 01:34:18  pauly
  *More final changes before ITK checkin

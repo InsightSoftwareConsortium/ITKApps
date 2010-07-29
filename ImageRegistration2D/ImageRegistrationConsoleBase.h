@@ -25,7 +25,7 @@
 #include <itkImageRegistrationMethod.h>
 
 #include "itkImageToVTKImageFilter.h"  //file located in the directory
-                    // InsightApplications/Auxiliary/vtk
+                    // ITKApps/Auxiliary/vtk
 
 // 
 // files for vtk image processing

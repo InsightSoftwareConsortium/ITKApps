@@ -174,7 +174,7 @@ the <b>su</b> command below.</li><br>
 
 <p> At this point, you will have a working installation of FLTK on your system.  Please refer to FLTK documentation (at <a href="http://www.fltk.org">www.fltk.org</a>) for troubleshooting information.</p>
 
-<h3> 5. Install and Build the ITK InsightApplications directory </h3>
+<h3> 5. Install and Build the ITK ITKApps directory </h3>
 
 <p> We will use CVS to download ITK Applications, including SNAP.  For more instructions, please refer to the <i>ITK Software Guide</i> located at <a href="http://www.itk.org/HTML/Documentation.htm">www.itk.org</a></p>
 
@@ -187,7 +187,7 @@ the <b>su</b> command below.</li><br>
   <li> Execute the following command to download ITK Applications. This will
   take several minutes. 
   <pre>
-    cvs -d :pserver:anonymous@www.itk.org:/cvsroot/Insight co InsightApplications
+    cvs -d :pserver:anonymous@www.itk.org:/cvsroot/Insight co ITKApps
   </pre></li>
   
   <li> Enter the build directory for appilcations:
@@ -197,7 +197,7 @@ the <b>su</b> command below.</li><br>
   
   <li> Execute the CMake command: 
   <pre>
-    ccmake ../InsightApplications
+    ccmake ../ITKApps
   </pre>
   </li>
   <li> The CMake user interface will appear.  Set the following options in this interface: 
@@ -209,7 +209,7 @@ the <b>su</b> command below.</li><br>
     USE_VTK = ON
     USE_FLTK = ON
   </pre></li>
-  <li> Use the <b>c</b> command to configure InsightApplications.  More options will appear: </li>
+  <li> Use the <b>c</b> command to configure ITKApps.  More options will appear: </li>
   <pre>
     VTK_DIR = [basedir]/vtk/bingcc
   </pre>
@@ -229,7 +229,7 @@ the <b>su</b> command below.</li><br>
                                     # for using patented code from VTK to do this!
     SNAP_USE_XFT_LIBRARY            # Use if you built FLTK with --enable-xft
   </pre>
-  <li> Use the <b>c</b> command to configure InsightApplications and 
+  <li> Use the <b>c</b> command to configure ITKApps and 
   use the <b>g</b> command to generate makefiles </li><br>
   <li> To build all ITK Applications, including SNAP, execute the following command.  Alternatively, to only build SNAP, first change directory to <i>basedir/app/bingcc/SNAP</i> and run the same command.
   <pre>
@@ -237,7 +237,7 @@ the <b>su</b> command below.</li><br>
   </pre></li>
 </ol>
 
-<p> At this point, you will have a working installation of ITK InsightApplications on your system.  Please refer to ITK documentation for troubleshooting information. </p>
+<p> At this point, you will have a working installation of ITK ITKApps on your system.  Please refer to ITK documentation for troubleshooting information. </p>
 
 <h3> 6. Running SNAP </h3>
 <ol>
@@ -283,7 +283,7 @@ directory. To do so, execute the following commands:
 
 <h3> 8. Troubleshooting </h3>
 
-<p> For troubleshooting the installation of ITK, VTK, FLTK and InsightApplications, please refer to the corresponding web sites noted above</p>
+<p> For troubleshooting the installation of ITK, VTK, FLTK and ITKApps, please refer to the corresponding web sites noted above</p>
 
 <p> We recommend that you join the <a
   href="http://www.itksnap.org/bb">ITK-SNAP Forum</a> or the <a

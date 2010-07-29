@@ -1,4 +1,4 @@
-# InsightApplications/ConnectVTKITK Tcl Package configuration.
+# ITKApps/ConnectVTKITK Tcl Package configuration.
 package ifneeded ConnectVTKITK @ConnectVTKITK_VERSION_ITK@ {
   package require InsightToolkit @ConnectVTKITK_VERSION_ITK@
   package require vtk @ConnectVTKITK_VERSION_VTK@

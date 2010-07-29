@@ -14,7 +14,7 @@ INCLUDE_DIRECTORIES(
 TARGET_LINK_LIBRARIES(ConvertBetweenFileFormats  ITKIO ITKCommon )
 IF (VTK_FOUND)
   TARGET_LINK_LIBRARIES(ConvertBetweenFileFormats vtkIO vtkCommon vtkFiltering vtkImaging )
-  INCLUDE_DIRECTORIES( ${InsightApplications_SOURCE_DIR}/Auxiliary/vtk )
+  INCLUDE_DIRECTORIES( ${ITKApps_SOURCE_DIR}/Auxiliary/vtk )
 ENDIF (VTK_FOUND)
 
 INSTALL_TARGETS(/bin ConvertBetweenFileFormats)

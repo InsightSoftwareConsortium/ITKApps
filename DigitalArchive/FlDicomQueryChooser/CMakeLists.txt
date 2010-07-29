@@ -7,7 +7,7 @@ IF(DCMTK_DIR)
   INCLUDE(${FlDicomQueryChooser_SOURCE_DIR}/FindDCMTK.cmake)
 FIND_PACKAGE(ZLIB)
 
-INCLUDE(${FlDicomQueryChooser_SOURCE_DIR}/FindInsightApplications.cmake)
+INCLUDE(${FlDicomQueryChooser_SOURCE_DIR}/FindITKApps.cmake)
 
 #Find ITK.
 FIND_PACKAGE(ITK)
@@ -68,8 +68,8 @@ ENDIF(HAS_FLTK)
 INCLUDE_DIRECTORIES(
   ${DCMTKTEST_SOURCE_DIR}
   ${DCMTKTEST_BINARY_DIR}
-  ${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer
-  ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
+  ${ITKApps_SOURCE_DIR}/Auxiliary/FltkImageViewer
+  ${ITKApps_BINARY_DIR}/Auxiliary/FltkImageViewer
 )
 
 

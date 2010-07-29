@@ -8,14 +8,14 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
     INCLUDE(${ITK_USE_FILE})
   ELSE(ITK_FOUND)
     MESSAGE(FATAL_ERROR
-            "Cannot build InsightApplications without ITK.  Please set ITK_DIR.")
+            "Cannot build ITKApps without ITK.  Please set ITK_DIR.")
   ENDIF(ITK_FOUND)
 
 ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 
 
-INCLUDE_DIRECTORIES(${InsightApplications_SOURCE_DIR}/EdgeDetection)
+INCLUDE_DIRECTORIES(${ITKApps_SOURCE_DIR}/EdgeDetection)
 
 #ADD_EXECUTABLE(itk2DEdgeDetectionSample itk2DEdgeDetectionSample.cxx)
 ADD_EXECUTABLE(itk3DEdgeDetectionSample itk3DEdgeDetectionSample.cxx)

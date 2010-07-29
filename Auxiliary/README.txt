@@ -15,7 +15,7 @@ a README file describing what extra steps are required.
 
   This directory contains classed intended to be built
   in a library. The library is used by several demo
-  applications in InsightApplications.  The main interest
+  applications in ITKApps.  The main interest
   of this library to provide viewers for displaying ITK
   images inside FLTK GUI's.
 

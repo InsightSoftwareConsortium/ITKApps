@@ -8,7 +8,7 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
     INCLUDE(${ITK_USE_FILE})
   ELSE(ITK_FOUND)
     MESSAGE(FATAL_ERROR
-            "Cannot build InsightApplications without ITK.  Please set ITK_DIR.")
+            "Cannot build ITKApps without ITK.  Please set ITK_DIR.")
   ENDIF(ITK_FOUND)
 
   FIND_PACKAGE(FLTK)
@@ -28,7 +28,7 @@ ${ITK_SOURCE_DIR}/Code/Common
 ${ITK_SOURCE_DIR}/Code/BasicFilters
 ${ITK_SOURCE_DIR}/Code/Algorithms
 ${ITK_SOURCE_DIR}/Code/IO
-${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer
+${ITKApps_SOURCE_DIR}/Auxiliary/FltkImageViewer
 ${ThresholdSegmentationLevelSetFltkGui_SOURCE_DIR}
 ${ThresholdSegmentationLevelSetFltkGui_BINARY_DIR}
 ${FLTK_INCLUDE_PATH}

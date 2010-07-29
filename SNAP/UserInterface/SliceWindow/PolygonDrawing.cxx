@@ -702,7 +702,7 @@ PolygonDrawing
  *FIX: A large number of bugs has been fixed for 1.4 release
  *
  *Revision 1.1  2003/07/12 04:46:50  pauly
- *Initial checkin of the SNAP application into the InsightApplications tree.
+ *Initial checkin of the SNAP application into the ITKApps tree.
  *
  *Revision 1.1  2003/07/11 23:28:10  pauly
  **** empty log message ***

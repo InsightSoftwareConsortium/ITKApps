@@ -4,14 +4,14 @@ IF(COMMAND CMAKE_POLICY)
 ENDIF(COMMAND CMAKE_POLICY)
 
 
-PROJECT(InsightApplications)
+PROJECT(ITKApps)
 
 
 INCLUDE_REGULAR_EXPRESSION("^.*$")
 
 # Tell CMake's FIND_PACKAGE command where to look for our Find<pkg>
 # modules.
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${InsightApplications_SOURCE_DIR})
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ITKApps_SOURCE_DIR})
 
 IF(NOT WIN32)
   OPTION(BUILD_SHARED_LIBS "Build Insight-Applications with shared libraries." OFF)
@@ -23,7 +23,7 @@ IF(ITK_FOUND)
   INCLUDE(${ITK_USE_FILE})
 ELSE(ITK_FOUND)
   MESSAGE(FATAL_ERROR
-          "Cannot build InsightApplications without ITK.  Please set ITK_DIR.")
+          "Cannot build ITKApps without ITK.  Please set ITK_DIR.")
 ENDIF(ITK_FOUND)
 
 
@@ -92,7 +92,7 @@ IF(USE_VTK)
         ENDIF(NOT VTK_USE_HYBRID)
 
       # If VTK was built using Patented, add an option for using patented code
-      # in InsightApplications (SNAP in particular)
+      # in ITKApps (SNAP in particular)
       IF(VTK_USE_PATENTED)
         OPTION(USE_VTK_PATENTED "Use VTK Patented Libraries (optional)" OFF)
         MARK_AS_ADVANCED(USE_VTK_PATENTED)

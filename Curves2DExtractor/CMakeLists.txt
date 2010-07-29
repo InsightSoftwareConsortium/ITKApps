@@ -7,7 +7,7 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
     INCLUDE(${ITK_USE_FILE})
   ELSE(ITK_FOUND)
     MESSAGE(FATAL_ERROR
-            "Cannot build InsightApplications without ITK.  Please set ITK_DIR.")
+            "Cannot build ITKApps without ITK.  Please set ITK_DIR.")
   ENDIF(ITK_FOUND)
 
   FIND_PACKAGE(FLTK)
@@ -21,10 +21,10 @@ ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 
 INCLUDE_DIRECTORIES(
-  ${InsightApplications_BINARY_DIR}/Curves2DExtractor
-  ${InsightApplications_SOURCE_DIR}/Auxiliary/FltkImageViewer
-  ${InsightApplications_BINARY_DIR}/Auxiliary/FltkImageViewer
-  ${InsightApplications_SOURCE_DIR}/Curves2DExtractor
+  ${ITKApps_BINARY_DIR}/Curves2DExtractor
+  ${ITKApps_SOURCE_DIR}/Auxiliary/FltkImageViewer
+  ${ITKApps_BINARY_DIR}/Auxiliary/FltkImageViewer
+  ${ITKApps_SOURCE_DIR}/Curves2DExtractor
 )
 
 # Take the list of GUI files, generate .cxx and .h from them and add
