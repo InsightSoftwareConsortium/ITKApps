@@ -9,15 +9,15 @@
   Copyright (c) 2002 Insight Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 #ifndef _RawSliceVolumeReader_txx
 #define _RawSliceVolumeReader_txx
 
-#include "itkRawImageSequenceReader.h"
+#include "itkImageSeriesReader.h"
 #include "itkRawImageIO.h"
 
 #include "RawSliceVolumeReader.h"
@@ -69,20 +69,22 @@ RawSliceVolumeReader<TPixel,TImage>
     }
   io->SetDimensions( 2, 1 );
 
-  typedef itk::RawImageSequenceReader<ImageType> ReaderType;
-  typename ReaderType::Pointer reader = ReaderType::New();
-
-  reader->SetFilePrefix( m_FilePrefix.c_str() );
-  reader->SetFilePattern( m_FilePattern.c_str() );
-  reader->SetStartSliceNumber( m_StartSliceNumber );
-  reader->SetEndSliceNumber( m_StartSliceNumber + (signed long) m_Size[2] - 1 );
-
-  reader->SetImageIO( io );
+  typedef itk::ImageSeriesReader<ImageType> SeriesReader;
+  typename SeriesReader::Pointer reader = SeriesReader::New();
+  typename SeriesReader::FileNamesContainer filenames;
+  for(unsigned i = m_StartSliceNumber;
+      i < (m_StartSliceNumber + m_Size[2]); i++)
+    {
+    std::string filename(m_FilePrefix);
+    char buf[2048];
+    sprintf(buf,m_FilePattern.c_str(), i);
+    filename += buf;
+    filenames.push_back(filename);
+    }
+  reader->SetFileNames(filenames);
+  reader->SetImageIO(io);
   reader->Update();
-
   m_Image = reader->GetOutput();
-
-
 }
 
 
