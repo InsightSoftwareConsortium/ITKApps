@@ -7,3 +7,14 @@
 *.png           -crlf
 *.raw           -crlf
 *.sh             crlf=input
+
+*.c              whitespace=tab-in-indent,no-lf-at-eof  hooks.style=KWStyle,uncrustify
+*.h              whitespace=tab-in-indent,no-lf-at-eof  hooks.style=KWStyle,uncrustify
+*.cxx            whitespace=tab-in-indent,no-lf-at-eof  hooks.style=KWStyle,uncrustify
+*.hxx            whitespace=tab-in-indent,no-lf-at-eof  hooks.style=KWStyle,uncrustify
+*.txx            whitespace=tab-in-indent,no-lf-at-eof  hooks.style=KWStyle,uncrustify
+*.txt            whitespace=tab-in-indent,no-lf-at-eof
+*.cmake          whitespace=tab-in-indent,no-lf-at-eof
+
+# Third-party code need not pass our style checks.
+/Utilities/*    -hooks.style
