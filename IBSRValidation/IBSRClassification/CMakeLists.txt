@@ -20,10 +20,7 @@ ${IBSRClassification_SOURCE_DIR}
 
 ADD_EXECUTABLE(GaussianIBSRClassificationApp Code/GaussianClassifierValidationApp.cxx)
 INSTALL_TARGETS(/bin GaussianIBSRClassificationApp)
-TARGET_LINK_LIBRARIES (GaussianIBSRClassificationApp
-ITKBasicFilters
-ITKIO
-)
+TARGET_LINK_LIBRARIES (GaussianIBSRClassificationApp ${ITK_LIBRARIES})
 
 
 ADD_EXECUTABLE(KmeansIBSRClassificationApp Code/KmeansClassifierValidationApp.cxx)

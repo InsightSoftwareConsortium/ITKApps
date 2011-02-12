@@ -52,8 +52,7 @@ ENDIF(FEM_VISUALIZATION)
 
 ADD_EXECUTABLE(FEMBrainStripValidationApp ${FEMBrainStripApp_SRCS} )
 INSTALL_TARGETS(/bin FEMBrainStripValidationApp)
-TARGET_LINK_LIBRARIES(FEMBrainStripValidationApp ITKBasicFilters ITKNumerics
-                                                 ITKFEM ITKIO ITKStatistics)
+TARGET_LINK_LIBRARIES(FEMBrainStripValidationApp ${ITK_LIBRARIES})
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
   SET_SOURCE_FILES_PROPERTIES (Code/FEMBrainStripValidationApp.cxx PROPERTIES COMPILE_FLAGS -w)
