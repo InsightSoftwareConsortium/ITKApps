@@ -37,7 +37,6 @@ SET ( ImageColorViewer_SRCS
 ADD_GUI_EXECUTABLE( ImageColorViewer "${ImageColorViewer_SRCS}" )
 
 TARGET_LINK_LIBRARIES (ImageColorViewer
-  ITKBasicFilters
+  ${ITK_LIBRARIES}
   ITKFltkImageViewer
-  ITKIO
 )

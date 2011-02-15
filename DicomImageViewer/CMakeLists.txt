@@ -30,8 +30,7 @@ ITK_DISABLE_FLTK_GENERATED_WARNINGS("DicomImageViewer.cxx")
 
 ADD_GUI_EXECUTABLE( DicomImageViewer DicomImageViewer.cxx )
 TARGET_LINK_LIBRARIES (DicomImageViewer
-  ITKBasicFilters
-  ITKIO
+  ${ITK_LIBRARIES}
   ITKFltkImageViewer
 )
 

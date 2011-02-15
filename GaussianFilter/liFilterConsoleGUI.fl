@@ -252,37 +252,71 @@ class liFilterConsoleGUI {open : {public liFilterConsoleBase}
     }
   }
   Function {~liFilterConsoleGUI()} {return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
   Function {Quit( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Load( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowInput( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowFilteredX( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowFilteredY( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowFilteredZ( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowSecondDerivativeX( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowSecondDerivativeY( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowSecondDerivativeZ( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowLaplacian( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowGradientModulus( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {WriteGradientX( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {WriteGradientY( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {WriteGradientZ( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {WriteGradientModulus( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {WriteLaplacian( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
 } 

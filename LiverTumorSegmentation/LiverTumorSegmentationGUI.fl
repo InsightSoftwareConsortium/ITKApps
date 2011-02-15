@@ -283,11 +283,17 @@ m_ShiftAndScaleParameterWindow->hide();}
 m_TextDisplay->buffer(m_TextBuffer);} {}
   }
   Function {~LiverTumorSegmentationGUI()} {return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
   Function {Quit()} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Load()} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Show()} {return_type {virtual void}
   } {
     code {m_MainWindow->show();
@@ -303,28 +309,41 @@ m_ShiftAndScaleParameterWindow->hide();
 m_AboutWindow->hide();} {}
   }
   Function {SelectAxialSlice( int )} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SelectCoronalSlice( int )} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SelectSaggitalSlice( int )} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {LoadDICOM()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {OnSegmentation()} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {GetImageScale(void)} {return_type {virtual double}
   } {
     code {return 1.0f;} {}
   }
   Function {SetImageScale( double val)} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {GetImageShift(void)} {return_type {virtual double}
   } {
     code {return 1.0f;} {}
   }
   Function {SetImageShift( double val)} {return_type {virtual void}
-  } {}
-  decl {Fl_Text_Buffer m_TextBuffer;} {}
+  } {
+  decl {Fl_Text_Buffer m_TextBuffer;} code {} {}
+  }
   Function {GetOverlayedVolumeOpacity()} {return_type {virtual float}
   } {
     code {return 0.0f;} {}
@@ -334,17 +353,29 @@ m_AboutWindow->hide();} {}
     code {return false;} {}
   }
   Function {LoadSegmentedVolume( void )} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {OnDebugButton()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {OnSegmentationParameters(void)} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {OnSegmentationParametersOk( int module )} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {OnSegmentationModuleSelection(int module)} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {OnOpacityControl( float opacity )} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SetSegmentedVolumeOpacityControlOn( double val )} {return_type {virtual void}
   } {
     code {m_SegmentedVolumeOpacityControl->value( val );

@@ -42,7 +42,8 @@ class CannyEdgeDetectionRunner
       // Set the parameters on it
       module.GetFilter()->SetVariance( variance );
       module.GetFilter()->SetMaximumError( maximumError );
-      module.GetFilter()->SetThreshold( threshold );
+      module.GetFilter()->SetUpperThreshold( threshold );
+      module.GetFilter()->SetLowerThreshold( threshold / 2.0);
       // Execute the filter
       module.ProcessData( pds  );
     }

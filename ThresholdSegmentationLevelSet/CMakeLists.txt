@@ -49,19 +49,16 @@ ${ThresholdSegmentationLevelSet_FLTK_UI_SRCS}
 ADD_GUI_EXECUTABLE(ThresholdSegmentationLevelSet "${ThresholdSegmentationLevelSet_SRCS}")
 
 TARGET_LINK_LIBRARIES (ThresholdSegmentationLevelSet
-ITKCommon
-ITKNumerics
-ITKBasicFilters
-ITKIO
-ITKFltkImageViewer
-ITKVtkFltk
-vtkCommon
-vtkFiltering
-vtkIO
-vtkImaging
-vtkGraphics
-vtkRendering
-vtkHybrid
+  ${ITK_LIBRARIES}
+  ITKFltkImageViewer
+  ITKVtkFltk
+  vtkCommon
+  vtkFiltering
+  vtkIO
+  vtkImaging
+  vtkGraphics
+  vtkRendering
+  vtkHybrid
 )
 
 IF(VTK_USE_VOLUMERENDERING)

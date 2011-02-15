@@ -212,35 +212,63 @@ m_TextDisplay->buffer(m_TextBuffer);} {}
   
  }
   Function {~DeformableModelApplicationGUI()} {return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
   Function {Help()} {return_type {virtual void}
-  } {}
-decl {Fl_Text_Buffer m_TextBuffer;} {}        
+  } {
+  decl {Fl_Text_Buffer m_TextBuffer;} code {} {}
+  }
   Function {Quit()} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SaveMask()} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SaveMesh()} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {DeformMesh()} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {LoadMesh()} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {CreateMesh()} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Load()} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Show()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Hide()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SelectAxialSlice( int )} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SelectCoronalSlice( int )} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SelectSagittalSlice( int )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ComputeInternalForces()} {return_type {virtual void}
-  } {}
- 
+  } {
+    code {} {}
+  }
 } 

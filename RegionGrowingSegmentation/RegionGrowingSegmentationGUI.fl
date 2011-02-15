@@ -328,31 +328,59 @@ class RegionGrowingSegmentationGUI {open : {public RegionGrowingSegmentationBase
     }
   }
   Function {~RegionGrowingSegmentationGUI()} {return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
   Function {Quit( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Load( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowAbout( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowInputImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowConnectedThresholdImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowConsole( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowHomogeneousImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowConfidenceConnectedImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowCurvatureFlowImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowCurvatureAnisotropicDiffusionImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowGradientAnisotropicDiffusionImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {UpdateExtract()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowHomogeneousImageWithVTK( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
 } 

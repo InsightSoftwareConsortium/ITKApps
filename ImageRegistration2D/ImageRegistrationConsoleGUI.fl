@@ -329,29 +329,55 @@ class ImageRegistrationConsoleGUI {open : {public ImageRegistrationConsoleBase}
     }
   }
   Function {~ImageRegistrationConsoleGUI()} {return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
   Function {Quit( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Load( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowAbout( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowFixedImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowMovingImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowRegisteredMovingImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowInputFixedImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowInputMovingImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowNormalizedInputMovingImage( void )} {selected return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowTransformedMovingImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowMixedChannelImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SaveRegisteredImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
 } 

@@ -53,12 +53,8 @@ ADD_EXECUTABLE(imageRegTool
 INSTALL_TARGETS(/bin imageRegTool)
 
 TARGET_LINK_LIBRARIES (imageRegTool
-ITKIO
-ITKMetaIO
-ITKBasicFilters
-ITKStatistics
-ITKNumerics
-ITKFlFileWriter
-ITKFltkImageViewer
+  ${ITK_LIBRARIES}
+  ITKFlFileWriter
+  ITKFltkImageViewer
 )
 

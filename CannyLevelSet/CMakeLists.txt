@@ -48,10 +48,7 @@ ITK_DISABLE_FLTK_GENERATED_WARNINGS("${CannySegmentationLevelSet_SRCS}")
 ADD_GUI_EXECUTABLE(CannySegmentationLevelSet "${CannySegmentationLevelSet_SRCS}")
 TARGET_LINK_LIBRARIES (
   CannySegmentationLevelSet
-  ITKCommon
-  ITKNumerics
-  ITKBasicFilters
-  ITKIO
+  ${ITK_LIBRARIES}
   vtkRendering
   vtkGraphics
   vtkHybrid

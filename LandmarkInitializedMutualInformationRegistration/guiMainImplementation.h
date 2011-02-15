@@ -26,7 +26,7 @@
 
 // FLTK related includes...
 #include <FL/Enumerations.H>
-#include <FL/fl_file_chooser.H>
+#include <FL/Fl_File_Chooser.H>
 
 // ITK related includes....
 #include <itkAffineTransform.h>

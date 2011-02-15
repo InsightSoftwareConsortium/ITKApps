@@ -134,6 +134,12 @@ class LandmarkSliceViewer : public GLSliceView< TImagePixel,
     LandmarkSpatialObjectType::Pointer     m_LandmarkSpatialObject;
     LandmarkPointListType *                m_LandmarkPointList;
   
+#ifdef None
+#undef None
+#endif
+#ifdef Add
+#undef Add
+#endif
     enum Action{ None, Add };
   
     enum Mode{ Normal, Selection };

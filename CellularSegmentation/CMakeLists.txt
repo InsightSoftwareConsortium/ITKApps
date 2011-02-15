@@ -67,7 +67,7 @@ INCLUDE_DIRECTORIES(
 
 
 TARGET_LINK_LIBRARIES( CellularSegmentation
-  ITKAlgorithms ITKBasicFilters ITKCommon ITKIO ITKNumerics ITKIO
+  ${ITK_LIBRARIES}
   ITKFltkImageViewer ITKVtkFltk
   vtkCommon
   vtkFiltering

@@ -158,7 +158,7 @@ bool LoadUserPreferencesInteractive(SystemInterface &system)
 
 // Setup printing of stack trace on segmentation faults. This only
 // works on select GNU systems
-#if defined(__GNUC__) && !defined(__CYGWIN__) && !defined(__APPLE__)
+#if defined(__GNUC__) && !defined(__CYGWIN__) && !defined(__MINGW32__) && !defined(__APPLE__)
 
 #include <signal.h>
 #include <execinfo.h>

@@ -21,11 +21,10 @@
 #include "itkImageFileWriter.h"
 #include "itkScalarToArrayCastImageFilter.h"
 
-#include "itkImageToListAdaptor.h"
+#include "itkImageToListSampleAdaptor.h"
 #include "itkMembershipSampleGenerator.h"
-#include "itkGaussianDensityFunction.h"
-#include "itkMeanCalculator.h"
-#include "itkCovarianceCalculator.h"
+#include "itkGaussianMembershipFunction.h"
+#include "itkMeanSampleFilter.h"
 #include "itkMaximumRatioDecisionRule.h"
 #include "itkSampleClassifierWithMask.h"
 
@@ -176,7 +175,7 @@ int main(int argc, char* argv[])
     VectorImageType ;
   typedef itk::ScalarToArrayCastImageFilter< ImageType, VectorImageType >
     VectorImageGeneratorType ;
-  typedef itk::Statistics::ImageToListAdaptor< VectorImageType > 
+  typedef itk::Statistics::ImageToSampleListAdaptor< VectorImageType >
     ImageSampleType ;
 
   StringVectorType::const_iterator fn_iter = 
@@ -254,9 +253,9 @@ int main(int argc, char* argv[])
   std::cout << "Inducing the gaussian density function parameters and"
             << " apriori probabilities..." << std::endl ;
 
-  typedef stat::GaussianDensityFunction< MeasurementVectorType > 
+  typedef stat::GaussianMembershipFunction< MeasurementVectorType >
     DensityFunctionType ;
-  typedef stat::MeanCalculator< ClassSampleType > MeanCalculatorType ;
+  typedef stat::MeanSampleFilter< ClassSampleType > MeanCalculatorType ;
   typedef stat::CovarianceCalculator< ClassSampleType >
     CovarianceCalculatorType ;
   typedef itk::Statistics::SampleClassifierWithMask

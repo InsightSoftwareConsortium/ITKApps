@@ -53,7 +53,9 @@ class RawImageReaderViewerGUI {open : {public RawImageReaderViewer}
     }
   }
   Function {~RawImageReaderViewerGUI()} {return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
   Function {Show(void)} {return_type {virtual void}
   } {
     code {panel->show();} {}

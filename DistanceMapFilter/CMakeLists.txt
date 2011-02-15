@@ -49,8 +49,7 @@ ADD_GUI_EXECUTABLE(DistanceMapFilter "${DistanceMapFilter_SRCS}")
 ITK_DISABLE_FLTK_GENERATED_WARNINGS("main.cxx;DistanceMapFilter.cxx;DistanceMapFilterBase.cxx;${DistanceMapFilter_FLTK_UI_SRCS}")
 
 TARGET_LINK_LIBRARIES (DistanceMapFilter
-ITKBasicFilters
-ITKIO
-ITKFltkImageViewer
+  ${ITK_LIBRARIES}
+  ITKFltkImageViewer
 )
 

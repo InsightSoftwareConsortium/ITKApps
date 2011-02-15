@@ -26,22 +26,19 @@ TARGET_LINK_LIBRARIES (GaussianIBSRClassificationApp ${ITK_LIBRARIES})
 ADD_EXECUTABLE(KmeansIBSRClassificationApp Code/KmeansClassifierValidationApp.cxx)
 INSTALL_TARGETS(/bin KmeansIBSRClassificationApp)
 TARGET_LINK_LIBRARIES (KmeansIBSRClassificationApp
-ITKBasicFilters
-ITKIO
+  ${ITK_LIBRARIES}
 )
 
 
 ADD_EXECUTABLE(MRFGaussianIBSRClassificationApp Code/MRFGaussianClassifierValidationApp.cxx)
 INSTALL_TARGETS(/bin MRFGaussianIBSRClassificationApp)
 TARGET_LINK_LIBRARIES (MRFGaussianIBSRClassificationApp
-ITKBasicFilters
-ITKIO
+  ${ITK_LIBRARIES}
 )
 
 
 ADD_EXECUTABLE(MRFKmeansIBSRClassificationApp Code/MRFKmeansClassifierValidationApp.cxx)
 INSTALL_TARGETS(/bin MRFKmeansIBSRClassificationApp)
 TARGET_LINK_LIBRARIES (MRFKmeansIBSRClassificationApp
-ITKBasicFilters
-ITKIO
+  ${ITK_LIBRARIES}
 )

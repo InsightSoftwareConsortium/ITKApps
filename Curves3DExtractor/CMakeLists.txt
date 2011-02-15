@@ -64,7 +64,7 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
   TARGET_LINK_LIBRARIES(
       Curves3DExtractorLib
-      ITKBasicFilters ITKIO ITKFltkImageViewer
+      ${ITK_LIBRARIES} ITKFltkImageViewer
       ${FLTK_LIBRARIES} ${OPENGL_glu_LIBRARY} ${OPENGL_LIBRARIES} )
 
 
@@ -95,7 +95,7 @@ ELSE( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
   INSTALL_TARGETS(/lib Curves3DExtractorLib)
 
   TARGET_LINK_LIBRARIES( Curves3DExtractorLib
-                         ITKBasicFilters ITKIO ITKFltkImageViewer )
+                         ${ITK_LIBRARIES} ITKFltkImageViewer )
   ADD_DEPENDENCIES(Curves3DExtractorLib ITKFltkImageViewer)
 
   SET(Curves3DExtractor_SRCS

@@ -321,31 +321,59 @@ class RegionGrowingSegmentation2DGUI {open : {public RegionGrowingSegmentationBa
     }
   }
   Function {~RegionGrowingSegmentation2DGUI()} {return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
   Function {Quit( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Load( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowAbout( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowInputImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowConnectedThresholdImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowConsole( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowHomogeneousImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowConfidenceConnectedImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowCurvatureFlowImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowCurvatureAnisotropicDiffusionImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowGradientAnisotropicDiffusionImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowComposedImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowBilateralImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
 } 

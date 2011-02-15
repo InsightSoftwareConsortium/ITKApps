@@ -23,7 +23,7 @@ ${ITKRegistrationLib_SOURCE_DIR}/../IBSRValidation/Common
 
 ADD_LIBRARY(Example_ITKRegistrationLib ITKRegistrationLib.cxx )
 INSTALL_TARGETS(/lib Example_ITKRegistrationLib)
-TARGET_LINK_LIBRARIES(Example_ITKRegistrationLib ITKNumerics ITKIO ITKBasicFilters ITKCommon )
+TARGET_LINK_LIBRARIES(Example_ITKRegistrationLib ${ITK_LIBRARIES})
 
 ADD_EXECUTABLE(Example_ITKRegistrationLibTest ITKRegistrationLibTest.cxx)
 INSTALL_TARGETS(/bin Example_ITKRegistrationLibTest)

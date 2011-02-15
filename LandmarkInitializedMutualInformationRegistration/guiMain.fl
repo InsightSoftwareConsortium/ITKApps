@@ -4,8 +4,6 @@ header_name {.h}
 code_name {.cxx}
 class guiMain {open
 } {
-  Function {~guiMain()} {open return_type virtual
-  } {}
   Function {guiMain()} {open
   } {
     Fl_Window tkWindow {
@@ -646,71 +644,139 @@ tkMovingImageViewer->DrawRegionOfInterest() ;}
     }
   }
   Function {SelectFixedImage()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SelectMovingImage()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {UpdateSliceNumber()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Register()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SetDisplayMovingImage()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {UpdateLandmark(Fl_Group* parent, unsigned int index )} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Quit()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ClearLandmarks(Fl_Group* parent)} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SaveLandmarks( bool moving )} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {LoadLandmarks( bool moving )} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SaveFinalRegisteredImage()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ApplyAdvancedOptions()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowAdvancedOptions()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {JumpToLandmark( bool moving, unsigned int index )} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SaveStudy()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {LoadStudy( const char * filename )} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowRegionOptions()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ApplyRegionOptions()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {UpdateRegionOptions()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowHelp( const char * file )} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Reset()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SelectImageSet(unsigned int)} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SaveTransform()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SaveOptions()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {LoadOptions()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SetViewAxis(unsigned int axis)} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {MoveRegionOfInterest(unsigned int direction)} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ResizeRegionOfInterest(unsigned int direction)} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ApplyRegionOfInterest()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {CancelRegionOfInterest()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowRegionOfInterestWindow()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {UpdateMovingSliceNumber()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {UpdateFixedSliceNumber()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {UpdateMovingImageSpacing(  )} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
 } 

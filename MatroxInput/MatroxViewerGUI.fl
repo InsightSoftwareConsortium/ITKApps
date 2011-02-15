@@ -40,7 +40,9 @@ class MatroxViewerGUI {open : {public ISIS::MatroxViewerBase}
     }
   }
   Function {~MatroxViewerGUI()} {open
-  } {}
+  } {
+    code {} {}
   Function {ShowCurvatureFlowImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
 } 

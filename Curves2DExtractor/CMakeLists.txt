@@ -39,7 +39,7 @@ ADD_LIBRARY(Curves2DExtractorLib  ceExtractorConsole.cxx
 INSTALL_TARGETS(/lib Curves2DExtractorLib)
 
 TARGET_LINK_LIBRARIES(Curves2DExtractorLib
-                      ITKBasicFilters ITKIO ITKFltkImageViewer)
+                      ${ITK_LIBRARIES} ITKFltkImageViewer)
 
 IF(NOT BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
   ADD_DEPENDENCIES(Curves2DExtractorLib ITKFltkImageViewer)

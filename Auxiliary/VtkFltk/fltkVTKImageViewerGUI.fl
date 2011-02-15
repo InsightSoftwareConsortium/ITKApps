@@ -18,11 +18,13 @@ class fltkVTKImageViewerGUI {open : {public fltk::VTKImageViewerBase}
     }
   }
   Function {~fltkVTKImageViewerGUI()} {open return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
   Function {Show()} {open return_type {virtual void}
   } {
     code {externalWindow->show();
-fltkRenderWindowInteractor->show();} {}
+          fltkRenderWindowInteractor->show();} {}
   }
   Function {Hide()} {open return_type {virtual void}
   } {

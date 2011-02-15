@@ -140,13 +140,23 @@ class liFilterConsole3DGUI {open : {public liFilterConsole3DBase}
     }
   }
   Function {~liFilterConsole3DGUI()} {return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
   Function {Quit( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Load( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowGradientImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowCurvatureImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
 } 

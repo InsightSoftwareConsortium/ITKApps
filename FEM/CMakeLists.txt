@@ -38,49 +38,27 @@ ENDIF(NOT UNIX)
 # Create project files for all examples
 ADD_EXECUTABLE(FEMRead FEMRead.cxx)
 INSTALL_TARGETS(/bin FEMRead)
-TARGET_LINK_LIBRARIES (FEMRead
-  ITKFEM
-  ITKCommon
-  ITKNumerics
-  ITKBasicFilters
-  ITKStatistics
-  ITKIO
-)
+TARGET_LINK_LIBRARIES (FEMRead ${ITK_LIBRARIES})
 
 
 ADD_EXECUTABLE(FEMTruss FEMTruss.cxx)
 INSTALL_TARGETS(/bin FEMTruss)
 TARGET_LINK_LIBRARIES (FEMTruss
-  ITKFEM
-  ITKCommon
-  ITKNumerics
-  ITKBasicFilters
-  ITKStatistics
-  ITKIO
+  ${ITK_LIBRARIES}
 )
 
 IF(NOT BORLAND)
   ADD_EXECUTABLE(FEMImageRegLMEx ${FEMImageRegLMEx_SRCS})
   INSTALL_TARGETS(/bin FEMImageRegLMEx)
   TARGET_LINK_LIBRARIES (FEMImageRegLMEx
-    ITKFEM
-    ITKCommon
-    ITKNumerics
-    ITKBasicFilters
-    ITKStatistics
-    ITKIO
+  ${ITK_LIBRARIES}
 )
 ENDIF(NOT BORLAND)
 
 ADD_EXECUTABLE(FEMSolverHyperbolicExample FEMSolverHyperbolicExample.cxx)
 INSTALL_TARGETS(/bin FEMSolverHyperbolicExample)
 TARGET_LINK_LIBRARIES (FEMSolverHyperbolicExample
-  ITKFEM
-  ITKCommon
-  ITKNumerics
-  ITKBasicFilters
-  ITKStatistics
-  ITKIO
+  ${ITK_LIBRARIES}
 )
 
 IF(CMAKE_COMPILER_IS_GNUCXX)

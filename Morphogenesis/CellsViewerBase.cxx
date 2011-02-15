@@ -20,7 +20,7 @@
 #endif
 
 #include "CellsViewerBase.h"
-#include <FL/fl_file_chooser.H>
+#include <FL/Fl_File_Chooser.H>
 #include <FL/fl_ask.H>
 
 namespace bio {
@@ -193,7 +193,7 @@ CellsViewerBase
   m_Stop = false;
   if( !m_StartTime ) 
     {
-    m_StartTime = m_RealTimeClock->GetTimeStamp();
+    m_StartTime = m_RealTimeClock->GetTimeInSeconds();
     }
   while( !m_Stop )
     {
@@ -378,7 +378,7 @@ double
 CellsViewerBase
 ::GetCurrentTime(void) const
 {
-  return m_RealTimeClock->GetTimeStamp();
+  return m_RealTimeClock->GetTimeInSeconds();
 }
 
 
@@ -389,7 +389,7 @@ double
 CellsViewerBase
 ::GetElapsedTime(void) const
 {
-  return m_RealTimeClock->GetTimeStamp() - m_StartTime;
+  return m_RealTimeClock->GetTimeInSeconds() - m_StartTime;
 }
 
 
@@ -596,7 +596,7 @@ void CellsViewerBase
     }
 
   m_CurrentFile++;
-  itk::OStringStream name;
+  std::ostringstream name;
   name << m_BaseFileName;
   name.width(4);
   name.fill('0');

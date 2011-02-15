@@ -1,7 +1,8 @@
 #include "time.h"
 
 #include <RegisterWindow.h>
-#include <FL/fl_file_chooser.H>
+#include <FL/Fl_File_Chooser.H>
+
 #include "itkTimeProbe.h"
 
 RegisterWindow::RegisterWindow()
@@ -270,7 +271,7 @@ void RegisterWindow::Execute(void)
   menuMixedChannel->activate() ;
   buSaveRegisteredImage->activate() ;
   grpControls->activate() ;
-  itk::OStringStream message ;
+  std::ostringstream message ;
   message
     << "Registration done in " << 
     timeProbe.GetMeanTime() << "seconds." 

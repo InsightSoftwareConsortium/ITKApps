@@ -100,17 +100,31 @@ class SegmenterConsole3DGUI {open : {public SegmenterConsole3DBase}
     }
   }
   Function {~SegmenterConsole3DGUI()} {return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
   Function {Quit( void )} {return_type {virtual void}
-  } {}
-  Function {Load( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
+ Function {Load( void )} {return_type {virtual void}
+  } {
+    code {} {}
+  }
   Function {ShowGradientImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowSegmentedImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Flip( int )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowHelp( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
 } 

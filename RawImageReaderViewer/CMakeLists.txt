@@ -39,9 +39,8 @@ ITK_DISABLE_FLTK_GENERATED_WARNINGS("${RawImageReaderViewer_SRCS}")
 ADD_GUI_EXECUTABLE(RawImageReaderViewer   "${RawImageReaderViewer_SRCS}")
 
 TARGET_LINK_LIBRARIES (RawImageReaderViewer
-ITKBasicFilters
-ITKIO
-ITKFltkImageViewer
+  ${ITK_LIBRARIES}
+  ITKFltkImageViewer
 )
 
 

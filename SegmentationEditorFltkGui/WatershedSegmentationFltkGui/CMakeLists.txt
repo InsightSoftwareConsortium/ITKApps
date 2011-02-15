@@ -43,12 +43,9 @@ ADD_EXECUTABLE(WatershedSegmentationFltkGui3D ${WatershedSegmentationFltkGui3D_S
 INSTALL_TARGETS(/bin WatershedSegmentationFltkGui3D)
 
 TARGET_LINK_LIBRARIES (WatershedSegmentationFltkGui3D
-ITKBasicFilters
-ITKIO
-ITKNumerics
-ITKAlgorithms
-ITKFltkImageViewer
-${FTLK_LIBRARIES}
+  ${ITK_LIBRARIES}
+  ITKFltkImageViewer
+  ${FTLK_LIBRARIES}
 )
 
 

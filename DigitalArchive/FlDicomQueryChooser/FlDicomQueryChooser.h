@@ -31,10 +31,12 @@
 #include <itkImageFileWriter.h>
 #include <itkRescaleIntensityImageFilter.h>
 #include <itkImage.h>
+
 #include <FL/Fl_Window.H>
-#include <FL/fl_file_chooser.H>
-#include <GLSliceView.h>
+#include <FL/Fl_File_Chooser.H>
 #include <FL/fl_ask.H>
+
+#include <GLSliceView.h>
 
 #ifdef WITH_ZLIB
 #include <zlib.h>          /* for zlibVersion() */

@@ -93,7 +93,7 @@ INSTALL_TARGETS(/bin LiverTumorSegmentationExample)
 
 TARGET_LINK_LIBRARIES( LiverTumorSegmentationExample
   LiverTumorSegmentationLibrary
-  ITKAlgorithms ITKBasicFilters ITKCommon ITKIO ITKNumerics ITKIO
+  ${ITK_LIBRARIES}
   ITKFltkImageViewer ITKVtkFltk
   vtkRendering vtkGraphics vtkHybrid vtkImaging vtkIO vtkFiltering vtkCommon
   ${FLTK_LIBRARIES})
@@ -101,5 +101,5 @@ TARGET_LINK_LIBRARIES( LiverTumorSegmentationExample
 ADD_EXECUTABLE(ResampleVolumes ResampleVolumes.cxx )
 INSTALL_TARGETS(/bin ResampleVolumes)
 
-TARGET_LINK_LIBRARIES(ResampleVolumes ITKIO ITKCommon ITKNumerics)
+TARGET_LINK_LIBRARIES(ResampleVolumes ${ITK_LIBRARIES})
 

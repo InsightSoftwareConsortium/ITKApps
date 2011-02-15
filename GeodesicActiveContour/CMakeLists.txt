@@ -45,5 +45,5 @@ SET(GeodesicActiveContour_SRCS
 
 ADD_GUI_EXECUTABLE(GeodesicActiveContour "${GeodesicActiveContour_SRCS}")
 
-TARGET_LINK_LIBRARIES(GeodesicActiveContour ITKNumerics ITKBasicFilters
-                      ITKIO vtkHybrid vtkIO ITKVtkFltk ITKFltkImageViewer)
+TARGET_LINK_LIBRARIES(GeodesicActiveContour   ${ITK_LIBRARIES}
+                      vtkHybrid vtkIO ITKVtkFltk ITKFltkImageViewer)

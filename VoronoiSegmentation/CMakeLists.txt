@@ -39,10 +39,7 @@ ${VoronoiSegmentation_FLTK_UI_SRCS}
 
 ADD_GUI_EXECUTABLE(VoronoiSegmentation   "${Project_SRCS}")
 TARGET_LINK_LIBRARIES (VoronoiSegmentation
-ITKCommon
-ITKNumerics
-ITKBasicFilters
-ITKIO
+${ITK_LIBRARIES}
 ITKFltkImageViewer
 
 )

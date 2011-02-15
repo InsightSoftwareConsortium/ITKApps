@@ -15,7 +15,7 @@ ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 ADD_LIBRARY(Example_ITKFilterLib ITKFilterLib.cxx )
 INSTALL_TARGETS(/lib Example_ITKFilterLib)
-TARGET_LINK_LIBRARIES(Example_ITKFilterLib ITKCommon ITKNumerics ITKIO ITKBasicFilters)
+TARGET_LINK_LIBRARIES(Example_ITKFilterLib ${ITK_LIBRARIES})
 
 ADD_EXECUTABLE(Example_ITKFilterLibTest ITKFilterLibTest.cxx )
 INSTALL_TARGETS(/bin Example_ITKFilterLibTest)

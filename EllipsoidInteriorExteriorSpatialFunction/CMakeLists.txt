@@ -29,15 +29,8 @@ ADD_EXECUTABLE(itkEllipsoidInteriorExteriorSpatialFunctionExample ${ELLIPSOID_SP
 INSTALL_TARGETS(/bin itkEllipsoidInteriorExteriorSpatialFunctionExample)
 
 TARGET_LINK_LIBRARIES (itkEllipsoidInteriorExteriorSpatialFunctionExample
-ITKCommon
-ITKIO
-ITKBasicFilters
+${ITK_LIBRARIES}
 )
-IF(UNIX)
-  TARGET_LINK_LIBRARIES (itkEllipsoidInteriorExteriorSpatialFunctionExample
-  -lm
-  )
-ENDIF(UNIX)
 
 
 

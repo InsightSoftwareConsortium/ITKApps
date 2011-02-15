@@ -37,7 +37,7 @@
 
 #include "itkTranslationTransform.h"
 #include "itkScaleTransform.h"
-#include "itkRigid3DTransform.h"
+#include "itkVersorRigid3DTransform.h"
 #include "itkAffineTransform.h"
 
 

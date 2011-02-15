@@ -27,7 +27,7 @@ ${ITK_BINARY_DIR}/Code/BasicFilters
 ${ITK_BINARY_DIR}/Code/Numerics
 )
 
-LINK_LIBRARIES( ITKCommon ITKBasicFilters ITKNumerics ITKIO )
+LINK_LIBRARIES( ITKCommon ITKBasicFilters ${ITK_LIBRARIES})
 CONFIGURE_FILE(${CLReg_SOURCE_DIR}/testScript.in
                 ${CLReg_BINARY_DIR}/testScript IMMEDIATE )
 ADD_EXECUTABLE(CLReg CLReg.cxx)

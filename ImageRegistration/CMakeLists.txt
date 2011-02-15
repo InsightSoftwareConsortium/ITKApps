@@ -41,8 +41,6 @@ ITK_DISABLE_FLTK_GENERATED_WARNINGS("${ImageRegistration_SRCS}")
 
 ADD_GUI_EXECUTABLE(ImageRegistration "${ImageRegistration_SRCS}")
 TARGET_LINK_LIBRARIES (ImageRegistration
-ITKNumerics
-ITKBasicFilters
-ITKIO
-ITKFltkImageViewer
+  ${ITK_LIBRARIES}
+  ITKFltkImageViewer
 )

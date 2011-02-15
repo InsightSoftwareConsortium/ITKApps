@@ -26,13 +26,11 @@
 #define vtkFloatingPointType float
 #endif
 
-#include "itkExceptionObject.h"
-
 // turn itk exceptions into vtk errors
 #undef itkExceptionMacro  
 #define itkExceptionMacro(x) \
   { \
-  ::itk::OStringStream message; \
+    std::ostringstream message;                \
   message << "itk::ERROR: " << this->GetNameOfClass() \
           << "(" << this << "): " x; \
   std::cerr << message.str().c_str() << std::endl; \
@@ -41,7 +39,7 @@
 #undef itkGenericExceptionMacro  
 #define itkGenericExceptionMacro(x) \
   { \
-  ::itk::OStringStream message; \
+    std::stringstream message; \
   message << "itk::ERROR: " x; \
   std::cerr << message.str().c_str() << std::endl; \
   }

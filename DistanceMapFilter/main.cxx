@@ -1,7 +1,6 @@
 
-#include "itkExceptionObject.h"
 #include "DistanceMapFilter.h"
-
+#include "itkMacro.h"
 
 int main()
 {
@@ -12,7 +11,7 @@ int main()
   example->Show();
   example->ShowDisplay();
   
-  try 
+  try
     {
     Fl::run();
     }

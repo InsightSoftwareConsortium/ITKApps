@@ -36,7 +36,5 @@ INSTALL_TARGETS(/bin AnisotropicDiffusionFltkGui3D)
 ADD_EXECUTABLE(AnisotropicDiffusionFltkGui2D ${AnisotropicDiffusionFltkGui2D_SRCS} ${AnisotropicDiffusionFltkGui2D_FLTK_UI_SRCS})
 INSTALL_TARGETS(/bin AnisotropicDiffusionFltkGui2D)
 
-TARGET_LINK_LIBRARIES(AnisotropicDiffusionFltkGui2D ITKFltkImageViewer ITKIO
-                      ITKBasicFilters)
-TARGET_LINK_LIBRARIES(AnisotropicDiffusionFltkGui3D ITKFltkImageViewer ITKIO
-                      ITKBasicFilters)
+TARGET_LINK_LIBRARIES(AnisotropicDiffusionFltkGui2D ITKFltkImageViewer ${ITK_LIBRARIES})
+TARGET_LINK_LIBRARIES(AnisotropicDiffusionFltkGui3D ITKFltkImageViewer   ${ITK_LIBRARIES})

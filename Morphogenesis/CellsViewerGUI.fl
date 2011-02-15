@@ -163,5 +163,7 @@ speciesWindow->hide();}
     }
   }
   Function {~CellsViewerGUI()} {return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
 } 

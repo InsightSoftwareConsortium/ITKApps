@@ -39,7 +39,7 @@ extern std::ostream &snaperr;
 #include "IRISVectorTypes.h"
 
 /** Definitions for the string streams, for compatibility */
-typedef itk::OStringStream IRISOStringStream;
+typedef std::ostringstream IRISOStringStream;
 typedef std::istringstream IRISIStringStream;
 
 // Short name (release tag, e.g. $Name:  $)

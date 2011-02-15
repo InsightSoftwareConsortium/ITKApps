@@ -2,10 +2,10 @@ PROJECT(ImageCalculator)
 SET(CXX_TEST_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 ADD_EXECUTABLE(ImageCalculator  ImageCalculator.cxx ImageCalculatorProcess2D.cxx ImageCalculatorProcess3D.cxx ImageCalculatorUtils.cxx)
-TARGET_LINK_LIBRARIES(ImageCalculator ITKCommon ITKIO ITKAlgorithms ITKBasicFilters )
+TARGET_LINK_LIBRARIES(ImageCalculator ${ITK_LIBRARIES} )
 
 ADD_EXECUTABLE(ImageGenerate ImageGenerate.cxx )
-TARGET_LINK_LIBRARIES(ImageGenerate ITKCommon ITKIO)
+TARGET_LINK_LIBRARIES(ImageGenerate ${ITK_LIBRARIES})
 
 INSTALL_FILES(/include/ImageCalculator "(\\.h)$")
 INSTALL_TARGETS(/bin ImageCalculator )
@@ -217,7 +217,7 @@ IF( BUILD_TESTING )
 
 
   ADD_EXECUTABLE(ImageCalculatorTests ImageCalculatorTests.cxx ImageCalculatorUtils.cxx ImageCalculatorProcess2D.cxx ImageCalculatorProcess3D.cxx)
-  TARGET_LINK_LIBRARIES(ImageCalculatorTests ITKCommon ITKIO ITKAlgorithms ITKBasicFilters)
+  TARGET_LINK_LIBRARIES(ImageCalculatorTests ${ITK_LIBRARIES})
 
 ENDIF( BUILD_TESTING )
 

@@ -179,39 +179,75 @@ class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
     }
   }
   Function {~ceExtractorConsoleGUI()} {return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
   Function {Quit( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Load( const char * )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowInput( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowLaplacian( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowGradientModulus( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ComputeHessian( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowTubeness( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowParametricSpace( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ResetViewOfParametricSpace( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowCurve3DPoints( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowExtractedParametricPoints( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ComputeHessianEigenAnalysis( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowLambda1( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowLambda2( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowLambda3( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ComputeGradient( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Load()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
 } 

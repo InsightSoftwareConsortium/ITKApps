@@ -344,49 +344,95 @@ class SegmenterConsoleGUI {open : {public SegmenterConsoleBase}
     }
   }
   Function {~SegmenterConsoleGUI()} {return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
   Function {Quit( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Load( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowInputImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowGradientImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowSegmentedImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SwitchCase( int )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {LoadSeedImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowSeedImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SmoothImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowSpeedImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ChangePaintRadius( float )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ClearGuess( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ClearThresh( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ToggleThresholdGuess( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {CalculateThresholds( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SaveSegmented( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SaveBinaryMask( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ChangeMinThresh( float )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ChangeMaxThresh( float )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SetThresholdFilterToModified( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SaveSession( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {LoadSession( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
 } 

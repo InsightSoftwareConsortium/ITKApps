@@ -1152,7 +1152,7 @@ guiMainImplementation
       m_ImageRegistrationApp->GetLandmarkScales();
   for ( unsigned int i = 0; i < landmarkScales.Size(); ++i )
     {
-    itk::OStringStream temp;
+    std::ostringstream temp;
     temp <<  "LandmarkScales_" << i;
     landmarkScales[i] = options[temp.str()];
     }
@@ -1171,7 +1171,7 @@ guiMainImplementation
       m_ImageRegistrationApp->GetRigidScales();
   for ( unsigned int i = 0; i < rigidScales.Size(); ++i )
     {
-    itk::OStringStream temp;
+    std::ostringstream temp;
     temp <<  "RigidScales_" << i;
     rigidScales[i] = options[temp.str()];
     }
@@ -1186,7 +1186,7 @@ guiMainImplementation
       m_ImageRegistrationApp->GetAffineScales();
   for ( unsigned int i = 0; i < affineScales.Size(); ++i )
     {
-    itk::OStringStream temp;
+    std::ostringstream temp;
     temp << "AffineScales_" << i;
     affineScales[i] = options[temp.str()];
     }

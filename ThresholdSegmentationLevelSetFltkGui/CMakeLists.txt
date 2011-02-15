@@ -55,11 +55,8 @@ ADD_EXECUTABLE(ThresholdSegmentationLevelSetFltkGui ${ThresholdSegmentationLevel
 INSTALL_TARGETS(/bin ThresholdSegmentationLevelSetFltkGui)
 
 TARGET_LINK_LIBRARIES (ThresholdSegmentationLevelSetFltkGui
-ITKBasicFilters
-ITKIO
-ITKNumerics
-ITKAlgorithms
-ITKFltkImageViewer
+  ${ITK_LIBRARIES}
+  ITKFltkImageViewer
 )
 
 

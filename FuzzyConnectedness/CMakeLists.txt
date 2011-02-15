@@ -21,4 +21,4 @@ INCLUDE_DIRECTORIES(${ITKApps_SOURCE_DIR}/FuzzyConnectedness
 ADD_EXECUTABLE(FuzzyConnectedness FuzzyConnectApp.cxx FuzzyConnectedness.cxx)
 INSTALL_TARGETS(/bin FuzzyConnectedness)
 
-TARGET_LINK_LIBRARIES(FuzzyConnectedness ITKIO)
+TARGET_LINK_LIBRARIES(FuzzyConnectedness ${ITK_LIBRARIES})
