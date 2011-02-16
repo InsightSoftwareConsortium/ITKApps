@@ -314,19 +314,35 @@ class liImageRegistrationConsoleGUI {open : {public liImageRegistrationConsoleBa
     }
   }
   Function {~liImageRegistrationConsoleGUI()} {return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
   Function {Quit( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Load( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowAbout( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowFixedImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowMovingImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowInputMovingImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowMappedMovingImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
 } 

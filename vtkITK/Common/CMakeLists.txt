@@ -99,5 +99,5 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
 TARGET_LINK_LIBRARIES(vtkVTKITKCommon vtkImaging
-                      ITKIO ITKNumerics ITKBasicFilters ITKAlgorithms)
+                      ${ITK_LIBRARIES})
 

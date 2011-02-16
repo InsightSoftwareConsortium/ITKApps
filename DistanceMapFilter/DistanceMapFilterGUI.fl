@@ -89,7 +89,9 @@ class DistanceMapFilterGUI {open : {public DistanceMapFilterBase}
     }
   }
   Function {~DistanceMapFilterGUI()} {return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
   Function {Quit(void)} {return_type {virtual void}
   } {
     code {this->Hide();} {}

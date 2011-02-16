@@ -4,8 +4,6 @@ header_name {.h}
 code_name {.cxx}
 class EditorConsoleGUI {open : {public EditorConsoleBase}
 } {
-  Function {EditorConsoleGUI()} {open
-  } {}
   Function {CreateGUI()} {open
   } {
     Fl_Window consoleWindow {
@@ -291,17 +289,31 @@ class EditorConsoleGUI {open : {public EditorConsoleBase}
     }
   }
   Function {~EditorConsoleGUI()} {return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
   Function {Quit( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowSeg( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SpecifySegmentedFile( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SpecifySourceFile( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {FlipSource( int )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowHelp( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
 } 

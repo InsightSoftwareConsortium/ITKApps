@@ -136,7 +136,9 @@ else{
     }
   }
   Function {~VDSegGrayUI()} {open
-  } {}
+  } {
+    code {} {}
+  }
   Function {Show(void)} {open return_type {virtual void}
   } {
     code {panel->show();} {}

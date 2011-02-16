@@ -1,12 +1,9 @@
 
 #include "MatroxViewer.h"
 
-
-
 // FLTK Includes
-#include "Fl/fl_file_chooser.H"
+#include <FL/fl_ask.H>
 #include "Fl/fl_ask.H"
-
 
 namespace ISIS 
 {

@@ -1,14 +1,11 @@
+#include "itkCastImageFilter.h"
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkPNGImageIO.h"
 #include "itkGradientAnisotropicDiffusionImageFilter.h"
-#include "itkCastImageFilter.h"
-#include <iostream>
-extern "C" {
-#include <stdio.h>
-}
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
 
   // Test for command line arguments.
   if (argc != 5)
@@ -21,8 +18,8 @@ int main(int argc, char *argv[]) {
   // Grab the number of iterations and conductance term
   int iterations;
   float conductance;
-  ::sscanf(argv[3], "%d", &iterations);
-  ::sscanf(argv[4], "%f", &conductance);
+  sscanf(argv[3], "%d", &iterations);
+  sscanf(argv[4], "%f", &conductance);
 
   // Convenient typedefs
   typedef itk::Image<float, 2> RealImageType;

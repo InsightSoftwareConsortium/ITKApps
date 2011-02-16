@@ -233,23 +233,43 @@ class RegisterGUI {open : {public RegisterApplication}
     }
   }
   Function {Quit()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Load()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowFixedImage()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowMovingImage()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowRegisteredImage()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowAdvancedOptionsWindow()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {UpdateAdvancedOptions(void)} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {CloseAdvancedOptionsWindow(void)} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SaveRegisteredImage(void)} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowMixedChannel(void)} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
 } 

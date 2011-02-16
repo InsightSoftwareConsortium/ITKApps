@@ -1,5 +1,4 @@
 #include "FuzzySegGrayRun.h"
-#include <FL/fl_file_chooser.H>
 #include <FL/Fl_Int_Input.H>
 #include <fstream>
 #include <iostream>

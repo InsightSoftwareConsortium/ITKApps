@@ -43,6 +43,6 @@ ADD_GUI_EXECUTABLE(MutualInformationEuler2DRegistration
   "${MutualInformationEuler2DRegistration_SRCS}")
 
 TARGET_LINK_LIBRARIES(MutualInformationEuler2DRegistration
-                      ITKNumerics ITKBasicFilters ITKIO ITKFltkImageViewer)
+                        ${ITK_LIBRARIES} ITKFltkImageViewer)
 
 

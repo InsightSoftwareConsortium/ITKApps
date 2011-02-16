@@ -17,7 +17,7 @@
 
 
 #include <liFilterConsole2D.h>
-#include <FL/fl_file_chooser.H>
+#include <FL/Fl_File_Chooser.H>
 #include "itkExceptionObject.h"
  
 

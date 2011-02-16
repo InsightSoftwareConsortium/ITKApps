@@ -71,7 +71,7 @@ public:
       }    
     else if( typeid( event ) == typeid( itk::IterationEvent ) )
       {
-      itk::OStringStream text;
+      std::ostringstream text;
       text << m_Optimizer->GetCurrentIteration() << " = ";
       text << m_Optimizer->GetValue() << " : ";
       text << m_Optimizer->GetCurrentPosition() << std::endl;
@@ -79,7 +79,7 @@ public:
       }
     else if( typeid( event ) == typeid( itk::EndEvent ) )
       {
-      itk::OStringStream text;
+      std::ostringstream text;
       text << std::endl << std::endl;
       text << "After " << m_Optimizer->GetCurrentIteration();
       text << "  iterations " << std::endl;

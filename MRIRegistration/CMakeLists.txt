@@ -33,7 +33,5 @@ TARGET_LINK_LIBRARIES(MIRegistration
   vtkIO
   vtkFiltering
   vtkCommon
-  ITKCommon
-  ITKIO
-  ITKNumerics)
+  ${ITK_LIBRARIES})
 

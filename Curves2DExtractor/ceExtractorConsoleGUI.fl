@@ -300,46 +300,84 @@ class ceExtractorConsoleGUI {open : {public ceExtractorConsoleBase}
       }
     }
   }
-  Function {~ceExtractorConsoleGUI()} {return_type virtual
-  } {}
   Function {Quit( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Load( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowInput( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowFilteredX( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowFilteredY( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowSecondDerivativeX( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowSecondDerivativeY( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowLaplacian( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowGradientModulus( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowCrossDerivativeXY( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowSmoothed( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowMaxEigenValue( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowMinEigenValue( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowMaxEigenVector( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowGradientOnEigenVector( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowParametricSpace( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ResetViewOfParametricSpace( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowCurve2DPoints( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowExtractedParametricPoints( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SaveOutput( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
 } 

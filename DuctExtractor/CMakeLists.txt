@@ -38,6 +38,6 @@ SET(DuctExtractor_SRCS
   )
 
 ADD_GUI_EXECUTABLE(DuctExtractor   "${DuctExtractor_SRCS}")
-TARGET_LINK_LIBRARIES(DuctExtractor ITKFltkImageViewer ITKIO ITKBasicFilters)
+TARGET_LINK_LIBRARIES(DuctExtractor ITKFltkImageViewer   ${ITK_LIBRARIES})
 
 

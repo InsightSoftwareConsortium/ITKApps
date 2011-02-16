@@ -66,9 +66,7 @@ ADD_EXECUTABLE(EditorFltkGui ${EditorFltkGui_SRCS} ${EditorFltkGui_FLTK_UI_SRCS}
 INSTALL_TARGETS(/bin EditorFltkGui)
 
 TARGET_LINK_LIBRARIES (EditorFltkGui
-  ITKBasicFilters
-  ITKIO
-  ITKNumerics
+  ${ITK_LIBRARIES}
   vtkCommon
   vtkFiltering
   vtkImaging

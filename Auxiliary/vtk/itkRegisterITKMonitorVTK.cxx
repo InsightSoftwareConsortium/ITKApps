@@ -22,7 +22,7 @@
 #include "itkImageRegistrationMethod.h"
 #include "itkMattesMutualInformationImageToImageMetric.h"
 #include "itkLinearInterpolateImageFunction.h"
-#include "itkOrientedImage.h"
+#include "itkImage.h"
 
 #include "itkVersorRigid3DTransform.h"
 #include "itkCenteredTransformInitializer.h"
@@ -125,10 +125,10 @@ int main( int argc, char *argv[] )
   typedef  signed short    MovingPixelType;
   typedef  float           InternalPixelType;
 
-  typedef itk::OrientedImage< FixedPixelType, Dimension >   InputFixedImageType;
-  typedef itk::OrientedImage< MovingPixelType, Dimension >  InputMovingImageType;
+  typedef itk::Image< FixedPixelType, Dimension >   InputFixedImageType;
+  typedef itk::Image< MovingPixelType, Dimension >  InputMovingImageType;
 
-  typedef itk::OrientedImage< InternalPixelType, Dimension > InternalImageType;
+  typedef itk::Image< InternalPixelType, Dimension > InternalImageType;
 
 
   typedef itk::VersorRigid3DTransform< double > TransformType;

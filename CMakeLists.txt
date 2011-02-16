@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 IF(COMMAND CMAKE_POLICY)
   CMAKE_POLICY(SET CMP0003 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
@@ -125,7 +125,8 @@ OPTION(USE_FLTK "Use FLTK (The Fast Light Toolkit) for GUI (some applications ne
 IF(USE_FLTK)
   FIND_PACKAGE(FLTK)
   IF(FLTK_FOUND)
-    INCLUDE_DIRECTORIES(${FLTK_INCLUDE_DIR})
+    INCLUDE(${FLTK_USE_FILE})
+    LINK_DIRECTORIES(${FLTK_LIB_DIR})
   ENDIF(FLTK_FOUND)
 ENDIF(USE_FLTK)
 
@@ -378,5 +379,29 @@ ITKAlgorithms
 ITKCommon
 ITKBasicFilters
 )
+
+if(WIN32)
+  # Some libraries have no dllexport markup, so we can
+  # build full shared libraries only with the GNU toolchain.
+  if(CMAKE_COMPILER_IS_GNUCXX)
+    # CMake adds --enable-all-exports on Cygwin (since Cygwin is
+    # supposed to be UNIX-like), but we need to add it explicitly for
+    # a native windows build with the MinGW tools.
+    if(MINGW)
+      set(CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS
+        "-shared -Wl,--export-all-symbols -Wl,--enable-auto-import")
+      set(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS
+        "-shared -Wl,--export-all-symbols -Wl,--enable-auto-import")
+      set(CMAKE_EXE_LINKER_FLAGS "-Wl,--enable-auto-import")
+    endif(MINGW)
+  else(CMAKE_COMPILER_IS_GNUCXX)
+   if(BUILD_SHARED_LIBS)
+     set(ITK_LIBRARY_BUILD_TYPE "SHARED")
+   else(BUILD_SHARED_LIBS)
+     set(ITK_LIBRARY_BUILD_TYPE "STATIC")
+   endif(BUILD_SHARED_LIBS)
+   set(BUILD_SHARED_LIBS OFF)
+  endif(CMAKE_COMPILER_IS_GNUCXX)
+endif(WIN32)
 
 

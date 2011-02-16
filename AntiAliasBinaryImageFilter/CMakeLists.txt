@@ -24,21 +24,13 @@ ADD_EXECUTABLE(itkAntiAliasBinaryImageFilterExample itkAntiAliasBinaryImageFilte
 INSTALL_TARGETS(/bin itkAntiAliasBinaryImageFilterExample)
 TARGET_LINK_LIBRARIES (itkAntiAliasBinaryImageFilterExample
   param
-  ITKAlgorithms
-  ITKBasicFilters
-  ITKCommon
-  ITKIO
-  )
+  ${ITK_LIBRARIES})
 
 
 ADD_EXECUTABLE(itkSampleDataGenerator itkSampleDataGenerator.cxx)
 INSTALL_TARGETS(/bin itkSampleDataGenerator)
 TARGET_LINK_LIBRARIES (itkSampleDataGenerator
   param
-  ITKAlgorithms
-  ITKBasicFilters
-  ITKCommon
-  ITKIO
-  )
+  ${ITK_LIBRARIES})
 
 

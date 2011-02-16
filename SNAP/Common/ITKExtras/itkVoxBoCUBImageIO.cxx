@@ -1,56 +1,73 @@
 /*=========================================================================
-
-  Program:   Insight Segmentation & Registration Toolkit
-  Module:    itkVoxBoCUBImageIO.cxx
-  Language:  C++
-  Date:      $Date$
-  Version:   $Revision$  
-
-  Copyright (c) Insight Software Consortium. All rights reserved.
-  See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-     PURPOSE.  See the above copyright notices for more information.
-
-=========================================================================*/
-#include <cstring> // needed for itkMetaDataObject.h
+ *
+ *  Copyright Insight Software Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 #include "itkVoxBoCUBImageIO.h"
 #include "itkIOCommon.h"
 #include "itkExceptionObject.h"
 #include "itkMetaDataObject.h"
 #include "itkByteSwapper.h"
+#include "itksys/SystemTools.hxx"
 #include <iostream>
 #include <list>
 #include <string>
 #include <math.h>
+#include <time.h>
 
-// Commented out because zlib is not available through Insight Applications
-#ifdef SNAP_GZIP_SUPPORT
-#include <zlib.h>
-#endif
+#include "itk_zlib.h"
+#include "itkSpatialOrientationAdapter.h"
 
-namespace itk {
-
-
+namespace itk
+{
 /**
+ *
+ * \class GenericCUBFileAdaptor
+ *
+ * \brief Reader and Writer for the VoxBo file format.
+ *
  * A generic reader and writer object for VoxBo files. Basically it
  * provides uniform access to gzip and normal files
+ *
+ * \author Burstein, Pablo D.; Yushkevich, Paul; Gee, James C.
+ *
+ * This implementation was contributed as a paper to the Insight Journal
+ * http://insight-journal.org/midas/handle.php?handle=1926/303
+ *
  */
 class GenericCUBFileAdaptor
 {
 public:
-    virtual ~GenericCUBFileAdaptor() {}
+  GenericCUBFileAdaptor() {}
+  virtual ~GenericCUBFileAdaptor() {}
+
+  typedef ImageIOBase::SizeType SizeType;
+
   virtual unsigned char ReadByte() = 0;
-  virtual void ReadData(void *data, unsigned long bytes) = 0;
-  virtual void WriteData(const void *data, unsigned long bytes) = 0;
+
+  virtual void ReadData(void *data, SizeType bytes) = 0;
+
+  virtual void WriteData(const void *data, SizeType bytes) = 0;
 
   std::string ReadHeader()
-    {
+  {
     // Read everything up to the \f symbol
-    std::ostringstream oss;
-    unsigned char byte = ReadByte();
-    while(byte != '\f')
+    itksys_ios::ostringstream oss;
+    unsigned char             byte = ReadByte();
+
+    while ( byte != '\f' )
       {
       oss << byte;
       byte = ReadByte();
@@ -58,11 +75,12 @@ public:
 
     // Read the next byte
     unsigned char term = ReadByte();
-    if(term == '\r')
+    if ( term == '\r' )
+      {
       term = ReadByte();
-
+      }
     // Throw exception if term is not there
-    if(term != '\n')
+    if ( term != '\n' )
       {
       ExceptionObject exception;
       exception.SetDescription("Header is not terminated by newline.");
@@ -71,217 +89,232 @@ public:
 
     // Return the header string
     return oss.str();
-    }
+  }
 };
 
 /**
  * A reader for gzip files
  */
-#ifdef SNAP_GZIP_SUPPORT
 
-class CompressedCUBFileAdaptor : public GenericCUBFileAdaptor
+class CompressedCUBFileAdaptor:public GenericCUBFileAdaptor
 {
 public:
   CompressedCUBFileAdaptor(const char *file, const char *mode)
-    {
+  {
     m_GzFile = ::gzopen(file, mode);
-    if(m_GzFile == NULL)
+    if ( m_GzFile == NULL )
       {
       ExceptionObject exception;
       exception.SetDescription("File cannot be accessed");
       throw exception;
       }
-    }
-  
-  ~CompressedCUBFileAdaptor()
-    {
-    if(m_GzFile)
+  }
+
+  virtual ~CompressedCUBFileAdaptor()
+  {
+    if ( m_GzFile )
+      {
+      ::gzflush(m_GzFile, Z_FINISH);
       ::gzclose(m_GzFile);
-    }
+      }
+  }
 
   unsigned char ReadByte()
-    {
+  {
     int byte = ::gzgetc(m_GzFile);
-    if(byte < 0)
+
+    if ( byte < 0 )
       {
-      std::ostringstream oss;
+      itksys_ios::ostringstream oss;
       oss << "Error reading byte from file at position: " << ::gztell(m_GzFile);
       ExceptionObject exception;
-      exception.SetDescription(oss.str().c_str());
+      exception.SetDescription( oss.str().c_str() );
       throw exception;
       }
-    return static_cast<unsigned char>(byte);
-    }
-  
-  void ReadData(void *data, unsigned long bytes)
-    {
-    if(m_GzFile == NULL)
+    return static_cast< unsigned char >( byte );
+  }
+
+  void ReadData(void *data, SizeType bytes)
+  {
+    if ( m_GzFile == NULL )
       {
       ExceptionObject exception;
       exception.SetDescription("File cannot be read");
       throw exception;
       }
 
-    int bread = ::gzread(m_GzFile, data, bytes);
-    if(bread != bytes)
+    unsigned int numberOfBytesToRead = Math::CastWithRangeCheck< unsigned int, SizeType >(bytes);
+    SizeType     bread = ::gzread(m_GzFile, data, numberOfBytesToRead);
+    if ( bread != bytes )
       {
-      std::ostringstream oss;
-      oss << "File size does not match header: " 
-        << bytes << " bytes requested but only "
-        << bread << " bytes available!" << std::endl
-        << "At file position " << ::gztell(m_GzFile);
+      itksys_ios::ostringstream oss;
+      oss << "File size does not match header: "
+          << bytes << " bytes requested but only "
+          << bread << " bytes available!" << std::endl
+          << "At file position " << ::gztell(m_GzFile);
       ExceptionObject exception;
-      exception.SetDescription(oss.str().c_str());
+      exception.SetDescription( oss.str().c_str() );
       throw exception;
       }
-    }
-  
-  void WriteData(const void *data, unsigned long bytes)
-    {
-    if(m_GzFile == NULL)
+  }
+
+  void WriteData(const void *data, SizeType bytes)
+  {
+    if ( m_GzFile == NULL )
       {
       ExceptionObject exception;
       exception.SetDescription("File cannot be written");
       throw exception;
       }
 
-    int bwritten = ::gzwrite(m_GzFile, (void *) data, bytes);
-    if(bwritten != bytes)
+    unsigned int numberOfBytesToWrite = Math::CastWithRangeCheck< unsigned int, SizeType >(bytes);
+    SizeType     bwritten = ::gzwrite(m_GzFile, const_cast< void * >( data ), numberOfBytesToWrite);
+    if ( bwritten != bytes )
       {
       ExceptionObject exception;
       exception.SetDescription("Could not write all bytes to file");
+      std::cout << "Could not write all bytes to file" << std::endl;
       throw exception;
       }
-    }
+    ::gzflush(m_GzFile, Z_SYNC_FLUSH);
+  }
 
 private:
-  ::gzFile m_GzFile;
+  gzFile m_GzFile;
 };
-
-#endif // SNAP_GZIP_SUPPORT
 
 /**
  * A reader for non-gzip files
  */
-class DirectCUBFileAdaptor : public GenericCUBFileAdaptor
+class DirectCUBFileAdaptor:public GenericCUBFileAdaptor
 {
 public:
   DirectCUBFileAdaptor(const char *file, const char *mode)
-    {
+  {
     m_File = fopen(file, mode);
-    if(m_File == NULL)
+    if ( !m_File )
       {
       ExceptionObject exception;
       exception.SetDescription("File cannot be read");
       throw exception;
       }
-    }
+  }
 
-  virtual ~DirectCUBFileAdaptor()
-    {
-    if(m_File)
+  ~DirectCUBFileAdaptor()
+  {
+    if ( m_File )
+      {
       fclose(m_File);
-    }
+      }
+  }
 
   unsigned char ReadByte()
-    {
+  {
     int byte = fgetc(m_File);
-    if(byte == EOF)
+
+    if ( byte == EOF )
       {
-      std::ostringstream oss;
+      itksys_ios::ostringstream oss;
       oss << "Error reading byte from file at position: " << ::ftell(m_File);
       ExceptionObject exception;
-      exception.SetDescription(oss.str().c_str());
+      exception.SetDescription( oss.str().c_str() );
       throw exception;
       }
-    return static_cast<unsigned char>(byte);
-    }
-  
-  void ReadData(void *data, unsigned long bytes)
-    {
-    if(m_File == NULL)
+    return static_cast< unsigned char >( byte );
+  }
+
+  void ReadData(void *data, SizeType bytes)
+  {
+    if ( m_File == NULL )
       {
       ExceptionObject exception;
       exception.SetDescription("File cannot be read");
       throw exception;
       }
 
-    size_t bread = fread(data, 1, bytes, m_File);
-    if(static_cast<unsigned long>(bread) != bytes)
+    const SizeValueType numberOfBytesToRead =  Math::CastWithRangeCheck< SizeValueType, SizeType >(bytes);
+    SizeType     bread = fread(data, NumericTraits< SizeValueType >::One, numberOfBytesToRead, m_File);
+    if ( bread != bytes )
       {
-      std::ostringstream oss;
-      oss << "File size does not match header: " 
-        << bytes << " bytes requested but only "
-        << bread << " bytes available!" << std::endl
-        << "At file position " << ftell(m_File);
+      itksys_ios::ostringstream oss;
+      oss << "File size does not match header: "
+          << bytes << " bytes requested but only "
+          << bread << " bytes available!" << std::endl
+          << "At file position " << ftell(m_File);
       ExceptionObject exception;
-      exception.SetDescription(oss.str().c_str());
+      exception.SetDescription( oss.str().c_str() );
       throw exception;
       }
-    }
+  }
 
-  void WriteData(const void *data, unsigned long bytes)
-    {
-    if(m_File == NULL)
+  void WriteData(const void *data, SizeType bytes)
+  {
+    if ( m_File == NULL )
       {
       ExceptionObject exception;
       exception.SetDescription("File cannot be written");
       throw exception;
       }
 
-    size_t bwritten = fwrite(data, 1, bytes, m_File);
-    if(static_cast<unsigned long>(bwritten) != bytes)
+    const SizeValueType numberOfBytesToWrite =  Math::CastWithRangeCheck< SizeValueType, SizeType >(bytes);
+    SizeType     bwritten = fwrite(data, NumericTraits< SizeValueType >::One, numberOfBytesToWrite, m_File);
+    if ( bwritten != bytes )
       {
       ExceptionObject exception;
       exception.SetDescription("Could not write all bytes to file");
       throw exception;
       }
-    }
+  }
+
 private:
   FILE *m_File;
 };
 
-
 /**
- * A swap helper class, used to perform swapping for any input
+ * \class VoxBoCUBImageIOSwapHelper
+ *
+ * \brief A swap helper class, used to perform swapping for any input
  * data type.
+ *
  */
-template<typename TPixel> class VoxBoCUBImageIOSwapHelper
+template< typename TPixel >
+class VoxBoCUBImageIOSwapHelper
 {
 public:
-  typedef ImageIOBase::ByteOrder ByteOrder;
+  typedef ImageIOBase::ByteOrder      ByteOrder;
+  typedef ImageIOBase::BufferSizeType BufferSizeType;
+
   static void SwapIfNecessary(
-    void *buffer, unsigned long numberOfBytes, ByteOrder order)
-    {
-    if ( order == ImageIOBase::LittleEndian )
+    void *buffer, BufferSizeType numberOfBytes, ByteOrder dataByteOrder)
+  {
+    if ( dataByteOrder == ImageIOBase::LittleEndian )
       {
-      ByteSwapper<TPixel>::SwapRangeFromSystemToLittleEndian(
-        (TPixel*)buffer, numberOfBytes / sizeof(TPixel) );
+      ByteSwapper< TPixel >::SwapRangeFromSystemToLittleEndian(
+        (TPixel *)buffer, numberOfBytes / sizeof( TPixel ) );
       }
-    else if ( order == ImageIOBase::BigEndian )
+    else if ( dataByteOrder == ImageIOBase::BigEndian )
       {
-      ByteSwapper<TPixel>::SwapRangeFromSystemToBigEndian(
-        (TPixel *)buffer, numberOfBytes / sizeof(TPixel) );
+      ByteSwapper< TPixel >::SwapRangeFromSystemToBigEndian(
+        (TPixel *)buffer, numberOfBytes / sizeof( TPixel ) );
       }
-    }
+  }
 };
 
-
 // Strings
-const char *VoxBoCUBImageIO::VB_IDENTIFIER_SYSTEM = "VB98";
-const char *VoxBoCUBImageIO::VB_IDENTIFIER_FILETYPE = "CUB1";
-const char *VoxBoCUBImageIO::VB_DIMENSIONS = "VoxDims(XYZ)";
-const char *VoxBoCUBImageIO::VB_SPACING = "VoxSizes(XYZ)";
-const char *VoxBoCUBImageIO::VB_ORIGIN = "Origin(XYZ)";
-const char *VoxBoCUBImageIO::VB_DATATYPE = "DataType";
-const char *VoxBoCUBImageIO::VB_BYTEORDER = "Byteorder";
-const char *VoxBoCUBImageIO::VB_ORIENTATION = "Orientation";
-const char *VoxBoCUBImageIO::VB_BYTEORDER_MSB = "msbfirst";
-const char *VoxBoCUBImageIO::VB_BYTEORDER_LSB = "lsbfirst";
-const char *VoxBoCUBImageIO::VB_DATATYPE_BYTE = "Byte";
-const char *VoxBoCUBImageIO::VB_DATATYPE_INT = "Integer";
-const char *VoxBoCUBImageIO::VB_DATATYPE_FLOAT = "Float";
-const char *VoxBoCUBImageIO::VB_DATATYPE_DOUBLE = "Double";
+const char *VoxBoCUBImageIO:: m_VB_IDENTIFIER_SYSTEM = "VB98";
+const char *VoxBoCUBImageIO:: m_VB_IDENTIFIER_FILETYPE = "CUB1";
+const char *VoxBoCUBImageIO:: m_VB_DIMENSIONS = "VoxDims(XYZ)";
+const char *VoxBoCUBImageIO:: m_VB_SPACING = "VoxSizes(XYZ)";
+const char *VoxBoCUBImageIO:: m_VB_ORIGIN = "Origin(XYZ)";
+const char *VoxBoCUBImageIO:: m_VB_DATATYPE = "DataType";
+const char *VoxBoCUBImageIO:: m_VB_BYTEORDER = "Byteorder";
+const char *VoxBoCUBImageIO:: m_VB_ORIENTATION = "Orientation";
+const char *VoxBoCUBImageIO:: m_VB_BYTEORDER_MSB = "msbfirst";
+const char *VoxBoCUBImageIO:: m_VB_BYTEORDER_LSB = "lsbfirst";
+const char *VoxBoCUBImageIO:: m_VB_DATATYPE_BYTE = "Byte";
+const char *VoxBoCUBImageIO:: m_VB_DATATYPE_INT = "Integer";
+const char *VoxBoCUBImageIO:: m_VB_DATATYPE_FLOAT = "Float";
+const char *VoxBoCUBImageIO:: m_VB_DATATYPE_DOUBLE = "Double";
 
 /** Constructor */
 VoxBoCUBImageIO::VoxBoCUBImageIO()
@@ -292,14 +325,18 @@ VoxBoCUBImageIO::VoxBoCUBImageIO()
   m_Writer = NULL;
 }
 
-
 /** Destructor */
 VoxBoCUBImageIO::~VoxBoCUBImageIO()
 {
-  if(m_Reader)
+  if ( m_Reader )
+    {
     delete m_Reader;
-  if(m_Writer)
+    }
+
+  if ( m_Writer )
+    {
     delete m_Writer;
+    }
 }
 
 GenericCUBFileAdaptor *
@@ -308,19 +345,23 @@ VoxBoCUBImageIO::CreateReader(const char *filename)
   try
     {
     bool compressed;
-    if(CheckExtension(filename, compressed))
-      if(compressed)
-#ifdef SNAP_GZIP_SUPPORT
-          return new CompressedCUBFileAdaptor(filename, "rb");
-#else
-          return NULL;
-#endif
+    if ( CheckExtension(filename, compressed) )
+      {
+      if ( compressed )
+        {
+        return new CompressedCUBFileAdaptor(filename, "rb");
+        }
       else
+        {
         return new DirectCUBFileAdaptor(filename, "rb");
+        }
+      }
     else
+      {
       return NULL;
+      }
     }
-  catch(...)
+  catch ( ... )
     {
     return NULL;
     }
@@ -332,95 +373,109 @@ VoxBoCUBImageIO::CreateWriter(const char *filename)
   try
     {
     bool compressed;
-    if(CheckExtension(filename, compressed))
-      if(compressed)
-#ifdef SNAP_GZIP_SUPPORT
-          return new CompressedCUBFileAdaptor(filename, "rb");
-#else
-          return NULL;
-#endif        
+    if ( CheckExtension(filename, compressed) )
+      {
+      if ( compressed )
+        {
+        return new CompressedCUBFileAdaptor(filename, "wb");
+        }
       else
+        {
         return new DirectCUBFileAdaptor(filename, "wb");
+        }
+      }
     else
+      {
       return NULL;
+      }
     }
-  catch(...)
+  catch ( ... )
     {
     return NULL;
     }
 }
 
-bool VoxBoCUBImageIO::CanReadFile( const char* filename ) 
-{ 
+bool VoxBoCUBImageIO::CanReadFile(const char *filename)
+{
   // First check if the file can be read
   GenericCUBFileAdaptor *reader = CreateReader(filename);
-  if(reader == NULL)
+
+  if ( reader == NULL )
     {
-    itkDebugMacro(<<"The file is not a valid CUB file");
+    itkDebugMacro(<< "The file is not a valid CUB file");
     return false;
     }
-    
+
   // Now check the content
   bool iscub = true;
-  try 
+  try
     {
     // Get the header
-    std::istringstream iss(reader->ReadHeader());
+    std::istringstream iss( reader->ReadHeader() );
 
     // Read the first two words
     std::string word;
 
     // Read the first line from the file
     iss >> word;
-    if(word != VB_IDENTIFIER_SYSTEM)
+    if ( word != m_VB_IDENTIFIER_SYSTEM )
+      {
       iscub = false;
+      }
 
     // Read the second line
     iss >> word;
-    if(word != VB_IDENTIFIER_FILETYPE)
+    if ( word != m_VB_IDENTIFIER_FILETYPE )
+      {
       iscub = false;
+      }
     }
-  catch(...)
-    { 
-    iscub = false; 
+  catch ( ... )
+    {
+    iscub = false;
     }
 
   delete reader;
   return iscub;
 }
 
-bool VoxBoCUBImageIO::CanWriteFile( const char * name )
+bool VoxBoCUBImageIO::CanWriteFile(const char *name)
 {
   bool compressed;
+
   return CheckExtension(name, compressed);
 }
 
-void VoxBoCUBImageIO::Read(void* buffer)
+void VoxBoCUBImageIO::Read(void *buffer)
 {
-  if(m_Reader == NULL)
+  if ( m_Reader == NULL )
     {
     ExceptionObject exception(__FILE__, __LINE__);
     exception.SetDescription("File cannot be read");
     throw exception;
     }
 
-  m_Reader->ReadData(buffer, GetImageSizeInBytes());
-  this->SwapBytesIfNecessary(buffer, GetImageSizeInBytes());
+  BufferSizeType numberOfBytesToRead =
+    Math::CastWithRangeCheck< BufferSizeType, SizeType >( this->GetImageSizeInBytes() );
+  m_Reader->ReadData(buffer, numberOfBytesToRead);
+  this->SwapBytesIfNecessary(buffer, numberOfBytesToRead);
 }
 
-/** 
+/**
  *  Read Information about the VoxBoCUB file
  *  and put the cursor of the stream just before the first data pixel
  */
 void VoxBoCUBImageIO::ReadImageInformation()
 {
   // Make sure there is no other reader
-  if(m_Reader)
+  if ( m_Reader )
+    {
     delete m_Reader;
+    }
 
   // Create a reader
-  m_Reader = CreateReader(m_FileName.c_str());
-  if(m_Reader == NULL)
+  m_Reader = CreateReader( m_FileName.c_str() );
+  if ( m_Reader == NULL )
     {
     ExceptionObject exception(__FILE__, __LINE__);
     exception.SetDescription("File cannot be read");
@@ -431,10 +486,10 @@ void VoxBoCUBImageIO::ReadImageInformation()
   SetNumberOfDimensions(3);
 
   // Read the file header
-  std::istringstream issHeader(m_Reader->ReadHeader());
+  std::istringstream issHeader( m_Reader->ReadHeader() );
 
   // Read every string in the header. Parse the strings that are special
-  while(issHeader.good())
+  while ( issHeader.good() )
     {
     // Read a line from the stream
     char linebuffer[512];
@@ -442,62 +497,77 @@ void VoxBoCUBImageIO::ReadImageInformation()
 
     // Get the key string
     std::istringstream iss(linebuffer);
-    std::string key;
+    std::string        key;
 
     // Read the key and strip the colon from it
     iss >> key;
-    if(key[key.size() - 1] == ':')
+
+    const std::string::size_type keysize = key.size();
+
+    if ( ( keysize > 0 ) && ( key[key.size() - 1] == ':' ) )
       {
       // Strip the colon off the key
       key = key.substr(0, key.size() - 1);
 
       // Check if this is a relevant key
-      if(key == VB_DIMENSIONS)
+      if ( key == m_VB_DIMENSIONS )
         {
         iss >> m_Dimensions[0];
         iss >> m_Dimensions[1];
         iss >> m_Dimensions[2];
         }
 
-      else if(key == VB_SPACING)
+      else if ( key == m_VB_SPACING )
         {
         iss >> m_Spacing[0];
         iss >> m_Spacing[1];
         iss >> m_Spacing[2];
         }
 
-      else if(key == VB_ORIGIN)
+      else if ( key == m_VB_ORIGIN )
         {
         double ox, oy, oz;
         iss >> ox; iss >> oy; iss >> oz;
-        m_Origin[0] = ox * m_Spacing[0];
-        m_Origin[1] = oy * m_Spacing[1];
-        m_Origin[2] = oz * m_Spacing[2];
+        m_Origin[0] = -ox * m_Spacing[0];
+        m_Origin[1] = -oy * m_Spacing[1];
+        m_Origin[2] = -oz * m_Spacing[2];
         }
 
-      else if(key == VB_DATATYPE)
+      else if ( key == m_VB_DATATYPE )
         {
         std::string type;
         iss >> type;
         m_PixelType = SCALAR;
-        if(type == VB_DATATYPE_BYTE)
+        if ( type == m_VB_DATATYPE_BYTE )
+          {
           m_ComponentType = UCHAR;
-        else if(type == VB_DATATYPE_INT)
+          }
+        else if ( type == m_VB_DATATYPE_INT )
+          {
           m_ComponentType = USHORT;
-        else if(type == VB_DATATYPE_FLOAT)
+          }
+        else if ( type == m_VB_DATATYPE_FLOAT )
+          {
           m_ComponentType = FLOAT;
-        else if(type == VB_DATATYPE_DOUBLE)
+          }
+        else if ( type == m_VB_DATATYPE_DOUBLE )
+          {
           m_ComponentType = DOUBLE;
+          }
         }
 
-      else if(key == VB_BYTEORDER)
+      else if ( key == m_VB_BYTEORDER )
         {
         std::string type;
         iss >> type;
-        if(type == VB_BYTEORDER_MSB)
+        if ( type == m_VB_BYTEORDER_MSB )
+          {
           SetByteOrderToBigEndian();
-        else if(type == VB_BYTEORDER_LSB)
+          }
+        else if ( type == m_VB_BYTEORDER_LSB )
+          {
           SetByteOrderToLittleEndian();
+          }
         else
           {
           ExceptionObject exception(__FILE__, __LINE__);
@@ -506,50 +576,55 @@ void VoxBoCUBImageIO::ReadImageInformation()
           }
         }
 
-      else if(key == VB_ORIENTATION)
+      else if ( key == m_VB_ORIENTATION )
         {
         std::string code;
         iss >> code;
 
         // Set the orientation code in the data dictionary
         OrientationMap::const_iterator it = m_OrientationMap.find(code);
-        if(it != m_OrientationMap.end())
+        if ( it != m_OrientationMap.end() )
           {
-          itk::MetaDataDictionary &dic =this->GetMetaDataDictionary();
-          EncapsulateMetaData<OrientationFlags>(
-            dic, ITK_CoordinateOrientation, it->second);
+          //NOTE:  The itk::ImageIOBase direction is a std::vector<std::vector > >, and threeDDirection is a 3x3 matrix
+          itk::SpatialOrientationAdapter soAdaptor;
+          itk::SpatialOrientationAdapter::DirectionType threeDDirection=soAdaptor.ToDirectionCosines(it->second);
+          this->m_Direction[0][0]=threeDDirection[0][0];
+          this->m_Direction[0][1]=threeDDirection[0][1];
+          this->m_Direction[0][2]=threeDDirection[0][2];
+          this->m_Direction[1][0]=threeDDirection[1][0];
+          this->m_Direction[1][1]=threeDDirection[1][1];
+          this->m_Direction[1][2]=threeDDirection[1][2];
+          this->m_Direction[2][0]=threeDDirection[2][0];
+          this->m_Direction[2][1]=threeDDirection[2][1];
+          this->m_Direction[2][2]=threeDDirection[2][2];
           }
         }
 
       else
         {
         // Encode the right hand side of the string in the meta-data dic
-        std::string word;
-        std::ostringstream oss;
-        while(iss >> word)
+        std::string               word;
+        itksys_ios::ostringstream oss;
+        while ( iss >> word )
           {
-          if(oss.str().size())
+          if ( oss.str().size() )
+            {
             oss << " ";
+            }
           oss << word;
           }
-        itk::MetaDataDictionary &dic =this->GetMetaDataDictionary();
-        EncapsulateMetaData<std::string>(dic, key, oss.str());
+        MetaDataDictionary & dic = this->GetMetaDataDictionary();
+        EncapsulateMetaData< std::string >( dic, key, oss.str() );
         }
       }
     }
 }
 
-void 
+void
 VoxBoCUBImageIO
 ::WriteImageInformation(void)
 {
-  // See if we have a writer already
-  if(m_Writer != NULL)
-    delete m_Writer;
-
-  // First check if the file can be written to
-  m_Writer = CreateWriter(m_FileName.c_str());
-  if(m_Writer == NULL)
+  if ( m_Writer == NULL )
     {
     ExceptionObject exception(__FILE__, __LINE__);
     exception.SetDescription("File cannot be read");
@@ -557,7 +632,7 @@ VoxBoCUBImageIO
     }
 
   // Check that the number of dimensions is correct
-  if(GetNumberOfDimensions() != 3)
+  if ( GetNumberOfDimensions() != 3 )
     {
     ExceptionObject exception(__FILE__, __LINE__);
     exception.SetDescription("Unsupported number of dimensions");
@@ -565,51 +640,28 @@ VoxBoCUBImageIO
     }
 
   // Put together a header
-  std::ostringstream header;
+  itksys_ios::ostringstream header;
 
   // Write the identifiers
-  header << VB_IDENTIFIER_SYSTEM << std::endl;
-  header << VB_IDENTIFIER_FILETYPE << std::endl;
+  header << m_VB_IDENTIFIER_SYSTEM << std::endl;
+  header << m_VB_IDENTIFIER_FILETYPE << std::endl;
 
-  // Write the image dimensions
-  header << VB_DIMENSIONS << ": " 
-    << m_Dimensions[0] << " "
-    << m_Dimensions[1] << " "
-    << m_Dimensions[2] << std::endl;
-
-  // Write the spacing
-  header << VB_SPACING << ": "
-    << m_Spacing[0] << " "
-    << m_Spacing[1] << " "
-    << m_Spacing[2] << std::endl;
-
-  // Write the origin (have to convert to bytes)
-  header << VB_ORIGIN << ": "
-    << static_cast< int >( m_Origin[0] / m_Spacing[0] + 0.5 ) << " "
-    << static_cast< int >( m_Origin[1] / m_Spacing[1] + 0.5 ) << " "
-    << static_cast< int >( m_Origin[2] / m_Spacing[2] + 0.5 ) << std::endl;
-
-  // Write the byte order
-  header << VB_BYTEORDER << ": "
-    << (ByteSwapper<char>::SystemIsBigEndian() 
-      ? VB_BYTEORDER_MSB : VB_BYTEORDER_LSB) << std::endl;
-
-  // Write the data type 
-  switch(m_ComponentType) 
+  // Write the data type
+  switch ( m_ComponentType )
     {
-    case CHAR: 
+    case CHAR:
     case UCHAR:
-      header << VB_DATATYPE << ": " << VB_DATATYPE_BYTE << std::endl;
+      header << m_VB_DATATYPE << ":\t" << m_VB_DATATYPE_BYTE << std::endl;
       break;
     case SHORT:
     case USHORT:
-      header << VB_DATATYPE << ": " << VB_DATATYPE_INT << std::endl;
+      header << m_VB_DATATYPE << ":\t" << m_VB_DATATYPE_INT << std::endl;
       break;
     case FLOAT:
-      header << VB_DATATYPE << ": " << VB_DATATYPE_FLOAT << std::endl;
+      header << m_VB_DATATYPE << ":\t" << m_VB_DATATYPE_FLOAT << std::endl;
       break;
     case DOUBLE:
-      header << VB_DATATYPE << ": " << VB_DATATYPE_DOUBLE << std::endl;
+      header << m_VB_DATATYPE << ":\t" << m_VB_DATATYPE_DOUBLE << std::endl;
       break;
     default:
       ExceptionObject exception(__FILE__, __LINE__);
@@ -617,65 +669,125 @@ VoxBoCUBImageIO
       throw exception;
     }
 
+  // Write the image dimensions
+  header << m_VB_DIMENSIONS << ":\t"
+         << m_Dimensions[0] << "\t"
+         << m_Dimensions[1] << "\t"
+         << m_Dimensions[2] << std::endl;
+
+  // Write the spacing
+  header << m_VB_SPACING << ":\t"
+         << m_Spacing[0] << "\t"
+         << m_Spacing[1] << "\t"
+         << m_Spacing[2] << std::endl;
+
+  // Write the origin (have to convert to bytes)
+
+  double x = -m_Origin[0] / m_Spacing[0];
+  double y = -m_Origin[1] / m_Spacing[1];
+  double z = -m_Origin[2] / m_Spacing[2];
+  header << m_VB_ORIGIN << ":\t"
+         << ( ( x >= 0 ) ? (int)( x + .5 ) : (int)( x - .5 ) ) << "\t"
+         << ( ( y >= 0 ) ? (int)( y + .5 ) : (int)( y - .5 ) ) << "\t"
+         << ( ( z >= 0 ) ? (int)( z + .5 ) : (int)( z - .5 ) ) << std::endl;
+
+  // Write the byte order
+  header << m_VB_BYTEORDER << ":\t"
+         << ( ( ByteSwapper< short >::SystemIsBigEndian() ) ? m_VB_BYTEORDER_MSB : m_VB_BYTEORDER_LSB ) << std::endl;
+
   // Write the orientation code
-  MetaDataDictionary &dic = GetMetaDataDictionary();
-  OrientationFlags oflag;
-  if(ExposeMetaData<OrientationFlags>(dic, ITK_CoordinateOrientation, oflag))
+  //NOTE:  The itk::ImageIOBase direction is a std::vector<std::vector > >, and threeDDirection is a 3x3 matrix
+  itk::SpatialOrientationAdapter soAdaptor;
+  itk::SpatialOrientationAdapter::DirectionType threeDDirection;
+  threeDDirection[0][0]=this->m_Direction[0][0];
+  threeDDirection[0][1]=this->m_Direction[0][1];
+  threeDDirection[0][2]=this->m_Direction[0][2];
+  threeDDirection[1][0]=this->m_Direction[1][0];
+  threeDDirection[1][1]=this->m_Direction[1][1];
+  threeDDirection[1][2]=this->m_Direction[1][2];
+  threeDDirection[2][0]=this->m_Direction[2][0];
+  threeDDirection[2][1]=this->m_Direction[2][1];
+  threeDDirection[2][2]=this->m_Direction[2][2];
+  OrientationFlags     oflag = soAdaptor.FromDirectionCosines(threeDDirection);
     {
-    InverseOrientationMap::const_iterator it = 
-      m_InverseOrientationMap.find(oflag);
-    if(it != m_InverseOrientationMap.end())
+    InverseOrientationMap::const_iterator it = m_InverseOrientationMap.find(oflag);
+    if ( it != m_InverseOrientationMap.end() )
       {
-      header << VB_ORIENTATION << ": " << it->second << std::endl;
+      header << m_VB_ORIENTATION << ":\t" << it->second << std::endl;
       }
     }
 
+  //Add CUB specific parameters to header from MetaDictionary
+  MetaDataDictionary & dic = GetMetaDataDictionary();
+  std::vector< std::string > keys = dic.GetKeys();
+  std::string                word;
+  for ( SizeValueType i = 0; i < keys.size(); i++ )
+    {
+    // The following local, key, was required to avoid Borland compiler errors
+    // Using const reference should avoid extra copy while still please bcc32
+    const std::string & key = keys[i];
+    ExposeMetaData< std::string >(dic, key, word);
+    if ( !strcmp(key.c_str(), "resample_date") )
+      {
+      time_t rawtime;
+      time(&rawtime);
+      word = ctime(&rawtime);
+      header << key << ":\t" << word;
+      }
+    else
+      {
+      header << key << ":\t" << word << std::endl;
+      }
+    }
   // Write the terminating characters
   header << "\f\n";
 
   // Write the header to the file as data
-  m_Writer->WriteData(header.str().c_str(), header.str().size());
+  m_Writer->WriteData( header.str().c_str(), header.str().size() );
 }
 
 /** The write function is not implemented */
-void 
+void
 VoxBoCUBImageIO
-::Write( const void* buffer) 
+::Write(const void *buffer)
 {
+  m_Writer = CreateWriter( m_FileName.c_str() );
   WriteImageInformation();
-  m_Writer->WriteData(buffer, GetImageSizeInBytes());
+  m_Writer->WriteData( buffer, this->GetImageSizeInBytes() );
+  delete m_Writer;
+  m_Writer = NULL;
 }
 
 /** Print Self Method */
-void VoxBoCUBImageIO::PrintSelf(std::ostream& os, Indent indent) const
+void VoxBoCUBImageIO::PrintSelf(std::ostream & os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
   os << indent << "PixelType " << m_PixelType << "\n";
 }
 
-
-bool VoxBoCUBImageIO::CheckExtension(const char* filename, bool &isCompressed)
+bool VoxBoCUBImageIO::CheckExtension(const char *filename, bool & isCompressed)
 {
   std::string fname = filename;
+
   if ( fname == "" )
-  {
+    {
     itkDebugMacro(<< "No filename specified.");
     return false;
-  }
+    }
 
   bool extensionFound = false;
   isCompressed = false;
 
   std::string::size_type giplPos = fname.rfind(".cub");
-  if ((giplPos != std::string::npos)
-      && (giplPos == fname.length() - 4))
+  if ( ( giplPos != std::string::npos )
+       && ( giplPos == fname.length() - 4 ) )
     {
-      extensionFound = true;
+    extensionFound = true;
     }
 
   giplPos = fname.rfind(".cub.gz");
-  if ((giplPos != std::string::npos)
-      && (giplPos == fname.length() - 7))
+  if ( ( giplPos != std::string::npos )
+       && ( giplPos == fname.length() - 7 ) )
     {
     extensionFound = true;
     isCompressed = true;
@@ -684,7 +796,7 @@ bool VoxBoCUBImageIO::CheckExtension(const char* filename, bool &isCompressed)
   return extensionFound;
 }
 
-void 
+void
 VoxBoCUBImageIO
 ::InitializeOrientationMap()
 {
@@ -738,51 +850,71 @@ VoxBoCUBImageIO
   m_OrientationMap["ASL"] = SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASL;
 
   OrientationMap::const_iterator it;
-  for(it = m_OrientationMap.begin(); it != m_OrientationMap.end(); ++it)
+  for ( it = m_OrientationMap.begin(); it != m_OrientationMap.end(); ++it )
+    {
     m_InverseOrientationMap[it->second] = it->first;
-
+    }
 }
 
-void 
+void
 VoxBoCUBImageIO
-::SwapBytesIfNecessary(void *buffer, unsigned long numberOfBytes)
+::SwapBytesIfNecessary(void *buffer, BufferSizeType numberOfBytes)
 {
-  if(m_ComponentType == CHAR)
-    VoxBoCUBImageIOSwapHelper<char>::SwapIfNecessary(
+  if ( m_ComponentType == CHAR )
+    {
+    VoxBoCUBImageIOSwapHelper< char >::SwapIfNecessary(
       buffer, numberOfBytes, m_ByteOrder);
-  else if(m_ComponentType == UCHAR)
-    VoxBoCUBImageIOSwapHelper<unsigned char>::SwapIfNecessary(
+    }
+  else if ( m_ComponentType == UCHAR )
+    {
+    VoxBoCUBImageIOSwapHelper< unsigned char >::SwapIfNecessary(
       buffer, numberOfBytes, m_ByteOrder);
-  else if(m_ComponentType == SHORT)
-    VoxBoCUBImageIOSwapHelper<short>::SwapIfNecessary(
+    }
+  else if ( m_ComponentType == SHORT )
+    {
+    VoxBoCUBImageIOSwapHelper< short >::SwapIfNecessary(
       buffer, numberOfBytes, m_ByteOrder);
-  else if(m_ComponentType == USHORT)
-    VoxBoCUBImageIOSwapHelper<unsigned short>::SwapIfNecessary(
+    }
+  else if ( m_ComponentType == USHORT )
+    {
+    VoxBoCUBImageIOSwapHelper< unsigned short >::SwapIfNecessary(
       buffer, numberOfBytes, m_ByteOrder);
-  else if(m_ComponentType == INT)
-    VoxBoCUBImageIOSwapHelper<int>::SwapIfNecessary(
+    }
+  else if ( m_ComponentType == INT )
+    {
+    VoxBoCUBImageIOSwapHelper< int >::SwapIfNecessary(
       buffer, numberOfBytes, m_ByteOrder);
-  else if(m_ComponentType == UINT)
-    VoxBoCUBImageIOSwapHelper<unsigned int>::SwapIfNecessary(
+    }
+  else if ( m_ComponentType == UINT )
+    {
+    VoxBoCUBImageIOSwapHelper< unsigned int >::SwapIfNecessary(
       buffer, numberOfBytes, m_ByteOrder);
-  else if(m_ComponentType == LONG)
-    VoxBoCUBImageIOSwapHelper<long>::SwapIfNecessary(
+    }
+  else if ( m_ComponentType == LONG )
+    {
+    VoxBoCUBImageIOSwapHelper< long >::SwapIfNecessary(
       buffer, numberOfBytes, m_ByteOrder);
-  else if(m_ComponentType == ULONG)
-    VoxBoCUBImageIOSwapHelper<unsigned long>::SwapIfNecessary(
+    }
+  else if ( m_ComponentType == ULONG )
+    {
+    VoxBoCUBImageIOSwapHelper< unsigned long >::SwapIfNecessary(
       buffer, numberOfBytes, m_ByteOrder);
-  else if(m_ComponentType == FLOAT)
-    VoxBoCUBImageIOSwapHelper<float>::SwapIfNecessary(
+    }
+  else if ( m_ComponentType == FLOAT )
+    {
+    VoxBoCUBImageIOSwapHelper< float >::SwapIfNecessary(
       buffer, numberOfBytes, m_ByteOrder);
-  else if(m_ComponentType == DOUBLE)
-    VoxBoCUBImageIOSwapHelper<double>::SwapIfNecessary(
+    }
+  else if ( m_ComponentType == DOUBLE )
+    {
+    VoxBoCUBImageIOSwapHelper< double >::SwapIfNecessary(
       buffer, numberOfBytes, m_ByteOrder);
-  else 
+    }
+  else
     {
     ExceptionObject exception(__FILE__, __LINE__);
     exception.SetDescription("Pixel Type Unknown");
     throw exception;
     }
 }
-
 } // end namespace itk

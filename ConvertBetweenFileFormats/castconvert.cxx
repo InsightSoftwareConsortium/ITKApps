@@ -68,11 +68,9 @@ extern int DicomFileConverterScalarA(const std::string &inputPixelComponentType,
 #include "itkGE4ImageIOFactory.h"
 #include "itkGE5ImageIOFactory.h"
 #include "itkGEAdwImageIOFactory.h"
-#include "itkBrains2MaskImageIOFactory.h"
 
 int  main(  int  argc,  char *argv[] )
   {
-  itk::Brains2MaskImageIOFactory::RegisterOneFactory();
   itk::GE4ImageIOFactory::RegisterOneFactory();
   itk::GE5ImageIOFactory::RegisterOneFactory();
   itk::GEAdwImageIOFactory::RegisterOneFactory();

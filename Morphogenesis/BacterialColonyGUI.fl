@@ -27,7 +27,9 @@ class BacterialColonyGUI {open
     }
   }
   Function {~BacterialColonyGUI()} {return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
   Function {Show(void)} {return_type {virtual void}
   } {
     code {panelWindow->show();} {}

@@ -17,11 +17,7 @@ ADD_EXECUTABLE(itk2DAnisotropicDiffusionImageFilter itk2DAnisotropicDiffusionIma
 INSTALL_TARGETS(/bin itk2DAnisotropicDiffusionImageFilter)
 
 TARGET_LINK_LIBRARIES (itk2DAnisotropicDiffusionImageFilter
-  ITKAlgorithms
-  ITKBasicFilters
-  ITKCommon
-  ITKIO
-  ITKNumerics
+  ${ITK_LIBRARIES}
   )
 
 

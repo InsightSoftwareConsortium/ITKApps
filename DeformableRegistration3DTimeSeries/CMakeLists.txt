@@ -64,14 +64,7 @@ TARGET_LINK_LIBRARIES(
   ITKFltkImageViewer
   ITKVtkFltk
 
-  ITKBasicFilters
-  ITKCommon
-  ITKIO
-  ITKFEM
-  ITKNumerics
-  ITKMetaIO
-  ITKStatistics
-
+  ${ITK_LIBRARIES}
 
   vtkCommon
   vtkFiltering

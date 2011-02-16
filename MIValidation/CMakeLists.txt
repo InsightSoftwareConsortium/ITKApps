@@ -25,5 +25,5 @@ Code/VanderbiltModality.cxx )
 
 ADD_EXECUTABLE(MIValidationApp   ${MIValidation_SRCS} )
 INSTALL_TARGETS(/bin MIValidationApp)
-TARGET_LINK_LIBRARIES(MIValidationApp ITKNumerics ITKIO ITKBasicFilters)
+TARGET_LINK_LIBRARIES(MIValidationApp ${ITK_LIBRARIES})
 

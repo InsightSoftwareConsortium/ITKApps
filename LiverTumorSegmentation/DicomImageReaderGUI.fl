@@ -28,7 +28,9 @@ this->ReadVolume();} selected
     }
   }
   Function {~DicomImageReaderGUI()} {return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowSeriesBrowser()} {return_type {virtual void}
   } {
     code {seriesBrowserWindow->show();} {}
@@ -44,5 +46,7 @@ while (seriesBrowserWindow->visible())
 Fl::check();} {}
   }
   Function {ReadVolume()} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
 } 

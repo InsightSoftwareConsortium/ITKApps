@@ -17,7 +17,7 @@ ADD_EXECUTABLE(SymmetricEllipsoidInteriorExteriorSpatialFunctionExample
   itkSymmetricEllipsoidInteriorExteriorSpatialFunctionExample.cxx)
 
 TARGET_LINK_LIBRARIES(SymmetricEllipsoidInteriorExteriorSpatialFunctionExample
-  ITKIO ITKBasicFilters ITKCommon)
+  ${ITK_LIBRARIES})
 
 INSTALL_TARGETS(/bin SymmetricEllipsoidInteriorExteriorSpatialFunctionExample)
 

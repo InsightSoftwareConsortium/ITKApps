@@ -472,7 +472,7 @@ liImageRegistrationConsoleBase
     }
   case rigidTransform:
     {
-    typedef itk::Rigid3DTransform<double> TransformType;
+    typedef itk::VersorRigid3DTransform<double> TransformType;
     TransformType::Pointer transform = TransformType::New();
     transform->SetIdentity();
     m_ImageRegistrationMethod->SetTransform( transform );

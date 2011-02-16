@@ -256,7 +256,7 @@ void vtkRegistrationMonitor::Update()
   //
   //  Generate the screenshot
   //
-  ::itk::OStringStream screenshotFileName;
+  std::ostringstream screenshotFileName;
   screenshotFileName << this->ScreenshotOutputDirectory << "/";
   screenshotFileName << this->ScreenshotBaseName;
   screenshotFileName << setw(3) << setfill('0');

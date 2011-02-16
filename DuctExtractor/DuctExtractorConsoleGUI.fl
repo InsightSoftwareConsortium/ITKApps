@@ -107,17 +107,31 @@ class DuctExtractorConsoleGUI {open : {public DuctExtractorConsoleBase}
     }
   }
   Function {~DuctExtractorConsoleGUI()} {return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
   Function {Quit( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Load( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowInput( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowLaplacian( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowSmoothed( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowRegionGrowth( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
 } 

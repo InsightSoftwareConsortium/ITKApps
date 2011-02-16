@@ -755,6 +755,7 @@ ImageIOWizardLogic<TPixel>
     // Get the meta data for the image
     itk::MetaDataDictionary &mdd = m_Image->GetMetaDataDictionary();
 
+#if 0
     // Find the entry dealing with orientation
     typedef itk::MetaDataObject<itk::SpatialOrientation::ValidCoordinateOrientationFlags> ObjectType;
     ObjectType *entry = 
@@ -820,8 +821,8 @@ ImageIOWizardLogic<TPixel>
         }
       flagGuessed = true;
       }
+#endif
     }
-
   if(flagGuessed)
     {
     // Set the preset to default

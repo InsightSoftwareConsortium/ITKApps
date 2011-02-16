@@ -3,7 +3,7 @@
 #include "itkDICOMImageIO2.h"
 
 //#include <Fl/Fl_Ask.H>
-#include <Fl/fl_ask.H>
+#include <FL/fl_ask.H>
 
 namespace ISIS
 {

@@ -605,7 +605,9 @@ this->StartBSplineDeformation();}
     code {} {}
   }
   Function {~DeformableRegistration3DTimeSeriesGUI()} {open return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
   Function {Show()} {open return_type {virtual void}
   } {
     code {externalWindow->show();
@@ -616,11 +618,17 @@ fltkRenderWindowInteractor->show();} {}
     code {externalWindow->hide();} {}
   }
   Function {LoadRawData()} {open C return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {LoadDeformableFieldData()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SelectTime(int)} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {timer_callback(void* v)} {open return_type {static void}
   } {
     code {DeformableRegistration3DTimeSeriesGUI* window = reinterpret_cast<DeformableRegistration3DTimeSeriesGUI*>(v);
@@ -662,39 +670,73 @@ fltkRenderWindowInteractor->show();} {}
 }} {}
   }
   Function {LoadSegmentedData()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {StartDemonsDeformation()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Save4DDeformationImage()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {AbortDeformation()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {StartBSplineDeformation()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ComputePathSelectedPoint()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {StartFEMDeformation()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ComputePathSelectedVolume()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {LoadDicomSeries()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ViewVolume()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Save4DSegmentedImage()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SetInteractor(int i)} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ViewSlice()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ManualSegmentationStart()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {RasterizePolygon()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ManualSegmentationStop()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Save3DSegmentedImage()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   decl {Fl_Text_Buffer *buff;} {public
   }
 } 

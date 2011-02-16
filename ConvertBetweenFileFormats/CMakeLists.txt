@@ -11,7 +11,7 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_BINARY_DIR} 
     )
 
-TARGET_LINK_LIBRARIES(ConvertBetweenFileFormats  ITKIO ITKCommon )
+TARGET_LINK_LIBRARIES(ConvertBetweenFileFormats  ${ITK_LIBRARIES} )
 IF (VTK_FOUND)
   TARGET_LINK_LIBRARIES(ConvertBetweenFileFormats vtkIO vtkCommon vtkFiltering vtkImaging )
   INCLUDE_DIRECTORIES( ${ITKApps_SOURCE_DIR}/Auxiliary/vtk )
@@ -67,6 +67,6 @@ IF( BUILD_TESTING )
   ADD_TEST(ccvnt_compare_nifti            ${IMAGE_COMPARE_TESTS} --compare ${IMAGE_PATH}/image_in.mhd ${IMAGE_PATH_OUTPUTS}/image_in8.mhd Dummy)
 
   ADD_EXECUTABLE(ImageCompareTests ImageCompareTests.cxx)
-  TARGET_LINK_LIBRARIES(ImageCompareTests ITKCommon ITKIO)
+  TARGET_LINK_LIBRARIES(ImageCompareTests ${ITK_LIBRARIES})
 ENDIF( BUILD_TESTING )
 

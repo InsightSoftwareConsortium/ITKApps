@@ -466,7 +466,7 @@ for (unsigned int n=0; n < (*ee)->GetNumberOfNodes(); n++) {
       // iteration frequency (specified by FIELD_FREQ, usu. 10)
 #if OUTPUT_FIELD      
       if (nit % FIELD_FREQ == 0 || nit == niter-1) {
-      itk::OStringStream s;
+      std::ostringstream s;
       s << (fieldctr+100);
       std::string fn;
 

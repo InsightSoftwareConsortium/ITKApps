@@ -16,7 +16,4 @@ ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 ADD_EXECUTABLE(MetaImageReadWrite MetaImageReadWrite.cxx )
 INSTALL_TARGETS(/bin MetaImageReadWrite)
-TARGET_LINK_LIBRARIES (MetaImageReadWrite
-  ITKBasicFilters
-  ITKIO
-    )
+TARGET_LINK_LIBRARIES (MetaImageReadWrite ${ITK_LIBRARIES})

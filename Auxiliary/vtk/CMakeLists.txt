@@ -10,9 +10,9 @@ FOREACH(exe vtk2itk vtk2itkDouble itkCurvatureFlowToVTK
   # Link against vtkWidgets if it is found, otherwise link against the older
   # library, vtkHybrid .
   IF(VTK_KITS MATCHES WIDGETS)
-    TARGET_LINK_LIBRARIES(${exe} ITKBasicFilters ITKIO vtkRendering vtkIO vtkWidgets)
+    TARGET_LINK_LIBRARIES(${exe} ${ITK_LIBRARIES} vtkRendering vtkIO vtkWidgets)
   ELSE(VTK_KITS MATCHES WIDGETS)
-    TARGET_LINK_LIBRARIES(${exe} ITKBasicFilters ITKIO vtkRendering vtkIO vtkHybrid)
+    TARGET_LINK_LIBRARIES(${exe} ${ITK_LIBRARIES} vtkRendering vtkIO vtkHybrid)
   ENDIF(VTK_KITS MATCHES WIDGETS)
 ENDFOREACH(exe)
 
@@ -24,11 +24,11 @@ ADD_LIBRARY(ITKVTKIntegration
 
 ADD_EXECUTABLE(itkRegisterITKMonitorVTK itkRegisterITKMonitorVTK)
 TARGET_LINK_LIBRARIES(itkRegisterITKMonitorVTK 
-  ITKVTKIntegration ITKNumerics ITKBasicFilters ITKIO vtkRendering vtkIO vtkHybrid)
+  ITKVTKIntegration ${ITK_LIBRARIES} vtkRendering vtkIO vtkHybrid)
 
 ADD_EXECUTABLE(ExtractIsoSurface ExtractIsoSurface.cxx)
 TARGET_LINK_LIBRARIES(ExtractIsoSurface 
-  ITKVTKIntegration ITKNumerics ITKBasicFilters ITKIO vtkRendering vtkIO vtkHybrid)
+  ITKVTKIntegration ${ITK_LIBRARIES} vtkRendering vtkIO vtkHybrid)
 
 ADD_EXECUTABLE(ScreenShotGenerator ScreenShotGenerator.cxx)
 TARGET_LINK_LIBRARIES(ScreenShotGenerator vtkRendering vtkIO vtkHybrid)

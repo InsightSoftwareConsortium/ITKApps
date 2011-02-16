@@ -41,12 +41,11 @@ ${FLTK_LIB_PATH}
 )
 
 LINK_LIBRARIES (
-ITKBasicFilters
-ITKIO
-FltkImageViewer
-${FLTK_LIBRARY}
-${OPENGL_LIBRARY}
-${OPENGL_glu_LIBRARY}
+  ${ITK_LIBRARIES}
+  FltkImageViewer
+  ${FLTK_LIBRARY}
+  ${OPENGL_LIBRARY}
+  ${OPENGL_glu_LIBRARY}
 )
 
 

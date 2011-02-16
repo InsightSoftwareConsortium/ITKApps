@@ -57,21 +57,39 @@ class CellularSegmentationApplicationGUI {open : {public CellularSegmentationApp
     }
   }
   Function {~CellularSegmentationApplicationGUI()} {return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
   Function {Quit()} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Load()} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Show()} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Hide()} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Run()} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Stop()} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {SetDisplayOption()} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Clear()} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
 } 

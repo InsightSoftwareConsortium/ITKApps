@@ -45,11 +45,7 @@ ITK_DISABLE_FLTK_GENERATED_WARNINGS("${Project_SRCS}")
 
 ADD_GUI_EXECUTABLE(SimpleFuzzyConnectedness   "${Project_SRCS}")
 TARGET_LINK_LIBRARIES (SimpleFuzzyConnectedness
-ITKCommon
-ITKNumerics
-ITKBasicFilters
-ITKIO
-ITKFltkImageViewer
-
+  ${ITK_LIBRARIES}
+  ITKFltkImageViewer
 )
 

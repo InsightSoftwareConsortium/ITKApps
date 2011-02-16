@@ -25,7 +25,8 @@
 
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
-#include <FL/fl_file_chooser.H>
+#include <FL/Fl_File_Chooser.H>
+
 #include <GLColorSliceView.h>
 #include <GLSliceView.h>
 #include <SliceView.h>

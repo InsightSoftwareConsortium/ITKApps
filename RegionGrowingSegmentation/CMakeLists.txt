@@ -59,36 +59,30 @@ ${RegionGrowingSegmentation_FLTK_UI_SRCS}
 
 ADD_GUI_EXECUTABLE(RegionGrowingSegmentation2D "${RegionGrowingSegmentation2D_SRCS}")
 TARGET_LINK_LIBRARIES (RegionGrowingSegmentation2D
-ITKCommon
-ITKNumerics
-ITKBasicFilters
-ITKIO
-ITKFltkImageViewer
-ITKVtkFltk
-vtkRendering
-vtkGraphics
-vtkHybrid
-vtkImaging
-vtkIO
-vtkFiltering
-vtkCommon
+  ${ITK_LIBRARIES}
+  ITKFltkImageViewer
+  ITKVtkFltk
+  vtkRendering
+  vtkGraphics
+  vtkHybrid
+  vtkImaging
+  vtkIO
+  vtkFiltering
+  vtkCommon
 )
 
 ADD_GUI_EXECUTABLE(RegionGrowingSegmentation "${RegionGrowingSegmentation_SRCS}")
 TARGET_LINK_LIBRARIES (RegionGrowingSegmentation
-ITKCommon
-ITKNumerics
-ITKBasicFilters
-ITKIO
-ITKFltkImageViewer
-ITKVtkFltk
-vtkRendering
-vtkGraphics
-vtkHybrid
-vtkImaging
-vtkIO
-vtkFiltering
-vtkCommon
+  ${ITK_LIBRARIES}
+  ITKFltkImageViewer
+  ITKVtkFltk
+  vtkRendering
+  vtkGraphics
+  vtkHybrid
+  vtkImaging
+  vtkIO
+  vtkFiltering
+  vtkCommon
 )
 
 IF(CMAKE_COMPILER_IS_GNUCXX)

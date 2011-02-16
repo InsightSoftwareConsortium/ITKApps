@@ -239,31 +239,59 @@ class CannySegmentationLevelSetGUI {open : {public CannySegmentationLevelSetBase
     }
   }
   Function {~CannySegmentationLevelSetGUI()} {return_type virtual
-  } {}
+  } {
+    code {} {}
+  }
   Function {Quit( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {Load( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowAbout( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowInputImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowConsole( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowThresholdedImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {UpdateExtract()} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowOutputLevelSet( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowGradientMagnitudeImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowEdgePotentialImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowFastMarchingResultImage( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ShowOutputCannyEdges( void )} {return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
   Function {ExportContour()} {open return_type {virtual void}
-  } {}
+  } {
+    code {} {}
+  }
 } 
