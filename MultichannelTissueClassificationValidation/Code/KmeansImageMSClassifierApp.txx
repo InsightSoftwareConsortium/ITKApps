@@ -160,16 +160,12 @@ KmeansImageMSClassifierApp<TVectorInputImage,TMaskImage>
     classIndex++ )
     {
     temp[0] = (double) kmeansResultForClass[classIndex];
-#ifdef ITK_USE_REVIEW_STATISTICS
     typename MembershipFunctionType::CentroidType centroid(temp.size());
     for (unsigned int i = 0; i < temp.size(); i++)
       {
       centroid[i] = temp[i];
       }
     membershipFunctions[classIndex]->SetCentroid(centroid);
-#else
-    membershipFunctions[classIndex]->SetCentroid(temp);
-#endif
     }  
 /*
   for(unsigned int classIndex=0; classIndex < membershipFunctions.size(); 
