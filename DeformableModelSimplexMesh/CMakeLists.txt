@@ -69,7 +69,7 @@ INCLUDE_DIRECTORIES(
 
 
 TARGET_LINK_LIBRARIES( DeformableModelSimplexMesh
-  ITKAlgorithms ITKBasicFilters ${ITK_LIBRARIES}
+  ${ITK_LIBRARIES}
   ITKFltkImageViewer ITKVtkFltk
   vtkCommon
   vtkFiltering

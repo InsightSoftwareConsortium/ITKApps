@@ -39,18 +39,18 @@ ADD_EXECUTABLE(itkRelabelerApp itkRelabelerApp.cxx)
 INSTALL_TARGETS(/bin itkRelabelerApp)
 
 
-TARGET_LINK_LIBRARIES (itkTreeGeneratorApp ITKBasicFilters ITKCommon
+TARGET_LINK_LIBRARIES (itkTreeGeneratorApp ${ITK_LIBRARIES}
  param chunks)
 
-TARGET_LINK_LIBRARIES (itkSegmenterApp ITKBasicFilters ITKCommon
+TARGET_LINK_LIBRARIES (itkSegmenterApp ${ITK_LIBRARIES}
  param chunks)
 
-TARGET_LINK_LIBRARIES (itkResolverApp ITKBasicFilters ITKCommon
+TARGET_LINK_LIBRARIES (itkResolverApp ${ITK_LIBRARIES}
  param chunks)
 
-TARGET_LINK_LIBRARIES (itkEquivalenceRelabelerApp ITKBasicFilters ITKCommon
+TARGET_LINK_LIBRARIES (itkEquivalenceRelabelerApp ${ITK_LIBRARIES}
  param chunks)
 
-TARGET_LINK_LIBRARIES (itkRelabelerApp ITKBasicFilters ITKCommon
+TARGET_LINK_LIBRARIES (itkRelabelerApp ${ITK_LIBRARIES}
  param chunks)
 

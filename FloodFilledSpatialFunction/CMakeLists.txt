@@ -20,4 +20,4 @@ ${FloodFilledSpatialFunction_SOURCE_DIR}
 
 ADD_EXECUTABLE(itkFloodFilledSpatialFunctionExample itkFloodFilledSpatialFunctionExample.cxx)
 INSTALL_TARGETS(/bin itkFloodFilledSpatialFunctionExample)
-TARGET_LINK_LIBRARIES(itkFloodFilledSpatialFunctionExample ITKCommon)
+TARGET_LINK_LIBRARIES(itkFloodFilledSpatialFunctionExample ${ITK_LIBRARIES})

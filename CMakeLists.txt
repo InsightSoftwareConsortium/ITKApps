@@ -23,7 +23,7 @@ IF(ITK_FOUND)
   INCLUDE(${ITK_USE_FILE})
 ELSE(ITK_FOUND)
   MESSAGE(FATAL_ERROR
-          "Cannot build ITKApps without ITK.  Please set ITK_DIR.")
+          "Can<not build ITKApps without ITK.  Please set ITK_DIR.")
 ENDIF(ITK_FOUND)
 
 
@@ -375,9 +375,7 @@ IF(VTK_FOUND)
 ENDIF(VTK_FOUND)
 
 LINK_LIBRARIES (
-ITKAlgorithms
-ITKCommon
-ITKBasicFilters
+${ITK_LIBRARIES}
 )
 
 if(WIN32)

@@ -28,9 +28,7 @@ IF (NOT ITK_USE_REVIEW_STATISTICS)
   ADD_EXECUTABLE(GaussianMinimumErrorClassifier ${GaussianMinimumErrorClassifier_SRCS})
   INSTALL_TARGETS(/bin GaussianMinimumErrorClassifier)
   TARGET_LINK_LIBRARIES (GaussianMinimumErrorClassifier
-    ITKCommon
-    ITKBasicFilters
-    ITKIO
+    ${ITK_LIBRARIES}
   )
 
 ENDIF (NOT ITK_USE_REVIEW_STATISTICS)

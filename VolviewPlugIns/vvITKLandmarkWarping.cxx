@@ -9,6 +9,7 @@
 #include "itkResampleImageFilter.h"
 #include "itkElasticBodySplineKernelTransform.h"
 
+#include <stdio.h>
 
 // =======================================================================
 // The main class definition

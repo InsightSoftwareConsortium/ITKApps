@@ -14,6 +14,8 @@
 #include "itkResampleImageFilter.h"
 #include "itkShrinkImageFilter.h"
 
+#include <stdio.h>
+
 // use itkRigid3DTransform instead?
 // use VerserRigid3DTransform (not centered ?)
 // use versor transform optimizer?
