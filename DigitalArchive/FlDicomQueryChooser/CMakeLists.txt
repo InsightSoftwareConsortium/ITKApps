@@ -114,9 +114,7 @@ IF(WIN32)
   FlDicomQueryChooser
   ${DCMTK_LIBRARIES}
   ${OPENGL_LIBRARY}
-  ITKCommon
-  ITKIO
-  ITKBasicFilters
+  ${ITK_LIBRARIES}
   ITKFltkImageViewer
   )
 ELSE(WIN32)
@@ -124,9 +122,7 @@ ELSE(WIN32)
   FlDicomQueryChooser
   ${DCMTK_LIBRARIES}
   ${OPENGL_LIBRARY}
-  ITKCommon
-  ITKIO
-  ITKBasicFilters
+  ${ITK_LIBRARIES}
   ITKFltkImageViewer
   wrap
 )
