@@ -14,12 +14,14 @@
 =========================================================================*/
 
 #include "ImageCalculatorUtils.h"
-
-
-
-
+#ifdef ITKV3_COMPATIBILITY
+#include "itkAnalyzeImageIOFactory.h"
+#endif
 int main(int argc, char *argv[])
 {
+#ifdef ITKV3_COMPATIBILITY
+  itk::ObjectFactoryBase::RegisterFactory( itk::AnalyzeImageIOFactory::New() );
+#endif
     return PrimaryImageCalculatorRoutine(argc, argv);
 }
 
