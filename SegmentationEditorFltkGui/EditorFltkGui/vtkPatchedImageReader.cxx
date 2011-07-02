@@ -880,8 +880,9 @@ static void vtkPatchedImageReaderUpdate1(vtkPatchedImageReader *self,
   outPtr = data->GetScalarPointer();
   switch (data->GetScalarType())
     {
-    vtkTemplateMacro4(vtkPatchedImageReaderUpdate2, self, data, inPtr, 
-                      (VTK_TT *)(outPtr));
+    vtkTemplateMacro(
+      vtkPatchedImageReaderUpdate2(self, data, inPtr, static_cast<VTK_TT *>(outPtr))
+      );
     default:
       vtkGenericWarningMacro("Update1: Unknown data type\n");
     }  
@@ -912,7 +913,8 @@ void vtkPatchedImageReader::ExecuteData(vtkDataObject *output)
   // Call the correct templated function for the output
   switch (this->GetDataScalarType())
     {
-    vtkTemplateMacro3(vtkPatchedImageReaderUpdate1, this, data, (VTK_TT *)(ptr));
+    vtkTemplateMacro(
+      vtkPatchedImageReaderUpdate1(this, data, static_cast<VTK_TT *>(ptr)));
     default:
       vtkErrorMacro(<< "UpdateFromFile: Unknown data type");
     }   
