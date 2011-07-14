@@ -22,6 +22,7 @@
 #include "itkMinimumDecisionRule.h"
 #include "itkImageClassifierBase.h"
 #include "itkMaskImageFilter.h"
+#include "itkVariableSizeMatrix.h"
 
 namespace itk
 {
@@ -80,10 +81,10 @@ public:
   itkNewMacro(Self);
 
   /** Integer Matrix type. */
-  typedef vnl_matrix<unsigned int> IntegerMatrixType;
+  typedef VariableSizeMatrix<unsigned int> IntegerMatrixType;
 
   /** Double Matrix type. */
-  typedef vnl_matrix<double> DoubleMatrixType;
+  typedef VariableSizeMatrix<double> DoubleMatrixType;
 
   /** Array of double matrices */
   typedef std::vector<DoubleMatrixType> DoubleMatrixArrayType; 

@@ -36,19 +36,19 @@ GaussianImageMSClassifierApp<TVectorInputImage,TMaskImage>
   // Initialize the containers for means/covariance/number of samples 
   //-------------------------------------------------------------------
 
-  m_ClassMeans.set_size( m_NumberOfClasses, m_NumberOfChannels );
-  m_ClassMeans.fill( 0 );
+  m_ClassMeans.SetSize( m_NumberOfClasses, m_NumberOfChannels );
+  m_ClassMeans.Fill( 0 );
 
   m_ClassCovariances.resize( m_NumberOfClasses );
 
   for(unsigned int i = 0; i < m_NumberOfClasses; i++ )
     {
-    m_ClassCovariances[i].set_size( m_NumberOfChannels, m_NumberOfChannels );
-    m_ClassCovariances[i].fill( 0 );
+    m_ClassCovariances[i].SetSize( m_NumberOfChannels, m_NumberOfChannels );
+    m_ClassCovariances[i].Fill( 0 );
     }
 
-  m_ClassNumberOfSamples.set_size( m_NumberOfClasses, m_NumberOfChannels );
-  m_ClassNumberOfSamples.fill( 0 );
+  m_ClassNumberOfSamples.SetSize( m_NumberOfClasses, m_NumberOfChannels );
+  m_ClassNumberOfSamples.Fill( 0 );
 
 }
 
@@ -121,11 +121,11 @@ GaussianImageMSClassifierApp<TVectorInputImage,TMaskImage>
    
     membershipFunction = MembershipFunctionType::New() ;
 
-    membershipFunction->
-      SetNumberOfSamples( m_ClassNumberOfSamples( classIndex, 0 ) ) ;     
+//    membershipFunction->
+//      SetNumberOfSamples( m_ClassNumberOfSamples( classIndex, 0 ) ) ;
 
     membershipFunction->
-      SetMean( m_ClassMeans.get_row( classIndex) ) ;
+      SetMean( m_ClassMeans[classIndex] ) ;
 
     membershipFunction->
       SetCovariance( m_ClassCovariances[ classIndex ] ) ;

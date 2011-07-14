@@ -21,11 +21,10 @@
 #include "itkObject.h"
 #include "itkFixedArray.h"
 #include "itkArray.h"
-#include "vnl/vnl_matrix.h"
 
 #include "itkImage.h"
 #include "itkImageRegionIterator.h"
-
+#include "itkVariableSizeMatrix.h"
 namespace itk
 {
 
@@ -84,10 +83,10 @@ public:
     VectorInputImagePixelType;
 
   /** Integer Matrix type. */
-  typedef vnl_matrix<unsigned int> IntegerMatrixType;
+  typedef VariableSizeMatrix<unsigned int> IntegerMatrixType;
 
   /** Double Matrix type. */
-  typedef vnl_matrix<double> DoubleMatrixType;
+  typedef VariableSizeMatrix<double> DoubleMatrixType;
 
   /** Array of double matrices */
   typedef std::vector<DoubleMatrixType> DoubleMatrixArrayType; 

@@ -54,19 +54,19 @@ ClassifierValidationInputParser<TVectorInputImage,TMaskImage>
   // Initialize the containers for means/covariance/number of samples 
   //-------------------------------------------------------------------
 
-  m_ClassMeans.set_size( m_NumberOfClasses, m_NumberOfChannels );
-  m_ClassMeans.fill( 0 );
+  m_ClassMeans.SetSize( m_NumberOfClasses, m_NumberOfChannels );
+  m_ClassMeans.Fill( 0 );
 
   m_ClassCovariances.resize( m_NumberOfClasses );
 
   for(unsigned int i = 0; i < m_NumberOfClasses; i++ )
     {
-    m_ClassCovariances[i].set_size( m_NumberOfChannels, m_NumberOfChannels );
-    m_ClassCovariances[i].set_identity( );
+    m_ClassCovariances[i].SetSize( m_NumberOfChannels, m_NumberOfChannels );
+    m_ClassCovariances[i].SetIdentity( );
     }
 
-  m_ClassNumberOfSamples.set_size( m_NumberOfClasses, m_NumberOfChannels );
-  m_ClassNumberOfSamples.fill( 0 );
+  m_ClassNumberOfSamples.SetSize( m_NumberOfClasses, m_NumberOfChannels );
+  m_ClassNumberOfSamples.Fill( 0 );
   
 }
 
@@ -355,8 +355,8 @@ ClassifierValidationInputParser<TVectorInputImage,TMaskImage>
     //-------------------------------------------------------------------
     // set the means container
     {
-    m_ClassMeans.set_size( m_NumberOfClasses, m_NumberOfChannels );
-    m_ClassMeans.fill( 0 );
+    m_ClassMeans.SetSize( m_NumberOfClasses, m_NumberOfChannels );
+    m_ClassMeans.Fill( 0 );
     }
 
     // set class covariance matrices container
@@ -364,16 +364,16 @@ ClassifierValidationInputParser<TVectorInputImage,TMaskImage>
     m_ClassCovariances.resize( m_NumberOfClasses );
     for(unsigned int i = 0; i < m_NumberOfClasses; i++ )
       {
-      m_ClassCovariances[i].set_size( m_NumberOfChannels, m_NumberOfChannels );
-      m_ClassCovariances[i].fill( 0 );
+      m_ClassCovariances[i].SetSize( m_NumberOfChannels, m_NumberOfChannels );
+      m_ClassCovariances[i].Fill( 0 );
       }
 
     }
 
     // set the class number of samples container
     {
-    m_ClassNumberOfSamples.set_size( m_NumberOfClasses, m_NumberOfChannels );
-    m_ClassNumberOfSamples.fill( 0 );    
+    m_ClassNumberOfSamples.SetSize( m_NumberOfClasses, m_NumberOfChannels );
+    m_ClassNumberOfSamples.Fill( 0 );
     }
 
     //-------------------------------------------------------------------
