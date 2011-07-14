@@ -18,7 +18,7 @@
 #include <string>
 #include <cstring>
 #include <vector>
-#include "itk_hash_map.h"
+#include "itksys/hash_map.hxx"
 
 #ifndef __VISParameterFile_h__
 #define __VISParameterFile_h__
@@ -44,14 +44,14 @@ public:
 inline std::ostream& operator<<(std::ostream& s, const Exception &f)
 { s << "VPF::Exception: " << f.info; return s; }
 
-//typedef itk::hash<const char *> strhash;
-class strhash : public itk::hash<const char *>
+//typedef itksys::hash<const char *> strhash;
+class strhash : public itksys::hash<const char *>
 {
 public:
-  itk::hash<const char *> hasher;
+  itksys::hash<const char *> hasher;
   ::size_t operator()(const std::string &s) const
   {
-    //    return itk::hash<const char *>::operator()(s.c_str());
+    //    return itksys::hash<const char *>::operator()(s.c_str());
     return hasher(s.c_str());
   }
 };
@@ -194,7 +194,7 @@ public:
   }
 };
 
-typedef itk::hash_map<std::string, Parameter, strhash, eqstr> File;
+typedef itksys::hash_map<std::string, Parameter, strhash, eqstr> File;
 
 class ParameterFile
 {
@@ -206,7 +206,7 @@ public:
   ParameterFile(const std::string &s) { this->Initialize(s.c_str()); }
   void PrintSelf(std::ostream &s) const
   {
-    for (itk::hash_map<std::string, Parameter, strhash, eqstr>::const_iterator
+    for (itksys::hash_map<std::string, Parameter, strhash, eqstr>::const_iterator
            it = m_File.begin(); it != m_File.end(); ++it )
       { (*it).second.PrintSelf(s); }
   }
