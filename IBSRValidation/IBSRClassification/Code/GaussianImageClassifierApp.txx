@@ -73,9 +73,15 @@ GaussianImageClassifierApp<TVectorInputImage,TMaskImage>
   //----------------------------------------------------------------------
   //Set the decision rule 
   //----------------------------------------------------------------------  
-  typedef typename DecisionRuleBase::Pointer DecisionRuleBasePointer;
+#if ITK_VERSION_MAJOR >= 4
+  typedef typename itk::Statistics::DecisionRule::Pointer DecisionRuleBasePointer;
+
+  typedef itk::Statistics::MinimumDecisionRule DecisionRuleType;
+#else
+  typedef typename DecisionRule::Pointer DecisionRuleBasePointer;
 
   typedef MinimumDecisionRule DecisionRuleType;
+#endif
   DecisionRuleType::Pointer  
     classifierDecisionRule = DecisionRuleType::New();
 
