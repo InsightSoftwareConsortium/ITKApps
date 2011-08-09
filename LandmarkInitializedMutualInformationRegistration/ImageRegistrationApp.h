@@ -96,9 +96,11 @@ class ImageRegistrationApp : public Object
                                                     DeformableParametersType;
     
     typedef AffineTransform<double, 3>              AffineTransformType;
-    typedef itk::BSplineDeformableTransform<double, 3, 3> 
-                                                    DeformableTransformType ;
-  
+#if ITK_VERSION_MAJOR < 4
+    typedef BSplineDeformableTransform<double, 3, 3> DeformableTransformType ;
+#else
+    typedef BSplineTransform<double, 3, 3>          DeformableTransformType ;
+#endif
     void SetOptimizerToOnePlusOne();
 
     void SetOptimizerToGradient();

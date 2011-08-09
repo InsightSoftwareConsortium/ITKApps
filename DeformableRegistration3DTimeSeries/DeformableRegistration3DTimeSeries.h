@@ -35,7 +35,7 @@
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkDemonsRegistrationFilter.h"
 #include "itkHistogramMatchingImageFilter.h"
-#include "itkBSplineDeformableTransform.h"
+#include "itkBSplineTransform.h"
 #include "itkLBFGSOptimizer.h"
 #include "itkImageRegistrationMethod.h"
 #include "itkMeanSquaresImageToImageMetric.h"
@@ -118,8 +118,8 @@ protected:
   //BSpline 
  // const unsigned int                                          SplineOrder = 3;
   typedef double                                              CoordinateRepType;
-  typedef itk::BSplineDeformableTransform<CoordinateRepType,3,
-          3 >                                       TransformType;
+  typedef itk::BSplineTransform<CoordinateRepType,3, 3 >
+                                                             TransformType;
   typedef itk::LBFGSOptimizer                                OptimizerType;
   typedef itk::MeanSquaresImageToImageMetric< 
                                     OutputImageType, 

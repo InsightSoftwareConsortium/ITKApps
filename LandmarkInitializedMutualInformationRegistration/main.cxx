@@ -118,7 +118,11 @@ int main(int argc, char **argv)
     typedef itk::TransformFileReader        TransformReaderType;
     typedef itk::TransformFileWriter        TransformWriterType;
     typedef itk::AffineTransform<double, 3> TransformType;
+#if ITK_VERSION_MAJOR < 4
     typedef itk::BSplineDeformableTransform<double, 3, 3> DeformableTransformType ;
+#else
+    typedef itk::BSplineTransform<double, 3, 3> DeformableTransformType ;
+#endif
     typedef itk::TransformFileReader::TransformListType * TransformListType;
     
     /** Read the fixed image **/
@@ -233,7 +237,11 @@ int main(int argc, char **argv)
               }
             }
 
+#if ITK_VERSION_MAJOR < 4
           if (!strcmp((*TransformIt)->GetNameOfClass(),"BSplineDeformableTransform"))
+#else
+          if (!strcmp((*TransformIt)->GetNameOfClass(),"BSplineTransform"))
+#endif
             {
             LoadedDefTType::Pointer bspline_read = static_cast<LoadedDefTType*>((*TransformIt).GetPointer());
             LoadedDefTType::ConstPointer m_bspline = bspline_read.GetPointer();
@@ -302,7 +310,11 @@ int main(int argc, char **argv)
               }
             }
 
+#if ITK_VERSION_MAJOR < 4
           if (!strcmp((*TransformIt)->GetNameOfClass(),"BSplineDeformableTransform"))
+#else
+          if (!strcmp((*TransformIt)->GetNameOfClass(),"BSplineTransform"))
+#endif
             {
             LoadedDefTType::Pointer bspline_read = static_cast<LoadedDefTType*>((*TransformIt).GetPointer());
             LoadedDefTType::ConstPointer m_bspline = bspline_read.GetPointer();

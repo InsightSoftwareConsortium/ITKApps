@@ -741,6 +741,7 @@ DeformableRegistration3DTimeSeries
     registration->SetFixedImage(m_extractfilter1->GetOutput());
     registration->SetMovingImage(m_extractfilter2->GetOutput());
 
+#if 0
     OutputImageType::RegionType fixedRegion = m_extractfilter1->GetOutput()->GetBufferedRegion();
     registration->SetFixedImageRegion( fixedRegion );
     typedef TransformType::RegionType RegionType;
@@ -767,6 +768,23 @@ DeformableRegistration3DTimeSeries
     transformLow->SetGridSpacing( spacingLow );
     transformLow->SetGridOrigin( originLow );
     transformLow->SetGridRegion( bsplineRegion );
+#else
+  TransformType::PhysicalDimensionsType   fixedPhysicalDimensions;
+  TransformType::MeshSizeType             meshSize;
+  for( unsigned int i=0; i < ImageDimension; i++ )
+    {
+    fixedPhysicalDimensions[i] = fixedImage->GetSpacing()[i] *
+      static_cast<double>(
+        fixedImage->GetLargestPossibleRegion().GetSize()[i] - 1 );
+    }
+  unsigned int numberOfGridNodesInOneDimension = 5;
+  meshSize.Fill( numberOfGridNodesInOneDimension - SplineOrder );
+  transformLow->SetTransformDomainOrigin( fixedImage->GetOrigin() );
+  transformLow->SetTransformDomainPhysicalDimensions( fixedPhysicalDimensions );
+  transformLow->SetTransformDomainMeshSize( meshSize );
+  transformLow->SetTransformDomainDirection( fixedImage->GetDirection() );
+#endif
+
     typedef TransformType::ParametersType     ParametersType;
     const unsigned int numberOfParameters =
                 transformLow->GetNumberOfParameters();
@@ -815,6 +833,7 @@ DeformableRegistration3DTimeSeries
     //  Once the registration has finished with the low resolution grid, we
     //  proceed to instantiate a higher resolution
     TransformType::Pointer  transformHigh = TransformType::New();
+#if 0
     RegionType::SizeType   gridHighSizeOnImage;
     gridHighSizeOnImage.Fill( this->BSplineHighSize->value() );
     totalGridSize = gridHighSizeOnImage + gridBorderSize;
@@ -831,6 +850,22 @@ DeformableRegistration3DTimeSeries
     transformHigh->SetGridSpacing( spacingHigh );
     transformHigh->SetGridOrigin( originHigh );
     transformHigh->SetGridRegion( bsplineRegion );
+#else
+  TransformType::PhysicalDimensionsType   fixedPhysicalDimensions;
+  TransformType::MeshSizeType             meshSize;
+  for( unsigned int i=0; i < ImageDimension; i++ )
+    {
+    fixedPhysicalDimensions[i] = fixedImage->GetSpacing()[i] *
+      static_cast<double>(
+        fixedImage->GetLargestPossibleRegion().GetSize()[i] - 1 );
+    }
+  unsigned int numberOfGridNodesInOneDimension = 5;
+  meshSize.Fill( numberOfGridNodesInOneDimension - SplineOrder );
+  transformHigh->SetTransformDomainOrigin( fixedImage->GetOrigin() );
+  transformHigh->SetTransformDomainPhysicalDimensions( fixedPhysicalDimensions );
+  transformHigh->SetTransformDomainMeshSize( meshSize );
+  transformHigh->SetTransformDomainDirection( fixedImage->GetDirection() );
+#endif
     ParametersType parametersHigh( transformHigh->GetNumberOfParameters() );
     parametersHigh.Fill( 0.0 );
     //  Now we need to initialize the BSpline coefficients of the higher resolution

@@ -22,7 +22,11 @@
 
 #include "itkImageRegistrationMethod.h"
 #include "itkDeformationFieldSource.h"
+#if ITK_VERSION_MAJOR < 4
 #include "itkBSplineDeformableTransform.h"
+#else
+#include "itkBSplineTransform.h"
+#endif
 #include "itkMattesMutualInformationImageToImageMetric.h"
 
 #include "itkOnePlusOneEvolutionaryOptimizer.h"
@@ -54,8 +58,11 @@ class DeformableRegistrator : public ImageRegistrationMethod < TImage, TImage >
     typedef typename TImage::PixelType PixelType ;
     typedef typename TImage::RegionType RegionType ;
 
-    typedef itk::BSplineDeformableTransform<double, 3, 3> TransformType ;
-
+#if ITK_VERSION_MAJOR < 4
+    typedef itk::BSplineDeformable<double, 3, 3> TransformType ;
+#else
+    typedef itk::BSplineTransform<double, 3, 3> TransformType ;
+#endif
     typedef enum { ONEPLUSONE,  LBFGS }         OptimizerMethodType;
 
     typedef OnePlusOneEvolutionaryOptimizer     OnePlusOneOptimizerType ;

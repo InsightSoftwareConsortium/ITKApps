@@ -71,6 +71,7 @@ DeformableRegistrator< TImage >
   this->GetTypedMetric()->SetNumberOfSpatialSamples( 
                           m_MetricNumberOfSpatialSamples );
   
+#if ITK_VERSION_MAJOR < 4
     // Definition of the differents objects used by the B Spline Transform
   TransformType::RegionType bsplineRegion;
   TransformType::RegionType::SizeType gridSizeOnImage;
@@ -99,7 +100,22 @@ DeformableRegistrator< TImage >
   this->GetTypedTransform()->SetGridSpacing( spacing );
   this->GetTypedTransform()->SetGridOrigin( origin );
   this->GetTypedTransform()->SetGridRegion( bsplineRegion );
-
+#else
+  TransformType::PhysicalDimensionsType   fixedPhysicalDimensions;
+  TransformType::MeshSizeType             meshSize;
+  for( unsigned int i=0; i < 3; i++ )
+    {
+    fixedPhysicalDimensions[i] = this->GetFixedImage()->GetSpacing()[i] *
+      static_cast<double>(
+        this->GetFixedImage()->GetLargestPossibleRegion().GetSize()[i] - 1 );
+    }
+  unsigned int numberOfGridNodesInOneDimension = 5;
+  meshSize.Fill( numberOfGridNodesInOneDimension - 3 );
+  this->GetTypedTransform()->SetTransformDomainOrigin( this->GetFixedImage()->GetOrigin() );
+  this->GetTypedTransform()->SetTransformDomainPhysicalDimensions( fixedPhysicalDimensions );
+  this->GetTypedTransform()->SetTransformDomainMeshSize( meshSize );
+  this->GetTypedTransform()->SetTransformDomainDirection( this->GetFixedImage()->GetDirection() );
+#endif
   const unsigned int numberOfParameters =
                this->GetTypedTransform()->GetNumberOfParameters();
   
