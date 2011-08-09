@@ -601,9 +601,16 @@ void
 ImageRegistrationApp< TImage >
 ::SetLoadedDeformableTransform(const DeformableTransformType & tfm)
   {
+#if ITK_VERSION_MAJOR < 4
   m_LoadedDeformableTransform->SetGridRegion( tfm.GetGridRegion() );
   m_LoadedDeformableTransform->SetGridSpacing( tfm.GetGridSpacing() );
   m_LoadedDeformableTransform->SetGridOrigin( tfm.GetGridOrigin() );
+#else
+  m_LoadedDeformableTransform->SetTransformDomainOrigin( tfm.GetTransformDomainOrigin() );
+  m_LoadedDeformableTransform->SetTransformDomainPhysicalDimensions( tfm.GetTransformDomainPhysicalDimensions() );
+  m_LoadedDeformableTransform->SetTransformDomainMeshSize( tfm.GetTransformDomainMeshSize() );
+  m_LoadedDeformableTransform->SetTransformDomainDirection( tfm.GetTransformDomainDirection() );
+#endif
   m_LoadedDeformableTransform->SetParameters(tfm.GetParameters());
   
   m_FinalParameters = tfm.GetParameters();
@@ -833,7 +840,9 @@ ImageRegistrationApp< TImage >
   registrator->SetOptimizerNumberOfIterations( m_DeformableNumberOfIterations );
   registrator->SetNumberOfControlPoints( m_DeformableNumberOfControlPoints );
 
+#if ITK_VERSION_MAJOR < 4
   registrator->GetTypedTransform()->SetBulkTransform( m_FinalTransform );
+#endif
   
   registrator->SetOptimizerToLBFGS();
   
@@ -864,8 +873,9 @@ ImageRegistrationApp< TImage >
                                                     ->GetFixedParameters() ) ;
   m_DeformableRegTransform->SetParametersByValue( registrator
                                              ->GetLastTransformParameters() );
+#if ITK_VERSION_MAJOR < 4
   m_DeformableRegTransform->SetBulkTransform( m_FinalTransform );
-
+#endif
   m_DeformableMetricValue = registrator->GetTypedMetric()->GetValue(
                                     m_DeformableRegTransform->GetParameters());
                                       
