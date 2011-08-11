@@ -1,4 +1,3 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 1.6)
 PROJECT(VolviewPlugIns)
 
 # The plugins are always built as shared libraries. VolView contains
