@@ -19,7 +19,7 @@ public:
   bool GetITKCompressFile();
 
   void SetDefaultSelectionType(unsigned int val) {guiITKPixelType->value(val);}
-  void SetShowAlertWindow(bool show) {m_ShowAlertWindow = show;}
+  void SetShowAlertWindow(bool sh) {m_ShowAlertWindow = sh;}
   bool GetShowAlertWindow() {return m_ShowAlertWindow;}
 
 protected:
@@ -185,7 +185,7 @@ itkFlFileWriter( ImageType *imP,       // O - Filename or NULL
     } 
   else 
     if (fc -> value()) 
-      strcpy(retname, (char *)fc -> value());
+      strcpy(retname, (const char *)fc -> value());
     else 
       return false;
 

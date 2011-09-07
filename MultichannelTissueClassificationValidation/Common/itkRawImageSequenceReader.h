@@ -17,6 +17,11 @@
 #ifndef __itkRawImageSequenceReader_h
 #define __itkRawImageSequenceReader_h
 
+#include "itkConfigure.h"
+#if ITK_VERSION_MAJOR >= 4
+#define ITK_TYPENAME typename
+#endif
+
 #include "itkImageIOBase.h"
 #include "itkImageSource.h"
 #include "itkExceptionObject.h"

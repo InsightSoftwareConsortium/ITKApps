@@ -17,6 +17,11 @@
 #ifndef _FEMBrainStripValidationApp_h
 #define _FEMBrainStripValidationApp_h
 
+#include "itkConfigure.h"
+#if ITK_VERSION_MAJOR >= 4
+#define ITK_TYPENAME typename
+#endif
+
 #include "itkFEM.h"
 
 #include "../../AtlasSegmentation/Code/ApplicationBase.h"

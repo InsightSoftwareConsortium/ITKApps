@@ -219,11 +219,11 @@ IF(NOT BORLAND)
 # Test the conditions for building the MRIBiasCorrection example
 OPTIONAL_APP(MRIBiasCorrection)
 
-IF (NOT ITK_USE_REVIEW_STATISTICS)
+if (ITK_VERSION_MAJOR STRLESS 4)
   # Add an option to build or not build the
   # GaussianMinimumErrorClassifier example
   OPTIONAL_APP(GaussianMinimumErrorClassifier)
-ENDIF (NOT ITK_USE_REVIEW_STATISTICS)
+endif()
 
 # Build the AntiAliasBinaryImageFilter example
 OPTIONAL_APP(AntiAliasBinaryImageFilter)
@@ -301,7 +301,9 @@ IF(FLTK_FOUND)
     OPTIONAL_APP(LiverTumorSegmentation)
     IF(NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION} LESS 4.5)
       OPTIONAL_APP(DeformableModelSimplexMesh)
+if (ITK_VERSION_MAJOR STRLESS 4)
       OPTIONAL_APP(DeformableRegistration3DTimeSeries)
+endif()
     ENDIF(NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION} LESS 4.5)
     OPTIONAL_APP(CellularSegmentation)
     OPTIONAL_APP(ImageRegistration2D)
@@ -314,8 +316,10 @@ ENDIF(FLTK_FOUND)
 OPTIONAL_APP(MetaImageImporter)
 OPTIONAL_APP(MetaImageReadWrite)
 
+if (ITK_VERSION_MAJOR STRLESS 4)
 # Add an option to build FEM applications
 OPTIONAL_APP(FEM)
+endif()
 
 # Add an option to build or not build the FuzzyConnectedness example
 IF(ITK_USE_PATENTED)
