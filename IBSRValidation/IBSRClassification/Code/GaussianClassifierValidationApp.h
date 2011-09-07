@@ -17,6 +17,11 @@
 #ifndef _GaussianClassifierValidationApp_h
 #define _GaussianClassifierValidationApp_h
 
+#include "itkConfigure.h"
+#if ITK_VERSION_MAJOR >= 4
+#define ITK_TYPENAME typename
+#endif
+
 #include <string>
 #include "ClassifierApplicationBase.h"
 #include "ClassifierValidationInputParser.h"

@@ -17,6 +17,11 @@
 #ifndef _BrainStripValidationApp_h
 #define _BrainStripValidationApp_h
 
+#include "itkConfigure.h"
+#if ITK_VERSION_MAJOR >= 4
+#define ITK_TYPENAME typename
+#endif
+
 #include <string>
 #include "ApplicationBase.h"
 #include "ValidationInputParser.h"

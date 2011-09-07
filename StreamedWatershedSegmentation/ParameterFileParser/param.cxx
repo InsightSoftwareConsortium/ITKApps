@@ -101,7 +101,6 @@ const Parameter& ParameterFile::operator[](const std::string &s)
 GenericValue * Parameter
 ::GetElement( std::vector<GenericValue *>::size_type n) const
 {
-  typedef std::vector<GenericValue *> Superclass;
   if (this->valid() == false)
     {
       return &m_InvalidValue;

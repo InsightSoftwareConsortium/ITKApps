@@ -39,11 +39,11 @@ LandmarkSliceViewer<TImagePixel>
   m_LandmarkChangeCallBack = 0;
 
   IndexType index;
-  SizeType  size;
+  SizeType  sz;
   index.Fill(0);
-  size.Fill(0);
+  sz.Fill(0);
   m_RegionOfInterest.SetIndex(index);
-  m_RegionOfInterest.SetSize(size);
+  m_RegionOfInterest.SetSize(sz);
 
   this->cColorTable->SetColor(0, 0, 0, 1, "Blue");
   this->cColorTable->SetColor(1, 1, 0, 0, "Red");
@@ -76,19 +76,19 @@ LandmarkSliceViewer<TImagePixel>
 template<class TImagePixel>
 void
 LandmarkSliceViewer<TImagePixel>
-::SetInputImage( ImageType* image )
+::SetInputImage( ImageType* im )
   {
-  GLSliceView< TImagePixel, unsigned char >::SetInputImage(image);
+  GLSliceView< TImagePixel, unsigned char >::SetInputImage(im);
 
-  typename OverlayImageType::Pointer overlay = OverlayImageType::New();
-  overlay->SetRegions(image->GetLargestPossibleRegion());
-  overlay->SetSpacing(image->GetSpacing());
-  overlay->SetOrigin(image->GetOrigin());
-  overlay->Allocate();
-  overlay->FillBuffer(0);
-  overlay->SetReferenceCount(2);
+  typename OverlayImageType::Pointer ovly = OverlayImageType::New();
+  ovly->SetRegions(im->GetLargestPossibleRegion());
+  ovly->SetSpacing(im->GetSpacing());
+  ovly->SetOrigin(im->GetOrigin());
+  ovly->Allocate();
+  ovly->FillBuffer(0);
+  ovly->SetReferenceCount(2);
   
-  this->SetInputOverlay(overlay);
+  this->SetInputOverlay(ovly);
   this->ViewOverlayData(true);
   }
 
@@ -100,10 +100,10 @@ LandmarkSliceViewer<TImagePixel>
   {
   this->HideLandmarks();
 
-  unsigned int size = m_LandmarkPointList->size();
-  for ( unsigned int i = 0; i < size; ++i )
+  unsigned int sz = m_LandmarkPointList->size();
+  for ( unsigned int ii = 0; ii < sz; ++ii )
     {
-    this->DeleteLandmark(i);
+    this->DeleteLandmark(ii);
     }
 
   m_LandmarkPointList->clear();
@@ -186,7 +186,7 @@ LandmarkSliceViewer<TImagePixel>
     }
   else
     {
-    for(unsigned int i=m_LandmarkPointList->size(); i<id; i++)
+    for(unsigned int ii=m_LandmarkPointList->size(); ii<id; ii++)
       {
       m_LandmarkPointList->push_back(*(new LandmarkPointType));
       }
@@ -198,12 +198,12 @@ LandmarkSliceViewer<TImagePixel>
 template<class TImagePixel>
 void
 LandmarkSliceViewer<TImagePixel>
-::AddLandmark(unsigned int id, ViewerColorType color)
+::AddLandmark(unsigned int id, ViewerColorType clr)
   {
   m_LandmarkCandidateId = id;
-  m_LandmarkCandidate.SetColor( this->cColorTable->GetColorComponent(color, 'r'),
-                                this->cColorTable->GetColorComponent(color, 'g'),
-                                this->cColorTable->GetColorComponent(color, 'b'), 1 );
+  m_LandmarkCandidate.SetColor( this->cColorTable->GetColorComponent(clr, 'r'),
+                                this->cColorTable->GetColorComponent(clr, 'g'),
+                                this->cColorTable->GetColorComponent(clr, 'b'), 1 );
   m_Mode = Selection;
   m_Action = Add;
   }
@@ -217,11 +217,11 @@ LandmarkSliceViewer<TImagePixel>
     {
     if( (*m_LandmarkPointList)[id].GetID() == (int)(id) )
       {
-      LandmarkPointType::ColorType color;
-      color.SetRed(0);
-      color.SetGreen(0);
-      color.SetBlue(0);
-      (*m_LandmarkPointList)[id].SetColor( color );
+      LandmarkPointType::ColorType clr;
+      clr.SetRed(0);
+      clr.SetGreen(0);
+      clr.SetBlue(0);
+      (*m_LandmarkPointList)[id].SetColor( clr );
       DrawLandmark( (*m_LandmarkPointList)[id] );
       (*m_LandmarkPointList)[id].SetID( -1 );
       }
@@ -298,10 +298,10 @@ LandmarkSliceViewer<TImagePixel>
 ::HideLandmarks() 
   {
   LandmarkPointType landmark;
-  LandmarkPointType::ColorType color;
-  color.SetRed( 0 );
-  color.SetGreen( 0 );
-  color.SetBlue( 0 );
+  LandmarkPointType::ColorType clr;
+  clr.SetRed( 0 );
+  clr.SetGreen( 0 );
+  clr.SetBlue( 0 );
   
   LandmarkPointListType::iterator iter = m_LandmarkPointList->begin();
   while ( iter != m_LandmarkPointList->end() )
@@ -309,7 +309,7 @@ LandmarkSliceViewer<TImagePixel>
     if(iter->GetID() >= 0)
       {
       landmark = *iter;
-      landmark.SetColor(color);
+      landmark.SetColor(clr);
       this->DrawLandmark(landmark);
       }
     ++iter;
@@ -327,71 +327,69 @@ void
 LandmarkSliceViewer<TImagePixel>
 ::DrawLandmark(LandmarkPointType & landmark) 
   {
-  int    x;
-  int    y;
-  int    z;
+  int    xx;
+  int    yy;
+  int    zz;
   IndexType       modifiedIndex;
   IndexType       index;
   RegionType      region;
-  ViewerColorType       color;
+  ViewerColorType       clr;
 
   region = this->cOverlayData->GetLargestPossibleRegion();
-  //SizeType        size = region.GetSize();
-
 
   this->cImData->TransformPhysicalPointToIndex(landmark.GetPosition(), index);
   if(landmark.GetColor().GetRed() == 0 &&
      landmark.GetColor().GetGreen() == 0 &&
      landmark.GetColor().GetBlue() == 0)
     {
-    color = 0;
+    clr = 0;
     }
   else
     {
-    color = this->cColorTable->GetClosestColorTableId(landmark.GetColor().GetRed(),
+    clr = this->cColorTable->GetClosestColorTableId(landmark.GetColor().GetRed(),
                                             landmark.GetColor().GetGreen(),
                                             landmark.GetColor().GetBlue()) + 1;
     }
 
-  for( int i=-5; i<6; i++ )
+  for( int ii=-5; ii<6; ii++ )
     {
-    x = index[0]+i;
+    xx = index[0]+ii;
     
-    modifiedIndex[0] = x;
+    modifiedIndex[0] = xx;
     modifiedIndex[1] = index[1];
     modifiedIndex[2] = index[2];
 
     if (region.IsInside(modifiedIndex))
       {
-      this->cOverlayData->SetPixel(modifiedIndex, color );
+      this->cOverlayData->SetPixel(modifiedIndex, clr );
       }
     }
 
-  for( int i=-5; i<6; i++ )
+  for( int ii=-5; ii<6; ii++ )
     {
-    y = index[1] + i;
+    yy = index[1] + ii;
 
     modifiedIndex[0] = index[0];
-    modifiedIndex[1] = y;
+    modifiedIndex[1] = yy;
     modifiedIndex[2] = index[2];
 
     if (region.IsInside(modifiedIndex))
       {
-      this->cOverlayData->SetPixel(modifiedIndex, color);
+      this->cOverlayData->SetPixel(modifiedIndex, clr);
       }
     }
 
-  for( int i=-5; i<6; i++ )
+  for( int ii=-5; ii<6; ii++ )
     {
-    z = index[2] + i;
+    zz = index[2] + ii;
 
     modifiedIndex[0] = index[0];
     modifiedIndex[1] = index[1];
-    modifiedIndex[2] = z;
+    modifiedIndex[2] = zz;
 
     if (region.IsInside(modifiedIndex))
       {
-      this->cOverlayData->SetPixel(modifiedIndex, color);
+      this->cOverlayData->SetPixel(modifiedIndex, clr);
       }
     }
 
@@ -417,31 +415,31 @@ LandmarkSliceViewer<TImagePixel>
 
   OverlayImageType::IndexType beginIndex;
   OverlayImageType::IndexType endIndex;
-  OverlayImageType::SizeType size;
+  OverlayImageType::SizeType sz;
   OverlayImageType::RegionType largestRegion;
   largestRegion = this->cImData->GetLargestPossibleRegion();
   beginIndex = largestRegion.GetIndex();
   for ( unsigned int axis = 0; axis < 3; ++axis )
     {
-    size[axis] = region.GetSize()[axis];
+    sz[axis] = region.GetSize()[axis];
     endIndex[axis] = beginIndex[axis] + largestRegion.GetSize()[axis] - 1;
     lowerBound[axis] = region.GetIndex()[axis];
-    upperBound[axis] = lowerBound[axis] + size[axis] - 1;
+    upperBound[axis] = lowerBound[axis] + sz[axis] - 1;
 
     if ( lowerBound[axis] < beginIndex[axis] )
       {
-      size[axis] = size[axis] - (beginIndex[axis] - lowerBound[axis]);
+      sz[axis] = sz[axis] - (beginIndex[axis] - lowerBound[axis]);
       lowerBound[axis] = beginIndex[axis];
       }
 
     if ( upperBound[axis] > endIndex[axis] )
       {
-      size[axis] = size[axis] - (upperBound[axis] - endIndex[axis]);
-      upperBound[axis] = lowerBound[axis] + size[axis] - 1;
+      sz[axis] = sz[axis] - (upperBound[axis] - endIndex[axis]);
+      upperBound[axis] = lowerBound[axis] + sz[axis] - 1;
       }
     }
   region.SetIndex(lowerBound);
-  region.SetSize(size);
+  region.SetSize(sz);
   }
 
 template<class TImagePixel>
@@ -464,12 +462,12 @@ LandmarkSliceViewer<TImagePixel>
     {
     index.Fill(0);
     region.SetIndex(index);
-    OverlayImageType::SizeType size;
+    OverlayImageType::SizeType sz;
     for ( unsigned int axis = 0; axis < 3; ++axis )
       {
-      size[axis] = 0;
+      sz[axis] = 0;
       }
-    region.SetSize(size);
+    region.SetSize(sz);
 
     return region;
     }
@@ -499,10 +497,10 @@ LandmarkSliceViewer<TImagePixel>
       ++iter;
       }
 
-    OverlayImageType::SizeType size;
+    OverlayImageType::SizeType sz;
     for ( unsigned int axis = 0; axis < 3; ++axis )
       {
-      size[axis] = (upperBound[axis] - lowerBound[axis]) + 1;
+      sz[axis] = (upperBound[axis] - lowerBound[axis]) + 1;
       }
 
     if ( scale != 1.0 )
@@ -510,9 +508,9 @@ LandmarkSliceViewer<TImagePixel>
       OverlayImageType::SizeType scaledSize;
       for ( unsigned int axis = 0; axis < 3; ++axis )
         {
-        scaledSize[axis] = (long)((float)size[axis] * scale );
+        scaledSize[axis] = (long)((float)sz[axis] * scale );
         lowerBound[axis] = 
-          lowerBound[axis] - (long)((scaledSize[axis] - size[axis]) / 2.0);
+          lowerBound[axis] - (long)((scaledSize[axis] - sz[axis]) / 2.0);
         }
       region.SetIndex(lowerBound);
       region.SetSize(scaledSize);
@@ -520,7 +518,7 @@ LandmarkSliceViewer<TImagePixel>
     else
       {
       region.SetIndex(lowerBound);
-      region.SetSize(size);
+      region.SetSize(sz);
       }
     this->FitRegion(region);
     }
@@ -544,11 +542,11 @@ void
 LandmarkSliceViewer<TImagePixel>
 ::ResizeRegionOfInterest(unsigned int axis, int step)
   {
-  OverlayImageType::SizeType size;
-  size = m_TempRegionOfInterest.GetSize();
-  size[axis] = size[axis] + step;
+  OverlayImageType::SizeType sz;
+  sz = m_TempRegionOfInterest.GetSize();
+  sz[axis] = sz[axis] + step;
 
-  m_TempRegionOfInterest.SetSize(size);
+  m_TempRegionOfInterest.SetSize(sz);
   this->FitRegion(m_TempRegionOfInterest);
   this->DrawRegionOfInterest();
   }
@@ -586,29 +584,29 @@ LandmarkSliceViewer<TImagePixel>
   OverlayImageType::IndexType intersectionBeginIndex;
   OverlayImageType::IndexType intersectionEndIndex;
   
-  for ( unsigned int i = 0; i < 3; ++i )
+  for ( unsigned int ii = 0; ii < 3; ++ii )
     {
-    if ( A.GetIndex()[i] > B.GetIndex()[i] )
+    if ( A.GetIndex()[ii] > B.GetIndex()[ii] )
       {
-      intersectionBeginIndex[i] = A.GetIndex()[i];
+      intersectionBeginIndex[ii] = A.GetIndex()[ii];
       }
     else
       {
-      intersectionBeginIndex[i] = B.GetIndex()[i];
+      intersectionBeginIndex[ii] = B.GetIndex()[ii];
       }
     
-    if ( (A.GetIndex()[i] + A.GetSize()[i] - 1) < 
-         (B.GetIndex()[i] + B.GetSize()[i] - 1) )
+    if ( (A.GetIndex()[ii] + A.GetSize()[ii] - 1) <
+         (B.GetIndex()[ii] + B.GetSize()[ii] - 1) )
       {
-      intersectionEndIndex[i] = A.GetIndex()[i] + A.GetSize()[i] - 1;
+      intersectionEndIndex[ii] = A.GetIndex()[ii] + A.GetSize()[ii] - 1;
       }
     else
       {
-      intersectionEndIndex[i] = B.GetIndex()[i] + B.GetSize()[i] - 1;
+      intersectionEndIndex[ii] = B.GetIndex()[ii] + B.GetSize()[ii] - 1;
       }
     
-    intersectionRegionSize[i] =
-      intersectionEndIndex[i] - intersectionBeginIndex[i] + 1;
+    intersectionRegionSize[ii] =
+      intersectionEndIndex[ii] - intersectionBeginIndex[ii] + 1;
     }
   intersectionRegion.SetIndex(intersectionBeginIndex);
   intersectionRegion.SetSize(intersectionRegionSize);
@@ -620,7 +618,7 @@ void
 LandmarkSliceViewer<TImagePixel>
 ::DrawExclusiveRegion(RegionType& target, 
                       RegionType& exclusion, 
-                      ViewerColorType& color)
+                      ViewerColorType& clr)
   {
   typedef itk::ImageRegionIteratorWithIndex< OverlayImageType >
     ImageIteratorType;
@@ -662,7 +660,7 @@ LandmarkSliceViewer<TImagePixel>
       iter.GoToBegin();
       while ( !iter.IsAtEnd() )
         {
-        this->cOverlayData->SetPixel(iter.GetIndex(), color);
+        this->cOverlayData->SetPixel(iter.GetIndex(), clr);
         ++iter;
         }
       leftoverSize[dim] = leftover.GetSize()[dim] - tempSize[dim];
@@ -718,9 +716,9 @@ LandmarkSliceViewer<TImagePixel>
     }
   this->update();
   this->redraw();
-  OverlayImageType::SizeType size;
-  size.Fill(0);
-  m_TempPreviousRegionOfInterest.SetSize(size);
+  OverlayImageType::SizeType sz;
+  sz.Fill(0);
+  m_TempPreviousRegionOfInterest.SetSize(sz);
   }
 
 template<class TImagePixel>
@@ -728,7 +726,7 @@ void
 LandmarkSliceViewer<TImagePixel>
 ::DrawRegionOfInterest()
   {
-  ViewerColorType color;
+  ViewerColorType clr;
   
   typedef itk::ImageRegionIteratorWithIndex< OverlayImageType >
     ImageIteratorType;
@@ -742,20 +740,20 @@ LandmarkSliceViewer<TImagePixel>
       this->ComputeIntersectionRegion(m_TempPreviousRegionOfInterest,
                                       m_TempRegionOfInterest);
 
-    color = 0;
+    clr = 0;
     this->DrawExclusiveRegion(m_TempPreviousRegionOfInterest,
-                              intersection, color );
-    color = 1;
-    this->DrawExclusiveRegion(m_TempRegionOfInterest, intersection, color);
+                              intersection, clr );
+    clr = 1;
+    this->DrawExclusiveRegion(m_TempRegionOfInterest, intersection, clr);
     }
   else
     {
     ImageIteratorType c_iter(this->cOverlayData, m_TempRegionOfInterest);
     
-    color = 1;
+    clr = 1;
     while ( !c_iter.IsAtEnd() )
       {
-      this->cOverlayData->SetPixel(c_iter.GetIndex(), color);
+      this->cOverlayData->SetPixel(c_iter.GetIndex(), clr);
       ++c_iter;
       }
     }

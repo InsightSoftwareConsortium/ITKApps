@@ -114,9 +114,9 @@ class LandmarkSliceViewer : public GLSliceView< TImagePixel,
     
     bool IsRegionOfInterestAvailable()
       {
-      for ( unsigned int i = 0; i < 3; ++i )
+      for ( unsigned int ii = 0; ii < 3; ++ii )
         {
-        if ( m_RegionOfInterest.GetSize()[i] > 0 )
+        if ( m_RegionOfInterest.GetSize()[ii] > 0 )
           {
           return true;
           }
