@@ -86,7 +86,6 @@ public:
   typedef CellularAggregateType::CellsIterator              CellsIterator;
   typedef CellularAggregateType::CellsConstIterator         CellsConstIterator;
   typedef CellularAggregateType::PointsContainer            PointsContainer;
-  typedef CellularAggregateType::IdentifierType             IdentifierType;
   typedef CellularAggregateType::VoronoiRegionType          VoronoiRegionType;
   typedef CellularAggregateType::VoronoiRegionAutoPointer   VoronoiRegionAutoPointer;
   typedef CellularAggregateType::BioCellType                BioCellType;
