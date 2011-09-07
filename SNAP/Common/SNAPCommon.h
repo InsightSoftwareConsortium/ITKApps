@@ -22,6 +22,9 @@
 #include <assert.h>
 #include <iostream>
 
+#if ITK_VERSION_MAJOR >= 4
+#define ITK_TYPENAME typename
+#endif
 
 // Specify a standard stream for verbose messages
 extern std::ostream &verbose;
