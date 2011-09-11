@@ -493,7 +493,7 @@ void SegmenterConsole::SetThresholdSegmentationInput()
   switch( m_filterCase )
     {
     case 1:
-      if (strcmp(m_SeedReader->GetFileName(), "") == 0)
+      if (m_SeedReader->GetFileName() == "")
         {
         fl_alert("Error! Please read in a Seed Image.");
         m_thresholdSegmentation->Modified();
@@ -1120,12 +1120,14 @@ void SegmenterConsole::SaveSession()
     out << "0 ";
   }
 
-  if(strcmp(m_SeedReader->GetFileName(), "") == 0) {
+  if(m_SeedReader->GetFileName() ==  "")
+    {
     out << "\nBLANK\n";
-  }
-  else {
+    }
+  else
+    {
     out << "\n" << m_SeedReader->GetFileName() << "\n";
-  }
+    }
   out << isosurface->value() << " ";
 
   out << seedX->value() << " ";
