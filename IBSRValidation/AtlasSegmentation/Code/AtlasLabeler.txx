@@ -86,7 +86,11 @@ AtlasLabeler<TLabelImage, TDeformationField>
   typename WarperType::Pointer warper = WarperType::New();
 
   warper->SetInput( distance->GetOutput() );
+#if ITK_VERSION_MAJOR < 4
   warper->SetDeformationField( m_DeformationField );
+#else
+  warper->SetDisplacementField( m_DeformationField );
+#endif
   warper->SetOutputOrigin( m_DeformationField->GetOrigin() );
   warper->SetOutputSpacing( m_DeformationField->GetSpacing() );
   warper->SetEdgePaddingValue( NumericTraits<RealType>::max() );

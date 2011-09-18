@@ -21,11 +21,12 @@
 #include "itkCommand.h"
 
 #include "itkImageRegistrationMethod.h"
-#include "itkDeformationFieldSource.h"
 #if ITK_VERSION_MAJOR < 4
 #include "itkBSplineDeformableTransform.h"
+#include "itkDeformationFieldSource.h"
 #else
 #include "itkBSplineTransform.h"
+#include "itkLandmarkDisplacementFieldSource.h"
 #endif
 #include "itkMattesMutualInformationImageToImageMetric.h"
 
@@ -80,9 +81,13 @@ class DeformableRegistrator : public ImageRegistrationMethod < TImage, TImage >
     
     typedef itk::Vector< double, 3 >            VectorType;
     typedef itk::Image< VectorType, 3 >         DeformationFieldType;
+#if ITK_VERSION_MAJOR < 4
     typedef itk::DeformationFieldSource< DeformationFieldType >              
                                                  DeformationSourceType;
-                   
+#else
+    typedef itk::LandmarkDisplacementFieldSource< DeformationFieldType >
+                                                 DeformationSourceType;
+#endif
     void StartRegistration() ;
 
     TransformType * GetTypedTransform(void)
