@@ -33,7 +33,7 @@
 // in a lookup table.   By including this file, it creates a main function
 // that calls RegisterTests() then looks up the function pointer for the test
 // specified on the command line.
-#include "itkWin32Header.h"
+#include "itkMacro.h"
 #include <map>
 #include <string>
 #include <iostream>

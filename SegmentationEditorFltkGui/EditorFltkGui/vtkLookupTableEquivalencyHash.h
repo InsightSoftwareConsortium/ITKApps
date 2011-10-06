@@ -16,7 +16,7 @@
 =========================================================================*/
 #ifndef __vtkLookupTableEquivalencyHash_h_
 #define __vtkLookupTableEquivalencyHash_h_
-#include "itkWin32Header.h"
+#include "itkMacro.h"
 #include "itksys/hash_map.hxx"
 #include <list>
 

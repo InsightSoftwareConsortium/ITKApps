@@ -17,7 +17,7 @@
 #ifndef __OPTIONLIST_H_
 #define __OPTIONLIST_H_
 
-#include <itkWin32Header.h>
+#include <itkMacro.h>
 #include <iostream>
 #include <string>
 #include <vector>

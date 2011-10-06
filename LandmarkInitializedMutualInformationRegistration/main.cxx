@@ -15,7 +15,7 @@
 
 =========================================================================*/
 
-#include "itkWin32Header.h"
+#include "itkMacro.h"
 #include "guiMainImplementation.h"
 #include "ImageRegistrationApp.h"
 #include <time.h>
