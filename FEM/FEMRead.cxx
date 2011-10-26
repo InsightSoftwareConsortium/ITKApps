@@ -15,25 +15,24 @@
 
 =========================================================================*/
 
-// disable debug warnings in MS compiler
-#ifdef _MSC_VER
-#pragma warning(disable: 4786)
-#endif
+#include "itkFEMSolver.h"
+#include "itkFEMObject.h"
+#include "itkFEMObjectSpatialObject.h"
+#include "itkGroupSpatialObject.h"
+#include "itkSpatialObject.h"
+#include "itkFEMSpatialObjectReader.h"
 
-#include "itkFEM.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 
 
-
-
 /**
- * This example reads a FEM problem from a *.fem file that is specified on
+ * This example reads a FEM problem from a *.meta file that is specified on
  * command line. If no argument is provided on command line, file
- * 'truss.fem' is read from the current folder.
+ * 'truss.meta' is read from the current folder.
  *
- * External forces, which are also specified inside a *.fem, are applied
+ * External forces, which are also specified inside a *.meta, are applied
  * and the problem is solved for displacements. Solution vector is output
  * on stdout.
  *
@@ -53,33 +52,20 @@ const char* filename;
     /**
      * If the argument was not specified, we try default file name.
      */
-    filename="truss.fem";
+    filename="truss.meta";
   }
 
 
   /**
-   * First we create the FEM solver object.
+   * First load tyhe FEM Object from the file
    */
-  ::itk::fem::Solver S;
-
-  /**
-   * Open the file and assign it to stream object f
-   */
-  std::cout<<"Reading FEM problem from file: "<<std::string(filename)<<"\n";
-  std::ifstream f;
-  f.open(filename);
-  if (!f)
-  {
-    std::cout<<"File "<<filename<<" not found!\n";
-    return 1;
-  }
-
-  /**
-   * Read the fem problem from the stream f
-   */
+  typedef itk::FEMSpatialObjectReader<2>      FEMSpatialObjectReaderType;
+  typedef FEMSpatialObjectReaderType::Pointer FEMSpatialObjectReaderPointer;
+  FEMSpatialObjectReaderPointer SpatialReader = FEMSpatialObjectReaderType::New();
+  SpatialReader->SetFileName( argv[1] );
   try 
   {
-    S.Read(f);
+    SpatialReader->Update();
   }
   catch (::itk::fem::FEMException e)
   {
@@ -88,62 +74,45 @@ const char* filename;
     return 1;
   }
 
-  f.close();
+  /** Second, get the FEM Object from the Spatial Object */
+  typedef itk::FEMObjectSpatialObject<2>      FEMObjectSpatialObjectType;
+  typedef FEMObjectSpatialObjectType::Pointer FEMObjectSpatialObjectPointer;
+  FEMObjectSpatialObjectType::ChildrenListType* children = SpatialReader->GetGroup()->GetChildren();
+  FEMObjectSpatialObjectType::Pointer femSO =
+    dynamic_cast<FEMObjectSpatialObjectType *>( (*(children->begin() ) ).GetPointer() );
+  delete children;
+
+  femSO->GetFEMObject()->FinalizeMesh();
 
   /**
-   * Now the whole problem is stored inside the Solver class.
-   * We can begin solving for displacements.
+   * Third, create the FEM solver object and generate the solution
    */
-  std::cout<<"Solving..."<<std::string(filename)<<"\n";
-
-  /**
-   * Assign a unique id (global freedom number - GFN)
-   * to every degree of freedom (DOF) in a system.
-   */
-  S.GenerateGFN();
-
-  /**
-   * Assemble the master stiffness matrix. In order to do this
-   * the GFN's should already be assigned to every DOF.
-   */
-  S.AssembleK();
-
-  /**
-   * Invert the master stiffness matrix
-   */
-  S.DecomposeK();
-
-  /**
-   * Assemble the master force vector (from the applied loads)
-   */
-  S.AssembleF();
-
-  /**
-   * Solve the system of equations for displacements (u=K^-1*F)
-   */
-  S.Solve();
-
-  /**
-   * Copy the displacemenets which are now stored inside
-   * the solver class back to nodes, where they belong.
-   */
-  S.UpdateDisplacements();
+  typedef itk::fem::Solver<2> FEMSolverType;
+  FEMSolverType::Pointer S = FEMSolverType::New();
+  S->SetInput( femSO->GetFEMObject() );
+  S->Update();
 
   /**
    * Output displacements of all nodes in a system;
    */
+  typedef itk::fem::FEMObject<2>      FEMObjectType;
+  FEMObjectType::Pointer fem = S->GetInput();
+
   std::cout<<"\nNodal displacements:\n";
-  for( ::itk::fem::Solver::NodeArray::iterator n = S.node.begin(); n!=S.node.end(); n++)
-  {
-    std::cout<<"Node#: "<<(*n)->GN<<": ";
-    /** For each DOF in the node... */
-    for( unsigned int d=0, dof; (dof=(*n)->GetDegreeOfFreedom(d))!=::itk::fem::Element::InvalidDegreeOfFreedomID; d++ )
+  unsigned int numberOfNodes = fem->GetNumberOfNodes();
+
+  for(unsigned int i = 0; i<numberOfNodes; i++)
     {
-      std::cout<<S.GetSolution(dof);
+    itk::fem::Element::Node::Pointer node = fem->GetNode( i );
+    std::cout<<"Node#: "<< node->GetGlobalNumber() <<": ";
+    /** For each DOF in the node... */
+    for( unsigned int d=0, dof; (dof=node->GetDegreeOfFreedom(d))!=itk::fem::Element::InvalidDegreeOfFreedomID; d++ )
+      {
+      std::cout<<S->GetSolution(dof);
       std::cout<<",  ";
-    }
+      }
     std::cout<<"\b\b\b \b\n";
-  }
+    }
 
   return 0;
 

@@ -15,13 +15,15 @@
 
 =========================================================================*/
 
-// disable debug warnings in MS compiler
-#ifdef _MSC_VER
-#pragma warning(disable: 4786)
-#endif
-
-#include "itkFEM.h"
+#include "itkFEMElementBase.h"
+#include "itkFEMObject.h"
+#include "itkFEMSolver.h"
 #include "itkFEMLinearSystemWrapperVNL.h"
+#include "itkFEMLoadBC.h"
+#include "itkFEMLoadNode.h"
+#include "itkFEMMaterialLinearElasticity.h"
+#include "itkFEMElement2DC1Beam.h"
+#include "itkFEMElement2DC0LinearLineStress.h"
 #include <iostream>
 
 
@@ -32,90 +34,76 @@
  */
 int main( int, char * [] ) {
 
+  itk::FEMFactoryBase::GetFactory()->RegisterDefaultTypes();
+
   /*
    * First we create the FEM solver object. This object stores pointers
    * to all objects that define the FEM problem. One solver object
    * effectively defines one FEM problem.
    */
-  itk::fem::Solver S;
+  typedef itk::fem::Solver<2> SolverType;
+  SolverType::Pointer S = SolverType::New();
 
   /*
    * Set the linear system wrapper object that we wish to use.
    */
   itk::fem::LinearSystemWrapperVNL vnlSolver;
   vnlSolver.SetMaximumNonZeroValuesInMatrix(1000,1000);
-  S.SetLinearSystemWrapper(&vnlSolver);
-
-
+  S->SetLinearSystemWrapper(&vnlSolver);
 
 
   /*
    * Below we'll define a FEM problem described in the chapter 25.3-4,
    * from the book, which can also be downloaded from 
    * http://titan.colorado.edu/courses.d/IFEM.d/IFEM.Ch25.d/IFEM.Ch25.pdf
-   */
-
-
-
-
-
-  /*
+   *
+   *
    * We start by creating four Node objects. One of them is of
    * class NodeXY. It has two displacements in two degrees of freedom.
    * 3 of them are of class NodeXYrotZ, which also includes the rotation
    * around Z axis.
    */
   
-  /* We'll need these pointers to create and initialize the objects. */
-  itk::fem::Node::Pointer n1;
-
-  /*
-   * We create the objects in a standard itk way by calling the New()
-   * static function in the class.
-   */
-  n1 = itk::fem::Node::New();
-  itk::fem::Element::VectorType pt(2);
-
   /*
    * Initialize the data members inside the node objects. Basically here
    * we only have to specify the vector of X and Y coordinate of the
    * node in global coordinate system.
    */
+
+  itk::fem::Element::Node::Pointer n1;
+  n1 = itk::fem::Element::Node::New();
+  itk::fem::Element::VectorType pt(2);
   pt[0]=-4.0;
   pt[1]=3.0;
   n1->SetCoordinates(pt);
 
   /*
-   * Convert the node pointer into a special pointer (FEMP) and add it to
-   * the nodes array inside the solver class. The special pointer now
-   * owns the object and we don't have to keep track of it anymore.
-   * Here we again have to use both reference and de-reference operator (&*),
-   * because we can't cast SmartPointer<NodeXYrotZ> to SmartPointer<Node>.
-   * If smart pointers are not used, the operators have no effect on the
-   * compiled code.
+   * Add the node to the FEM Object.
    */
-  S.node.push_back( itk::fem::FEMP<itk::fem::Node>(&*n1) );
-     
+  typedef itk::fem::FEMObject<2> FEMObjectType;
+  FEMObjectType::Pointer femObject = FEMObjectType::New();
+  femObject->AddNextNode(n1.GetPointer());
+
   /*
    * Create three more nodes in the same way.
    */
-  n1 = itk::fem::Node::New();
+  n1 = itk::fem::Element::Node::New();
   pt[0]=0.0;
   pt[1]=3.0;
   n1->SetCoordinates(pt);
-  S.node.push_back( itk::fem::FEMP<itk::fem::Node>(&*n1) );
+  femObject->AddNextNode(n1.GetPointer());
 
-  n1=itk::fem::Node::New();
+  n1=itk::fem::Element::Node::New();
   pt[0]=4.0;
   pt[1]=3.0;
   n1->SetCoordinates(pt);
-  S.node.push_back( itk::fem::FEMP<itk::fem::Node>(&*n1) );
+  femObject->AddNextNode(n1.GetPointer());
 
-  n1=itk::fem::Node::New();
+  n1=itk::fem::Element::Node::New();
   pt[0]=0.0;
   pt[1]=0.0;
   n1->SetCoordinates(pt);
-  S.node.push_back( itk::fem::FEMP<itk::fem::Node>(&*n1) );
+  femObject->AddNextNode(n1.GetPointer());
 
   /*
    * Automatically assign the global numbers (IDs) to
@@ -123,11 +111,7 @@ int main( int, char * [] ) {
    * second 1, and so on). We could have also specified the GN
    * member in all the created objects above, but this is easier.
    */
-  S.node.Renumber();
-
-
-
-
+  femObject->RenumberNodeContainer();
 
 
   /*
@@ -136,36 +120,25 @@ int main( int, char * [] ) {
    */
   itk::fem::MaterialLinearElasticity::Pointer m;
   m=itk::fem::MaterialLinearElasticity::New();
-  m->GN=0;       /* Global number of the material */
-  m->E=30000.0;  /* Young modulus */
-  m->A=0.02;     /* Crossection area */
-  m->I=0.004;    /* Momemt of inertia */
-  S.mat.push_back( itk::fem::FEMP<itk::fem::Material>(&*m) );
+  m->SetGlobalNumber( 0 );
+  m->SetYoungsModulus( 30000.0 );
+  m->SetCrossSectionalArea( 0.02 );
+  m->SetMomentOfInertia( 0.004 );
+  femObject->AddNextMaterial( m );
 
   m=itk::fem::MaterialLinearElasticity::New();
-  m->GN=1;       /* Global number of the material */
-  m->E=200000.0;  /* Young modulus */
-  m->A=0.001;     /* Crossection area */
-  /*
-   * Momemt of inertia. This material will be used in
-   * the Bar element, which doesn't need this constant.
-   */
-  m->I=0.0;
-  S.mat.push_back( itk::fem::FEMP<itk::fem::Material>(&*m) );
+  m->SetGlobalNumber( 1 );
+  m->SetYoungsModulus( 200000.0 );
+  m->SetCrossSectionalArea( 0.001 );
+  m->SetMomentOfInertia( 0.0 );
+  femObject->AddNextMaterial( m );
 
   m=itk::fem::MaterialLinearElasticity::New();
-  m->GN=2;       /* Global number of the material */
-  m->E=200000.0;  /* Young modulus */
-  m->A=0.003;     /* Crossection area */
-  /*
-   * Momemt of inertia. This material will be used in
-   * the Bar element, which doesn't need this constant.
-   */
-  m->I=0.0;
-  S.mat.push_back( itk::fem::FEMP<itk::fem::Material>(&*m) );
-
-
-
+  m->SetGlobalNumber( 2 );
+  m->SetYoungsModulus( 200000.0 );
+  m->SetCrossSectionalArea( 0.003 );
+  m->SetMomentOfInertia( 0.0 );
+  femObject->AddNextMaterial( m );
 
 
   /*
@@ -184,21 +157,19 @@ int main( int, char * [] ) {
    * Find function of the FEMPArray to search for object (in this
    * case node) with given GN.
    */
-  e1->GN=0;
-  e1->SetNode(0, &*S.node.Find(0) );
-  e1->SetNode(1, &*S.node.Find(1) );
-
-  /* same for material */
-  e1->m_mat=dynamic_cast<itk::fem::MaterialLinearElasticity*>( &*S.mat.Find(0) );
-  S.el.push_back( itk::fem::FEMP<itk::fem::Element>(&*e1) );
+  e1->SetGlobalNumber( 0 );
+  e1->SetNode(0, femObject->GetNode(0) );
+  e1->SetNode(1, femObject->GetNode(1) );
+  e1->SetMaterial( femObject->GetMaterial(0).GetPointer() );
+  femObject->AddNextElement( e1.GetPointer());
 
   /* Create the other elements */
   e1=itk::fem::Element2DC1Beam::New();
-  e1->GN=1;
-  e1->SetNode(0, &*S.node.Find(1) );
-  e1->SetNode(1, &*S.node.Find(2) );
-  e1->m_mat=dynamic_cast<itk::fem::MaterialLinearElasticity*>( &*S.mat.Find(0) );
-  S.el.push_back( itk::fem::FEMP<itk::fem::Element>(&*e1) );
+  e1->SetGlobalNumber( 1 );
+  e1->SetNode(0, femObject->GetNode(1) );
+  e1->SetNode(1, femObject->GetNode(2) );
+  e1->SetMaterial( femObject->GetMaterial(0).GetPointer() );
+  femObject->AddNextElement( e1.GetPointer());
 
   /*
    * Note that Bar2D element defines only two degrees of freedom
@@ -206,29 +177,26 @@ int main( int, char * [] ) {
    * the first two with Beam.
    */
   e2=itk::fem::Element2DC0LinearLineStress::New();
-  e2->GN=2;
-  e2->SetNode(0, &*S.node.Find(0) );
-  e2->SetNode(1, &*S.node.Find(3) );
-  e2->m_mat=dynamic_cast<itk::fem::MaterialLinearElasticity*>( &*S.mat.Find(1) );
-  S.el.push_back( itk::fem::FEMP<itk::fem::Element>(&*e2) );
+  e2->SetGlobalNumber( 2 );
+  e2->SetNode(0, femObject->GetNode(0) );
+  e2->SetNode(1, femObject->GetNode(3) );
+  e2->SetMaterial( femObject->GetMaterial(1).GetPointer() );
+  femObject->AddNextElement( e2.GetPointer());
+
 
   e2=itk::fem::Element2DC0LinearLineStress::New();
-  e2->GN=3;
-  e2->SetNode(0, &*S.node.Find(1) );
-  e2->SetNode(1, &*S.node.Find(3) );
-  e2->m_mat=dynamic_cast<itk::fem::MaterialLinearElasticity*>( &*S.mat.Find(2) );
-  S.el.push_back( itk::fem::FEMP<itk::fem::Element>(&*e2) );
+  e2->SetGlobalNumber( 3 );
+  e2->SetNode(0, femObject->GetNode(1) );
+  e2->SetNode(1, femObject->GetNode(3) );
+  e2->SetMaterial( femObject->GetMaterial(2).GetPointer() );
+  femObject->AddNextElement( e2.GetPointer());
 
   e2=itk::fem::Element2DC0LinearLineStress::New();
-  e2->GN=4;
-  e2->SetNode(0, &*S.node.Find(2) );
-  e2->SetNode(1, &*S.node.Find(3) );
-  e2->m_mat=dynamic_cast<itk::fem::MaterialLinearElasticity*>( &*S.mat.Find(1) );
-  S.el.push_back( itk::fem::FEMP<itk::fem::Element>(&*e2) );
-
-
-
-
+  e2->SetGlobalNumber( 4 );
+  e2->SetNode(0, femObject->GetNode(2) );
+  e2->SetNode(1, femObject->GetNode(3) );
+  e2->SetMaterial( femObject->GetMaterial(1).GetPointer() );
+  femObject->AddNextElement( e2.GetPointer());
 
 
   /*
@@ -252,26 +220,31 @@ int main( int, char * [] ) {
    * when having isotropic elements. This is not the case here, so we only
    * have a scalar.
    */
-  l1->m_element = &*S.el.Find(0);
-  l1->m_dof = 0;
-  l1->m_value = vnl_vector<double>(1,0.0);
-  S.load.push_back( itk::fem::FEMP<itk::fem::Load>(&*l1) );
+
+  l1->SetElement( femObject->GetElement(0) );
+  l1->SetGlobalNumber(0);
+  l1->SetDegreeOfFreedom(0);
+  l1->SetValue( vnl_vector<double>(1, 0.0) );
+  femObject->AddNextLoad( l1 );
+
 
   /*
    * In a same way we also fix the second DOF in a first node and the
    * second DOF in a third node (it's only fixed in Y direction).
    */
   l1=itk::fem::LoadBC::New();
-  l1->m_element = &*S.el.Find(0);
-  l1->m_dof = 1;
-  l1->m_value = vnl_vector<double>(1,0.0);
-  S.load.push_back( itk::fem::FEMP<itk::fem::Load>(&*l1) );
+  l1->SetElement( femObject->GetElement(0) );
+  l1->SetGlobalNumber(1);
+  l1->SetDegreeOfFreedom(1);
+  l1->SetValue( vnl_vector<double>(1, 0.0) );
+  femObject->AddNextLoad( l1 );
 
   l1=itk::fem::LoadBC::New();
-  l1->m_element = &*S.el.Find(1);
-  l1->m_dof = 4;
-  l1->m_value = vnl_vector<double>(1,0.0);
-  S.load.push_back( itk::fem::FEMP<itk::fem::Load>(&*l1) );
+  l1->SetElement( femObject->GetElement(1) );
+  l1->SetGlobalNumber(2);
+  l1->SetDegreeOfFreedom(4);
+  l1->SetValue( vnl_vector<double>(1, 0.0) );
+  femObject->AddNextLoad( l1 );
 
 
   /*
@@ -280,76 +253,47 @@ int main( int, char * [] ) {
    * second node of the third element in a system.
    */
   itk::fem::LoadNode::Pointer l2;
-
   l2=itk::fem::LoadNode::New();
-  l2->m_element=S.el.Find(2);
-  l2->m_pt=1;
-  l2->F=vnl_vector<double>(2);
-  l2->F[0]=20;
-  l2->F[1]=-20;
-  S.load.push_back( itk::fem::FEMP<itk::fem::Load>(&*l2) );
 
-
-
-
-
-  /*
-   * The whole problem is now stored inside the Solver class.
-   * Note that in the code above we don't use any of the
-   * constructors that make creation of objects easier and with
-   * less code. See declaration of classes for more info.
-   */
-
-
-
+  l2->SetElement( femObject->GetElement(2) );
+  l2->SetGlobalNumber(3);
+  l2->SetNode( 1 );
+  vnl_vector<double> force(2);
+  force[0] = 20.0;
+  force[1] = -20.0;
+  l2->SetForce( force );
+  femObject->AddNextLoad( l2 );
 
 
   /*
+   * The whole problem is now stored inside the FEM Object class.
    * We can now solve for displacements.
    */
+  femObject->FinalizeMesh();
+  S->SetInput( femObject );
+  S->Update();
 
-  /*
-   * Assign a unique id (global freedom number - GFN)
-   * to every degree of freedom (DOF) in a system.
-   */
-  S.GenerateGFN();
-
-  /*
-   * Assemble the master stiffness matrix. In order to do this
-   * the GFN's should already be assigned to every DOF.
-   */
-  S.AssembleK();
-
-  /*
-   * Perform any preprocessing on the master stiffness matrix.
-   */
-  S.DecomposeK();
-
-  /*
-   * Assemble the master force vector (from the applied loads).
-   */
-  S.AssembleF();
-
-  /*
-   * Solve the system of equations for displacements (u=K^-1*F)
-   */
-  S.Solve();
 
   /*
    * Output displacements of all nodes in a system;
    */
   std::cout<<"\nNodal displacements:\n";
-  for( ::itk::fem::Solver::NodeArray::iterator n = S.node.begin(); n!=S.node.end(); n++)
-  {
-    std::cout<<"Node#: "<<(*n)->GN<<": ";
-    /* For each DOF in the node... */
-    for( unsigned int d=0, dof; (dof=(*n)->GetDegreeOfFreedom(d))!=::itk::fem::Element::InvalidDegreeOfFreedomID; d++ )
+  const unsigned int invalidID = itk::fem::Element::InvalidDegreeOfFreedomID;
+  int numberOfNodes = S->GetInput()->GetNumberOfNodes();
+  for( int i = 0; i < numberOfNodes; i++ )
     {
-      std::cout<<S.GetSolution(dof);
-      std::cout<<",  ";
-    }
+    itk::fem::Element::Node::Pointer n1 = S->GetInput()->GetNode(i);
+    std::cout<<"Node#: ";
+    std::cout << n1->GetGlobalNumber( );
+    std::cout << ": ";
+
+    for( unsigned int d=0, dof; (dof=n1->GetDegreeOfFreedom(d))!=invalidID; d++ )
+      {
+      std::cout << S->GetSolution(dof);
+      std::cout << ",  ";
+      }
     std::cout<<"\b\b\b \b\n";
-  }
+    }
 
   std::cout << "\n";
 

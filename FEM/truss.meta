@@ -1,6 +1,18 @@
-% Simple truss example from the chapter 25.3
-% this chapter can be downloaded from http://titan.colorado.edu/courses.d/IFEM.d/IFEM.Ch25.d/IFEM.Ch25.pdf
-
+ObjectType = Scene
+NDims = 2
+NObjects = 1
+ObjectType = FEMObject
+NDims = 2
+BinaryData = False
+Offset = 0 0
+CenterOfRotation = 0 0
+ElementSpacing = 1 1
+ElementDataFile = LOCAL
+%
+% Simple truss example from the chapter 25.3 (with loads)
+% this chapter can be downloaded from
+% http://titan.colorado.edu/courses.d/IFEM.d/IFEM.Ch25.d/IFEM.Ch25.pdf
+%
 <Node>
 	0	% Global object number
 	2 -4 3	% Node coordinates
@@ -80,7 +92,7 @@
 	2	% GN of element on which the load acts
 	1 	% Point number within the element
 	2 20 -20	% Force vector (first number is the size of a vector)
-	
+
 % Essential boundary conditions are applyed, so that the system is
 % fixed and we can solve for displacements. In book the BCs are applied
 % in form of MFCs, and are different than these here.
@@ -101,4 +113,3 @@
 	1 0	% value of the fixed DOF
 
 <END>  % End of loads
-
