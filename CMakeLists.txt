@@ -316,10 +316,8 @@ ENDIF(FLTK_FOUND)
 OPTIONAL_APP(MetaImageImporter)
 OPTIONAL_APP(MetaImageReadWrite)
 
-if (ITK_VERSION_MAJOR STRLESS 4)
 # Add an option to build FEM applications
 OPTIONAL_APP(FEM)
-endif()
 
 # Add an option to build or not build the FuzzyConnectedness example
 IF(ITK_USE_PATENTED)
