@@ -1,15 +1,37 @@
-// disable debug warnings in MS  compiler
-#ifdef _MSC_VER
-#pragma  warning(disable: 4786)
-#endif
+/*=========================================================================
 
-#include <stdio.h>
-#include <iostream.h>
+ Program:   Insight Segmentation & Registration Toolkit
+ Module:    FEMImageRegLMEx.cxx
+ Language:  C++
+ Date:      $Date$
+ Version:   $Revision$
 
-void main()
+ Copyright (c) 2002 Insight Consortium. All rights reserved.
+ See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for detail.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notices for more information.
+
+ =========================================================================*/
+
+//#include <stdio.h>
+#include <iostream>
+
+int main(int argc, char **argv)
 {
   int N = 5;      // # elements in each direction
   int dim = 3;    // # spatial dimensions
+
+  std::cout << "ObjectType = Scene" << std::endl;
+  std::cout << "NDims = " << dim << std::endl;
+  std::cout << "NObjects = 1" << std::endl;
+  std::cout << "ObjectType = FEMObject" << std::endl;
+  std::cout << "BinaryData = False" << std::endl;
+  std::cout << "Offset = 0 0 0" << std::endl;
+  std::cout << "CenterOfRotation = 0 0 0" << std::endl;
+  std::cout << "ElementSpacing = 1 1 1" << std::endl;
+  std::cout << "ElementDataFile = LOCAL" << std::endl;
 
   // nodes
   float* pt = new float[3];
@@ -19,7 +41,7 @@ void main()
   pt[0]=-5.0+10.0/N*j;
   pt[1]=-5.0+10.0/N*i;
   pt[2]=-5.0+10.0/N*k;
-  
+
   std::cout << "<Node>\n";
   std::cout << "\t" << ( k*(N+1)*(N+1) + i*(N+1) + j ) << "\t% Global object number\n";
   std::cout << "\t" << dim << " " << pt[0] << " " << pt[1] << " " << pt[2] << "\t% Nodal coordinates\n";
@@ -41,9 +63,8 @@ void main()
   std::cout << "\th: 1\n";
   std::cout << "\tRhoC: 1\n";
   std::cout << "\tEND:  % End of material definition\n\n";
-  
   std::cout << "<END>  % End of materials\n\n";
-  
+
   // elements
   for (int k=0; k<N; k++) {
     for(int j=0; j<N; j++) {
@@ -66,7 +87,6 @@ void main()
   std::cout << "\n<END>  % End of elements\n\n";
 
   // gravity load
-  
   std::cout << "<LoadGravConst>\n";
   std::cout << "\t0\t% Global load  number\n";
   std::cout << "\t-1\t% Load acts on all elements\n";
@@ -98,7 +118,7 @@ void main()
       std::cout << "\t" << "1 0" << "\t% rhs of MFC\n";
 
     }
-    
+
     // Fix node 3 in elements along the y-axis
     if (el % N == 0) {
       std::cout << "<LoadBC>\n";
@@ -147,20 +167,20 @@ void main()
     std::cout << "\t" << el << "\t% GN of element\n";
     std::cout << "\t" << "6" << "\t% DOF# in element\n";
     std::cout << "\t" << "1 0" << "\t% rhs of MFC\n";
-    
+
     std::cout << "<LoadBC>\n";
     std::cout << "\t" << ++nload << "\t% Global load number\n";
     std::cout << "\t" << el << "\t% GN of element\n";
     std::cout << "\t" << "7" << "\t% DOF# in element\n";
     std::cout << "\t" << "1 0" << "\t% rhs of MFC\n";
-    
+
     std::cout << "<LoadBC>\n";
     std::cout << "\t" << ++nload << "\t% Global load number\n";
     std::cout << "\t" << el << "\t% GN of element\n";
     std::cout << "\t" << "8" << "\t% DOF# in element\n";
     std::cout << "\t" << "1 0" << "\t% rhs of MFC\n";
   }    
-   
+
   std::cout << "\n<END>  % End of loads\n";
 
   return 0;
