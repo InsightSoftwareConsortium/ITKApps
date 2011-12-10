@@ -247,7 +247,7 @@ static void vtkITKMIViolaWellsQuaternionRigidExecute(vtkITKMutualInformationTran
   
   // Start registration
   
-  registration->StartRegistration();
+  registration->Update();
   
   // Get the results
   typename RegistrationType::ParametersType solution = 

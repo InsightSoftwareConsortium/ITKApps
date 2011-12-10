@@ -108,7 +108,7 @@ MIEuler2DRegistrator<TFixedImage,TMovingImage>
 
   try
     {
-    m_Registration->StartRegistration();
+    m_Registration->Update();
     }
   catch( itk::ExceptionObject & err )
     {

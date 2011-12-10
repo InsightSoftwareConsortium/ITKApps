@@ -241,7 +241,7 @@ void
 liImageRegistrationConsoleBase 
 ::Execute( void )
 {
-  m_ImageRegistrationMethod->StartRegistration();
+  m_ImageRegistrationMethod->Update();
 }
 
 

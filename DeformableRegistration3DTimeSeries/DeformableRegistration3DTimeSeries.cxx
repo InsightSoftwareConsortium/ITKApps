@@ -78,7 +78,7 @@ void DeformableRegistration3DTimeSeries
   if(!m_3dview_selected)this->SetInteractor(1);
   if(m_image_loaded)
     {
-    m_AdaptorFilter->GetImporter()->Update(); 
+    m_AdaptorFilter->GetImporter()->Update();
     this->Select3DViewImage(m_AdaptorFilter->GetImporter()->GetOutput());
     }
   if( m_deformable_loaded)
@@ -119,7 +119,7 @@ void DeformableRegistration3DTimeSeries
     m_extractfilter->SetExtractionRegion(desiredRegion );
     m_extractfilter->UpdateLargestPossibleRegion();
     m_AdaptorFilter->SetInput(m_extractfilter->GetOutput());
-    m_AdaptorFilter->GetImporter()->Update(); 
+    m_AdaptorFilter->GetImporter()->Update();
     //m_AdaptorFilter->ReleaseDataFlagOn();
     //This is the only way to get properly the extent
     this->SetImageVtkExtent(m_AdaptorFilter->GetImporter()->GetOutput()); 
@@ -188,7 +188,7 @@ void DeformableRegistration3DTimeSeries
     m_extractfilter->SetInput(m_Image4D); 
     m_extractfilter->UpdateLargestPossibleRegion();
     m_AdaptorFilter->GetExporter()->SetInput(m_extractfilter->GetOutput());
-    m_AdaptorFilter->GetImporter()->Update(); 
+    m_AdaptorFilter->GetImporter()->Update();
     this->SetImageVtkExtent(m_AdaptorFilter->GetImporter()->GetOutput()); 
     if(m_3dview_selected)
         this->Select3DViewImage(m_AdaptorFilter->GetImporter()->GetOutput());
@@ -822,7 +822,7 @@ DeformableRegistration3DTimeSeries
     this->progressBar->Observe(registration);
     try 
     { 
-      registration->StartRegistration(); 
+    registration->Update();
     } 
     catch( itk::ExceptionObject & err ) 
     { 
@@ -938,7 +938,7 @@ DeformableRegistration3DTimeSeries
 
     try 
       { 
-      registration->StartRegistration(); 
+      registration->UpDate();
       } 
     catch( itk::ExceptionObject & err ) 
       { 
