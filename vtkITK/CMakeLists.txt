@@ -23,6 +23,8 @@ INCLUDE_REGULAR_EXPRESSION("^.*$")
 
 INCLUDE_DIRECTORIES ( ${vtkITK_SOURCE_DIR}/Common )
 
+OPTION(VTK_WRAP_PYTHON "Wrap VTK classes into the Python language." OFF)
+
 # Add the common directory
 SUBDIRS ( Common )
 SUBDIRS ( Wrapping )
