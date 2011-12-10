@@ -322,7 +322,7 @@ ImageRegistrationConsoleBase
     
   try
   {
-    m_ImageRegistrationMethod->StartRegistration();
+    m_ImageRegistrationMethod->Update();
   }
   catch(itk::ExceptionObject & err )
   {

@@ -337,7 +337,7 @@ Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
   info->UpdateProgress(info,0.0,"Starting Registration ...");      
   try
     {
-    m_Registration->StartRegistration();
+    m_Registration->Update();
     }
   catch( itk::ExceptionObject )
     {

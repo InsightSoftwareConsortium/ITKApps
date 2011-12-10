@@ -273,7 +273,7 @@ int main(int argc, char **argv)
 
   // Start registration
 
- registration->StartRegistration();
+ registration->Update();
 
   // Get the results
   RegistrationType::ParametersType solution = 

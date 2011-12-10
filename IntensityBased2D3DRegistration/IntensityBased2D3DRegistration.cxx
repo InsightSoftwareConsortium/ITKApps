@@ -1058,7 +1058,7 @@ int main( int argc, char *argv[] )
     //
     // Software Guide : EndLatex
     // Software Guide : BeginCodeSnippet
-    registration->StartRegistration(); 
+    registration->Update();
     // Software Guide : EndCodeSnippet
     } 
   catch( itk::ExceptionObject & err ) 
