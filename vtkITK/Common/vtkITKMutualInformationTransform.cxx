@@ -380,7 +380,7 @@ static void vtkITKMIMattesQuaternionRigidExecute(vtkITKMutualInformationTransfor
   optimizer->SetLearningRate( self->GetLearningRate() );      
   optimizer->SetNumberOfIterations( self->GetNumberOfIterations() );
    // Start registration    
-  registration->StartRegistration();
+  registration->Update();
   
   // Get the results
   typename RegistrationType::ParametersType solution = 
@@ -503,7 +503,7 @@ static void vtkITKMIViolaWellsAffineExecute(vtkITKMutualInformationTransform *se
   optimizer->SetMinimumStepLength( self->GetMinimumStepLength() );      
   optimizer->SetNumberOfIterations( self->GetNumberOfIterations() );
    // Start registration    
-  registration->StartRegistration();
+  registration->Update();
   
   // Get the results
   typename RegistrationType::ParametersType solution = 
@@ -622,7 +622,7 @@ static void vtkITKMIMattesAffineExecute(vtkITKMutualInformationTransform *self,
   optimizer->SetMinimumStepLength( self->GetMinimumStepLength() );      
   optimizer->SetNumberOfIterations( self->GetNumberOfIterations() );
    // Start registration    
-  registration->StartRegistration();
+  registration->Update();
   
   // Get the results
   typename RegistrationType::ParametersType solution = 

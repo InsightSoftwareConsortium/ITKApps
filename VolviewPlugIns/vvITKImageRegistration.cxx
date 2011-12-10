@@ -367,7 +367,7 @@ Execute( vtkVVPluginInfo *info, vtkVVProcessDataStruct *pds )
             m_Optimizer->GetCurrentIteration());
     try
       {
-      m_Registration->StartRegistration();
+      m_Registration->Update();
       }
     catch( itk::ExceptionObject )
       {
