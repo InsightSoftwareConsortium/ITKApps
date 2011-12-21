@@ -194,7 +194,12 @@ int main( int argc, char * argv [] )
       {
       MeshType::CellAutoPointer c;
       TriangleCellType * tcell = new TriangleCellType;
-      tcell->SetPointIds( pointIds );
+      TriangleCellType::PointIdentifier itkPts[3];
+      for (int ii = 0; ii < 3; ++ii)
+        {
+        itkPts[ii] = static_cast<TriangleCellType::PointIdentifier>(pointIds[ii]);
+        }
+      tcell->SetPointIds( itkPts );
       c.TakeOwnership( tcell );
       mesh->SetCell( cellId, c );
       cellId++;
@@ -202,8 +207,6 @@ int main( int argc, char * argv [] )
       pointIds[1] = pointIds[2];
       pointIds[2] = cellPoints[t+3];
       }
-
-    
     }
 
 
@@ -217,7 +220,12 @@ int main( int argc, char * argv [] )
       }
     MeshType::CellAutoPointer c;
     TriangleCellType * t = new TriangleCellType;
-    t->SetPointIds( (unsigned long*)cellPoints );
+    TriangleCellType::PointIdentifier itkPts[3];
+    for (int ii = 0; ii < numberOfCellPoints; ++ii)
+      {
+      itkPts[ii] = static_cast<TriangleCellType::PointIdentifier>(cellPoints[ii]);
+      }
+    t->SetPointIds( itkPts );
     c.TakeOwnership( t );
     mesh->SetCell( cellId, c );
     cellId++;

@@ -133,7 +133,12 @@ doubleMesh::Pointer MeshFromUnstructuredGrid(vtkUnstructuredGrid* grid)
         typedef itk::CellInterface<double, doubleMesh::CellTraits> CellInterfaceType;
         typedef itk::TriangleCell<CellInterfaceType> TriangleCellType;
         TriangleCellType * t = new TriangleCellType;
-        t->SetPointIds((unsigned long*)pts);
+        TriangleCellType::PointIdentifier itkPts[3];
+        for (int ii = 0; ii < npts; ++ii)
+          {
+          itkPts[ii] = static_cast<TriangleCellType::PointIdentifier>(pts[ii]);
+          }
+        t->SetPointIds(itkPts);
         c.TakeOwnership( t );
         break;
         }  
@@ -142,7 +147,12 @@ doubleMesh::Pointer MeshFromUnstructuredGrid(vtkUnstructuredGrid* grid)
         typedef itk::CellInterface<double, doubleMesh::CellTraits> CellInterfaceType;
         typedef itk::QuadrilateralCell<CellInterfaceType> QuadrilateralCellType;
         QuadrilateralCellType * t = new QuadrilateralCellType;
-        t->SetPointIds((unsigned long*)pts);
+        QuadrilateralCellType::PointIdentifier itkPts[3];
+        for (int ii = 0; ii < npts; ++ii)
+          {
+          itkPts[ii] = static_cast<QuadrilateralCellType::PointIdentifier>(pts[ii]);
+          }
+        t->SetPointIds(itkPts);
         c.TakeOwnership( t );
         break;
         }  
