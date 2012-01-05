@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vector>
 #include <vnl/vnl_math.h>
 
+#include "metaTypes.h"
 #include "imageutils.h"
 #include "metaITKUtils.h"
 #include "OptionList.h"
