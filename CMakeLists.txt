@@ -5,8 +5,6 @@ ENDIF(COMMAND CMAKE_POLICY)
 
 
 PROJECT(ITKApps)
-
-
 INCLUDE_REGULAR_EXPRESSION("^.*$")
 
 # Tell CMake's FIND_PACKAGE command where to look for our Find<pkg>
@@ -21,6 +19,10 @@ ENDIF(NOT WIN32)
 FIND_PACKAGE(ITK)
 IF(ITK_FOUND)
   INCLUDE(${ITK_USE_FILE})
+  if (NOT ITK_VERSION)
+    set(ITK_VERSION "${ITK_VERSION_MAJOR}.${ITK_VERSION_MINOR}.${ITK_VERSION_PATCH}")
+  endif()
+  message(STATUS "ITK VERSION: ${ITK_VERSION}")
 ELSE(ITK_FOUND)
   MESSAGE(FATAL_ERROR
           "Can<not build ITKApps without ITK.  Please set ITK_DIR.")
@@ -67,7 +69,7 @@ IF(USE_VTK)
   FIND_PACKAGE(VTK)
   IF (VTK_FOUND)
     INCLUDE (${VTK_USE_FILE})
-
+    message(STATUS "VTK VERSION: ${VTK_VERSION}")
     # Test for VTK using std libs
     IF(WIN32) # It seems that the following message is only relavant for MSVC 6 installs
       IF(NOT VTK_USE_ANSI_STDLIB)
@@ -123,10 +125,12 @@ ENDIF(OPENGL_INCLUDE_PATH)
 # Add an option to use or not use FLTK (http://www.fltk.org)
 OPTION(USE_FLTK "Use FLTK (The Fast Light Toolkit) for GUI (some applications need this)" OFF)
 IF(USE_FLTK)
-  FIND_PACKAGE(FLTK)
+  FIND_PACKAGE(FLTK REQUIRED NO_MODULE)
   IF(FLTK_FOUND)
+    set(FLTK_EXE_LINKER_FLAGS "")
     INCLUDE(${FLTK_USE_FILE})
     LINK_DIRECTORIES(${FLTK_LIB_DIR})
+    set(FLTK_LIBRARIES "fltk;fltk_images;fltk_forms;fltk_gl")
   ENDIF(FLTK_FOUND)
 ENDIF(USE_FLTK)
 
@@ -403,5 +407,3 @@ if(WIN32)
    set(BUILD_SHARED_LIBS OFF)
   endif(CMAKE_COMPILER_IS_GNUCXX)
 endif(WIN32)
-
-
