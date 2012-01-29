@@ -190,7 +190,7 @@ guiMainImplementation
       }
     } // end of if-else
 
-  tkResultImageViewer->imageMode(IMG_LOG);
+  tkResultImageViewer->imageMode(itk::IMG_LOG);
   tkResultImageViewer->update();
   tkResultImageViewer->redraw();
   tkResultImageViewer->activate();
@@ -712,7 +712,7 @@ guiMainImplementation
   spacing[2] = m_MovingImage->GetSpacing()[2] * scale;
 
   LandmarkPointType landmark;
-  ContinuousIndex<double, 3> index[4];
+  itk::ContinuousIndex<double, 3> index[4];
   for(unsigned int i=0;
       i < m_MovingLandmarkSpatialObject->GetNumberOfPoints();
       i++)

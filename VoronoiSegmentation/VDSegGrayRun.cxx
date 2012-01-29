@@ -229,7 +229,7 @@ ComputeStats(void)
   IndexType idx;
   for(i=0;i<numPoints;i++)
     {
-    ClickPoint point;
+    itk::ClickPoint point;
     if( m_Viewer->getClickedPoint(i,point) )
       {
       x=(int)(point.x);

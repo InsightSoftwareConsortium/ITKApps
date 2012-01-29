@@ -17,11 +17,12 @@
 #ifndef Cell_H
 #define Cell_H
 
-#include "itkRGBPixel.h"
 #include <FL/fl_draw.H>
+#include "fltkSphere3D.h"
+#undef max
+#include "itkRGBPixel.h"
 #include "itkVector.h"
 #include "itkPoint.h"
-#include "fltkSphere3D.h"
 #include "Genome.h"
 
 namespace bio {

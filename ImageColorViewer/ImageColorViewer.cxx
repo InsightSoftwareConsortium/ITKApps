@@ -142,7 +142,7 @@ int main(int argc, char **argv)
                 tmpImP->GetLargestPossibleRegion() );
               while( !imIter.IsAtEnd() )
                 {
-                RGBPixel< unsigned char > p;
+                itk::RGBPixel< unsigned char > p;
                 p[0] = ((tmpImIter.Get()-tmpImPMin) 
                         / (tmpImPMax-tmpImPMin)) * 255;
                 imIter.Set( p );
@@ -158,7 +158,7 @@ int main(int argc, char **argv)
               ColorImageType::IndexType indx;
               while( !imIter.IsAtEnd() )
                 {
-                RGBPixel< unsigned char > p;
+                itk::RGBPixel< unsigned char > p;
                 p = imIter.Get();
                 indx = imIter.GetIndex();
                 imP->TransformIndexToPhysicalPoint( indx, pnt );

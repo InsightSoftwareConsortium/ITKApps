@@ -101,8 +101,8 @@ int main(int argc, char **argv)
       return 1;
       }
 
-    typedef itk::Image<short, 3>            ImageType;
-    typedef ImageRegistrationApp<ImageType> ImageRegistrationAppType;
+    typedef itk::Image<short, 3>                 ImageType;
+    typedef itk::ImageRegistrationApp<ImageType> ImageRegistrationAppType;
 
     /** Create the registration app **/
     ImageRegistrationAppType::Pointer imageRegistrationApp =
