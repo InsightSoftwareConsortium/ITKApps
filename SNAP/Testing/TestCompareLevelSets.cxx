@@ -84,8 +84,8 @@ public:
   typedef typename Superclass::TimeStepType TimeStepType;
 
   /** Set/Get the number of iterations that the filter will run. */
-  itkSetMacro(NumberOfIterations, unsigned int);
-  itkGetConstReferenceMacro(NumberOfIterations, unsigned int);
+  itkSetMacro(NumberOfIterations, itk::IdentifierType);
+  itkGetConstReferenceMacro(NumberOfIterations, itk::IdentifierType);
 
 protected:
   LevelSetExtensionFilter() 
@@ -112,7 +112,7 @@ private:
   LevelSetExtensionFilter(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
   
-  unsigned int     m_NumberOfIterations;
+  itk::IdentifierType  m_NumberOfIterations;
 };
 
 #ifdef _USE_FastLevelSetFunction_

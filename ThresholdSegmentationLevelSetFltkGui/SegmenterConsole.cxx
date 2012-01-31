@@ -902,7 +902,7 @@ void SegmenterConsole::CalculateThresholds()
 
   for ( int i = numPoints-1; i >= 0; i-- )
     {
-    ClickPoint point;
+    itk::ClickPoint point;
     if( (m_InputViewer->GetSliceViewPointer())->getClickedPoint(i,point) )
       {
       const float value = point.value;

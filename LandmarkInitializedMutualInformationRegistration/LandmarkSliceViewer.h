@@ -27,8 +27,8 @@
 #include "GLSliceView.h"
 
 template< class TImagePixel >
-class LandmarkSliceViewer : public GLSliceView< TImagePixel,
-                                                unsigned char >
+class LandmarkSliceViewer : public itk::GLSliceView< TImagePixel,
+                                                     unsigned char >
   {
   public:
 
@@ -37,8 +37,8 @@ class LandmarkSliceViewer : public GLSliceView< TImagePixel,
   
     ~LandmarkSliceViewer();
   
-    typedef LandmarkSliceViewer< TImagePixel >          Self;
-    typedef GLSliceView< TImagePixel, unsigned char >   Superclass;
+    typedef LandmarkSliceViewer< TImagePixel >               Self;
+    typedef itk::GLSliceView< TImagePixel, unsigned char >   Superclass;
   
     typedef unsigned char  ViewerColorType;
 

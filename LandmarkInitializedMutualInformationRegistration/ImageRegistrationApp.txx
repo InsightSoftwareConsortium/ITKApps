@@ -28,6 +28,8 @@
 #include "itkCommand.h"
 #include "itkSingleValuedNonLinearOptimizer.h"
 
+namespace itk
+{
 class ImageRegistrationAppViewer
 : public itk::Command
 {
@@ -1079,5 +1081,5 @@ ImageRegistrationApp< TImage >
   return resample->GetOutput();
   }
 
-    
+} // end namespace itk
 #endif //__ImageRegistrationApp_txx

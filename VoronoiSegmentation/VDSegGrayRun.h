@@ -30,7 +30,7 @@ public:
   typedef unsigned char BinaryPixelType;
   typedef itk::Image<BinaryPixelType,3> BinImage;
   typedef itk::Image<BinaryPixelType,2> BinImage2D;
-  typedef GLSliceView<float,BinaryPixelType>   ViewerType;
+  typedef itk::GLSliceView<float,BinaryPixelType>   ViewerType;
   typedef itk::VoronoiSegmentationImageFilter<FloatImage2D,BinImage2D> VDFilter;
 
   VDSegGrayRun();

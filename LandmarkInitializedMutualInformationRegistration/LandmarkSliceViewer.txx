@@ -27,7 +27,7 @@ template<class TImagePixel>
 LandmarkSliceViewer<TImagePixel>
 ::LandmarkSliceViewer( unsigned int x, unsigned int y,
                        unsigned int w, unsigned int h, const char * label )
-  : GLSliceView< TImagePixel, unsigned char >(x,y,w,h,label)
+  : itk::GLSliceView< TImagePixel, unsigned char >(x,y,w,h,label)
   { 
   m_Mode = Normal;
   m_Action = None;
@@ -78,7 +78,7 @@ void
 LandmarkSliceViewer<TImagePixel>
 ::SetInputImage( ImageType* im )
   {
-  GLSliceView< TImagePixel, unsigned char >::SetInputImage(im);
+    itk::GLSliceView< TImagePixel, unsigned char >::SetInputImage(im);
 
   typename OverlayImageType::Pointer ovly = OverlayImageType::New();
   ovly->SetRegions(im->GetLargestPossibleRegion());
@@ -240,7 +240,7 @@ LandmarkSliceViewer<TImagePixel>
     case FL_PUSH:
       if( m_Mode == Selection )
         {
-        ClickPoint coord;
+        itk::ClickPoint coord;
         this->getClickedPoint(0, coord);
         ContinuousIndexType index;
         index[0] = (double) coord.x;
