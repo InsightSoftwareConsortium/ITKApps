@@ -23,7 +23,7 @@
 typedef void (CALLBACK *TessCallback)();
 #else
 #ifdef __APPLE__
-typedef GLvoid (*TessCallback)(...);
+typedef GLvoid (*TessCallback)();
 #else
 typedef void (*TessCallback)();
 #endif
