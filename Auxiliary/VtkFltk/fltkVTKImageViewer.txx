@@ -65,7 +65,12 @@ VTKImageViewer<ImagePixelType>
 
   // Create the volume mapper and set the ray function and scalar input
   vtkVolumeRayCastMapper *volumeMapper = vtkVolumeRayCastMapper::New();
+#if VTK_MAJOR_VERSION <= 5
     volumeMapper->SetInput( m_AdaptorFilter->GetOutput() );
+#else
+    m_AdaptorFilter->Update();
+    volumeMapper->SetInputData( m_AdaptorFilter->GetOutput() );
+#endif
     volumeMapper->SetVolumeRayCastFunction(compositeFunction);
 
   // Create the volume and set the mapper and property

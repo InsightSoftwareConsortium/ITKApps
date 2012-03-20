@@ -198,7 +198,7 @@ void vtkFlRenderWindowInteractor::OnTimer(void)
     // this is all we need to do, InteractorStyle is stateful and will
     // continue with whatever it's busy
     
-#if ((VTK_MAJOR_VERSION == 4 && VTK_MINOR_VERSION > 0) || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION >= 0))
+#if VTK_MAJOR_VERSION >= 4
     // new style
     this->InvokeEvent(vtkCommand::TimerEvent, NULL);
 #else
@@ -269,7 +269,7 @@ void vtkFlRenderWindowInteractor::hide() {
 int vtkFlRenderWindowInteractor::handle( int event ) {
     if( !Enabled ) return 0;
     
-#if ((VTK_MAJOR_VERSION == 4 && VTK_MINOR_VERSION > 0) || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION >= 0))
+#if VTK_MAJOR_VERSION >= 4
     // setup for new style
     // SEI(x, y, ctrl, shift, keycode, repeatcount, keysym)
     this->SetEventInformation(Fl::event_x(), this->h()-Fl::event_y()-1, 
@@ -285,7 +285,7 @@ int vtkFlRenderWindowInteractor::handle( int event ) {
     break;
       
       case FL_KEYBOARD:   // keypress
-#if ((VTK_MAJOR_VERSION == 4 && VTK_MINOR_VERSION > 0) || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION >= 0))
+#if VTK_MAJOR_VERSION >= 4
         // new style
         this->InvokeEvent(vtkCommand::MouseMoveEvent, NULL);        
         this->InvokeEvent(vtkCommand::KeyPressEvent, NULL);
@@ -306,7 +306,7 @@ int vtkFlRenderWindowInteractor::handle( int event ) {
     switch( Fl::event_button() ) 
     {
       case FL_LEFT_MOUSE:
-#if ((VTK_MAJOR_VERSION == 4 && VTK_MINOR_VERSION > 0) || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION >= 0))
+#if VTK_MAJOR_VERSION >= 4
             // new style
             this->InvokeEvent(vtkCommand::LeftButtonPressEvent,NULL);
 #else
@@ -315,7 +315,7 @@ int vtkFlRenderWindowInteractor::handle( int event ) {
 #endif            
         break;
       case FL_MIDDLE_MOUSE:
-#if ((VTK_MAJOR_VERSION == 4 && VTK_MINOR_VERSION > 0) || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION >= 0))
+#if VTK_MAJOR_VERSION >= 4
             // new style
             this->InvokeEvent(vtkCommand::MiddleButtonPressEvent,NULL);
 #else
@@ -324,7 +324,7 @@ int vtkFlRenderWindowInteractor::handle( int event ) {
 #endif
         break;
       case FL_RIGHT_MOUSE:
-#if ((VTK_MAJOR_VERSION == 4 && VTK_MINOR_VERSION > 0) || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION >= 0))
+#if VTK_MAJOR_VERSION >= 4
             // new style
             this->InvokeEvent(vtkCommand::RightButtonPressEvent,NULL);
 #else
@@ -340,7 +340,7 @@ int vtkFlRenderWindowInteractor::handle( int event ) {
     // a while to find :)
       case FL_DRAG:
       case FL_MOVE:
-#if ((VTK_MAJOR_VERSION == 4 && VTK_MINOR_VERSION > 0) || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION >= 0))
+#if VTK_MAJOR_VERSION >= 4
         // new style
         this->InvokeEvent(vtkCommand::MouseMoveEvent, NULL);
 #else        
@@ -352,7 +352,7 @@ int vtkFlRenderWindowInteractor::handle( int event ) {
       case FL_RELEASE:    // mouse up
     switch( Fl::event_button() ) {
       case FL_LEFT_MOUSE:
-#if ((VTK_MAJOR_VERSION == 4 && VTK_MINOR_VERSION > 0) || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION >= 0))
+#if VTK_MAJOR_VERSION >= 4
             // new style
             this->InvokeEvent(vtkCommand::LeftButtonReleaseEvent,NULL);
 #else            
@@ -361,7 +361,7 @@ int vtkFlRenderWindowInteractor::handle( int event ) {
 #endif
         break;
       case FL_MIDDLE_MOUSE:
-#if ((VTK_MAJOR_VERSION == 4 && VTK_MINOR_VERSION > 0) || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION >= 0))
+#if VTK_MAJOR_VERSION >= 4
             // new style
             this->InvokeEvent(vtkCommand::MiddleButtonReleaseEvent,NULL);
 #else            
@@ -370,7 +370,7 @@ int vtkFlRenderWindowInteractor::handle( int event ) {
 #endif
         break;
       case FL_RIGHT_MOUSE:
-#if ((VTK_MAJOR_VERSION == 4 && VTK_MINOR_VERSION > 0) || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION >= 0))
+#if VTK_MAJOR_VERSION >= 4
             // new style
             this->InvokeEvent(vtkCommand::RightButtonReleaseEvent,NULL);
 #else            
