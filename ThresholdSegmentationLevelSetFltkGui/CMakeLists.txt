@@ -24,10 +24,6 @@ IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 INCLUDE_DIRECTORIES(
-${ITK_SOURCE_DIR}/Code/Common
-${ITK_SOURCE_DIR}/Code/BasicFilters
-${ITK_SOURCE_DIR}/Code/Algorithms
-${ITK_SOURCE_DIR}/Code/IO
 ${ITKApps_SOURCE_DIR}/Auxiliary/FltkImageViewer
 ${ThresholdSegmentationLevelSetFltkGui_SOURCE_DIR}
 ${ThresholdSegmentationLevelSetFltkGui_BINARY_DIR}

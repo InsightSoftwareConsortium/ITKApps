@@ -15,9 +15,6 @@ ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 
 
 INCLUDE_DIRECTORIES(
-${ITK_SOURCE_DIR}/Code/Common
-${ITK_SOURCE_DIR}/Code/IO
-${ITK_SOURCE_DIR}/Code/BasicFilters
 ${EllipsoidInteriorExteriorSpatialFunction_SOURCE_DIR}
 )
 

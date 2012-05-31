@@ -1,10 +1,6 @@
 PROJECT( WatershedSegmentationFltkGui )
 
 INCLUDE_DIRECTORIES(
-${ITK_SOURCE_DIR}/Code/Common
-${ITK_SOURCE_DIR}/Code/BasicFilters
-${ITK_SOURCE_DIR}/Code/Algorithms
-${ITK_SOURCE_DIR}/Code/IO
 ${ITKApps_SOURCE_DIR}/Auxiliary/FltkImageViewer
 ${ITKApps_BINARY_DIR}/Auxiliary/FltkImageViewer
 ${WatershedSegmentationFltkGui_SOURCE_DIR}
@@ -14,10 +10,6 @@ ${OPENGL_INCLUDE_PATH}
 )
 
 LINK_DIRECTORIES(
-${ITK_BINARY_DIR}/Code/Common
-${ITK_BINARY_DIR}/Code/BasicFilters
-${ITK_BINARY_DIR}/Code/Algorithms
-${ITK_BINARY_DIR}/Code/IO
 ${ITKApps_BINARY_DIR}/Auxiliary/FltkImageViewer
 ${WatershedSegmentationFltkGui_BINARY_DIR}
 )

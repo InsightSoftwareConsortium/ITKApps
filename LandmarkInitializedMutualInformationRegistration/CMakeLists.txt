@@ -26,14 +26,6 @@ CONFIGURE_FILE(${ITKApps_SOURCE_DIR}/LandmarkInitializedMutualInformationRegistr
                ${ITKApps_BINARY_DIR}/LandmarkInitializedMutualInformationRegistration/Help/Index.html COPYONLY)
 
 INCLUDE_DIRECTORIES(
-  ${ITK_SOURCE_DIR}/Code/Common
-  ${ITK_SOURCE_DIR}/Code/BasicFilters
-  ${ITK_SOURCE_DIR}/Code/IO
-  ${ITK_SOURCE_DIR}/Code/Numerics
-  ${ITK_SOURCE_DIR}/Code/Numerics/vxl
-  ${ITK_SOURCE_DIR}/Code/Numerics/Statistics
-  ${ITK_SOURCE_DIR}/Utilities/MetaIO
-  ${ITK_SOURCE_DIR}/Utilities/MetaIO/SaptialObject
   ${ITKApps_SOURCE_DIR}/Auxiliary/FltkImageViewer
   ${ITKApps_BINARY_DIR}/Auxiliary/FltkImageViewer
   ${ITKApps_SOURCE_DIR}/Auxiliary/ITKFlFileWriter
