@@ -17,7 +17,7 @@ IF(ITK_CSWIG_TCL AND VTK_WRAP_TCL)
   SET_SOURCE_FILES_PROPERTIES(ConnectVTKITK_wrapTcl.cxx GENERATED)
   ADD_LIBRARY(ConnectVTKITKTcl  SHARED ConnectVTKITK_wrapTcl.cxx)
   INSTALL_TARGETS(/lib ConnectVTKITKTcl)
-  TARGET_LINK_LIBRARIES(ConnectVTKITKTcl ITKBasicFilters
+  TARGET_LINK_LIBRARIES(ConnectVTKITKTcl ${ITK_LIBRARIES}
   vtkCommonTCL vtkImaging SwigRuntimeTcl ${TCL_LIBRARY})
   ADD_CUSTOM_COMMAND(
     COMMENT "ConnectVTKITK_wrapTcl.cxx from ConnectVTKITK.i"
@@ -59,7 +59,7 @@ IF(ITK_CSWIG_PYTHON AND VTK_WRAP_PYTHON)
   INSTALL_TARGETS(/lib _ConnectVTKITKPython)
   # we don't want a "lib" prefix, thanks.
   SET_TARGET_PROPERTIES(_ConnectVTKITKPython PROPERTIES PREFIX "")
-  TARGET_LINK_LIBRARIES(_ConnectVTKITKPython ITKBasicFilters
+  TARGET_LINK_LIBRARIES(_ConnectVTKITKPython ${ITK_LIBRARIES}
   vtkCommonPython vtkImaging SwigRuntimePython
   ${PYTHON_LIBRARY})
 
