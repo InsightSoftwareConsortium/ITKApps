@@ -569,7 +569,7 @@ ImageRegistrationApp< TImage >
   m_LandmarkAffineTransform->SetIdentity();
   m_LandmarkAffineTransform->SetCenter(m_LandmarkRegTransform->GetCenter());
   m_LandmarkAffineTransform->SetMatrix(
-                                   m_LandmarkRegTransform->GetRotationMatrix());
+                                   m_LandmarkRegTransform->GetMatrix());
   m_LandmarkAffineTransform->SetOffset(m_LandmarkRegTransform->GetOffset());
   m_FinalTransform = m_LandmarkAffineTransform;
   m_PriorRegistrationMethod = LANDMARK;
@@ -730,7 +730,7 @@ ImageRegistrationApp< TImage >
                                       m_RigidRegTransform->GetParameters());
   m_RigidAffineTransform->SetIdentity();
   m_RigidAffineTransform->SetCenter(m_RigidRegTransform->GetCenter());
-  m_RigidAffineTransform->SetMatrix( m_RigidRegTransform->GetRotationMatrix());
+  m_RigidAffineTransform->SetMatrix( m_RigidRegTransform->GetMatrix());
   m_RigidAffineTransform->SetOffset(m_RigidRegTransform->GetOffset());
   m_FinalTransform = m_RigidAffineTransform;
   m_PriorRegistrationMethod = RIGID;
