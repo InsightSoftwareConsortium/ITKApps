@@ -138,7 +138,7 @@ MIEuler2DRegistrator<TFixedImage,TMovingImage>
 {
   m_Transform->SetParameters( m_Registration->GetLastTransformParameters() );
   
-  m_AffineTransform->SetMatrix( m_Transform->GetRotationMatrix() );
+  m_AffineTransform->SetMatrix( m_Transform->GetMatrix() );
   m_AffineTransform->SetOffset( m_Transform->GetOffset() );
 
   return m_AffineTransform;

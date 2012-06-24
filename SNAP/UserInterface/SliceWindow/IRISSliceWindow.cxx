@@ -148,7 +148,7 @@ IRISSliceWindow
     unsigned int nUpdates = 0;
 
     // Iterate
-    for (itPolygon.Begin(); !itPolygon.IsAtEnd(); ++itPolygon)
+    for (itPolygon.GoToBegin(); !itPolygon.IsAtEnd(); ++itPolygon)
     {
       // Get the current polygon pixel      
       PolygonSliceType::PixelType pxPolygon = itPolygon.Get();
