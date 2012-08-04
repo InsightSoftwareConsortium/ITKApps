@@ -1,40 +1,20 @@
 PROJECT( EditorFltkGui )
 
 INCLUDE_DIRECTORIES(
-${ITK_SOURCE_DIR}/Code/Common
-${ITK_SOURCE_DIR}/Code/BasicFilters
-${ITK_SOURCE_DIR}/Code/Algorithms
-${ITK_SOURCE_DIR}/Code/IO
 ${ITKApps_SOURCE_DIR}/Auxiliary/FltkImageViewer
 ${ITKApps_BINARY_DIR}/Auxiliary/FltkImageViewer
 ${ITKApps_SOURCE_DIR}/Auxiliary/VtkFltk
 ${ITKApps_BINARY_DIR}/Auxiliary/VtkFltk
 ${ITKApps_SOURCE_DIR}/Auxiliary/vtk
-${VTK_SOURCE_DIR}/Common
-${VTK_SOURCE_DIR}/Filtering
-${VTK_SOURCE_DIR}/Imaging
-${VTK_SOURCE_DIR}/Rendering
-${VTK_SOURCE_DIR}/IO
-${VTK_SOURCE_DIR}/Patented
 ${EditorFltkGui_SOURCE_DIR}
 ${FLTK_INCLUDE_PATH}
 ${OPENGL_INCLUDE_PATH}
 )
 
 LINK_DIRECTORIES(
-${ITK_BINARY_DIR}/Code/Common
-${ITK_BINARY_DIR}/Code/BasicFilters
-${ITK_BINARY_DIR}/Code/Algorithms
-${ITK_BINARY_DIR}/Code/IO
 ${ITKApps_BINARY_DIR}/Auxiliary/FltkImageViewer
 ${ITKApps_BINARY_DIR}/Auxiliary/VtkFltk
 ${ITKApps_BINARY_DIR}/Auxiliary/vtk
-${VTK_BINARY_DIR}/Common
-${VTK_BINARY_DIR}/Filtering
-${VTK_BINARY_DIR}/Imaging
-${VTK_BINARY_DIR}/Rendering
-${VTK_BINARY_DIR}/IO
-${VTK_BINARY_DIR}/Patented
 ${EditorFltkGui_BINARY_DIR}
 )
 

@@ -274,7 +274,7 @@ void RegisterWindow::Execute(void)
   std::ostringstream message ;
   message
     << "Registration done in " << 
-    timeProbe.GetMeanTime() << "seconds." 
+    timeProbe.GetMean() << "seconds."
     << std::endl ;
   message << "angle = " 
     << m_Registrator->GetTransformParameters()[0] << ", x offset = "

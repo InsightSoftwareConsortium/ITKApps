@@ -29,14 +29,6 @@ ${CMAKE_HOME_DIRECTORY}
 )
 
 LINK_DIRECTORIES(
-${ITK_BINARY_DIR}/Code/Common
-${ITK_BINARY_DIR}/Code/BasicFilters
-${ITK_BINARY_DIR}/Code/IO
-${ITK_BINARY_DIR}/Code/Numerics/vxl
-${ITK_BINARY_DIR}/Auxiliary/FltkImageViewer
-${ITK_BINARY_DIR}/Utilities/MetaIO
-${ITK_BINARY_DIR}/Utilities/png
-${ITK_BINARY_DIR}/Utilities/zlib
 ${FLTK_LIB_PATH}
 )
 

@@ -25,9 +25,15 @@ IF(ITK_FOUND)
   message(STATUS "ITK VERSION: ${ITK_VERSION}")
 ELSE(ITK_FOUND)
   MESSAGE(FATAL_ERROR
-          "Can<not build ITKApps without ITK.  Please set ITK_DIR.")
+          "Cannot build ITKApps without ITK.  Please set ITK_DIR.")
 ENDIF(ITK_FOUND)
 
+if(${ITK_VERSION} VERSION_GREATER "4.2")
+  if( NOT ITKV3_COMPATIBILITY)
+    message(FATAL_ERROR
+            "ITK must be built with ITKV3_COMPATIBILITY ON and ITK_LEGACY_REMOVE OFF")
+  endif()
+endif()
 
 # On Visual Studio 8 MS deprecated C. This removes all 1.276E1265 security
 # warnings
@@ -131,6 +137,9 @@ IF(USE_FLTK)
     INCLUDE(${FLTK_USE_FILE})
     LINK_DIRECTORIES(${FLTK_LIB_DIR})
     set(FLTK_LIBRARIES "fltk;fltk_images;fltk_forms;fltk_gl")
+    IF(APPLE)
+      list(APPEND FLTK_LIBRARIES "-framework Cocoa")
+    ENDIF(APPLE)
   ENDIF(FLTK_FOUND)
 ENDIF(USE_FLTK)
 

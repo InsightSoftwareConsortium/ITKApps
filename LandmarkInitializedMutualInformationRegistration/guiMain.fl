@@ -104,7 +104,7 @@ Register();}
           label label
           xywh {475 56 573 601} box FLAT_BOX color 42 deactivate resizable
           code0 {\#include <GLTwoImageSliceView.h>}
-          class {GLTwoImageSliceView< short, unsigned char >}
+          class {itk::GLTwoImageSliceView< short, unsigned char >}
         }
         Fl_Group tkSubGroup {
           xywh {5 51 424 609}
