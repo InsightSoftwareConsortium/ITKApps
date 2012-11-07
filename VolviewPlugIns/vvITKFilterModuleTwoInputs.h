@@ -48,8 +48,7 @@ public:
   typedef typename Input1ImageType::PixelType     Input1PixelType;
   typedef typename Input2ImageType::PixelType     Input2PixelType;
 
-  itkStaticConstMacro( Dimension, unsigned int, 
-         itk::GetImageDimension< Input1ImageType >::ImageDimension );
+  itkStaticConstMacro( Dimension, unsigned int, Input1ImageType::ImageDimension );
 
 
   // Instantiate the two ImportImageFilters These filters are used for building

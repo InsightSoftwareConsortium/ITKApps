@@ -30,8 +30,8 @@ class SNAPAdvectionFieldImageFilter:
     TInputImage,
     itk::Image<
       itk::CovariantVector<TOutputValueType,
-        ::itk::GetImageDimension<TInputImage>::ImageDimension>,
-      ::itk::GetImageDimension<TInputImage>::ImageDimension> >
+        TInputImage::ImageDimension>,
+        TInputImage::ImageDimension> >
 {
 public:
   
