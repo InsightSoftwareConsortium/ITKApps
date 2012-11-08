@@ -28,8 +28,7 @@ public:
   typedef typename Superclass::InputPixelType     InputPixelType;
   typedef typename Superclass::OutputPixelType    OutputPixelType;
 
-  itkStaticConstMacro( Dimension, unsigned int, 
-         itk::GetImageDimension< InputImageType >::ImageDimension );
+  itkStaticConstMacro( Dimension, unsigned int, InputImageType::ImageDimension );
 
   typedef typename Superclass::ImportFilterType   ImportFilterType;
   typedef typename Superclass::SizeType           SizeType;

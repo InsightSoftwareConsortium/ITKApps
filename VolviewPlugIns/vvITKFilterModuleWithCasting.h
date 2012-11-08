@@ -37,8 +37,7 @@ public:
 
   typedef TFinalPixelType                         FinalPixelType;
 
-  itkStaticConstMacro( Dimension, unsigned int, 
-         itk::GetImageDimension< InternalImageType >::ImageDimension );
+  itkStaticConstMacro( Dimension, unsigned int, InternalImageType::ImageDimension );
 
   typedef itk::Image< InputPixelType,  
           itkGetStaticConstMacro(Dimension) > InputImageType;

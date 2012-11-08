@@ -32,8 +32,7 @@ public:
   typedef typename InputImageType::PixelType      InputPixelType;
   typedef typename OutputImageType::PixelType     OutputPixelType;
 
-  itkStaticConstMacro( Dimension, unsigned int, 
-         itk::GetImageDimension< InputImageType >::ImageDimension );
+  itkStaticConstMacro( Dimension, unsigned int, InputImageType::ImageDimension );
 
   // Instantiate the ImportImageFilter
   // This filter is used for building an ITK image using 
