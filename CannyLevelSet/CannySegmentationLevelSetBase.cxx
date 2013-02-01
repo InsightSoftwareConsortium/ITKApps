@@ -103,14 +103,14 @@ CannySegmentationLevelSetBase
   m_ItkExporter1->SetInput( m_CannyFilter->GetOutput() );
   m_ItkExporter2->SetInput( m_DerivativeFilter->GetOutput() );
  
-  m_ContourFilter->SetInput( m_VtkImporter1->GetOutput() );  
+  m_ContourFilter->SetInputConnection( m_VtkImporter1->GetOutputPort() );
 
   m_ContourFilter->SetValue( 0, 0.0 ); // Value of the ZeroSet.
 
-  m_ProbeFilter->SetInput( m_ContourFilter->GetOutput() );
-  m_ProbeFilter->SetSource( m_VtkImporter2->GetOutput() );
+  m_ProbeFilter->SetInputConnection( m_ContourFilter->GetOutputPort() );
+  m_ProbeFilter->SetSourceConnection( m_VtkImporter2->GetOutputPort() );
   
-  m_PolyDataWriter->SetInput( m_ProbeFilter->GetOutput() );
+  m_PolyDataWriter->SetInputConnection( m_ProbeFilter->GetOutputPort() );
 
 }
 

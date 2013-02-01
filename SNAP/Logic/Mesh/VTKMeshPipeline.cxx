@@ -153,7 +153,11 @@ VTKMeshPipeline
   if(options.GetUseGaussianSmoothing()) 
     {    
     // The Gaussian filter is enabled
+#if VTK_MAJOR_VERSION <= 5
     m_VTKGaussianFilter->SetInput(pipeImageTail);
+#else
+    m_VTKGaussianFilter->SetInputConnection(m_VTKImporter->GetOutputPort());
+#endif
     m_Progress->RegisterSource(m_VTKGaussianFilter, 10.0f);
     pipeImageTail = m_VTKGaussianFilter->GetOutput();
 
@@ -173,7 +177,11 @@ VTKMeshPipeline
 #ifdef USE_VTK_PATENTED
   
   // Marching cubes gets the tail
+#if VTK_MAJOR_VERSION <= 5
   m_MarchingCubesFilter->SetInput(pipeImageTail);
+#else
+  m_MarchingCubesFilter->SetInputConnection(m_VTKGaussianFilter->GetOutputPort());
+#endif
   m_Progress->RegisterSource(m_MarchingCubesFilter, 10.0);
   pipePolyTail = m_MarchingCubesFilter->GetOutput();
 
