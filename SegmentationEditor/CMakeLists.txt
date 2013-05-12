@@ -23,6 +23,7 @@ INCLUDE_REGULAR_EXPRESSION("^.*$")
 # Link in with ITK
 INCLUDE_DIRECTORIES ( ${SegmentationEditor_SOURCE_DIR}/../vtkITK/Common )
 INCLUDE_DIRECTORIES ( ${SegmentationEditor_SOURCE_DIR}/Common )
+INCLUDE_DIRECTORIES ( ${TCL_INCLUDE_PATH} )
 
 LINK_DIRECTORIES ( ${SegmentationEditor_BINARY_DIR}/../vtkITK/Common )
 LINK_DIRECTORIES ( ${SegmentationEditor_BINARY_DIR}/Common )
