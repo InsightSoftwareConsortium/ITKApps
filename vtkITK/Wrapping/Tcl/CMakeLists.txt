@@ -8,6 +8,7 @@ TARGET_LINK_LIBRARIES(vtkITK
   vtkIOTCL
   vtkFilteringTCL
   vtkCommonTCL
+  ${TCL_LIBRARY} ${TK_LIBRARY}
 )
 
 IF (VTK_USE_RENDERING)

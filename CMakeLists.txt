@@ -352,6 +352,7 @@ IF(VTK_FOUND)
   ENDIF(FLTK_FOUND)
 
   IF(VTK_WRAP_TCL)
+    set(VTK_WRAP_TCL_FIND_LIBS 1)
     FIND_FILE(ITK_VTK_WRAP_TCL vtkWrapTcl.cmake 
       ${VTK_SOURCE_DIR}/CMake
       ${VTK_DIR}/CMake
