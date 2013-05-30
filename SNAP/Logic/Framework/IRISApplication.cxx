@@ -26,6 +26,7 @@
 #include "IRISVectorTypesToITKConversion.h"
 #include "SNAPImageData.h"
 #include "IntensityCurveVTK.h"
+#include "itkConstantBoundaryCondition.h"
 #include "itkImageRegionIterator.h"
 #include "itkImageRegionConstIterator.h"
 #include "itkImageRegionIteratorWithIndex.h"

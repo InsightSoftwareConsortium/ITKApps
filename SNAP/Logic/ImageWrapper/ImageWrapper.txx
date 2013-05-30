@@ -15,6 +15,7 @@
 #ifndef __ImageWrapper_txx_
 #define __ImageWrapper_txx_
 
+#include "itkConstantBoundaryCondition.h"
 #include "itkImageRegionIterator.h"
 #include "itkImageSliceConstIteratorWithIndex.h"
 #include "itkNumericTraits.h"
