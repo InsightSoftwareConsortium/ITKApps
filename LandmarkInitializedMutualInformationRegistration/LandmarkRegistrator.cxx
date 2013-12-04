@@ -67,9 +67,10 @@ LandmarkRegistrator
     throw(e);
     }
 
-  itk::Point<double, 3> fixedCenter;
+  typedef VersorType::PointType PointType;
+  PointType fixedCenter;
   fixedCenter.Fill(0);
-  itk::Point<double, 3> movingCenter;
+  PointType movingCenter;
   movingCenter.Fill(0);
   for( unsigned int i=0; i<m_MovingLandmarkSet->GetNumberOfPoints(); i++)
     {
@@ -88,21 +89,25 @@ LandmarkRegistrator
   m_InitialTransformParameters[4] = movingCenter[1]-fixedCenter[1];
   m_InitialTransformParameters[5] = movingCenter[2]-fixedCenter[2];
 
-  vnl_vector<double> v1(3);
-  vnl_vector<double> v2(3);
-  vnl_vector<double> vTemp(3);
-  vnl_matrix<double> m(3,3);
-  vnl_matrix<double> mTemp(3,3);
+  typedef VersorType::VnlVectorType VnlVectorType;
+  typedef vnl_matrix< ScalarType >  VnlMatrixType;
+  typedef VersorType::VectorType    VectorType;
+  typedef VersorType::MatrixType    MatrixType;
+  VnlVectorType v1(3);
+  VnlVectorType v2(3);
+  VnlVectorType vTemp(3);
+  VnlMatrixType m(3,3);
+  VnlMatrixType mTemp(3,3);
   m.set_identity();
 
-  itk::Vector<double, 3> vct;
-  itk::Versor<double> vsr;
-  itk::Versor<double> vsrTemp;
-  itk::Matrix<double, 3, 3> mat;
+  VectorType vct;
+  VersorType vsr;
+  VersorType vsrTemp;
+  MatrixType mat;
 
   mat = m;
   vsr.Set(mat);
-  double weight = 0.5;
+  ScalarType weight = 0.5;
   for( int count = 0; count < 5; count++)
     {
     for( unsigned int i=0; i<m_MovingLandmarkSet->GetNumberOfPoints(); i++)

@@ -32,13 +32,16 @@ namespace itk
 class LandmarkRegistrator : public Object
 {
 public:
+  typedef double                                            ScalarType;
+
   typedef LandmarkRegistrator                               Self;
   typedef Object                                            Superclass;
   typedef SmartPointer<Self>                                Pointer;
   typedef SmartPointer<const Self>                          ConstPointer;
 
-  typedef VersorRigid3DTransform< double >                  TransformType;
+  typedef VersorRigid3DTransform< ScalarType >              TransformType;
   typedef LeastSquaredDistanceCostFunction< TransformType > MetricType;
+  typedef TransformType::VersorType                         VersorType;
 
   typedef MetricType::PointType                             LandmarkType;
   typedef MetricType::PointSetType                          LandmarkSetType;
