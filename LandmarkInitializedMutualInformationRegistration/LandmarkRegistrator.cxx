@@ -25,7 +25,7 @@ namespace itk
 {
 
 LandmarkRegistrator::LandmarkRegistrator()
-  {
+{
   m_FixedLandmarkSet = LandmarkSetType::New();
   m_MovingLandmarkSet = LandmarkSetType::New();
   m_Optimizer = OptimizerType::New();
@@ -45,20 +45,20 @@ LandmarkRegistrator::LandmarkRegistrator()
   m_OptimizerScales[3] = 1;   // offset
   m_OptimizerScales[4] = 1;
   m_OptimizerScales[5] = 1;
-  }
+}
 
 LandmarkRegistrator
 ::~LandmarkRegistrator()
-  {
-  }
+{
+}
 
 void
 LandmarkRegistrator
 ::StartRegistration()
-  { 
+{
   m_Generator->Initialize(1289);
 
-  if( m_FixedLandmarkSet->GetNumberOfPoints() 
+  if( m_FixedLandmarkSet->GetNumberOfPoints()
       != m_MovingLandmarkSet->GetNumberOfPoints() )
     {
     itk::ExceptionObject e("LandmarkRegistrator.txx",77);
@@ -110,11 +110,11 @@ LandmarkRegistrator
       v1 = (m_MovingLandmarkSet->GetPoint(i)->GetPosition().GetVnlVector()
             - movingCenter.GetVnlVector());
       v1.normalize();
-      
+
       v2 = (m_FixedLandmarkSet->GetPoint(i)->GetPosition().GetVnlVector()
             - fixedCenter.GetVnlVector());
       v2.normalize();
-      
+
       vTemp = m * v2;
       vTemp.normalize();
       mat = outer_product(v1, vTemp);
@@ -123,7 +123,7 @@ LandmarkRegistrator
       vct[0] = vsr.GetX() + weight * vsrTemp.GetX();
       vct[1] = vsr.GetY() + weight * vsrTemp.GetY();
       vct[2] = vsr.GetZ() + weight * vsrTemp.GetZ();
-      if(vct.GetNorm() > 1) 
+      if(vct.GetNorm() > 1)
         {
         vct.Normalize();
         }
@@ -143,7 +143,7 @@ LandmarkRegistrator
     v1 = (m_MovingLandmarkSet->GetPoint(i)->GetPosition().GetVnlVector()
           - movingCenter.GetVnlVector());
     v1.normalize();
-    
+
     v2 = (m_FixedLandmarkSet->GetPoint(i)->GetPosition().GetVnlVector()
           - fixedCenter.GetVnlVector());
     v2.normalize();
@@ -195,12 +195,12 @@ LandmarkRegistrator
   m_Transform = TransformType::New();
   m_Transform->SetParameters(m_Optimizer->GetCurrentPosition());
   m_Transform->SetCenter(fixedCenter);
-  }
+}
 
-void 
+void
 LandmarkRegistrator
 ::PrintSelf( std::ostream &os, itk::Indent indent ) const
-  {
+{
   os<<"-------------------------------------"<<std::endl;
   Superclass::PrintSelf(os,indent);
   os<<"FixedLandmarkSet: "<<m_FixedLandmarkSet<<std::endl;
@@ -209,17 +209,17 @@ LandmarkRegistrator
   os<<"OptimizerScales: "<<m_OptimizerScales<<std::endl;
   os<<"Transform: "<<m_Transform<<std::endl;
   os<<"Optimizer: "<<m_Optimizer<<std::endl;
-  }
+}
 
-void 
+void
 LandmarkRegistrator
 ::CopyLandmarkSet( LandmarkSetType::Pointer source,
                    LandmarkSetType::Pointer dest ) const
-  {
+{
   dest->Initialize();
 
   dest->SetPoints( source->GetPoints() );
-  }
+}
 
 } // end namespace itk
 
