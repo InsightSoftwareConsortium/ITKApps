@@ -30,87 +30,85 @@ namespace itk
 {
 
 class LandmarkRegistrator : public Object
-  {
+{
+public:
+  typedef double                                            ScalarType;
 
-  public:
+  typedef LandmarkRegistrator                               Self;
+  typedef Object                                            Superclass;
+  typedef SmartPointer<Self>                                Pointer;
+  typedef SmartPointer<const Self>                          ConstPointer;
 
-    typedef LandmarkRegistrator                           Self;
-    typedef Object                                   Superclass;
-    typedef SmartPointer<Self>                       Pointer;
-    typedef SmartPointer<const Self>                 ConstPointer;
+  typedef VersorRigid3DTransform< ScalarType >              TransformType;
+  typedef LeastSquaredDistanceCostFunction< TransformType > MetricType;
+  typedef TransformType::VersorType                         VersorType;
 
-    typedef VersorRigid3DTransform< double >         TransformType;
-    typedef LeastSquaredDistanceCostFunction<
-                                      TransformType >     MetricType;
+  typedef MetricType::PointType                             LandmarkType;
+  typedef MetricType::PointSetType                          LandmarkSetType;
 
-    typedef MetricType::PointType                         LandmarkType ;
-    typedef MetricType::PointSetType                      LandmarkSetType;
+  typedef OnePlusOneEvolutionaryOptimizer                   OptimizerType;
+  typedef Statistics::NormalVariateGenerator                NormalGeneratorType;
+  typedef TransformType::ParametersType                     ParametersType;
+  typedef TransformType::ParametersType                     ScalesType;
 
-    typedef OnePlusOneEvolutionaryOptimizer          OptimizerType;
-    typedef Statistics::NormalVariateGenerator       NormalGeneratorType;
-    typedef TransformType::ParametersType                 ParametersType;
-    typedef TransformType::ParametersType                 ScalesType;
+  itkTypeMacro(LandmarkRegistrator, Object);
 
-    itkTypeMacro(LandmarkRegistrator,Object);
+  itkNewMacro(LandmarkRegistrator);
 
-    itkNewMacro(LandmarkRegistrator);
+  itkSetObjectMacro(Metric,MetricType);
+  MetricType * GetTypedMetric(void)
+    {
+    return m_Metric;
+    }
 
+  itkSetMacro(InitialTransformParameters, ParametersType);
+  itkGetConstMacro(InitialTransformParameters, ParametersType);
 
-    //
-    itkSetObjectMacro(Metric,MetricType);
-    MetricType * GetTypedMetric(void)
-      {
-      return m_Metric;
-      }
+  itkSetObjectMacro(Transform, TransformType);
+  TransformType * GetTypedTransform(void)
+    {
+    return m_Transform;
+    }
 
-    itkSetMacro(InitialTransformParameters,ParametersType);
-    itkGetConstMacro(InitialTransformParameters,ParametersType);
+  itkSetMacro(OptimizerScales, ScalesType);
+  itkGetMacro(OptimizerScales, ScalesType);
+  itkSetMacro(OptimizerNumberOfIterations, unsigned int);
+  itkGetMacro(OptimizerNumberOfIterations, unsigned int);
 
-    itkSetObjectMacro(Transform,TransformType);
-    TransformType * GetTypedTransform(void)
-      {
-      return m_Transform;
-      }
+  itkSetObjectMacro(FixedLandmarkSet, LandmarkSetType);
+  itkGetObjectMacro(FixedLandmarkSet, LandmarkSetType);
 
-    itkSetMacro(OptimizerScales,ScalesType);
-    itkGetMacro(OptimizerScales,ScalesType);
-    itkSetMacro(OptimizerNumberOfIterations,unsigned int);
-    itkGetMacro(OptimizerNumberOfIterations,unsigned int);
+  itkSetObjectMacro(MovingLandmarkSet, LandmarkSetType);
+  itkGetObjectMacro(MovingLandmarkSet, LandmarkSetType);
 
-    itkSetObjectMacro(FixedLandmarkSet,LandmarkSetType);
-    itkGetObjectMacro(FixedLandmarkSet,LandmarkSetType);
+  void StartRegistration();
 
-    itkSetObjectMacro(MovingLandmarkSet,LandmarkSetType);
-    itkGetObjectMacro(MovingLandmarkSet,LandmarkSetType);
+protected:
 
-    void StartRegistration();
+  virtual void PrintSelf( std::ostream &os, Indent indent ) const;
 
-  protected:
+  LandmarkRegistrator();
 
-    virtual void PrintSelf( std::ostream &os, Indent indent ) const;
+  ~LandmarkRegistrator();
 
-    LandmarkRegistrator();
+  void CopyLandmarkSet( LandmarkSetType::Pointer source,
+                        LandmarkSetType::Pointer dest ) const;
 
-    ~LandmarkRegistrator();
+  LandmarkSetType::Pointer    m_FixedLandmarkSet;
+  LandmarkSetType::Pointer    m_MovingLandmarkSet;
+  MetricType::Pointer         m_Metric;
+  TransformType::Pointer      m_Transform;
+  ParametersType              m_InitialTransformParameters;
+  NormalGeneratorType::Pointer    m_Generator;
+  OptimizerType::Pointer      m_Optimizer;
+  ScalesType                  m_OptimizerScales;
+  unsigned int                m_OptimizerNumberOfIterations;
 
-    void CopyLandmarkSet( LandmarkSetType::Pointer source,
-                          LandmarkSetType::Pointer dest ) const;
+private:
 
-    LandmarkSetType::Pointer    m_FixedLandmarkSet;
-    LandmarkSetType::Pointer    m_MovingLandmarkSet;
-    MetricType::Pointer         m_Metric;
-    TransformType::Pointer      m_Transform;
-    ParametersType              m_InitialTransformParameters;
-    NormalGeneratorType::Pointer    m_Generator;
-    OptimizerType::Pointer      m_Optimizer;
-    ScalesType                  m_OptimizerScales;
-    unsigned int                m_OptimizerNumberOfIterations;
-
-  private:
-
-    LandmarkRegistrator(const Self&);  //purposely not implemented
-    void operator=(const Self&);  //purposely not implemented
-  };
+  LandmarkRegistrator(const Self&);  //purposely not implemented
+  void operator=(const Self&);  //purposely not implemented
+};
 
 } // end namespace itk
 
