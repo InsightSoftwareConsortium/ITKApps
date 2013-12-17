@@ -7,7 +7,7 @@ if (VTK_EXTERNAL_PROJECT)
   set( itk_depends VTK ) # because of ITKVtkGlue
 endif()
 
-set( ITK_TAG "v4.4.0" )
+set( ITK_TAG "v4.5.0" )
 ExternalProject_Add( ITK
   GIT_REPOSITORY "${git_protocol}://itk.org/ITK.git"
   GIT_TAG "${ITK_TAG}"
@@ -19,7 +19,7 @@ ExternalProject_Add( ITK
     -DBUILD_SHARED_LIBS:BOOL=ON
     -DBUILD_EXAMPLES:BOOL=OFF
     -DBUILD_TESTING:BOOL=OFF
-    -DITK_BUILD_ALL_MODULES:BOOL=ON
+    -DITK_BUILD_DEFAULT_MODULES:BOOL=ON
     -DITK_LEGACY_REMOVE:BOOL=OFF
     -DITKV3_COMPATIBILITY:BOOL=ON
     -DVTK_DIR:PATH=${VTK_DIR}
