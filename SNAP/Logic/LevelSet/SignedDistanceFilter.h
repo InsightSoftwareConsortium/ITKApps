@@ -8,8 +8,8 @@
   Copyright (c) 2003 Insight Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #ifndef __SignedDistanceFilter_h_
@@ -23,21 +23,21 @@
 
 /**
  * \class SignedDistanceFilter
- * \brief This filter computes an inside/outside signed distance image 
+ * \brief This filter computes an inside/outside signed distance image
  * given a binary image of the 'inside'
  */
 template <typename TInputImage,typename TOutputImage>
-class SignedDistanceFilter: 
+class SignedDistanceFilter:
   public itk::ImageToImageFilter<TInputImage,TOutputImage>
 {
 public:
-  
+
   /** Standard class typedefs. */
   typedef SignedDistanceFilter                                     Self;
   typedef itk::ImageToImageFilter<TInputImage,TOutputImage>  Superclass;
   typedef itk::SmartPointer<Self>                               Pointer;
-  typedef itk::SmartPointer<const Self>                    ConstPointer;  
-  
+  typedef itk::SmartPointer<const Self>                    ConstPointer;
+
   /** Pixel Type of the input image */
   typedef TInputImage                                    InputImageType;
   typedef typename InputImageType::PixelType             InputPixelType;
@@ -55,7 +55,7 @@ public:
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self)
-    
+
   /** Image dimension. */
   itkStaticConstMacro(ImageDimension, unsigned int,
                       TInputImage::ImageDimension);
@@ -64,7 +64,7 @@ protected:
   SignedDistanceFilter();
   virtual ~SignedDistanceFilter() {};
   void PrintSelf(std::ostream& os, itk::Indent indent) const;
-  
+
   /** Generate Data */
   void GenerateData( void );
 
@@ -73,18 +73,18 @@ private:
   /** A functor used to invert the input image */
   class InvertFunctor {
   public:
-    InputPixelType operator()(InputPixelType input) 
-    { 
-      return input == itk::NumericTraits<InputPixelType>::Zero ? 
-        itk::NumericTraits<InputPixelType>::One : 
-        itk::NumericTraits<InputPixelType>::Zero; 
-    }  
+    InputPixelType operator()(InputPixelType input)
+    {
+      return input == itk::NumericTraits<InputPixelType>::ZeroValue() ?
+        itk::NumericTraits<InputPixelType>::OneValue() :
+        itk::NumericTraits<InputPixelType>::ZeroValue();
+    }
   };
 
   // Types used in the internal pipeline
   typedef itk::UnaryFunctorImageFilter<InputImageType,
     InputImageType,InvertFunctor>                       InvertFilterType;
-    
+
   typedef itk::DanielssonDistanceMapImageFilter<
     InputImageType,OutputImageType>                   DistanceFilterType;
 
@@ -97,7 +97,7 @@ private:
   // Define the actual filters
   typename InvertFilterType::Pointer   m_InvertFilter;
   typename DistanceFilterType::Pointer m_InsideDistanceFilter;
-  typename DistanceFilterType::Pointer m_OutsideDistanceFilter;  
+  typename DistanceFilterType::Pointer m_OutsideDistanceFilter;
   typename SubtractFilterType::Pointer m_SubtractFilter;
 
   /** Progress tracking object */
