@@ -27,7 +27,7 @@ class GeodesicActiveContoureRunner
       module.SetUpdateMessage("Computing Geodesic Active Contour...");
       module.ProcessData( pds  );
       sprintf(tmp,"Total number of iterations = %d \n Final RMS error = %g",
-                         module.GetFilter()->GetElapsedIterations(),
+                         static_cast< int >( module.GetFilter()->GetElapsedIterations() ),
                          module.GetFilter()->GetRMSChange());
       info->SetProperty( info, VVP_REPORT_TEXT, tmp );
 
