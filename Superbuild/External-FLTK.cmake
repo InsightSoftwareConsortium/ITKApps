@@ -17,7 +17,7 @@ set(FLTK_INSTALL_COMMAND ${CMAKE_MAKE_COMMAND} install)
 
 ExternalProject_Add(FLTK
   # Patched version of FLTK 1.3 r9815
-  URL http://midas3.kitware.com/midas/download/bitstream/324025/FLTK-1.3-r9815-patched.zip
+  URL http://midas3.kitware.com/midas/download/bitstream/452953/FLTK-1.3-r9815-patched.zip
   UPDATE_COMMAND ""
   # PATCH_COMMAND ${FLTK_PATCH_COMMAND}
   SOURCE_DIR FLTK
