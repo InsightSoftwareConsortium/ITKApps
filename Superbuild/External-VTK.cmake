@@ -3,7 +3,7 @@
 #
 #-----------------------------------------------------------------------------
 
-set( VTK_TAG "v5.10.1" )
+set( VTK_TAG "v6.2.0" )
 
 ExternalProject_Add(VTK
   GIT_REPOSITORY "${git_protocol}://vtk.org/VTK.git"
