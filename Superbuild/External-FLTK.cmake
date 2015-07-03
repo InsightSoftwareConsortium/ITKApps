@@ -6,7 +6,7 @@ if( NOT WIN32)
   configure_file(
     ${CMAKE_SOURCE_DIR}/patch-FLTK.sh.in
     ${CMAKE_BINARY_DIR}/patch-FLTK.sh
-    @only
+    @ONLY
   )
   set(FLTK_PATCH_COMMAND "${CMAKE_BINARY_DIR}/patch-FLTK.sh")
 else ()
