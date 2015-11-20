@@ -100,7 +100,7 @@ IF(USE_VTK)
         ENDIF(NOT VTK_USE_HYBRID)
 
       # If VTK was built using Patented, add an option for using patented code
-      # in ITKApps (SNAP in particular)
+      # in ITKApps
       IF(VTK_USE_PATENTED)
         OPTION(USE_VTK_PATENTED "Use VTK Patented Libraries (optional)" OFF)
         MARK_AS_ADVANCED(USE_VTK_PATENTED)
@@ -310,7 +310,6 @@ IF(FLTK_FOUND)
     OPTIONAL_APP(ShapeDetectionLevelSet)
     OPTIONAL_APP(GeodesicActiveContour)
     OPTIONAL_APP(SegmentationEditorFltkGui)
-    OPTIONAL_APP(SNAP)
     OPTIONAL_APP(LiverTumorSegmentation)
     IF(NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION} LESS 4.5)
       OPTIONAL_APP(DeformableModelSimplexMesh)
