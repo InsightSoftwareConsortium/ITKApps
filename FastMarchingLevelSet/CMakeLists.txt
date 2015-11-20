@@ -45,5 +45,5 @@ ITK_DISABLE_FLTK_GENERATED_WARNINGS("${FastMarchingLevelSet_SRCS}")
 
 ADD_GUI_EXECUTABLE(FastMarchingLevelSet "${FastMarchingLevelSet_SRCS}")
 
-TARGET_LINK_LIBRARIES(FastMarchingLevelSet   ${ITK_LIBRARIES} ITKVtkFltk
+TARGET_LINK_LIBRARIES(FastMarchingLevelSet   ${VTK_LIBRARIES} ${ITK_LIBRARIES} ITKVtkFltk
                       ITKFltkImageViewer)

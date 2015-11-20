@@ -62,13 +62,7 @@ TARGET_LINK_LIBRARIES (RegionGrowingSegmentation2D
   ${ITK_LIBRARIES}
   ITKFltkImageViewer
   ITKVtkFltk
-  vtkRendering
-  vtkGraphics
-  vtkHybrid
-  vtkImaging
-  vtkIO
-  vtkFiltering
-  vtkCommon
+  ${VTK_LIBRARIES}
 )
 
 ADD_GUI_EXECUTABLE(RegionGrowingSegmentation "${RegionGrowingSegmentation_SRCS}")
@@ -76,13 +70,7 @@ TARGET_LINK_LIBRARIES (RegionGrowingSegmentation
   ${ITK_LIBRARIES}
   ITKFltkImageViewer
   ITKVtkFltk
-  vtkRendering
-  vtkGraphics
-  vtkHybrid
-  vtkImaging
-  vtkIO
-  vtkFiltering
-  vtkCommon
+  ${VTK_LIBRARIES}
 )
 
 IF(CMAKE_COMPILER_IS_GNUCXX)

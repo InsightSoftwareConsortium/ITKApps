@@ -71,12 +71,7 @@ INCLUDE_DIRECTORIES(
 TARGET_LINK_LIBRARIES( DeformableModelSimplexMesh
   ${ITK_LIBRARIES}
   ITKFltkImageViewer ITKVtkFltk
-  vtkCommon
-  vtkFiltering
-  vtkGraphics
-  vtkImaging
-  vtkIO
-  vtkRendering
+  ${VTK_LIBRARIES}
   ${FLTK_LIBRARIES}
   )
 

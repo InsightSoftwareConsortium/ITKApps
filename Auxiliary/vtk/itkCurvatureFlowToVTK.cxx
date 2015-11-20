@@ -141,14 +141,24 @@ int main()
   // to an unsigned char image.  Connect it to the vtkImageImport
   // instance.
   vtkImageShiftScale* shifter = vtkImageShiftScale::New();
+#if VTK_MAJOR_VERSION <= 5
   shifter->SetInput(importer->GetOutput());
+#else
+  importer->Update();
+  shifter->SetInputData(importer->GetOutput());
+#endif
   shifter->SetScale(256);
   shifter->SetOutputScalarTypeToUnsignedChar();
 
   // Create a vtkImageActor to help render the image.  Connect it to
   // the vtkImageShiftScale instance.
   vtkImageActor* actor = vtkImageActor::New();
+#if VTK_MAJOR_VERSION <= 5
   actor->SetInput(shifter->GetOutput());
+#else
+  shifter->Update();
+  actor->SetInputData(shifter->GetOutput());
+#endif
   
   // Create a renderer, render window, and render window interactor to
   // display the results.

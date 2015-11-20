@@ -52,15 +52,20 @@ ImageSurfaceViewer
   m_Renderer->SetBackground( 0, 0, 0 );
 
   m_Sphere       = vtkSphereSource::New();
-  m_SphereActor  = vtkActor::New();  
+  m_SphereActor  = vtkActor::New();
   m_SphereMapper = vtkPolyDataMapper::New();
 
-  m_SphereMapper->SetInput( m_Sphere->GetOutput() );  
+#if VTK_MAJOR_VERSION <= 5
+  m_SphereMapper->SetInput( m_Sphere->GetOutput() );
+#else
+  m_Sphere->Update();
+  m_SphereMapper->SetInputData( m_Sphere->GetOutput() );
+#endif
   m_SphereActor->SetMapper( m_SphereMapper );
   m_SphereActor->GetProperty()->SetColor(0,1,0); // set to red
 
 
-  m_SurfaceActor  = vtkActor::New();  
+  m_SurfaceActor  = vtkActor::New();
   m_SurfaceMapper = vtkPolyDataMapper::New();
 
   m_SurfaceActor->SetMapper( m_SurfaceMapper );
@@ -82,7 +87,7 @@ ImageSurfaceViewer
   if( m_RenderWindow )
     {
     m_RenderWindow->Delete();
-    }   
+    }
   /*
   if( m_InteractorObserver )
     {
@@ -91,12 +96,12 @@ ImageSurfaceViewer
   if( m_Sphere )
     {
     m_Sphere->Delete();
-    }   
+    }
 
   if( m_SurfaceActor )
     {
     m_SurfaceActor->Delete();
-    }    
+    }
 }
 
 
@@ -106,7 +111,7 @@ ImageSurfaceViewer
 ::Render()
 {
   // m_Camera->SetClippingRange( 0.1, 100000 );
-  
+
   m_RenderWindow->Render();
 }
 
@@ -126,16 +131,16 @@ ImageSurfaceViewer
   image->GetDimensions(dimensions);
 
   // use cell picker
-  
+
   vtkCellPicker * picker = vtkCellPicker::New();
   picker->SetTolerance(0.005);
 
   //assign default props to the ipw's texture plane actor
   vtkProperty * ipwProp = vtkProperty::New();
-   
+
   // The 3 image plane widgets are used to probe the dataset.
   m_PlaneWidgetX->DisplayTextOn();
-  m_PlaneWidgetX->SetInput(image);
+  m_PlaneWidgetX->SetInputData(image);
   m_PlaneWidgetX->SetPlaneOrientationToXAxes();
   m_PlaneWidgetX->SetSliceIndex(dimensions[0]/2);
   m_PlaneWidgetX->SetPicker(picker);
@@ -146,7 +151,7 @@ ImageSurfaceViewer
   m_PlaneWidgetX->SetResliceInterpolateToNearestNeighbour();
 
   m_PlaneWidgetY->DisplayTextOn();
-  m_PlaneWidgetY->SetInput(image);
+  m_PlaneWidgetY->SetInputData(image);
   m_PlaneWidgetY->SetPlaneOrientationToYAxes();
   m_PlaneWidgetY->SetSliceIndex(dimensions[1]/2);
   m_PlaneWidgetY->SetPicker(picker);
@@ -157,7 +162,7 @@ ImageSurfaceViewer
   m_PlaneWidgetY->SetLookupTable(m_PlaneWidgetX->GetLookupTable());
 
   m_PlaneWidgetZ->DisplayTextOn();
-  m_PlaneWidgetZ->SetInput(image);
+  m_PlaneWidgetZ->SetInputData(image);
   m_PlaneWidgetZ->SetPlaneOrientationToZAxes();
   m_PlaneWidgetZ->SetSliceIndex(dimensions[2]/2);
   m_PlaneWidgetZ->SetPicker(picker);
@@ -168,10 +173,10 @@ ImageSurfaceViewer
 
   m_PlaneWidgetX->SetInteractor( m_RenderWindow->GetInteractor());
   m_PlaneWidgetX->On();
-   
+
   m_PlaneWidgetY->SetInteractor( m_RenderWindow->GetInteractor());
   m_PlaneWidgetY->On();
-   
+
   m_PlaneWidgetZ->SetInteractor(m_RenderWindow->GetInteractor());
   m_PlaneWidgetZ->On();
 
@@ -200,12 +205,12 @@ ImageSurfaceViewer
   vtkFloatingPointType spacing[3];
   vtkFloatingPointType origin[3];
   int   dimensions[3];
-  
-  
+
+
   image->GetSpacing(spacing);
   image->GetOrigin(origin);
   image->GetDimensions(dimensions);
-  
+
   double focalPoint[3];
   double position[3];
   for ( unsigned int cc = 0; cc < 3; cc++)
@@ -223,19 +228,19 @@ ImageSurfaceViewer
   m_Camera->SetPosition (   position );
   m_Camera->SetFocalPoint ( focalPoint );
 
-#define myMAX(x,y) (((x)>(y))?(x):(y))  
+#define myMAX(x,y) (((x)>(y))?(x):(y))
 
    int d1 = (idx + 1) % 3;
    int d2 = (idx + 2) % 3;
- 
-  double max = myMAX( 
+
+  double max = myMAX(
     spacing[d1] * dimensions[d1],
     spacing[d2] * dimensions[d2]);
 
 
-  m_Camera->SetParallelScale( max / 2  * m_ZoomFactor ); 
+  m_Camera->SetParallelScale( max / 2  * m_ZoomFactor );
 
-  
+
 }
 
 
@@ -252,21 +257,21 @@ void
   ImageSurfaceViewer
 ::SetInteractor( vtkRenderWindowInteractor * interactor )
 {
-  
+
   m_RenderWindow->SetInteractor( interactor);
-  
- 
+
+
   vtkInteractorStyleTrackballCamera * interactorStyle = vtkInteractorStyleTrackballCamera::New();
   interactor->SetInteractorStyle( interactorStyle );
   interactorStyle->Delete();
 
-   
+
   //interactor->AddObserver( ::vtkCommand::LeftButtonPressEvent, m_InteractorObserver );
   //interactor->AddObserver( ::vtkCommand::LeftButtonReleaseEvent, m_InteractorObserver );
   //interactor->AddObserver( ::vtkCommand::MouseMoveEvent, m_InteractorObserver );
 }
 
-unsigned long 
+unsigned long
 ImageSurfaceViewer::AddObserver( const itk::EventObject & event, itk::Command * command)
 {
   return m_Notifier->AddObserver( event, command );
@@ -274,11 +279,11 @@ ImageSurfaceViewer::AddObserver( const itk::EventObject & event, itk::Command * 
 
 
 
-void 
+void
 ImageSurfaceViewer
 ::SetSimplexMesh(vtkPolyData * mesh)
 {
-  m_SurfaceMapper->SetInput( mesh );
+  m_SurfaceMapper->SetInputData( mesh );
   m_SurfaceActor->SetMapper( m_SurfaceMapper );
   m_Renderer->AddActor( m_SurfaceActor );
   m_Renderer->RemoveActor(m_SphereActor);

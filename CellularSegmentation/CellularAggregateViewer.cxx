@@ -63,13 +63,26 @@ CellularAggregateViewer
 
   m_CellGlyphTransformFilter = vtkTransformPolyDataFilter::New();
   m_CellGlyphTransformFilter->SetTransform( m_CellGlyphTransform );
+#if VTK_MAJOR_VERSION <= 5
   m_CellGlyphTransformFilter->SetInput( m_CellGlyphSource->GetOutput() );
+#else
+  m_CellGlyphSource->Update();
+  m_CellGlyphTransformFilter->SetInputData( m_CellGlyphSource->GetOutput() );
+#endif
 
   m_GlyphFilter = vtkGlyph2D::New();
+#if VTK_MAJOR_VERSION <= 5
   m_GlyphFilter->SetSource( m_CellGlyphTransformFilter->GetOutput() );
+#else
+  m_CellGlyphTransformFilter->Update();
+  m_GlyphFilter->SetSourceData( m_CellGlyphTransformFilter->GetOutput() );
+#endif
 
-
+#if VTK_MAJOR_VERSION <= 5
   m_SurfaceMapper->SetInput( m_PolyData );
+#else
+  m_SurfaceMapper->SetInputData( m_PolyData );
+#endif
 
   m_SurfaceActor->SetMapper( m_SurfaceMapper );
   m_SurfaceActor->GetProperty()->SetColor(1.0,0.0,0.0);
@@ -138,8 +151,14 @@ CellularAggregateViewer
 
   this->m_PolyData->SetPoints(newPoints);
 
+#if VTK_MAJOR_VERSION <= 5
   m_GlyphFilter->SetInput( this->m_PolyData );
   m_SurfaceMapper->SetInput( m_GlyphFilter->GetOutput() );
+#else
+  m_GlyphFilter->SetInputData( this->m_PolyData );
+  m_GlyphFilter->Update();
+  m_SurfaceMapper->SetInputData( m_GlyphFilter->GetOutput() );
+#endif
 }
 
 
@@ -223,7 +242,11 @@ CellularAggregateViewer
 
   this->m_PolyData->SetLines( lines );
 
+#if VTK_MAJOR_VERSION <= 5
   m_SurfaceMapper->SetInput( m_PolyData );
+#else
+  m_SurfaceMapper->SetInputData( m_PolyData );
+#endif
 
 }
 
@@ -275,12 +298,22 @@ CellularAggregateViewer
 
   if( pointId > 3 )
     {
+#if VTK_MAJOR_VERSION <= 5
     m_Delaunay2DFilter->SetInput( this->m_PolyData );
     m_SurfaceMapper->SetInput( m_Delaunay2DFilter->GetOutput() );
+#else
+    m_Delaunay2DFilter->SetInputData( this->m_PolyData );
+    m_Delaunay2DFilter->Update();
+    m_SurfaceMapper->SetInputData( m_Delaunay2DFilter->GetOutput() );
+#endif
     }
   else
     {
+#if VTK_MAJOR_VERSION <= 5
     m_SurfaceMapper->SetInput( this->m_PolyData );
+#else
+    m_SurfaceMapper->SetInputData( this->m_PolyData );
+#endif
     }
 }
 

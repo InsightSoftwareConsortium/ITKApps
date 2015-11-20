@@ -145,12 +145,22 @@ ThinPlateSplinesApplicationBase
     axes->SetScaleFactor( 1.0 );
 
   vtkTubeFilter *axesTubes = vtkTubeFilter::New();
+#if VTK_MAJOR_VERSION <= 5
     axesTubes->SetInput(axes->GetOutput());
+#else
+    axes->Update();
+    axesTubes->SetInputData(axes->GetOutput());
+#endif
     axesTubes->SetRadius(axes->GetScaleFactor()/100.0);
     axesTubes->SetNumberOfSides(6);
 
   vtkPolyDataMapper *axesMapper = vtkPolyDataMapper::New();
+#if VTK_MAJOR_VERSION <= 5
     axesMapper->SetInput(axesTubes->GetOutput());
+#else
+    axesTubes->Update();
+    axesMapper->SetInputData(axesTubes->GetOutput());
+#endif
 
   vtkActor *axesActor = vtkActor::New();
     axesActor->SetMapper(axesMapper);
@@ -292,28 +302,56 @@ ThinPlateSplinesApplicationBase
    
   vtkSphereSource * typicalSphere = vtkSphereSource::New();
   typicalSphere->SetRadius(0.05);
+  typicalSphere->Update();
 
   vtkPolyData * sourcePolyData = vtkPolyData::New();
   vtkGlyph3D  * sourceSpheres  = vtkGlyph3D::New();
 
+#if VTK_MAJOR_VERSION <= 5
   sourceSpheres->SetSource( typicalSphere->GetOutput() );
+#else
+  typicalSphere->Update();
+  sourceSpheres->SetSourceData( typicalSphere->GetOutput() );
+#endif
   sourcePolyData->SetPoints( m_VTKSourceLandMarks );
+#if VTK_MAJOR_VERSION <= 5
   sourceSpheres->SetInput( sourcePolyData );
+#else
+  sourceSpheres->SetInputData( sourcePolyData );
+#endif
 
   vtkPolyData * targetPolyData = vtkPolyData::New();
   vtkGlyph3D  * targetSpheres  = vtkGlyph3D::New();
 
+#if VTK_MAJOR_VERSION <= 5
   targetSpheres->SetSource( typicalSphere->GetOutput() );
+#else
+  targetSpheres->SetSourceData( typicalSphere->GetOutput() );
+#endif
   targetPolyData->SetPoints( m_VTKTargetLandMarks );
+#if VTK_MAJOR_VERSION <= 5
   targetSpheres->SetInput( targetPolyData );
+#else
+  targetSpheres->SetInputData( targetPolyData );
+#endif
 
   // map to graphics library
   vtkPolyDataMapper * sourceMapper   = vtkPolyDataMapper::New();
+#if VTK_MAJOR_VERSION <= 5
   sourceMapper->SetInput( sourceSpheres->GetOutput() );
+#else
+  sourceSpheres->Update();
+  sourceMapper->SetInputData( sourceSpheres->GetOutput() );
+#endif
 
   // map to graphics library
   vtkPolyDataMapper * targetMapper   = vtkPolyDataMapper::New();
+#if VTK_MAJOR_VERSION <= 5
   targetMapper->SetInput( targetSpheres->GetOutput() );
+#else
+  targetSpheres->Update();
+  targetMapper->SetInputData( targetSpheres->GetOutput() );
+#endif
 
   // actor coordinates geometry, properties, transformation
   vtkActor * sourceActor = vtkActor::New();
@@ -681,13 +719,25 @@ ThinPlateSplinesApplicationBase
 
   // map to graphics library
   vtkDataSetMapper * sourceMapper   = vtkDataSetMapper::New();
+#if VTK_MAJOR_VERSION <= 5
   sourceMapper->SetInput( sourceGrid );
+#else
+  sourceMapper->SetInputData( sourceGrid );
+#endif
 
   vtkDataSetMapper * targetMapperByITK   = vtkDataSetMapper::New();
+#if VTK_MAJOR_VERSION <= 5
   targetMapperByITK->SetInput( targetGridByITK );
+#else
+  targetMapperByITK->SetInputData( targetGridByITK );
+#endif
 
   vtkDataSetMapper * targetMapperByVTK   = vtkDataSetMapper::New();
+#if VTK_MAJOR_VERSION <= 5
   targetMapperByVTK->SetInput( targetGridByVTK );
+#else
+  targetMapperByVTK->SetInputData( targetGridByVTK );
+#endif
 
   // actor coordinates geometry, properties, transformation
   vtkActor * sourceActor = vtkActor::New();

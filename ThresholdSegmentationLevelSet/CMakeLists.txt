@@ -52,13 +52,7 @@ TARGET_LINK_LIBRARIES (ThresholdSegmentationLevelSet
   ${ITK_LIBRARIES}
   ITKFltkImageViewer
   ITKVtkFltk
-  vtkCommon
-  vtkFiltering
-  vtkIO
-  vtkImaging
-  vtkGraphics
-  vtkRendering
-  vtkHybrid
+  ${VTK_LIBRARIES}
 )
 
 IF(VTK_USE_VOLUMERENDERING)

@@ -437,7 +437,12 @@ ImageRegistrationConsoleBase
   m_FixedImageItkToVtkConnector->SetInput(m_FixedImageReader->GetOutput());
 
   vtkImageCast *cast = vtkImageCast::New();
+#if VTK_MAJOR_VERSION <= 5
   cast->SetInput( m_FixedImageItkToVtkConnector->GetOutput() );
+#else
+  m_FixedImageItkToVtkConnector->Update();
+  cast->SetInputData( m_FixedImageItkToVtkConnector->GetOutput() );
+#endif
   cast->SetOutputScalarTypeToFloat();
 
   //
@@ -527,7 +532,12 @@ ImageRegistrationConsoleBase
   m_MovingImageItkToVtkConnector->SetInput(m_MovingImageReader->GetOutput());
 
   vtkImageCast *cast = vtkImageCast::New();
+#if VTK_MAJOR_VERSION <= 5
   cast->SetInput( m_MovingImageItkToVtkConnector->GetOutput() );
+#else
+  m_MovingImageItkToVtkConnector->Update();
+  cast->SetInputData( m_MovingImageItkToVtkConnector->GetOutput() );
+#endif
   cast->SetOutputScalarTypeToFloat();
 
   //

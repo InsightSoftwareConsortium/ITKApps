@@ -309,8 +309,13 @@ int main( int argc, char *argv[] )
   vtkContourFilter * fixedContour  = vtkContourFilter::New();
   vtkContourFilter * movingContour = vtkContourFilter::New();
 
+#if VTK_MAJOR_VERSION <= 5
   fixedContour->SetInput( fixedKWImage->GetVTKImage() );
   movingContour->SetInput( movingKWImage->GetVTKImage() );
+#else
+  fixedContour->SetInputData( fixedKWImage->GetVTKImage() );
+  movingContour->SetInputData( movingKWImage->GetVTKImage() );
+#endif
 
   fixedContour->SetValue(  0, 50.0 ); // level for iso-contour
   movingContour->SetValue( 0, 50.0 ); // level for iso-contour

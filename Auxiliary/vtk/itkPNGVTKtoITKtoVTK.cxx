@@ -128,7 +128,11 @@ int main()
 //  luminance->SetInput( source->GetOutput() );
 
   vtkImageExport* vtkExporter = vtkImageExport::New();
+#if VTK_MAJOR_VERSION <= 5
   vtkExporter->SetInput(source->GetOutput());
+#else
+  vtkExporter->SetInputData(source->GetOutput());
+#endif
   
   //------------------------------------------------------------------------
   // VTK to ITK pipeline connection.
@@ -192,14 +196,24 @@ int main()
   // to an unsigned char image.  Connect it to the vtkImageImport
   // instance.
   vtkImageShiftScale* shifter = vtkImageShiftScale::New();
+#if VTK_MAJOR_VERSION <= 5
   shifter->SetInput(vtkImporter->GetOutput());
+#else
+  vtkImporter->Update();
+  shifter->SetInputData(vtkImporter->GetOutput());
+#endif
   shifter->SetScale(256);
   shifter->SetOutputScalarTypeToUnsignedChar();
 
   // Create a vtkImageActor to help render the image.  Connect it to
   // the vtkImageShiftScale instance.
   vtkImageActor* actor = vtkImageActor::New();
+#if VTK_MAJOR_VERSION <= 5
   actor->SetInput(shifter->GetOutput());
+#else
+  shifter->Update();
+  actor->SetInputData(shifter->GetOutput());
+#endif
   
   // Create a renderer, render window, and render window interactor to
   // display the results.
