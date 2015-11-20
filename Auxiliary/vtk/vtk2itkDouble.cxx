@@ -52,11 +52,19 @@ void Display(vtkUnstructuredGrid* itkgrid, vtkUnstructuredGrid* vtkgrid)
   inter->SetRenderWindow(renWin);
 
   vtkDataSetMapper* mapper = vtkDataSetMapper::New();
+#if VTK_MAJOR_VERSION <= 5
   mapper->SetInput(itkgrid);
+#else
+  mapper->SetInputData(itkgrid);
+#endif
   vtkActor* actor = vtkActor::New();
   actor->SetMapper(mapper);
   vtkDataSetMapper* mapper2 = vtkDataSetMapper::New();
+#if VTK_MAJOR_VERSION <= 5
   mapper2->SetInput(vtkgrid);
+#else
+  mapper2->SetInputData(vtkgrid);
+#endif
   vtkActor* actor2 = vtkActor::New();
   actor2->SetMapper(mapper2);
   ren1->SetViewport(0.0, 0.0, 0.5, 1.0);
@@ -354,7 +362,11 @@ int main(int ac, char** av)
   std::cerr << "Begin vtk dispaly of both grids " << std::endl;
   Display(grid, reader->GetUnstructuredGridOutput());
   vtkDataSetWriter* writer = vtkDataSetWriter::New();
+#if VTK_MAJOR_VERSION <= 5
   writer->SetInput(grid);
+#else
+  writer->SetInputData(grid);
+#endif
   writer->SetFileName("./itkblow.vtk");
   writer->Update();
 #ifdef VTK_USE_ANSI_STDLIB  

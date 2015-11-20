@@ -60,7 +60,12 @@ ImageSliceViewer
 
   vtkPolyDataMapper * sphereMapper = vtkPolyDataMapper::New();
 
-  sphereMapper->SetInput( m_Sphere->GetOutput() );  
+#if VTK_MAJOR_VERSION <= 5
+  sphereMapper->SetInput( m_Sphere->GetOutput() );
+#else
+  m_Sphere->Update();
+  sphereMapper->SetInputData( m_Sphere->GetOutput() );
+#endif
   m_SphereActor->SetMapper( sphereMapper );
   m_Renderer->AddActor( m_SphereActor );
 
@@ -110,7 +115,11 @@ ImageSliceViewer
 ::SetInput( vtkImageData * image )
 {
 
+#if VTK_MAJOR_VERSION <= 5
   m_Actor->SetInput( image );
+#else
+  m_Actor->SetInputData( image );
+#endif
   this->SetupCamera();
 
 }

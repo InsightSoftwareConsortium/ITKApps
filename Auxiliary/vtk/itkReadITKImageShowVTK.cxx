@@ -151,7 +151,12 @@ int main(int argc, char * argv [] )
     vtkImageExport* vtkExporter = vtkImageExport::New();  
     ConnectPipelines(vtkExporter, itkImporter);
     
+#if VTK_MAJOR_VERSION <= 5
     vtkExporter->SetInput( vtkImporter->GetOutput() );
+#else
+    vtkImporter->Update();
+    vtkExporter->SetInputData( vtkImporter->GetOutput() );
+#endif
     
     typedef itk::ImageFileWriter< ImageType > WriterType;
     WriterType::Pointer itkWriter = WriterType::New();
@@ -172,7 +177,11 @@ int main(int argc, char * argv [] )
     // Create a vtkImageActor to help render the image.  Connect it to
     // the vtkImporter instance.
     vtkImageActor* actor = vtkImageActor::New();
+#if VTK_MAJOR_VERSION <= 5
     actor->SetInput(vtkImporter->GetOutput());
+#else
+    actor->SetInputData(vtkImporter->GetOutput());
+#endif
     
     vtkInteractorStyleImage * interactorStyle = vtkInteractorStyleImage::New();
 

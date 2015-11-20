@@ -55,7 +55,11 @@ int main( int argc, char * argv[] )
   vtkKWImage * image = reader->HarvestReadImage();
 
   vtkSmartPointer< vtkContourFilter > contourFilter = vtkSmartPointer< vtkContourFilter >::New();
+#if VTK_MAJOR_VERSION <= 5
   contourFilter->SetInput( image->GetVTKImage() );
+#else
+  contourFilter->SetInputData( image->GetVTKImage() );
+#endif
   contourFilter->ComputeNormalsOff();
   contourFilter->Update();
 
@@ -127,7 +131,12 @@ int main( int argc, char * argv[] )
   if( filenameExtension == ".vtp" )
     {
     vtkSmartPointer< vtkXMLPolyDataWriter > contourWriter = vtkSmartPointer< vtkXMLPolyDataWriter >::New();
+#if VTK_MAJOR_VERSION <= 5
     contourWriter->SetInput( contourFilter->GetOutput() );
+#else
+    contourFilter->Update();
+    contourWriter->SetInputData( contourFilter->GetOutput() );
+#endif
     contourWriter->SetFileName( argv[2] );
     contourWriter->Update();
     }
@@ -135,7 +144,12 @@ int main( int argc, char * argv[] )
   if( filenameExtension == ".stl" )
     {
     vtkSmartPointer< vtkSTLWriter > contourWriter = vtkSmartPointer< vtkSTLWriter >::New();
+#if VTK_MAJOR_VERSION <= 5
     contourWriter->SetInput( contourFilter->GetOutput() );
+#else
+    contourFilter->Update();
+    contourWriter->SetInputData( contourFilter->GetOutput() );
+#endif
     contourWriter->SetFileName( argv[2] );
     contourWriter->Update();
     }

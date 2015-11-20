@@ -51,13 +51,7 @@ ADD_GUI_EXECUTABLE(ShapeDetectionLevelSet "${ShapeDetectionLevelSet_SRCS}")
 
 TARGET_LINK_LIBRARIES (ShapeDetectionLevelSet
   ${ITK_LIBRARIES}
-  vtkCommon
-  vtkFiltering
-  vtkIO
-  vtkImaging
-  vtkGraphics
-  vtkRendering
-  vtkHybrid
+  ${VTK_LIBRARIES}
   ITKVtkFltk
   ITKFltkImageViewer
 )

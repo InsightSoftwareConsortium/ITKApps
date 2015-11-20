@@ -45,7 +45,12 @@ DeformableModelApplication
 
   m_ShiftScaleImageFilter = vtkImageShiftScale::New();
 
+#if VTK_MAJOR_VERSION <= 5
   m_ShiftScaleImageFilter->SetInput(  m_ITK2VTKAdaptor->GetOutput() );
+#else
+  m_ITK2VTKAdaptor->Update();
+  m_ShiftScaleImageFilter->SetInputData(  m_ITK2VTKAdaptor->GetOutput() );
+#endif
   m_ShiftScaleImageFilter->SetOutputScalarTypeToUnsignedChar();
   m_ShiftScaleImageFilter->ClampOverflowOn();
 
@@ -61,7 +66,7 @@ DeformableModelApplication
   m_SagittalViewerCommand->SetCallbackFunction(this, &DeformableModelApplication::ProcessSagittalViewInteraction);
   m_SagittalViewer.AddObserver(ClickedPointEvent(), m_SagittalViewerCommand);
 
-  
+
   //   m_SurfaceViewerCommand = itk::SimpleMemberCommand<DeformableModelApplication>::New();
   //  m_SurfaceViewerCommand->SetCallbackFunction(this, &DeformableModelApplication::ProcessSurfaceViewInteraction);
   //  m_SimplexMeshViewer.AddObserver(ClickedPointEvent(), m_SurfaceViewerCommand);
@@ -69,7 +74,7 @@ DeformableModelApplication
 
   const float alpha = 0.8; //internal forces
   const float beta  = 0.8; //external forces
-  const float gamma = 0.35; 
+  const float gamma = 0.35;
   const int   range = 2; // how far to go through scan line algorithm
   const int   rigidity = 0; // regularization
   const int   iterations = 100;
@@ -86,7 +91,7 @@ DeformableModelApplication
   m_RigidityForceValueInput->value(m_MessageString);
   sprintf(m_MessageString, "%d", iterations);
   m_IterationsValueInput->value(m_MessageString);
- 
+
   m_ImageLoaded = false;
   m_MeshLoaded = false;
   m_MeshCreated = false;
@@ -107,18 +112,18 @@ void
 DeformableModelApplication
 ::Show()
 {
- 
+
   mainWindow->show();
   axialView->show();
   coronalView->show();
   sagittalView->show();
   surfaceView->show();
-  
+
   m_AxialViewer.SetInteractor( axialView );
   m_CoronalViewer.SetInteractor( coronalView );
   m_SagittalViewer.SetInteractor( sagittalView );
   m_SimplexMeshViewer.SetInteractor( surfaceView );
- 
+
   axialView->Initialize();
   coronalView->Initialize();
   sagittalView->Initialize();
@@ -126,27 +131,27 @@ DeformableModelApplication
 
 }
 
-void 
+void
 DeformableModelApplication
 ::Hide()
 {
   mainWindow->hide();
 }
 
-void 
+void
 DeformableModelApplication
 ::Quit()
 {
   this->Hide();
 }
 
-void 
+void
 DeformableModelApplication
 ::LoadMesh()
 {
   if (m_ImageLoaded )
     {
-      if (m_MeshCreated) 
+      if (m_MeshCreated)
         {
           return;
         }
@@ -156,25 +161,30 @@ DeformableModelApplication
       return;
     }
   const char * filename = fl_file_chooser("Mesh filename","*.*","");
- 
+
   if( !filename  || strlen(filename) == 0 )
     {
     return;
     }
-  
+
   typedef itk::ImageFileReader< MeshPixelType > ReaderType;
-  
+
   ReaderType::Pointer meshReader = ReaderType::New();
   meshReader->SetFileName(filename);
   meshReader->Update();
- 
+
   // convert ITK image to VTK image to send to marching cubes
   m_ImageToVTKImage->SetInput(meshReader->GetOutput());
   m_ImageToVTKImage->Update();
-  
+
   // now send it to marching cubes to create a vtk mesh
   vtkImageMarchingCubes*  vmarchingcubes = vtkImageMarchingCubes::New();
+#if VTK_MAJOR_VERSION <= 5
   vmarchingcubes->SetInput(m_ImageToVTKImage->GetOutput());
+#else
+  m_ImageToVTKImage->Update();
+  vmarchingcubes->SetInputData(m_ImageToVTKImage->GetOutput());
+#endif
   vmarchingcubes->SetValue(0, 0.5);
   vmarchingcubes->ComputeScalarsOff();
   vmarchingcubes->ComputeNormalsOff();
@@ -182,41 +192,45 @@ DeformableModelApplication
   vmarchingcubes->SetInputMemoryLimit(1000);
   vmarchingcubes->Update();
 
-  vtkDecimatePro* vdecimate = vtkDecimatePro::New(); 
-  vdecimate->SetInput(vmarchingcubes->GetOutput()); 
+  vtkDecimatePro* vdecimate = vtkDecimatePro::New();
+#if VTK_MAJOR_VERSION <= 5
+  vdecimate->SetInput(vmarchingcubes->GetOutput());
+#else
+  vdecimate->SetInputData(vmarchingcubes->GetOutput());
+#endif
   vdecimate->SetTargetReduction(0.9); //compression factor, closer to 1 higher compression)
   vdecimate->PreserveTopologyOn();
   vdecimate->Update();
-  
+
   // send polydata to vtkPolyDataToitkMesh to return itkMesh
   m_PolyData.SetInput(vdecimate->GetOutput());
   m_TriangleMesh = m_PolyData.GetOutput();
- 
+
   std::cout << "Number of Points =   " << m_TriangleMesh->GetNumberOfPoints() << std::endl;
   std::cout << "Number of Cells  =   " << m_TriangleMesh->GetNumberOfCells()  << std::endl;
-  
+
   m_SimplexMeshFilter->SetInput( m_TriangleMesh);
   m_SimplexMeshFilter->Update();
-   
+
   m_SimplexMesh = m_SimplexMeshFilter->GetOutput();
 
   m_SimplexMesh->DisconnectPipeline();
   m_SimplexMeshFilter->Delete();
-  
+
   std::cout << "simplex Number of Points =   " << m_SimplexMesh->GetNumberOfPoints() << std::endl;
   std::cout << "simplex Number of Cells  =   " << m_SimplexMesh->GetNumberOfCells()  << std::endl;
 
   m_SimplexMeshToShow = m_SimplexMesh;
   m_MeshLoaded = true;
   this->RefreshMeshVisualization();
-   
+
   // force a redraw
   axialView->redraw();
   coronalView->redraw();
   sagittalView->redraw();
   surfaceView->redraw();
 
-  Fl::check(); 
+  Fl::check();
 
   //delete all VTK objects
   vmarchingcubes->Delete();
@@ -226,10 +240,10 @@ void
 DeformableModelApplication
 ::CreateMesh()
 {
-  
+
    if (m_ImageLoaded )
     {
-      if (m_MeshLoaded) 
+      if (m_MeshLoaded)
         {
           return;
         }
@@ -240,21 +254,21 @@ DeformableModelApplication
     }
   m_SphereMeshSource->SetCenter(m_SeedPoint);
   m_SimplexFilter->Update();
-  
+
   m_SimplexMesh = m_SimplexFilter->GetOutput();
   m_SimplexMesh->DisconnectPipeline();
 
   m_SimplexMeshToShow = m_SimplexMesh;
   m_MeshCreated = true;
   this->RefreshMeshVisualization();
-   
+
   // force a redraw
   axialView->redraw();
   coronalView->redraw();
   sagittalView->redraw();
   surfaceView->redraw();
 
-  Fl::check(); 
+  Fl::check();
 }
 
 void
@@ -262,13 +276,13 @@ DeformableModelApplication
 ::RefreshMeshVisualization()
 {
    int numPoints =  m_SimplexMeshToShow->GetNumberOfPoints();
-  
+
  if (numPoints == 0)
    {
      fl_alert( "no points in Grid ");
-     return; 
+     return;
    }
- 
+
  // fill in here the conversion between itkMesh versus vtkUnstructuredGrid
 
  vtkPolyData* vgrid = vtkPolyData::New();
@@ -276,7 +290,7 @@ DeformableModelApplication
  // Create the vtkPoints object and set the number of points
  vtkPoints* vpoints = vtkPoints::New();
  vpoints->SetNumberOfPoints(numPoints);
-  
+
  // iterate over all the points in the itk mesh filling in
  // the vtkPoints object as we go
  SimplexMeshType::PointsContainer::Pointer points = m_SimplexMeshToShow->GetPoints();
@@ -289,26 +303,26 @@ DeformableModelApplication
      // itk returns a const pointer, but vtk is not const correct, so
      // we have to use a const cast to get rid of the const
      vtkFloatingPointType * pp = const_cast<vtkFloatingPointType*>(i->Value().GetDataPointer());
-      
+
      vpoints->SetPoint(idx, pp);
-     
+
    }
 
  // Set the points on the vtk grid
  vgrid->SetPoints(vpoints);
-  
+
  // it is probably better not to add scalar to the vis mesh
  // as it makes it harder to visualize
  //  vgrid->GetPointData()->SetScalars(scalars);
  //  vgrid->GetPointData()->CopyAllOn();
- 
+
  SimplexMeshType::CellType::MultiVisitor::Pointer mv =
    SimplexMeshType::CellType::MultiVisitor::New();
 
   LineVisitor::Pointer lv = LineVisitor::New();
   PolygonVisitor::Pointer pv = PolygonVisitor::New();
   TriangleVisitor::Pointer tv = TriangleVisitor::New();
- 
+
   //set up the visitors
   int vtkCellCount = 0; // running counter for current cell inserted into vtk
   int numCells = m_SimplexMeshToShow->GetNumberOfCells();
@@ -329,7 +343,7 @@ DeformableModelApplication
     tv->SetTypeArray(types);
     tv->SetCellCounter(&vtkCellCount);
     tv->SetCellArray(cells);
-  
+
 
   // Set the TypeArray CellCount and CellArray for both visitors
   //lv->SetTypeArray(types);
@@ -338,21 +352,21 @@ DeformableModelApplication
     //  tv->SetCellCounter(&vtkCellCount);
   //lv->SetCellArray(cells);
     //  tv->SetCellArray(cells);
- 
+
   // mv->AddVisitor(lv);
   //mv->AddVisitor(tv);
   m_SimplexMeshToShow->Accept(mv);
 
 
   //vgrid->SetLines(cells);
-  //vgrid->SetStrips(cells);  
-   
+  //vgrid->SetStrips(cells);
+
 if (onlyTriangles) {
       mv->AddVisitor(tv);
       m_SimplexMeshToShow->Accept(mv);
-      vgrid->SetStrips(cells);  
+      vgrid->SetStrips(cells);
     }
-    else 
+    else
     {
       mv->AddVisitor(tv);
       mv->AddVisitor(lv);
@@ -363,28 +377,28 @@ if (onlyTriangles) {
       // cell types of the visitors added to the MultiVisitor
   m_SimplexMeshToShow->Accept(mv);
       // Now set the cells on the vtk grid with the type array and cell array
-  vgrid->SetPolys(cells);  
-      //vgrid->SetStrips(cells);  
+  vgrid->SetPolys(cells);
+      //vgrid->SetStrips(cells);
   vgrid->SetLines(cells);
     // Clean up vtk objects (no vtkSmartPointer ... )
   }
 
   cells->Delete();
   vpoints->Delete();
-   
+
   m_AxialViewer.SetSimplexMesh(vgrid);
   m_CoronalViewer.SetSimplexMesh(vgrid);
   m_SagittalViewer.SetSimplexMesh(vgrid);
   m_SimplexMeshViewer.SetSimplexMesh(vgrid);
 
- 
+
 
  return;
-  
+
 }
 
 
-void 
+void
 DeformableModelApplication
 ::ComputeInternalForces()
 {
@@ -404,13 +418,13 @@ DeformableModelApplication
   //m_GradientMagnitude->SetInput( m_GradientAnisotropicImage->GetOutput() );
   m_GradientMagnitude->SetInput(m_CastImage->GetOutput() );
   m_GradientMagnitude->SetSigma(0.5);
-  
+
   m_SigmoidImage->SetInput( m_GradientMagnitude->GetOutput());
   m_SigmoidImage->SetOutputMinimum(0);
   m_SigmoidImage->SetOutputMaximum(1);
   m_SigmoidImage->SetAlpha(230);
   m_SigmoidImage->SetBeta(1300);
-  
+
   m_GradientFilter->SetInput( m_SigmoidImage->GetOutput());
   m_GradientFilter->SetSigma( 0.5);
 
@@ -425,13 +439,13 @@ DeformableModelApplication
 }
 
 
-void 
+void
 DeformableModelApplication::IterationCallback()
 {
   // The visualization cannot be refreshed at every iteration because the
   // deformable model filter do not fully recomputes its output at every
   // iteration. It only does it when the iterations are completed.
-  // 
+  //
   // this->DeformableModelApplicationBase::IterationCallback();
   //
 }
@@ -440,21 +454,25 @@ void
 DeformableModelApplication
 ::SaveMesh()
 {
- 
+
   const char * filename = fl_file_chooser("Save Mesh As","*.vtk","");
- 
+
   if( !filename  || strlen(filename) == 0 )
     {
     return;
     }
 
   vtkPolyDataWriter *vpolywriter = vtkPolyDataWriter::New();
+#if VTK_MAJOR_VERSION <= 5
   vpolywriter->SetInput(m_SimplexMeshViewer.GetSimplexMesh());
+#else
+  vpolywriter->SetInputData(m_SimplexMeshViewer.GetSimplexMesh());
+#endif
   vpolywriter->SetFileName(filename);
   vpolywriter->Write();
 
   vpolywriter->Delete();
-      
+
 }
 
 void
@@ -467,7 +485,7 @@ DeformableModelApplication
     }
 
   const char * filename = fl_file_chooser("Save Mask As","*.mhd","");
- 
+
   if( !filename  || strlen(filename) == 0 )
     {
     return;
@@ -478,10 +496,10 @@ DeformableModelApplication
   orgn[2] = m_LoadedVolume->GetOrigin()[2];
 
   std::cout << "Converting Simplex Mesh to Triangle Mesh . . ." << std::endl;
-  
+
   m_SimplexToTriangle->SetInput(m_DeformFilter->GetOutput());
   m_SimplexToTriangle->Update();
-  
+
   TriangleMeshType::Pointer triangleMesh = m_SimplexToTriangle->GetOutput();
   triangleMesh->DisconnectPipeline();
   m_SimplexToTriangle->Delete();
@@ -492,8 +510,8 @@ DeformableModelApplication
   size[1] = m_LoadedVolume->GetBufferedRegion().GetSize()[1];
   size[2] = m_LoadedVolume->GetBufferedRegion().GetSize()[2];
   m_TriangleToImage->SetSize(size);
-  
- 
+
+
   m_TriangleToImage->SetOrigin(orgn);
   // spacing remains (1,1,1) until we make a change to deformable model class
   float spacing[3];
@@ -511,7 +529,7 @@ DeformableModelApplication
   m_ImageWriter->Update();
 }
 
-void 
+void
 DeformableModelApplication
 ::DeformMesh()
 {
@@ -521,51 +539,51 @@ DeformableModelApplication
     }
  SimplexMeshType::Pointer simplexMesh2 = m_SimplexMesh;
   const unsigned int numberOfIterationsToGo = atoi(m_IterationsValueInput->value());
- 
+
   for( unsigned int i=0; i<numberOfIterationsToGo; i++ )
     {
       std::cout << " Iteration   " << i << std::endl;
       m_SimplexMesh->DisconnectPipeline();
-      
+
       m_DeformFilter->SetInput( m_SimplexMesh );
 
-      m_DeformFilter->SetIterations(1); 
+      m_DeformFilter->SetIterations(1);
       m_DeformFilter->Update();
 
       simplexMesh2 =  m_DeformFilter->GetOutput();
-     
+
       m_SimplexMeshToShow  = m_SimplexMesh;
 
       this->RefreshMeshVisualization();
-     
+
       // force a redraw
       axialView->redraw();
       coronalView->redraw();
       sagittalView->redraw();
       surfaceView->redraw();
 
-      Fl::check(); 
+      Fl::check();
     }
 
-  
-}
-   
 
-void 
+}
+
+
+void
 DeformableModelApplication
 ::Load()
 {
 
   const char * filename = fl_file_chooser("Volume filename","*.*","");
- 
+
   if( !filename  || strlen(filename) == 0 )
     {
       return;
     }
-  
+
   m_VolumeReader->SetFileName( filename );
   m_VolumeReader->Update();
-  
+
   m_LoadedVolume = m_VolumeReader->GetOutput();
 
   this->LoadPostProcessing();
@@ -576,7 +594,7 @@ DeformableModelApplication
 
 
 
-void 
+void
 DeformableModelApplication
 ::LoadPostProcessing()
 {
@@ -593,7 +611,7 @@ DeformableModelApplication
       return;
     }
 
-  
+
   // of type ImageSliceViewer
   m_AxialViewer.SetInput(    m_ShiftScaleImageFilter->GetOutput() );
   m_CoronalViewer.SetInput(  m_ShiftScaleImageFilter->GetOutput() );
@@ -620,12 +638,12 @@ DeformableModelApplication
   m_CoronalViewer.Render();
   m_SagittalViewer.Render();
   m_SimplexMeshViewer.Render();
-  
+
 }
 
 
 
-void 
+void
 DeformableModelApplication
 ::SelectAxialSlice( int slice )
 {
@@ -636,7 +654,7 @@ DeformableModelApplication
 
 
 
-void 
+void
 DeformableModelApplication
 ::SelectCoronalSlice( int slice )
 {
@@ -647,7 +665,7 @@ DeformableModelApplication
 
 
 
-void 
+void
 DeformableModelApplication
 ::SelectSagittalSlice( int slice )
 {
@@ -658,7 +676,7 @@ DeformableModelApplication
 
 
 
-void 
+void
 DeformableModelApplication
 ::ProcessAxialViewInteraction( void )
 {
@@ -667,21 +685,21 @@ DeformableModelApplication
 }
 
 
-void  
+void
 DeformableModelApplication
 ::ProcessCoronalViewInteraction( void )
 {
-  
+
   m_CoronalViewer.GetSelectPoint( m_SeedPoint );
   this->SyncAllViews();
 }
 
 
-void  
+void
 DeformableModelApplication
 ::ProcessSagittalViewInteraction( void )
 {
-  
+
   m_SagittalViewer.GetSelectPoint( m_SeedPoint );
   this->SyncAllViews();
 }
@@ -690,12 +708,12 @@ void
 DeformableModelApplication
 ::ProcessSurfaceViewInteraction( void )
 {
-  
+
   //m_SagittalViewer.GetSelectPoint( m_SeedPoint );
   //this->SyncAllViews();
 }
 
-void 
+void
 DeformableModelApplication
 ::SyncAllViews(void)
 {
@@ -704,8 +722,8 @@ DeformableModelApplication
   point[1] = m_SeedPoint[1];
   point[2] = m_SeedPoint[2];
 
-  
-  VisualizationVolumeType::IndexType index; 
+
+  VisualizationVolumeType::IndexType index;
 
   m_LoadedVolume->TransformPhysicalPointToIndex( point, index );
 

@@ -161,7 +161,12 @@ int main(int argc, char * argv [] )
     // Create a vtkImageActor to help render the image.  Connect it to
     // the vtkImporter instance.
     vtkImageActor* actor = vtkImageActor::New();
+#if VTK_MAJOR_VERSION <= 5
     actor->SetInput(vtkImporter1->GetOutput());
+#else
+    vtkImporter1->Update();
+    actor->SetInputData(vtkImporter1->GetOutput());
+#endif
     
     vtkInteractorStyleImage * interactorStyle = vtkInteractorStyleImage::New();
 
@@ -184,7 +189,12 @@ int main(int argc, char * argv [] )
 
     // Draw contours around the segmented regions
     vtkContourFilter * contour = vtkContourFilter::New();
+#if VTK_MAJOR_VERSION <= 5
     contour->SetInput( vtkImporter2->GetOutput() );
+#else
+    vtkImporter2->Update();
+    contour->SetInputData( vtkImporter2->GetOutput() );
+#endif
     contour->SetValue(0, 128); // edges of a binary image with values 0,255
 
 
@@ -192,7 +202,12 @@ int main(int argc, char * argv [] )
     vtkActor          * polyActor  = vtkActor::New();
 
     polyActor->SetMapper( polyMapper );
+#if VTK_MAJOR_VERSION <= 5
     polyMapper->SetInput( contour->GetOutput() );
+#else
+    contour->Update();
+    polyMapper->SetInputData( contour->GetOutput() );
+#endif
     polyMapper->ScalarVisibilityOff();
     
 

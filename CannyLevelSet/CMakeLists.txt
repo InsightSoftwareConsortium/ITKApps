@@ -49,13 +49,7 @@ ADD_GUI_EXECUTABLE(CannySegmentationLevelSet "${CannySegmentationLevelSet_SRCS}"
 TARGET_LINK_LIBRARIES (
   CannySegmentationLevelSet
   ${ITK_LIBRARIES}
-  vtkRendering
-  vtkGraphics
-  vtkHybrid
-  vtkImaging
-  vtkIO
-  vtkFiltering
-  vtkCommon
+  ${VTK_LIBRARIES}
   ITKFltkImageViewer
 )
 

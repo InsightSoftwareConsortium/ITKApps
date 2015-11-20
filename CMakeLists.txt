@@ -100,7 +100,7 @@ IF(USE_VTK)
         ENDIF(NOT VTK_USE_HYBRID)
 
       # If VTK was built using Patented, add an option for using patented code
-      # in ITKApps (SNAP in particular)
+      # in ITKApps
       IF(VTK_USE_PATENTED)
         OPTION(USE_VTK_PATENTED "Use VTK Patented Libraries (optional)" OFF)
         MARK_AS_ADVANCED(USE_VTK_PATENTED)
@@ -108,15 +108,14 @@ IF(USE_VTK)
           ADD_DEFINITIONS(-DUSE_VTK_PATENTED)
         ENDIF(USE_VTK_PATENTED)
       ENDIF(VTK_USE_PATENTED)
-    ELSE( "${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}" LESS 4.5 )
+    ELSEIF( "${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}" LESS 6.0 )
         IF(NOT VTK_USE_RENDERING)
           MESSAGE("Your VTK was not built with the VTK_USE_RENDERING option ON.  "
                   "Please reconfigure and recompile VTK with this option before "
                   "trying to use it with ITK.")
           SET(VTK_FOUND 0)
-    ENDIF(NOT VTK_USE_RENDERING)
-
-    ENDIF( "${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}" LESS 4.5 )
+        ENDIF(NOT VTK_USE_RENDERING)
+    ENDIF( )
 
   ENDIF (VTK_FOUND)
 ENDIF(USE_VTK)
@@ -279,7 +278,6 @@ OPTIONAL_APP(IntensityBased2D3DRegistration)
 # and for applying basic image operations.
 OPTIONAL_APP(ConvertBetweenFileFormats)
 
-# Applications requiring MetaImages and Fltk GUI
 IF(FLTK_FOUND)
   IF(WIN32)
     ADD_DEFINITIONS(-DWIN32)
@@ -310,14 +308,11 @@ IF(FLTK_FOUND)
     OPTIONAL_APP(ShapeDetectionLevelSet)
     OPTIONAL_APP(GeodesicActiveContour)
     OPTIONAL_APP(SegmentationEditorFltkGui)
-    OPTIONAL_APP(SNAP)
     OPTIONAL_APP(LiverTumorSegmentation)
-    IF(NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION} LESS 4.5)
-      OPTIONAL_APP(DeformableModelSimplexMesh)
-if (ITK_VERSION_MAJOR STRLESS 4)
-      OPTIONAL_APP(DeformableRegistration3DTimeSeries)
-endif()
-    ENDIF(NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION} LESS 4.5)
+    OPTIONAL_APP(DeformableModelSimplexMesh)
+      IF (ITK_VERSION_MAJOR STRLESS 4)
+        OPTIONAL_APP(DeformableRegistration3DTimeSeries)
+      ENDIF()
     OPTIONAL_APP(CellularSegmentation)
     OPTIONAL_APP(ImageRegistration2D)
   ENDIF(VTK_FOUND)
@@ -383,10 +378,6 @@ IF(VTK_FOUND)
   IF(VTK_WRAP_TCL AND ITK_CSWIG_TCL)
     SET(VTK_AND_ITK_WRAPPED 1)
   ENDIF(VTK_WRAP_TCL AND ITK_CSWIG_TCL)
-
-  IF(VTK_AND_ITK_WRAPPED)
-    OPTIONAL_APP(ConnectVTKITK)
-  ENDIF(VTK_AND_ITK_WRAPPED)
 
 ENDIF(VTK_FOUND)
 

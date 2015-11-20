@@ -130,12 +130,22 @@ int main(int argc, char * argv [] )
     vtkImporter->Update();
      
     vtkContourFilter * contour = vtkContourFilter::New();
+#if VTK_MAJOR_VERSION <= 5
     contour->SetInput( vtkImporter->GetOutput() );
+#else
+    vtkImporter->Update();
+    contour->SetInputData( vtkImporter->GetOutput() );
+#endif
     contour->SetValue( 0, atof( argv[3] ) );
 
     vtkPolyDataWriter * writer = vtkPolyDataWriter::New();
     writer->SetFileName(argv[2]);
+#if VTK_MAJOR_VERSION <= 5
     writer->SetInput( contour->GetOutput() );
+#else
+    contour->Update();
+    writer->SetInputData( contour->GetOutput() );
+#endif
     writer->Write();
     }
   catch( itk::ExceptionObject & e )

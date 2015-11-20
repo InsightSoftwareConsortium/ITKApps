@@ -39,7 +39,12 @@ LiverTumorSegmentation::LiverTumorSegmentation()
   
   m_ShiftScaleImageFilter = vtkImageShiftScale::New();
   
+#if VTK_MAJOR_VERSION <= 5
   m_ShiftScaleImageFilter->SetInput(  m_ITK2VTKAdaptor->GetOutput() );
+#else
+  m_ITK2VTKAdaptor->Update();
+  m_ShiftScaleImageFilter->SetInputData(  m_ITK2VTKAdaptor->GetOutput() );
+#endif
   m_ShiftScaleImageFilter->SetOutputScalarTypeToUnsignedChar();
   m_ShiftScaleImageFilter->ClampOverflowOn();
   
@@ -67,12 +72,19 @@ LiverTumorSegmentation::LiverTumorSegmentation()
   m_SegmentedVolumeRescaleIntensity->SetInput( m_SegmentedVolume );
   
   m_vtkImageBlender = vtkImageBlend::New();
+#if VTK_MAJOR_VERSION <= 5
   m_vtkImageBlender->SetInput( 0, m_ITK2VTKAdaptor->GetOutput() );
   m_vtkImageBlender->SetInput( 1, m_SegmentedVolumeITK2VTKAdaptor->GetOutput() );
+  m_ShiftScaleImageFilter->SetInput( m_ITK2VTKAdaptor->GetOutput() );
+#else
+  m_vtkImageBlender->SetInputData( 0, m_ITK2VTKAdaptor->GetOutput() );
+  m_SegmentedVolumeITK2VTKAdaptor->Update();
+  m_vtkImageBlender->SetInputData( 1, m_SegmentedVolumeITK2VTKAdaptor->GetOutput() );
+  m_ShiftScaleImageFilter->SetInputData( m_ITK2VTKAdaptor->GetOutput() );
+#endif
   m_vtkImageBlender->SetOpacity(0, 1.0 - m_SegmentedVolumeOpacity );
   m_vtkImageBlender->SetOpacity(1, m_SegmentedVolumeOpacity );
   
-  m_ShiftScaleImageFilter->SetInput( m_ITK2VTKAdaptor->GetOutput() );
   
 //  m_ShowVolumeView = true;
   
@@ -133,7 +145,12 @@ void LiverTumorSegmentation::Load( void )
   if (LiverTumorSegmentationBase::Load( filename ) )
     {
     /* Put off Image Blending. Show only the loaded image. */
+#if VTK_MAJOR_VERSION <= 5
     m_ShiftScaleImageFilter->SetInput( m_ITK2VTKAdaptor->GetOutput() );
+#else
+    m_ITK2VTKAdaptor->Update();
+    m_ShiftScaleImageFilter->SetInputData( m_ITK2VTKAdaptor->GetOutput() );
+#endif
 
     /* Switch off Opacity Control knob. */
     this->SetSegmentedVolumeOpacityControlOff();
@@ -572,7 +589,12 @@ void LiverTumorSegmentation::OnSegmentation( void )
   m_SegmentedVolumeRescaleIntensity->SetInput( m_SegmentedVolume );
       
   /* Put on Image Blending with Input and Segmented image. */
+#if VTK_MAJOR_VERSION <= 5
   m_ShiftScaleImageFilter->SetInput( m_vtkImageBlender->GetOutput() );
+#else
+  m_vtkImageBlender->Update();
+  m_ShiftScaleImageFilter->SetInputData( m_vtkImageBlender->GetOutput() );
+#endif
   m_ShiftScaleImageFilter->UpdateWholeExtent();
       
   m_AxialViewer.Render();

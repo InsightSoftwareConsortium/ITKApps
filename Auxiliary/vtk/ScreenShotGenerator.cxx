@@ -98,7 +98,12 @@ int main(int argc, char * argv [] )
 
   windowToImageFilter->SetInput( renderWindow );
 
+#if VTK_MAJOR_VERSION <= 5
   writer->SetInput( windowToImageFilter->GetOutput() );
+#else
+  windowToImageFilter->Update();
+  writer->SetInputData( windowToImageFilter->GetOutput() );
+#endif
   
 
   renderWindow->SetSize( 1024, 1024);
@@ -114,7 +119,12 @@ int main(int argc, char * argv [] )
   actor->SetMapper( mapper );
   mapper->ScalarVisibilityOff();
 
+#if VTK_MAJOR_VERSION <= 5
   mapper->SetInput( reader->GetOutput() );
+#else
+  reader->Update();
+  mapper->SetInputData( reader->GetOutput() );
+#endif
 
   property->SetAmbient(0.0);
   property->SetDiffuse(1.0);

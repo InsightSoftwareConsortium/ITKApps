@@ -26,10 +26,14 @@ ImageSliceViewer
 
   m_Renderer->AddActor( m_Actor );
 
+  m_Actor->Delete();
+
   m_Camera = m_Renderer->GetActiveCamera();
   m_Camera->ParallelProjectionOn();
 
   m_RenderWindow->AddRenderer( m_Renderer );
+
+  m_Renderer->Delete();
 
   this->SetOrientation( Axial );
 
@@ -47,10 +51,15 @@ ImageSliceViewer
   m_Renderer->SetBackground( 0, 0, 0 );
 
   m_Sphere       = vtkSphereSource::New();
-  m_SphereActor  = vtkActor::New();  
+  m_SphereActor  = vtkActor::New();
   m_SphereMapper = vtkPolyDataMapper::New();
 
-  m_SphereMapper->SetInput( m_Sphere->GetOutput() );  
+#if VTK_MAJOR_VERSION <= 5
+  m_SphereMapper->SetInput( m_Sphere->GetOutput() );
+#else
+  m_Sphere->Update();
+  m_SphereMapper->SetInputData( m_Sphere->GetOutput() );
+#endif
   m_SphereActor->SetMapper( m_SphereMapper );
   m_SphereActor->GetProperty()->SetColor(0,1,0); // set to red
 
@@ -79,7 +88,11 @@ void
 ImageSliceViewer
 ::SetInput( vtkImageData * image )
 {
+#if VTK_MAJOR_VERSION <= 5
   m_Actor->SetInput( image );
+#else
+  m_Actor->SetInputData( image );
+#endif
   m_Renderer->AddActor( m_SphereActor );
   this->SetupCamera();
 }
@@ -144,12 +157,12 @@ ImageSliceViewer
   m_Camera->SetPosition (   position );
   m_Camera->SetFocalPoint ( focalPoint );
 
-#define myMAX(x,y) (((x)>(y))?(x):(y))  
+#define myMAX(x,y) (((x)>(y))?(x):(y))
 
    int d1 = (idx + 1) % 3;
    int d2 = (idx + 2) % 3;
- 
-  double max = myMAX( 
+
+  double max = myMAX(
     spacing[d1] * dimensions[d1],
     spacing[d2] * dimensions[d2]);
 
@@ -200,7 +213,7 @@ void
   ImageSliceViewer
 ::SelectSlice( int slice )
 {
-  if (!m_Actor->GetInput()) 
+  if (!m_Actor->GetInput())
     {
     return;     // return, if no image is loaded yet.
     }
@@ -244,7 +257,7 @@ void
 ImageSliceViewer
 ::SelectPoint( int x, int y )
 {
-  if (!m_Actor->GetInput()) 
+  if (!m_Actor->GetInput())
     {
     return;     // return, if no image is loaded yet.
     }
@@ -296,23 +309,23 @@ ImageSliceViewer
 
   // At this point we have 3D position in the variable wpoint
   this->SelectPoint(wpoint[0], wpoint[1], wpoint[2]);
-  
- 
+
+
   m_Notifier->InvokeEvent( ClickedPointEvent() );
 }
 
-void  
+void
 ImageSliceViewer::SelectPoint( double x, double y, double z )
 {
-  
-  if (!m_Actor->GetInput()) 
+
+  if (!m_Actor->GetInput())
     {
     return;     // return, if no image is loaded yet.
     }
   m_SelectPoint[0] = x;
   m_SelectPoint[1] = y;
   m_SelectPoint[2] = z;
-  
+
   m_SphereActor->SetPosition( x, y, z );
 
   int dimensions[3] = { 100, 100, 100 };
@@ -323,7 +336,7 @@ ImageSliceViewer::SelectPoint( double x, double y, double z )
     }
 }
 
-void 
+void
 ImageSliceViewer::GetSelectPoint(double data[3])
 {
   for(int i=0; i<3; i++)
@@ -333,14 +346,14 @@ ImageSliceViewer::GetSelectPoint(double data[3])
 }
 
 
-unsigned long 
+unsigned long
 ImageSliceViewer::AddObserver( const itk::EventObject & event, itk::Command * command)
 {
   return m_Notifier->AddObserver( event, command );
 }
 
 
-vtkRenderer * 
+vtkRenderer *
 ImageSliceViewer::GetRenderer()
 {
   return m_Renderer;

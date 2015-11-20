@@ -160,7 +160,11 @@ void vtkRegistrationMonitor::StartVisualization()
 
   // Setup the Fixed Surface infrastructure
   this->FixedActor->SetMapper( this->FixedMapper );
+#if VTK_MAJOR_VERSION <= 5
   this->FixedMapper->SetInput( this->FixedSurface );
+#else
+  this->FixedMapper->SetInputData( this->FixedSurface );
+#endif
   this->FixedMapper->ScalarVisibilityOff();
 
   this->FixedProperty->SetAmbient(0.1);
@@ -175,7 +179,11 @@ void vtkRegistrationMonitor::StartVisualization()
 
   // Setup the Moving Surface infrastructure
   this->MovingActor->SetMapper( this->MovingMapper );
+#if VTK_MAJOR_VERSION <= 5
   this->MovingMapper->SetInput( this->MovingSurface );
+#else
+  this->MovingMapper->SetInputData( this->MovingSurface );
+#endif
   this->MovingMapper->ScalarVisibilityOff();
 
   this->MovingProperty->SetAmbient(0.1);
@@ -285,7 +293,11 @@ void vtkRegistrationMonitor::Update()
 
   windowToImageFilter->Update();
 
+#if VTK_MAJOR_VERSION <= 5
   writer->SetInput( windowToImageFilter->GetOutput() );
+#else
+  writer->SetInputData( windowToImageFilter->GetOutput() );
+#endif
   
   writer->SetFileName( screenshotFileName.str().c_str() );
   
@@ -293,7 +305,11 @@ void vtkRegistrationMonitor::Update()
   
   writer->Write();
 
+#if VTK_MAJOR_VERSION <= 5
   writer->SetInput( NULL );
+#else
+  writer->SetInputData( NULL );
+#endif
   windowToImageFilter->SetInput( NULL );
 
   windowToImageFilter->Delete();
