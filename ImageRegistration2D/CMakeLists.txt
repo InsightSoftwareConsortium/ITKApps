@@ -43,6 +43,5 @@ ADD_GUI_EXECUTABLE(ImageRegistration2D "${ImageRegistration2D_SRCS}")
 
 TARGET_LINK_LIBRARIES(ImageRegistration2D ITKFltkImageViewer
                       ${ITK_LIBRARIES}
-                      vtkRendering vtkGraphics vtkHybrid
-                      vtkImaging vtkIO vtkFiltering vtkCommon
+                      ${VTK_LIBRARIES}
 )

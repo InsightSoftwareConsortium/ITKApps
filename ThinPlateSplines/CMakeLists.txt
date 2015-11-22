@@ -39,7 +39,7 @@ ADD_EXECUTABLE(ThinPlateSplines ThinPlateSplinesApplicationBase.cxx ThinPlateSpl
 INSTALL_TARGETS(/bin ThinPlateSplines)
 
 TARGET_LINK_LIBRARIES(ThinPlateSplines ${ITK_LIBRARIES}
-                      ITKFltkImageViewer ITKVtkFltk vtkHybrid)
+                      ITKFltkImageViewer ITKVtkFltk ${VTK_LIBRARIES})
 IF(CMAKE_COMPILER_IS_GNUCXX)
   SET_SOURCE_FILES_PROPERTIES (ThinPlateSplinesApplication.cxx PROPERTIES COMPILE_FLAGS -Wno-cast-qual)
   SET_SOURCE_FILES_PROPERTIES (main.cxx PROPERTIES COMPILE_FLAGS -Wno-cast-qual)

@@ -13,7 +13,7 @@ INCLUDE_DIRECTORIES(
 
 TARGET_LINK_LIBRARIES(ConvertBetweenFileFormats  ${ITK_LIBRARIES} )
 IF (VTK_FOUND)
-  TARGET_LINK_LIBRARIES(ConvertBetweenFileFormats vtkIO vtkCommon vtkFiltering vtkImaging )
+  TARGET_LINK_LIBRARIES(ConvertBetweenFileFormats ${VTK_LIBRARIES} )
   INCLUDE_DIRECTORIES( ${ITKApps_SOURCE_DIR}/Auxiliary/vtk )
 ENDIF (VTK_FOUND)
 
