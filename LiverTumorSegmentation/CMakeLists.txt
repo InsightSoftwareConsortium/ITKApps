@@ -95,7 +95,7 @@ TARGET_LINK_LIBRARIES( LiverTumorSegmentationExample
   LiverTumorSegmentationLibrary
   ${ITK_LIBRARIES}
   ITKFltkImageViewer ITKVtkFltk
-  vtkRendering vtkGraphics vtkHybrid vtkImaging vtkIO vtkFiltering vtkCommon
+  ${VTK_LIBRARIES}
   ${FLTK_LIBRARIES})
 
 ADD_EXECUTABLE(ResampleVolumes ResampleVolumes.cxx )

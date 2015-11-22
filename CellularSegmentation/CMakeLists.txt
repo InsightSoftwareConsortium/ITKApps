@@ -69,13 +69,7 @@ INCLUDE_DIRECTORIES(
 TARGET_LINK_LIBRARIES( CellularSegmentation
   ${ITK_LIBRARIES}
   ITKFltkImageViewer ITKVtkFltk
-  vtkCommon
-  vtkFiltering
-  vtkGraphics
-  vtkImaging
-  vtkIO
-  vtkHybrid
-  vtkRendering
+  ${VTK_LIBRARIES}
   ${FLTK_LIBRARIES}
   )
 
