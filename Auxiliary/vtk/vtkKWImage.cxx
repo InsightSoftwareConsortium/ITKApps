@@ -95,7 +95,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWImage );
-vtkCxxRevisionMacro(vtkKWImage, "$Revision: 1.1 $");
+//vtkCxxRevisionMacro(vtkKWImage, "$Revision: 1.1 $");
 
 //----------------------------------------------------------------------------
 vtkKWImage::vtkKWImage()

@@ -34,7 +34,7 @@
 #include "vtkCellArray.h"
 
 #ifndef vtkFloatingPointType
-#define vtkFloatingPointType float
+#define vtkFloatingPointType double
 #endif
 
 typedef itk::Mesh<double, 3,
