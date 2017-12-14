@@ -18,7 +18,7 @@
 
 #ifndef vtkFloatingPointType
 # define vtkFloatingPointType vtkFloatingPointType
-typedef float vtkFloatingPointType;
+typedef double vtkFloatingPointType;
 #endif
 
   /** 

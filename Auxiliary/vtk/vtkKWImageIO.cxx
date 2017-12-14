@@ -194,7 +194,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWImageIO );
-vtkCxxRevisionMacro(vtkKWImageIO, "$Revision: 1.5 $");
+//vtkCxxRevisionMacro(vtkKWImageIO, "$Revision: 1.5 $");
 
 //----------------------------------------------------------------------------
 vtkKWImageIO::vtkKWImageIO()

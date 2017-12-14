@@ -75,7 +75,7 @@ int main( int argc, char * argv [] )
 
 // This define is needed to deal with double/float changes in VTK
 #ifndef vtkFloatingPointType
-#define vtkFloatingPointType float
+#define vtkFloatingPointType double
 #endif
 
 

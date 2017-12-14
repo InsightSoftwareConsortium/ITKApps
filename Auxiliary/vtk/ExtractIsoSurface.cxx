@@ -33,6 +33,10 @@
 
 #include <vtksys/SystemTools.hxx>
 
+#ifndef vtkFloatingPointType
+#define vtkFloatingPointType double
+#endif
+
 int main( int argc, char * argv[] )
 {
   if( argc < 3 ) 
