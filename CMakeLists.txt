@@ -28,13 +28,6 @@ ELSE(ITK_FOUND)
           "Cannot build ITKApps without ITK.  Please set ITK_DIR.")
 ENDIF(ITK_FOUND)
 
-#if(${ITK_VERSION} VERSION_GREATER "4.2")
-#  if( NOT ITKV3_COMPATIBILITY)
- #   message(FATAL_ERROR
-  #          "ITK must be built with ITKV3_COMPATIBILITY ON and ITK_LEGACY_REMOVE OFF")
-  #endif()
-#endif()
-
 # On Visual Studio 8 MS deprecated C. This removes all 1.276E1265 security
 # warnings
 IF(WIN32)
@@ -353,14 +346,6 @@ IF(VTK_FOUND)
       )
     INCLUDE(${ITK_VTK_WRAP_TCL})
   ENDIF(VTK_WRAP_TCL)
-
-  #IF(VTK_WRAP_PYTHON)
-    #FIND_FILE(ITK_VTK_WRAP_PYTHON vtkWrapPython.cmake 
-     # ${VTK_SOURCE_DIR}/CMake
-     # ${VTK_DIR}/CMake
-     # )
-    #INCLUDE(${ITK_VTK_WRAP_PYTHON})
-  #ENDIF(VTK_WRAP_PYTHON)
 
   IF(VTK_WRAP_TCL)
     OPTIONAL_APP(MRIRegistration)
